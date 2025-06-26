@@ -3,6 +3,7 @@ import uuid
 from collections import defaultdict
 from operator import attrgetter
 
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import ProgrammingError, transaction
 from django.http import HttpRequest
@@ -36,6 +37,7 @@ class SemanticTileOperation:
         self.request = request
         if not self.request:
             self.request = HttpRequest()
+            self.request.user = User.objects.get(username="anonymous")
         self.save_kwargs = save_kwargs or {}
         self.transaction_id = uuid.uuid4()
 
