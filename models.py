@@ -502,10 +502,7 @@ class TileTree(TileModel):
         given the current implementation that doesn't serialize them."""
 
         datatype_factory = DataTypeFactory()
-        # Not object-oriented because TileModel.nodegroup is a property.
-        for node in Node.objects.filter(nodegroup_id=self.nodegroup_id).only(
-            "datatype"
-        ):
+        for node in self.nodegroup.node_set.all():
             if node.datatype == "semantic":
                 continue
             node_id_str = str(node.nodeid)
