@@ -71,7 +71,9 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
     def get_display_value(self, tile, node, *, details=None, **kwargs):
         if details is None:
             details = self.get_details(tile, node)
-        return ", ".join([detail["display_value"] for detail in details])
+        return ", ".join(
+            [detail["display_value"] or "" for detail in details if detail]
+        )
 
     def to_python(self, value, *, tile, **kwargs):
         if not (related_resources := self.get_related_resources(tile, value)):
