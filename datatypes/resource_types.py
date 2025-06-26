@@ -192,9 +192,9 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
         return [
             {
                 "resource_id": resource_dict["resourceId"],
-                "display_value": resource_display_value_map[
-                    resource_dict["resourceId"]
-                ],
+                "display_value": resource_display_value_map.get(
+                    resource_dict["resourceId"], _("Missing")
+                ),
             }
             for resource_dict in value
         ]
