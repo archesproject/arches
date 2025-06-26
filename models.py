@@ -193,6 +193,7 @@ class SemanticResource(ResourceInstance):
         )
 
     def refresh_from_db(self, using=None, fields=None, from_queryset=None, user=None):
+        del self._annotated_tiles
         if from_queryset is None:
             from_queryset = self.__class__.as_model(
                 self.graph.slug,
@@ -209,12 +210,14 @@ class SemanticResource(ResourceInstance):
             super().refresh_from_db(using, fields, from_queryset)
             # Retrieve aliased data from the queryset cache.
             self.aliased_data = from_queryset[0].aliased_data
+            self._annotated_tiles = from_queryset[0]._annotated_tiles
         else:
             # Django 4: good-enough riff on refresh_from_db(), but not bulletproof.
             db_instance = from_queryset.get()
             for field in db_instance._meta.concrete_fields:
                 setattr(self, field.attname, getattr(db_instance, field.attname))
             self.aliased_data = db_instance.aliased_data
+            self._annotated_tiles = from_queryset[0]._annotated_tiles
 
 
 class SemanticTile(TileModel):
