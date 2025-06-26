@@ -148,7 +148,7 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
             else:
                 ret.append(
                     {
-                        "resource_id": str(related.pk),
+                        "resource_id": None,
                         "display_value": _("Missing"),
                     }
                 )
