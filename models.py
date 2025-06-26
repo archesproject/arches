@@ -416,8 +416,6 @@ class SemanticTile(TileModel):
                 node_value = blank_tile.data.get(str(node.pk))
                 blank_tile.set_aliased_data(node, node_value)
 
-        # Signify that the tile is not yet saved.
-        blank_tile.pk = None
         return blank_tile
 
     def fill_blanks(self):
