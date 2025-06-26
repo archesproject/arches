@@ -125,8 +125,11 @@ class List(models.Model):
 
         reordered_items = []
         exclude_fields = field_names(ListItem()) - {"sortorder", "parent_id"}
+        existing_items = ListItem.objects.filter(pk__in=sortorder_map).in_bulk()
+
         for item_id, sortorder in sortorder_map.items():
-            item = ListItem(pk=uuid.UUID(item_id), sortorder=sortorder)
+            item = existing_items[uuid.UUID(item_id)]
+            item.sortorder = sortorder
             if item_id in parent_map:
                 new_parent = parent_map[item_id]
                 item.parent_id = uuid.UUID(new_parent) if new_parent else None
