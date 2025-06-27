@@ -1,6 +1,5 @@
 from http import HTTPStatus
 from uuid import UUID
-import json
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -9,14 +8,12 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 
 from arches.app.models.utils import field_names
-from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.decorators import group_required
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
 from arches.app.utils.string_utils import str_to_bool
 from arches.app.views.api import APIBase
-from arches.app.views.search import search_terms
 from arches_controlled_lists.models import (
     List,
     ListItem,
@@ -25,7 +22,6 @@ from arches_controlled_lists.models import (
     ListItemValue,
     NodeProxy,
 )
-from arches_controlled_lists.search_indexes.reference_index import ReferenceIndex
 
 
 def _prefetch_terms(request):
@@ -51,9 +47,6 @@ def _prefetch_terms(request):
     return terms
 
 
-@method_decorator(
-    group_required("RDM Administrator", raise_exception=True), name="dispatch"
-)
 class ListsView(APIBase):
     def get(self, request):
         """Returns either a flat representation (?flat=true) or a tree (default)."""
@@ -78,9 +71,6 @@ class ListsView(APIBase):
         return JSONResponse({"controlled_lists": serialized})
 
 
-@method_decorator(
-    group_required("RDM Administrator", raise_exception=True), name="dispatch"
-)
 class ListView(APIBase):
     def get(self, request, list_id):
         """Returns either a flat representation (?flat=true) or a tree (default)."""
@@ -97,6 +87,9 @@ class ListView(APIBase):
 
         return JSONResponse(serialized)
 
+    @method_decorator(
+        group_required("RDM Administrator", raise_exception=True), name="dispatch"
+    )
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
         lst = List(name=data.get("name", None))
@@ -109,6 +102,9 @@ class ListView(APIBase):
         lst.save()
         return JSONResponse(lst.serialize(), status=HTTPStatus.CREATED)
 
+    @method_decorator(
+        group_required("RDM Administrator", raise_exception=True), name="dispatch"
+    )
     def patch(self, request, list_id):
         data = JSONDeserializer().deserialize(request.body)
         data.pop("items", None)
@@ -141,6 +137,9 @@ class ListView(APIBase):
 
         return JSONResponse(status=HTTPStatus.NO_CONTENT)
 
+    @method_decorator(
+        group_required("RDM Administrator", raise_exception=True), name="dispatch"
+    )
     def delete(self, request, list_id):
         try:
             list_to_delete = List.objects.get(pk=list_id)
