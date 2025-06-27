@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import InputText from "primevue/inputtext";
+import Textarea from "primevue/textarea";
 import Message from "primevue/message";
 
 import { FormField, type FormFieldResolverOptions } from "@primevue/forms";
@@ -30,9 +30,9 @@ function validate(e: FormFieldResolverOptions) {
         :initial-value="props.initialValue"
         :resolver="resolver"
     >
-        <InputText
-            type="text"
+        <Textarea
             :fluid="true"
+            style="resize: vertical"
         />
         <Message
             v-for="error in $field.errors"
