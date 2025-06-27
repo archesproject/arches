@@ -62,9 +62,10 @@ function extractInitialOrDefaultValue(
                 formatValForPrimevue(reference),
             );
         } else if (defaultVal) {
-            extractedVals = defaultVal?.map((reference) =>
-                formatValForPrimevue(reference),
-            );
+            extractedVals = defaultVal?.reduce((acc, reference) => {
+                const formatted = formatValForPrimevue(reference);
+                return { ...acc, ...formatted };
+            }, {});
         }
     } else {
         if (initialVal && initialVal.length > 0) {
