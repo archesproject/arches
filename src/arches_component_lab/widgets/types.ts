@@ -15,6 +15,7 @@ export interface NewResourceInstance {
 export interface ResourceInstanceReference {
     resource_id: string;
     display_value: string;
+    interchange_value?: string;
     ontologyProperty?: string;
     resourceXresourceId?: string;
     inverseOntologyProperty?: string;
