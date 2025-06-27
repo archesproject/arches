@@ -6,7 +6,7 @@ from django.db import models
 from django.utils.translation import gettext as _
 
 from arches import VERSION as arches_version
-from arches.app.models.models import Node, ResourceXResource
+from arches.app.models.models import Node
 
 from arches_querysets.datatypes.datatypes import DataTypeFactory
 from arches_querysets.utils.models import (
@@ -22,7 +22,10 @@ class TileTreeManager(models.Manager):
         qs = super().get_queryset().select_related("nodegroup", "parenttile")
         if arches_version >= (8, 0):
             qs = qs.select_related("nodegroup__grouping_node")
-            qs = qs.prefetch_related("nodegroup__children__node_set")
+            qs = qs.prefetch_related(
+                "nodegroup__children__node_set",
+                "resourceinstance__from_resxres__to_resource",
+            )
         else:
             # Annotate nodegroup_alias on Arches 7.6.
             qs = qs.annotate(
@@ -31,7 +34,10 @@ class TileTreeManager(models.Manager):
                     nodegroup__tilemodel=models.OuterRef("tileid"),
                 ).values("alias")[:1]
             )
-            qs = qs.prefetch_related("nodegroup__nodegroup_set__node_set")
+            qs = qs.prefetch_related(
+                "nodegroup__nodegroup_set__node_set",
+                "resourceinstance__resxres_resource_instance_ids_from__resourceinstanceidto",
+            )
         return qs
 
 
@@ -123,17 +129,7 @@ class TileTreeQuerySet(models.QuerySet):
                 )
             )
 
-        qs = qs.alias(**node_alias_expressions).order_by("sortorder")
-
-        qs = qs.prefetch_related(
-            models.Prefetch(
-                "resourceinstance",
-                ResourceTileTree.objects.with_related_resource_display_names(
-                    nodes=self._queried_nodes
-                ),
-            ),
-        )
-        return qs
+        return qs.alias(**node_alias_expressions).order_by("sortorder")
 
     def _prefetch_related_objects(self):
         """Hook into QuerySet evaluation to customize the result."""
@@ -332,28 +328,6 @@ class ResourceTileTreeQuerySet(models.QuerySet):
                 to_attr="_annotated_tiles",
             ),
         ).alias(**node_sql_aliases)
-
-    def with_related_resource_display_names(self, nodes=None):
-        if arches_version >= (8, 0):
-            return self.prefetch_related(
-                models.Prefetch(
-                    "from_resxres",
-                    queryset=ResourceXResource.objects.filter(
-                        node__in=nodes
-                    ).prefetch_related("to_resource"),
-                    to_attr="from_resxres_for_queried_nodes",
-                ),
-            )
-        else:
-            return self.prefetch_related(
-                models.Prefetch(
-                    "resxres_resource_instance_ids_from",
-                    queryset=ResourceXResource.objects.filter(
-                        nodeid__in=nodes
-                    ).prefetch_related("resourceinstanceidto"),
-                    to_attr="from_resxres_for_queried_nodes",
-                ),
-            )
 
     def _fetch_all(self):
         """Hook into QuerySet evaluation to customize the result."""

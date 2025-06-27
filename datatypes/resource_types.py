@@ -84,15 +84,10 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
         if not value:
             return []
         related_resources = []
-        try:
-            relations = tile.resourceinstance.from_resxres_for_queried_nodes
-        except:
-            if arches_version >= (8, 0):  # TODO: why?
-                relations = tile.resourceinstance.from_resxres.all()
-            else:
-                relations = (
-                    tile.resourceinstance.resxres_resource_instance_ids_from.all()
-                )
+        if arches_version >= (8, 0):
+            relations = tile.resourceinstance.from_resxres.all()
+        else:
+            relations = tile.resourceinstance.resxres_resource_instance_ids_from.all()
 
         def handle_missing_data(to_resource_id):
             msg = f"Missing ResourceXResource target: {to_resource_id}"
