@@ -17,11 +17,12 @@ export interface NewResourceInstance {
 }
 
 export interface ResourceInstanceReference {
-    resourceId: string;
-    ontologyProperty: string;
+    resource_id: string;
+    display_value: string;
+    interchange_value?: string;
+    ontologyProperty?: string;
     resourceXresourceId?: string;
-    inverseOntologyProperty: string;
-    display_value?: string;
+    inverseOntologyProperty?: string;
 }
 
 export interface ResourceInstanceResult {
@@ -47,4 +48,9 @@ export interface FileReference {
     attribution: string;
     description: string;
     title: string;
+}
+
+export interface URLDatatype {
+    url: string;
+    url_label: string;
 }

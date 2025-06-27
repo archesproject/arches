@@ -70,9 +70,7 @@ async function getOptions(page: number, filterTerm?: string) {
                 resourceRecord: ResourceInstanceResult,
             ): ResourceInstanceReference => ({
                 display_value: resourceRecord.display_value,
-                resourceId: resourceRecord.resourceinstanceid,
-                ontologyProperty: "",
-                inverseOntologyProperty: "",
+                resource_id: resourceRecord.resourceinstanceid,
             }),
         );
 
@@ -135,7 +133,7 @@ function resolver(e: FormFieldResolverOptions) {
     return {
         values: {
             [props.nodeAlias]: options.value.find((option) => {
-                return value && value === option.resourceId;
+                return value && value === option.resource_id;
             }),
         },
     };
@@ -158,14 +156,14 @@ function validate(e: FormFieldResolverOptions) {
         ref="formField"
         v-slot="$field"
         :name="props.nodeAlias"
-        :initial-value="props.value?.resourceId"
+        :initial-value="props.value?.resource_id"
         :resolver="resolver"
     >
         <Select
             :id="`${props.graphSlug}-${props.nodeAlias}-input`"
             display="chip"
             option-label="display_value"
-            option-value="resourceId"
+            option-value="resource_id"
             :filter="true"
             :filter-placeholder="$gettext('Filter Resources')"
             :fluid="true"
