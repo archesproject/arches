@@ -81,8 +81,6 @@ class TileTreeQuerySet(models.QuerySet):
             - True: calls to_json() datatype methods
             - False: calls to_python() datatype methods
         """
-        from arches_querysets.models import ResourceTileTree
-
         self._as_representation = as_representation
 
         deferred_node_aliases = {
@@ -126,6 +124,11 @@ class TileTreeQuerySet(models.QuerySet):
                         as_representation=as_representation,
                         depth=depth - 1,
                     ),
+                    # Using to_attr ensures the query results materialize into
+                    # TileTree objects rather than TileModel objects. This isn't
+                    # usually an issue, but something in the way we're overriding
+                    # ORM internals seems to require this.
+                    to_attr="_tile_trees",
                 )
             )
 
@@ -170,11 +173,7 @@ class TileTreeQuerySet(models.QuerySet):
             self._set_child_tile_data(tile)
 
     def _set_child_tile_data(self, tile):
-        if arches_version >= (8, 0):
-            fallback = getattr(tile, "children")
-        else:
-            fallback = getattr(tile, "tilemodel_set")
-        for child_tile in getattr(tile, "_annotated_tiles", fallback.all()):
+        for child_tile in getattr(tile, "_tile_trees", []):
             child_nodegroup_alias = child_tile.find_nodegroup_alias()
             if child_tile.nodegroup.cardinality == "1":
                 setattr(tile.aliased_data, child_nodegroup_alias, child_tile)
@@ -325,7 +324,7 @@ class ResourceTileTreeQuerySet(models.QuerySet):
                     permitted_nodes=self._permitted_nodes,
                     as_representation=as_representation,
                 ),
-                to_attr="_annotated_tiles",
+                to_attr="_tile_trees",
             ),
         ).alias(**node_sql_aliases)
 
@@ -367,15 +366,15 @@ class ResourceTileTreeQuerySet(models.QuerySet):
                 setattr(resource.aliased_data, grouping_node.alias, default)
 
             # Fill aliased data with top nodegroup data.
-            for annotated_tile in getattr(resource, "_annotated_tiles", []):
-                if annotated_tile.nodegroup.parentnodegroup_id:
+            for tile in getattr(resource, "_tile_trees", []):
+                if tile.nodegroup.parentnodegroup_id:
                     continue
-                nodegroup_alias = grouping_nodes[annotated_tile.nodegroup_id].alias
-                if annotated_tile.nodegroup.cardinality == "n":
+                nodegroup_alias = grouping_nodes[tile.nodegroup_id].alias
+                if tile.nodegroup.cardinality == "n":
                     tile_array = getattr(resource.aliased_data, nodegroup_alias)
-                    tile_array.append(annotated_tile)
+                    tile_array.append(tile)
                 else:
-                    setattr(resource.aliased_data, nodegroup_alias, annotated_tile)
+                    setattr(resource.aliased_data, nodegroup_alias, tile)
 
     def _clone(self):
         """Persist private attributes through the life of the QuerySet."""

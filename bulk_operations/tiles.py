@@ -68,7 +68,7 @@ class TileTreeOperation:
         else:
             self.resourceid = self.entry.pk
             self.nodegroups = []  # not necessary to populate.
-            existing_tiles = self.entry._annotated_tiles
+            existing_tiles = getattr(self.entry, "_tile_trees", [])
 
         self.grouping_nodes_by_nodegroup_id = self._get_grouping_node_lookup()
         self.existing_tiles_by_nodegroup_alias = defaultdict(list)
