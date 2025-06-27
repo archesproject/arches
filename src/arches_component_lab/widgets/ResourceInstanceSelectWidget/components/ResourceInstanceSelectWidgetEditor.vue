@@ -1,14 +1,11 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 
-import arches from "arches";
-
 import { useGettext } from "vue3-gettext";
 import { FormField } from "@primevue/forms";
 
-import Button from "primevue/button";
 import Message from "primevue/message";
-import MultiSelect from "primevue/multiselect";
+import Select from "primevue/select";
 
 import { fetchRelatableResources } from "@/arches_component_lab/widgets/api.ts";
 
@@ -22,7 +19,7 @@ import type {
 } from "@/arches_component_lab/widgets/types.ts";
 
 const props = defineProps<{
-    initialValue: ResourceInstanceReference[] | null | undefined;
+    initialValue: ResourceInstanceReference | null | undefined;
     graphSlug: string;
     nodeAlias: string;
 }>();
@@ -44,7 +41,7 @@ onMounted(async () => {
 });
 
 function clearOptions() {
-    options.value = props.initialValue || [];
+    options.value = props.initialValue ? [props.initialValue] : [];
 }
 
 function onFilter(event: MultiSelectFilterEvent) {
@@ -61,7 +58,7 @@ async function getOptions(page: number, filterTerm?: string) {
             props.nodeAlias,
             page,
             filterTerm,
-            props.initialValue,
+            props.initialValue ? [props.initialValue] : null,
         );
 
         const references = resourceData.data.map(
@@ -120,27 +117,16 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     await getOptions((resourceResultsPage.value || 0) + 1);
 }
 
-function getOption(value: string): ResourceInstanceReference | undefined {
-    const option = options.value.find((option) => option.resource_id == value);
-    return option;
-}
-
 function resolver(e: FormFieldResolverOptions) {
     validate(e);
 
     let value = e.value;
 
-    if (!Array.isArray(value)) {
-        value = [value];
-    }
-
     return {
         values: {
-            [props.nodeAlias]: options.value
-                .filter((option) => {
-                    return value?.includes(option.resource_id);
-                })
-                .map((option) => option.resource_id),
+            [props.nodeAlias]: options.value.find((option) => {
+                return value && value === option.resource_id;
+            }),
         },
     };
 }
@@ -161,12 +147,10 @@ function validate(e: FormFieldResolverOptions) {
         v-else
         v-slot="$field"
         :name="props.nodeAlias"
-        :initial-value="
-            props.initialValue?.map((resource) => resource.resource_id)
-        "
+        :initial-value="props.initialValue?.resource_id"
         :resolver="resolver"
     >
-        <MultiSelect
+        <Select
             display="chip"
             option-label="display_value"
             option-value="resource_id"
@@ -186,46 +170,7 @@ function validate(e: FormFieldResolverOptions) {
             @filter="onFilter"
             @before-show="getOptions(1)"
         >
-            <template #chip="slotProps">
-                <div style="width: 100%">
-                    <div class="chip-text">
-                        {{ getOption(slotProps.value)?.display_value }}
-                    </div>
-                </div>
-                <div class="button-container">
-                    <Button
-                        as="a"
-                        icon="pi pi-info-circle"
-                        target="_blank"
-                        variant="text"
-                        size="small"
-                        style="text-decoration: none"
-                        :href="`${arches.urls.resource_report}${slotProps.value}`"
-                        @click.stop
-                    />
-                    <Button
-                        as="a"
-                        icon="pi pi-pencil"
-                        target="_blank"
-                        variant="text"
-                        size="small"
-                        style="text-decoration: none"
-                        :href="`${arches.urls.resource_editor}${slotProps.value}`"
-                        @click.stop
-                    />
-                    <Button
-                        icon="pi pi-times"
-                        variant="text"
-                        size="small"
-                        @click.stop="
-                            (e) => {
-                                slotProps.removeCallback(e, slotProps.value);
-                            }
-                        "
-                    />
-                </div>
-            </template>
-        </MultiSelect>
+        </Select>
         <Message
             v-for="error in $field.errors"
             :key="error.message"
@@ -236,37 +181,3 @@ function validate(e: FormFieldResolverOptions) {
         </Message>
     </FormField>
 </template>
-
-<style scoped>
-.button-container {
-    display: flex;
-    justify-content: flex-end;
-}
-
-.chip-text {
-    width: min-content;
-    min-width: fit-content;
-    overflow-wrap: anywhere;
-    padding: 0.5rem 1rem;
-}
-
-:deep(.p-multiselect-label) {
-    width: inherit;
-    flex-direction: column;
-    white-space: break-spaces;
-    align-items: flex-start;
-}
-
-:deep(.p-multiselect-chip-item) {
-    width: inherit;
-    border: 0.125rem solid var(--p-inputtext-border-color);
-    padding: 0.25rem;
-    border-radius: 0.5rem;
-    margin: 0.25rem;
-}
-
-:deep(.p-multiselect-label-container) {
-    white-space: break-spaces;
-    width: inherit;
-}
-</style>

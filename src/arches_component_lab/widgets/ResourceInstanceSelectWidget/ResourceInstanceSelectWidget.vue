@@ -4,21 +4,24 @@ import { onMounted, ref } from "vue";
 import Message from "primevue/message";
 import ProgressSpinner from "primevue/progressspinner";
 
-import DateWidgetEditor from "@/arches_component_lab/widgets/DateWidget/components/DateWidgetEditor.vue";
-import DateWidgetViewer from "@/arches_component_lab/widgets/DateWidget/components/DateWidgetViewer.vue";
+import ResourceInstanceSelectWidgetEditor from "@/arches_component_lab/widgets/ResourceInstanceSelectWidget/components/ResourceInstanceSelectWidgetEditor.vue";
+import ResourceInstanceSelectWidgetViewer from "@/arches_component_lab/widgets/ResourceInstanceSelectWidget/components/ResourceInstanceSelectWidgetViewer.vue";
 
 import {
     fetchWidgetData,
     fetchNodeData,
 } from "@/arches_component_lab/widgets/api.ts";
-
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+
+import type {
+    ResourceInstanceReference,
+    WidgetMode,
+} from "@/arches_component_lab/widgets/types.ts";
 
 const props = withDefaults(
     defineProps<{
         mode: WidgetMode;
-        initialValue: string | null | undefined;
+        initialValue: ResourceInstanceReference | null | undefined;
         nodeAlias: string;
         graphSlug: string;
         showLabel?: boolean;
@@ -35,11 +38,11 @@ const configurationError = ref();
 
 onMounted(async () => {
     try {
-        nodeData.value = await fetchNodeData(props.graphSlug, props.nodeAlias);
         widgetData.value = await fetchWidgetData(
             props.graphSlug,
             props.nodeAlias,
         );
+        nodeData.value = await fetchNodeData(props.graphSlug, props.nodeAlias);
     } catch (error) {
         configurationError.value = error;
     } finally {
@@ -60,26 +63,25 @@ onMounted(async () => {
             <span v-if="nodeData.isrequired && props.mode === EDIT">*</span>
         </label>
 
-        <div :class="[nodeAlias, graphSlug].join(' ')">
-            <DateWidgetEditor
+        <div :class="[props.nodeAlias, props.graphSlug].join(' ')">
+            <ResourceInstanceSelectWidgetEditor
                 v-if="mode === EDIT"
-                :initial-value="props.initialValue"
-                :graph-slug="props.graphSlug"
+                ref="editor"
+                :initial-value="initialValue"
                 :node-alias="props.nodeAlias"
-                :widget-data="widgetData"
+                :graph-slug="props.graphSlug"
             />
-            <DateWidgetViewer
+            <ResourceInstanceSelectWidgetViewer
                 v-else-if="mode === VIEW"
-                :initial-value="props.initialValue"
-                :widget-data="widgetData"
+                :value="initialValue"
             />
         </div>
+        <Message
+            v-if="configurationError"
+            severity="error"
+            size="small"
+        >
+            {{ configurationError.message }}
+        </Message>
     </template>
-    <Message
-        v-if="configurationError"
-        severity="error"
-        size="small"
-    >
-        {{ configurationError.message }}
-    </Message>
 </template>

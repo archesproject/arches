@@ -63,15 +63,17 @@ onMounted(async () => {
             <span v-if="nodeData.isrequired && props.mode === EDIT">*</span>
         </label>
 
-        <div v-if="mode === EDIT">
+        <div :class="[nodeAlias, graphSlug].join(' ')">
             <ResourceInstanceMultiSelectWidgetEditor
+                v-if="mode === EDIT"
                 :initial-value="initialValue"
                 :node-alias="props.nodeAlias"
                 :graph-slug="props.graphSlug"
             />
-        </div>
-        <div v-if="mode === VIEW">
-            <ResourceInstanceMultiSelectWidgetViewer :value="initialValue" />
+            <ResourceInstanceMultiSelectWidgetViewer
+                v-else-if="mode === VIEW"
+                :value="initialValue"
+            />
         </div>
         <Message
             v-if="configurationError"
