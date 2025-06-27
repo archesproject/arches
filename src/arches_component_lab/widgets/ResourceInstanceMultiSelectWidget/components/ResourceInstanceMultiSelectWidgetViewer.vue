@@ -12,7 +12,7 @@ const props = defineProps<{
         :key="resourceInstance.resource_id"
     >
         <a
-            :href="`${arches.urls.resource_editor}${resourceInstance.resource_id}`"
+            :href="`${arches.urls.resource_editor}${resourceInstance.interchange_value}`"
         >
             {{ resourceInstance.display_value }}
         </a>
