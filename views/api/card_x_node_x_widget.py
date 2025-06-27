@@ -49,7 +49,7 @@ class CardXNodeXWidgetView(View):
         card_x_node_x_widget = (
             models.CardXNodeXWidget.objects.filter(query)
             .select_related()  # eagerly load all related objects
-            .get()
+            .first()
         )
 
         if not card_x_node_x_widget:
