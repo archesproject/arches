@@ -40,11 +40,6 @@ onMounted(() => {
     const acceptedFiles = props.cardXNodeXWidgetData.config.acceptedFiles;
     allowedFileTypes.value = acceptedFiles != "" ? acceptedFiles : null;
 
-    // @ts-expect-error - This is a bug in the PrimeVue types
-    formFieldRef.value!.field.states.value = {
-        newFiles: [],
-        deletedFiles: [],
-    };
     if (props.value) {
         currentValues.value = props.value;
     }
@@ -69,7 +64,7 @@ function select(event: FileUploadSelectEvent) {
     // @ts-expect-error - This is a bug in the PrimeVue types
     formFieldRef.value!.field.states.value = {
         // @ts-expect-error - This is a bug in the PrimeVue types
-        ...formFieldRef.value!.field.states.value,
+        ...(formFieldRef.value!.field.states.value ?? {}),
         newFiles: event.files,
     };
 }
@@ -78,7 +73,7 @@ function remove(event: FileUploadRemoveEvent) {
     // @ts-expect-error - This is a bug in the PrimeVue types
     formFieldRef.value!.field.states.value = {
         // @ts-expect-error - This is a bug in the PrimeVue types
-        ...formFieldRef.value!.field.states.value,
+        ...(formFieldRef.value!.field.states.value ?? {}),
         newFiles: event.files,
     };
 }
@@ -91,10 +86,10 @@ function deleteImage(fileId: string) {
     // @ts-expect-error - This is a bug in the PrimeVue types
     formFieldRef.value!.field.states.value = {
         // @ts-expect-error - This is a bug in the PrimeVue types
-        ...formFieldRef.value!.field.states.value,
+        ...(formFieldRef.value!.field.states.value ?? {}),
         deletedFiles: [
             // @ts-expect-error - This is a bug in the PrimeVue types
-            ...formFieldRef.value!.field.states.value.deletedFiles,
+            ...(formFieldRef.value!.field.states.value?.deletedFiles ?? []),
             fileId,
         ],
     };
@@ -166,7 +161,6 @@ function deleteImage(fileId: string) {
 <style scoped>
 .uploaded-images-container {
     display: flex;
-    flex-direction: column;
 }
 
 :deep(.uploaded-image img) {
