@@ -7,18 +7,18 @@ import ProgressSpinner from "primevue/progressspinner";
 import URLWidgetEditor from "@/arches_component_lab/widgets/URLWidget/components/URLWidgetEditor.vue";
 import URLWidgetViewer from "@/arches_component_lab/widgets/URLWidget/components/URLWidgetViewer.vue";
 
+import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import {
     fetchWidgetData,
     fetchNodeData,
 } from "@/arches_component_lab/widgets/api.ts";
-import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { WidgetMode, URLDatatype } from "@/arches_component_lab/widgets/types.ts";
+import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const props = withDefaults(
     defineProps<{
         mode: WidgetMode;
-        initialValue: URLDatatype | null | undefined;
+        initialValue: string | null | undefined;
         nodeAlias: string;
         graphSlug: string;
         showLabel?: boolean;
@@ -53,29 +53,30 @@ onMounted(async () => {
         v-if="isLoading"
         style="width: 2em; height: 2em"
     />
-
     <template v-else>
         <label v-if="props.showLabel">
             <span>{{ widgetData.label }}</span>
             <span v-if="nodeData.isrequired && props.mode === EDIT">*</span>
         </label>
 
-        <div v-if="mode === EDIT">
+        <div :class="[nodeAlias, graphSlug].join(' ')">
             <URLWidgetEditor
+                v-if="mode === EDIT"
                 :initial-value="initialValue"
-                :node-alias="props.nodeAlias"
                 :graph-slug="props.graphSlug"
+                :node-alias="props.nodeAlias"
+            />
+            <URLWidgetViewer
+                v-else-if="mode === VIEW"
+                :value="props.initialValue"
             />
         </div>
-        <div v-if="mode === VIEW">
-            <URLWidgetViewer :value="initialValue" />
-        </div>
-        <Message
-            v-if="configurationError"
-            severity="error"
-            size="small"
-        >
-            {{ configurationError.message }}
-        </Message>
     </template>
+    <Message
+        v-if="configurationError"
+        severity="error"
+        size="small"
+    >
+        {{ configurationError.message }}
+    </Message>
 </template>
