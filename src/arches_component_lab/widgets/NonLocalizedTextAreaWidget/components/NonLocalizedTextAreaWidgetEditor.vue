@@ -32,6 +32,8 @@ function validate(e: FormFieldResolverOptions) {
     >
         <Textarea
             :fluid="true"
+            :draggable="true"
+            :rows="12"
             style="resize: vertical"
         />
         <Message
