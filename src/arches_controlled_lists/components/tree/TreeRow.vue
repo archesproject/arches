@@ -98,22 +98,26 @@ watch(newListInput, () => {
     }
 });
 
-const rowLabel = computed(() => {
+const unstyledLabel = computed(() => {
     if (!node.data) {
         return "";
     }
-    const unstyledLabel =
+    return (
         node.data.name ??
         getItemLabel(
             node.data,
             selectedLanguage.value.code,
             systemLanguage.code,
-        ).value;
+        ).value
+    );
+});
+
+const splitFilterValue = computed(() => {
     if (!filterValue.value) {
-        return unstyledLabel;
+        return [unstyledLabel.value];
     }
     const regex = new RegExp(`(${filterValue.value})`, "gi");
-    return unstyledLabel.replace(regex, "<b>$1</b>");
+    return unstyledLabel.value.split(regex);
 });
 
 const showMoveHereButton = (rowId: string) => {
@@ -298,12 +302,13 @@ const acceptNewListShortcutEntry = async () => {
                 @keyup.enter="triggerAcceptNewListShortcut"
             />
         </div>
-        <!-- eslint-disable vue/no-v-html -->
-        <span
-            v-else
-            v-html="rowLabel"
-        />
-        <!-- eslint-enable vue/no-v-html -->
+        <span>
+            {{ splitFilterValue[0]
+            }}<template v-if="splitFilterValue[1]">
+                <b>{{ splitFilterValue[1] }}</b
+                >{{ splitFilterValue[2] }}
+            </template>
+        </span>
         <div
             v-if="movingItem"
             class="actions"
