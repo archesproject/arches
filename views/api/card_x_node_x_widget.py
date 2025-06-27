@@ -52,6 +52,22 @@ class CardXNodeXWidgetView(View):
             .get()
         )
 
+        if not card_x_node_x_widget:
+            # Supply default widget configuration.
+            nodes = models.Node.objects.filter(graph__slug=graph_slug, alias=node_alias)
+            if arches_version >= (8, 0):
+                nodes = nodes.filter(source_identifier=None)
+            node = nodes.get()
+            datatype_factory = DataTypeFactory()
+            d_data_type = datatype_factory.datatypes[node.datatype]
+            default_widget = d_data_type.defaultwidget
+            card_x_node_x_widget = models.CardXNodeXWidget(
+                node=node,
+                card=node.nodegroup.cardmodel_set.first(),
+                widget=default_widget,
+                config=default_widget.defaultconfig,
+            )
+
         serialized = serialize_card_x_node_x_widget(
             card_x_node_x_widget, DataTypeFactory()
         )
