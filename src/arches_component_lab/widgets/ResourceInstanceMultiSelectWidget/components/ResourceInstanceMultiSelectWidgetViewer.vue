@@ -9,10 +9,10 @@ const props = defineProps<{
 <template>
     <div
         v-for="resourceInstance in props.value"
-        :key="resourceInstance.resourceId"
+        :key="resourceInstance.resource_id"
     >
         <a
-            :href="`${arches.urls.resource_editor}${resourceInstance.resourceId}`"
+            :href="`${arches.urls.resource_editor}${resourceInstance.resource_id}`"
         >
             {{ resourceInstance.display_value }}
         </a>

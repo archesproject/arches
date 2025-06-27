@@ -65,7 +65,7 @@ export const fetchRelatableResources = async (
         params.append("filter_term", filterTerm);
     }
     initialValues?.forEach((initialValue) =>
-        params.append("initialValue", initialValue.resourceId),
+        params.append("initialValue", initialValue.resource_id),
     );
     const response = await fetch(
         `${arches.urls.api_relatable_resources(

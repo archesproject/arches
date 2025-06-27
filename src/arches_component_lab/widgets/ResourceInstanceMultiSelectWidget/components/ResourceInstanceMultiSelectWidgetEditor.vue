@@ -69,9 +69,7 @@ async function getOptions(page: number, filterTerm?: string) {
                 resourceRecord: ResourceInstanceResult,
             ): ResourceInstanceReference => ({
                 display_value: resourceRecord.display_value,
-                resourceId: resourceRecord.resourceinstanceid,
-                ontologyProperty: "",
-                inverseOntologyProperty: "",
+                resource_id: resourceRecord.resourceinstanceid,
             }),
         );
 
@@ -123,7 +121,7 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
 }
 
 function getOption(value: string): ResourceInstanceReference | undefined {
-    const option = options.value.find((option) => option.resourceId == value);
+    const option = options.value.find((option) => option.resource_id == value);
     return option;
 }
 
@@ -138,9 +136,11 @@ function resolver(e: FormFieldResolverOptions) {
 
     return {
         values: {
-            [props.nodeAlias]: options.value.filter((option) => {
-                return value?.includes(option.resourceId);
-            }),
+            [props.nodeAlias]: options.value
+                .filter((option) => {
+                    return value?.includes(option.resource_id);
+                })
+                .map((option) => option.resource_id),
         },
     };
 }
@@ -162,14 +162,14 @@ function validate(e: FormFieldResolverOptions) {
         v-slot="$field"
         :name="props.nodeAlias"
         :initial-value="
-            props.initialValue?.map((resource) => resource.resourceId)
+            props.initialValue?.map((resource) => resource.resource_id)
         "
         :resolver="resolver"
     >
         <MultiSelect
             display="chip"
             option-label="display_value"
-            option-value="resourceId"
+            option-value="resource_id"
             :filter="true"
             :filter-placeholder="$gettext('Filter Resources')"
             :fluid="true"
