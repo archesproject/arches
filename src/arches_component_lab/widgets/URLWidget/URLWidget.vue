@@ -1,82 +1,66 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-
-import Message from "primevue/message";
-import ProgressSpinner from "primevue/progressspinner";
-
+import GenericWidget from "@/arches_component_lab/widgets/components/GenericWidget.vue";
 import URLWidgetEditor from "@/arches_component_lab/widgets/URLWidget/components/URLWidgetEditor.vue";
 import URLWidgetViewer from "@/arches_component_lab/widgets/URLWidget/components/URLWidgetViewer.vue";
 
-import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
-import {
-    fetchWidgetData,
-    fetchNodeData,
-} from "@/arches_component_lab/widgets/api.ts";
-
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
+import type {
+    URLDatatype,
+    WidgetMode,
+} from "@/arches_component_lab/widgets/types.ts";
 
 const props = withDefaults(
     defineProps<{
         mode: WidgetMode;
-        initialValue: string | null | undefined;
         nodeAlias: string;
         graphSlug: string;
+        cardXNodeXWidgetData?: CardXNodeXWidget;
+        value?: URLDatatype | null | undefined;
         showLabel?: boolean;
     }>(),
     {
+        cardXNodeXWidgetData: undefined,
+        initialValue: undefined,
         showLabel: true,
+        value: undefined,
     },
 );
 
-const isLoading = ref(true);
-const nodeData = ref();
-const widgetData = ref();
-const configurationError = ref();
-
-onMounted(async () => {
-    try {
-        widgetData.value = await fetchWidgetData(
-            props.graphSlug,
-            props.nodeAlias,
-        );
-        nodeData.value = await fetchNodeData(props.graphSlug, props.nodeAlias);
-    } catch (error) {
-        configurationError.value = error;
-    } finally {
-        isLoading.value = false;
-    }
-});
+const emit = defineEmits(["update:isDirty", "update:value"]);
 </script>
 
 <template>
-    <ProgressSpinner
-        v-if="isLoading"
-        style="width: 2em; height: 2em"
-    />
-    <template v-else>
-        <label v-if="props.showLabel">
-            <span>{{ widgetData.label }}</span>
-            <span v-if="nodeData.isrequired && props.mode === EDIT">*</span>
-        </label>
-
-        <div :class="[nodeAlias, graphSlug].join(' ')">
-            <URLWidgetEditor
-                v-if="mode === EDIT"
-                :initial-value="initialValue"
-                :graph-slug="props.graphSlug"
-                :node-alias="props.nodeAlias"
-            />
-            <URLWidgetViewer
-                v-else-if="mode === VIEW"
-                :value="props.initialValue"
-            />
-        </div>
-    </template>
-    <Message
-        v-if="configurationError"
-        severity="error"
-        size="small"
+    <GenericWidget
+        :graph-slug="props.graphSlug"
+        :node-alias="props.nodeAlias"
+        :mode="props.mode"
+        :show-label="props.showLabel"
+        :card-x-node-x-widget-data="cardXNodeXWidgetData"
     >
-        {{ configurationError.message }}
-    </Message>
+        <template #editor="slotProps">
+            <URLWidgetEditor
+                :card-x-node-x-widget-data="slotProps.cardXNodeXWidgetData"
+                :graph-slug="graphSlug"
+                :node-alias="nodeAlias"
+                :value="props.value"
+                @update:value="emit('update:value', $event)"
+                @update:is-dirty="emit('update:isDirty', $event)"
+            />
+        </template>
+        <template #viewer="slotProps">
+            <URLWidgetViewer
+                :card-x-node-x-widget-data="slotProps.cardXNodeXWidgetData"
+                :value="props.value"
+            />
+        </template>
+    </GenericWidget>
 </template>
+
+<style scoped>
+.widget {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    width: 100%;
+}
+</style>

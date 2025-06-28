@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, useTemplateRef } from "vue";
 
 import { useGettext } from "vue3-gettext";
 import { FormField } from "@primevue/forms";
@@ -19,14 +19,18 @@ import type {
 } from "@/arches_component_lab/widgets/types.ts";
 
 const props = defineProps<{
-    initialValue: ResourceInstanceReference | null | undefined;
     graphSlug: string;
     nodeAlias: string;
+    value: ResourceInstanceReference | null | undefined;
 }>();
+
+const emit = defineEmits(["update:isDirty", "update:value"]);
 
 const { $gettext } = useGettext();
 
 const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidget config
+
+const formFieldRef = useTemplateRef("formField");
 
 const options = ref<ResourceInstanceReference[]>([]);
 const isLoading = ref(false);
@@ -41,7 +45,7 @@ onMounted(async () => {
 });
 
 function clearOptions() {
-    options.value = props.initialValue ? [props.initialValue] : [];
+    options.value = props.value ? [props.value] : [];
 }
 
 function onFilter(event: MultiSelectFilterEvent) {
@@ -58,7 +62,7 @@ async function getOptions(page: number, filterTerm?: string) {
             props.nodeAlias,
             page,
             filterTerm,
-            props.initialValue ? [props.initialValue] : null,
+            props.value ? [props.value] : null,
         );
 
         const references = resourceData.data.map(
@@ -122,6 +126,10 @@ function resolver(e: FormFieldResolverOptions) {
 
     let value = e.value;
 
+    // @ts-expect-error This is a bug with PrimeVue types
+    emit("update:isDirty", Boolean(formFieldRef.value!.fieldAttrs.dirty));
+    emit("update:value", value);
+
     return {
         values: {
             [props.nodeAlias]: options.value.find((option) => {
@@ -145,12 +153,14 @@ function validate(e: FormFieldResolverOptions) {
     </Message>
     <FormField
         v-else
+        ref="formField"
         v-slot="$field"
         :name="props.nodeAlias"
-        :initial-value="props.initialValue?.resource_id"
+        :initial-value="props.value?.resource_id"
         :resolver="resolver"
     >
         <Select
+            :id="`${props.graphSlug}-${props.nodeAlias}-input`"
             display="chip"
             option-label="display_value"
             option-value="resource_id"

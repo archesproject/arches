@@ -7,32 +7,28 @@ import FileUpload from "primevue/fileupload";
 import Image from "primevue/image";
 import Button from "primevue/button";
 import { FormField } from "@primevue/forms";
+
 import type {
     FileUploadRemoveEvent,
     FileUploadSelectEvent,
 } from "primevue/fileupload";
 import type { FormFieldResolverOptions } from "@primevue/forms";
 import type { FileReference } from "@/arches_component_lab/widgets/types.ts";
+import type { CardXNodeXWidget } from "@/arches_component_lab/types";
 
 const { $gettext } = useGettext();
 const allowedFileTypes = ref();
 const props = defineProps<{
-    initialValue: FileReference[] | null | undefined;
+    value: FileReference[] | null | undefined;
     graphSlug: string;
     nodeAlias: string;
-    widgetData: {
+    cardXNodeXWidgetData: CardXNodeXWidget & {
         config: {
             acceptedFiles: string;
+            maxFiles: number;
             maxFilesize: number;
             rerender: boolean;
             label: string;
-        };
-    };
-    nodeData: {
-        config: {
-            imagesOnly: boolean;
-            maxFiles: number;
-            maxFileSize: number;
         };
     };
 }>();
@@ -41,21 +37,22 @@ const formFieldRef = useTemplateRef("formFieldRef");
 const currentValues = ref<FileReference[]>();
 
 onMounted(() => {
-    const acceptedFiles = props.widgetData.config.acceptedFiles;
+    const acceptedFiles = props.cardXNodeXWidgetData.config.acceptedFiles;
     allowedFileTypes.value = acceptedFiles != "" ? acceptedFiles : null;
 
-    if (props.initialValue) {
-        currentValues.value = props.initialValue;
+    if (props.value) {
+        currentValues.value = props.value;
     }
 });
 
 const currentMax = computed(() => {
     if (currentValues.value) {
         return (
-            props.nodeData.config.maxFiles - (currentValues.value.length ?? 0)
+            props.cardXNodeXWidgetData.config.maxFiles -
+            (currentValues.value.length ?? 0)
         );
     } else {
-        return props.nodeData.config.maxFiles;
+        return props.cardXNodeXWidgetData.config.maxFiles;
     }
 });
 
@@ -113,7 +110,7 @@ function deleteImage(fileId: string) {
         ref="formFieldRef"
         v-slot="$field"
         :name="props.nodeAlias"
-        :initial-value="props.initialValue"
+        :initial-value="props.value"
         :resolver="resolver"
     >
         <div class="uploaded-images-container">

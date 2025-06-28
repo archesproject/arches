@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, useTemplateRef } from "vue";
 
 import arches from "arches";
 
@@ -22,14 +22,18 @@ import type {
 } from "@/arches_component_lab/widgets/types.ts";
 
 const props = defineProps<{
-    initialValue: ResourceInstanceReference[] | null | undefined;
+    value: ResourceInstanceReference[] | null | undefined;
     graphSlug: string;
     nodeAlias: string;
 }>();
 
+const emit = defineEmits(["update:isDirty", "update:value"]);
+
 const { $gettext } = useGettext();
 
 const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidget config
+
+const formFieldRef = useTemplateRef("formField");
 
 const options = ref<ResourceInstanceReference[]>([]);
 const isLoading = ref(false);
@@ -44,7 +48,7 @@ onMounted(async () => {
 });
 
 function clearOptions() {
-    options.value = props.initialValue || [];
+    options.value = props.value || [];
 }
 
 function onFilter(event: MultiSelectFilterEvent) {
@@ -61,7 +65,7 @@ async function getOptions(page: number, filterTerm?: string) {
             props.nodeAlias,
             page,
             filterTerm,
-            props.initialValue,
+            props.value,
         );
 
         const references = resourceData.data.map(
@@ -134,6 +138,10 @@ function resolver(e: FormFieldResolverOptions) {
         value = [value];
     }
 
+    // @ts-expect-error This is a bug with PrimeVue types
+    emit("update:isDirty", Boolean(formFieldRef.value!.fieldAttrs.dirty));
+    emit("update:value", value);
+
     return {
         values: {
             [props.nodeAlias]: options.value
@@ -159,14 +167,14 @@ function validate(e: FormFieldResolverOptions) {
     </Message>
     <FormField
         v-else
+        ref="formField"
         v-slot="$field"
         :name="props.nodeAlias"
-        :initial-value="
-            props.initialValue?.map((resource) => resource.resource_id)
-        "
+        :initial-value="props.value?.map((resource) => resource.resource_id)"
         :resolver="resolver"
     >
         <MultiSelect
+            :id="`${props.graphSlug}-${props.nodeAlias}-input`"
             display="chip"
             option-label="display_value"
             option-value="resource_id"

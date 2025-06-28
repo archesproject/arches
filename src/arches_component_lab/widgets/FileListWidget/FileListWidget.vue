@@ -1,87 +1,79 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-
-import Message from "primevue/message";
-import ProgressSpinner from "primevue/progressspinner";
-
+import GenericWidget from "@/arches_component_lab/widgets/components/GenericWidget.vue";
 import FileListWidgetViewer from "@/arches_component_lab/widgets/FileListWidget/components/FileListWidgetViewer.vue";
 import FileListWidgetEditor from "@/arches_component_lab/widgets/FileListWidget/components/FileListWidgetEditor.vue";
 
-import {
-    fetchWidgetData,
-    fetchNodeData,
-} from "@/arches_component_lab/widgets/api.ts";
-import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
-
+import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 import type {
     WidgetMode,
     FileReference,
 } from "@/arches_component_lab/widgets/types.ts";
 
+interface FileListCardXNodeXWidgetData extends CardXNodeXWidget {
+    config: {
+        acceptedFiles: string;
+        maxFiles: number;
+        maxFilesize: number;
+        rerender: boolean;
+        label: string;
+    };
+}
+
 const props = withDefaults(
     defineProps<{
         mode: WidgetMode;
-        initialValue: FileReference[] | null | undefined;
         nodeAlias: string;
         graphSlug: string;
+        cardXNodeXWidgetData: FileListCardXNodeXWidgetData | undefined;
+        value?: FileReference[] | null | undefined;
         showLabel?: boolean;
     }>(),
     {
+        cardXNodeXWidgetData: undefined,
         showLabel: true,
+        value: undefined,
     },
 );
 
-const isLoading = ref(true);
-const nodeData = ref();
-const widgetData = ref();
-const configurationError = ref();
-
-onMounted(async () => {
-    try {
-        widgetData.value = await fetchWidgetData(
-            props.graphSlug,
-            props.nodeAlias,
-        );
-        nodeData.value = await fetchNodeData(props.graphSlug, props.nodeAlias);
-    } catch (error) {
-        configurationError.value = error;
-    } finally {
-        isLoading.value = false;
-    }
-});
+const emit = defineEmits(["update:isDirty", "update:value"]);
 </script>
 
 <template>
-    <ProgressSpinner
-        v-if="isLoading"
-        style="width: 2em; height: 2em"
-    />
-    <Message
-        v-else-if="configurationError"
-        severity="error"
-        size="small"
+    <GenericWidget
+        :graph-slug="props.graphSlug"
+        :node-alias="props.nodeAlias"
+        :mode="props.mode"
+        :show-label="props.showLabel"
+        :card-x-node-x-widget-data="cardXNodeXWidgetData"
     >
-        {{ configurationError.message }}
-    </Message>
-    <template v-else>
-        <label v-if="props.showLabel">
-            <span>{{ widgetData.label }}</span>
-            <span v-if="nodeData.isrequired && props.mode === EDIT">*</span>
-        </label>
-        <div :class="[nodeAlias, graphSlug].join(' ')">
+        <template #editor="slotProps">
             <FileListWidgetEditor
-                v-if="mode === EDIT"
-                :initial-value="props.initialValue"
+                :card-x-node-x-widget-data="
+                    slotProps.cardXNodeXWidgetData as FileListCardXNodeXWidgetData
+                "
                 :graph-slug="props.graphSlug"
                 :node-alias="props.nodeAlias"
-                :widget-data="widgetData"
-                :node-data="nodeData"
+                :value="props.value"
+                @update:value="emit('update:value', $event)"
+                @update:is-dirty="emit('update:isDirty', $event)"
             />
+        </template>
+        <template #viewer="slotProps">
             <FileListWidgetViewer
-                v-else-if="mode === VIEW"
-                :value="initialValue"
-                :widget-data="widgetData"
+                :card-x-node-x-widget-data="
+                    slotProps.cardXNodeXWidgetData as FileListCardXNodeXWidgetData
+                "
+                :value="props.value"
             />
-        </div>
-    </template>
+        </template>
+    </GenericWidget>
 </template>
+
+<style scoped>
+.widget {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    width: 100%;
+}
+</style>

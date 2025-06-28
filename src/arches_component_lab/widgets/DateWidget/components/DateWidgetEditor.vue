@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, useTemplateRef } from "vue";
 
 import dayjs from "dayjs";
 import { convertISO8601DatetimeFormatToPrimevueDatetimeFormat } from "@/arches_component_lab/widgets/utils.ts";
@@ -8,18 +8,28 @@ import DatePicker from "primevue/datepicker";
 import Message from "primevue/message";
 
 import { FormField } from "@primevue/forms";
+
 import type { FormFieldResolverOptions } from "@primevue/forms";
+import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 
 const props = defineProps<{
-    initialValue: string | null | undefined;
+    value: string | null | undefined;
     graphSlug: string;
     nodeAlias: string;
-    widgetData: {
+    cardXNodeXWidgetData: CardXNodeXWidget & {
         config: {
             dateFormat: string;
+            datePickerDisplayConfiguration: {
+                dateFormat: string;
+                shouldShowTime: boolean;
+            };
         };
     };
 }>();
+
+const emit = defineEmits(["update:isDirty", "update:value"]);
+
+const formFieldRef = useTemplateRef("formField");
 
 const shouldShowTime = ref(false);
 const dateFormat = ref();
@@ -27,19 +37,23 @@ const dateFormat = ref();
 onMounted(() => {
     const convertedDateFormat =
         convertISO8601DatetimeFormatToPrimevueDatetimeFormat(
-            props.widgetData.config.dateFormat,
+            props.cardXNodeXWidgetData.config.dateFormat,
         );
 
     dateFormat.value = convertedDateFormat.dateFormat;
     shouldShowTime.value = convertedDateFormat.shouldShowTime;
 });
 
-function resolver(e: FormFieldResolverOptions) {
-    validate(e);
+function resolver(event: FormFieldResolverOptions) {
+    validate(event);
+
+    // @ts-expect-error This is a bug with PrimeVue types
+    emit("update:isDirty", Boolean(formFieldRef.value!.fieldAttrs.dirty));
+    emit("update:value", event.value);
 
     return {
         values: {
-            [props.nodeAlias]: formatDate(e.value),
+            [props.nodeAlias]: formatDate(event.value),
         },
     };
 }
@@ -53,19 +67,20 @@ function formatDate(date: Date | null): string | null {
         return null;
     }
 
-    return dayjs(date).format(props.widgetData.config.dateFormat);
+    return dayjs(date).format(props.cardXNodeXWidgetData.config.dateFormat);
 }
 </script>
 
 <template>
     <FormField
-        ref="formFieldRef"
+        ref="formField"
         v-slot="$field"
         :name="props.nodeAlias"
-        :initial-value="props.initialValue"
+        :initial-value="props.value"
         :resolver="resolver"
     >
         <DatePicker
+            :id="`${props.graphSlug}-${props.nodeAlias}-input`"
             icon-display="input"
             :date-format="dateFormat"
             :fluid="true"

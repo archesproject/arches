@@ -1,18 +1,9 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-
-import Message from "primevue/message";
-import ProgressSpinner from "primevue/progressspinner";
-
+import GenericWidget from "@/arches_component_lab/widgets/components/GenericWidget.vue";
 import ResourceInstanceMultiSelectWidgetEditor from "@/arches_component_lab/widgets/ResourceInstanceMultiSelectWidget/components/ResourceInstanceMultiSelectWidgetEditor.vue";
 import ResourceInstanceMultiSelectWidgetViewer from "@/arches_component_lab/widgets/ResourceInstanceMultiSelectWidget/components/ResourceInstanceMultiSelectWidgetViewer.vue";
 
-import {
-    fetchWidgetData,
-    fetchNodeData,
-} from "@/arches_component_lab/widgets/api.ts";
-import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
-
+import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 import type {
     ResourceInstanceReference,
     WidgetMode,
@@ -21,66 +12,55 @@ import type {
 const props = withDefaults(
     defineProps<{
         mode: WidgetMode;
-        initialValue: ResourceInstanceReference[] | null | undefined;
         nodeAlias: string;
         graphSlug: string;
+        cardXNodeXWidgetData?: CardXNodeXWidget;
+        value?: ResourceInstanceReference[] | null | undefined;
         showLabel?: boolean;
     }>(),
     {
+        cardXNodeXWidgetData: undefined,
+        initialValue: undefined,
         showLabel: true,
+        value: undefined,
     },
 );
 
-const isLoading = ref(true);
-const nodeData = ref();
-const widgetData = ref();
-const configurationError = ref();
-
-onMounted(async () => {
-    try {
-        widgetData.value = await fetchWidgetData(
-            props.graphSlug,
-            props.nodeAlias,
-        );
-        nodeData.value = await fetchNodeData(props.graphSlug, props.nodeAlias);
-    } catch (error) {
-        configurationError.value = error;
-    } finally {
-        isLoading.value = false;
-    }
-});
+const emit = defineEmits(["update:isDirty", "update:value"]);
 </script>
 
 <template>
-    <ProgressSpinner
-        v-if="isLoading"
-        style="width: 2em; height: 2em"
-    />
-
-    <template v-else>
-        <label v-if="props.showLabel">
-            <span>{{ widgetData.label }}</span>
-            <span v-if="nodeData.isrequired && props.mode === EDIT">*</span>
-        </label>
-
-        <div :class="[nodeAlias, graphSlug].join(' ')">
+    <GenericWidget
+        :graph-slug="props.graphSlug"
+        :node-alias="props.nodeAlias"
+        :mode="props.mode"
+        :show-label="props.showLabel"
+        :card-x-node-x-widget-data="cardXNodeXWidgetData"
+    >
+        <template #editor="slotProps">
             <ResourceInstanceMultiSelectWidgetEditor
-                v-if="mode === EDIT"
-                :initial-value="initialValue"
-                :node-alias="props.nodeAlias"
-                :graph-slug="props.graphSlug"
+                :card-x-node-x-widget-data="slotProps.cardXNodeXWidgetData"
+                :graph-slug="graphSlug"
+                :node-alias="nodeAlias"
+                :value="props.value"
+                @update:value="emit('update:value', $event)"
+                @update:is-dirty="emit('update:isDirty', $event)"
             />
+        </template>
+        <template #viewer="slotProps">
             <ResourceInstanceMultiSelectWidgetViewer
-                v-else-if="mode === VIEW"
-                :value="initialValue"
+                :card-x-node-x-widget-data="slotProps.cardXNodeXWidgetData"
+                :value="props.value"
             />
-        </div>
-        <Message
-            v-if="configurationError"
-            severity="error"
-            size="small"
-        >
-            {{ configurationError.message }}
-        </Message>
-    </template>
+        </template>
+    </GenericWidget>
 </template>
+
+<style scoped>
+.widget {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    width: 100%;
+}
+</style>
