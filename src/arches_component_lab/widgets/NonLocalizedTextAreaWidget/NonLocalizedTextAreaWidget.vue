@@ -62,7 +62,7 @@ onMounted(async () => {
         <div :class="[nodeAlias, graphSlug].join(' ')">
             <NonLocalizedTextAreaWidgetEditor
                 v-if="mode === EDIT"
-                :initial-value="initialValue"
+                :value="initialValue"
                 :graph-slug="props.graphSlug"
                 :node-alias="props.nodeAlias"
             />
