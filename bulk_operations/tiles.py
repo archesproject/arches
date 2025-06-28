@@ -7,10 +7,16 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import ProgrammingError, transaction
 from django.http import HttpRequest
-from django.utils.translation import gettext as _
+from django.utils.translation import get_language, gettext as _
 
 from arches import VERSION as arches_version
-from arches.app.models.models import Language, Node, TileModel, ResourceInstance
+from arches.app.models.models import (
+    CardXNodeXWidget,
+    Language,
+    Node,
+    TileModel,
+    ResourceInstance,
+)
 from arches.app.models.tile import Tile, TileValidationError
 
 from arches_querysets.datatypes.datatypes import DataTypeFactory
@@ -391,8 +397,10 @@ class SemanticTileOperation:
                     upsert_proxy._Tile__preSave(request=self.request)
                     upsert_proxy.check_for_missing_nodes()  # also runs clean()
                     upsert_proxy.check_for_constraint_violation()
-                except TileValidationError as tve:
-                    raise ValidationError(tve.message) from tve
+                except TileValidationError as error:
+                    if ":" in error.message:
+                        self.parse_required_error(error)
+                    raise ValidationError(error.message) from error
                 (
                     oldprovisionalvalue,
                     newprovisionalvalue,
@@ -504,3 +512,33 @@ class SemanticTileOperation:
                     exc_info=True,
                 )
                 continue
+
+    def parse_required_error(self, error):
+        """
+        This is a make-do attempt to parse the TileValidationError,
+        which should raise something more discrete than a localized
+        "This card requires values for the following: "
+        Some translations of that string do not include whitespace
+        after the colon, so be sure to only strip the space, not split.
+        """
+        error_names = [name.strip() for name in error.message.split(":")[1].split(", ")]
+        aliases = []
+        for widget_label_or_node_name in error_names:
+            widget = CardXNodeXWidget.objects.filter(
+                node__in=self.entry._permitted_nodes,
+                # Awkward due to I18n_JSON
+                label__contains={get_language(): widget_label_or_node_name},
+            ).first()
+            if widget:
+                node = widget.node
+            else:
+                node = Node.objects.filter(
+                    pk__in=self.entry._permitted_nodes, name=widget_label_or_node_name
+                ).first()
+            if node:
+                aliases.append(node.alias)
+            else:
+                msg = "Unable to backsolve error name: %s"
+                logger.error(msg, widget_label_or_node_name)
+                raise ValidationError(error.message) from error
+        raise ValidationError({alias: error.message for alias in aliases}) from error
