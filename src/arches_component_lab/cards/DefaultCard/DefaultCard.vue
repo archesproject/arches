@@ -31,7 +31,7 @@ const props = defineProps<{
     mode: WidgetMode;
     nodegroupAlias: string;
     graphSlug: string;
-    tileId?: string;
+    tileId?: string | null;
 }>();
 
 const emit = defineEmits(["update:isDirty", "update:tileData"]);

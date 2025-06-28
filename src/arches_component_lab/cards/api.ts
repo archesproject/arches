@@ -23,7 +23,7 @@ export const fetchCardData = async (
 export const fetchTileData = async (
     graphSlug: string,
     nodegroupAlias: string,
-    tileId: string | undefined,
+    tileId: string | null | undefined,
 ) => {
     const response = await fetch(
         arches.urls.api_tile(graphSlug, nodegroupAlias, tileId),
