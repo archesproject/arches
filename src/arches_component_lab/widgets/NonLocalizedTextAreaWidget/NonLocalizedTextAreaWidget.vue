@@ -18,7 +18,7 @@ import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 const props = withDefaults(
     defineProps<{
         mode: WidgetMode;
-        initialValue: string | null | undefined;
+        value: string | null | undefined;
         nodeAlias: string;
         graphSlug: string;
         showLabel?: boolean;
@@ -62,13 +62,13 @@ onMounted(async () => {
         <div :class="[nodeAlias, graphSlug].join(' ')">
             <NonLocalizedTextAreaWidgetEditor
                 v-if="mode === EDIT"
-                :value="initialValue"
+                :value="value"
                 :graph-slug="props.graphSlug"
                 :node-alias="props.nodeAlias"
             />
             <NonLocalizedTextAreaWidgetViewer
                 v-else-if="mode === VIEW"
-                :value="props.initialValue"
+                :value="props.value"
             />
         </div>
     </template>

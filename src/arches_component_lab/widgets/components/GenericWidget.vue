@@ -48,8 +48,8 @@ watchEffect(async () => {
 
     try {
         cardXNodeXWidgetData.value = await fetchCardXNodeXWidgetData(
-            props.nodeAlias,
             props.graphSlug,
+            props.nodeAlias,
         );
     } catch (error) {
         configurationError.value = error as Error;

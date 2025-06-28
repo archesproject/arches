@@ -17,7 +17,6 @@ const props = withDefaults(
     }>(),
     {
         cardXNodeXWidgetData: undefined,
-        initialValue: undefined,
         showLabel: true,
         value: undefined,
     },
