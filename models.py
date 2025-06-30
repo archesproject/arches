@@ -149,33 +149,6 @@ class ResourceTileTree(ResourceInstance):
     def save_without_related_objects(self, **kwargs):
         return super().save(**kwargs)
 
-    def _save_aliased_data(self, *, request=None, index=True, **kwargs):
-        """Raises a compound ValidationError with any failing tile values.
-
-        It's not exactly idiomatic for a Django project to clean()
-        values during a save(), but we can't easily express this logic
-        in a "pure" DRF field validator, because:
-            - the node values are phantom fields.
-            - we have other entry points besides DRF.
-        """
-        operation = TileTreeOperation(entry=self, request=request, save_kwargs=kwargs)
-        operation.validate_and_save_tiles()
-
-        # Instantiate proxy model for now, but refactor & expose this on vanilla model
-        proxy_resource = Resource.objects.get(pk=self.pk)
-        proxy_resource.save_descriptors()
-        if index:
-            proxy_resource.index()
-
-        if request:
-            self.save_edit(user=request.user, transaction_id=operation.transaction_id)
-
-        self.refresh_from_db(
-            using=kwargs.get("using"),
-            fields=kwargs.get("update_fields"),
-            user=request.user if request else None,
-        )
-
     def refresh_from_db(self, using=None, fields=None, from_queryset=None, user=None):
         del self._tile_trees
         if from_queryset is None:
@@ -202,6 +175,26 @@ class ResourceTileTree(ResourceInstance):
                 setattr(self, field.attname, getattr(db_instance, field.attname))
             self.aliased_data = db_instance.aliased_data
             self._tile_trees = from_queryset[0]._tile_trees
+
+    def _save_aliased_data(self, *, request=None, index=True, **kwargs):
+        """Raises a compound ValidationError with any failing tile values."""
+        operation = TileTreeOperation(entry=self, request=request, save_kwargs=kwargs)
+        operation.validate_and_save_tiles()
+
+        # Instantiate proxy model for now, but refactor & expose this on vanilla model
+        proxy_resource = Resource.objects.get(pk=self.pk)
+        proxy_resource.save_descriptors()
+        if index:
+            proxy_resource.index()
+
+        if request:
+            self.save_edit(user=request.user, transaction_id=operation.transaction_id)
+
+        self.refresh_from_db(
+            using=kwargs.get("using"),
+            fields=kwargs.get("update_fields"),
+            user=request.user if request else None,
+        )
 
 
 class TileTree(TileModel):
@@ -241,77 +234,17 @@ class TileTree(TileModel):
     def parent(self, parent):
         self._parent = parent
 
-    def clean_fields(self, exclude=None):
-        if (
-            self.nodegroup
-            and self.nodegroup.parentnodegroup_id
-            and "parenttile" not in exclude
-        ):
-            if (
-                not self.parenttile_id
-                or self.nodegroup.parentnodegroup_id != self.parenttile.nodegroup_id
-            ):
-                raise ValidationError(_("Wrong parent tile for parent nodegroup."))
-        # Exclude parenttile to ensure batch creations of parent & child do not fail.
-        new_exclude = [*(exclude or []), "parenttile"]
-        super().clean_fields(exclude=new_exclude)
-
-    def serialize(self, **kwargs):
-        """Prevent serialization of properties (would cause cycles)."""
-        options = {**kwargs}
-        options["exclude"] = {"data", "parent"} | set(options.pop("exclude", {}))
-        return JSONSerializer().handle_model(self, **options)
-
-    def find_nodegroup_alias(self):
-        # TileTreeManager provides grouping_node on 7.6
-        if self.nodegroup_id and hasattr(self.nodegroup, "grouping_node"):
-            return self.nodegroup.grouping_node.alias
-        if not getattr(self, "_nodegroup_alias", None):
-            self._nodegroup_alias = Node.objects.get(pk=self.nodegroup_id).alias
-        return self._nodegroup_alias
-
-    @classmethod
-    def deserialize(cls, tile_dict, parent_tile: TileModel | None):
-        """
-        DRF doesn't provide nested writable fields by default,
-        so we have this little deserializer helper. Consider moving this.
-        """
-        if not isinstance(tile_dict, Mapping):
-            raise TypeError(
-                f'Expected a mapping, got: "{tile_dict}". '
-                "Did you mistakenly provide node data directly under a nodegroup alias?"
+    def save(self, *, request=None, index=True, **kwargs):
+        if arches_version < (8, 0) and self.nodegroup:
+            # Cannot supply this too early, as nodegroup might be included
+            # with the request and already instantiated to a fresh object.
+            self.nodegroup.grouping_node = self.nodegroup.node_set.get(
+                pk=models.F("nodegroup")
             )
-        attrs = {**tile_dict}
-        if (tile_id := attrs.pop("tileid", None)) and isinstance(tile_id, str):
-            attrs["tileid"] = uuid.UUID(tile_id)
-        if (resourceinstance_id := attrs.pop("resourceinstance", None)) and isinstance(
-            resourceinstance_id, str
-        ):
-            attrs["resourceinstance_id"] = uuid.UUID(resourceinstance_id)
-        if (nodegroup_id := attrs.pop("nodegroup", None)) and isinstance(
-            nodegroup_id, str
-        ):
-            attrs["nodegroup_id"] = uuid.UUID(nodegroup_id)
-        if (parenttile_id := attrs.pop("parenttile", None)) and isinstance(
-            parenttile_id, str
-        ):
-            attrs["parenttile_id"] = uuid.UUID(parenttile_id)
-
-        attrs["parenttile"] = parent_tile
-
-        tile = cls(**attrs)
-        for attr in {"resourceinstance", "nodegroup", "parenttile"}:
-            if attr in tile_dict:
-                try:
-                    tile_dict[attr] = getattr(tile, attr)
-                except:
-                    pass
-
-        if arches_version < (8, 0):
-            # Simulate the default supplied by v8.
-            tile.data = {}
-
-        return tile
+        with transaction.atomic():
+            if self.sortorder is None or self.is_fully_provisional():
+                self.set_next_sort_order()
+            self._save_aliased_data(request=request, index=index, **kwargs)
 
     @classmethod
     def get_tiles(
@@ -370,17 +303,77 @@ class TileTree(TileModel):
             entry_node=entry_node,
         )
 
-    def save(self, *, request=None, index=True, **kwargs):
-        if arches_version < (8, 0) and self.nodegroup:
-            # Cannot supply this too early, as nodegroup might be included
-            # with the request and already instantiated to a fresh object.
-            self.nodegroup.grouping_node = self.nodegroup.node_set.get(
-                pk=models.F("nodegroup")
+    def serialize(self, **kwargs):
+        """Prevent serialization of properties (would cause cycles)."""
+        options = {**kwargs}
+        options["exclude"] = {"data", "parent"} | set(options.pop("exclude", {}))
+        return JSONSerializer().handle_model(self, **options)
+
+    def clean_fields(self, exclude=None):
+        if (
+            self.nodegroup
+            and self.nodegroup.parentnodegroup_id
+            and "parenttile" not in exclude
+        ):
+            if (
+                not self.parenttile_id
+                or self.nodegroup.parentnodegroup_id != self.parenttile.nodegroup_id
+            ):
+                raise ValidationError(_("Wrong parent tile for parent nodegroup."))
+        # Exclude parenttile to ensure batch creations of parent & child do not fail.
+        new_exclude = [*(exclude or []), "parenttile"]
+        super().clean_fields(exclude=new_exclude)
+
+    def find_nodegroup_alias(self):
+        # TileTreeManager provides grouping_node on 7.6
+        if self.nodegroup_id and hasattr(self.nodegroup, "grouping_node"):
+            return self.nodegroup.grouping_node.alias
+        if not getattr(self, "_nodegroup_alias", None):
+            self._nodegroup_alias = Node.objects.get(pk=self.nodegroup_id).alias
+        return self._nodegroup_alias
+
+    @classmethod
+    def deserialize(cls, tile_dict, parent_tile: TileModel | None):
+        """
+        DRF doesn't provide nested writable fields by default,
+        so we have this little deserializer helper. Consider moving this.
+        """
+        if not isinstance(tile_dict, Mapping):
+            raise TypeError(
+                f'Expected a mapping, got: "{tile_dict}". '
+                "Did you mistakenly provide node data directly under a nodegroup alias?"
             )
-        with transaction.atomic():
-            if self.sortorder is None or self.is_fully_provisional():
-                self.set_next_sort_order()
-            self._save_aliased_data(request=request, index=index, **kwargs)
+        attrs = {**tile_dict}
+        if (tile_id := attrs.pop("tileid", None)) and isinstance(tile_id, str):
+            attrs["tileid"] = uuid.UUID(tile_id)
+        if (resourceinstance_id := attrs.pop("resourceinstance", None)) and isinstance(
+            resourceinstance_id, str
+        ):
+            attrs["resourceinstance_id"] = uuid.UUID(resourceinstance_id)
+        if (nodegroup_id := attrs.pop("nodegroup", None)) and isinstance(
+            nodegroup_id, str
+        ):
+            attrs["nodegroup_id"] = uuid.UUID(nodegroup_id)
+        if (parenttile_id := attrs.pop("parenttile", None)) and isinstance(
+            parenttile_id, str
+        ):
+            attrs["parenttile_id"] = uuid.UUID(parenttile_id)
+
+        attrs["parenttile"] = parent_tile
+
+        tile = cls(**attrs)
+        for attr in {"resourceinstance", "nodegroup", "parenttile"}:
+            if attr in tile_dict:
+                try:
+                    tile_dict[attr] = getattr(tile, attr)
+                except:
+                    pass
+
+        if arches_version < (8, 0):
+            # Simulate the default supplied by v8.
+            tile.data = {}
+
+        return tile
 
     def sync_private_attributes(self, source):
         self._as_representation = source._as_representation
@@ -509,6 +502,34 @@ class TileTree(TileModel):
         save_kwargs = {**kwargs, "update_fields": set()}
         return super().save(**save_kwargs)
 
+    def set_aliased_data(self, node, node_value):
+        """Format node_value according to the self._as_representation flag and
+        set it on self.aliased_data."""
+        datatype_instance = DataTypeFactory().get_instance(node.datatype)
+        empty_values = (None, "", '{"url": "", "url_label": ""}')
+
+        if self._as_representation:
+            compiled_json = datatype_instance.to_json(self, node)
+            final_val = {
+                "display_value": compiled_json["@display_value"],
+                "interchange_value": datatype_instance.get_interchange_value(
+                    node_value,
+                    tile=self,
+                    node=node,
+                    details=compiled_json.get("details"),
+                ),
+            }
+            if final_val["display_value"] in empty_values:
+                # TODO: upstream this into datatype methods (another hook?)
+                final_val["display_value"] = _("(Empty)")
+        else:
+            if hasattr(datatype_instance, "to_python"):
+                final_val = datatype_instance.to_python(node_value, tile=self)
+            else:
+                final_val = node_value
+
+        setattr(self.aliased_data, node.alias, final_val)
+
     def _save_aliased_data(self, *, request=None, index=True, **kwargs):
         operation = TileTreeOperation(entry=self, request=request, save_kwargs=kwargs)
         operation.validate_and_save_tiles()
@@ -599,34 +620,6 @@ class TileTree(TileModel):
             }
 
         return oldprovisionalvalue, newprovisionalvalue, provisional_edit_log_details
-
-    def set_aliased_data(self, node, node_value):
-        """Format node_value according to the self._as_representation flag and
-        set it on self.aliased_data."""
-        datatype_instance = DataTypeFactory().get_instance(node.datatype)
-        empty_values = (None, "", '{"url": "", "url_label": ""}')
-
-        if self._as_representation:
-            compiled_json = datatype_instance.to_json(self, node)
-            final_val = {
-                "display_value": compiled_json["@display_value"],
-                "interchange_value": datatype_instance.get_interchange_value(
-                    node_value,
-                    tile=self,
-                    node=node,
-                    details=compiled_json.get("details"),
-                ),
-            }
-            if final_val["display_value"] in empty_values:
-                # TODO: upstream this into datatype methods (another hook?)
-                final_val["display_value"] = _("(Empty)")
-        else:
-            if hasattr(datatype_instance, "to_python"):
-                final_val = datatype_instance.to_python(node_value, tile=self)
-            else:
-                final_val = node_value
-
-        setattr(self.aliased_data, node.alias, final_val)
 
 
 class GraphWithPrefetching(GraphModel):
