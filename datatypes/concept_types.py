@@ -32,7 +32,7 @@ class ConceptDataType(concept_types.ConceptDataType):
             return None
         try:
             value = uuid.UUID(value)
-        except TypeError:
+        except (TypeError, ValueError):
             pass
         return self.get_value(value)
 
@@ -77,7 +77,10 @@ class ConceptListDataType(concept_types.ConceptListDataType):
     def get_instances(self, value):
         new_values = []
         for inner_value in value or []:
-            new_val = self.get_value(uuid.UUID(inner_value))
+            try:
+                new_val = self.get_value(uuid.UUID(inner_value))
+            except (TypeError, ValueError):
+                new_val = self.get_value(inner_value)
             new_values.append(new_val)
         return new_values
 
