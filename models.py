@@ -380,7 +380,7 @@ class TileTree(TileModel):
             else nodegroup.nodegroup_set.all()
         )
 
-        # Initialize a blank tile with nested semantic data.
+        # Initialize a blank tile with nested aliased data.
         blank_tile = self.__class__(
             resourceinstance=self.resourceinstance,
             nodegroup=nodegroup,
