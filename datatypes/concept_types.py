@@ -1,6 +1,7 @@
 import uuid
 
 from arches.app.datatypes import concept_types
+from arches.app.models.models import Value
 from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
 
 
@@ -8,6 +9,8 @@ class ConceptDataType(concept_types.ConceptDataType):
     def transform_value_for_tile(self, value, **kwargs):
         if isinstance(value, dict) and (value_id := value.get("valueid")):
             return super().transform_value_for_tile(value_id)
+        if isinstance(value, Value):
+            return super().transform_value_for_tile(str(value.pk))
         return super().transform_value_for_tile(value)
 
     def to_python(self, value, **kwargs):
