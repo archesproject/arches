@@ -219,8 +219,7 @@ class TileTreeOperation:
                     if node.datatype != "semantic":
                         new_tile.data[str(node.pk)] = new_tile.get_default_value(node)
                 new_tile._incoming_tile = new_tile
-                # TODO: reimplement correct nodegroup for parenttile check somewhere.
-                new_tile.full_clean(exclude={"parenttile"})
+                new_tile.full_clean()
                 to_insert.add(new_tile)
             else:
                 original_tile_data_by_tile_id[existing_tile.pk] = {**existing_tile.data}

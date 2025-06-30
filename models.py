@@ -4,7 +4,11 @@ import uuid
 from types import SimpleNamespace
 from typing import Mapping
 
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.core.exceptions import (
+    MultipleObjectsReturned,
+    ObjectDoesNotExist,
+    ValidationError,
+)
 from django.db import models, transaction
 from django.utils.translation import gettext as _
 
@@ -236,6 +240,21 @@ class TileTree(TileModel):
     @parent.setter
     def parent(self, parent):
         self._parent = parent
+
+    def clean_fields(self, exclude=None):
+        if (
+            self.nodegroup
+            and self.nodegroup.parentnodegroup_id
+            and "parenttile" not in exclude
+        ):
+            if (
+                not self.parenttile_id
+                or self.nodegroup.parentnodegroup_id != self.parenttile.nodegroup_id
+            ):
+                raise ValidationError(_("Wrong parent tile for parent nodegroup."))
+        # Exclude parenttile to ensure batch creations of parent & child do not fail.
+        new_exclude = [*(exclude or []), "parenttile"]
+        super().clean_fields(exclude=new_exclude)
 
     def serialize(self, **kwargs):
         """Prevent serialization of properties (would cause cycles)."""
