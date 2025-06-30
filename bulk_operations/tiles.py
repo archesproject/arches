@@ -378,12 +378,11 @@ class TileTreeOperation:
     def _save(self):
         # Instantiate proxy models for now, but TODO: expose this
         # functionality on vanilla models, and in bulk.
+        tile_model_fields = Tile._meta.get_fields()
         upserts = self.to_insert | self.to_update
         insert_proxies = [
-            # TODO: make readable.
-            Tile(
-                **(pop_arches_model_kwargs(vars(insert), Tile._meta.get_fields())[1]),
-            )
+            # Instantiate TileProxyModel instances without aliased data.
+            Tile(**(pop_arches_model_kwargs(vars(insert), tile_model_fields)[1]))
             for insert in self.to_insert
         ]
         update_proxies = list(
