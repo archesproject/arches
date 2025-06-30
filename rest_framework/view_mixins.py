@@ -23,7 +23,7 @@ class MetadataWithWidgetConfig(SimpleMetadata):
             "initial": (
                 None if field.initial is field.default_empty_html else field.initial
             ),
-            "visible": field.style.get("visible", False),
+            "visible": field.style.get("visible", True),
             "datatype": field.style.get("datatype"),
             "widget_config": field.style.get("widget_config", {}),
             "sortorder": field.style.get("sortorder", 0),
