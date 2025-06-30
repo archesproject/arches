@@ -1,7 +1,6 @@
 import logging
 import sys
 import uuid
-from itertools import chain
 from types import SimpleNamespace
 
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
@@ -509,13 +508,7 @@ class TileTree(TileModel):
             old = original_data.get(node_id_str)
             datatype_instance = datatype_factory.get_instance(node.datatype)
             new = self.data[node_id_str]
-            if match_fn := getattr(datatype_instance, "values_match", None):
-                if not match_fn(old, new):
-                    return False
-            if node.datatype in ("resource-instance", "resource-instance-list"):
-                if not self._resource_values_match(old, new):
-                    return False
-            if old != new:
+            if not datatype_instance.values_match(old, new):
                 return False
 
         return True
@@ -525,16 +518,6 @@ class TileTree(TileModel):
         if tile_val is None or len(tile_val) != 1:
             return tile_val
         return tile_val[0]
-
-    @staticmethod
-    def _resource_values_match(value1, value2):
-        if not isinstance(value1, list) or not isinstance(value2, list):
-            return value1 == value2
-        copy1 = [{**inner_val} for inner_val in value1]
-        copy2 = [{**inner_val} for inner_val in value2]
-        for inner_val in chain(copy1, copy2):
-            inner_val.pop("resourceXresourceId", None)
-        return copy1 == copy2
 
     def _enrich(self, graph_slug, *, only=None):
         resource = ResourceTileTree.get_tiles(

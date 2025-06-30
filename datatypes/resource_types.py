@@ -1,6 +1,7 @@
 import json
 import logging
 import uuid
+from itertools import chain
 
 from arches import VERSION as arches_version
 from arches.app.datatypes import datatypes
@@ -167,6 +168,16 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
             "ontologyProperty": graph_config.get("ontologyProperty", ""),
             "inverseOntologyProperty": graph_config.get("inverseOntologyProperty", ""),
         }
+
+    @staticmethod
+    def values_match(value1, value2):
+        if not isinstance(value1, list) or not isinstance(value2, list):
+            return value1 == value2
+        copy1 = [{**inner_val} for inner_val in value1]
+        copy2 = [{**inner_val} for inner_val in value2]
+        for inner_val in chain(copy1, copy2):
+            inner_val.pop("resourceXresourceId", None)
+        return copy1 == copy2
 
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):
