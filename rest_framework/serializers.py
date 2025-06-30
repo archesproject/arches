@@ -217,6 +217,10 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         self._root_node = kwargs.pop("root_node", None)
         super().__init__(instance, data, **kwargs)
         self._child_nodegroup_aliases = []
+        if not self.url_field_name:
+            # Avoid cryptic errors in case a node alias collides with
+            # DRF's default URL field name ("url")
+            self.url_field_name = "__nonexistent__"
 
     def __deepcopy__(self, memo):
         ret = super().__deepcopy__(memo)
