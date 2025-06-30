@@ -33,7 +33,7 @@ from arches_querysets.querysets import (
     TileTreeQuerySet,
 )
 from arches_querysets.utils.models import (
-    find_nodegroup_by_alias,
+    append_tiles_recursively,
     get_recursive_prefetches,
     get_nodegroups_here_and_below,
     pop_arches_model_kwargs,
@@ -44,7 +44,7 @@ logger = logging.getLogger(__name__)
 
 
 class AliasedData(SimpleNamespace):
-    """Provides dot access into node values and nested nodegroups.
+    """Provides dot access into node values and nested nodegroups by alias.
 
     >>> ResourceTileTree.get_tiles('new_resource_model_1').get(...).aliased_data
     namespace(string_node={'en': {'value': 'abcde', 'direction': 'ltr'}},
@@ -116,31 +116,16 @@ class ResourceTileTree(ResourceInstance):
             user=user,
         )
 
+    def append_tile(self, nodegroup_alias):
+        TileTree.create_blank_tile(
+            nodegroup_alias=nodegroup_alias,
+            container=self,
+            permitted_nodes=self._permitted_nodes,
+        )
+
     def fill_blanks(self):
         """Initialize a blank tile with empty values for each nodegroup lacking a tile."""
-        if not vars(self.aliased_data):
-            raise RuntimeError("aliased_data is empty")
-
-        for nodegroup_alias, value in vars(self.aliased_data).items():
-            if value in (None, []):
-                nodegroup = find_nodegroup_by_alias(
-                    nodegroup_alias, self._permitted_nodes
-                )
-                blank_tile = TileTree(resourceinstance=self, nodegroup=nodegroup)
-                blank_tile.sync_private_attributes(self)
-                blank_tile = blank_tile.create_blank_tile(nodegroup)
-            if value == []:
-                value.append(blank_tile)
-            elif value is None:
-                setattr(self.aliased_data, nodegroup_alias, blank_tile)
-
-            # Recurse.
-            if isinstance(value, list):
-                for tile in value:
-                    tile.fill_blanks()
-            else:
-                tile = value or blank_tile
-                tile.fill_blanks()
+        append_tiles_recursively(self)
 
     def save_edit(self, user=None, transaction_id=None):
         """Intended to replace proxy model method eventually."""
@@ -383,35 +368,48 @@ class TileTree(TileModel):
         self._queried_nodes = source._queried_nodes
         self._permitted_nodes = source._permitted_nodes
 
-    def create_blank_tile(self, nodegroup, parent_tile=None):
-        children = (
-            nodegroup.children.all()
-            if arches_version >= (8, 0)
-            else nodegroup.nodegroup_set.all()
+    def append_tile(self, nodegroup_alias):
+        TileTree.create_blank_tile(
+            nodegroup_alias=nodegroup_alias,
+            container=self,
+            permitted_nodes=self._permitted_nodes,
         )
 
-        # Initialize a blank tile with nested aliased data.
-        blank_tile = self.__class__(
-            resourceinstance=self.resourceinstance,
+    @classmethod
+    def create_blank_tile(
+        cls, *, nodegroup=None, nodegroup_alias=None, container, permitted_nodes
+    ):
+        if not nodegroup:
+            if not nodegroup_alias:
+                raise ValueError("nodegroup or nodegroup_alias is required.")
+            nodegroup = cls.find_nodegroup_from_alias_or_pk(
+                nodegroup_alias, permitted_nodes=permitted_nodes
+            )
+
+        if not nodegroup_alias:
+            nodegroup_alias = cls.find_nodegroup_from_alias_or_pk(
+                pk=nodegroup.pk, permitted_nodes=permitted_nodes
+            )._nodegroup_alias
+
+        if isinstance(container, ResourceInstance):
+            resource = container
+            parent_tile = None
+        else:
+            resource = container.resourceinstance
+            parent_tile = container
+
+        # Initialize a blank tile with nested data.
+        blank_tile = cls(
+            resourceinstance=resource,
             nodegroup=nodegroup,
             parenttile=parent_tile,
             data={
-                str(node.pk): self.get_default_value(node)
+                str(node.pk): cls.get_default_value(node)
                 for node in nodegroup.node_set.all()
                 if node.datatype != "semantic"
             },
-            **{
-                self.find_nodegroup_from_alias_or_pk(
-                    pk=child_nodegroup.pk
-                )._nodegroup_alias: (
-                    self.create_blank_tile(child_nodegroup, parent_tile=self)
-                    if child_nodegroup.cardinality == "1"
-                    else [self.create_blank_tile(child_nodegroup, parent_tile=self)]
-                )
-                for child_nodegroup in children
-            },
         )
-        blank_tile.sync_private_attributes(self)
+        blank_tile.sync_private_attributes(container)
 
         # Finalize the aliased data according to the value of self._as_representation.
         # (e.g. either a dict of display_value & interchange_value, or call to_python().)
@@ -420,38 +418,42 @@ class TileTree(TileModel):
                 node_value = blank_tile.data.get(str(node.pk))
                 blank_tile.set_aliased_data(node, node_value)
 
+        # Attach the blank tile to the container.
+        try:
+            aliased_data_value = getattr(container.aliased_data, nodegroup_alias)
+        except AttributeError:
+            aliased_data_value = None if nodegroup.cardinality == "1" else []
+            setattr(container.aliased_data, nodegroup_alias, aliased_data_value)
+        if isinstance(aliased_data_value, list):
+            aliased_data_value.append(blank_tile)
+        elif aliased_data_value is None:
+            setattr(container.aliased_data, nodegroup_alias, blank_tile)
+        else:
+            msg = "Attempted to append to a populated cardinality-1 nodegroup"
+            raise RuntimeError(msg)
+
+        children = (
+            nodegroup.children.all()
+            if arches_version >= (8, 0)
+            else nodegroup.nodegroup_set.all()
+        )
+        for child_nodegroup in children:
+            cls.create_blank_tile(
+                nodegroup=child_nodegroup,
+                container=blank_tile,
+                permitted_nodes=permitted_nodes,
+            )
+
         return blank_tile
 
     def fill_blanks(self):
-        """Initialize empty node values for each nodegroup lacking a tile."""
-        if not vars(self.aliased_data):
-            return
+        """Initialize a blank tile with empty values for each nodegroup lacking a tile."""
+        append_tiles_recursively(self)
 
-        for alias, value in vars(self.aliased_data).items():
-            try:
-                nodegroup = self.find_nodegroup_from_alias_or_pk(alias=alias)
-            except RuntimeError:  # possibly not permitted
-                continue
-            if value in (None, []):
-                blank_tile = self.create_blank_tile(nodegroup, self)
-            if value == []:
-                value.append(blank_tile)
-            elif value is None:
-                setattr(self.aliased_data, alias, blank_tile)
-
-            # Recurse.
-            if isinstance(value, list):
-                for tile in value:
-                    if isinstance(tile, TileTree):
-                        tile.fill_blanks()
-            else:
-                tile = value or blank_tile
-                if isinstance(tile, TileTree):
-                    tile.fill_blanks()
-
-    def find_nodegroup_from_alias_or_pk(self, alias=None, *, pk=None):
+    @staticmethod
+    def find_nodegroup_from_alias_or_pk(alias=None, *, permitted_nodes, pk=None):
         """Some of this complexity can be removed when dropping 7.6."""
-        for permitted_node in self._permitted_nodes:
+        for permitted_node in permitted_nodes:
             if permitted_node.alias == alias or permitted_node.pk == pk:
                 permitted_node.nodegroup._nodegroup_alias = permitted_node.alias
                 return permitted_node.nodegroup

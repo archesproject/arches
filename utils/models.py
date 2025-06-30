@@ -239,8 +239,19 @@ def get_recursive_prefetches(lookup_str, *, recursive_part="children", depth):
     return prefetches
 
 
-def find_nodegroup_by_alias(nodegroup_alias, permitted_nodes):
-    for fetched_node in permitted_nodes:
-        if fetched_node.alias == nodegroup_alias:
-            return fetched_node.nodegroup
-    raise RuntimeError(nodegroup_alias)
+def append_tiles_recursively(resource_or_tile):
+    if not vars(resource_or_tile.aliased_data):
+        raise RuntimeError("aliased_data is empty")
+
+    for alias, tiles in vars(resource_or_tile.aliased_data).items():
+        if tiles in (None, []):
+            try:
+                resource_or_tile.append_tile(alias)
+            except RuntimeError:  # not a nodegroup or nodegroup not permitted
+                continue
+
+            tiles = getattr(resource_or_tile.aliased_data, alias)
+            if not isinstance(tiles, list):
+                tiles = [tiles]
+            for tile in tiles:
+                tile.fill_blanks()
