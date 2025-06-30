@@ -58,7 +58,7 @@ function extractInitialOrDefaultValue(
     let extractedVals: object | undefined = undefined;
     if (multiVal) {
         if (initialVal) {
-            extractedVals = defaultVal?.reduce((acc, reference) => {
+            extractedVals = initialVal?.reduce((acc, reference) => {
                 const formatted = formatValForPrimevue(reference);
                 return { ...acc, ...formatted };
             }, {});
