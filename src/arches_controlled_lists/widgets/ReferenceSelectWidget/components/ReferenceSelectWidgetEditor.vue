@@ -16,7 +16,7 @@ import type {
 } from "@/arches_controlled_lists/widgets/types";
 
 const props = defineProps<{
-    initialValue: ReferenceSelectFetchedOption[] | undefined;
+    value: ReferenceSelectFetchedOption[] | undefined;
     nodeConfig: {
         multiValue: boolean;
         controlledList: string;
@@ -37,7 +37,7 @@ const expandedKeys: Ref<TreeExpandedKeys> = ref({});
 const initialVal = toRef(
     extractInitialOrDefaultValue(
         props.nodeConfig.multiValue,
-        props.initialValue,
+        props.value,
         props.widgetConfig.defaultValue,
     ),
 );
@@ -45,7 +45,7 @@ const initialVal = toRef(
 onMounted(() => {
     const defaultVal = props.widgetConfig.defaultValue;
     options.value = [
-        ...optionsAsNodes(props.initialValue ? props.initialValue : []),
+        ...optionsAsNodes(props.value ? props.value : []),
         ...optionsAsNodes(defaultVal ? defaultVal : []),
     ];
 });

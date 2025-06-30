@@ -18,7 +18,7 @@ import type { ReferenceSelectFetchedOption } from "@/arches_controlled_lists/wid
 const props = withDefaults(
     defineProps<{
         mode: WidgetMode;
-        initialValue: ReferenceSelectFetchedOption[] | undefined;
+        value: ReferenceSelectFetchedOption[] | undefined;
         nodeAlias: string;
         graphSlug: string;
         showLabel?: boolean;
@@ -54,7 +54,7 @@ onMounted(async () => {
 
         <div v-if="mode === EDIT">
             <ReferenceSelectWidgetEditor
-                :initial-value="initialValue"
+                :value="value"
                 :node-config="nodeData.config"
                 :widget-config="widgetData.config"
                 :node-alias="props.nodeAlias"
@@ -62,7 +62,7 @@ onMounted(async () => {
             />
         </div>
         <div v-if="mode === VIEW">
-            <ReferenceSelectWidgetViewer :value="initialValue" />
+            <ReferenceSelectWidgetViewer :value="value" />
         </div>
     </template>
 </template>
