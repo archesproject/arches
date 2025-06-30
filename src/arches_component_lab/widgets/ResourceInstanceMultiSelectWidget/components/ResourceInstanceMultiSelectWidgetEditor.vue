@@ -16,16 +16,25 @@ import type { MultiSelectFilterEvent } from "primevue/multiselect";
 import type { FormFieldResolverOptions } from "@primevue/forms";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
 
+import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
+
 import type {
     ResourceInstanceReference,
     ResourceInstanceResult,
 } from "@/arches_component_lab/widgets/types.ts";
 
-const props = defineProps<{
-    value: ResourceInstanceReference[] | null | undefined;
-    graphSlug: string;
-    nodeAlias: string;
-}>();
+const props = withDefaults(
+    defineProps<{
+        nodeAlias: string;
+        graphSlug: string;
+        cardXNodeXWidgetData?: CardXNodeXWidget;
+        value?: ResourceInstanceReference[] | null | undefined;
+    }>(),
+    {
+        cardXNodeXWidgetData: undefined,
+        value: undefined,
+    },
+);
 
 const emit = defineEmits(["update:isDirty", "update:value"]);
 

@@ -24,7 +24,7 @@ const props = withDefaults(
         mode: WidgetMode;
         nodeAlias: string;
         graphSlug: string;
-        cardXNodeXWidgetData: FileListCardXNodeXWidgetData | undefined;
+        cardXNodeXWidgetData?: FileListCardXNodeXWidgetData | undefined;
         value?: FileReference[] | null | undefined;
         showLabel?: boolean;
     }>(),
