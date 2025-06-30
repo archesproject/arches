@@ -3,8 +3,40 @@ from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
 from django.urls import include, path
 
+from arches_querysets.apps import ArchesQuerySetsConfig
+from arches_querysets.rest_framework.generic_views import (
+    ArchesResourceDetailView,
+    ArchesResourceListCreateView,
+    ArchesTileDetailView,
+    ArchesTileListCreateView,
+)
+
+app_name = ArchesQuerySetsConfig.name
+arches_rest_framework_urls = [
+    path(
+        "api/resource/<slug:graph>",
+        ArchesResourceListCreateView.as_view(),
+        name="api-resources",
+    ),
+    path(
+        "api/resource/<slug:graph>/<uuid:pk>",
+        ArchesResourceDetailView.as_view(),
+        name="api-resource",
+    ),
+    path(
+        "api/tile/<slug:graph>/<slug:nodegroup_alias>",
+        ArchesTileListCreateView.as_view(),
+        name="api-tiles",
+    ),
+    path(
+        "api/tile/<slug:graph>/<slug:nodegroup_alias>/<uuid:pk>",
+        ArchesTileDetailView.as_view(),
+        name="api-tile",
+    ),
+]
+
 urlpatterns = [
-    # project-level urls
+    *arches_rest_framework_urls,
 ]
 
 # handler400 = "arches.app.views.main.custom_400"
