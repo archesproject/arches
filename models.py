@@ -338,7 +338,7 @@ class TileTree(TileModel):
             raise Node.DoesNotExist(f"graph: {graph_slug} node: {nodegroup_alias}")
 
         if not entry_node.nodegroup:
-            raise ValueError(f'"{entry_node_alias}" is a top node.')
+            raise ValueError(f'"{nodegroup_alias}" is a top node.')
 
         entry_node_and_nodes_below = []
         for nodegroup in get_nodegroups_here_and_below(entry_node.nodegroup):
