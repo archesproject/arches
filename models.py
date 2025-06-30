@@ -2,6 +2,7 @@ import logging
 import sys
 import uuid
 from types import SimpleNamespace
+from typing import Mapping
 
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import models, transaction
@@ -269,8 +270,13 @@ class TileTree(TileModel):
     def deserialize(cls, tile_dict, parent_tile: TileModel | None):
         """
         DRF doesn't provide nested writable fields by default,
-        so we have this little deserializer helper. Must be a better way.
+        so we have this little deserializer helper. Consider moving this.
         """
+        if not isinstance(tile_dict, Mapping):
+            raise TypeError(
+                f'Expected a mapping, got: "{tile_dict}". '
+                "Did you mistakenly provide node data directly under a nodegroup alias?"
+            )
         attrs = {**tile_dict}
         if (tile_id := attrs.pop("tileid", None)) and isinstance(tile_id, str):
             attrs["tileid"] = uuid.UUID(tile_id)
