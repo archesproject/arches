@@ -43,16 +43,18 @@ class TileTreeOperation:
         self.request = request
         if not self.request:
             self.request = HttpRequest()
+        if not getattr(self.request, "user", None):
+            # Allow server-side usage when not going through middlewrae
             self.request.user = User.objects.get(username="anonymous")
         self.save_kwargs = save_kwargs or {}
         self.transaction_id = uuid.uuid4()
         # Store off these properties since they are expensive.
-        # self.viewable_nodegroups: set[str] = request.user.userprofile.viewable_nodegroups
+        # self.viewable_nodegroups: set[str] = self.request.user.userprofile.viewable_nodegroups
         self.editable_nodegroups: set[str] = (
-            request.user.userprofile.editable_nodegroups
+            self.request.user.userprofile.editable_nodegroups
         )
         self.deletable_nodegroups: set[str] = (
-            request.user.userprofile.deletable_nodegroups
+            self.request.user.userprofile.deletable_nodegroups
         )
 
         if isinstance(entry, TileModel):
@@ -426,7 +428,7 @@ class TileTreeOperation:
                     upsert_proxy,
                     upsert_proxy._existing_data,
                     upsert_proxy._existing_provisionaledits,
-                    user=getattr(self.request, "user", None),
+                    user=self.request.user,
                 )
                 # Remember the values needed for the edit log updates later.
                 upsert_proxy._oldprovisionalvalue = oldprovisionalvalue
@@ -489,7 +491,7 @@ class TileTreeOperation:
             # Save edits: could be done in bulk once above side effects are un-proxied.
             for insert_proxy in insert_proxies:
                 insert_proxy.save_edit(
-                    user=getattr(self.request, "user", None),
+                    user=self.request.user,
                     edit_type="tile create",
                     old_value={},
                     new_value=insert_proxy.data,
@@ -501,7 +503,7 @@ class TileTreeOperation:
                 )
             for update_proxy in update_proxies:
                 update_proxy.save_edit(
-                    user=getattr(self.request, "user", None),
+                    user=self.request.user,
                     edit_type="tile edit",
                     old_value=update_proxy._existing_data,
                     new_value=update_proxy.data,
@@ -512,7 +514,7 @@ class TileTreeOperation:
                 )
             for delete_proxy in delete_proxies:
                 delete_proxy.save_edit(
-                    user=getattr(self.request, "user", None),
+                    user=self.request.user,
                     edit_type="tile delete",
                     old_value=delete_proxy.data,
                     provisional_edit_log_details=None,
