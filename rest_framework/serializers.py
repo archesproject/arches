@@ -379,7 +379,7 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         queryset=NodeGroup.objects.all(), required=False, html_cutoff=0
     )
     parenttile = serializers.PrimaryKeyRelatedField(
-        queryset=TileTree.objects.all(),
+        queryset=TileTree.objects.prefetch_related(None),
         required=False,
         allow_null=True,
         html_cutoff=0,
