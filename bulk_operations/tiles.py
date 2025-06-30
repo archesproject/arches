@@ -162,6 +162,10 @@ class TileTreeOperation:
             # Currently also prevents deletes.
             return
 
+        to_insert = set()
+        to_update = set()
+        to_delete = set()
+
         # TODO: Find something more clean than this double if/else.
         if isinstance(container, dict):
             aliased_data = container.get("aliased_data")
@@ -204,7 +208,7 @@ class TileTreeOperation:
                     delete_siblings
                     and str(existing_tile.nodegroup_id) in self.deletable_nodegroups
                 ):
-                    self.to_delete.add(existing_tile)
+                    to_delete.add(existing_tile)
                 continue
             if existing_tile is NOT_PROVIDED:
                 new_tile.nodegroup_id = grouping_node.nodegroup_id
@@ -217,17 +221,14 @@ class TileTreeOperation:
                 new_tile._incoming_tile = new_tile
                 # TODO: reimplement correct nodegroup for parenttile check somewhere.
                 new_tile.full_clean(exclude={"parenttile"})
-                self.to_insert.add(new_tile)
+                to_insert.add(new_tile)
             else:
                 original_tile_data_by_tile_id[existing_tile.pk] = {**existing_tile.data}
                 existing_tile._incoming_tile = new_tile
-                self.to_update.add(existing_tile)
+                to_update.add(existing_tile)
 
         nodes = grouping_node.nodegroup.node_set.all()
-        for tile in self.to_insert | self.to_update:
-            if tile.nodegroup_id != grouping_node.pk:
-                # TODO: this is a symptom this should be refactored.
-                continue
+        for tile in to_insert | to_update:
             if arches_version >= (8, 0):
                 children = tile.nodegroup.children.all()
             else:
@@ -249,40 +250,16 @@ class TileTreeOperation:
                 )
             self._validate_and_patch_incoming_values(tile, nodes=nodes)
 
-        # https://github.com/archesproject/arches-querysets/issues/11
-        # for tile in self.to_insert | self.to_update:
-        #     if tile.nodegroup.pk != grouping_node.pk:
-        #         # TODO: this is a symptom this should be refactored.
-        #         continue
-        #     # Remove blank tiles if they have no children.
-        #     if (
-        #         not any(tile.data.values())
-        #         and not tile.children.exists()
-        #         # Check unsaved children.
-        #         and not any(
-        #             getattr(tile._incoming_tile, child_tile_alias, None)
-        #             for child_tile_alias in grouping_node.nodegroup.children.values_list(
-        #                 # TODO: 7.6 compat
-        #                 "grouping_node__alias",
-        #                 flat=True,
-        #             )
-        #         )
-        #     ):
-        #         if tile._state.adding:
-        #             self.to_insert.remove(tile)
-        #         else:
-        #             self.to_update.remove(tile)
-        #             self.to_delete.add(tile)
-
-        for tile in self.to_insert | self.to_update:
-            if tile.nodegroup.pk != grouping_node.pk:
-                # TODO: this is a symptom this should be refactored.
-                continue
+        for tile in to_insert | to_update:
             # Remove no-op upserts.
             if (
                 original_data := original_tile_data_by_tile_id.pop(tile.pk, None)
             ) and tile._tile_update_is_noop(original_data):
-                self.to_update.remove(tile)
+                to_update.remove(tile)
+
+        self.to_insert |= to_insert
+        self.to_update |= to_update
+        self.to_delete |= to_delete
 
     def _pair_tiles(self, existing_tiles, new_tiles):
         pairs = []
