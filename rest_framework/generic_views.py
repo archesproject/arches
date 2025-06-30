@@ -1,4 +1,7 @@
+from django.conf import settings
+
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.parsers import JSONParser
 
 from arches_querysets.rest_framework.multipart_json_parser import MultiPartJSONParser
@@ -14,6 +17,8 @@ class ArchesResourceListCreateView(ArchesModelAPIMixin, ListCreateAPIView):
     permission_classes = [ResourceEditor | ReadOnly]
     serializer_class = ArchesResourceSerializer
     parser_classes = [JSONParser, MultiPartJSONParser]
+    pagination_class = LimitOffsetPagination
+    page_size = settings.API_MAX_PAGE_SIZE
 
 
 class ArchesResourceDetailView(ArchesModelAPIMixin, RetrieveUpdateDestroyAPIView):
@@ -26,6 +31,8 @@ class ArchesTileListCreateView(ArchesModelAPIMixin, ListCreateAPIView):
     permission_classes = [ResourceEditor | ReadOnly]
     serializer_class = ArchesTileSerializer
     parser_classes = [JSONParser, MultiPartJSONParser]
+    pagination_class = LimitOffsetPagination
+    page_size = settings.API_MAX_PAGE_SIZE
 
 
 class ArchesTileDetailView(ArchesModelAPIMixin, RetrieveUpdateDestroyAPIView):
