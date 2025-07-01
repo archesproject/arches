@@ -146,7 +146,7 @@ class ResourceTileTree(ResourceInstance):
             user=user, edit_type=edit_type, transaction_id=transaction_id
         )
 
-    def save_without_related_objects(self, **kwargs):
+    def save_without_aliased_data(self, **kwargs):
         return super().save(**kwargs)
 
     def refresh_from_db(self, using=None, fields=None, from_queryset=None, user=None):
@@ -205,6 +205,7 @@ class TileTree(TileModel):
         db_table = "tiles"
 
     def __init__(self, *args, **kwargs):
+        self._request = kwargs.pop("__request", None)
         arches_model_kwargs, other_kwargs = pop_arches_model_kwargs(
             kwargs, self._meta.get_fields()
         )
@@ -241,6 +242,7 @@ class TileTree(TileModel):
             self.nodegroup.grouping_node = self.nodegroup.node_set.get(
                 pk=models.F("nodegroup")
             )
+        request = request or self._request
         with transaction.atomic():
             if self.sortorder is None or self.is_fully_provisional():
                 self.set_next_sort_order()
@@ -493,7 +495,7 @@ class TileTree(TileModel):
 
         return default_value
 
-    def save_without_related_objects(self, **kwargs):
+    def save_without_aliased_data(self, **kwargs):
         return super().save(**kwargs)
 
     def dummy_save(self, **kwargs):

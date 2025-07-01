@@ -443,7 +443,7 @@ class TileTreeOperation:
                 TileModel.objects.filter(pk__in=[t.pk for t in self.to_delete]).delete()
 
             if isinstance(self.entry, ResourceInstance):
-                self.entry.save_without_related_objects(**self.save_kwargs)
+                self.entry.save_without_aliased_data(**self.save_kwargs)
             else:
                 self.entry.dummy_save(**self.save_kwargs)
 
