@@ -82,15 +82,19 @@ class TileTreeOperation:
         from arches_querysets.models import ResourceTileTree, TileTree
 
         lookup = {}
+        if not self.entry._permitted_nodes:
+            self.entry._permitted_nodes = Node.objects.filter(
+                nodegroup__in=self.editable_nodegroups
+            )
         if isinstance(self.entry, ResourceTileTree):
             for node in self.entry._permitted_nodes:
                 if node.pk == node.nodegroup_id:
                     lookup[node.pk] = node
         elif isinstance(self.entry, TileTree):
-            # TODO: look into whether this is repetitive.
             for nodegroup in self.nodegroups:
                 if arches_version >= (8, 0):
-                    lookup[nodegroup.pk] = nodegroup.grouping_node
+                    if nodegroup.grouping_node in self.entry._permitted_nodes:
+                        lookup[nodegroup.pk] = nodegroup.grouping_node
                 else:
                     for node in nodegroup.node_set.all():
                         if (
@@ -111,9 +115,8 @@ class TileTreeOperation:
         except ProgrammingError as e:
             if e.args and "excess_tiles" in e.args[0]:
                 nodegroup_id = e.args[0].split("nodegroupid: ")[1].split(",")[0]
-                nodegroup_alias = self.grouping_nodes_by_nodegroup_id[
-                    uuid.UUID(nodegroup_id)
-                ].alias
+                uid = uuid.UUID(nodegroup_id)
+                nodegroup_alias = self.grouping_nodes_by_nodegroup_id[uid].alias
                 msg = _("Tile Cardinality Error")
                 raise ValidationError({nodegroup_alias: msg}) from e
             raise

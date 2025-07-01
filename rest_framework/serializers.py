@@ -437,6 +437,8 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             dummy_instance.sortorder = None
             dummy_instance.set_next_sort_order()
             validated_data["sortorder"] = dummy_instance.sortorder
+        if arches_version < (8, 0):
+            validated_data["data"] = {}
         validated_data["__request"] = self.context["request"]
         with transaction.atomic():
             created = super().create(validated_data)
