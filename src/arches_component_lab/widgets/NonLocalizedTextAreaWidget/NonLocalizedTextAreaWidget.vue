@@ -2,7 +2,7 @@
 import { onMounted, ref } from "vue";
 
 import Message from "primevue/message";
-import ProgressSpinner from "primevue/progressspinner";
+import Skeleton from "primevue/skeleton";
 
 import NonLocalizedTextAreaWidgetEditor from "@/arches_component_lab/widgets/NonLocalizedTextAreaWidget/components/NonLocalizedTextAreaWidgetEditor.vue";
 import NonLocalizedTextAreaWidgetViewer from "@/arches_component_lab/widgets/NonLocalizedTextAreaWidget/components/NonLocalizedTextAreaWidgetViewer.vue";
@@ -49,9 +49,9 @@ onMounted(async () => {
 </script>
 
 <template>
-    <ProgressSpinner
+    <Skeleton
         v-if="isLoading"
-        style="width: 2em; height: 2em"
+        style="height: 2em"
     />
     <template v-else>
         <label v-if="props.showLabel">
