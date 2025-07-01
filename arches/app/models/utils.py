@@ -3,7 +3,7 @@ def add_to_update_fields(kwargs, field_name):
     Update the `update_field` arg inside `kwargs` (if present) in-place
     with `field_name`.
     """
-    if (update_fields := kwargs.get("update_fields")) is not None:
+    if update_fields := kwargs.get("update_fields"):
         if isinstance(update_fields, set):
             # Django sends a set from update_or_create()
             update_fields.add(field_name)

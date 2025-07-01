@@ -822,3 +822,14 @@ class TileTests(ArchesTestCase):
         tile.save()
 
         self.assertEqual(tile.data, {data_collecting_grouping_node_id: None})
+
+    def test_dummy_save(self):
+        """Providing update_fields=set() will abort the save and only run side effects."""
+        data_collecting_grouping_node_id = "72048cb3-adbc-11e6-9ccf-14109fd34195"
+        tile = Tile(
+            resourceinstance_id=UUID("40000000-0000-0000-0000-000000000000"),
+            nodegroup_id=UUID(data_collecting_grouping_node_id),
+            data={},  # v8: can just omit
+        )
+        tile.save(update_fields=set())
+        self.assertFalse(Tile.objects.filter(pk=tile.pk).exists())
