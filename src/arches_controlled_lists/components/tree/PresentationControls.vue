@@ -32,6 +32,9 @@ const { $gettext } = useGettext();
 
 <template>
     <div class="tree-controls-container">
+        <div class="container-title">
+            {{ $gettext("Tree controls") }}
+        </div>
         <div
             style="
                 text-align: center;
