@@ -130,7 +130,7 @@ def pop_arches_model_kwargs(kwargs, model_fields):
 
 def get_tile_values_for_resource(node, permitted_nodes):
     """
-    Return a tile values query expression for use in a ResourceInstanceQuerySet.
+    Return a tile values query expression for use in a ResourceTileTreeQuerySet.
 
     Allows shallow filtering, e.g. concepts.filter(uri_content...
     even if `uri_content` is not in the top nodegroup. For this reason,
