@@ -155,6 +155,7 @@ INSTALLED_APPS = (
     "django.contrib.gis",
     "django_hosts",
     "arches_controlled_lists",
+    "arches_querysets",
     "arches",
     "arches.app.models",
     "arches.management",
