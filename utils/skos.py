@@ -34,8 +34,7 @@ class SKOSReader(SKOSReader):
         allowed_languages = {}
         for lang in models.Language.objects.all():
             allowed_languages[lang.code] = lang
-        default_lang = settings.LANGUAGE_CODE
-        list_lookup = {}
+        default_lang = allowed_languages[settings.LANGUAGE_CODE]
 
         # if the graph is of the type rdflib.graph.Graph
         if isinstance(graph, Graph):
@@ -43,9 +42,8 @@ class SKOSReader(SKOSReader):
             ### Lists ###
             # Search for ConceptSchemes first - these will become Lists
             for scheme, v, o in graph.triples((None, RDF.type, SKOS.ConceptScheme)):
-                scheme_id = self.generate_uuidv5_from_subject(baseuuid, scheme)
-                new_list = List(scheme_id)
-                list_lookup[scheme] = new_list
+                list_id = self.generate_uuidv5_from_subject(baseuuid, scheme)
+                new_list = List(list_id)
 
                 for predicate, object in graph.predicate_objects(subject=scheme):
                     # Get List name from a ConceptScheme's title element
@@ -58,7 +56,7 @@ class SKOSReader(SKOSReader):
                         val = self.unwrapJsonLiteral(object)
                         new_list.name = val["value"]
 
-                self.lists[scheme_id] = new_list
+                self.lists[scheme] = new_list
 
             # Create lookups for valuetypes used during Concept processing
             value_types = models.DValueType.objects.all()
@@ -90,7 +88,7 @@ class SKOSReader(SKOSReader):
                         uri = self.unwrapJsonLiteral(str(object))["value"]
 
                     elif predicate == SKOS.inScheme:
-                        list_item.list = list_lookup.get(object)
+                        list_item.list = self.lists[object]
 
                     elif any(
                         type in predicate for type in skos_note_and_label_types.keys()
@@ -100,8 +98,7 @@ class SKOSReader(SKOSReader):
                                 allowed_languages[lang.code] = lang
 
                         object_language = (
-                            allowed_languages[object.language]
-                            or allowed_languages[default_lang]
+                            allowed_languages[object.language] or default_lang
                         )
                         relation_or_value_type = predicate.replace(SKOS, "").replace(
                             ARCHES, ""
@@ -140,7 +137,7 @@ class SKOSReader(SKOSReader):
                 list_item.sortorder = 0
                 self.list_items[list_item_id] = list_item
 
-            # Create relationships
+            ### Relationships ###
             for relation in self.relations:
                 source = relation["source"]
                 target = relation["target"]
