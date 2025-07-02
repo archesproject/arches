@@ -386,9 +386,10 @@ class TileTests(ArchesTestCase):
         provisional_tile.save(index=False, request=request)
         self.assertEqual(provisional_tile.sortorder, 0)
 
-        obj, _ = TileModel.objects.update_or_create(
-            pk=provisional_tile.pk, nodegroup_id=provisional_tile.nodegroup_id
-        )
+        with self.assertWarns(FutureWarning):
+            obj, _ = TileModel.objects.update_or_create(
+                pk=provisional_tile.pk, nodegroup_id=provisional_tile.nodegroup_id
+            )
         obj.refresh_from_db()  # give test opportunity to fail on Django 4.2+
 
         self.assertEqual(obj.sortorder, 1)

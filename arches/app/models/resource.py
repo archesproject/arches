@@ -283,7 +283,7 @@ class Resource(models.ResourceInstance):
 
         if not self.principaluser_id and user:
             self.principaluser_id = user.id
-            add_to_update_fields(kwargs, "principaluser_id")
+            kwargs = add_to_update_fields(kwargs, "principaluser_id")
 
         super(Resource, self).save(**kwargs)
 
