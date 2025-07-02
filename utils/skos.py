@@ -1,19 +1,11 @@
-import os
 import uuid
 import re
-import logging
-from django.db import transaction, IntegrityError
 from django.db.models import Q
-from django.utils import translation
-from django.utils.http import urlencode
-from rdflib import Literal, Namespace, RDF, URIRef
+from rdflib import Namespace, RDF
 from rdflib.namespace import SKOS, DCTERMS
 from rdflib.graph import Graph
-from time import time
 from arches.app.models import models
 from arches.app.models.system_settings import settings
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.i18n import capitalize_region
 from arches.app.utils.skos import SKOSReader
 from arches_controlled_lists.models import List, ListItem, ListItemValue
 
@@ -24,8 +16,8 @@ ARCHES = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 class SKOSReader(SKOSReader):
     def __init__(self):
         super().__init__()
-        self.lists = []
-        self.list_items = []
+        self.lists = {}
+        self.list_items = {}
         self.list_item_values = []
 
     """
@@ -66,9 +58,7 @@ class SKOSReader(SKOSReader):
                         val = self.unwrapJsonLiteral(object)
                         new_list.name = val["value"]
 
-                # TODO: Bulk create (and blessed overwrite)
-                # list.save()
-                self.lists.append(new_list)
+                self.lists[scheme_id] = new_list
 
             # Create lookups for valuetypes used during Concept processing
             value_types = models.DValueType.objects.all()
@@ -100,9 +90,8 @@ class SKOSReader(SKOSReader):
                         uri = self.unwrapJsonLiteral(str(object))["value"]
 
                     elif predicate == SKOS.inScheme:
-                        list_item.list = list_lookup.get(object, None)
+                        list_item.list = list_lookup.get(object)
 
-                    # Capture remaining SKOS properties as list item values
                     elif any(
                         type in predicate for type in skos_note_and_label_types.keys()
                     ):
@@ -125,17 +114,47 @@ class SKOSReader(SKOSReader):
                         )
                         self.list_item_values.append(list_item_value)
 
-                    elif predicate in [SKOS.broader, SKOS.narrower]:
-                        pass
+                    elif predicate == SKOS.broader:
+                        self.relations.append(
+                            {
+                                "source": self.generate_uuidv5_from_subject(
+                                    baseuuid, object
+                                ),
+                                "type": "broader",
+                                "target": list_item,
+                            }
+                        )
+                    elif predicate == SKOS.narrower:
+                        self.relations.append(
+                            {
+                                "source": list_item,
+                                "type": "narrower",
+                                "target": self.generate_uuidv5_from_subject(
+                                    baseuuid, object
+                                ),
+                            }
+                        )
 
                 list_item.uri = uri
+                # TODO: Mint unique sortorder
+                list_item.sortorder = 0
+                self.list_items[list_item_id] = list_item
 
-                # TODO: Tie the list_item to a list
-                # list_item.list =
-                # list_item.sortorder = # not sure how to determine this from SKOS
-                # list_item.guide = False # safe to fall back to False?
+            # Create relationships
+            for relation in self.relations:
+                source = relation["source"]
+                target = relation["target"]
+                type = relation["type"]
+                if type == "narrower":
+                    self.list_items[target].parent = source
+                elif type == "broader":
+                    self.list_items[source].parent = target
 
-                self.list_items.append(list_item)
+            # TODO: Handle list item pk collisions in polyhierarhcies
+
+            List.objects.bulk_create(self.lists.values())
+            ListItem.objects.bulk_create(self.list_items.values())
+            ListItemValue.objects.bulk_create(self.list_item_values)
 
     def generate_uuidv5_from_subject(self, baseuuid, subject):
         uuidregx = re.compile(
