@@ -1,6 +1,8 @@
 import uuid
 import re
+from itertools import chain
 from django.db.models import Q
+from django.db import transaction
 from rdflib import Namespace, RDF
 from rdflib.namespace import SKOS, DCTERMS
 from rdflib.graph import Graph
@@ -82,6 +84,7 @@ class SKOSReader(SKOSReader):
 
                 # rdf:about is fallback URI for a concept, unless it has dcterms:identifier
                 uri = self.unwrapJsonLiteral(str(concept))
+                sortorder = 0
 
                 for predicate, object in graph.predicate_objects(subject=concept):
                     if predicate == DCTERMS.identifier:
@@ -132,9 +135,11 @@ class SKOSReader(SKOSReader):
                             }
                         )
 
+                    elif predicate == ARCHES.sortOrder:
+                        sortorder = int(self.unwrapJsonLiteral(str(object))["value"])
+
                 list_item.uri = uri
-                # TODO: Mint unique sortorder
-                list_item.sortorder = 0
+                list_item.sortorder = sortorder
                 self.list_items[list_item_id] = list_item
 
             ### Relationships ###
@@ -147,11 +152,46 @@ class SKOSReader(SKOSReader):
                 elif type == "broader":
                     self.list_items[source].parent = target
 
-            # TODO: Handle list item pk collisions in polyhierarhcies
+            with transaction.atomic():
+                List.objects.bulk_create(self.lists.values())
+                ListItem.objects.bulk_create(self.list_items.values())
+                ListItemValue.objects.bulk_create(self.list_item_values)
 
-            List.objects.bulk_create(self.lists.values())
-            ListItem.objects.bulk_create(self.list_items.values())
-            ListItemValue.objects.bulk_create(self.list_item_values)
+                # TODO: Handle list item pk collisions in polyhierarhcies
+
+                ### Sort order ###
+                new_list_items = ListItem.objects.filter(
+                    list_id__in=[new_list.pk for new_list in self.lists.values()]
+                ).prefetch_related("children")
+
+                parents = set(
+                    chain(
+                        new_list_items.filter(parent__isnull=True),  # root items
+                        new_list_items.exclude(children__isnull=True),  # with children
+                    )
+                )
+                list_items_with_sortorder = []
+                for parent in parents:
+                    children = {}
+                    for child in parent.children.all().prefetch_related(
+                        "list_item_values"
+                    ):
+                        try:
+                            prefLabel = child.list_item_values.get(
+                                valuetype="prefLabel", language=default_lang
+                            )
+                        except ListItemValue.DoesNotExist:
+                            prefLabel = child.list_item_values.filter(
+                                valuetype="prefLabel"
+                            ).first()
+                        children[prefLabel.value] = child
+
+                    children = [val for key, val in sorted(children.items())]
+                    for i, child in enumerate(children):
+                        child.sortorder = i
+                        list_items_with_sortorder.append(child)
+
+                ListItem.objects.bulk_update(list_items_with_sortorder, ["sortorder"])
 
     def generate_uuidv5_from_subject(self, baseuuid, subject):
         uuidregx = re.compile(
