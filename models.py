@@ -6,6 +6,8 @@ from collections import defaultdict
 from typing import Iterable, TYPE_CHECKING
 
 from django.conf import settings
+from django.contrib.postgres.constraints import ExclusionConstraint
+from django.contrib.postgres.fields import RangeOperators
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models, transaction
@@ -185,14 +187,28 @@ class ListItem(models.Model):
     class Meta:
         ordering = ["sortorder"]
         constraints = [
-            # Sort order concerns the list as a whole, not subsets
-            # of the hierarchy.
-            models.UniqueConstraint(
-                fields=["list", "sortorder"],
+            ExclusionConstraint(
+                expressions=[
+                    ("list", RangeOperators.EQUAL),
+                    ("sortorder", RangeOperators.EQUAL),
+                ],
                 name="unique_list_sortorder",
+                condition=models.Q(parent__isnull=True),
                 deferrable=Deferrable.DEFERRED,
                 violation_error_message=_(
-                    "All items in this list must have distinct sort orders."
+                    "All items at the root of this list must have distinct sort orders."
+                ),
+            ),
+            ExclusionConstraint(
+                expressions=[
+                    ("parent", RangeOperators.EQUAL),
+                    ("sortorder", RangeOperators.EQUAL),
+                ],
+                name="unique_parent_sortorder",
+                condition=models.Q(parent__isnull=False),
+                deferrable=Deferrable.DEFERRED,
+                violation_error_message=_(
+                    "All child items in this parent item must have distinct sort orders."
                 ),
             ),
             models.UniqueConstraint(
