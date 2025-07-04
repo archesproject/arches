@@ -2116,21 +2116,22 @@ class ResourceInstanceDataType(BaseDataType):
 
         resourceid = None
         data = self.get_tile_data(tile)
-        nodevalue = self.get_nodevalues(data[str(node.nodeid)])
+        if data:
+            nodevalue = self.get_nodevalues(data[str(node.nodeid)])
 
-        items = []
-        for resourceXresource in nodevalue:
-            try:
-                resourceid = resourceXresource["resourceId"]
-                related_resource = Resource.objects.get(pk=resourceid)
-                displayname = related_resource.displayname()
-                if displayname is not None:
-                    items.append(displayname)
-            except (TypeError, KeyError):
-                pass
-            except:
-                logger.info(f'Resource with id "{resourceid}" not in the system.')
-        return ", ".join(items)
+            items = []
+            for resourceXresource in nodevalue:
+                try:
+                    resourceid = resourceXresource["resourceId"]
+                    related_resource = Resource.objects.get(pk=resourceid)
+                    displayname = related_resource.displayname()
+                    if displayname is not None:
+                        items.append(displayname)
+                except (TypeError, KeyError):
+                    pass
+                except:
+                    logger.info(f'Resource with id "{resourceid}" not in the system.')
+            return ", ".join(items)
 
     def get_relationship_display_value(self, relationship_valueid):
         preflabel = get_preflabel_from_valueid(relationship_valueid, get_language())
