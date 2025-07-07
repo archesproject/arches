@@ -326,8 +326,11 @@ class ListItem(models.Model):
             return None
         return ranked_labels[0].value
 
-    def find_best_label(self):
-        return self.find_best_label_from_set(self.list_item_values.labels())
+    def find_best_label(self, language=None) -> str | None:
+        prefetched_labels = getattr(self, "list_item_labels", [])
+        return self.find_best_label_from_set(
+            prefetched_labels or self.list_item_values.labels(), language
+        )
 
     def get_child_uris(self, uris=[]):
         uris.append(self.uri)
