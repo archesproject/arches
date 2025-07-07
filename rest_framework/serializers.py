@@ -78,13 +78,14 @@ def _handle_nested_aliased_data(data, *, fields_map) -> AliasedData:
         tile_serializer.initial_data = field_data
         # Later: could look into batching these exceptions up.
         tile_serializer.is_valid(raise_exception=True)
-        if getattr(tile_serializer, "many", False):
-            tile_or_tiles = [
-                TileTree(**data) for data in tile_serializer.validated_data
-            ]
-        else:
-            tile_or_tiles = TileTree(**tile_serializer.validated_data)
-        setattr(all_data, field_name, tile_or_tiles)
+        if tile_serializer.validated_data:
+            if getattr(tile_serializer, "many", False):
+                tile_or_tiles = [
+                    TileTree(**data) for data in tile_serializer.validated_data
+                ]
+            else:
+                tile_or_tiles = TileTree(**tile_serializer.validated_data)
+            setattr(all_data, field_name, tile_or_tiles)
     return all_data
 
 
