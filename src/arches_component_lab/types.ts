@@ -2,7 +2,10 @@ export interface CardXNodeXWidget {
     card: {
         name: string;
     };
-    config: unknown;
+    config: {
+        defaultValue: unknown | null;
+        placeholder: unknown | null;
+    };
     id: string;
     label: string;
     node: {

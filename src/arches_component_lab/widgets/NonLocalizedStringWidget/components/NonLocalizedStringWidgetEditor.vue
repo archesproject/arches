@@ -8,7 +8,6 @@ import { FormField, type FormFieldResolverOptions } from "@primevue/forms";
 
 const props = defineProps<{
     nodeAlias: string;
-    graphSlug: string;
     value: string | null | undefined;
 }>();
 
@@ -42,7 +41,6 @@ function validate(e: FormFieldResolverOptions) {
         :resolver="resolver"
     >
         <InputText
-            :id="`${props.graphSlug}-${props.nodeAlias}-input`"
             type="text"
             :fluid="true"
         />

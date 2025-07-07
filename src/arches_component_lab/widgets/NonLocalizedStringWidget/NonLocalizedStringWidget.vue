@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import GenericWidget from "@/arches_component_lab/widgets/components/GenericWidget.vue";
 import NonLocalizedStringWidgetEditor from "@/arches_component_lab/widgets/NonLocalizedStringWidget/components/NonLocalizedStringWidgetEditor.vue";
 import NonLocalizedStringWidgetViewer from "@/arches_component_lab/widgets/NonLocalizedStringWidget/components/NonLocalizedStringWidgetViewer.vue";
+
+import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
@@ -11,14 +12,12 @@ const props = withDefaults(
         mode: WidgetMode;
         nodeAlias: string;
         graphSlug: string;
-        cardXNodeXWidgetData?: CardXNodeXWidget;
-        value?: string | null | undefined;
+        cardXNodeXWidgetData: CardXNodeXWidget;
+        value: string | null | undefined;
         showLabel?: boolean;
     }>(),
     {
-        cardXNodeXWidgetData: undefined,
         showLabel: true,
-        value: undefined,
     },
 );
 
@@ -26,30 +25,20 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
 </script>
 
 <template>
-    <GenericWidget
-        :graph-slug="props.graphSlug"
-        :node-alias="props.nodeAlias"
-        :mode="props.mode"
-        :show-label="props.showLabel"
+    <NonLocalizedStringWidgetEditor
+        v-if="props.mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-    >
-        <template #editor="slotProps">
-            <NonLocalizedStringWidgetEditor
-                :card-x-node-x-widget-data="slotProps.cardXNodeXWidgetData"
-                :graph-slug="graphSlug"
-                :node-alias="nodeAlias"
-                :value="props.value"
-                @update:value="emit('update:value', $event)"
-                @update:is-dirty="emit('update:isDirty', $event)"
-            />
-        </template>
-        <template #viewer="slotProps">
-            <NonLocalizedStringWidgetViewer
-                :card-x-node-x-widget-data="slotProps.cardXNodeXWidgetData"
-                :value="props.value"
-            />
-        </template>
-    </GenericWidget>
+        :graph-slug="graphSlug"
+        :node-alias="nodeAlias"
+        :value="props.value"
+        @update:value="emit('update:value', $event)"
+        @update:is-dirty="emit('update:isDirty', $event)"
+    />
+    <NonLocalizedStringWidgetViewer
+        v-if="props.mode === VIEW"
+        :card-x-node-x-widget-data="cardXNodeXWidgetData"
+        :value="props.value"
+    />
 </template>
 
 <style scoped>
