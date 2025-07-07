@@ -10,7 +10,7 @@ import type {
     WidgetMode,
 } from "@/arches_component_lab/widgets/types.ts";
 
-const props = defineProps<{
+defineProps<{
     mode: WidgetMode;
     nodeAlias: string;
     graphSlug: string;
@@ -23,16 +23,16 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
 
 <template>
     <ResourceInstanceMultiSelectWidgetEditor
-        v-if="props.mode === EDIT"
+        v-if="mode === EDIT"
         :graph-slug="graphSlug"
         :node-alias="nodeAlias"
-        :value="props.value"
+        :value="value"
         @update:value="emit('update:value', $event)"
         @update:is-dirty="emit('update:isDirty', $event)"
     />
     <ResourceInstanceMultiSelectWidgetViewer
-        v-if="props.mode === VIEW"
+        v-if="mode === VIEW"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="props.value"
+        :value="value"
     />
 </template>
