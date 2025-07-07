@@ -130,7 +130,7 @@ class TileTreeOperation:
         if isinstance(self.entry, TileModel):
             self._update_tile(
                 self.entry.nodegroup.grouping_node,
-                self.entry,
+                None,
                 original_tile_data_by_tile_id,
             )
         else:
@@ -239,22 +239,22 @@ class TileTreeOperation:
     def _extract_incoming_tiles(self, container, grouping_node):
         from arches_querysets.models import TileTree
 
-        if isinstance(container, dict):
+        if container is None:
+            aliased_data = self.entry.aliased_data
+        elif isinstance(container, dict):
             aliased_data = container.get("aliased_data")
         else:
             aliased_data = container.aliased_data
-        if isinstance(aliased_data, dict):
+
+        if container is None:
+            new_tiles = [self.entry]
+        elif isinstance(aliased_data, dict):
             new_tiles = aliased_data.get(grouping_node.alias, NOT_PROVIDED)
         else:
             new_tiles = getattr(aliased_data, grouping_node.alias, NOT_PROVIDED)
-        # Is this grouping node the entry point?
-        if (
-            isinstance(self.entry, TileTree)
-            and self.entry.nodegroup_id == grouping_node.pk
-        ):
-            new_tiles = [container]
         if new_tiles is NOT_PROVIDED:
             raise KeyError(grouping_node.alias)
+
         if grouping_node.nodegroup.cardinality == "1":
             if new_tiles is None:
                 new_tiles = []
