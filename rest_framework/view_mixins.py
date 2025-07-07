@@ -49,6 +49,7 @@ class ArchesModelAPIMixin:
         else:
             self.resource_ids = None
         self.fill_blanks = request.GET.get("fill_blanks", "f").lower().startswith("t")
+        self.graph_nodes = []  # populated in get_object()
 
         return super().setup(request, *args, **kwargs)
 
@@ -93,7 +94,7 @@ class ArchesModelAPIMixin:
         return {
             **super().get_serializer_context(),
             "graph_slug": self.graph_slug,
-            "graph_nodes": getattr(self, "graph_nodes", None),
+            "graph_nodes": self.graph_nodes,
             "nodegroup_alias": self.nodegroup_alias,
         }
 

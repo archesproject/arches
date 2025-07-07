@@ -50,6 +50,7 @@ def _make_tile_serializer(
         many=cardinality == "n",
         required=False,
         allow_null=True,
+        graph_slug=slug,
         graph_nodes=graph_nodes,
         style={"alias": nodegroup_alias, "sortorder": sortorder},
     )
@@ -397,6 +398,7 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         fields = "__all__"
 
     def __init__(self, instance=None, data=empty, **kwargs):
+        self._graph_slug = kwargs.pop("graph_slug", None)
         self._graph_nodes = kwargs.pop("graph_nodes", [])
         super().__init__(instance, data, **kwargs)
         self._child_nodegroup_aliases = []
@@ -482,6 +484,18 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         graph_slug = None
         nodegroups = "__all__"
         fields = "__all__"
+
+    def __init__(self, *args, graph_slug=None, graph_nodes=None, **kwargs):
+        if not kwargs.get("context"):
+            # The view provides a context, so this is mainly here for CLI usage.
+            self.parent = None
+            context = {
+                "graph_slug": graph_slug,
+                "graph_nodes": graph_nodes or self.find_graph_nodes(),
+            }
+            kwargs = {**kwargs, "context": context}
+
+        super().__init__(*args, **kwargs)
 
     def build_relational_field(self, field_name, relation_info):
         ret = super().build_relational_field(field_name, relation_info)
