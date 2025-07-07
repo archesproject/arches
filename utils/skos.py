@@ -1,7 +1,7 @@
 import uuid
 import re
 from itertools import chain
-from django.db.models import Q
+from django.db.models import Q, prefetch_related_objects
 from django.db import transaction
 from rdflib import Namespace, RDF
 from rdflib.namespace import SKOS, DCTERMS
@@ -154,37 +154,22 @@ class SKOSReader(SKOSReader):
 
             with transaction.atomic():
                 List.objects.bulk_create(self.lists.values())
-                ListItem.objects.bulk_create(self.list_items.values())
+                new_list_items = ListItem.objects.bulk_create(self.list_items.values())
                 ListItemValue.objects.bulk_create(self.list_item_values)
 
                 # TODO: Handle list item pk collisions in polyhierarhcies
 
                 ### Sort order ###
-                new_list_items = ListItem.objects.filter(
-                    list_id__in=[new_list.pk for new_list in self.lists.values()]
-                ).prefetch_related("children")
-
-                parents = set(
-                    chain(
-                        new_list_items.filter(parent__isnull=True),  # root items
-                        new_list_items.exclude(children__isnull=True),  # with children
-                    )
+                prefetch_related_objects(
+                    new_list_items, "children", "children__list_item_values"
                 )
+
                 list_items_with_sortorder = []
-                for parent in parents:
+                for parent in new_list_items:
                     children = {}
-                    for child in parent.children.all().prefetch_related(
-                        "list_item_values"
-                    ):
-                        try:
-                            prefLabel = child.list_item_values.get(
-                                valuetype="prefLabel", language=default_lang
-                            )
-                        except ListItemValue.DoesNotExist:
-                            prefLabel = child.list_item_values.filter(
-                                valuetype="prefLabel"
-                            ).first()
-                        children[prefLabel.value] = child
+                    for child in parent.children.all():
+                        label = child.find_best_label(default_lang.code)
+                        children[(label, child.pk)] = child
 
                     children = [val for key, val in sorted(children.items())]
                     for i, child in enumerate(children):
