@@ -475,25 +475,34 @@ class TileTree(TileModel):
 
     @staticmethod
     def get_default_value(node):
+        datatype_factory = DataTypeFactory()
         # TODO: When ingesting this into core, make this a method on the node.
         try:
             widget_config = node.cardxnodexwidget_set.all()[0].config
             localized_config = widget_config.serialize()
         except (IndexError, ObjectDoesNotExist, MultipleObjectsReturned):
-            datatype_factory = DataTypeFactory()
             d_data_type = datatype_factory.datatypes[node.datatype]
             default_widget = d_data_type.defaultwidget
             localized_config = default_widget.defaultconfig
         default_value = localized_config.get("defaultValue")
+        return TileTree.get_cleaned_default_value(node, default_value)
 
-        if node.datatype == "number":
-            # Trying to call float("") breaks the integration with DRF.
-            # There should probably be some validation in the datatype
-            # methods to ensure that poor types don't end up in defaultValue.
-            if default_value == "":
-                default_value = None
+    @staticmethod
+    def get_cleaned_default_value(node, default_value):
+        """
+        Empty strings can break type coercion at the DRF layer, e.g.
+        float(""), or datatype methods that expect UUID | None.
+        There should probably be some validation in the datatype
+        methods to ensure that poor types don't end up in defaultValue.
+        https://github.com/archesproject/arches/issues/8715#issuecomment-3033192406
+        """
+        dt_instance = DataTypeFactory().get_instance(node.datatype)
+        node_id_str = str(node.pk)
+        mock_tile = SimpleNamespace(data={node_id_str: default_value})
+        dt_instance.clean(mock_tile, node_id_str)
+        cleaned_default = mock_tile.data[node_id_str]
 
-        return default_value
+        return cleaned_default
 
     def save_without_aliased_data(self, **kwargs):
         return super().save(**kwargs)
