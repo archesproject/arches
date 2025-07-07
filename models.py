@@ -338,6 +338,19 @@ class ListItem(models.Model):
             child.get_child_uris(uris)
         return uris
 
+    def sort_children(self, language=None):
+        sorted_children = []
+        children = {}
+        for child in self.children.all():
+            label = child.find_best_label(language=language)
+            children[(label, child.pk)] = child
+
+        children = [val for key, val in sorted(children.items())]
+        for i, child in enumerate(children):
+            child.sortorder = i
+            sorted_children.append(child)
+        return sorted_children
+
 
 class ListItemValue(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

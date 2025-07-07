@@ -166,15 +166,9 @@ class SKOSReader(SKOSReader):
 
                 list_items_with_sortorder = []
                 for parent in new_list_items:
-                    children = {}
-                    for child in parent.children.all():
-                        label = child.find_best_label(default_lang.code)
-                        children[(label, child.pk)] = child
-
-                    children = [val for key, val in sorted(children.items())]
-                    for i, child in enumerate(children):
-                        child.sortorder = i
-                        list_items_with_sortorder.append(child)
+                    list_items_with_sortorder.extend(
+                        parent.sort_children(default_lang.code)
+                    )
 
                 ListItem.objects.bulk_update(list_items_with_sortorder, ["sortorder"])
 
