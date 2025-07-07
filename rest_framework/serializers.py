@@ -21,7 +21,7 @@ from arches_querysets.rest_framework import interchange_mixin
 
 def _make_tile_serializer(
     *, nodegroup_alias, cardinality, sortorder, slug, graph_nodes, nodes="__all__"
-) -> type:
+) -> type["ArchesTileSerializer"]:
     """
     DRF encourages a declarative programming style with classes. You, as
     the project implementer, can follow that style if you wish, but we've
@@ -191,9 +191,8 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
         return AliasedData(**data)
 
     def validate(self, attrs):
-        if hasattr(self, "initial_data") and (
-            unknown_keys := set(self.initial_data) - set(self.fields)
-        ):
+        aliased_data = attrs  # thanks to to_internal_value() right above.
+        if unknown_keys := set(vars(aliased_data)) - set(self.fields):
             raise ValidationError({unknown_keys.pop(): "Unexpected field"})
         return attrs
 
@@ -363,9 +362,8 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         return AliasedData(**data)
 
     def validate(self, attrs):
-        if hasattr(self, "initial_data") and (
-            unknown_keys := set(self.initial_data) - set(self.fields)
-        ):
+        aliased_data = attrs  # thanks to to_internal_value() right above.
+        if unknown_keys := set(vars(aliased_data)) - set(self.fields):
             raise ValidationError({unknown_keys.pop(): "Unexpected field"})
 
         if validate_method := getattr(self, f"validate_{self._root_node.alias}", None):
