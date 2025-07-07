@@ -6,6 +6,7 @@ import Message from "primevue/message";
 import FileUpload from "primevue/fileupload";
 import Image from "primevue/image";
 import Button from "primevue/button";
+
 import { FormField } from "@primevue/forms";
 
 import type {
@@ -13,14 +14,12 @@ import type {
     FileUploadSelectEvent,
 } from "primevue/fileupload";
 import type { FormFieldResolverOptions } from "@primevue/forms";
+
 import type { FileReference } from "@/arches_component_lab/widgets/types.ts";
 import type { CardXNodeXWidget } from "@/arches_component_lab/types";
 
-const { $gettext } = useGettext();
-const allowedFileTypes = ref();
 const props = defineProps<{
     value: FileReference[] | null | undefined;
-    graphSlug: string;
     nodeAlias: string;
     cardXNodeXWidgetData: CardXNodeXWidget & {
         config: {
@@ -33,7 +32,11 @@ const props = defineProps<{
     };
 }>();
 
+const { $gettext } = useGettext();
+
 const formFieldRef = useTemplateRef("formFieldRef");
+
+const allowedFileTypes = ref();
 const currentValues = ref<FileReference[]>();
 
 onMounted(() => {

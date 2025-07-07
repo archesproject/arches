@@ -1,20 +1,31 @@
 <script setup lang="ts">
-import Textarea from "primevue/textarea";
-import Message from "primevue/message";
+import { useTemplateRef } from "vue";
 
-import { FormField, type FormFieldResolverOptions } from "@primevue/forms";
+import Message from "primevue/message";
+import Textarea from "primevue/textarea";
+
+import { FormField } from "@primevue/forms";
+
+import type { FormFieldResolverOptions } from "@primevue/forms";
 
 const props = defineProps<{
-    value: string | null | undefined;
     nodeAlias: string;
-    graphSlug: string;
+    value: string | null | undefined;
 }>();
 
-function resolver(e: FormFieldResolverOptions) {
-    validate(e);
+const emit = defineEmits(["update:isDirty", "update:value"]);
+
+const formFieldRef = useTemplateRef("formField");
+
+function resolver(event: FormFieldResolverOptions) {
+    validate(event);
+
+    // @ts-expect-error This is a bug with PrimeVue types
+    emit("update:isDirty", Boolean(formFieldRef.value!.fieldAttrs.dirty));
+    emit("update:value", event.value);
 
     return {
-        values: { [props.nodeAlias]: e.value },
+        values: { [props.nodeAlias]: event.value },
     };
 }
 
@@ -25,6 +36,7 @@ function validate(e: FormFieldResolverOptions) {
 
 <template>
     <FormField
+        ref="formField"
         v-slot="$field"
         :name="props.nodeAlias"
         :initial-value="props.value"

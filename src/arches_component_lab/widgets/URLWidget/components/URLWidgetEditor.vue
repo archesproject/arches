@@ -4,13 +4,14 @@ import { useTemplateRef } from "vue";
 import InputText from "primevue/inputtext";
 import Message from "primevue/message";
 
-import { FormField, type FormFieldResolverOptions } from "@primevue/forms";
+import { FormField } from "@primevue/forms";
+
+import type { FormFieldResolverOptions } from "@primevue/forms";
 
 import type { URLDatatype } from "@/arches_component_lab/widgets/types.ts";
 
 const props = defineProps<{
     nodeAlias: string;
-    graphSlug: string;
     value: URLDatatype | null | undefined;
 }>();
 
@@ -44,7 +45,6 @@ function validate(e: FormFieldResolverOptions) {
         :resolver="resolver"
     >
         <InputText
-            :id="`${props.graphSlug}-${props.nodeAlias}-input`"
             type="text"
             :fluid="true"
         />

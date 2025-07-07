@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { Image, Galleria } from "primevue";
+
 import type { FileReference } from "@/arches_component_lab/widgets/types.ts";
 
 const props = defineProps<{

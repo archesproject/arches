@@ -16,25 +16,16 @@ import type { MultiSelectFilterEvent } from "primevue/multiselect";
 import type { FormFieldResolverOptions } from "@primevue/forms";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
 
-import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
-
 import type {
     ResourceInstanceReference,
     ResourceInstanceResult,
 } from "@/arches_component_lab/widgets/types.ts";
 
-const props = withDefaults(
-    defineProps<{
-        nodeAlias: string;
-        graphSlug: string;
-        cardXNodeXWidgetData?: CardXNodeXWidget;
-        value?: ResourceInstanceReference[] | null | undefined;
-    }>(),
-    {
-        cardXNodeXWidgetData: undefined,
-        value: undefined,
-    },
-);
+const props = defineProps<{
+    nodeAlias: string;
+    graphSlug: string;
+    value: ResourceInstanceReference[] | null | undefined;
+}>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);
 
@@ -183,7 +174,6 @@ function validate(e: FormFieldResolverOptions) {
         :resolver="resolver"
     >
         <MultiSelect
-            :id="`${props.graphSlug}-${props.nodeAlias}-input`"
             display="chip"
             option-label="display_value"
             option-value="resource_id"

@@ -1,18 +1,13 @@
 <script setup lang="ts">
 import arches from "arches";
-import type { ResourceInstanceReference } from "@/arches_component_lab/widgets/types.ts";
 
+import type { ResourceInstanceReference } from "@/arches_component_lab/widgets/types.ts";
 import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 
-const props = withDefaults(
-    defineProps<{
-        value: ResourceInstanceReference[] | null | undefined;
-        cardXNodeXWidgetData?: CardXNodeXWidget;
-    }>(),
-    {
-        cardXNodeXWidgetData: undefined,
-    },
-);
+const props = defineProps<{
+    value: ResourceInstanceReference[] | null | undefined;
+    cardXNodeXWidgetData?: CardXNodeXWidget;
+}>();
 </script>
 <template>
     <div

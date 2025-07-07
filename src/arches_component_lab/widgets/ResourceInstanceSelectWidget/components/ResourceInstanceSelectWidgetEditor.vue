@@ -9,8 +9,8 @@ import Select from "primevue/select";
 
 import { fetchRelatableResources } from "@/arches_component_lab/widgets/api.ts";
 
-import type { MultiSelectFilterEvent } from "primevue/multiselect";
 import type { FormFieldResolverOptions } from "@primevue/forms";
+import type { MultiSelectFilterEvent } from "primevue/multiselect";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
 
 import type {
@@ -160,7 +160,6 @@ function validate(e: FormFieldResolverOptions) {
         :resolver="resolver"
     >
         <Select
-            :id="`${props.graphSlug}-${props.nodeAlias}-input`"
             display="chip"
             option-label="display_value"
             option-value="resource_id"

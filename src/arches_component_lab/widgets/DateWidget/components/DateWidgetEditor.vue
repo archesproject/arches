@@ -14,7 +14,6 @@ import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 
 const props = defineProps<{
     value: string | null | undefined;
-    graphSlug: string;
     nodeAlias: string;
     cardXNodeXWidgetData: CardXNodeXWidget & {
         config: {
@@ -75,12 +74,11 @@ function formatDate(date: Date | null): string | null {
     <FormField
         ref="formField"
         v-slot="$field"
-        :name="props.nodeAlias"
-        :initial-value="props.value"
+        :name="nodeAlias"
+        :initial-value="value"
         :resolver="resolver"
     >
         <DatePicker
-            :id="`${props.graphSlug}-${props.nodeAlias}-input`"
             icon-display="input"
             :date-format="dateFormat"
             :fluid="true"
