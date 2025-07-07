@@ -159,52 +159,23 @@ class TileTreeOperation:
         original_tile_data_by_tile_id,
         delete_siblings=False,
     ):
-        from arches_querysets.models import TileTree
-
         if str(grouping_node.nodegroup_id) not in self.editable_nodegroups:
             # Currently also prevents deletes.
             return
 
-        to_insert = set()
-        to_update = set()
-        to_delete = set()
-
-        # TODO: Find something more clean than this double if/else.
-        if isinstance(container, dict):
-            aliased_data = container.get("aliased_data")
-        else:
-            aliased_data = container.aliased_data
-        if isinstance(aliased_data, dict):
-            new_tiles = aliased_data.get(grouping_node.alias, NOT_PROVIDED)
-        else:
-            new_tiles = getattr(aliased_data, grouping_node.alias, NOT_PROVIDED)
-        # Is this grouping node the entry point?
-        if (
-            isinstance(self.entry, TileTree)
-            and self.entry.nodegroup_id == grouping_node.pk
-        ):
-            new_tiles = [container]
-        if new_tiles is NOT_PROVIDED:
+        try:
+            new_tiles = self._extract_incoming_tiles(container, grouping_node)
+        except KeyError:
             return
-        if grouping_node.nodegroup.cardinality == "1":
-            if new_tiles is None:
-                new_tiles = []
-            elif not isinstance(new_tiles, list):
-                # TODO: ensure this line is even reachable now.
-                new_tiles = [new_tiles]
-        if all(isinstance(tile, TileModel) for tile in new_tiles):
-            new_tiles.sort(key=attrgetter("sortorder"))
-        else:
-            parent_tile = container if isinstance(container, TileModel) else None
-            new_tiles = [
-                TileTree.deserialize(tile_dict, parent_tile=parent_tile)
-                for tile_dict in new_tiles
-            ]
         existing_tiles = self.existing_tiles_by_nodegroup_alias[grouping_node.alias]
         if not existing_tiles:
             next_sort_order = 0
         else:
             next_sort_order = max(t.sortorder or 0 for t in existing_tiles) + 1
+
+        to_insert = set()
+        to_update = set()
+        to_delete = set()
         for existing_tile, new_tile in self._pair_tiles(existing_tiles, new_tiles):
             if new_tile is NOT_PROVIDED:
                 if (
@@ -222,6 +193,8 @@ class TileTreeOperation:
                     if node.datatype != "semantic":
                         new_tile.data[str(node.pk)] = new_tile.get_default_value(node)
                 new_tile._incoming_tile = new_tile
+                if isinstance(container, TileModel):
+                    new_tile.parenttile = container
                 new_tile.full_clean()
                 to_insert.add(new_tile)
             else:
@@ -262,6 +235,40 @@ class TileTreeOperation:
         self.to_insert |= to_insert
         self.to_update |= to_update
         self.to_delete |= to_delete
+
+    def _extract_incoming_tiles(self, container, grouping_node):
+        from arches_querysets.models import TileTree
+
+        if isinstance(container, dict):
+            aliased_data = container.get("aliased_data")
+        else:
+            aliased_data = container.aliased_data
+        if isinstance(aliased_data, dict):
+            new_tiles = aliased_data.get(grouping_node.alias, NOT_PROVIDED)
+        else:
+            new_tiles = getattr(aliased_data, grouping_node.alias, NOT_PROVIDED)
+        # Is this grouping node the entry point?
+        if (
+            isinstance(self.entry, TileTree)
+            and self.entry.nodegroup_id == grouping_node.pk
+        ):
+            new_tiles = [container]
+        if new_tiles is NOT_PROVIDED:
+            raise KeyError(grouping_node.alias)
+        if grouping_node.nodegroup.cardinality == "1":
+            if new_tiles is None:
+                new_tiles = []
+            elif not isinstance(new_tiles, list):
+                new_tiles = [new_tiles]
+        if all(isinstance(tile, TileTree) for tile in new_tiles):
+            new_tiles.sort(key=attrgetter("sortorder"))
+        else:
+            parent_tile = container if isinstance(container, TileTree) else None
+            new_tiles = [
+                TileTree.deserialize(tile_dict, parent_tile=parent_tile)
+                for tile_dict in new_tiles
+            ]
+        return new_tiles
 
     def _pair_tiles(self, existing_tiles, new_tiles):
         pairs = []

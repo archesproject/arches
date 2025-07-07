@@ -337,8 +337,9 @@ class TileTree(TileModel):
     @classmethod
     def deserialize(cls, tile_dict, parent_tile: TileModel | None):
         """
-        DRF doesn't provide nested writable fields by default,
-        so we have this little deserializer helper. Consider moving this.
+        If you're not using the Django REST Framework optional dependency,
+        e.g. if you request an evaluate a queryset with as_representation=True and
+        resave the instance, you'll need a way to deserialize dicts into TileTrees.
         """
         if not isinstance(tile_dict, Mapping):
             raise TypeError(
@@ -577,17 +578,6 @@ class TileTree(TileModel):
         if tile_val is None or len(tile_val) != 1:
             return tile_val
         return tile_val[0]
-
-    def _enrich(self, graph_slug, *, only=None):
-        resource = ResourceTileTree.get_tiles(
-            graph_slug, only=only, resource_ids=[self.resourceinstance_id]
-        ).get()
-        for grouping_node in resource._permitted_nodes:
-            if grouping_node.pk != grouping_node.nodegroup_id:
-                continue  # not a grouping node
-            for node in grouping_node.nodegroup.node_set.all():
-                setattr(self.aliased_data, node.alias, self.data.get(str(node.pk)))
-        self.resourceinstance = resource
 
     def _apply_provisional_edit(
         self, proxy, existing_data, existing_provisional_edits, *, user=None

@@ -69,6 +69,25 @@ def _wrap_serializer_field(serializer_field_class) -> type:
     )
 
 
+def _handle_nested_aliased_data(data, *, fields_map) -> AliasedData:
+    all_data = AliasedData(**data)
+    for field_name, tile_serializer in fields_map.items():
+        if not isinstance(tile_serializer, ArchesTileSerializer):
+            continue
+        field_data = getattr(all_data, field_name, None)
+        tile_serializer.initial_data = field_data
+        # Later: could look into batching these exceptions up.
+        tile_serializer.is_valid(raise_exception=True)
+        if getattr(tile_serializer, "many", False):
+            tile_or_tiles = [
+                TileTree(**data) for data in tile_serializer.validated_data
+            ]
+        else:
+            tile_or_tiles = TileTree(**tile_serializer.validated_data)
+        setattr(all_data, field_name, tile_or_tiles)
+    return all_data
+
+
 class NodeFetcherMixin:
     @property
     def graph_slug(self):
@@ -189,10 +208,12 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
         return field_names
 
     def to_internal_value(self, data):
-        return AliasedData(**data)
+        """Make nested aliased data writable."""
+        self.initial_data = data
+        return _handle_nested_aliased_data(data, fields_map=self.fields)
 
     def validate(self, attrs):
-        aliased_data = attrs  # thanks to to_internal_value() right above.
+        aliased_data = attrs  # thanks to to_internal_value().
         if unknown_keys := set(vars(aliased_data)) - set(self.fields):
             raise ValidationError({unknown_keys.pop(): "Unexpected field"})
         return attrs
@@ -360,15 +381,19 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         return ret
 
     def to_internal_value(self, data):
-        return AliasedData(**data)
+        """Make nested aliased data writable."""
+        self.initial_data = data
+        return _handle_nested_aliased_data(data, fields_map=self.fields)
 
     def validate(self, attrs):
-        aliased_data = attrs  # thanks to to_internal_value() right above.
+        aliased_data = attrs  # thanks to to_internal_value().
         if unknown_keys := set(vars(aliased_data)) - set(self.fields):
             raise ValidationError({unknown_keys.pop(): "Unexpected field"})
 
-        if validate_method := getattr(self, f"validate_{self._root_node.alias}", None):
-            attrs = validate_method(attrs)
+        if validate_method := getattr(
+            self.root, f"validate_{self._root_node.alias}", None
+        ):
+            attrs = validate_method(attrs, initial_tile_data=self.parent.initial_data)
 
         return attrs
 
