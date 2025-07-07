@@ -199,6 +199,6 @@ class SKOSReader(SKOSReader):
         )
         matches = uuidregx.search(str(subject))
         if matches:
-            return matches.group(0)
+            return uuid.UUID(matches.group(0))
         else:
-            return str(uuid.uuid5(baseuuid, str(subject)))
+            return uuid.uuid5(baseuuid, str(subject))
