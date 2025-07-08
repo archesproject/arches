@@ -84,15 +84,17 @@ watchEffect(async () => {
                 props.graphSlug,
                 props.nodegroupAlias,
             );
-        const tileDataPromise = fetchTileData(
-            props.graphSlug,
-            props.nodegroupAlias,
-            props.tileId,
-        );
+        if (props.tileId) {
+            const tileDataPromise = fetchTileData(
+                props.graphSlug,
+                props.nodegroupAlias,
+                props.tileId,
+            );
+            tileData.value = await tileDataPromise;
+        }
 
         cardData.value = await cardDataPromise;
         cardXNodeXWidgetData.value = await cardXNodeXWidgetDataPromise;
-        tileData.value = await tileDataPromise;
     } catch (error) {
         configurationError.value = error;
     } finally {

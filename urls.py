@@ -40,12 +40,12 @@ urlpatterns = [
         name="api-node-data",
     ),
     path(
-        "arches-component-lab/api/card-x-node-x-widget-list-from-nodegroup/<slug:graph_slug>/<slug:nodegroup_grouping_node_alias>",
+        "arches-component-lab/api/card-x-node-x-widget-list-from-nodegroup/<slug:graph_slug>/<slug:nodegroup_alias>",
         CardXNodeXWidgetListFromNodegroupView.as_view(),
         name="api-card-x-node-x-widget-list-from-nodegroup",
     ),
     path(
-        "arches-component-lab/api/card-data/<slug:graph_slug>/<slug:nodegroup_grouping_node_alias>",
+        "arches-component-lab/api/card-data/<slug:graph_slug>/<slug:nodegroup_alias>",
         CardDataView.as_view(),
         name="api-card-data",
     ),
