@@ -44,7 +44,7 @@ class TileTreeOperation:
         if not self.request:
             self.request = HttpRequest()
         if not getattr(self.request, "user", None):
-            # Allow server-side usage when not going through middlewrae
+            # Allow server-side usage when not going through middleware
             self.request.user = User.objects.get(username="anonymous")
         self.save_kwargs = save_kwargs or {}
         self.transaction_id = uuid.uuid4()

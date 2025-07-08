@@ -1,14 +1,17 @@
 from django.utils.translation import get_language
 
 from arches.app.datatypes import datatypes
+from arches.app.models import models
 
 
 class FileListDataType(datatypes.FileListDataType):
     localized_metadata_keys = {"altText", "attribution", "description", "title"}
 
-    def transform_value_for_tile(self, value, *, languages, **kwargs):
+    def transform_value_for_tile(self, value, *, languages=None, **kwargs):
         if not value:
             return value
+        if not languages:  # pragma: no cover
+            languages = models.Language.objects.all()
 
         language = get_language()
         stringified_list = ",".join([file_info.get("name") for file_info in value])
