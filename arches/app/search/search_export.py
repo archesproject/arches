@@ -22,6 +22,7 @@ import logging
 from io import StringIO
 from io import BytesIO
 import re
+import uuid
 from django.contrib.gis.geos import GeometryCollection, GEOSGeometry
 from django.core.files import File
 from django.utils.translation import gettext as _
@@ -195,8 +196,9 @@ class SearchResultsExporter(object):
                         resource_obj
                     )
 
+        graphs = models.GraphModel.objects.filter(pk__in=output).in_bulk()
         for graph_id, resources in output.items():
-            graph = models.GraphModel.objects.get(pk=graph_id)
+            graph = graphs[uuid.UUID(graph_id)]
 
             if (report_link == "true") and (format != "tilexl"):
                 for resource in resources["output"]:
