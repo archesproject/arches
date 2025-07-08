@@ -363,7 +363,6 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
 
         ret = self.build_standard_field(field_name, model_field)
         ret[1]["required"] = node.isrequired
-        ret[1]["initial"] = TileTree.get_default_value(node)
         ret[1]["help_text"] = config.serialize().get("placeholder")
         ret[1]["label"] = label.serialize()
         ret[1]["style"] = {
@@ -373,6 +372,14 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             "datatype": node.datatype,
             "sortorder": sortorder,
         }
+
+        # Stock default value.
+        default_val = TileTree.get_default_value(node)
+        # It's a little roundabout to instantiate a tile like this, but the underlying
+        # methods expect tiles in case there are provisional edits there.
+        dummy_tile = TileTree(data={str(node.pk): default_val})
+        pair = dummy_tile.get_display_interchange_pair(node, node_value=default_val)
+        ret[1]["initial"] = pair
 
         return ret
 

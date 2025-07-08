@@ -60,8 +60,20 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
                 ]
             raise
 
+    def get_resource(self, tile):
+        try:
+            return tile.resourceinstance
+        except models.ResourceInstance.DoesNotExist:
+            return None
+        except AttributeError:
+            resource_id = tile["resourceinstance_id"]
+            return models.ResourceInstance.objects.filter(pk=resource_id).first()
+
     def to_json(self, tile, node):
-        return self.compile_json(tile, node, details=self.get_details(tile, node))
+        data = self.get_tile_data(tile)
+        value = data.get(str(node.nodeid))
+        resource = self.get_resource(tile)
+        return self.compile_json(tile, node, details=self.get_details(value, resource))
 
     def compile_json(self, tile, node, *, details=None, **kwargs):
         ret = {"@display_value": self.get_display_value(tile, node, details=details)}
@@ -70,28 +82,28 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
 
     def get_display_value(self, tile, node, *, details=None, **kwargs):
         if details is None:
-            details = self.get_details(tile, node)
+            data = self.get_tile_data(tile)
+            value = data.get(str(node.nodeid))
+            resource = self.get_resource(tile)
+            details = self.get_details(value, resource)
         return ", ".join(
             [detail["display_value"] or "" for detail in details if detail]
         )
 
-    def to_python(self, value, *, tile, **kwargs):
-        if not (related_resources := self.get_related_resources(tile, value)):
+    def to_python(self, value, *, resource=None):
+        if not (related_resources := self.get_related_resources(value, resource)):
             return None
         return related_resources[0]
 
-    def get_related_resources(self, tile, value):
+    def get_related_resources(self, value, resource):
         if not value:
             return []
         related_resources = []
 
-        if not isinstance(tile, models.TileModel):
-            tile = models.TileModel(**tile)
-
         if arches_version >= (8, 0):
-            relations = tile.resourceinstance.from_resxres.all()
+            relations = resource.from_resxres.all()
         else:
-            relations = tile.resourceinstance.resxres_resource_instance_ids_from.all()
+            relations = resource.resxres_resource_instance_ids_from.all()
 
         def handle_missing_data(to_resource_id):
             msg = f"Missing ResourceXResource target: {to_resource_id}"
@@ -100,13 +112,24 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
         for inner_val in value:
             if not inner_val:
                 continue
+            target_resource_id = uuid.UUID(inner_val["resourceId"])
+            if not relations:
+                if arches_version >= (8, 0):
+                    relations = models.ResourceXResource.objects.filter(
+                        to_resource_id=target_resource_id
+                    )
+                else:
+                    relations = models.ResourceXResource.objects.filter(
+                        resourceinstanceidto_id=target_resource_id
+                    )
+
             for relation in relations:
                 to_resource_id = (
                     relation.resourceinstanceidto_id
                     if arches_version < (8, 0)
                     else relation.to_resource_id
                 )
-                if to_resource_id == uuid.UUID(inner_val["resourceId"]):
+                if to_resource_id == target_resource_id:
                     try:
                         to_resource = (
                             relation.resourceinstanceidto
@@ -123,17 +146,16 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
 
         return related_resources
 
-    def get_details(self, tile, node, *, value=None):
+    def get_details(self, value, resource=None):
         """Hook for deriving information needed by both the display value
         and the interchange value."""
         lang = get_language()
-        value = value or self.get_tile_data(tile).get(str(node.pk)) or []
         related_resources_by_id = {
             related_resource.pk: related_resource
-            for related_resource in self.get_related_resources(tile, value)
+            for related_resource in self.get_related_resources(value, resource)
         }
         ret = []
-        for inner_val in value:
+        for inner_val in value or []:
             if not inner_val:
                 continue
             if related := related_resources_by_id.get(
@@ -187,8 +209,8 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
     def collects_multiple_values(self):
         return True
 
-    def to_python(self, value, *, tile, **kwargs):
-        if not (related_resources := self.get_related_resources(tile, value)):
+    def to_python(self, value, *, resource=None):
+        if not (related_resources := self.get_related_resources(value, resource)):
             return None
         return related_resources
 

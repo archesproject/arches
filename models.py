@@ -235,6 +235,10 @@ class TileTree(TileModel):
     def parent(self, parent):
         self._parent = parent
 
+    @property
+    def resource_or_none(self):
+        return self.resourceinstance if self.resourceinstance_id else None
+
     def save(self, *, request=None, index=True, **kwargs):
         if arches_version < (8, 0) and self.nodegroup:
             # Cannot supply this too early, as nodegroup might be included
@@ -505,6 +509,26 @@ class TileTree(TileModel):
 
         return cleaned_default
 
+    def get_display_interchange_pair(self, node, node_value):
+        datatype_instance = DataTypeFactory().get_instance(node.datatype)
+        empty_values = (None, "", '{"url": "", "url_label": ""}')
+        compiled_json = datatype_instance.to_json(self, node)
+        pair = {
+            "display_value": compiled_json["@display_value"],
+            "interchange_value": datatype_instance.get_interchange_value(
+                node_value,
+                # Provide details to avoid repetitive computations.
+                details=compiled_json.get("details"),
+                # An optional extra hint for the ResourceInstance{list} types
+                # so that prefetched related resources can be used.
+                resource=self.resource_or_none,
+            ),
+        }
+        if pair["display_value"] in empty_values:
+            # Future: upstream this into datatype methods (another hook?)
+            pair["display_value"] = _("(Empty)")
+        return pair
+
     def save_without_aliased_data(self, **kwargs):
         return super().save(**kwargs)
 
@@ -518,25 +542,14 @@ class TileTree(TileModel):
         """Format node_value according to the self._as_representation flag and
         set it on self.aliased_data."""
         datatype_instance = DataTypeFactory().get_instance(node.datatype)
-        empty_values = (None, "", '{"url": "", "url_label": ""}')
 
         if self._as_representation:
-            compiled_json = datatype_instance.to_json(self, node)
-            final_val = {
-                "display_value": compiled_json["@display_value"],
-                "interchange_value": datatype_instance.get_interchange_value(
-                    node_value,
-                    tile=self,
-                    node=node,
-                    details=compiled_json.get("details"),
-                ),
-            }
-            if final_val["display_value"] in empty_values:
-                # TODO: upstream this into datatype methods (another hook?)
-                final_val["display_value"] = _("(Empty)")
+            final_val = self.get_display_interchange_pair(node, node_value)
         else:
             if hasattr(datatype_instance, "to_python"):
-                final_val = datatype_instance.to_python(node_value, tile=self)
+                final_val = datatype_instance.to_python(
+                    node_value, resource=self.resource_or_none
+                )
             else:
                 final_val = node_value
 
