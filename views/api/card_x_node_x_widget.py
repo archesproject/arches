@@ -75,10 +75,10 @@ class CardXNodeXWidgetView(View):
 
 
 class CardXNodeXWidgetListFromNodegroupView(View):
-    def get(self, request, graph_slug, nodegroup_grouping_node_alias):
+    def get(self, request, graph_slug, nodegroup_alias):
         card_x_node_x_widgets_query = Q(
             node__graph__slug=graph_slug,
-            node__nodegroup__node__alias=nodegroup_grouping_node_alias,
+            node__nodegroup__node__alias=nodegroup_alias,
         )
 
         if arches_version >= (8, 0):
