@@ -27,7 +27,7 @@ const props = defineProps<{
 
 const emit = defineEmits(["update:isDirty", "update:tileData"]);
 
-const isLoading = ref();
+const isLoading = ref(false);
 const configurationError = ref();
 
 const cardData = ref();
@@ -79,9 +79,7 @@ watchEffect(async () => {
             {{ configurationError.message }}
         </Message>
         <template v-else>
-            <label>
-                <span>{{ cardData.name }}</span>
-            </label>
+            <span>{{ cardData.name }}</span>
 
             <DefaultCardEditor
                 v-if="props.mode === EDIT"

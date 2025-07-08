@@ -24,7 +24,12 @@ const props = defineProps<{
     nodegroupAlias: string;
     tileData: {
         tileid: string;
-        aliased_data: Record<string, unknown>;
+        aliased_data: {
+            [key: string]: {
+                display_value: string;
+                interchange_value: unknown;
+            };
+        };
     };
 }>();
 
@@ -124,7 +129,10 @@ async function save(_event: FormSubmitEvent) {
             >
                 <GenericWidget
                     v-if="cardXNodeXWidgetDatum.visible"
-                    v-model:value="localData[cardXNodeXWidgetDatum.node.alias]"
+                    v-model:value="
+                        localData[cardXNodeXWidgetDatum.node.alias]
+                            .interchange_value
+                    "
                     v-model:is-dirty="
                         widgetDirtyStates[cardXNodeXWidgetDatum.node.alias]
                     "

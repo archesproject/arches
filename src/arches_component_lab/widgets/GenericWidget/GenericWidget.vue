@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent, ref, watchEffect } from "vue";
+import {
+    computed,
+    defineAsyncComponent,
+    ref,
+    shallowRef,
+    watchEffect,
+} from "vue";
 
 import Message from "primevue/message";
 import Skeleton from "primevue/skeleton";
@@ -12,61 +18,67 @@ import { getUpdatedComponentPath } from "@/arches_component_lab/widgets/utils.ts
 import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-const props = withDefaults(
-    defineProps<{
-        cardXNodeXWidgetData?: CardXNodeXWidget;
-        graphSlug: string;
-        mode: WidgetMode;
-        nodeAlias: string;
-        shouldShowLabel?: boolean;
-        value?: unknown | null | undefined;
-    }>(),
-    {
-        cardXNodeXWidgetData: undefined,
-        shouldShowLabel: true,
-        value: undefined,
-    },
-);
+const {
+    cardXNodeXWidgetData,
+    graphSlug,
+    mode,
+    nodeAlias,
+    shouldShowLabel = true,
+    value,
+} = defineProps<{
+    cardXNodeXWidgetData?: CardXNodeXWidget;
+    graphSlug: string;
+    mode: WidgetMode;
+    nodeAlias: string;
+    shouldShowLabel?: boolean;
+    value?: unknown | null | undefined;
+}>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);
 
 const isLoading = ref(false);
-const cardXNodeXWidgetData = ref(props.cardXNodeXWidgetData);
+const resolvedCardXNodeXWidgetData = shallowRef(cardXNodeXWidgetData);
 const configurationError = ref<Error>();
 
 const widgetComponent = computed(() => {
-    if (!cardXNodeXWidgetData.value) {
+    if (!resolvedCardXNodeXWidgetData.value) {
         return null;
     }
 
     const updatedComponentPath = getUpdatedComponentPath(
-        cardXNodeXWidgetData.value.widget.component,
+        resolvedCardXNodeXWidgetData.value.widget.component,
     );
 
-    return defineAsyncComponent(() => import(`@/${updatedComponentPath}.vue`));
+    return defineAsyncComponent(async () => {
+        try {
+            return await import(`@/${updatedComponentPath}.vue`);
+        } catch (err) {
+            configurationError.value = err as Error;
+        }
+    });
 });
 
-const value = computed(() => {
-    if (props.value !== undefined) {
-        return props.value;
-    } else if (cardXNodeXWidgetData.value) {
-        return cardXNodeXWidgetData.value.config.defaultValue;
+const widgetValue = computed(() => {
+    if (value !== undefined) {
+        return value;
+    } else if (resolvedCardXNodeXWidgetData.value) {
+        return resolvedCardXNodeXWidgetData.value.config.defaultValue;
     } else {
         return null;
     }
 });
 
 watchEffect(async () => {
-    if (props.cardXNodeXWidgetData) {
+    if (resolvedCardXNodeXWidgetData.value) {
         return;
     }
 
     isLoading.value = true;
 
     try {
-        cardXNodeXWidgetData.value = await fetchCardXNodeXWidgetData(
-            props.graphSlug,
-            props.nodeAlias,
+        resolvedCardXNodeXWidgetData.value = await fetchCardXNodeXWidgetData(
+            graphSlug,
+            nodeAlias,
         );
     } catch (error) {
         configurationError.value = error as Error;
@@ -79,8 +91,8 @@ watchEffect(async () => {
 <template>
     <div
         class="widget"
-        :graph-slug="graphSlug"
-        :node-alias="nodeAlias"
+        :data-graph-slug="graphSlug"
+        :data-node-alias="nodeAlias"
     >
         <Skeleton
             v-if="isLoading"
@@ -93,28 +105,29 @@ watchEffect(async () => {
         >
             {{ configurationError.message }}
         </Message>
-        <template v-else-if="widgetComponent && cardXNodeXWidgetData">
-            <label class="widget-label-container">
-                <GenericWidgetLabel
-                    v-if="shouldShowLabel"
-                    :mode="mode"
-                    :card-x-node-x-widget-data="cardXNodeXWidgetData"
-                />
+        <label
+            v-else-if="widgetComponent && resolvedCardXNodeXWidgetData"
+            class="widget-label-container"
+        >
+            <GenericWidgetLabel
+                v-if="shouldShowLabel"
+                :mode="mode"
+                :card-x-node-x-widget-data="resolvedCardXNodeXWidgetData"
+            />
 
-                <!-- Placing the component inside the label allows for inherit association with grandchild input -->
-                <component
-                    :is="widgetComponent"
-                    :key="cardXNodeXWidgetData.id"
-                    :card-x-node-x-widget-data="cardXNodeXWidgetData"
-                    :graph-slug="graphSlug"
-                    :mode="mode"
-                    :node-alias="nodeAlias"
-                    :value="value"
-                    @update:value="emit('update:value', $event)"
-                    @update:is-dirty="emit('update:isDirty', $event)"
-                />
-            </label>
-        </template>
+            <!-- Placing the component inside the label allows for inherit association with grandchild input -->
+            <component
+                :is="widgetComponent"
+                :key="resolvedCardXNodeXWidgetData.id"
+                :card-x-node-x-widget-data="resolvedCardXNodeXWidgetData"
+                :graph-slug="graphSlug"
+                :mode="mode"
+                :node-alias="nodeAlias"
+                :value="widgetValue"
+                @update:value="emit('update:value', $event)"
+                @update:is-dirty="emit('update:isDirty', $event)"
+            />
+        </label>
     </div>
 </template>
 
