@@ -363,7 +363,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
 
         ret = self.build_standard_field(field_name, model_field)
         ret[1]["required"] = node.isrequired
-        ret[1]["initial"] = config.serialize().get("defaultValue")
+        ret[1]["initial"] = TileTree.get_default_value(node)
         ret[1]["help_text"] = config.serialize().get("placeholder")
         ret[1]["label"] = label.serialize()
         ret[1]["style"] = {
