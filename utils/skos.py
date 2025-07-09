@@ -84,7 +84,10 @@ class SKOSReader(SKOSReader):
 
                 # rdf:about is fallback URI for a concept, unless it has dcterms:identifier
                 uri = self.unwrapJsonLiteral(str(concept))
-                sortorder = 0
+
+                # not-null placeholder to differentiate between items with no sortorder
+                # & those with sortorder in skos file
+                sortorder = 999999
 
                 for predicate, object in graph.predicate_objects(subject=concept):
                     if predicate == DCTERMS.identifier:
@@ -164,13 +167,19 @@ class SKOSReader(SKOSReader):
                     new_list_items, "children", "children__list_item_values"
                 )
 
-                list_items_with_sortorder = []
+                list_items_to_update = []
+                root_items = []
                 for parent in new_list_items:
-                    list_items_with_sortorder.extend(
-                        parent.sort_children(default_lang.code)
+                    list_items_to_update.extend(parent.sort_children(default_lang.code))
+                    if parent.parent is None:
+                        root_items.append(parent)
+
+                if root_items:
+                    list_items_to_update.extend(
+                        root_items[0].sort_siblings(default_lang.code, root_items)
                     )
 
-                ListItem.objects.bulk_update(list_items_with_sortorder, ["sortorder"])
+                ListItem.objects.bulk_update(list_items_to_update, ["sortorder"])
 
     def generate_uuidv5_from_subject(self, baseuuid, subject):
         uuidregx = re.compile(

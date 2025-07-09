@@ -339,6 +339,11 @@ class ListItem(models.Model):
         return uris
 
     def sort_children(self, language=None):
+        """
+        Takes a parent ListItem and sorts its n-children
+        by their best label.
+        Returns list of children with updated sortorder for implementer to save / bulk_update.
+        """
         sorted_children = []
         children = {}
         for child in self.children.all():
@@ -350,6 +355,29 @@ class ListItem(models.Model):
             child.sortorder = i
             sorted_children.append(child)
         return sorted_children
+
+    def sort_siblings(self, language=None, root_siblings=[]):
+        """
+        Sorts the siblings of the provided ListItem by their best label.
+        Returns list of siblings with updated sortorder for implementer to save / bulk_update.
+        """
+        sorted_siblings = []
+        parent = self.parent
+        if parent:
+            sorted_siblings = parent.sort_children(language=language)
+        else:
+            if not root_siblings:
+                root_siblings = self.list.list_items.filter(parent__isnull=True)
+            siblings = {}
+            for sibling in root_siblings:
+                label = sibling.find_best_label(language=language)
+                siblings[(label, sibling.pk)] = sibling
+
+            siblings = [val for key, val in sorted(siblings.items())]
+            for i, sibling in enumerate(siblings):
+                sibling.sortorder = i
+                sorted_siblings.append(sibling)
+        return sorted_siblings
 
 
 class ListItemValue(models.Model):
