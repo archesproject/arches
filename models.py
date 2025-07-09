@@ -338,7 +338,7 @@ class ListItem(models.Model):
             child.get_child_uris(uris)
         return uris
 
-    def sort_children(self, language=None):
+    def sort_children(self, language=None, overwrite_sortorder=None):
         """
         Takes a parent ListItem and sorts its n-children
         by their best label.
@@ -352,11 +352,12 @@ class ListItem(models.Model):
 
         children = [val for key, val in sorted(children.items())]
         for i, child in enumerate(children):
-            child.sortorder = i
-            sorted_children.append(child)
+            if child.sortorder == overwrite_sortorder:
+                child.sortorder = i
+                sorted_children.append(child)
         return sorted_children
 
-    def sort_siblings(self, language=None, root_siblings=[]):
+    def sort_siblings(self, language=None, overwrite_sortorder=None, root_siblings=[]):
         """
         Sorts the siblings of the provided ListItem by their best label.
         Returns list of siblings with updated sortorder for implementer to save / bulk_update.
@@ -364,7 +365,9 @@ class ListItem(models.Model):
         sorted_siblings = []
         parent = self.parent
         if parent:
-            sorted_siblings = parent.sort_children(language=language)
+            sorted_siblings = parent.sort_children(
+                language=language, overwrite_sortorder=overwrite_sortorder
+            )
         else:
             if not root_siblings:
                 root_siblings = self.list.list_items.filter(parent__isnull=True)
@@ -375,8 +378,9 @@ class ListItem(models.Model):
 
             siblings = [val for key, val in sorted(siblings.items())]
             for i, sibling in enumerate(siblings):
-                sibling.sortorder = i
-                sorted_siblings.append(sibling)
+                if sibling.sortorder == overwrite_sortorder:
+                    sibling.sortorder = i
+                    sorted_siblings.append(sibling)
         return sorted_siblings
 
 
