@@ -52,8 +52,8 @@ class AliasedData(SimpleNamespace):
     """Provides dot access into node values and nested nodegroups by alias.
 
     >>> ResourceTileTree.get_tiles('new_resource_model_1').get(...).aliased_data
-    namespace(string_node={'en': {'value': 'abcde', 'direction': 'ltr'}},
-          child_node=<TileTree: child_node (c3637412-9b13-4f05-8f4a-5a80560b8b6e)>)
+    AliasedData(string_node={'en': {'value': 'abcde', 'direction': 'ltr'}},
+                child_node=<TileTree: child_node (c3637412-9b13-4f05-8f4a-5a80560b8b6e)>)
     """
 
     def serialize(self, **kwargs):
