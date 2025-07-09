@@ -224,6 +224,7 @@ class TileTreeOperation:
                     delete_siblings=True,
                 )
             self._validate_and_patch_incoming_values(tile, nodes=nodes)
+            tile.set_missing_keys_to_none()
 
         for tile in to_insert | to_update:
             # Remove no-op upserts.
@@ -287,7 +288,7 @@ class TileTreeOperation:
         return pairs
 
     def _validate_and_patch_incoming_values(self, tile, *, nodes):
-        """Validate data found on ._incoming_tile and move it to .data.
+        """Validate data found on tile._incoming_tile and move it to tile.data.
         Update errors_by_node_alias in place."""
         from arches_querysets.models import AliasedData, TileTree
 
@@ -380,6 +381,11 @@ class TileTreeOperation:
         )
 
         with transaction.atomic():
+            if isinstance(self.entry, ResourceInstance):
+                super(ResourceInstance, self.entry).save(**self.save_kwargs)
+            # no else: if the entry point needs saving, it's already in
+            # self.to_update or self.to_insert
+
             # Interact with the database in bulk as much as possible, but
             # run certain side effects from Tile.save() one-at-a-time until
             # proxy model methods can be refactored. Then run in bulk.
@@ -447,15 +453,11 @@ class TileTreeOperation:
             if self.to_update:
                 TileModel.objects.bulk_update(
                     self.to_update,
+                    # No updates to resource instance or nodegroup.
                     {"data", "parenttile", "provisionaledits", "sortorder"},
                 )
             if self.to_delete:
                 TileModel.objects.filter(pk__in=[t.pk for t in self.to_delete]).delete()
-
-            if isinstance(self.entry, ResourceInstance):
-                self.entry.save_without_aliased_data(**self.save_kwargs)
-            else:
-                self.entry.dummy_save(**self.save_kwargs)
 
             for upsert_tile in upserts:
                 if arches_version < (8, 0):

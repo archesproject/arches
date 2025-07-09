@@ -92,8 +92,7 @@ class ResourceTileTree(ResourceInstance):
         self._aliased_data = value
 
     def save(self, *, request=None, index=True, **kwargs):
-        with transaction.atomic():
-            self._save_aliased_data(request=request, index=index, **kwargs)
+        self._save_aliased_data(request=request, index=index, **kwargs)
 
     @classmethod
     def get_tiles(
@@ -145,9 +144,6 @@ class ResourceTileTree(ResourceInstance):
         ephemeral_proxy_instance.save_edit(
             user=user, edit_type=edit_type, transaction_id=transaction_id
         )
-
-    def save_without_aliased_data(self, **kwargs):
-        return super().save(**kwargs)
 
     def refresh_from_db(self, using=None, fields=None, from_queryset=None, user=None):
         del self._tile_trees
@@ -247,10 +243,10 @@ class TileTree(TileModel):
                 pk=models.F("nodegroup")
             )
         request = request or self._request
-        with transaction.atomic():
-            if self.sortorder is None or self.is_fully_provisional():
-                self.set_next_sort_order()
-            self._save_aliased_data(request=request, index=index, **kwargs)
+        # Mimic some computations trapped on TileModel.save().
+        if self.sortorder is None or self.is_fully_provisional():
+            self.set_next_sort_order()
+        self._save_aliased_data(request=request, index=index, **kwargs)
 
     @classmethod
     def get_tiles(
@@ -335,7 +331,7 @@ class TileTree(TileModel):
         if self.nodegroup_id and hasattr(self.nodegroup, "grouping_node"):
             return self.nodegroup.grouping_node.alias
         if not getattr(self, "_nodegroup_alias", None):
-            self._nodegroup_alias = Node.objects.get(pk=self.nodegroup_id).alias
+            self._nodegroup_alias = self.nodegroup.alias if self.nodegroup_id else None
         return self._nodegroup_alias
 
     @classmethod
@@ -528,15 +524,6 @@ class TileTree(TileModel):
             # Future: upstream this into datatype methods (another hook?)
             pair["display_value"] = _("(Empty)")
         return pair
-
-    def save_without_aliased_data(self, **kwargs):
-        return super().save(**kwargs)
-
-    def dummy_save(self, **kwargs):
-        """Don't save this tile, but run any other side effects."""
-        # update_fields=set() will abort the save.
-        save_kwargs = {**kwargs, "update_fields": set()}
-        return super().save(**save_kwargs)
 
     def set_aliased_data(self, node, node_value):
         """Format node_value according to the self._as_representation flag and
