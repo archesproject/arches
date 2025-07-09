@@ -15,6 +15,7 @@ import { EDIT } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { FormSubmitEvent } from "@primevue/forms";
 import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
+import type { AliasedTileData } from "@/arches_component_lab/cards/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types";
 
 const props = defineProps<{
@@ -22,15 +23,7 @@ const props = defineProps<{
     graphSlug: string;
     mode: WidgetMode;
     nodegroupAlias: string;
-    tileData: {
-        tileid: string;
-        aliased_data: {
-            [key: string]: {
-                display_value: string;
-                interchange_value: unknown;
-            };
-        };
-    };
+    tileData: AliasedTileData | undefined;
 }>();
 
 const emit = defineEmits(["update:isDirty", "update:tileData"]);
@@ -42,7 +35,7 @@ const formKey = ref(0);
 const isSaving = ref(false);
 const saveError = ref();
 
-const localData = reactive({ ...props.tileData.aliased_data });
+const aliasedData = reactive({ ...props.tileData?.aliased_data });
 
 const widgetDirtyStates = reactive(
     props.cardXNodeXWidgetData.reduce(
@@ -67,7 +60,7 @@ watch(isDirty, (newValue, oldValue) => {
 });
 
 function resetForm() {
-    Object.assign(localData, props.tileData.aliased_data);
+    Object.assign(aliasedData, props.tileData?.aliased_data);
 
     Object.keys(widgetDirtyStates).forEach((key) => {
         widgetDirtyStates[key] = false;
@@ -83,8 +76,8 @@ async function save(_event: FormSubmitEvent) {
         const updatedTileData = {
             ...props.tileData,
             aliased_data: {
-                ...props.tileData.aliased_data,
-                ...localData,
+                ...props.tileData?.aliased_data,
+                ...aliasedData,
             },
         };
 
@@ -92,10 +85,10 @@ async function save(_event: FormSubmitEvent) {
             props.graphSlug,
             props.nodegroupAlias,
             updatedTileData,
-            props.tileData.tileid,
+            props.tileData?.tileid,
         );
 
-        Object.assign(localData, updatedTileData.aliased_data);
+        Object.assign(aliasedData, updatedTileData.aliased_data);
 
         emit("update:tileData", upsertedTileData);
     } catch (error) {
@@ -130,8 +123,7 @@ async function save(_event: FormSubmitEvent) {
                 <GenericWidget
                     v-if="cardXNodeXWidgetDatum.visible"
                     v-model:value="
-                        localData[cardXNodeXWidgetDatum.node.alias]
-                            .interchange_value
+                        aliasedData[cardXNodeXWidgetDatum.node.alias]
                     "
                     v-model:is-dirty="
                         widgetDirtyStates[cardXNodeXWidgetDatum.node.alias]

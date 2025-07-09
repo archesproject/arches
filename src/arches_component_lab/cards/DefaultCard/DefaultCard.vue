@@ -16,6 +16,7 @@ import { fetchCardXNodeXWidgetDataFromNodeGroup } from "@/arches_component_lab/w
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
+import type { AliasedTileData } from "@/arches_component_lab/cards/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const props = defineProps<{
@@ -32,7 +33,7 @@ const configurationError = ref();
 
 const cardData = ref();
 const cardXNodeXWidgetData = ref<CardXNodeXWidget[]>([]);
-const tileData = ref();
+const tileData = ref<AliasedTileData>();
 
 watchEffect(async () => {
     isLoading.value = true;
