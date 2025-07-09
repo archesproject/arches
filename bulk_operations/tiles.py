@@ -3,10 +3,8 @@ import uuid
 from collections import defaultdict
 from operator import attrgetter
 
-from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import ProgrammingError, transaction
-from django.http import HttpRequest
 from django.utils.translation import get_language, gettext as _
 
 from arches import VERSION as arches_version
@@ -32,7 +30,7 @@ NOT_PROVIDED = object()
 
 
 class TileTreeOperation:
-    def __init__(self, *, entry, request=None, save_kwargs=None):
+    def __init__(self, *, entry, request, save_kwargs=None):
         self.to_insert = set()
         self.to_update = set()
         self.to_delete = set()
@@ -41,11 +39,6 @@ class TileTreeOperation:
         self.datatype_factory = DataTypeFactory()
         self.languages = Language.objects.all()
         self.request = request
-        if not self.request:
-            self.request = HttpRequest()
-        if not getattr(self.request, "user", None):
-            # Allow server-side usage when not going through middleware
-            self.request.user = User.objects.get(username="anonymous")
         self.save_kwargs = save_kwargs or {}
         self.transaction_id = uuid.uuid4()
         # Store off these properties since they are expensive.

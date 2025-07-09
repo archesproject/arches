@@ -38,6 +38,7 @@ from arches_querysets.querysets import (
 )
 from arches_querysets.utils.models import (
     append_tiles_recursively,
+    ensure_request,
     get_recursive_prefetches,
     get_nodegroups_here_and_below,
     pop_arches_model_kwargs,
@@ -118,8 +119,8 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
     def aliased_data(self, value):
         self._aliased_data = value
 
-    def save(self, *, request=None, index=True, **kwargs):
-        self._save_aliased_data(request=request, index=index, **kwargs)
+    def save(self, *, request=None, index=True, force_admin=False, **kwargs):
+        self._save_aliased_data(request=request, index=index, force_admin=force_admin, **kwargs)
 
     @classmethod
     def get_tiles(
@@ -183,8 +184,11 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
             )
         self._refresh_aliased_data(using, fields, from_queryset)
 
-    def _save_aliased_data(self, *, request=None, index=True, **kwargs):
+    def _save_aliased_data(
+        self, *, request=None, index=True, force_admin=False, **kwargs
+    ):
         """Raises a compound ValidationError with any failing tile values."""
+        request = ensure_request(request, force_admin)
         operation = TileTreeOperation(entry=self, request=request, save_kwargs=kwargs)
         operation.validate_and_save_tiles()
 
@@ -242,7 +246,7 @@ class TileTree(TileModel, AliasedDataMixin):
     def parent(self, parent):
         self._parent = parent
 
-    def save(self, *, request=None, index=True, **kwargs):
+    def save(self, *, request=None, index=True, force_admin=False, **kwargs):
         if arches_version < (8, 0) and self.nodegroup:
             # Cannot supply this too early, as nodegroup might be included
             # with the request and already instantiated to a fresh object.
@@ -257,7 +261,7 @@ class TileTree(TileModel, AliasedDataMixin):
             or self.is_fully_provisional()
         ):
             self.set_next_sort_order()
-        self._save_aliased_data(request=request, index=index, **kwargs)
+        self._save_aliased_data(request=request, index=index, force_admin=force_admin, **kwargs)
 
     @classmethod
     def get_tiles(
@@ -552,7 +556,8 @@ class TileTree(TileModel, AliasedDataMixin):
 
         setattr(self.aliased_data, node.alias, final_val)
 
-    def _save_aliased_data(self, *, request=None, index=True, **kwargs):
+    def _save_aliased_data(self, *, request=None, index=True, force_admin=False, **kwargs):
+        request = ensure_request(request, force_admin)
         operation = TileTreeOperation(entry=self, request=request, save_kwargs=kwargs)
         operation.validate_and_save_tiles()
 

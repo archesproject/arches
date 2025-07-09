@@ -1,5 +1,6 @@
 from itertools import chain
 
+from django.contrib.auth.models import User
 from django.contrib.postgres.expressions import ArraySubquery
 from django.contrib.postgres.fields import ArrayField
 from django.db.models import (
@@ -18,6 +19,7 @@ from django.db.models import (
 )
 from django.db.models.functions import Cast
 from django.db.models.fields.json import KT
+from django.http import HttpRequest
 from django.utils.functional import cached_property
 
 from arches import VERSION as arches_version
@@ -273,3 +275,14 @@ def append_tiles_recursively(resource_or_tile):
                 tiles = [tiles]
             for tile in tiles:
                 tile.fill_blanks()
+
+
+def ensure_request(request, force_admin=False):
+    """Allow server-side usage when not going through middleware."""
+    if not request:
+        request = HttpRequest()
+        if force_admin:
+            request.user = User.objects.get(username="admin")
+        else:
+            request.user = User.objects.get(username="anonymous")
+    return request
