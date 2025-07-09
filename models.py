@@ -353,8 +353,8 @@ class TileTree(TileModel, AliasedDataMixin):
     def deserialize(cls, tile_dict, parent_tile: TileModel | None):
         """
         If you're not using the Django REST Framework optional dependency,
-        e.g. if you request an evaluate a queryset with as_representation=True and
-        resave the instance, you'll need a way to deserialize dicts into TileTrees.
+        e.g. if you evaluate a queryset with as_representation=True and resave
+        the instance, you'll need a way to deserialize dicts into TileTrees.
         """
         if not isinstance(tile_dict, Mapping):
             raise TypeError(

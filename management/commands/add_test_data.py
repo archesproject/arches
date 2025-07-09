@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from tests.utils import GraphTestCase
+from arches_querysets.utils.tests import GraphTestCase
 
 
 class Command(BaseCommand):

@@ -63,10 +63,9 @@ class TileTreeQuerySet(models.QuerySet):
         entry_node=None,
     ):
         """
-        Entry point for filtering arches data by nodegroups (instead of grouping by
-        resource.)
+        Entry point for filtering arches data by nodegroups.
 
-        >>> statements = TileTree.get_tiles("concept", "statement")
+        >>> statements = TileTree.get_tiles("datatype_lookups", "statement")
         # TODO: show this with some test node that's actually a localized string.
         >>> results = statements.filter(statement_content__any_lang_startswith="F")
         >>> for result in results:
