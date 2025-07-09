@@ -6,9 +6,8 @@ from itertools import chain
 from arches import VERSION as arches_version
 from arches.app.datatypes import datatypes
 from arches.app.models import models
-
-from django.utils.translation import get_language, gettext as _
-
+from django.utils.translation import get_language
+from django.utils.translation import gettext as _
 
 logger = logging.getLogger(__name__)
 
@@ -85,6 +84,10 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
         if not value:
             return []
         related_resources = []
+
+        if not isinstance(tile, models.TileModel):
+            tile = models.TileModel(**tile)
+
         if arches_version >= (8, 0):
             relations = tile.resourceinstance.from_resxres.all()
         else:
