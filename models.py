@@ -9,7 +9,7 @@ from django.core.exceptions import (
     ObjectDoesNotExist,
     ValidationError,
 )
-from django.db import models, transaction
+from django.db import models
 from django.utils.translation import gettext as _
 
 from arches import VERSION as arches_version
@@ -64,7 +64,34 @@ class AliasedData(SimpleNamespace):
         }
 
 
-class ResourceTileTree(ResourceInstance):
+class AliasedDataMixin:
+    def _refresh_aliased_data(self, using, fields, from_queryset):
+        try:
+            del self._tile_trees
+        except AttributeError:
+            pass
+
+        # Commandeer the responsibility for filtering on pk from Django
+        # so we can retrieve aliased data from the queryset cache.
+        from_queryset = from_queryset.filter(pk=self.pk)
+        if arches_version >= (8, 0):
+            # Patch out filter(pk=...) so that when refresh_from_db() calls get(),
+            # it populates the cache. TODO: ask on forum about happier path.
+            from_queryset.filter = lambda pk=None: from_queryset
+            models.Model.refresh_from_db(self, using, fields, from_queryset)
+            # Retrieve aliased data from the queryset cache.
+            self.aliased_data = from_queryset[0].aliased_data
+            self._tile_trees = from_queryset[0]._tile_trees
+        else:
+            # Django 4: good-enough riff on refresh_from_db(), but not bulletproof.
+            db_instance = from_queryset.get()
+            for field in db_instance._meta.concrete_fields:
+                setattr(self, field.attname, getattr(db_instance, field.attname))
+            self.aliased_data = db_instance.aliased_data
+            self._tile_trees = from_queryset[0]._tile_trees
+
+
+class ResourceTileTree(ResourceInstance, AliasedDataMixin):
     objects = ResourceTileTreeQuerySet.as_manager()
 
     class Meta:
@@ -146,31 +173,15 @@ class ResourceTileTree(ResourceInstance):
         )
 
     def refresh_from_db(self, using=None, fields=None, from_queryset=None, user=None):
-        del self._tile_trees
         if from_queryset is None:
+            # TODO: symptom that we need a backreference to the queryset args.
             from_queryset = self.__class__.get_tiles(
                 self.graph.slug,
                 only={node.alias for node in self._queried_nodes},
                 as_representation=getattr(self, "_as_representation", False),
                 user=user,
             )
-        # Filter now so we can patch it out below.
-        from_queryset = from_queryset.filter(pk=self.pk)
-        if arches_version >= (8, 0):
-            # Patch out filter(pk=...) so that when refresh_from_db() calls get(),
-            # it populates the cache. TODO: ask on forum about happier path.
-            from_queryset.filter = lambda pk=None: from_queryset
-            super().refresh_from_db(using, fields, from_queryset)
-            # Retrieve aliased data from the queryset cache.
-            self.aliased_data = from_queryset[0].aliased_data
-            self._tile_trees = from_queryset[0]._tile_trees
-        else:
-            # Django 4: good-enough riff on refresh_from_db(), but not bulletproof.
-            db_instance = from_queryset.get()
-            for field in db_instance._meta.concrete_fields:
-                setattr(self, field.attname, getattr(db_instance, field.attname))
-            self.aliased_data = db_instance.aliased_data
-            self._tile_trees = from_queryset[0]._tile_trees
+        self._refresh_aliased_data(using, fields, from_queryset)
 
     def _save_aliased_data(self, *, request=None, index=True, **kwargs):
         """Raises a compound ValidationError with any failing tile values."""
@@ -193,7 +204,7 @@ class ResourceTileTree(ResourceInstance):
         )
 
 
-class TileTree(TileModel):
+class TileTree(TileModel, AliasedDataMixin):
     objects = TileTreeManager.from_queryset(TileTreeQuerySet)()
 
     class Meta:
@@ -555,6 +566,18 @@ class TileTree(TileModel):
             using=kwargs.get("using", None),
             fields=kwargs.get("update_fields", None),
         )
+
+    def refresh_from_db(self, using=None, fields=None, from_queryset=None, user=None):
+        if from_queryset is None:
+            # TODO: symptom that we need a backreference to the queryset args.
+            from_queryset = self.__class__.get_tiles(
+                self.resourceinstance.graph.slug,
+                nodegroup_alias=self.find_nodegroup_alias(),
+                only={node.alias for node in self._queried_nodes},
+                as_representation=getattr(self, "_as_representation", False),
+                user=user,
+            )
+        self._refresh_aliased_data(using, fields, from_queryset)
 
     def _tile_update_is_noop(self, original_data):
         """Skipping no-op tile saves avoids regenerating RxR rows, at least
