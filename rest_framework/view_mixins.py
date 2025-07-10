@@ -49,7 +49,11 @@ class ArchesModelAPIMixin:
         else:
             self.resource_ids = None
         self.fill_blanks = request.GET.get("fill_blanks", "f").lower().startswith("t")
-        self.graph_nodes = []  # populated in get_object()
+
+        # Initialize a variable to hold the permitted nodes nodes materialized
+        # by the underlying queryset (populated by get_object() for detail
+        # views or filter_queryset() for list views).
+        self.permitted_nodes = []
 
         return super().setup(request, *args, **kwargs)
 
@@ -94,12 +98,11 @@ class ArchesModelAPIMixin:
         return {
             **super().get_serializer_context(),
             "graph_slug": self.graph_slug,
-            "graph_nodes": self.graph_nodes,
+            "permitted_nodes": self.permitted_nodes,
             "nodegroup_alias": self.nodegroup_alias,
         }
 
     def get_object(self, permission_callable=None, fill_blanks=False):
-        # TODO: discloses existence?
         ret = super().get_object()
         options = self.serializer_class.Meta
         if issubclass(options.model, ResourceInstance):
@@ -121,12 +124,16 @@ class ArchesModelAPIMixin:
             # Not 404, see https://github.com/archesproject/arches/issues/11563
             raise PermissionDenied
         ret.save = partial(ret.save, request=self.request)
-        self.graph_nodes = ret._permitted_nodes
+        self.permitted_nodes = ret._permitted_nodes
 
         if fill_blanks:
             ret.fill_blanks()
 
         return ret
+
+    def filter_queryset(self, queryset):
+        self.permitted_nodes = queryset._permitted_nodes
+        return super().filter_queryset(queryset)
 
     def create(self, request, *args, **kwargs):
         self.get_object = partial(

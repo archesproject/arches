@@ -21,7 +21,7 @@ from arches_querysets.rest_framework import interchange_mixin
 
 
 def _make_tile_serializer(
-    *, nodegroup_alias, cardinality, sortorder, slug, graph_nodes, nodes="__all__"
+    *, nodegroup_alias, cardinality, sortorder, slug, permitted_nodes, nodes="__all__"
 ) -> type["ArchesTileSerializer"]:
     """
     DRF encourages a declarative programming style with classes. You, as
@@ -34,7 +34,7 @@ def _make_tile_serializer(
         aliased_data = TileAliasedDataSerializer(
             required=False,
             allow_null=False,
-            graph_nodes=graph_nodes,
+            permitted_nodes=permitted_nodes,
             graph_slug=slug,
             root_node=nodegroup_alias,
         )
@@ -52,7 +52,7 @@ def _make_tile_serializer(
         required=False,
         allow_null=True,
         graph_slug=slug,
-        graph_nodes=graph_nodes,
+        permitted_nodes=permitted_nodes,
         style={"alias": nodegroup_alias, "sortorder": sortorder},
     )
 
@@ -107,16 +107,16 @@ class NodeFetcherMixin:
         )
 
     @property
-    def graph_nodes(self):
-        if not self._graph_nodes:
-            self._graph_nodes = (
-                self.context.get("graph_nodes") or self.find_graph_nodes()
+    def permitted_nodes(self):
+        if not self._permitted_nodes:
+            self._permitted_nodes = (
+                self.context.get("permitted_nodes") or self._find_permitted_nodes()
             )
-        return self._graph_nodes
+        return self._permitted_nodes
 
-    def find_graph_nodes(self):
-        # TODO(next): factor this out and get it only once.
-        # Does not check nodegroup permissions.
+    def _find_permitted_nodes(self):
+        """Only meant for debugging; does not check nodegroup permissions."""
+        assert settings.DEBUG
         node_filters = models.Q(
             graph__slug=self.graph_slug,
             nodegroup__isnull=False,
@@ -150,12 +150,12 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
 
     def __init__(self, instance=None, data=empty, **kwargs):
         super().__init__(instance, data, **kwargs)
-        self._graph_nodes = []
+        self._permitted_nodes = []
         self._root_node_aliases = []
 
     def __deepcopy__(self, memo):
         ret = super().__deepcopy__(memo)
-        ret._graph_nodes = self._graph_nodes
+        ret._permitted_nodes = self._permitted_nodes
         return ret
 
     def get_value(self, dictionary):
@@ -172,7 +172,7 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
             only = options.nodegroups
 
         # Create serializers for top-level nodegroups.
-        for node in self.graph_nodes:
+        for node in self.permitted_nodes:
             if (
                 not node.nodegroup_id
                 or node.nodegroup.parentnodegroup_id
@@ -192,7 +192,7 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
                         slug=self.graph_slug,
                         nodegroup_alias=node.alias,
                         cardinality=node.nodegroup.cardinality,
-                        graph_nodes=self.graph_nodes,
+                        permitted_nodes=self.permitted_nodes,
                         sortorder=sortorder,
                     )
 
@@ -235,7 +235,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         fields = "__all__"
 
     def __init__(self, instance=None, data=empty, **kwargs):
-        self._graph_nodes = kwargs.pop("graph_nodes", [])
+        self._permitted_nodes = kwargs.pop("permitted_nodes", [])
         self._graph_slug = kwargs.pop("graph_slug", None)
         self._root_node = kwargs.pop("root_node", None)
         super().__init__(instance, data, **kwargs)
@@ -247,7 +247,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
 
     def __deepcopy__(self, memo):
         ret = super().__deepcopy__(memo)
-        ret._graph_nodes = self._graph_nodes
+        ret._permitted_nodes = self._permitted_nodes
         return ret
 
     # TODO: uncache this
@@ -272,7 +272,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             # 3. From generic view
             or self.context.get("nodegroup_alias")
         )
-        nodes_by_node_aliases = {node.alias: node for node in self.graph_nodes}
+        nodes_by_node_aliases = {node.alias: node for node in self.permitted_nodes}
         try:
             self._root_node = nodes_by_node_aliases.get(nodegroup_alias)
         except KeyError:
@@ -308,7 +308,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
                         nodegroup_alias=child_nodegroup_alias,
                         cardinality=child_nodegroup.cardinality,
                         slug=self.graph_slug,
-                        graph_nodes=self.graph_nodes,
+                        permitted_nodes=self.permitted_nodes,
                         sortorder=sortorder,
                     )
 
@@ -325,7 +325,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         return field_names
 
     def build_unknown_field(self, field_name, model_class):
-        for node in self.graph_nodes:
+        for node in self.permitted_nodes:
             if node.alias == field_name:
                 break
         else:
@@ -341,7 +341,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
                 slug=self.graph_slug,
                 nodegroup_alias=node.alias,
                 cardinality=node.nodegroup.cardinality,
-                graph_nodes=self.graph_nodes,
+                permitted_nodes=self.permitted_nodes,
                 sortorder=sortorder,
             )
         else:
@@ -429,7 +429,7 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
 
     def __init__(self, instance=None, data=empty, **kwargs):
         self._graph_slug = kwargs.pop("graph_slug", None)
-        self._graph_nodes = kwargs.pop("graph_nodes", [])
+        self._permitted_nodes = kwargs.pop("permitted_nodes", [])
         super().__init__(instance, data, **kwargs)
         self._child_nodegroup_aliases = []
 
@@ -495,13 +495,13 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             "graph": {"allow_null": True},
         }
 
-    def __init__(self, *args, graph_slug=None, graph_nodes=None, **kwargs):
+    def __init__(self, *args, graph_slug=None, permitted_nodes=None, **kwargs):
         if not kwargs.get("context"):
             # The view provides a context, so this is mainly here for CLI usage.
             self.parent = None
             context = {
                 "graph_slug": graph_slug,
-                "graph_nodes": graph_nodes or self.find_graph_nodes(),
+                "permitted_nodes": permitted_nodes or self.find_permitted_nodes(),
             }
             kwargs = {**kwargs, "context": context}
 
