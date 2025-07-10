@@ -449,7 +449,7 @@ class TileTreeOperation:
                     )
                 upsert_proxies = refreshed_insert_proxies + update_proxies
             else:
-                insert_proxies = TileModel.objects.none()
+                insert_proxies = Tile.objects.none()
             if self.to_update:
                 TileModel.objects.bulk_update(
                     self.to_update,
