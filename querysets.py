@@ -1,4 +1,5 @@
 import uuid
+from operator import attrgetter
 from slugify import slugify
 
 from django.core.exceptions import ValidationError
@@ -132,7 +133,7 @@ class TileTreeQuerySet(models.QuerySet):
                 )
             )
 
-        return qs.alias(**node_alias_expressions).order_by("sortorder")
+        return qs.alias(**node_alias_expressions)
 
     def _prefetch_related_objects(self):
         """Hook into QuerySet evaluation to customize the result."""
@@ -173,7 +174,8 @@ class TileTreeQuerySet(models.QuerySet):
             self._set_child_tile_data(tile)
 
     def _set_child_tile_data(self, tile):
-        for child_tile in getattr(tile, "_tile_trees", []):
+        child_tiles = getattr(tile, "_tile_trees", [])
+        for child_tile in sorted(child_tiles, key=attrgetter("sortorder")):
             child_nodegroup_alias = child_tile.find_nodegroup_alias()
             if child_tile.nodegroup.cardinality == "1":
                 setattr(tile.aliased_data, child_nodegroup_alias, child_tile)
