@@ -242,10 +242,6 @@ class TileTree(TileModel, AliasedDataMixin):
     def parent(self, parent):
         self._parent = parent
 
-    @property
-    def resource_or_none(self):
-        return self.resourceinstance if self.resourceinstance_id else None
-
     def save(self, *, request=None, index=True, **kwargs):
         if arches_version < (8, 0) and self.nodegroup:
             # Cannot supply this too early, as nodegroup might be included
@@ -528,7 +524,7 @@ class TileTree(TileModel, AliasedDataMixin):
                 details=compiled_json.get("details"),
                 # An optional extra hint for the ResourceInstance{list} types
                 # so that prefetched related resources can be used.
-                resource=self.resource_or_none,
+                resource=self.resourceinstance if self.resourceinstance_id else None,
             ),
         }
         if pair["display_value"] in empty_values:
@@ -545,9 +541,8 @@ class TileTree(TileModel, AliasedDataMixin):
             final_val = self.get_display_interchange_pair(node, node_value)
         else:
             if hasattr(datatype_instance, "to_python"):
-                final_val = datatype_instance.to_python(
-                    node_value, resource=self.resource_or_none
-                )
+                resource = self.resourceinstance if self.resourceinstance_id else None
+                final_val = datatype_instance.to_python(node_value, resource=resource)
             else:
                 final_val = node_value
 
