@@ -439,7 +439,6 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         if isinstance(data, TileTree):
             if data._state.adding:
                 ret["tileid"] = None
-            if data.parenttile_id and data.parenttile._state.adding:
                 ret["parenttile"] = None
         return ret
 

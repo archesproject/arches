@@ -19,7 +19,7 @@ NOT_PROVIDED = object()
 
 class TileTreeManager(models.Manager):
     def get_queryset(self):
-        qs = super().get_queryset().select_related("nodegroup", "parenttile")
+        qs = super().get_queryset().select_related("nodegroup")
         if arches_version >= (8, 0):
             qs = qs.select_related("nodegroup__grouping_node")
             qs = qs.prefetch_related(
