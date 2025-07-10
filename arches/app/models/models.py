@@ -93,7 +93,7 @@ class CardModel(SaveSupportsBlindOverwriteMixin, models.Model):
     def save(self, **kwargs):
         if self.pk == self.source_identifier_id:
             self.source_identifier_id = None
-            add_to_update_fields(kwargs, "source_identifier_id")
+            kwargs = add_to_update_fields(kwargs, "source_identifier_id")
         super(CardModel, self).save(**kwargs)
 
     class Meta:
@@ -170,7 +170,7 @@ class CardXNodeXWidget(SaveSupportsBlindOverwriteMixin, models.Model):
     def save(self, **kwargs):
         if self.pk == self.source_identifier_id:
             self.source_identifier_id = None
-            add_to_update_fields(kwargs, "source_identifier_id")
+            kwargs = add_to_update_fields(kwargs, "source_identifier_id")
         super(CardXNodeXWidget, self).save(**kwargs)
 
     def __str__(self):
@@ -307,7 +307,7 @@ class Edge(SaveSupportsBlindOverwriteMixin, models.Model):
     def save(self, **kwargs):
         if self.pk == self.source_identifier_id:
             self.source_identifier_id = None
-            add_to_update_fields(kwargs, "source_identifier_id")
+            kwargs = add_to_update_fields(kwargs, "source_identifier_id")
         super(Edge, self).save(**kwargs)
 
     class Meta:
@@ -414,7 +414,7 @@ class File(SaveSupportsBlindOverwriteMixin, models.Model):
                 self.thumbnail_data = ThumbnailGeneratorInstance.get_thumbnail_data(
                     self.path.file
                 )
-                add_to_update_fields(kwargs_from_save_call, "thumbnail_data")
+                kwargs = add_to_update_fields(kwargs_from_save_call, "thumbnail_data")
         except Exception as e:
             logger.error(f"Thumbnail not generated for {self.path}: {e}")
             traceback.print_exc(file=sys.stdout)
@@ -741,11 +741,11 @@ class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
             self.resource_instance_lifecycle_id = (
                 settings.DEFAULT_RESOURCE_INSTANCE_LIFECYCLE_ID
             )
-            add_to_update_fields(kwargs, "resource_instance_lifecycle_id")
+            kwargs = add_to_update_fields(kwargs, "resource_instance_lifecycle_id")
 
         if self.has_unpublished_changes is not False:
             self.has_unpublished_changes = True
-            add_to_update_fields(kwargs, "has_unpublished_changes")
+            kwargs = add_to_update_fields(kwargs, "has_unpublished_changes")
 
         super(GraphModel, self).save(**kwargs)
 
@@ -1087,10 +1087,10 @@ class Node(SaveSupportsBlindOverwriteMixin, models.Model):
 
     def save(self, **kwargs):
         if not self.alias:
-            add_to_update_fields(kwargs, "alias")
-            add_to_update_fields(kwargs, "hascustomalias")
+            kwargs = add_to_update_fields(kwargs, "alias")
+            kwargs = add_to_update_fields(kwargs, "hascustomalias")
         if self.pk == self.source_identifier_id:
-            add_to_update_fields(kwargs, "source_identifier_id")
+            kwargs = add_to_update_fields(kwargs, "source_identifier_id")
 
         self.clean()
 
@@ -1420,9 +1420,9 @@ class ResourceXResource(SaveSupportsBlindOverwriteMixin, models.Model):
 
         if not self.created:
             self.created = datetime.datetime.now()
-            add_to_update_fields(kwargs, "created")
+            kwargs = add_to_update_fields(kwargs, "created")
         self.modified = datetime.datetime.now()
-        add_to_update_fields(kwargs, "modified")
+        kwargs = add_to_update_fields(kwargs, "modified")
 
         super(ResourceXResource, self).save(**kwargs)
 
@@ -1520,8 +1520,8 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
                 self.get_initial_resource_instance_lifecycle_state()
             )
 
-        add_to_update_fields(kwargs, "resource_instance_lifecycle_state")
-        add_to_update_fields(kwargs, "graph_publication")
+        kwargs = add_to_update_fields(kwargs, "resource_instance_lifecycle_state")
+        kwargs = add_to_update_fields(kwargs, "graph_publication")
         super(ResourceInstance, self).save(**kwargs)
 
 
@@ -1859,13 +1859,13 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
 
     def save(self, **kwargs):
         if self.set_missing_keys_to_none():
-            add_to_update_fields(kwargs, "data")
+            kwargs = add_to_update_fields(kwargs, "data")
         if self.sortorder is None or self.is_fully_provisional():
             self.set_next_sort_order()
-            add_to_update_fields(kwargs, "sortorder")
+            kwargs = add_to_update_fields(kwargs, "sortorder")
         if not self.tileid:
             self.tileid = uuid.uuid4()
-            add_to_update_fields(kwargs, "tileid")
+            kwargs = add_to_update_fields(kwargs, "tileid")
 
         # Query for this first instead of during a transaction rollback.
         nodegroup_alias = self.find_nodegroup_alias()

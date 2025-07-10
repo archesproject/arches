@@ -1,21 +1,45 @@
-import os
+import warnings
 from pathlib import Path
 
 
+PRIOR_UPDATE_FIELDS_SENTINEL = []
+FUTURE_UPDATE_FIELDS_SENTINEL = []
+
+
 def add_to_update_fields(kwargs, field_name):
-    """
-    Update the `update_field` arg inside `kwargs` (if present) in-place
-    with `field_name`.
-    """
-    if (update_fields := kwargs.get("update_fields")) is not None:
-        if isinstance(update_fields, set):
-            # Django sends a set from update_or_create()
-            update_fields.add(field_name)
-        else:
-            # Arches sends a list from tile POST view
-            new = set(update_fields)
-            new.add(field_name)
-            kwargs["update_fields"] = new
+    """Return new kwargs with any `update_field` kwarg augmented with `field_name`."""
+    # When the future comes, replace all of this with just:
+    # if update_fields := kwargs.get("update_fields"):
+    #     return {
+    #         **kwargs,
+    #         "update_fields": {*update_fields, field_name},
+    #     }
+    # return kwargs
+
+    update_fields = kwargs.get("update_fields")
+    if (
+        not update_fields
+        and update_fields is not None
+        and update_fields is not FUTURE_UPDATE_FIELDS_SENTINEL
+    ):
+        # Empty iterable. Handle like None for now, but issue a warning.
+        # https://forum.djangoproject.com/t/update-or-create-defaults-none-sends-update-fields-set-rather-than-none/41657/4
+        warnings.warn(
+            "You likely called update_or_create() without specifying "
+            f"{field_name} in `defaults`.\n"
+            "In the future, you will not be able to depend on model "
+            f"save() logic injecting {field_name} without explicitly "
+            "opting in by providing some preliminary value for it via `defaults`.",
+            FutureWarning,
+            stacklevel=5,
+        )
+        update_fields = PRIOR_UPDATE_FIELDS_SENTINEL
+    if update_fields or update_fields is PRIOR_UPDATE_FIELDS_SENTINEL:
+        return {
+            **kwargs,
+            "update_fields": {*update_fields, field_name},
+        }
+    return kwargs
 
 
 def field_names(instance_or_class):
