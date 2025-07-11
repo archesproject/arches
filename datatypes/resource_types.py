@@ -1,4 +1,3 @@
-import json
 import logging
 import uuid
 from itertools import chain
@@ -14,51 +13,42 @@ logger = logging.getLogger(__name__)
 
 class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
     def transform_value_for_tile(self, value, **kwargs):
+        parsed = super().transform_value_for_tile(value, **kwargs)
+        if parsed is None:
+            parsed = value
+
         graph_configs_by_graph_id = {
             graph_config["graphid"]: graph_config
             for graph_config in kwargs.get("graphs", [])
         }
-        try:
-            if isinstance(value, (str, dict)):
-                value = [value]
-                raise TypeError
-            return json.loads(value)
-        except TypeError:
-            if isinstance(value, list):
-                transformed = []
-                for inner_val in value:
-                    match inner_val:
-                        case models.ResourceInstance():
-                            transformed.append(
-                                self.from_id_string(
-                                    str(inner_val.pk),
-                                    graph_configs_by_graph_id.get(
-                                        inner_val.graph_id, None
-                                    ),
-                                )
-                            )
-                        case uuid.UUID():
-                            # TODO: handle multiple graph configs, requires db?
-                            transformed.append(self.from_id_string(str(inner_val)))
-                        case str():
-                            # TODO: handle multiple graph configs, requires db?
-                            transformed.append(self.from_id_string(inner_val))
-                        case dict():
-                            # TODO: handle multiple graph configs, requires db?
-                            transformed.append(
-                                self.from_id_string(inner_val.get("resource_id"))
-                            )
-                        case _:
-                            transformed.append(inner_val)
-                return transformed
-            if isinstance(value, models.ResourceInstance):
-                return [
-                    self.from_id_string(
-                        str(value.pk),
-                        graph_configs_by_graph_id.get(value.graph_id),
+
+        if not isinstance(parsed, list):
+            parsed = [parsed]
+        transformed = []
+        for inner_val in parsed:
+            match inner_val:
+                case models.ResourceInstance():
+                    transformed.append(
+                        self.from_id_string(
+                            str(inner_val.pk),
+                            graph_configs_by_graph_id.get(inner_val.graph_id),
+                        )
                     )
-                ]
-            raise
+                case uuid.UUID():
+                    # TODO: handle multiple graph configs, requires db?
+                    transformed.append(self.from_id_string(str(inner_val)))
+                case str():
+                    # TODO: handle multiple graph configs, requires db?
+                    transformed.append(self.from_id_string(inner_val))
+                case dict():
+                    # TODO: handle multiple graph configs, requires db?
+                    if interchange_value := inner_val.get("resource_id"):
+                        transformed.append(self.from_id_string(interchange_value))
+                    else:
+                        transformed.append(inner_val)
+                case _:
+                    transformed.append(inner_val)
+        return transformed
 
     def get_resource(self, tile):
         try:
