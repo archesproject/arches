@@ -115,11 +115,10 @@ class NodeFetcherMixin:
         return self._permitted_nodes
 
     def _find_permitted_nodes(self):
-        """Only meant for debugging; does not check nodegroup permissions."""
-        assert settings.DEBUG
         node_filters = models.Q(
             graph__slug=self.graph_slug,
             nodegroup__isnull=False,
+            nodegroup__in=self.context["request"].user.userprofile.editable_nodegroups,
         )
         children = "nodegroup_set"
         if arches_version >= (8, 0):
