@@ -1,3 +1,5 @@
+from itertools import chain
+
 from django.contrib.postgres.expressions import ArraySubquery
 from django.contrib.postgres.fields import ArrayField
 from django.db.models import (
@@ -20,7 +22,6 @@ from django.utils.functional import cached_property
 
 from arches import VERSION as arches_version
 from arches.app.models.models import ResourceInstance, TileModel
-from arches.app.models.utils import field_names
 
 from arches_querysets.fields import (
     CardinalityNResourceInstanceField,
@@ -78,12 +79,27 @@ def field_attnames(instance_or_class):
     return {f.attname for f in instance_or_class._meta.fields}
 
 
+def get_invalid_aliases(instance_or_class):
+    # From QuerySet._annotate() in Django
+    return set(
+        chain.from_iterable(
+            (
+                (field.name, field.attname)
+                if hasattr(field, "attname")
+                else (field.name,)
+            )
+            for field in instance_or_class._meta.get_fields()
+        )
+    )
+
+
 def generate_node_alias_expressions(nodes, *, defer, only, model):
     if defer and only and (overlap := defer.intersection(only)):
         raise ValueError(f"Got intersecting defer/only nodes: {overlap}")
     alias_expressions = {}
-    invalid_names = field_names(model)
+    invalid_names = get_invalid_aliases(model)
 
+    queried_nodes = []
     for node in nodes:
         if node.datatype == "semantic":
             continue
@@ -93,9 +109,10 @@ def generate_node_alias_expressions(nodes, *, defer, only, model):
             continue
         if (defer and node.alias in defer) or (only and node.alias not in only):
             continue
-        # TODO: solution here, either bump to aliased_data or rewrite as JSON
+        alias = node.alias
         if node.alias in invalid_names:
-            raise ValueError(f'"{node.alias}" clashes with a model field name.')
+            # TODO (Arches 8.1): determine reserved namespace for node aliases
+            alias = "_arches_querysets_" + alias
 
         if issubclass(model, ResourceInstance):
             tile_values_query = get_tile_values_for_resource(node, nodes)
@@ -107,12 +124,13 @@ def generate_node_alias_expressions(nodes, *, defer, only, model):
                 tile_values_query = F(f"data__{node.pk}")
         else:
             raise ValueError
-        alias_expressions[node.alias] = tile_values_query
+        alias_expressions[alias] = tile_values_query
+        queried_nodes.append(node)
 
     if not alias_expressions:
         raise ValueError("All fields were excluded.")
 
-    return alias_expressions
+    return queried_nodes, alias_expressions
 
 
 def pop_arches_model_kwargs(kwargs, model_fields):

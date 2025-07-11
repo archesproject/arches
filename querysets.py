@@ -94,7 +94,7 @@ class TileTreeQuerySet(models.QuerySet):
             for n in permitted_nodes
             if getattr(n.nodegroup, "nodegroup_alias", None) in (only or [])
         }
-        node_alias_expressions = generate_node_alias_expressions(
+        queried_nodes, alias_expressions = generate_node_alias_expressions(
             permitted_nodes,
             defer=deferred_node_aliases,
             only=only_node_aliases,
@@ -102,9 +102,7 @@ class TileTreeQuerySet(models.QuerySet):
         )
 
         self._permitted_nodes = permitted_nodes  # permitted nodes below entry point
-        self._queried_nodes = [
-            n for n in permitted_nodes if n.alias in node_alias_expressions
-        ]
+        self._queried_nodes = queried_nodes
         self._entry_node = entry_node
 
         qs = self.filter(nodegroup_id__in={n.nodegroup_id for n in self._queried_nodes})
@@ -133,7 +131,7 @@ class TileTreeQuerySet(models.QuerySet):
                 )
             )
 
-        return qs.alias(**node_alias_expressions)
+        return qs.alias(**alias_expressions)
 
     def _prefetch_related_objects(self):
         """Hook into QuerySet evaluation to customize the result."""
@@ -301,18 +299,14 @@ class ResourceTileTreeQuerySet(models.QuerySet):
             n.alias
             for n in filter_nodes_by_highest_parent(self._permitted_nodes, only or [])
         }
-        node_sql_aliases = generate_node_alias_expressions(
+        queried_nodes, alias_expressions = generate_node_alias_expressions(
             self._permitted_nodes,
             defer=deferred_node_aliases,
             only=only_node_aliases,
             model=self.model,
         )
-        self._queried_nodes = [
-            node
-            for node in self._permitted_nodes
-            if node.alias in node_sql_aliases
-            and not getattr(node, "source_identifier_id", None)
-        ]
+
+        self._queried_nodes = queried_nodes
 
         if resource_ids:
             qs = self.filter(pk__in=resource_ids)
@@ -328,7 +322,7 @@ class ResourceTileTreeQuerySet(models.QuerySet):
                 ),
                 to_attr="_tile_trees",
             ),
-        ).alias(**node_sql_aliases)
+        ).alias(**alias_expressions)
 
     def _fetch_all(self):
         """Hook into QuerySet evaluation to customize the result."""
