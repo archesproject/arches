@@ -251,7 +251,11 @@ class TileTree(TileModel, AliasedDataMixin):
             )
         request = request or self._request
         # Mimic some computations trapped on TileModel.save().
-        if self.sortorder is None or self.is_fully_provisional():
+        if (
+            arches_version >= (8, 0)
+            and self.sortorder is None
+            or self.is_fully_provisional()
+        ):
             self.set_next_sort_order()
         self._save_aliased_data(request=request, index=index, **kwargs)
 
