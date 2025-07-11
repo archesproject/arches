@@ -461,12 +461,6 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             user=self.context["request"].user,
         )
         validated_data["nodegroup_id"] = qs._entry_node.nodegroup_id
-        if validated_data.get("sortorder") is None:
-            # Use a dummy instance to avoid save() and signals.
-            dummy_instance = options.model(**validated_data)
-            dummy_instance.sortorder = None
-            dummy_instance.set_next_sort_order()
-            validated_data["sortorder"] = dummy_instance.sortorder
         if arches_version < (8, 0):
             validated_data["data"] = {}
         validated_data["__request"] = self.context["request"]
