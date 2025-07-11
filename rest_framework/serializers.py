@@ -470,6 +470,7 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         if arches_version < (8, 0):
             validated_data["data"] = {}
         validated_data["__request"] = self.context["request"]
+        validated_data["__as_representation"] = True
         with transaction.atomic():
             created = super().create(validated_data)
         return created

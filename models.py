@@ -201,6 +201,7 @@ class TileTree(TileModel):
         db_table = "tiles"
 
     def __init__(self, *args, **kwargs):
+        self._as_representation = kwargs.pop("__as_representation", False)
         self._request = kwargs.pop("__request", None)
         arches_model_kwargs, other_kwargs = pop_arches_model_kwargs(
             kwargs, self._meta.get_fields()
@@ -213,7 +214,6 @@ class TileTree(TileModel):
         self._permitted_nodes = Node.objects.none()
         # Data-collecting nodes that were queried
         self._queried_nodes = Node.objects.none()
-        self._as_representation = False
 
     @property
     def aliased_data(self):
