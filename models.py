@@ -120,7 +120,9 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         self._aliased_data = value
 
     def save(self, *, request=None, index=True, force_admin=False, **kwargs):
-        self._save_aliased_data(request=request, index=index, force_admin=force_admin, **kwargs)
+        self._save_aliased_data(
+            request=request, index=index, force_admin=force_admin, **kwargs
+        )
 
     @classmethod
     def get_tiles(
@@ -261,7 +263,9 @@ class TileTree(TileModel, AliasedDataMixin):
             or self.is_fully_provisional()
         ):
             self.set_next_sort_order()
-        self._save_aliased_data(request=request, index=index, force_admin=force_admin, **kwargs)
+        self._save_aliased_data(
+            request=request, index=index, force_admin=force_admin, **kwargs
+        )
 
     @classmethod
     def get_tiles(
@@ -556,7 +560,9 @@ class TileTree(TileModel, AliasedDataMixin):
 
         setattr(self.aliased_data, node.alias, final_val)
 
-    def _save_aliased_data(self, *, request=None, index=True, force_admin=False, **kwargs):
+    def _save_aliased_data(
+        self, *, request=None, index=True, force_admin=False, **kwargs
+    ):
         request = ensure_request(request, force_admin)
         operation = TileTreeOperation(entry=self, request=request, save_kwargs=kwargs)
         operation.validate_and_save_tiles()
