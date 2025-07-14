@@ -461,7 +461,7 @@ class TileTree(TileModel, AliasedDataMixin):
         blank_tile.sync_private_attributes(container)
 
         # Finalize the aliased data according to the value of self._as_representation.
-        # (e.g. either a dict of display_value & interchange_value, or call to_python().)
+        # (e.g. either a dict of node_value, display_value, & details, or call to_python().)
         for node in nodegroup.node_set.all():
             if node.datatype != "semantic":
                 node_value = blank_tile.data.get(str(node.pk))
@@ -539,28 +539,29 @@ class TileTree(TileModel, AliasedDataMixin):
 
         return cleaned_default
 
-    def get_display_interchange_pair(self, node, node_value, datatype_contexts=None):
+    def get_value_with_context(self, node, node_value, datatype_contexts=None):
         datatype_instance = DataTypeFactory().get_instance(node.datatype)
         empty_values = (None, "", '{"url": "", "url_label": ""}')
         compiled_json = datatype_instance.to_json(self, node)
         if datatype_contexts is None:
             datatype_contexts = {}
-        pair = {
+        ret = {
+            "node_value": node_value,
             "display_value": compiled_json["@display_value"],
-            "interchange_value": datatype_instance.get_interchange_value(
+            "details": datatype_instance.get_details(
                 node_value,
-                # Provide details and datatype_contexts to avoid repetitive computations.
-                details=compiled_json.get("details"),
                 datatype_context=datatype_contexts.get(node.datatype),
                 # An optional extra hint for the ResourceInstance{list} types
                 # so that prefetched related resources can be used.
                 resource=self.resourceinstance if self.resourceinstance_id else None,
             ),
         }
-        if pair["display_value"] in empty_values:
+        if ret["details"] is None:
+            del ret["details"]
+        if ret["display_value"] in empty_values:
             # Future: upstream this into datatype methods (another hook?)
-            pair["display_value"] = _("(Empty)")
-        return pair
+            ret["display_value"] = _("(Empty)")
+        return ret
 
     def set_aliased_data(self, node, node_value, datatype_contexts=None):
         """Format node_value according to the self._as_representation flag and
@@ -568,7 +569,7 @@ class TileTree(TileModel, AliasedDataMixin):
         datatype_instance = DataTypeFactory().get_instance(node.datatype)
 
         if self._as_representation:
-            final_val = self.get_display_interchange_pair(
+            final_val = self.get_value_with_context(
                 node, node_value, datatype_contexts=datatype_contexts
             )
         else:

@@ -41,6 +41,7 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
                     # TODO: handle multiple graph configs, requires db?
                     transformed.append(self.from_id_string(inner_val))
                 case dict():
+                    # TODO: reassess if needed.
                     # TODO: handle multiple graph configs, requires db?
                     if interchange_value := inner_val.get("resource_id"):
                         transformed.append(self.from_id_string(interchange_value))
@@ -59,23 +60,12 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
             resource_id = tile["resourceinstance_id"]
             return models.ResourceInstance.objects.filter(pk=resource_id).first()
 
-    def to_json(self, tile, node):
-        data = self.get_tile_data(tile)
-        value = data.get(str(node.nodeid))
-        resource = self.get_resource(tile)
-        return self.compile_json(tile, node, details=self.get_details(value, resource))
-
-    def compile_json(self, tile, node, *, details=None, **kwargs):
-        ret = {"@display_value": self.get_display_value(tile, node, details=details)}
-        ret.update(kwargs)
-        return ret
-
     def get_display_value(self, tile, node, *, details=None, **kwargs):
         if details is None:
             data = self.get_tile_data(tile)
             value = data.get(str(node.nodeid))
             resource = self.get_resource(tile)
-            details = self.get_details(value, resource)
+            details = self.get_details(value, resource=resource)
         return ", ".join(
             [detail["display_value"] or "" for detail in details if detail]
         )
@@ -136,9 +126,7 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
 
         return related_resources
 
-    def get_details(self, value, resource=None):
-        """Hook for deriving information needed by both the display value
-        and the interchange value."""
+    def get_details(self, value, *, resource=None, **kwargs):
         lang = get_language()
         related_resources_by_id = {
             related_resource.pk: related_resource
@@ -166,15 +154,6 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
                     }
                 )
         return ret
-
-    def get_interchange_value(
-        self, value, *, details=None, datatype_context=None, **kwargs
-    ):
-        if not value:
-            return None
-        if details is None:
-            details = self.get_details(value=value, **kwargs)
-        return details[0]["resource_id"]
 
     @staticmethod
     def from_id_string(uuid_string, graph_config=None):
@@ -206,13 +185,10 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
             return None
         return related_resources
 
-    def get_interchange_value(
-        self, value, *, details=None, datatype_context=None, **kwargs
-    ):
+    def get_details(self, value, *, resource=None, **kwargs):
         if not value:
-            return None
-        if details is None:
-            details = self.get_details(value=value, **kwargs)
+            return []
+        details = super().get_details(value=value, resource=resource, **kwargs)
         resource_display_value_map = {
             str(detail["resource_id"]): detail["display_value"] for detail in details
         }

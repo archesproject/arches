@@ -299,11 +299,9 @@ class TileTreeOperation:
             if value_to_validate is NOT_PROVIDED:
                 continue
             if isinstance(value_to_validate, dict):
-                interchange_val = value_to_validate.get(
-                    "interchange_value", NOT_PROVIDED
+                value_to_validate = value_to_validate.get(
+                    "node_value", value_to_validate
                 )
-                if interchange_val is not NOT_PROVIDED:
-                    value_to_validate = interchange_val
 
             self._run_datatype_methods(tile, value_to_validate, node)
 

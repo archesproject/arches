@@ -17,16 +17,9 @@ class ConceptDataType(concept_types.ConceptDataType):
     def to_python(self, value, **kwargs):
         return self.get_instance(value)
 
-    def to_json(self, tile, node, **kwargs):
-        return self.compile_json(tile, node, details=self.get_details(tile, node))
-
-    def get_details(self, tile, node):
-        """Hook for deriving information needed by both the display value
-        and the interchange value."""
-        data = self.get_tile_data(tile)
-        value = data.get(str(node.nodeid))
+    def get_details(self, value, **kwargs):
         instance = self.get_instance(value)
-        return JSONSerializer().serialize(instance)
+        return JSONDeserializer().deserialize(JSONSerializer().serialize(instance))
 
     def get_instance(self, value):
         if value is None:
@@ -36,16 +29,6 @@ class ConceptDataType(concept_types.ConceptDataType):
         except (TypeError, ValueError):
             pass
         return self.get_value(value)
-
-    def get_interchange_value(
-        self, value, *, details=None, datatype_context=None, **kwargs
-    ):
-        if not value:
-            return None
-        if details is None:
-            instance = self.get_instance(value)
-            return JSONSerializer().handle_model(instance)
-        return JSONDeserializer().deserialize(JSONSerializer().serialize(details))
 
     def get_display_value_context_in_bulk(self, values):
         value_ids = [
@@ -78,16 +61,9 @@ class ConceptListDataType(concept_types.ConceptListDataType):
     def to_python(self, value, **kwargs):
         return self.get_instances(value) or None
 
-    def to_json(self, tile, node, **kwargs):
-        return self.compile_json(tile, node, details=self.get_details(tile, node))
-
-    def get_details(self, tile, node):
-        """Hook for deriving information needed by both the display value
-        and the interchange value."""
-        data = self.get_tile_data(tile)
-        value = data.get(str(node.nodeid))
+    def get_details(self, value, **kwargs):
         instances = self.get_instances(value)
-        return [JSONSerializer().handle_model(inst) for inst in instances]
+        return JSONDeserializer().deserialize(JSONSerializer().serialize(instances))
 
     def get_instances(self, value):
         new_values = []
@@ -98,15 +74,6 @@ class ConceptListDataType(concept_types.ConceptListDataType):
                 new_val = self.get_value(inner_value)
             new_values.append(new_val)
         return new_values
-
-    def get_interchange_value(
-        self, value, *, details=None, datatype_context=None, **kwargs
-    ):
-        if not value:
-            return None
-        if details is None:
-            details = [self.get_instances(value)]
-        return JSONDeserializer().deserialize(JSONSerializer().serialize(details))
 
     def get_display_value(self, tile, node, **kwargs):
         new_values = []

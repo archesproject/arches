@@ -18,7 +18,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 from arches_querysets.datatypes.datatypes import DataTypeFactory
 from arches_querysets.models import AliasedData, ResourceTileTree, TileTree
-from arches_querysets.rest_framework import interchange_mixin
+from arches_querysets.rest_framework.node_value_mixin import NodeValueMixin
 
 
 def _make_tile_serializer(
@@ -62,11 +62,11 @@ def _wrap_serializer_field(serializer_field_class) -> type:
     """
     Ensure every serializer field in DRF's serializer_field_mapping
     resolves to one of *our* serializer fields with overrides handling
-    interchange_value wrapping and unwrapping.
+    node_value wrapping and unwrapping.
     """
     return type(
         serializer_field_class.__name__,
-        (interchange_mixin.InterchangeValueMixin, serializer_field_class),
+        (NodeValueMixin, serializer_field_class),
         {},
     )
 
@@ -402,7 +402,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             # It's a little roundabout to instantiate a tile like this, but the underlying
             # methods expect tiles in case there are provisional edits there.
             dummy_tile = TileTree(data={str(node.pk): default_val})
-            pair = dummy_tile.get_display_interchange_pair(
+            pair = dummy_tile.get_value_with_context(
                 node, node_value=default_val, datatype_contexts=datatype_contexts
             )
             field.initial = pair

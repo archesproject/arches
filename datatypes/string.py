@@ -8,11 +8,6 @@ from django.utils.translation import get_language
 
 
 class StringDataType(datatypes.StringDataType):
-    def get_interchange_value(self, value, **kwargs):
-        if not value or not isinstance(value, dict):
-            return None
-        return value
-
     def transform_value_for_tile(self, value, *, languages=None, **kwargs):
         """
         Override to:
