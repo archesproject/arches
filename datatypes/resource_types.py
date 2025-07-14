@@ -167,7 +167,9 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
                 )
         return ret
 
-    def get_interchange_value(self, value, *, details=None, **kwargs):
+    def get_interchange_value(
+        self, value, *, details=None, datatype_context=None, **kwargs
+    ):
         if not value:
             return None
         if details is None:
@@ -204,7 +206,9 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
             return None
         return related_resources
 
-    def get_interchange_value(self, value, *, details=None, **kwargs):
+    def get_interchange_value(
+        self, value, *, details=None, datatype_context=None, **kwargs
+    ):
         if not value:
             return None
         if details is None:

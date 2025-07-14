@@ -1,4 +1,5 @@
 import uuid
+from itertools import chain
 
 from arches.app.datatypes import concept_types
 from arches.app.models.models import Value
@@ -36,13 +37,27 @@ class ConceptDataType(concept_types.ConceptDataType):
             pass
         return self.get_value(value)
 
-    def get_interchange_value(self, value, *, details=None, **kwargs):
+    def get_interchange_value(
+        self, value, *, details=None, datatype_context=None, **kwargs
+    ):
         if not value:
             return None
         if details is None:
             instance = self.get_instance(value)
             return JSONSerializer().handle_model(instance)
         return JSONDeserializer().deserialize(JSONSerializer().serialize(details))
+
+    def get_display_value_context_in_bulk(self, values):
+        value_ids = [
+            value
+            for value in values
+            if value and uuid.UUID(value) not in self.value_lookup
+        ]
+        return Value.objects.filter(pk__in=value_ids)
+
+    def set_display_value_context_in_bulk(self, datatype_context):
+        for value in datatype_context:
+            self.value_lookup[value.pk] = value
 
 
 class ConceptListDataType(concept_types.ConceptListDataType):
@@ -84,7 +99,9 @@ class ConceptListDataType(concept_types.ConceptListDataType):
             new_values.append(new_val)
         return new_values
 
-    def get_interchange_value(self, value, *, details=None, **kwargs):
+    def get_interchange_value(
+        self, value, *, details=None, datatype_context=None, **kwargs
+    ):
         if not value:
             return None
         if details is None:
@@ -98,3 +115,12 @@ class ConceptListDataType(concept_types.ConceptListDataType):
             new_val = self.get_value(uuid.UUID(val))
             new_values.append(new_val.value)
         return ",".join(new_values)
+
+    def get_display_value_context_in_bulk(self, values):
+        not_null_values = [val for val in values if val]
+        value_ids = list(chain(*not_null_values))
+        return Value.objects.filter(pk__in=value_ids)
+
+    def set_display_value_context_in_bulk(self, datatype_context):
+        for value in datatype_context:
+            self.value_lookup[value.pk] = value

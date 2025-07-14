@@ -539,16 +539,19 @@ class TileTree(TileModel, AliasedDataMixin):
 
         return cleaned_default
 
-    def get_display_interchange_pair(self, node, node_value):
+    def get_display_interchange_pair(self, node, node_value, datatype_contexts=None):
         datatype_instance = DataTypeFactory().get_instance(node.datatype)
         empty_values = (None, "", '{"url": "", "url_label": ""}')
         compiled_json = datatype_instance.to_json(self, node)
+        if datatype_contexts is None:
+            datatype_contexts = {}
         pair = {
             "display_value": compiled_json["@display_value"],
             "interchange_value": datatype_instance.get_interchange_value(
                 node_value,
-                # Provide details to avoid repetitive computations.
+                # Provide details and datatype_contexts to avoid repetitive computations.
                 details=compiled_json.get("details"),
+                datatype_context=datatype_contexts.get(node.datatype),
                 # An optional extra hint for the ResourceInstance{list} types
                 # so that prefetched related resources can be used.
                 resource=self.resourceinstance if self.resourceinstance_id else None,
@@ -559,13 +562,15 @@ class TileTree(TileModel, AliasedDataMixin):
             pair["display_value"] = _("(Empty)")
         return pair
 
-    def set_aliased_data(self, node, node_value):
+    def set_aliased_data(self, node, node_value, datatype_contexts=None):
         """Format node_value according to the self._as_representation flag and
         set it on self.aliased_data."""
         datatype_instance = DataTypeFactory().get_instance(node.datatype)
 
         if self._as_representation:
-            final_val = self.get_display_interchange_pair(node, node_value)
+            final_val = self.get_display_interchange_pair(
+                node, node_value, datatype_contexts=datatype_contexts
+            )
         else:
             if hasattr(datatype_instance, "to_python"):
                 resource = self.resourceinstance if self.resourceinstance_id else None

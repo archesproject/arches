@@ -1,4 +1,5 @@
 import uuid
+from collections import defaultdict
 from operator import attrgetter
 from slugify import slugify
 
@@ -144,30 +145,50 @@ class TileTreeQuerySet(models.QuerySet):
             raise RuntimeError(e) from e
 
     def _set_aliased_data(self):
-        """Call datatype to_python() methods when materializing the QuerySet.
-        Memoize fetched nodes. Attach child tiles to parent tiles and vice versa.
+        """
+        Call datatype to_python() methods when materializing the QuerySet.
+        Memoize fetched nodes.
+        Fetch display values in bulk.
+        Attach child tiles to parent tiles and vice versa.
         """
         for tile in self._result_cache:
             if not isinstance(tile, self.model):
                 return
             break
 
+        aliased_data_to_update = {}
+        values_by_datatype = defaultdict(list)
+        datatype_contexts = {}
         for tile in self._result_cache:
             tile.sync_private_attributes(self)
             for node in self._queried_nodes:
                 if node.nodegroup_id == tile.nodegroup_id:
                     datatype_instance = DataTypeFactory().get_instance(node.datatype)
                     tile_data = datatype_instance.get_tile_data(tile)
-                    node_val = tile_data.get(str(node.pk))
-                    if node_val is None:
+                    node_value = tile_data.get(str(node.pk))
+                    if node_value is None:
                         # Datatype methods assume tiles always have all keys, but we've
                         # seen problems in the wild.
                         tile_data[str(node.pk)] = None
-                    tile.set_aliased_data(node, node_val)
+                    aliased_data_to_update[(tile, node)] = node_value
+                    values_by_datatype[node.datatype].append(node_value)
                 elif node.nodegroup.parentnodegroup_id == tile.nodegroup_id:
                     empty_value = None if node.nodegroup.cardinality == "1" else []
                     setattr(tile.aliased_data, tile.find_nodegroup_alias(), empty_value)
 
+        # Get datatype context querysets.
+        for datatype, values in values_by_datatype.items():
+            datatype_instance = DataTypeFactory().get_instance(datatype)
+            bulk_values = datatype_instance.get_display_value_context_in_bulk(values)
+            datatype_instance.set_display_value_context_in_bulk(bulk_values)
+            datatype_contexts[datatype] = bulk_values
+
+        # Set aliased_data property.
+        for tile_node_pair, node_value in aliased_data_to_update.items():
+            tile, node = tile_node_pair
+            tile.set_aliased_data(node, node_value, datatype_contexts)
+
+        for tile in self._result_cache:
             self._set_child_tile_data(tile)
 
     def _set_child_tile_data(self, tile):
