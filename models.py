@@ -756,19 +756,21 @@ class GraphWithPrefetching(GraphModel):
         return self.node_set.all()
 
     def _annotate_grouping_node(self):
+        nodegroups = set()
         grouping_node_map = {}
         for node in self.permitted_nodes:
             if node.nodegroup_id == node.pk:
                 grouping_node_map[node.pk] = node
-        for node in self.permitted_nodes:
-            if nodegroup := node.nodegroup:
-                nodegroup.grouping_node = grouping_node_map.get(nodegroup.pk)
-                children = (
-                    nodegroup.children.all()
-                    if arches_version >= (8, 0)
-                    else nodegroup.nodegroup_set.all()
+                if node.nodegroup:
+                    nodegroups.add(node.nodegroup)
+        for nodegroup in nodegroups:
+            nodegroup.grouping_node = grouping_node_map.get(nodegroup.pk)
+            children = (
+                nodegroup.children.all()
+                if arches_version >= (8, 0)
+                else nodegroup.nodegroup_set.all()
+            )
+            for child_nodegroup in children:
+                child_nodegroup.grouping_node = grouping_node_map.get(
+                    child_nodegroup.pk
                 )
-                for child_nodegroup in children:
-                    child_nodegroup.grouping_node = grouping_node_map.get(
-                        child_nodegroup.pk
-                    )
