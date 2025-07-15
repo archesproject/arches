@@ -8,7 +8,7 @@ import Button from "primevue/button";
 import Message from "primevue/message";
 import Skeleton from "primevue/skeleton";
 
-import GenericWidget from "@/arches_component_lab/widgets/GenericWidget/GenericWidget.vue";
+import GenericWidget from "@/arches_component_lab/generic/GenericWidget/GenericWidget.vue";
 
 import { upsertTile } from "@/arches_component_lab/cards/api.ts";
 import { EDIT } from "@/arches_component_lab/widgets/constants.ts";
@@ -88,8 +88,7 @@ async function save(_event: FormSubmitEvent) {
             props.tileData?.tileid,
         );
 
-        Object.assign(aliasedData, updatedTileData.aliased_data);
-
+        Object.assign(aliasedData, upsertedTileData.aliased_data);
         emit("update:tileData", upsertedTileData);
     } catch (error) {
         saveError.value = error;

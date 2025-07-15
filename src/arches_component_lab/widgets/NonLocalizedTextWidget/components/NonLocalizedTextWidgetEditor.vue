@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Textarea from "primevue/textarea";
+import InputText from "primevue/inputtext";
 import GenericFormField from "@/arches_component_lab/generic/GenericFormField.vue";
 
 import type { NodeData } from "@/arches_component_lab/types.ts";
@@ -16,11 +16,9 @@ const { nodeAlias, value } = defineProps<{
         :node-alias="nodeAlias"
         :initial-value="value?.interchange_value"
     >
-        <Textarea
+        <InputText
+            type="text"
             :fluid="true"
-            :draggable="true"
-            :rows="12"
-            style="resize: vertical"
         />
     </GenericFormField>
 </template>

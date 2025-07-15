@@ -4,7 +4,10 @@ import NonLocalizedTextAreaWidgetViewer from "@/arches_component_lab/widgets/Non
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
+import type {
+    CardXNodeXWidget,
+    NodeData,
+} from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 defineProps<{
@@ -12,7 +15,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidget;
-    value: string | null | undefined;
+    value: NodeData | null | undefined;
 }>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);
@@ -22,6 +25,7 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
     <NonLocalizedTextAreaWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
+        :graph-slug="graphSlug"
         :node-alias="nodeAlias"
         :value="value"
         @update:value="emit('update:value', $event)"

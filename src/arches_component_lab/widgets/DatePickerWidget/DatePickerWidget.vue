@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import FileListWidgetViewer from "@/arches_component_lab/widgets/FileListWidget/components/FileListWidgetViewer.vue";
-import FileListWidgetEditor from "@/arches_component_lab/widgets/FileListWidget/components/FileListWidgetEditor/FileListWidgetEditor.vue";
+import DatePickerWidgetEditor from "@/arches_component_lab/widgets/DatePickerWidget/components/DatePickerWidgetEditor.vue";
+import DatePickerWidgetViewer from "@/arches_component_lab/widgets/DatePickerWidget/components/DatePickerWidgetViewer.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { FileListCardXNodeXWidgetData } from "@/arches_component_lab/datatypes/file-list/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import type { DateDatatypeCardXNodeXWidgetData } from "@/arches_component_lab/datatypes/date/types.ts";
 import type { NodeData } from "@/arches_component_lab/types.ts";
 
 defineProps<{
     mode: WidgetMode;
     nodeAlias: string;
     graphSlug: string;
-    cardXNodeXWidgetData: FileListCardXNodeXWidgetData | undefined;
+    cardXNodeXWidgetData: DateDatatypeCardXNodeXWidgetData;
     value: NodeData | null | undefined;
 }>();
 
@@ -20,20 +20,20 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
 </script>
 
 <template>
-    <FileListWidgetEditor
+    <DatePickerWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="
-            cardXNodeXWidgetData as FileListCardXNodeXWidgetData
+            cardXNodeXWidgetData as DateDatatypeCardXNodeXWidgetData
         "
         :node-alias="nodeAlias"
         :value="value"
         @update:value="emit('update:value', $event)"
         @update:is-dirty="emit('update:isDirty', $event)"
     />
-    <FileListWidgetViewer
+    <DatePickerWidgetViewer
         v-if="mode === VIEW"
         :card-x-node-x-widget-data="
-            cardXNodeXWidgetData as FileListCardXNodeXWidgetData
+            cardXNodeXWidgetData as DateDatatypeCardXNodeXWidgetData
         "
         :value="value"
     />

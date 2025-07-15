@@ -2,21 +2,24 @@
 import { computed } from "vue";
 import { Image, Galleria } from "primevue";
 
+import type { NodeData } from "@/arches_component_lab/types.ts";
 import type { FileReference } from "@/arches_component_lab/widgets/types.ts";
 
-const props = defineProps<{
-    value: FileReference[] | null | undefined;
+const { value } = defineProps<{
+    value: NodeData | null | undefined;
 }>();
 
 const imageData = computed(() => {
-    return props.value?.map((fileReference) => {
-        return {
-            thumbnailImageSrc: `${fileReference.url}`,
-            itemImageSrc: `${fileReference.url}`,
-            alt: fileReference.altText,
-            title: fileReference.title,
-        };
-    });
+    return (value?.interchange_value as FileReference[])?.map(
+        (fileReference) => {
+            return {
+                thumbnailImageSrc: `${fileReference.url}`,
+                itemImageSrc: `${fileReference.url}`,
+                alt: fileReference.altText,
+                title: fileReference.title,
+            };
+        },
+    );
 });
 
 const showThumbnails = computed(() => {

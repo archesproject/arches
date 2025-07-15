@@ -9,11 +9,10 @@ import {
 
 import Message from "primevue/message";
 import Skeleton from "primevue/skeleton";
+import GenericWidgetLabel from "@/arches_component_lab/generic/GenericWidget/components/GenericWidgetLabel.vue";
 
-import GenericWidgetLabel from "@/arches_component_lab/widgets/GenericWidget/components/GenericWidgetLabel.vue";
-
-import { fetchCardXNodeXWidgetData } from "@/arches_component_lab/widgets/api.ts";
-import { getUpdatedComponentPath } from "@/arches_component_lab/widgets/utils.ts";
+import { fetchCardXNodeXWidgetData } from "@/arches_component_lab/generic/GenericWidget/api.ts";
+import { getUpdatedComponentPath } from "@/arches_component_lab/generic/GenericWidget/utils.ts";
 
 import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
@@ -124,7 +123,10 @@ watchEffect(async () => {
                 :mode="mode"
                 :node-alias="nodeAlias"
                 :value="widgetValue"
-                @update:value="emit('update:value', $event)"
+                @update:value="
+                    emit('update:value', $event);
+                    console.log('update:value', $event);
+                "
                 @update:is-dirty="emit('update:isDirty', $event)"
             />
         </label>

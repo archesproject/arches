@@ -1,3 +1,8 @@
+export interface NodeData {
+    display_value: string;
+    interchange_value: unknown;
+}
+
 export interface CardXNodeXWidget {
     card: {
         name: string;
@@ -11,6 +16,7 @@ export interface CardXNodeXWidget {
     node: {
         alias: string;
         isrequired: boolean;
+        nodeid: string;
     };
     sortorder: number;
     visible: boolean;
