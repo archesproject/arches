@@ -557,7 +557,7 @@ class TileTree(TileModel, AliasedDataMixin):
             ),
         }
         if ret["details"] is None:
-            del ret["details"]
+            ret["details"] = []
         if ret["display_value"] in empty_values:
             # Future: upstream this into datatype methods (another hook?)
             ret["display_value"] = _("(Empty)")
