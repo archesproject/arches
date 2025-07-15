@@ -18,7 +18,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 from arches_querysets.datatypes.datatypes import DataTypeFactory
 from arches_querysets.models import AliasedData, ResourceTileTree, TileTree
-from arches_querysets.rest_framework.node_value_mixin import NodeValueMixin
+from arches_querysets.rest_framework.field_mixins import NodeValueMixin
 
 
 def _make_tile_serializer(
