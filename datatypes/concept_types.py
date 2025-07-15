@@ -19,7 +19,9 @@ class ConceptDataType(concept_types.ConceptDataType):
 
     def get_details(self, value, **kwargs):
         instance = self.get_instance(value)
-        return JSONDeserializer().deserialize(JSONSerializer().serialize(instance))
+        if not instance:
+            return None
+        return JSONDeserializer().deserialize(JSONSerializer().serialize([instance]))
 
     def get_instance(self, value):
         if value is None:
