@@ -472,6 +472,9 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
     # aliased_data is a virtual field not inferred by serializers.ModelSerializer.
     aliased_data = ResourceAliasedDataSerializer(required=False, allow_null=False)
 
+    # Custom read-only fields.
+    graph_has_different_publication = serializers.SerializerMethodField()
+
     class Meta:
         model = ResourceTileTree
         # If None, supply by a route providing a <slug:graph> component
@@ -546,6 +549,13 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             )
             updated = self.update(instance_from_factory, validated_data)
         return updated
+
+    def get_graph_has_different_publication(self, obj):
+        if arches_version < (8, 0):
+            return False
+        return obj.graph_publication_id and (
+            obj.graph_publication_id != obj.graph.publication_id
+        )
 
 
 # Workaround for I18n_string fields

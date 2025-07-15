@@ -120,6 +120,11 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         self._aliased_data = value
 
     def save(self, *, request=None, index=True, force_admin=False, **kwargs):
+        if self.graph_publication_id and (
+            self.graph_publication_id != self.graph.publication_id
+        ):
+            raise ValidationError(_("Graph Has Different Publication"))
+
         self._save_aliased_data(
             request=request, index=index, force_admin=force_admin, **kwargs
         )
@@ -249,6 +254,16 @@ class TileTree(TileModel, AliasedDataMixin):
         self._parent = parent
 
     def save(self, *, request=None, index=True, force_admin=False, **kwargs):
+        if (
+            self.resourceinstance_id
+            and self.resourceinstance.graph_publication_id
+            and (
+                self.resourceinstance.graph_publication_id
+                != self.resourceinstance.graph.publication_id
+            )
+        ):
+            raise ValidationError(_("Graph Has Different Publication"))
+
         if arches_version < (8, 0) and self.nodegroup:
             # Cannot supply this too early, as nodegroup might be included
             # with the request and already instantiated to a fresh object.

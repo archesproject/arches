@@ -42,6 +42,7 @@ class GraphTestCase(TestCase):
         if arches_version < (8, 0):
             graph_proxy.refresh_from_database()
         graph_proxy.publish(user=None)
+        cls.graph.publication = graph_proxy.publication
 
     @classmethod
     def create_graph(cls):
@@ -215,11 +216,13 @@ class GraphTestCase(TestCase):
             graph=cls.graph,
             descriptors={"en": {"name": "Resource referencing 42"}},
             name="Resource referencing 42",
+            graph_publication_id=cls.graph.publication_id,
         )
         cls.resource_none = ResourceInstance.objects.create(
             graph=cls.graph,
             descriptors={"en": {"name": "Resource referencing None"}},
             name="Resource referencing None",
+            graph_publication_id=cls.graph.publication_id,
         )
 
     @classmethod

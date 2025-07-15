@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils.translation import gettext as _
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.metadata import SimpleMetadata
+from rest_framework.settings import api_settings
 
 from arches import VERSION as arches_version
 from arches.app.models.models import ResourceInstance, TileModel
@@ -185,7 +186,11 @@ class ArchesModelAPIMixin:
             serializer.save()
         except DjangoValidationError as django_error:
             flattened_errors = self.flatten_validation_errors(django_error)
-            raise ValidationError(flattened_errors) from django_error
+            if isinstance(flattened_errors, dict):
+                errors = flattened_errors
+            else:
+                errors = {api_settings.NON_FIELD_ERRORS_KEY: flattened_errors}
+            raise ValidationError(errors) from django_error
 
     def perform_create(self, serializer):
         self.validate_tile_data_and_save(serializer)
@@ -206,4 +211,5 @@ class ArchesModelAPIMixin:
                 )
                 for k, v in error.error_dict.items()
             }
-        return error
+        else:
+            return error.messages
