@@ -18,8 +18,6 @@ const { value, nodeAlias, cardXNodeXWidgetData } = defineProps<{
     cardXNodeXWidgetData: DateDatatypeCardXNodeXWidgetData;
 }>();
 
-defineEmits(["update:isDirty", "update:value"]);
-
 const shouldShowTime = ref(false);
 const dateFormat = ref();
 
