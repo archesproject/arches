@@ -9,7 +9,7 @@ import MultiSelect from "primevue/multiselect";
 
 import GenericFormField from "@/arches_component_lab/generic/GenericFormField.vue";
 
-import { fetchRelatableResources } from "@/arches_component_lab/widgets/api.ts";
+import { fetchRelatableResources } from "@/arches_component_lab/datatypes/resource-instance-list/api.ts";
 
 import type { FormFieldResolverOptions } from "@primevue/forms";
 import type { MultiSelectFilterEvent } from "primevue/multiselect";
