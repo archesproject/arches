@@ -81,6 +81,13 @@ async function save(_event: FormSubmitEvent) {
             },
         };
 
+        console.log(
+            "Saving tile data",
+            updatedTileData,
+            props.graphSlug,
+            props.nodegroupAlias,
+        );
+
         const upsertedTileData = await upsertTile(
             props.graphSlug,
             props.nodegroupAlias,

@@ -24,7 +24,7 @@ const dateFormat = ref();
 watchEffect(() => {
     const convertedDateFormat =
         convertISO8601DatetimeFormatToPrimevueDatetimeFormat(
-            cardXNodeXWidgetData.config.dateFormat,
+            cardXNodeXWidgetData.node.config.dateFormat,
         );
 
     dateFormat.value = convertedDateFormat.dateFormat;
@@ -32,11 +32,11 @@ watchEffect(() => {
 });
 
 function resolver(event: FormFieldResolverOptions) {
-    return {
-        values: {
-            [nodeAlias]: formatDate(event.value, dateFormat.value) ?? null,
-        },
-    };
+    if (!event.value) {
+        return null;
+    }
+
+    return formatDate(event.value, cardXNodeXWidgetData.node.config.dateFormat);
 }
 </script>
 
@@ -44,7 +44,7 @@ function resolver(event: FormFieldResolverOptions) {
     <GenericFormField
         v-bind="$attrs"
         :node-alias="nodeAlias"
-        :initial-value="value?.interchange_value"
+        :initial-value="new Date(value?.interchange_value as string)"
         :resolver="resolver"
     >
         <DatePicker
