@@ -8,6 +8,8 @@ const { nodeAlias, value } = defineProps<{
     nodeAlias: string;
     value: NodeData | null | undefined;
 }>();
+
+console.log("NonLocalizedTextWidgetEditor", nodeAlias, value);
 </script>
 
 <template>

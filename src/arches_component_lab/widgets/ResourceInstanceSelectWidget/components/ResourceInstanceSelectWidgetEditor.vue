@@ -60,10 +60,7 @@ async function getOptions(page: number, filterTerm?: string) {
             nodeAlias,
             page,
             filterTerm,
-            value?.interchange_value as
-                | ResourceInstanceReference
-                | null
-                | undefined,
+            value?.interchange_value as string,
         );
 
         const references = resourceData.data.map(

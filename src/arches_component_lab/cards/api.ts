@@ -1,6 +1,8 @@
 import arches from "arches";
 import Cookies from "js-cookie";
 
+import { extractFileEntriesFromPayload } from "@/arches_component_lab/cards/utils.ts";
+
 export const fetchCardData = async (
     graphSlug: string,
     nodegroupAlias: string,
@@ -40,72 +42,66 @@ export const fetchTileData = async (
     }
 };
 
-export const upsertTile = async (
+export const fetchCardXNodeXWidgetDataFromNodeGroup = async (
+    graphSlug: string,
+    nodegroupAlias: string,
+) => {
+    const response = await fetch(
+        arches.urls.api_card_x_node_x_widget_list_from_nodegroup(
+            graphSlug,
+            nodegroupAlias,
+        ),
+    );
+
+    try {
+        const parsed = await response.json();
+        if (response.ok) {
+            return parsed;
+        }
+        throw new Error(parsed.message);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
+    }
+};
+
+export async function upsertTile(
     graphSlug: string,
     nodegroupAlias: string,
     payload: Record<string, unknown>,
     tileId?: string,
-) => {
-    // 1) URL + method
+): Promise<unknown> {
     const urlSegments = [graphSlug, nodegroupAlias];
+    let httpMethod = "POST";
+
     if (tileId) {
         urlSegments.push(tileId);
+        httpMethod = "PUT";
     }
-    const requestUrl = arches.urls.api_tile(...urlSegments);
-    const requestMethod = tileId ? "PUT" : "POST";
 
-    // 2) CSRF
-    const headers: Record<string, string> = {
-        "X-CSRFTOKEN": Cookies.get("csrftoken") || "",
-        // ← no Content-Type here
-    };
-
-    // 3) Clone + strip Files
-    const clonedPayload = structuredClone(payload);
-    type UploadEntry = { file: File; node_id: string };
-    const filesToUpload: UploadEntry[] = [];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (function extractFiles(obj: any) {
-        for (const key of Object.keys(obj)) {
-            const value = obj[key];
-            if (value instanceof File) {
-                filesToUpload.push({ file: value, node_id: obj.node_id });
-                delete obj[key];
-            } else if (value && typeof value === "object") {
-                extractFiles(value);
-            }
-        }
-    })(clonedPayload);
-
-    // 4) Build FormData
     const formData = new FormData();
-    // — append the JSON on the key the API wants
-    formData.append("json", JSON.stringify(clonedPayload));
-    // — append each file
-    filesToUpload.forEach(({ file, node_id }) => {
-        formData.append(`file-list_${node_id}`, file, file.name);
-    });
+    formData.append("json", JSON.stringify(payload));
 
-    // 5) Fire the request as multipart
-    const response = await fetch(requestUrl, {
-        method: requestMethod,
-        headers, // only X-CSRFTOKEN
+    const fileEntries = extractFileEntriesFromPayload(payload);
+    for (const { file, nodeId } of fileEntries) {
+        formData.append(`file-list_${nodeId}`, file, file.name);
+    }
+
+    const endpointUrl = arches.urls.api_tile(...urlSegments);
+    const response = await fetch(endpointUrl, {
+        method: httpMethod,
+        headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") },
         body: formData,
     });
 
-    // 6) Parse + error‐wrap
-    const rawText = await response.text();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let parsed: any = {};
     try {
-        if (rawText) {
-            parsed = JSON.parse(rawText);
+        const raw = await response.text();
+        const parsed = JSON.parse(raw);
+
+        if (response.ok) {
+            return parsed;
         }
-    } catch {
-        throw new Error(response.statusText);
+        throw new Error(parsed.message);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
     }
-    if (response.ok) {
-        return parsed;
-    }
-    throw new Error(parsed.message || response.statusText);
-};
+}

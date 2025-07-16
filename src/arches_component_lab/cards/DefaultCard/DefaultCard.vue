@@ -11,7 +11,7 @@ import {
     fetchCardData,
     fetchTileData,
 } from "@/arches_component_lab/cards/api.ts";
-import { fetchCardXNodeXWidgetDataFromNodeGroup } from "@/arches_component_lab/widgets/api.ts";
+import { fetchCardXNodeXWidgetDataFromNodeGroup } from "@/arches_component_lab/cards/api.ts";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 

@@ -1,12 +1,11 @@
 import arches from "arches";
-import type { ResourceInstanceReference } from "@/arches_component_lab/widgets/types.ts";
 
 export const fetchRelatableResources = async (
     graphSlug: string,
     nodeAlias: string,
     page: number,
     filterTerm?: string,
-    initialValue?: ResourceInstanceReference | null | undefined,
+    initialValue?: string | null | undefined,
 ) => {
     const params = new URLSearchParams();
 
@@ -17,7 +16,7 @@ export const fetchRelatableResources = async (
     }
 
     if (initialValue) {
-        params.append("initialValue", initialValue.resource_id);
+        params.append("initialValue", initialValue);
     }
 
     const response = await fetch(
