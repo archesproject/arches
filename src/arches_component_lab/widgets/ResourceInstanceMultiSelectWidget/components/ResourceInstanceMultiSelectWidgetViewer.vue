@@ -2,16 +2,15 @@
 import arches from "arches";
 
 import type { ResourceInstanceReference } from "@/arches_component_lab/widgets/types.ts";
-import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
+import type { NodeData } from "@/arches_component_lab/types.ts";
 
-const props = defineProps<{
-    value: ResourceInstanceReference[] | null | undefined;
-    cardXNodeXWidgetData?: CardXNodeXWidget;
+const { value } = defineProps<{
+    value: NodeData | null | undefined;
 }>();
 </script>
 <template>
     <div
-        v-for="resourceInstance in props.value"
+        v-for="resourceInstance in value?.interchange_value as ResourceInstanceReference[]"
         :key="resourceInstance.resource_id"
     >
         <a
