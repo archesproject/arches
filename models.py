@@ -338,7 +338,7 @@ class ListItem(models.Model):
             child.get_child_uris(uris)
         return uris
 
-    def sort_children(self, language=None, overwrite_sortorder=None):
+    def sort_children(self, language=None):
         """
         Takes a parent ListItem and sorts its n-children
         by their best label.
@@ -348,16 +348,15 @@ class ListItem(models.Model):
         children = {}
         for child in self.children.all():
             label = child.find_best_label(language=language)
-            children[(label, child.pk)] = child
+            children[(child.sortorder, label, child.pk)] = child
 
         children = [val for key, val in sorted(children.items())]
         for i, child in enumerate(children):
-            if child.sortorder == overwrite_sortorder:
-                child.sortorder = i
-                sorted_children.append(child)
+            child.sortorder = i
+            sorted_children.append(child)
         return sorted_children
 
-    def sort_siblings(self, language=None, overwrite_sortorder=None, root_siblings=[]):
+    def sort_siblings(self, language=None, root_siblings=[]):
         """
         Sorts the siblings of the provided ListItem by their best label.
         Returns list of siblings with updated sortorder for implementer to save / bulk_update.
@@ -365,22 +364,19 @@ class ListItem(models.Model):
         sorted_siblings = []
         parent = self.parent
         if parent:
-            sorted_siblings = parent.sort_children(
-                language=language, overwrite_sortorder=overwrite_sortorder
-            )
+            sorted_siblings = parent.sort_children(language=language)
         else:
             if not root_siblings:
                 root_siblings = self.list.list_items.filter(parent__isnull=True)
             siblings = {}
             for sibling in root_siblings:
                 label = sibling.find_best_label(language=language)
-                siblings[(label, sibling.pk)] = sibling
+                siblings[(sibling.sortorder, label, sibling.pk)] = sibling
 
             siblings = [val for key, val in sorted(siblings.items())]
             for i, sibling in enumerate(siblings):
-                if sibling.sortorder == overwrite_sortorder:
-                    sibling.sortorder = i
-                    sorted_siblings.append(sibling)
+                sibling.sortorder = i
+                sorted_siblings.append(sibling)
         return sorted_siblings
 
 

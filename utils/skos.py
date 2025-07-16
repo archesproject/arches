@@ -170,17 +170,13 @@ class SKOSReader(SKOSReader):
                 list_items_to_update = []
                 root_items = []
                 for parent in new_list_items:
-                    list_items_to_update.extend(
-                        parent.sort_children(default_lang.code, 999999)
-                    )
+                    list_items_to_update.extend(parent.sort_children(default_lang.code))
                     if parent.parent is None:
                         root_items.append(parent)
 
                 if root_items:
                     list_items_to_update.extend(
-                        root_items[0].sort_siblings(
-                            default_lang.code, 999999, root_items
-                        )
+                        root_items[0].sort_siblings(default_lang.code, root_items)
                     )
 
                 ListItem.objects.bulk_update(list_items_to_update, ["sortorder"])
