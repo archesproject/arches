@@ -39,7 +39,6 @@ function internalResolver(event: FormFieldResolverOptions) {
 
     internalValidate(resolverResult);
 
-    console.log("internalResolver", resolverResult);
     // @ts-expect-error This is a bug with PrimeVue types
     emit("update:isDirty", Boolean(formFieldRef.value!.fieldAttrs.dirty));
     emit("update:value", resolverResult);
@@ -47,8 +46,6 @@ function internalResolver(event: FormFieldResolverOptions) {
 
     return resolverResult;
 }
-
-defineExpose({ formFieldRef });
 </script>
 
 <template>
