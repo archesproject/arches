@@ -1,36 +1,33 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, useTemplateRef } from "vue";
+import { computed, ref, watchEffect } from "vue";
 
 import { useGettext } from "vue3-gettext";
-import { FormField } from "@primevue/forms";
 
-import Message from "primevue/message";
 import Select from "primevue/select";
 
-import { fetchRelatableResources } from "@/arches_component_lab/widgets/api.ts";
+import GenericFormField from "@/arches_component_lab/generic/GenericFormField.vue";
+
+import { fetchRelatableResources } from "@/arches_component_lab/datatypes/resource-instance/api.ts";
 
 import type { FormFieldResolverOptions } from "@primevue/forms";
-import type { MultiSelectFilterEvent } from "primevue/multiselect";
+import type { SelectFilterEvent } from "primevue/select";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
 
+import type { NodeData } from "@/arches_component_lab/types.ts";
 import type {
     ResourceInstanceReference,
     ResourceInstanceResult,
 } from "@/arches_component_lab/widgets/types.ts";
 
-const props = defineProps<{
-    graphSlug: string;
+const { nodeAlias, graphSlug, value } = defineProps<{
     nodeAlias: string;
-    value: ResourceInstanceReference | null | undefined;
+    graphSlug: string;
+    value: NodeData | null | undefined;
 }>();
-
-const emit = defineEmits(["update:isDirty", "update:value"]);
 
 const { $gettext } = useGettext();
 
 const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidget config
-
-const formFieldRef = useTemplateRef("formField");
 
 const options = ref<ResourceInstanceReference[]>([]);
 const isLoading = ref(false);
@@ -40,16 +37,17 @@ const fetchError = ref<string | null>(null);
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
 
-onMounted(async () => {
-    await getOptions(1);
+watchEffect(() => {
+    getOptions(1);
 });
 
-function clearOptions() {
-    options.value = props.value ? [props.value] : [];
-}
+function onFilter(event: SelectFilterEvent) {
+    if (value?.interchange_value) {
+        options.value = value.interchange_value as ResourceInstanceReference[];
+    } else {
+        options.value = [];
+    }
 
-function onFilter(event: MultiSelectFilterEvent) {
-    clearOptions();
     getOptions(1, event.value);
 }
 
@@ -58,11 +56,14 @@ async function getOptions(page: number, filterTerm?: string) {
         isLoading.value = true;
 
         const resourceData = await fetchRelatableResources(
-            props.graphSlug,
-            props.nodeAlias,
+            graphSlug,
+            nodeAlias,
             page,
             filterTerm,
-            props.value ? [props.value] : null,
+            value?.interchange_value as
+                | ResourceInstanceReference
+                | null
+                | undefined,
         );
 
         const references = resourceData.data.map(
@@ -121,42 +122,20 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     await getOptions((resourceResultsPage.value || 0) + 1);
 }
 
-function resolver(e: FormFieldResolverOptions) {
-    validate(e);
-
-    let value = e.value;
-
-    // @ts-expect-error This is a bug with PrimeVue types
-    emit("update:isDirty", Boolean(formFieldRef.value!.fieldAttrs.dirty));
-    emit("update:value", value);
-
-    return {
-        values: {
-            [props.nodeAlias]: options.value.find((option) => {
-                return value && value === option.resource_id;
-            }),
-        },
-    };
+function getOption(value: string): ResourceInstanceReference | undefined {
+    return options.value.find((option) => option.resource_id == value);
 }
 
-function validate(e: FormFieldResolverOptions) {
-    console.log("validate", e);
+function resolver(event: FormFieldResolverOptions) {
+    return getOption(event.value);
 }
 </script>
 
 <template>
-    <Message
-        v-if="fetchError"
-        severity="error"
-    >
-        {{ fetchError }}
-    </Message>
-    <FormField
-        v-else
-        ref="formField"
-        v-slot="$field"
-        :name="props.nodeAlias"
-        :initial-value="props.value?.resource_id"
+    <GenericFormField
+        v-bind="$attrs"
+        :node-alias="nodeAlias"
+        :initial-value="value?.interchange_value"
         :resolver="resolver"
     >
         <Select
@@ -167,7 +146,7 @@ function validate(e: FormFieldResolverOptions) {
             :filter-placeholder="$gettext('Filter Resources')"
             :fluid="true"
             :loading="isLoading"
-            :options
+            :options="options"
             :placeholder="$gettext('Select Resources')"
             :reset-filter-on-hide="true"
             :virtual-scroller-options="{
@@ -178,15 +157,6 @@ function validate(e: FormFieldResolverOptions) {
             }"
             @filter="onFilter"
             @before-show="getOptions(1)"
-        >
-        </Select>
-        <Message
-            v-for="error in $field.errors"
-            :key="error.message"
-            severity="error"
-            size="small"
-        >
-            {{ error.message }}
-        </Message>
-    </FormField>
+        />
+    </GenericFormField>
 </template>

@@ -10,9 +10,7 @@ const { nodeAlias, initialValue, validate, resolver } = defineProps<{
     nodeAlias: string;
     initialValue: unknown | null | undefined;
     validate?: (event: unknown) => void;
-    resolver?: (event: FormFieldResolverOptions) => {
-        values: Record<string, unknown>;
-    };
+    resolver?: (event: FormFieldResolverOptions) => unknown | null | undefined;
 }>();
 
 const emit = defineEmits<{
