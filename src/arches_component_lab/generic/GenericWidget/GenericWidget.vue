@@ -123,10 +123,7 @@ watchEffect(async () => {
                 :mode="mode"
                 :node-alias="nodeAlias"
                 :value="widgetValue"
-                @update:value="
-                    emit('update:value', $event);
-                    console.log('update:value', $event);
-                "
+                @update:value="emit('update:value', $event)"
                 @update:is-dirty="emit('update:isDirty', $event)"
             />
         </label>
