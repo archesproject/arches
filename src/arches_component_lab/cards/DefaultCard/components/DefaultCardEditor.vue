@@ -18,32 +18,32 @@ import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 import type { AliasedTileData } from "@/arches_component_lab/cards/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types";
 
-const props = defineProps<{
-    cardXNodeXWidgetData: CardXNodeXWidget[];
-    graphSlug: string;
-    mode: WidgetMode;
-    nodegroupAlias: string;
-    tileData: AliasedTileData | undefined;
-}>();
+const { $gettext } = useGettext();
+
+const { cardXNodeXWidgetData, graphSlug, mode, nodegroupAlias, tileData } =
+    defineProps<{
+        cardXNodeXWidgetData: CardXNodeXWidget[];
+        graphSlug: string;
+        mode: WidgetMode;
+        nodegroupAlias: string;
+        tileData: AliasedTileData | undefined;
+    }>();
 
 const emit = defineEmits(["update:isDirty", "update:tileData"]);
 
-const { $gettext } = useGettext();
-
 const formKey = ref(0);
-
 const isSaving = ref(false);
-const saveError = ref();
+const saveError = ref<Error | undefined>(undefined);
 
-const aliasedData = reactive({ ...props.tileData?.aliased_data });
+const aliasedData = reactive({ ...tileData?.aliased_data });
 
 const widgetDirtyStates = reactive(
-    props.cardXNodeXWidgetData.reduce(
-        (acc, widget) => {
-            acc[widget.node.alias] = false;
-            return acc;
+    cardXNodeXWidgetData.reduce<Record<string, boolean>>(
+        (dirtyStatesMap, widgetData) => {
+            dirtyStatesMap[widgetData.node.alias] = false;
+            return dirtyStatesMap;
         },
-        {} as Record<string, boolean>,
+        {},
     ),
 );
 
@@ -60,7 +60,7 @@ watch(isDirty, (newValue, oldValue) => {
 });
 
 function resetForm() {
-    Object.assign(aliasedData, props.tileData?.aliased_data);
+    Object.assign(aliasedData, tileData?.aliased_data);
 
     Object.keys(widgetDirtyStates).forEach((key) => {
         widgetDirtyStates[key] = false;
@@ -74,34 +74,26 @@ async function save(_event: FormSubmitEvent) {
 
     try {
         const updatedTileData = {
-            ...props.tileData,
+            ...tileData,
             aliased_data: {
-                ...props.tileData?.aliased_data,
+                ...tileData?.aliased_data,
                 ...aliasedData,
             },
-        };
-
-        console.log(
-            "Saving tile data",
-            updatedTileData,
-            props.graphSlug,
-            props.nodegroupAlias,
-        );
+        } as AliasedTileData;
 
         const upsertedTileData = await upsertTile(
-            props.graphSlug,
-            props.nodegroupAlias,
+            graphSlug,
+            nodegroupAlias,
             updatedTileData,
-            props.tileData?.tileid,
+            tileData?.tileid,
         );
 
-        Object.assign(
-            aliasedData,
-            (upsertedTileData as AliasedTileData).aliased_data,
-        );
+        Object.assign(aliasedData, upsertedTileData.aliased_data);
+
         emit("update:tileData", upsertedTileData);
+        emit("update:isDirty", false);
     } catch (error) {
-        saveError.value = error;
+        saveError.value = error as Error;
     } finally {
         isSaving.value = false;
     }

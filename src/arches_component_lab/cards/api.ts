@@ -3,6 +3,8 @@ import Cookies from "js-cookie";
 
 import { extractFileEntriesFromPayload } from "@/arches_component_lab/cards/utils.ts";
 
+import type { AliasedTileData } from "@/arches_component_lab/cards/types.ts";
+
 export const fetchCardData = async (
     graphSlug: string,
     nodegroupAlias: string,
@@ -67,9 +69,9 @@ export const fetchCardXNodeXWidgetDataFromNodeGroup = async (
 export async function upsertTile(
     graphSlug: string,
     nodegroupAlias: string,
-    payload: Record<string, unknown>,
+    payload: AliasedTileData,
     tileId?: string,
-): Promise<unknown> {
+): Promise<AliasedTileData> {
     const urlSegments = [graphSlug, nodegroupAlias];
     let httpMethod = "POST";
 

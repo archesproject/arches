@@ -4,10 +4,8 @@ import NonLocalizedTextWidgetViewer from "@/arches_component_lab/widgets/NonLoca
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type {
-    CardXNodeXWidget,
-    NodeData,
-} from "@/arches_component_lab/types.ts";
+import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
+import type { NonLocalizedTextData } from "@/arches_component_lab/datatypes/non-localized-text/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 defineProps<{
@@ -15,7 +13,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidget;
-    value: NodeData | null | undefined;
+    value: NonLocalizedTextData | null | undefined;
 }>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);

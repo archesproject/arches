@@ -1,37 +1,34 @@
-export function extractFileEntriesFromPayload(
-    payloadObject: Record<string, unknown>,
-) {
-    const fileEntries: { file: File; nodeId: string }[] = [];
+import type { AliasedTileData } from "@/arches_component_lab/cards/types.ts";
 
-    function recurse(currentObject: Record<string, unknown>): void {
-        for (const key in currentObject) {
-            if (!Object.prototype.hasOwnProperty.call(currentObject, key)) {
-                continue;
-            }
-            const value = currentObject[key];
+export function extractFileEntriesFromPayload(
+    payload: AliasedTileData,
+): { file: File; nodeId: string }[] {
+    const collectedEntries: { file: File; nodeId: string }[] = [];
+
+    function traverseObject(currentObject: AliasedTileData): void {
+        if (!currentObject.aliased_data) return;
+
+        for (const [_key, value] of Object.entries(currentObject)) {
             if (value instanceof File) {
-                const possibleNodeId = currentObject["node_id"];
-                if (typeof possibleNodeId === "string") {
-                    fileEntries.push({
+                const maybeNodeId = currentObject.node_id;
+                if (typeof maybeNodeId === "string") {
+                    collectedEntries.push({
                         file: value,
-                        nodeId: possibleNodeId,
+                        nodeId: maybeNodeId,
                     });
                 }
-                delete currentObject[key];
-            } else if (value && typeof value === "object") {
-                if (Array.isArray(value)) {
-                    for (const item of value) {
-                        if (item && typeof item === "object") {
-                            recurse(item as Record<string, unknown>);
-                        }
+            } else if (Array.isArray(value)) {
+                for (const arrayItem of value) {
+                    if (arrayItem && typeof arrayItem === "object") {
+                        traverseObject(arrayItem as AliasedTileData);
                     }
-                } else {
-                    recurse(value as Record<string, unknown>);
                 }
+            } else if (value && typeof value === "object") {
+                traverseObject(value as AliasedTileData);
             }
         }
     }
 
-    recurse(payloadObject);
-    return fileEntries;
+    traverseObject(payload);
+    return collectedEntries;
 }

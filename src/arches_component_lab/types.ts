@@ -1,6 +1,7 @@
 export interface NodeData {
     display_value: string;
-    interchange_value: unknown;
+    node_value: unknown;
+    details: unknown[];
 }
 
 export interface CardXNodeXWidget {

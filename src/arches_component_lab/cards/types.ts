@@ -1,9 +1,15 @@
+import type { NodeData } from "@/arches_component_lab/types.ts";
+
 export interface AliasedTileData {
-    tileid: string;
     aliased_data: {
-        [key: string]: {
-            display_value: string;
-            interchange_value: unknown;
-        };
+        [key: string]: NodeData;
     };
+    nodegroup: string;
+    parenttile: string | null;
+    provisionaledits: {
+        [key: string]: NodeData;
+    } | null;
+    resourceinstanceid: string;
+    sortorder: number;
+    tileid: string;
 }
