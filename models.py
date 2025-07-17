@@ -356,7 +356,7 @@ class ListItem(models.Model):
             sorted_children.append(child)
         return sorted_children
 
-    def sort_siblings(self, language=None, root_siblings=[]):
+    def sort_siblings(self, language=None, root_siblings=None):
         """
         Sorts the siblings of the provided ListItem by their best label.
         Returns list of siblings with updated sortorder for implementer to save / bulk_update.

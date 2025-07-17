@@ -38,9 +38,6 @@ class Command(PackagesCommand):
         if options["operation"] == "export_controlled_lists":
             self.export_controlled_lists(options["dest_dir"], options["file_name"])
 
-        if options["operation"] == "import_rdf_xml":
-            self.import_
-
     def import_controlled_lists(self, source):
         if source.lower().endswith(".xml"):
             skos = SKOSReader()
