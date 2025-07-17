@@ -343,7 +343,9 @@ class TileTreeOperation:
 
         datatype_instance.clean(tile, node_id_str)
 
-        if errors := datatype_instance.validate(transformed, node=node):
+        if errors := datatype_instance.validate(
+            transformed, node=node, request=self.request
+        ):
             self.errors_by_node_alias[node.alias].extend(errors)
 
         try:

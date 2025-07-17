@@ -1,22 +1,32 @@
-from rest_framework import parsers
+import json
+
+from rest_framework.parsers import MultiPartParser, DataAndFiles
+from rest_framework.exceptions import ParseError
 
 
-class MultiPartJSONParser(parsers.MultiPartParser):
-    """https://stackoverflow.com/a/63398121"""
+class MultiPartJSONParser(MultiPartParser):
+    """
+    Parses multipart/form-data, extracts the 'json' part,
+    decodes it into a native dict, and returns that as request.data.
+    Uploaded files remain in request.FILES.
+    """
 
-    def parse(self, stream, *args, **kwargs):
-        data = super().parse(stream, *args, **kwargs)
+    def parse(self, stream, media_type=None, parser_context=None):
+        parsed = super().parse(stream, media_type, parser_context)
 
-        # Any 'File' found having application/json as type will be moved to data
-        mutable_data = data.data.copy()
-        unmarshaled_blob_names = []
-        json_parser = parsers.JSONParser()
-        for name, blob in data.files.items():
-            if blob.content_type == "application/json" and name not in data.data:
-                mutable_data[name] = json_parser.parse(blob)
-                unmarshaled_blob_names.append(name)
-        for name in unmarshaled_blob_names:
-            del data.files[name]
-        data.data = mutable_data
+        file_fields = parsed.files
+        form_fields = parsed.data
 
-        return data
+        raw_json = form_fields.get("json")
+        if raw_json is None:
+            raise ParseError(detail="Missing 'json' part in multipart payload")
+
+        try:
+            decoded = json.loads(raw_json)
+        except ValueError as err:
+            raise ParseError(detail=f"Invalid JSON in 'json' part: {err}")
+
+        if not isinstance(decoded, dict):
+            raise ParseError(detail="'json' part did not decode to a dict")
+
+        return DataAndFiles(decoded, file_fields)
