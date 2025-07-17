@@ -541,7 +541,7 @@ class TileTree(TileModel, AliasedDataMixin):
 
     def get_value_with_context(self, node, node_value, datatype_contexts=None):
         datatype_instance = DataTypeFactory().get_instance(node.datatype)
-        empty_values = (None, "", '{"url": "", "url_label": ""}')
+        empty_display_values = (None, "", '{"url": "", "url_label": ""}')
         compiled_json = datatype_instance.to_json(self, node)
         if datatype_contexts is None:
             datatype_contexts = {}
@@ -558,7 +558,7 @@ class TileTree(TileModel, AliasedDataMixin):
         }
         if ret["details"] is None:
             ret["details"] = []
-        if ret["display_value"] in empty_values:
+        if ret["display_value"] in empty_display_values:
             # Future: upstream this into datatype methods (another hook?)
             ret["display_value"] = _("(Empty)")
         return ret
