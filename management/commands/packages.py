@@ -33,16 +33,18 @@ class Command(PackagesCommand):
         super().handle(self, *args, **options)
 
         if options["operation"] == "import_controlled_lists":
-            self.import_controlled_lists(options["source"])
+            self.import_controlled_lists(options["source"], options["overwrite"])
 
         if options["operation"] == "export_controlled_lists":
             self.export_controlled_lists(options["dest_dir"], options["file_name"])
 
-    def import_controlled_lists(self, source):
+    def import_controlled_lists(self, source, overwrite_options):
         if source.lower().endswith(".xml"):
             skos = SKOSReader()
             rdf = skos.read_file(source)
-            concepts = skos.save_controlled_lists_from_skos(rdf)
+            concepts = skos.save_controlled_lists_from_skos(
+                rdf, overwrite_options=overwrite_options
+            )
 
         elif source.lower().endswith(".xlsx"):
             created_instances_pks = []

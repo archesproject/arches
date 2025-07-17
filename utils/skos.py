@@ -30,13 +30,20 @@ class SKOSReader(SKOSReader):
     def save_controlled_lists_from_skos(
         self,
         graph,
-        # overwrite_options="overwrite",
+        overwrite_options="overwrite",
     ):
         baseuuid = uuid.uuid4()
         allowed_languages = {}
         for lang in models.Language.objects.all():
             allowed_languages[lang.code] = lang
         default_lang = allowed_languages[settings.LANGUAGE_CODE]
+
+        existing_lists = List.objects.all()
+        existing_list_ids = [list.pk for list in existing_lists]
+        existing_list_items = ListItem.objects.all().prefetch_related(
+            "list_item_values"
+        )
+        existing_list_item_ids = [item.pk for item in existing_list_items]
 
         # if the graph is of the type rdflib.graph.Graph
         if isinstance(graph, Graph):
@@ -45,7 +52,14 @@ class SKOSReader(SKOSReader):
             # Search for ConceptSchemes first - these will become Lists
             for scheme, v, o in graph.triples((None, RDF.type, SKOS.ConceptScheme)):
                 list_id = self.generate_uuidv5_from_subject(baseuuid, scheme)
-                new_list = List(list_id)
+
+                if list_id in existing_list_ids and overwrite_options == "ignore":
+                    new_list = List(uuid.uuid4())
+                elif list_id in existing_list_ids and overwrite_options == "overwrite":
+                    existing_lists.get(pk=list_id).delete()
+                    new_list = List(id=list_id)
+                else:
+                    new_list = List(id=list_id)
 
                 for predicate, object in graph.predicate_objects(subject=scheme):
                     # Get List name from a ConceptScheme's title element
@@ -80,7 +94,14 @@ class SKOSReader(SKOSReader):
             # Concepts become ListItems & ListItemValues
             for concept, v, o in graph.triples((None, RDF.type, SKOS.Concept)):
                 list_item_id = self.generate_uuidv5_from_subject(baseuuid, concept)
-                list_item = ListItem(id=list_item_id)
+
+                if (
+                    list_item_id in existing_list_item_ids
+                    and overwrite_options == "ignore"
+                ):
+                    list_item = ListItem(uuid.uuid4())
+                else:
+                    list_item = ListItem(id=list_item_id)
 
                 # rdf:about is fallback URI for a concept, unless it has dcterms:identifier
                 uri = self.unwrapJsonLiteral(str(concept))
