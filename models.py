@@ -771,12 +771,11 @@ class GraphWithPrefetching(GraphModel):
                     nodegroups.add(node.nodegroup)
         for nodegroup in nodegroups:
             nodegroup.grouping_node = grouping_node_map.get(nodegroup.pk)
-            children = (
-                nodegroup.children.all()
-                if arches_version >= (8, 0)
-                else nodegroup.nodegroup_set.all()
-            )
-            for child_nodegroup in children:
+            if arches_version >= (8, 0):
+                child_nodegroups = nodegroup.children.all()
+            else:
+                child_nodegroups = nodegroup.nodegroup_set.all()
+            for child_nodegroup in child_nodegroups:
                 child_nodegroup.grouping_node = grouping_node_map.get(
                     child_nodegroup.pk
                 )
