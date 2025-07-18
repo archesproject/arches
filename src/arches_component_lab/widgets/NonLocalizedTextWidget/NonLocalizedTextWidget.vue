@@ -13,7 +13,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidget;
-    value: NonLocalizedTextData | null | undefined;
+    value: NonLocalizedTextData | undefined;
 }>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);

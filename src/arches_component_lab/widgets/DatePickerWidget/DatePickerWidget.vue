@@ -5,15 +5,17 @@ import DatePickerWidgetViewer from "@/arches_component_lab/widgets/DatePickerWid
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
-import type { DateDatatypeCardXNodeXWidgetData } from "@/arches_component_lab/datatypes/date/types.ts";
-import type { NodeData } from "@/arches_component_lab/types.ts";
+import type {
+    DateData,
+    DateDatatypeCardXNodeXWidgetData,
+} from "@/arches_component_lab/datatypes/date/types.ts";
 
 defineProps<{
     mode: WidgetMode;
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: DateDatatypeCardXNodeXWidgetData;
-    value: NodeData | null | undefined;
+    value: DateData | undefined;
 }>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);

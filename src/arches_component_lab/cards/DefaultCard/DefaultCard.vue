@@ -16,14 +16,16 @@ import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 import type { AliasedTileData } from "@/arches_component_lab/cards/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-const { mode, nodegroupAlias, graphSlug, tileId } = defineProps<{
-    mode: WidgetMode;
-    nodegroupAlias: string;
-    graphSlug: string;
-    tileId?: string | null;
-}>();
+const { mode, nodegroupAlias, graphSlug, resourceInstanceId, tileId } =
+    defineProps<{
+        mode: WidgetMode;
+        nodegroupAlias: string;
+        graphSlug: string;
+        resourceInstanceId?: string | null;
+        tileId?: string | null;
+    }>();
 
-const emit = defineEmits(["update:isDirty", "update:tileData"]);
+const emit = defineEmits(["update:widgetDirtyStates", "update:tileData"]);
 
 const isLoading = ref(false);
 const configurationError = ref();
@@ -37,6 +39,7 @@ watchEffect(async () => {
     try {
         const cardXNodeXWidgetDataPromise =
             fetchCardXNodeXWidgetDataFromNodeGroup(graphSlug, nodegroupAlias);
+
         if (tileId) {
             const tileDataPromise = fetchTileData(
                 graphSlug,
@@ -44,10 +47,16 @@ watchEffect(async () => {
                 tileId,
             );
             tileData.value = await tileDataPromise;
+        } else if (resourceInstanceId) {
+            // TODO: Replace with querysets call for empty tile structure
+            // @ts-expect-error this is an incomplete tile structure
+            tileData.value = {
+                resourceinstance: resourceInstanceId,
+                aliased_data: {},
+            };
         }
 
         cardXNodeXWidgetData.value = await cardXNodeXWidgetDataPromise;
-        console.log("!!!!", tileData.value, cardXNodeXWidgetData.value);
     } catch (error) {
         configurationError.value = error;
     } finally {
@@ -78,7 +87,10 @@ watchEffect(async () => {
                 :graph-slug="graphSlug"
                 :mode="mode"
                 :nodegroup-alias="nodegroupAlias"
-                @update:is-dirty="emit('update:isDirty', $event)"
+                :resource-instance-id="resourceInstanceId"
+                @update:widget-dirty-states="
+                    emit('update:widgetDirtyStates', $event)
+                "
                 @update:tile-data="emit('update:tileData', $event)"
             />
             <DefaultCardViewer

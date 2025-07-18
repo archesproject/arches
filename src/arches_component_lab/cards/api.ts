@@ -3,14 +3,15 @@ import Cookies from "js-cookie";
 
 import { extractFileEntriesFromPayload } from "@/arches_component_lab/cards/utils.ts";
 
+import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 import type { AliasedTileData } from "@/arches_component_lab/cards/types.ts";
 
-export const fetchCardData = async (
+export async function fetchTileStructure(
     graphSlug: string,
     nodegroupAlias: string,
-) => {
+): Promise<AliasedTileData> {
     const response = await fetch(
-        arches.urls.api_card_data(graphSlug, nodegroupAlias),
+        arches.urls.api_resource(graphSlug, nodegroupAlias),
     );
 
     try {
@@ -22,13 +23,13 @@ export const fetchCardData = async (
     } catch (error) {
         throw new Error((error as Error).message || response.statusText);
     }
-};
+}
 
-export const fetchTileData = async (
+export async function fetchTileData(
     graphSlug: string,
     nodegroupAlias: string,
     tileId: string | null | undefined,
-) => {
+): Promise<AliasedTileData> {
     const response = await fetch(
         arches.urls.api_tile(graphSlug, nodegroupAlias, tileId),
     );
@@ -42,12 +43,12 @@ export const fetchTileData = async (
     } catch (error) {
         throw new Error((error as Error).message || response.statusText);
     }
-};
+}
 
-export const fetchCardXNodeXWidgetDataFromNodeGroup = async (
+export async function fetchCardXNodeXWidgetDataFromNodeGroup(
     graphSlug: string,
     nodegroupAlias: string,
-) => {
+): Promise<CardXNodeXWidget[]> {
     const response = await fetch(
         arches.urls.api_card_x_node_x_widget_list_from_nodegroup(
             graphSlug,
@@ -64,46 +65,119 @@ export const fetchCardXNodeXWidgetDataFromNodeGroup = async (
     } catch (error) {
         throw new Error((error as Error).message || response.statusText);
     }
-};
+}
 
 export async function upsertTile(
     graphSlug: string,
     nodegroupAlias: string,
     payload: AliasedTileData,
     tileId?: string,
+    resourceInstanceId?: string | null | undefined,
+): Promise<AliasedTileData> {
+    const fileEntries = extractFileEntriesFromPayload(payload);
+
+    if (fileEntries.length > 0) {
+        return upsertTileWithFiles(
+            graphSlug,
+            nodegroupAlias,
+            payload,
+            tileId,
+            resourceInstanceId,
+            fileEntries,
+        );
+    }
+    return upsertTileAsJson(
+        graphSlug,
+        nodegroupAlias,
+        payload,
+        tileId,
+        resourceInstanceId,
+    );
+}
+
+export async function upsertTileAsJson(
+    graphSlug: string,
+    nodegroupAlias: string,
+    payload: AliasedTileData,
+    tileId?: string,
+    resourceInstanceId?: string | null | undefined,
 ): Promise<AliasedTileData> {
     const urlSegments = [graphSlug, nodegroupAlias];
-    let httpMethod = "POST";
+    let endpointUrl;
 
     if (tileId) {
         urlSegments.push(tileId);
-        httpMethod = "PUT";
+        endpointUrl = arches.urls.api_tile(...urlSegments);
+    } else if (resourceInstanceId) {
+        urlSegments.push(resourceInstanceId);
+        endpointUrl = arches.urls.api_tile_list_create(...urlSegments);
+    }
+
+    const httpMethod = tileId ? "PATCH" : "POST";
+
+    console.log(
+        "((",
+        endpointUrl,
+        tileId,
+        resourceInstanceId,
+        arches.urls.api_tile_list_create,
+    );
+
+    const response = await fetch(endpointUrl, {
+        method: httpMethod,
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFTOKEN": Cookies.get("csrftoken"),
+        },
+        body: JSON.stringify(payload),
+    });
+
+    const parsedBody = await response.json();
+    if (!response.ok) {
+        throw new Error(parsedBody.message || response.statusText);
+    }
+    return parsedBody;
+}
+
+export async function upsertTileWithFiles(
+    graphSlug: string,
+    nodegroupAlias: string,
+    payload: AliasedTileData,
+    tileId: string | undefined,
+    resourceInstanceId: string | null | undefined,
+    fileEntries: Array<{ file: File; nodeId: string }>,
+): Promise<AliasedTileData> {
+    const urlSegments = [graphSlug, nodegroupAlias];
+    let endpointUrl;
+
+    if (tileId) {
+        urlSegments.push(tileId);
+        endpointUrl = arches.urls.api_tile(...urlSegments);
+    } else if (resourceInstanceId) {
+        urlSegments.push(resourceInstanceId);
+        endpointUrl = arches.urls.api_tile_list_create(...urlSegments);
     }
 
     const formData = new FormData();
     formData.append("json", JSON.stringify(payload));
 
-    const fileEntries = extractFileEntriesFromPayload(payload);
     for (const { file, nodeId } of fileEntries) {
         formData.append(`file-list_${nodeId}`, file, file.name);
     }
 
-    const endpointUrl = arches.urls.api_tile(...urlSegments);
+    const httpMethod = tileId ? "PATCH" : "POST";
     const response = await fetch(endpointUrl, {
         method: httpMethod,
-        headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") },
+        headers: {
+            "Content-Type": "multipart/form-data",
+            "X-CSRFTOKEN": Cookies.get("csrftoken"),
+        },
         body: formData,
     });
 
-    try {
-        const raw = await response.text();
-        const parsed = JSON.parse(raw);
-
-        if (response.ok) {
-            return parsed;
-        }
-        throw new Error(parsed.message);
-    } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+    const parsedBody = await response.json();
+    if (!response.ok) {
+        throw new Error(parsedBody.message || response.statusText);
     }
+    return parsedBody;
 }

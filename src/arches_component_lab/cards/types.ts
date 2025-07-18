@@ -9,7 +9,7 @@ export interface AliasedTileData {
     provisionaledits: {
         [key: string]: NodeData;
     } | null;
-    resourceinstanceid: string;
+    resourceinstance: string;
     sortorder: number;
     tileid: string;
 }

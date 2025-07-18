@@ -110,14 +110,16 @@ class CardXNodeXWidgetListFromNodegroupView(View):
             else:
                 datatype_for_node = datatype_factory.datatypes[node.datatype]
                 default_widget_definition = datatype_for_node.defaultwidget
-                widget_instances.append(
-                    models.CardXNodeXWidget(
-                        node=node,
-                        card=node.nodegroup.cardmodel_set.first(),
-                        widget=default_widget_definition,
-                        config=default_widget_definition.defaultconfig,
+
+                if default_widget_definition is not None:  # handle semantic nodes
+                    widget_instances.append(
+                        models.CardXNodeXWidget(
+                            node=node,
+                            card=node.nodegroup.cardmodel_set.first(),
+                            widget=default_widget_definition,
+                            config=default_widget_definition.defaultconfig,
+                        )
                     )
-                )
 
         serialized_data = [
             serialize_card_x_node_x_widget(widget_instance, datatype_factory)
