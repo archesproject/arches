@@ -1,24 +1,20 @@
 <script setup lang="ts">
 import { useGettext } from "vue3-gettext";
-import type { AliasedTileNodeValue } from "@/arches_component_lab/types.ts";
-import type { URLDatatype } from "@/arches_component_lab/widgets/types.ts";
+import type { URLValue } from "@/arches_component_lab/datatypes/url/types.ts";
 
 const { $gettext } = useGettext();
 
 const { value } = defineProps<{
-    value?: AliasedTileNodeValue | null | undefined;
+    value?: URLValue | null | undefined;
 }>();
 </script>
 
 <template>
     <a
-        v-if="(value?.interchange_value as URLDatatype)?.url"
-        :href="(value?.interchange_value as URLDatatype)?.url"
+        v-if="value?.node_value.url"
+        :href="value?.node_value.url"
     >
-        {{
-            (value?.interchange_value as URLDatatype)?.url_label ||
-            (value?.interchange_value as URLDatatype)?.url
-        }}
+        {{ value?.node_value?.url_label || value?.node_value?.url }}
     </a>
 
     <span v-else>

@@ -132,7 +132,7 @@ function resolver(event: FormFieldResolverOptions) {
     <GenericFormField
         v-bind="$attrs"
         :node-alias="nodeAlias"
-        :initial-value="value?.details[0]"
+        :initial-value="value?.details[0].resource_id"
         :resolver="resolver"
     >
         <Select
@@ -146,6 +146,7 @@ function resolver(event: FormFieldResolverOptions) {
             :options="options"
             :placeholder="$gettext('Select Resources')"
             :reset-filter-on-hide="true"
+            :show-clear="true"
             :virtual-scroller-options="{
                 itemSize: itemSize,
                 lazy: true,

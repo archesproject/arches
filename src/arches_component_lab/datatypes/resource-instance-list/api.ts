@@ -1,5 +1,5 @@
 import arches from "arches";
-import type { ResourceInstanceReference } from "@/arches_component_lab/widgets/types.ts";
+import type { ResourceInstanceReference } from "@/arches_component_lab/datatypes/resource-instance/types.ts";
 
 export const fetchRelatableResources = async (
     graphSlug: string,

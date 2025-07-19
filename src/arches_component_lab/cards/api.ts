@@ -133,7 +133,6 @@ export async function upsertTileAsJson(
 }
 
 // TODO: DRY this when functionality lands
-// TODO: This has stopped working
 export async function upsertTileWithFiles(
     graphSlug: string,
     nodegroupAlias: string,
@@ -164,7 +163,8 @@ export async function upsertTileWithFiles(
     const response = await fetch(endpointUrl, {
         method: httpMethod,
         headers: {
-            "Content-Type": "multipart/form-data",
+            // It's important to not set 'Content-Type' here, as the browser will set it automatically
+            // with the correct boundary for multipart/form-data.
             "X-CSRFTOKEN": Cookies.get("csrftoken"),
         },
         body: formData,

@@ -14,7 +14,7 @@ defineProps<{
     mode: WidgetMode;
     nodeAlias: string;
     graphSlug: string;
-    cardXNodeXWidgetData: FileListCardXNodeXWidgetData | undefined;
+    cardXNodeXWidgetData: FileListCardXNodeXWidgetData;
     value: FileListValue | null | undefined;
 }>();
 

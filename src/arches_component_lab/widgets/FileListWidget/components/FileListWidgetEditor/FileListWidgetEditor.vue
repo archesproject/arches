@@ -15,7 +15,7 @@ import type {
 import type {
     FileData,
     PrimeVueFile,
-} from "@/arches_component_lab/widgets/FileListWidget/components/FileListWidgetEditor/types.ts";
+} from "@/arches_component_lab/widgets/FileListWidget/types.ts";
 
 const { value, nodeAlias, cardXNodeXWidgetData } = defineProps<{
     value: FileListValue | null | undefined;
