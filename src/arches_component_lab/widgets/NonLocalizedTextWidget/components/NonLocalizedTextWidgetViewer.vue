@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { NonLocalizedTextData } from "@/arches_component_lab/datatypes/non-localized-text/types";
+import type { NonLocalizedTextValue } from "@/arches_component_lab/datatypes/non-localized-text/types";
 
 const props = defineProps<{
-    value: NonLocalizedTextData | null | undefined;
+    value: NonLocalizedTextValue | null | undefined;
 }>();
 </script>
 

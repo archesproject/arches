@@ -13,16 +13,16 @@ import type { FormFieldResolverOptions } from "@primevue/forms";
 import type { SelectFilterEvent } from "primevue/select";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
 
-import type { NodeData } from "@/arches_component_lab/types.ts";
 import type {
     ResourceInstanceReference,
     ResourceInstanceResult,
-} from "@/arches_component_lab/widgets/types.ts";
+    ResourceInstanceValue,
+} from "@/arches_component_lab/datatypes/resource-instance/types.ts";
 
 const { nodeAlias, graphSlug, value } = defineProps<{
     nodeAlias: string;
     graphSlug: string;
-    value: NodeData | null | undefined;
+    value: ResourceInstanceValue | null | undefined;
 }>();
 
 const { $gettext } = useGettext();
@@ -42,8 +42,8 @@ watchEffect(() => {
 });
 
 function onFilter(event: SelectFilterEvent) {
-    if (value?.interchange_value) {
-        options.value = value.interchange_value as ResourceInstanceReference[];
+    if (value?.details) {
+        options.value = value.details;
     } else {
         options.value = [];
     }
@@ -60,7 +60,7 @@ async function getOptions(page: number, filterTerm?: string) {
             nodeAlias,
             page,
             filterTerm,
-            value?.interchange_value as string,
+            value?.details[0].resource_id,
         );
 
         const references = resourceData.data.map(
@@ -132,7 +132,7 @@ function resolver(event: FormFieldResolverOptions) {
     <GenericFormField
         v-bind="$attrs"
         :node-alias="nodeAlias"
-        :initial-value="value?.interchange_value"
+        :initial-value="value?.details[0]"
         :resolver="resolver"
     >
         <Select

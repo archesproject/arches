@@ -4,10 +4,8 @@ import ResourceInstanceMultiselectWidgetViewer from "@/arches_component_lab/widg
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type {
-    CardXNodeXWidget,
-    NodeData,
-} from "@/arches_component_lab/types.ts";
+import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
+import type { ResourceInstanceListValue } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 defineProps<{
@@ -15,7 +13,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidget;
-    value: NodeData | null | undefined;
+    value: ResourceInstanceListValue | null | undefined;
 }>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);

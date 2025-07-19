@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { useGettext } from "vue3-gettext";
-import type { NodeData } from "@/arches_component_lab/types.ts";
+import type { AliasedTileNodeValue } from "@/arches_component_lab/types.ts";
 import type { URLDatatype } from "@/arches_component_lab/widgets/types.ts";
 
 const { $gettext } = useGettext();
 
 const { value } = defineProps<{
-    value?: NodeData | null | undefined;
+    value?: AliasedTileNodeValue | null | undefined;
 }>();
 </script>
 

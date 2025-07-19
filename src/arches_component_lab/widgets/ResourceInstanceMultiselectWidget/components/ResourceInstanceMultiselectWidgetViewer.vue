@@ -1,22 +1,21 @@
 <script setup lang="ts">
 import arches from "arches";
 
-import type { ResourceInstanceReference } from "@/arches_component_lab/widgets/types.ts";
-import type { NodeData } from "@/arches_component_lab/types.ts";
+import type { ResourceInstanceListValue } from "@/arches_component_lab/datatypes/resource-instance-list/types";
 
 const { value } = defineProps<{
-    value: NodeData | null | undefined;
+    value: ResourceInstanceListValue | null | undefined;
 }>();
 </script>
 <template>
     <div
-        v-for="resourceInstance in value?.interchange_value as ResourceInstanceReference[]"
-        :key="resourceInstance.resource_id"
+        v-for="resourceInstanceDetail in value?.details"
+        :key="resourceInstanceDetail.resource_id"
     >
         <a
-            :href="`${arches.urls.resource_editor}${resourceInstance.interchange_value}`"
+            :href="`${arches.urls.resource_editor}${resourceInstanceDetail.resource_id}`"
         >
-            {{ resourceInstance.display_value }}
+            {{ resourceInstanceDetail.display_value }}
         </a>
     </div>
 </template>

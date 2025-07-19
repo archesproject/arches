@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { DateDatatypeCardXNodeXWidgetData } from "@/arches_component_lab/datatypes/date/types.ts";
-import type { NodeData } from "@/arches_component_lab/types";
+import type { AliasedTileNodeValue } from "@/arches_component_lab/types";
 
 defineProps<{
-    value: NodeData | null | undefined;
+    value: AliasedTileNodeValue | null | undefined;
     cardXNodeXWidgetData: DateDatatypeCardXNodeXWidgetData;
 }>();
 </script>

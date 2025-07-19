@@ -4,16 +4,18 @@ import FileListWidgetEditor from "@/arches_component_lab/widgets/FileListWidget/
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { FileListCardXNodeXWidgetData } from "@/arches_component_lab/datatypes/file-list/types.ts";
+import type {
+    FileListCardXNodeXWidgetData,
+    FileListValue,
+} from "@/arches_component_lab/datatypes/file-list/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
-import type { NodeData } from "@/arches_component_lab/types.ts";
 
 defineProps<{
     mode: WidgetMode;
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: FileListCardXNodeXWidgetData | undefined;
-    value: NodeData | null | undefined;
+    value: FileListValue | null | undefined;
 }>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);
@@ -22,9 +24,7 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
 <template>
     <FileListWidgetEditor
         v-if="mode === EDIT"
-        :card-x-node-x-widget-data="
-            cardXNodeXWidgetData as FileListCardXNodeXWidgetData
-        "
+        :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :node-alias="nodeAlias"
         :value="value"
         @update:value="emit('update:value', $event)"
@@ -32,9 +32,7 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
     />
     <FileListWidgetViewer
         v-if="mode === VIEW"
-        :card-x-node-x-widget-data="
-            cardXNodeXWidgetData as FileListCardXNodeXWidgetData
-        "
+        :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :value="value"
     />
 </template>

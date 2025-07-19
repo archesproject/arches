@@ -95,6 +95,7 @@ export async function upsertTile(
     );
 }
 
+// TODO: DRY this when functionality lands
 export async function upsertTileAsJson(
     graphSlug: string,
     nodegroupAlias: string,
@@ -115,14 +116,6 @@ export async function upsertTileAsJson(
 
     const httpMethod = tileId ? "PATCH" : "POST";
 
-    console.log(
-        "((",
-        endpointUrl,
-        tileId,
-        resourceInstanceId,
-        arches.urls.api_tile_list_create,
-    );
-
     const response = await fetch(endpointUrl, {
         method: httpMethod,
         headers: {
@@ -139,6 +132,8 @@ export async function upsertTileAsJson(
     return parsedBody;
 }
 
+// TODO: DRY this when functionality lands
+// TODO: This has stopped working
 export async function upsertTileWithFiles(
     graphSlug: string,
     nodegroupAlias: string,

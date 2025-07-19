@@ -9,11 +9,13 @@ import GenericFormField from "@/arches_component_lab/generic/GenericFormField.vu
 import { formatDate } from "@/arches_component_lab/datatypes/date/utils.ts";
 
 import type { FormFieldResolverOptions } from "@primevue/forms";
-import type { DateDatatypeCardXNodeXWidgetData } from "@/arches_component_lab/datatypes/date/types.ts";
-import type { NodeData } from "@/arches_component_lab/types.ts";
+import type {
+    DateDatatypeCardXNodeXWidgetData,
+    DateValue,
+} from "@/arches_component_lab/datatypes/date/types.ts";
 
 const { value, nodeAlias, cardXNodeXWidgetData } = defineProps<{
-    value: NodeData | null | undefined;
+    value: DateValue | null | undefined;
     nodeAlias: string;
     cardXNodeXWidgetData: DateDatatypeCardXNodeXWidgetData;
 }>();
@@ -44,7 +46,7 @@ function resolver(event: FormFieldResolverOptions) {
     <GenericFormField
         v-bind="$attrs"
         :node-alias="nodeAlias"
-        :initial-value="new Date(value?.interchange_value as string)"
+        :initial-value="new Date(value?.node_value!)"
         :resolver="resolver"
     >
         <DatePicker

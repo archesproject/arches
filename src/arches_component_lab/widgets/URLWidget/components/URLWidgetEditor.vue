@@ -2,11 +2,11 @@
 import InputText from "primevue/inputtext";
 
 import GenericFormField from "@/arches_component_lab/generic/GenericFormField.vue";
-import type { NodeData } from "@/arches_component_lab/types.ts";
+import type { AliasedTileNodeValue } from "@/arches_component_lab/types.ts";
 
 const { nodeAlias, value } = defineProps<{
     nodeAlias: string;
-    value: NodeData | null | undefined;
+    value: AliasedTileNodeValue | null | undefined;
 }>();
 </script>
 

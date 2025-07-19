@@ -8,10 +8,12 @@ import Message from "primevue/message";
 import Skeleton from "primevue/skeleton";
 
 import GenericWidget from "@/arches_component_lab/generic/GenericWidget/GenericWidget.vue";
+
 import { upsertTile } from "@/arches_component_lab/cards/api.ts";
 import { EDIT } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { FormSubmitEvent } from "@primevue/forms";
+
 import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 import type { AliasedTileData } from "@/arches_component_lab/cards/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types";
@@ -116,8 +118,8 @@ async function save(_event: FormSubmitEvent) {
         );
 
         resetWidgetDirtyStates();
-    } catch (err) {
-        saveError.value = err as Error;
+    } catch (error) {
+        saveError.value = error as Error;
     } finally {
         isSaving.value = false;
     }

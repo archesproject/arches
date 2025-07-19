@@ -2,11 +2,11 @@
 import InputText from "primevue/inputtext";
 import GenericFormField from "@/arches_component_lab/generic/GenericFormField.vue";
 
-import type { NonLocalizedTextData } from "@/arches_component_lab/datatypes/non-localized-text/types";
+import type { NonLocalizedTextValue } from "@/arches_component_lab/datatypes/non-localized-text/types";
 
 const { nodeAlias, value } = defineProps<{
     nodeAlias: string;
-    value: NonLocalizedTextData | null | undefined;
+    value: NonLocalizedTextValue | null | undefined;
 }>();
 </script>
 

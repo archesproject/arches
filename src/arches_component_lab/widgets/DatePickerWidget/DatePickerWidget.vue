@@ -6,7 +6,7 @@ import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 import type {
-    DateData,
+    DateValue,
     DateDatatypeCardXNodeXWidgetData,
 } from "@/arches_component_lab/datatypes/date/types.ts";
 
@@ -15,7 +15,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: DateDatatypeCardXNodeXWidgetData;
-    value: DateData | undefined;
+    value: DateValue | undefined;
 }>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);
@@ -24,9 +24,7 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
 <template>
     <DatePickerWidgetEditor
         v-if="mode === EDIT"
-        :card-x-node-x-widget-data="
-            cardXNodeXWidgetData as DateDatatypeCardXNodeXWidgetData
-        "
+        :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :node-alias="nodeAlias"
         :value="value"
         @update:value="emit('update:value', $event)"
@@ -34,9 +32,7 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
     />
     <DatePickerWidgetViewer
         v-if="mode === VIEW"
-        :card-x-node-x-widget-data="
-            cardXNodeXWidgetData as DateDatatypeCardXNodeXWidgetData
-        "
+        :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :value="value"
     />
 </template>

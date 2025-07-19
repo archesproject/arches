@@ -15,16 +15,16 @@ import type { FormFieldResolverOptions } from "@primevue/forms";
 import type { MultiSelectFilterEvent } from "primevue/multiselect";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
 
-import type { NodeData } from "@/arches_component_lab/types.ts";
+import type { ResourceInstanceListValue } from "@/arches_component_lab/datatypes/resource-instance-list/types";
 import type {
     ResourceInstanceReference,
     ResourceInstanceResult,
-} from "@/arches_component_lab/widgets/types.ts";
+} from "@/arches_component_lab/datatypes/resource-instance/types.ts";
 
 const { nodeAlias, graphSlug, value } = defineProps<{
     nodeAlias: string;
     graphSlug: string;
-    value: NodeData | null | undefined;
+    value: ResourceInstanceListValue | null | undefined;
 }>();
 
 const { $gettext } = useGettext();
@@ -40,12 +40,10 @@ const fetchError = ref<string | null>(null);
 const resourceResultsCurrentCount = computed(() => options.value.length);
 
 const initialValueFromTileData = computed(() => {
-    if (value?.interchange_value) {
-        return (value.interchange_value as ResourceInstanceReference[]).map(
-            (option) => {
-                return option.resource_id;
-            },
-        );
+    if (value?.details) {
+        return value.details.map((option) => {
+            return option.resource_id;
+        });
     }
     return [];
 });
@@ -55,8 +53,8 @@ watchEffect(() => {
 });
 
 function onFilter(event: MultiSelectFilterEvent) {
-    if (value?.interchange_value) {
-        options.value = value.interchange_value as ResourceInstanceReference[];
+    if (value?.details) {
+        options.value = value.details;
     } else {
         options.value = [];
     }
@@ -73,7 +71,7 @@ async function getOptions(page: number, filterTerm?: string) {
             nodeAlias,
             page,
             filterTerm,
-            value?.interchange_value as ResourceInstanceReference[],
+            value?.details,
         );
 
         const references = resourceData.data.map(

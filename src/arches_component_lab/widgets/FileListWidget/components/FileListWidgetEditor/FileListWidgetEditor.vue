@@ -7,23 +7,18 @@ import GenericFormField from "@/arches_component_lab/generic/GenericFormField.vu
 import FileList from "@/arches_component_lab/widgets/FileListWidget/components/FileListWidgetEditor/components/FileList.vue";
 import FileDropZone from "@/arches_component_lab/widgets/FileListWidget/components/FileListWidgetEditor/components/FileDropZone.vue";
 
-import type { NodeData } from "@/arches_component_lab/types.ts";
-import type { FileReference } from "@/arches_component_lab/widgets/types.ts";
-import type { FileListCardXNodeXWidgetData } from "@/arches_component_lab/datatypes/file-list/types.ts";
-
-interface FileData {
-    name: string;
-    size: number;
-    type: string;
-    url: string;
-    file: File;
-    node_id: string;
-}
-
-type PrimeVueFile = File & { objectURL: string };
+import type { FileReference } from "@/arches_component_lab/datatypes/file-list/types.ts";
+import type {
+    FileListCardXNodeXWidgetData,
+    FileListValue,
+} from "@/arches_component_lab/datatypes/file-list/types.ts";
+import type {
+    FileData,
+    PrimeVueFile,
+} from "@/arches_component_lab/widgets/FileListWidget/components/FileListWidgetEditor/types.ts";
 
 const { value, nodeAlias, cardXNodeXWidgetData } = defineProps<{
-    value: NodeData | null | undefined;
+    value: FileListValue | null | undefined;
     nodeAlias: string;
     cardXNodeXWidgetData: FileListCardXNodeXWidgetData;
 }>();
@@ -39,17 +34,15 @@ onMounted(() => {
     allowedFileTypes.value = acceptedFiles != "" ? acceptedFiles : null;
 
     if (value) {
-        currentValues.value = value.interchange_value;
+        currentValues.value = value.node_value;
 
-        if (value.interchange_value) {
-            savedFiles.value = (value.interchange_value as FileReference[]).map(
-                (file) => {
-                    return {
-                        ...file,
-                        node_id: cardXNodeXWidgetData.node.nodeid,
-                    };
-                },
-            );
+        if (value.node_value) {
+            savedFiles.value = value.node_value.map((file) => {
+                return {
+                    ...file,
+                    node_id: cardXNodeXWidgetData.node.nodeid,
+                };
+            });
         } else {
             savedFiles.value = [];
         }
@@ -70,13 +63,34 @@ function onSelect(event: { files: PrimeVueFile[] }, field: unknown): void {
         value: [...savedFiles.value, ...pendingFiles.value],
     });
 }
+
+function onRemovePendingFile(
+    field: unknown,
+    fileIndex: number,
+    removeFileCallback: (index: number) => void,
+): void {
+    removeFileCallback(fileIndex);
+    pendingFiles.value.splice(fileIndex, 1);
+
+    (field as { onInput: (value: unknown) => void }).onInput({
+        value: [...savedFiles.value, ...pendingFiles.value],
+    });
+}
+
+function onRemoveSavedFile(field: unknown, fileIndex: number): void {
+    savedFiles.value.splice(fileIndex, 1);
+
+    (field as { onInput: (value: unknown) => void }).onInput({
+        value: [...savedFiles.value, ...pendingFiles.value],
+    });
+}
 </script>
 
 <template>
     <GenericFormField
         v-bind="$attrs"
         :node-alias="nodeAlias"
-        :initial-value="value?.interchange_value ?? []"
+        :initial-value="value?.node_value"
     >
         <template #default="$field">
             <FileUpload
@@ -95,29 +109,20 @@ function onSelect(event: { files: PrimeVueFile[] }, field: unknown): void {
                     <FileList
                         :files="pendingFiles as unknown as FileReference[]"
                         @remove="
-                            (_fileReference, fileIndex) => {
-                                removeFileCallback(fileIndex);
-                                pendingFiles.splice(fileIndex, 1);
-
-                                // @ts-expect-error This is a bug with PrimeVue types
-                                $field.onInput({
-                                    value: [...savedFiles, ...pendingFiles],
-                                });
-                            }
+                            (_fileReference, fileIndex) =>
+                                onRemovePendingFile(
+                                    $field,
+                                    fileIndex,
+                                    removeFileCallback,
+                                )
                         "
                     />
 
                     <FileList
                         :files="savedFiles"
                         @remove="
-                            (_fileReference, fileIndex) => {
-                                savedFiles.splice(fileIndex, 1);
-
-                                // @ts-expect-error This is a bug with PrimeVue types
-                                $field.onInput({
-                                    value: [...savedFiles, ...pendingFiles],
-                                });
-                            }
+                            (_fileReference, fileIndex) =>
+                                onRemoveSavedFile($field, fileIndex)
                         "
                     />
                 </template>

@@ -1,4 +1,4 @@
-export interface NodeData {
+export interface AliasedTileNodeValue {
     display_value: string;
     node_value: unknown;
     details: unknown[];
