@@ -30,7 +30,7 @@ class SKOSReader(SKOSReader):
     def save_controlled_lists_from_skos(
         self,
         graph,
-        overwrite_options="overwrite",
+        overwrite_options="overwrite",  # options: ignore, duplicate, overwrite
     ):
         baseuuid = uuid.uuid4()
         allowed_languages = {}
@@ -40,9 +40,7 @@ class SKOSReader(SKOSReader):
 
         existing_lists = List.objects.all()
         existing_list_ids = [list.pk for list in existing_lists]
-        existing_list_items = ListItem.objects.all().prefetch_related(
-            "list_item_values"
-        )
+        existing_list_items = ListItem.objects.all()
         existing_list_item_ids = [item.pk for item in existing_list_items]
 
         # if the graph is of the type rdflib.graph.Graph
@@ -54,6 +52,8 @@ class SKOSReader(SKOSReader):
                 list_id = self.generate_uuidv5_from_subject(baseuuid, scheme)
 
                 if list_id in existing_list_ids and overwrite_options == "ignore":
+                    continue
+                elif list_id in existing_list_ids and overwrite_options == "duplicate":
                     new_list = List(uuid.uuid4())
                 elif list_id in existing_list_ids and overwrite_options == "overwrite":
                     existing_lists.get(pk=list_id).delete()
@@ -98,6 +98,11 @@ class SKOSReader(SKOSReader):
                 if (
                     list_item_id in existing_list_item_ids
                     and overwrite_options == "ignore"
+                ):
+                    continue
+                elif (
+                    list_item_id in existing_list_item_ids
+                    and overwrite_options == "duplicate"
                 ):
                     list_item = ListItem(uuid.uuid4())
                 else:
@@ -167,6 +172,7 @@ class SKOSReader(SKOSReader):
                 self.list_items[list_item_id] = list_item
 
             ### Relationships ###
+            # TODO: Handle duplicating concepts with multiple parentage in polyhierarchies
             for relation in self.relations:
                 source = relation["source"]
                 target = relation["target"]
@@ -180,8 +186,6 @@ class SKOSReader(SKOSReader):
                 List.objects.bulk_create(self.lists.values())
                 new_list_items = ListItem.objects.bulk_create(self.list_items.values())
                 ListItemValue.objects.bulk_create(self.list_item_values)
-
-                # TODO: Handle list item pk collisions in polyhierarhcies
 
                 ### Sort order ###
                 prefetch_related_objects(
