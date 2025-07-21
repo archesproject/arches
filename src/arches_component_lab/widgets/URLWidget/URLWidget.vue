@@ -8,22 +8,13 @@ import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 import type { URLValue } from "@/arches_component_lab/datatypes/url/types";
 
-const { mode, nodeAlias, graphSlug, cardXNodeXWidgetData, value } =
-    defineProps<{
-        mode: WidgetMode;
-        nodeAlias: string;
-        graphSlug: string;
-        cardXNodeXWidgetData: CardXNodeXWidget;
-        value: URLValue | null | undefined;
-    }>();
-
-console.log("URLWidget.vue", {
-    mode,
-    nodeAlias,
-    graphSlug,
-    cardXNodeXWidgetData,
-    value,
-});
+defineProps<{
+    mode: WidgetMode;
+    nodeAlias: string;
+    graphSlug: string;
+    cardXNodeXWidgetData: CardXNodeXWidget;
+    value: URLValue | null | undefined;
+}>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);
 </script>
