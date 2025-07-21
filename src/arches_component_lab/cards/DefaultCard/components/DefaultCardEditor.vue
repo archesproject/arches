@@ -24,7 +24,7 @@ const {
     mode,
     nodegroupAlias,
     resourceInstanceId,
-    shouldShowFormButtons = true,
+    shouldShowFormButtons,
     tileData,
 } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidget[];

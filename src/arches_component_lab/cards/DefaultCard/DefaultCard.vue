@@ -21,7 +21,7 @@ const {
     nodegroupAlias,
     graphSlug,
     resourceInstanceId,
-    shouldShowFormButtons,
+    shouldShowFormButtons = true,
     tileId,
 } = defineProps<{
     mode: WidgetMode;
