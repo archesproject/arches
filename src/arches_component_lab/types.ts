@@ -1,13 +1,22 @@
+export interface AliasedTileNodeValue {
+    display_value: string;
+    node_value: unknown;
+    details: unknown[];
+}
+
 export interface CardXNodeXWidget {
     card: {
         name: string;
     };
-    config: unknown;
+    config: {
+        defaultValue: unknown | null;
+    };
     id: string;
     label: string;
     node: {
         alias: string;
         isrequired: boolean;
+        nodeid: string;
     };
     sortorder: number;
     visible: boolean;

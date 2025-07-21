@@ -1,28 +1,30 @@
 <script setup lang="ts">
 import { computed, ref, watchEffect } from "vue";
 
+import arches from "arches";
 import { useGettext } from "vue3-gettext";
 
-import Select from "primevue/select";
+import Button from "primevue/button";
+import MultiSelect from "primevue/multiselect";
 
 import GenericFormField from "@/arches_component_lab/generic/GenericFormField.vue";
 
-import { fetchRelatableResources } from "@/arches_component_lab/datatypes/resource-instance/api.ts";
+import { fetchRelatableResources } from "@/arches_component_lab/datatypes/resource-instance-list/api.ts";
 
 import type { FormFieldResolverOptions } from "@primevue/forms";
-import type { SelectFilterEvent } from "primevue/select";
+import type { MultiSelectFilterEvent } from "primevue/multiselect";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
 
+import type { ResourceInstanceListValue } from "@/arches_component_lab/datatypes/resource-instance-list/types";
 import type {
     ResourceInstanceReference,
     ResourceInstanceResult,
-    ResourceInstanceValue,
 } from "@/arches_component_lab/datatypes/resource-instance/types.ts";
 
 const { nodeAlias, graphSlug, value } = defineProps<{
     nodeAlias: string;
     graphSlug: string;
-    value: ResourceInstanceValue | null | undefined;
+    value: ResourceInstanceListValue | null | undefined;
 }>();
 
 const { $gettext } = useGettext();
@@ -37,11 +39,20 @@ const fetchError = ref<string | null>(null);
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
 
+const initialValueFromTileData = computed(() => {
+    if (value?.details) {
+        return value.details.map((option) => {
+            return option.resource_id;
+        });
+    }
+    return [];
+});
+
 watchEffect(() => {
     getOptions(1);
 });
 
-function onFilter(event: SelectFilterEvent) {
+function onFilter(event: MultiSelectFilterEvent) {
     if (value?.details) {
         options.value = value.details;
     } else {
@@ -60,7 +71,7 @@ async function getOptions(page: number, filterTerm?: string) {
             nodeAlias,
             page,
             filterTerm,
-            value?.details[0].resource_id,
+            value?.details,
         );
 
         const references = resourceData.data.map(
@@ -124,7 +135,9 @@ function getOption(value: string): ResourceInstanceReference | undefined {
 }
 
 function resolver(event: FormFieldResolverOptions) {
-    return getOption(event.value);
+    return event.value.map((resourceId: string) => {
+        return getOption(resourceId);
+    });
 }
 </script>
 
@@ -132,10 +145,10 @@ function resolver(event: FormFieldResolverOptions) {
     <GenericFormField
         v-bind="$attrs"
         :node-alias="nodeAlias"
-        :initial-value="value?.details[0].resource_id"
+        :initial-value="initialValueFromTileData"
         :resolver="resolver"
     >
-        <Select
+        <MultiSelect
             display="chip"
             option-label="display_value"
             option-value="resource_id"
@@ -146,7 +159,6 @@ function resolver(event: FormFieldResolverOptions) {
             :options="options"
             :placeholder="$gettext('Select Resources')"
             :reset-filter-on-hide="true"
-            :show-clear="true"
             :virtual-scroller-options="{
                 itemSize: itemSize,
                 lazy: true,
@@ -155,6 +167,78 @@ function resolver(event: FormFieldResolverOptions) {
             }"
             @filter="onFilter"
             @before-show="getOptions(1)"
-        />
+        >
+            <template #chip="slotProps">
+                <div style="width: 100%">
+                    <div class="chip-text">
+                        {{ getOption(slotProps.value)?.display_value }}
+                    </div>
+                </div>
+                <div class="button-container">
+                    <Button
+                        as="a"
+                        icon="pi pi-info-circle"
+                        target="_blank"
+                        variant="text"
+                        size="small"
+                        style="text-decoration: none"
+                        :href="`${arches.urls.resource_report}${slotProps.value}`"
+                        @click.stop
+                    />
+                    <Button
+                        as="a"
+                        icon="pi pi-pencil"
+                        target="_blank"
+                        variant="text"
+                        size="small"
+                        style="text-decoration: none"
+                        :href="`${arches.urls.resource_editor}${slotProps.value}`"
+                        @click.stop
+                    />
+                    <Button
+                        icon="pi pi-times"
+                        variant="text"
+                        size="small"
+                        @click.stop="
+                            slotProps.removeCallback($event, slotProps.value)
+                        "
+                    />
+                </div>
+            </template>
+        </MultiSelect>
     </GenericFormField>
 </template>
+
+<style scoped>
+.button-container {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.chip-text {
+    width: min-content;
+    min-width: fit-content;
+    overflow-wrap: anywhere;
+    padding: 0.5rem 1rem;
+}
+
+:deep(.p-multiselect-label) {
+    width: inherit;
+    flex-direction: column;
+    white-space: break-spaces;
+    align-items: flex-start;
+}
+
+:deep(.p-multiselect-chip-item) {
+    width: inherit;
+    border: 0.125rem solid var(--p-inputtext-border-color);
+    padding: 0.25rem;
+    border-radius: 0.5rem;
+    margin: 0.25rem;
+}
+
+:deep(.p-multiselect-label-container) {
+    white-space: break-spaces;
+    width: inherit;
+}
+</style>

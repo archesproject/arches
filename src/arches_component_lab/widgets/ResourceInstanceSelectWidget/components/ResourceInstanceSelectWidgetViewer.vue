@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import arches from "arches";
-import type { ResourceInstanceReference } from "@/arches_component_lab/widgets/types.ts";
 
-const props = defineProps<{
-    value?: ResourceInstanceReference | null | undefined;
+import type { ResourceInstanceValue } from "@/arches_component_lab/datatypes/resource-instance/types";
+
+const { value } = defineProps<{
+    value: ResourceInstanceValue | null | undefined;
 }>();
 </script>
 <template>
-    <div :key="props.value?.resource_id">
-        <a :href="`${arches.urls.resource_editor}${props.value?.resource_id}`">
-            {{ props.value?.display_value }}
+    <div :key="value?.details[0].resource_id">
+        <a
+            :href="`${arches.urls.resource_editor}${value?.details[0].resource_id}`"
+        >
+            {{ value?.details[0].display_value }}
         </a>
     </div>
 </template>

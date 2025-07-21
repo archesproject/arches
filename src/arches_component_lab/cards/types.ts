@@ -1,7 +1,15 @@
-import type { Component } from "vue";
-import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
+import type { AliasedTileNodeValue } from "@/arches_component_lab/types.ts";
 
-export interface WidgetComponent {
-    component: Component;
-    cardXNodeXWidgetData: CardXNodeXWidget;
+export interface AliasedTileData {
+    aliased_data: {
+        [key: string]: AliasedTileNodeValue;
+    };
+    nodegroup: string;
+    parenttile: string | null;
+    provisionaledits: {
+        [key: string]: AliasedTileNodeValue;
+    } | null;
+    resourceinstance: string;
+    sortorder: number;
+    tileid: string;
 }

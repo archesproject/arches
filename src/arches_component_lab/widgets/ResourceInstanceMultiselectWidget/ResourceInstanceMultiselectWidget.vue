@@ -1,26 +1,26 @@
 <script setup lang="ts">
-import ResourceInstanceSelectWidgetEditor from "@/arches_component_lab/widgets/ResourceInstanceSelectWidget/components/ResourceInstanceSelectWidgetEditor.vue";
-import ResourceInstanceSelectWidgetViewer from "@/arches_component_lab/widgets/ResourceInstanceSelectWidget/components/ResourceInstanceSelectWidgetViewer.vue";
+import ResourceInstanceMultiselectWidgetEditor from "@/arches_component_lab/widgets/ResourceInstanceMultiselectWidget/components/ResourceInstanceMultiselectWidgetEditor.vue";
+import ResourceInstanceMultiselectWidgetViewer from "@/arches_component_lab/widgets/ResourceInstanceMultiselectWidget/components/ResourceInstanceMultiselectWidgetViewer.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
+import type { ResourceInstanceListValue } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
-import type { ResourceInstanceValue } from "@/arches_component_lab/datatypes/resource-instance/types";
 
 defineProps<{
     mode: WidgetMode;
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidget;
-    value: ResourceInstanceValue | null | undefined;
+    value: ResourceInstanceListValue | null | undefined;
 }>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);
 </script>
 
 <template>
-    <ResourceInstanceSelectWidgetEditor
+    <ResourceInstanceMultiselectWidgetEditor
         v-if="mode === EDIT"
         :graph-slug="graphSlug"
         :node-alias="nodeAlias"
@@ -28,7 +28,7 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
         @update:value="emit('update:value', $event)"
         @update:is-dirty="emit('update:isDirty', $event)"
     />
-    <ResourceInstanceSelectWidgetViewer
+    <ResourceInstanceMultiselectWidgetViewer
         v-if="mode === VIEW"
         :value="value"
     />

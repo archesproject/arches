@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import { useGettext } from "vue3-gettext";
-import type { URLDatatype } from "@/arches_component_lab/widgets/types.ts";
+import type { URLValue } from "@/arches_component_lab/datatypes/url/types.ts";
 
 const { $gettext } = useGettext();
 
-const props = defineProps<{
-    value?: URLDatatype | null | undefined;
+const { value } = defineProps<{
+    value?: URLValue | null | undefined;
 }>();
 </script>
 
 <template>
     <a
-        v-if="props.value?.url"
-        :href="props.value.url"
+        v-if="value?.node_value.url"
+        :href="value?.node_value.url"
     >
-        {{ props.value.url_label || props.value.url }}
+        {{ value?.node_value?.url_label || value?.node_value?.url }}
     </a>
 
     <span v-else>

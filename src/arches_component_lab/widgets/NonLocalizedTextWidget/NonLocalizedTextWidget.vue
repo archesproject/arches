@@ -1,35 +1,37 @@
 <script setup lang="ts">
-import ResourceInstanceSelectWidgetEditor from "@/arches_component_lab/widgets/ResourceInstanceSelectWidget/components/ResourceInstanceSelectWidgetEditor.vue";
-import ResourceInstanceSelectWidgetViewer from "@/arches_component_lab/widgets/ResourceInstanceSelectWidget/components/ResourceInstanceSelectWidgetViewer.vue";
+import NonLocalizedTextWidgetEditor from "@/arches_component_lab/widgets/NonLocalizedTextWidget/components/NonLocalizedTextWidgetEditor.vue";
+import NonLocalizedTextWidgetViewer from "@/arches_component_lab/widgets/NonLocalizedTextWidget/components/NonLocalizedTextWidgetViewer.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
+import type { NonLocalizedTextValue } from "@/arches_component_lab/datatypes/non-localized-text/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
-import type { ResourceInstanceValue } from "@/arches_component_lab/datatypes/resource-instance/types";
 
 defineProps<{
     mode: WidgetMode;
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidget;
-    value: ResourceInstanceValue | null | undefined;
+    value: NonLocalizedTextValue | undefined;
 }>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);
 </script>
 
 <template>
-    <ResourceInstanceSelectWidgetEditor
+    <NonLocalizedTextWidgetEditor
         v-if="mode === EDIT"
+        :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :graph-slug="graphSlug"
         :node-alias="nodeAlias"
         :value="value"
         @update:value="emit('update:value', $event)"
         @update:is-dirty="emit('update:isDirty', $event)"
     />
-    <ResourceInstanceSelectWidgetViewer
+    <NonLocalizedTextWidgetViewer
         v-if="mode === VIEW"
+        :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :value="value"
     />
 </template>

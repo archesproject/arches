@@ -29,10 +29,11 @@ def serialize_card_x_node_x_widget(widget, datatype_factory):
     del data["widget_id"]
 
     try:
-        datatype = datatype_factory.get_instance(widget.node.datatype)
-        data["config"]["defaultValue"] = datatype.get_interchange_value(
-            data["config"].get("defaultValue", None)
-        )
+        pass
+        # datatype = datatype_factory.get_instance(widget.node.datatype)
+        # data["config"]["defaultValue"] = datatype.get_interchange_value(
+        #     data["config"].get("defaultValue", None)
+        # )
     except AttributeError:
         pass
 
@@ -84,16 +85,44 @@ class CardXNodeXWidgetListFromNodegroupView(View):
         if arches_version >= (8, 0):
             card_x_node_x_widgets_query &= Q(node__source_identifier_id__isnull=True)
 
-        card_x_node_x_widgets = (
+        saved_widget_queryset = (
             models.CardXNodeXWidget.objects.filter(card_x_node_x_widgets_query)
-            .select_related()  # Eagerly load _all_ related objects
+            .select_related()
             .order_by("sortorder")
         )
 
         datatype_factory = DataTypeFactory()
-        data = [
-            serialize_card_x_node_x_widget(widget, datatype_factory)
-            for widget in card_x_node_x_widgets
-        ]
 
-        return JSONResponse(data)
+        saved_widgets_by_node_id = {
+            saved_widget.node_id: saved_widget for saved_widget in saved_widget_queryset
+        }
+
+        node_queryset = models.Node.objects.filter(
+            graph__slug=graph_slug, nodegroup__node__alias=nodegroup_alias
+        )
+        if arches_version >= (8, 0):
+            node_queryset = node_queryset.filter(source_identifier=None)
+
+        widget_instances = []
+        for node in node_queryset:
+            if node.pk in saved_widgets_by_node_id:
+                widget_instances.append(saved_widgets_by_node_id[node.pk])
+            else:
+                datatype_for_node = datatype_factory.datatypes[node.datatype]
+                default_widget_definition = datatype_for_node.defaultwidget
+
+                if default_widget_definition is not None:  # handle semantic nodes
+                    widget_instances.append(
+                        models.CardXNodeXWidget(
+                            node=node,
+                            card=node.nodegroup.cardmodel_set.first(),
+                            widget=default_widget_definition,
+                            config=default_widget_definition.defaultconfig,
+                        )
+                    )
+
+        serialized_data = [
+            serialize_card_x_node_x_widget(widget_instance, datatype_factory)
+            for widget_instance in widget_instances
+        ]
+        return JSONResponse(serialized_data)

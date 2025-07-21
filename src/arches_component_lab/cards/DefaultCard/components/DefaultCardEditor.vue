@@ -1,105 +1,140 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from "vue";
+import { reactive, toRaw, ref, watch, nextTick } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import { Form } from "@primevue/forms";
-
 import Button from "primevue/button";
 import Message from "primevue/message";
 import Skeleton from "primevue/skeleton";
 
-import { upsertTile } from "@/arches_component_lab/cards/api.ts";
+import GenericWidget from "@/arches_component_lab/generic/GenericWidget/GenericWidget.vue";
 
+import { upsertTile } from "@/arches_component_lab/cards/api.ts";
 import { EDIT } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { FormSubmitEvent } from "@primevue/forms";
-
-import type { WidgetComponent } from "@/arches_component_lab/cards/types.ts";
 import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
-
-const props = defineProps<{
-    cardXNodeXWidgetData: CardXNodeXWidget[];
-    graphSlug: string;
-    mode: string;
-    nodegroupAlias: string;
-    tileData: {
-        tileid: string;
-        aliased_data: Record<string, unknown>;
-    };
-    widgets: WidgetComponent[];
-}>();
-
-const emit = defineEmits(["update:isDirty", "update:tileData"]);
+import type { AliasedTileData } from "@/arches_component_lab/cards/types.ts";
+import type { WidgetMode } from "@/arches_component_lab/widgets/types";
 
 const { $gettext } = useGettext();
 
+const {
+    cardXNodeXWidgetData,
+    graphSlug,
+    mode,
+    nodegroupAlias,
+    resourceInstanceId,
+    shouldShowFormButtons,
+    tileData,
+} = defineProps<{
+    cardXNodeXWidgetData: CardXNodeXWidget[];
+    graphSlug: string;
+    mode: WidgetMode;
+    nodegroupAlias: string;
+    resourceInstanceId: string | null | undefined;
+    shouldShowFormButtons: boolean | undefined;
+    tileData?: AliasedTileData;
+}>();
+
+const emit = defineEmits([
+    "update:widgetDirtyStates",
+    "update:tileData",
+    "save",
+]);
+
 const formKey = ref(0);
-
 const isSaving = ref(false);
-const saveError = ref();
+const saveError = ref<Error>();
 
-const localData = reactive({ ...props.tileData.aliased_data });
+const originalAliasedData = structuredClone(tileData?.aliased_data || {});
+const aliasedData = reactive(structuredClone(tileData?.aliased_data || {}));
 
 const widgetDirtyStates = reactive(
-    props.widgets.reduce(
-        (acc, widget) => {
-            acc[widget.cardXNodeXWidgetData.node.alias] = false;
-            return acc;
+    cardXNodeXWidgetData.reduce<Record<string, boolean>>(
+        (dirtyStatesMap, widgetDatum) => {
+            dirtyStatesMap[widgetDatum.node.alias] = false;
+            return dirtyStatesMap;
         },
-        {} as Record<string, boolean>,
+        {},
     ),
 );
 
-const isDirty = computed(() => {
-    return Object.values(widgetDirtyStates).some(
-        (widgetDirtyState) => widgetDirtyState,
-    );
-});
+watch(
+    aliasedData,
+    () => {
+        emit("update:tileData", {
+            ...tileData,
+            aliased_data: toRaw(aliasedData),
+        });
+    },
+    { deep: true },
+);
 
-watch(isDirty, (newValue, oldValue) => {
-    if (newValue !== oldValue) {
-        emit("update:isDirty", newValue);
-    }
-});
+watch(
+    widgetDirtyStates,
+    (newValue) => {
+        emit("update:widgetDirtyStates", newValue);
+    },
+    { deep: true },
+);
+
+// TODO: should we force widgets to coerce their values to match aliased data?
+function onUpdateWidgetValue(nodeAlias: string, value: unknown) {
+    aliasedData[nodeAlias].node_value = value;
+}
+
+function resetWidgetDirtyStates() {
+    Object.keys(widgetDirtyStates).forEach((nodeAlias) => {
+        widgetDirtyStates[nodeAlias] = false;
+    });
+}
 
 function resetForm() {
-    Object.assign(localData, props.tileData.aliased_data);
+    resetWidgetDirtyStates();
 
-    Object.keys(widgetDirtyStates).forEach((key) => {
-        widgetDirtyStates[key] = false;
-    });
-
+    Object.assign(aliasedData, structuredClone(originalAliasedData));
     formKey.value += 1;
 }
 
-async function save(_event: FormSubmitEvent) {
+async function save() {
     isSaving.value = true;
+    saveError.value = undefined;
 
     try {
-        const updatedTileData = {
-            ...props.tileData,
-            aliased_data: {
-                ...props.tileData.aliased_data,
-                ...localData,
+        const updatedTileData = await upsertTile(
+            graphSlug,
+            nodegroupAlias,
+            {
+                ...(tileData as AliasedTileData),
+                aliased_data: toRaw(aliasedData),
             },
-        };
-
-        const upsertedTileData = await upsertTile(
-            props.graphSlug,
-            props.nodegroupAlias,
-            updatedTileData,
-            props.tileData.tileid,
+            tileData?.tileid,
+            resourceInstanceId,
         );
 
-        Object.assign(localData, updatedTileData.aliased_data);
+        Object.assign(
+            aliasedData,
+            structuredClone(updatedTileData.aliased_data),
+        );
+        Object.assign(
+            originalAliasedData,
+            structuredClone(updatedTileData.aliased_data),
+        );
 
-        emit("update:tileData", upsertedTileData);
+        resetWidgetDirtyStates();
+
+        nextTick(() => {
+            // nextTick ensures `save` is emitted after `update:tileData`
+            emit("save", updatedTileData);
+        });
     } catch (error) {
-        saveError.value = error;
+        saveError.value = error as Error;
     } finally {
         isSaving.value = false;
     }
 }
+
+defineExpose({ save });
 </script>
 
 <template>
@@ -119,23 +154,33 @@ async function save(_event: FormSubmitEvent) {
             class="form"
             @submit="save"
         >
-            <component
-                :is="widget.component"
-                v-for="widget in widgets"
-                :key="widget.cardXNodeXWidgetData.id"
-                v-model:value="
-                    localData[widget.cardXNodeXWidgetData.node.alias]
-                "
-                v-model:is-dirty="
-                    widgetDirtyStates[widget.cardXNodeXWidgetData.node.alias]
-                "
-                :mode="props.mode"
-                :graph-slug="props.graphSlug"
-                :node-alias="widget.cardXNodeXWidgetData.node.alias"
-                :card-x-node-x-widget-data="widget.cardXNodeXWidgetData"
-            />
+            <template
+                v-for="cardXNodeXWidgetDatum in cardXNodeXWidgetData"
+                :key="cardXNodeXWidgetDatum.id"
+            >
+                <GenericWidget
+                    v-if="cardXNodeXWidgetDatum.visible"
+                    v-model:is-dirty="
+                        widgetDirtyStates[cardXNodeXWidgetDatum.node.alias]
+                    "
+                    :mode="mode"
+                    :graph-slug="graphSlug"
+                    :node-alias="cardXNodeXWidgetDatum.node.alias"
+                    :card-x-node-x-widget-data="cardXNodeXWidgetDatum"
+                    :value="aliasedData[cardXNodeXWidgetDatum.node.alias]"
+                    @update:value="
+                        onUpdateWidgetValue(
+                            cardXNodeXWidgetDatum.node.alias,
+                            $event,
+                        )
+                    "
+                />
+            </template>
 
-            <div style="display: flex">
+            <div
+                v-if="shouldShowFormButtons"
+                style="display: flex"
+            >
                 <Button
                     type="submit"
                     :disabled="isSaving"
