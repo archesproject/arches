@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watchEffect } from "vue";
+import { ref, useTemplateRef, watchEffect } from "vue";
 
 import Message from "primevue/message";
 import Skeleton from "primevue/skeleton";
@@ -16,22 +16,35 @@ import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 import type { AliasedTileData } from "@/arches_component_lab/cards/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-const { mode, nodegroupAlias, graphSlug, resourceInstanceId, tileId } =
-    defineProps<{
-        mode: WidgetMode;
-        nodegroupAlias: string;
-        graphSlug: string;
-        resourceInstanceId?: string | null;
-        tileId?: string | null;
-    }>();
+const {
+    mode,
+    nodegroupAlias,
+    graphSlug,
+    resourceInstanceId,
+    shouldShowFormButtons,
+    tileId,
+} = defineProps<{
+    mode: WidgetMode;
+    nodegroupAlias: string;
+    graphSlug: string;
+    resourceInstanceId?: string | null;
+    shouldShowFormButtons?: boolean;
+    tileId?: string | null;
+}>();
 
-const emit = defineEmits(["update:widgetDirtyStates", "update:tileData"]);
+const emit = defineEmits([
+    "update:widgetDirtyStates",
+    "update:tileData",
+    "save",
+]);
 
 const isLoading = ref(false);
 const configurationError = ref();
 
 const cardXNodeXWidgetData = ref<CardXNodeXWidget[]>([]);
 const tileData = ref<AliasedTileData>();
+
+const defaultCardEditor = useTemplateRef("defaultCardEditor");
 
 watchEffect(async () => {
     isLoading.value = true;
@@ -63,6 +76,14 @@ watchEffect(async () => {
         isLoading.value = false;
     }
 });
+
+defineExpose({
+    save: function () {
+        if (defaultCardEditor.value) {
+            defaultCardEditor.value.save();
+        }
+    },
+});
 </script>
 
 <template>
@@ -82,12 +103,15 @@ watchEffect(async () => {
 
             <DefaultCardEditor
                 v-if="mode === EDIT"
+                ref="defaultCardEditor"
                 v-model:tile-data="tileData"
                 :card-x-node-x-widget-data="cardXNodeXWidgetData"
                 :graph-slug="graphSlug"
                 :mode="mode"
                 :nodegroup-alias="nodegroupAlias"
                 :resource-instance-id="resourceInstanceId"
+                :should-show-form-buttons="shouldShowFormButtons"
+                @save="emit('save', $event)"
                 @update:widget-dirty-states="
                     emit('update:widgetDirtyStates', $event)
                 "

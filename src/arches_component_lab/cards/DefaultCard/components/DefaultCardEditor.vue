@@ -12,8 +12,6 @@ import GenericWidget from "@/arches_component_lab/generic/GenericWidget/GenericW
 import { upsertTile } from "@/arches_component_lab/cards/api.ts";
 import { EDIT } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { FormSubmitEvent } from "@primevue/forms";
-
 import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 import type { AliasedTileData } from "@/arches_component_lab/cards/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types";
@@ -26,6 +24,7 @@ const {
     mode,
     nodegroupAlias,
     resourceInstanceId,
+    shouldShowFormButtons = true,
     tileData,
 } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidget[];
@@ -33,10 +32,15 @@ const {
     mode: WidgetMode;
     nodegroupAlias: string;
     resourceInstanceId: string | null | undefined;
+    shouldShowFormButtons: boolean | undefined;
     tileData?: AliasedTileData;
 }>();
 
-const emit = defineEmits(["update:widgetDirtyStates", "update:tileData"]);
+const emit = defineEmits([
+    "update:widgetDirtyStates",
+    "update:tileData",
+    "save",
+]);
 
 const formKey = ref(0);
 const isSaving = ref(false);
@@ -92,7 +96,7 @@ function resetForm() {
     formKey.value += 1;
 }
 
-async function save(_event: FormSubmitEvent) {
+async function save() {
     isSaving.value = true;
     saveError.value = undefined;
 
@@ -118,12 +122,16 @@ async function save(_event: FormSubmitEvent) {
         );
 
         resetWidgetDirtyStates();
+
+        emit("save", updatedTileData);
     } catch (error) {
         saveError.value = error as Error;
     } finally {
         isSaving.value = false;
     }
 }
+
+defineExpose({ save });
 </script>
 
 <template>
@@ -166,7 +174,10 @@ async function save(_event: FormSubmitEvent) {
                 />
             </template>
 
-            <div style="display: flex">
+            <div
+                v-if="shouldShowFormButtons"
+                style="display: flex"
+            >
                 <Button
                     type="submit"
                     :disabled="isSaving"
