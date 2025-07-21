@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, toRaw, ref, watch } from "vue";
+import { reactive, toRaw, ref, watch, nextTick } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import { Form } from "@primevue/forms";
@@ -123,7 +123,10 @@ async function save() {
 
         resetWidgetDirtyStates();
 
-        emit("save", updatedTileData);
+        nextTick(() => {
+            // nextTick ensures `save` is emitted after `update:tileData`
+            emit("save", updatedTileData);
+        });
     } catch (error) {
         saveError.value = error as Error;
     } finally {
