@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, useTemplateRef, watchEffect } from "vue";
+import { useGettext } from "vue3-gettext";
 
 import Message from "primevue/message";
 import Skeleton from "primevue/skeleton";
@@ -15,6 +16,8 @@ import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 import type { AliasedTileData } from "@/arches_component_lab/cards/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+
+const { $gettext } = useGettext();
 
 const {
     mode,
@@ -54,6 +57,14 @@ watchEffect(async () => {
     try {
         const cardXNodeXWidgetDataPromise =
             fetchCardXNodeXWidgetDataFromNodeGroup(graphSlug, nodegroupAlias);
+
+        if (!tileData && !tileId && !resourceInstanceId) {
+            throw new Error(
+                $gettext(
+                    "No tile data, tile ID, or resource instance ID provided.",
+                ),
+            );
+        }
 
         if (tileData) {
             aliasedTileData.value = structuredClone(tileData);

@@ -81,9 +81,9 @@ export async function upsertTile(
             graphSlug,
             nodegroupAlias,
             payload,
+            fileEntries,
             tileId,
             resourceInstanceId,
-            fileEntries,
         );
     }
     return upsertTileAsJson(
@@ -137,9 +137,9 @@ export async function upsertTileWithFiles(
     graphSlug: string,
     nodegroupAlias: string,
     payload: AliasedTileData,
-    tileId: string | undefined,
-    resourceInstanceId: string | null | undefined,
     fileEntries: Array<{ file: File; nodeId: string }>,
+    tileId?: string,
+    resourceInstanceId?: string | null,
 ): Promise<AliasedTileData> {
     const urlSegments = [graphSlug, nodegroupAlias];
     let endpointUrl;
