@@ -22,6 +22,7 @@ const {
     graphSlug,
     resourceInstanceId,
     shouldShowFormButtons = true,
+    tileData,
     tileId,
 } = defineProps<{
     mode: WidgetMode;
@@ -29,6 +30,7 @@ const {
     graphSlug: string;
     resourceInstanceId?: string | null;
     shouldShowFormButtons?: boolean;
+    tileData?: AliasedTileData;
     tileId?: string | null;
 }>();
 
@@ -42,7 +44,7 @@ const isLoading = ref(false);
 const configurationError = ref();
 
 const cardXNodeXWidgetData = ref<CardXNodeXWidget[]>([]);
-const tileData = ref<AliasedTileData>();
+const aliasedTileData = ref<AliasedTileData>();
 
 const defaultCardEditor = useTemplateRef("defaultCardEditor");
 
@@ -53,17 +55,19 @@ watchEffect(async () => {
         const cardXNodeXWidgetDataPromise =
             fetchCardXNodeXWidgetDataFromNodeGroup(graphSlug, nodegroupAlias);
 
-        if (tileId) {
-            const tileDataPromise = fetchTileData(
+        if (tileData) {
+            aliasedTileData.value = structuredClone(tileData);
+        } else if (tileId) {
+            const aliasedTileDataPromise = fetchTileData(
                 graphSlug,
                 nodegroupAlias,
                 tileId,
             );
-            tileData.value = await tileDataPromise;
+            aliasedTileData.value = await aliasedTileDataPromise;
         } else if (resourceInstanceId) {
             // TODO: Replace with querysets call for empty tile structure
             // @ts-expect-error this is an incomplete tile structure
-            tileData.value = {
+            aliasedTileData.value = {
                 resourceinstance: resourceInstanceId,
                 aliased_data: {},
             };
@@ -104,7 +108,7 @@ defineExpose({
             <DefaultCardEditor
                 v-if="mode === EDIT"
                 ref="defaultCardEditor"
-                v-model:tile-data="tileData"
+                v-model:tile-data="aliasedTileData"
                 :card-x-node-x-widget-data="cardXNodeXWidgetData"
                 :graph-slug="graphSlug"
                 :mode="mode"
@@ -119,7 +123,7 @@ defineExpose({
             />
             <DefaultCardViewer
                 v-else-if="mode === VIEW"
-                v-model:tile-data="tileData"
+                v-model:tile-data="aliasedTileData"
                 :card-x-node-x-widget-data="cardXNodeXWidgetData"
                 :graph-slug="graphSlug"
                 :mode="mode"
