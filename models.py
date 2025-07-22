@@ -211,13 +211,13 @@ class ListItem(models.Model):
                     "All child items in this parent item must have distinct sort orders."
                 ),
             ),
-            models.UniqueConstraint(
-                fields=["list", "uri"],
-                name="unique_list_uri",
-                violation_error_message=_(
-                    "All items in this list must have distinct URIs."
-                ),
-            ),
+            # models.UniqueConstraint(
+            #     fields=["list", "uri"],
+            #     name="unique_list_uri",
+            #     violation_error_message=_(
+            #         "All items in this list must have distinct URIs."
+            #     ),
+            # ),
         ]
 
     def clean_fields(self, exclude=None):
@@ -337,6 +337,35 @@ class ListItem(models.Model):
         for child in self.children.all():
             child.get_child_uris(uris)
         return uris
+
+    def duplicate_under_new_parent(self, parents=None):
+        """
+        Duplicates the ListItem and its children under the given parent(s),
+        returning the new ListItem and its new ListItemValues, for implementer to save.
+        It is up to the implementer to decide & provide which parent(s) should be used.
+        """
+        new_items = []
+        new_item_values = []
+        for parent in parents:
+            new_item = ListItem(
+                uri=self.uri,
+                list=self.list,
+                sortorder=self.sortorder,
+                parent=parent,
+                guide=self.guide,
+            )
+            new_items.append(new_item)
+            for value in self.list_item_values.all():
+                value.pk = None
+                new_list_item_value = ListItemValue(
+                    list_item=new_item,
+                    valuetype=value.valuetype,
+                    language=value.language,
+                    value=value.value,
+                )
+                value.list_item = new_item
+                new_item_values.append(new_list_item_value)
+        return new_items, new_item_values
 
     def sort_children(self, language=None):
         """
