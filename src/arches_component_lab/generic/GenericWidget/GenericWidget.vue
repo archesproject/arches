@@ -135,10 +135,6 @@ watchEffect(async () => {
     display: flex;
     flex-direction: column;
 }
-.widget-label {
-    display: flex;
-    cursor: pointer;
-}
 .widget-label-container {
     display: flex;
     flex-direction: column;
