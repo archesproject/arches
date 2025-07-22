@@ -211,13 +211,30 @@ class ListItem(models.Model):
                     "All child items in this parent item must have distinct sort orders."
                 ),
             ),
-            # models.UniqueConstraint(
-            #     fields=["list", "uri"],
-            #     name="unique_list_uri",
-            #     violation_error_message=_(
-            #         "All items in this list must have distinct URIs."
-            #     ),
-            # ),
+            ExclusionConstraint(
+                expressions=[
+                    ("list", RangeOperators.EQUAL),
+                    ("uri", RangeOperators.EQUAL),
+                ],
+                name="unique_list_uri",
+                condition=models.Q(parent__isnull=True),
+                deferrable=Deferrable.DEFERRED,
+                violation_error_message=_(
+                    "All items at the root of this list must have distinct URIs."
+                ),
+            ),
+            ExclusionConstraint(
+                expressions=[
+                    ("parent", RangeOperators.EQUAL),
+                    ("uri", RangeOperators.EQUAL),
+                ],
+                name="unique_parent_uri",
+                condition=models.Q(parent__isnull=False),
+                deferrable=Deferrable.DEFERRED,
+                violation_error_message=_(
+                    "All child items in this parent item must have distinct URIs."
+                ),
+            ),
         ]
 
     def clean_fields(self, exclude=None):
