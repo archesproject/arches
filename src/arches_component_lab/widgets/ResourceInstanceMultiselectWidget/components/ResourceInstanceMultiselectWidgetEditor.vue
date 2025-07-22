@@ -235,6 +235,7 @@ function resolver(event: FormFieldResolverOptions) {
     padding: 0.25rem;
     border-radius: 0.5rem;
     margin: 0.25rem;
+    display: flex;
 }
 
 :deep(.p-multiselect-label-container) {
