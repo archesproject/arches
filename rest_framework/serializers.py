@@ -4,7 +4,7 @@ from functools import lru_cache, partial
 
 from django.conf import settings
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from django.db import models, transaction
+from django.db import models
 from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
 from rest_framework import renderers
@@ -13,7 +13,7 @@ from rest_framework.fields import empty
 
 from arches import VERSION as arches_version
 from arches.app.models.fields.i18n import I18n_JSON, I18n_String
-from arches.app.models.models import Node, NodeGroup
+from arches.app.models.models import EditLog, Node, NodeGroup
 from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
@@ -492,14 +492,24 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             validated_data["data"] = {}
         validated_data["__request"] = self.context["request"]
         validated_data["__as_representation"] = True
-        with transaction.atomic():
-            self.create_resource_if_missing(validated_data, entry_node=qs._entry_node)
+        resource, resource_created = self.create_resource_if_missing(
+            validated_data, entry_node=qs._entry_node
+        )
+        try:
             created = super().create(validated_data)
+        except:
+            if resource_created:
+                # Manually manage failures instead of using transaction.atomic(), see:
+                # https://github.com/archesproject/arches/issues/12318
+                # Don't want to run model delete() which *creates* edit log entries.
+                EditLog.objects.filter(resourceinstanceid=resource.pk).delete()
+                Resource.objects.filter(pk=resource.pk).delete()
+            raise
         return created
 
     def create_resource_if_missing(self, validated_data, entry_node):
-        if validated_data.get("resourceinstance"):
-            return
+        if instance := validated_data.get("resourceinstance"):
+            return instance, False
         # Would like to do the following, but we don't yet have a ResourceTileTree.save()
         # method handling a fast path for empty creates:
         # ResourceSubclass = self.fields["resourceinstance"].queryset.model
@@ -507,6 +517,7 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         instance = Resource(graph=entry_node.graph)
         instance.save(request=validated_data["__request"])
         validated_data["resourceinstance"] = instance
+        return instance, True
 
 
 class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
@@ -572,23 +583,29 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         options = self.__class__.Meta
         # TODO: we probably want a queryset method to do one-shot
         # creates with tile data
-        with transaction.atomic():
-            without_tile_data = validated_data.copy()
-            without_tile_data.pop("aliased_data", None)
-            # TODO: decide on "blank" interface.
-            instance_without_tile_data = options.model.mro()[1](**without_tile_data)
-            instance_without_tile_data.save()
-            instance_from_factory = options.model.get_tiles(
-                graph_slug=self.graph_slug,
-                only=None,
-                as_representation=True,
-                user=self.context["request"].user,
-            ).get(pk=instance_without_tile_data.pk)
-            # TODO: decide whether to override update() instead of using partial().
-            instance_from_factory.save = partial(
-                instance_from_factory.save, request=self.context["request"]
-            )
+        without_tile_data = validated_data.copy()
+        without_tile_data.pop("aliased_data", None)
+        # TODO: decide on "blank" interface.
+        instance_without_tile_data = options.model.mro()[1](**without_tile_data)
+        instance_without_tile_data.save()
+        instance_from_factory = options.model.get_tiles(
+            graph_slug=self.graph_slug,
+            only=None,
+            as_representation=True,
+            user=self.context["request"].user,
+        ).get(pk=instance_without_tile_data.pk)
+        # TODO: decide whether to override update() instead of using partial().
+        instance_from_factory.save = partial(
+            instance_from_factory.save, request=self.context["request"]
+        )
+        try:
             updated = self.update(instance_from_factory, validated_data)
+        except:
+            # Manually manage failures instead of using transaction.atomic(), see
+            # https://github.com/archesproject/arches/issues/12318
+            EditLog.objects.filter(resourceinstanceid=instance_from_factory.pk).delete()
+            Resource.objects.filter(pk=instance_from_factory.pk).delete()
+            raise
         return updated
 
     def get_graph_has_different_publication(self, obj):

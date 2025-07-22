@@ -397,7 +397,12 @@ class TileTreeOperation:
             pk__in=[tile.pk for tile in self.to_delete]
         )
 
-        with transaction.atomic():
+        # durable=True is a guard against any higher-level code trying to wrap in
+        # another transaction. Ideally durable=True would be removed, and any
+        # IntegrityErrors would not be ignored in after_update_all(), but we have
+        # some Arches projects that test with "incomplete" datasets with data
+        # integrity issues, so we can't do the natural thing (yet).
+        with transaction.atomic(durable=True):
             if isinstance(self.entry, ResourceInstance):
                 super(ResourceInstance, self.entry).save(**self.save_kwargs)
             # no else: if the entry point needs saving, it's already in
@@ -530,6 +535,9 @@ class TileTreeOperation:
             try:
                 datatype.after_update_all()
             except:
+                # This wide catch can leave the DB in an unusable state, so not only is
+                # this the *last* operation, but durable=True on the transaction.
+                # https://github.com/archesproject/arches/issues/12318
                 logger.error(
                     f"Error in {datatype.__class__.__name__}.after_update_all():",
                     exc_info=True,
