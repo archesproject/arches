@@ -21,6 +21,7 @@ class SKOSReader(SKOSReader):
         self.lists = {}
         self.list_items = {}
         self.list_item_values = []
+        # self.relations = {}
 
     """
     This class extends the SKOSReader to provide additional functionality
@@ -91,6 +92,10 @@ class SKOSReader(SKOSReader):
             }
 
             ### List items & values ###
+
+            # # keep track of concepts with multiple parents
+            # list_items_with_multiple_parents = {}
+
             # Concepts become ListItems & ListItemValues
             for concept, v, o in graph.triples((None, RDF.type, SKOS.Concept)):
                 list_item_id = self.generate_uuidv5_from_subject(baseuuid, concept)
@@ -109,11 +114,12 @@ class SKOSReader(SKOSReader):
                     list_item = ListItem(id=list_item_id)
 
                 # rdf:about is fallback URI for a concept, unless it has dcterms:identifier
-                uri = self.unwrapJsonLiteral(str(concept))
+                uri = self.unwrapJsonLiteral(str(concept))["value"]
 
                 # not-null placeholder to differentiate between items with no sortorder
                 # & those with sortorder in skos file
                 sortorder = 999999
+                # parents = []
 
                 for predicate, object in graph.predicate_objects(subject=concept):
                     if predicate == DCTERMS.identifier:
@@ -144,23 +150,22 @@ class SKOSReader(SKOSReader):
                         self.list_item_values.append(list_item_value)
 
                     elif predicate == SKOS.broader:
+                        parent = self.generate_uuidv5_from_subject(baseuuid, object)
+                        # parents.append(parent)
                         self.relations.append(
                             {
-                                "source": self.generate_uuidv5_from_subject(
-                                    baseuuid, object
-                                ),
                                 "type": "broader",
-                                "target": list_item,
+                                "child": list_item,
+                                "parent": parent,
                             }
                         )
                     elif predicate == SKOS.narrower:
+                        child = self.generate_uuidv5_from_subject(baseuuid, object)
                         self.relations.append(
                             {
-                                "source": list_item,
                                 "type": "narrower",
-                                "target": self.generate_uuidv5_from_subject(
-                                    baseuuid, object
-                                ),
+                                "parent": list_item,
+                                "child": child,
                             }
                         )
 
@@ -169,23 +174,31 @@ class SKOSReader(SKOSReader):
 
                 list_item.uri = uri
                 list_item.sortorder = sortorder
-                self.list_items[list_item_id] = list_item
 
-            ### Relationships ###
-            # TODO: Handle duplicating concepts with multiple parentage in polyhierarchies
-            for relation in self.relations:
-                source = relation["source"]
-                target = relation["target"]
-                type = relation["type"]
-                if type == "narrower":
-                    self.list_items[target].parent = source
-                elif type == "broader":
-                    self.list_items[source].parent = target
+                # if len(parents) > 1:
+                #     list_items_with_multiple_parents[list_item] = parents
+
+                self.list_items[list_item_id] = list_item
 
             with transaction.atomic():
                 List.objects.bulk_create(self.lists.values())
                 new_list_items = ListItem.objects.bulk_create(self.list_items.values())
                 ListItemValue.objects.bulk_create(self.list_item_values)
+
+                list_items_to_update = []
+
+                ### Relationships ###
+                for relation in self.relations:
+                    type = relation["type"]
+                    if type == "broader":
+                        child = relation["child"]
+                        parent = self.list_items[relation["parent"]]
+                    elif type == "narrower":
+                        parent = relation["parent"]
+                        child = self.list_items[relation["child"]]
+                    child.parent = parent
+                    list_items_to_update.append(child)
+                ListItem.objects.bulk_update(list_items_to_update, ["parent"])
 
                 ### Sort order ###
                 prefetch_related_objects(
