@@ -43,6 +43,7 @@ class SKOSReader(SKOSReader):
         existing_list_ids = [list.pk for list in existing_lists]
         existing_list_items = ListItem.objects.all()
         existing_list_item_ids = [item.pk for item in existing_list_items]
+        existing_lists_to_delete = []
 
         # if the graph is of the type rdflib.graph.Graph
         if isinstance(graph, Graph):
@@ -57,7 +58,7 @@ class SKOSReader(SKOSReader):
                 elif list_id in existing_list_ids and overwrite_options == "duplicate":
                     new_list = List(uuid.uuid4())
                 elif list_id in existing_list_ids and overwrite_options == "overwrite":
-                    existing_lists.get(pk=list_id).delete()
+                    existing_lists_to_delete.append(list_id)
                     new_list = List(id=list_id)
                 else:
                     new_list = List(id=list_id)
@@ -181,6 +182,8 @@ class SKOSReader(SKOSReader):
                 self.list_items[list_item_id] = list_item
 
             with transaction.atomic():
+                List.objects.filter(pk__in=existing_lists_to_delete).delete()
+
                 List.objects.bulk_create(self.lists.values())
                 new_list_items = ListItem.objects.bulk_create(self.list_items.values())
                 ListItemValue.objects.bulk_create(self.list_item_values)
