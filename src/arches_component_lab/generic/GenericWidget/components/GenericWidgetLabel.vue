@@ -54,5 +54,6 @@ const shouldShowRequiredAsterisk = computed(() => {
 .widget-label {
     display: flex;
     cursor: pointer;
+    font-weight: 600;
 }
 </style>
