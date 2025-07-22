@@ -49,6 +49,9 @@ class GraphTestCase(TestCase):
         cls.graph = GraphWithPrefetching.objects.create_graph(
             name="Datatype Lookups", is_resource=True
         )
+        if arches_version >= (8, 0):
+            cls.graph.is_active = True
+            cls.graph.save()
         cls.root_node = cls.graph.node_set.get(istopnode=True)
 
     @classmethod

@@ -14,6 +14,7 @@ from rest_framework.fields import empty
 from arches import VERSION as arches_version
 from arches.app.models.fields.i18n import I18n_JSON, I18n_String
 from arches.app.models.models import Node, NodeGroup
+from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 from arches_querysets.datatypes.datatypes import DataTypeFactory
@@ -430,10 +431,13 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
     # "extra_kwargs" in class Meta to support subclassing by TileAliasedDataSerializer.
     tileid = serializers.UUIDField(validators=[], required=False, allow_null=True)
     resourceinstance = serializers.PrimaryKeyRelatedField(
-        queryset=ResourceTileTree.objects.all(), required=False, html_cutoff=0
+        queryset=ResourceTileTree.objects.all(),
+        required=False,
+        allow_null=True,
+        html_cutoff=0,
     )
     nodegroup = serializers.PrimaryKeyRelatedField(
-        queryset=NodeGroup.objects.all(), required=False, html_cutoff=0
+        queryset=NodeGroup.objects.all(), required=False, allow_null=True, html_cutoff=0
     )
     parenttile = serializers.PrimaryKeyRelatedField(
         queryset=TileTree.objects.prefetch_related(None),
@@ -489,8 +493,20 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         validated_data["__request"] = self.context["request"]
         validated_data["__as_representation"] = True
         with transaction.atomic():
+            self.create_resource_if_missing(validated_data, entry_node=qs._entry_node)
             created = super().create(validated_data)
         return created
+
+    def create_resource_if_missing(self, validated_data, entry_node):
+        if validated_data.get("resourceinstance"):
+            return
+        # Would like to do the following, but we don't yet have a ResourceTileTree.save()
+        # method handling a fast path for empty creates:
+        # ResourceSubclass = self.fields["resourceinstance"].queryset.model
+        # So hardcode the Resource(Proxy)Model for now.
+        instance = Resource(graph=entry_node.graph)
+        instance.save(request=validated_data["__request"])
+        validated_data["resourceinstance"] = instance
 
 
 class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):

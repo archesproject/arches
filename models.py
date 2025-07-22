@@ -131,6 +131,13 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         ):
             raise ValidationError(_("Graph Has Different Publication"))
 
+        # Emulate some computations trapped on Resource.save()
+        # _save_aliased_data() will call super().save(), i.e. ResourceInstance.save()
+        if arches_version >= (8, 0) and not self.resource_instance_lifecycle_state_id:
+            self.resource_instance_lifecycle_state = (
+                self.get_initial_resource_instance_lifecycle_state()
+            )
+
         self._save_aliased_data(
             request=request,
             index=index,
