@@ -79,8 +79,15 @@ watch(
 );
 
 // TODO: should we force widgets to coerce their values to match aliased data?
+// TODO: update this logic with querysets empty tile
 function onUpdateWidgetValue(nodeAlias: string, value: unknown) {
-    if (aliasedData[nodeAlias]) {
+    if (!aliasedData[nodeAlias]) {
+        aliasedData[nodeAlias] = {
+            node_value: value,
+            display_value: "",
+            details: [],
+        };
+    } else {
         aliasedData[nodeAlias].node_value = value;
     }
 }
