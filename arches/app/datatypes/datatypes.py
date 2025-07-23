@@ -1162,7 +1162,7 @@ class FileListDataType(BaseDataType):
                                 "title": title,
                             }
                         )
-            print("A")
+
             if (
                 value is not None
                 and config["activateMax"] is True
