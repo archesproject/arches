@@ -1162,7 +1162,7 @@ class FileListDataType(BaseDataType):
                                 "title": title,
                             }
                         )
-
+            print("A")
             if (
                 value is not None
                 and config["activateMax"] is True
@@ -1380,7 +1380,11 @@ class FileListDataType(BaseDataType):
         mime = MimeTypes()
         tile_data = []
         source_path = kwargs.get("path")
-        for file_path in [filename.strip() for filename in value.split(",")]:
+        try:
+            file_names = value.split(",")
+        except AttributeError:
+            return value
+        for file_path in [filename.strip() for filename in file_names]:
             tile_file = {}
             try:
                 file_stats = os.stat(file_path)
