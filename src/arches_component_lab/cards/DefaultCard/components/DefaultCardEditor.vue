@@ -80,7 +80,9 @@ watch(
 
 // TODO: should we force widgets to coerce their values to match aliased data?
 function onUpdateWidgetValue(nodeAlias: string, value: unknown) {
-    aliasedData[nodeAlias].node_value = value;
+    if (aliasedData[nodeAlias]) {
+        aliasedData[nodeAlias].node_value = value;
+    }
 }
 
 function resetWidgetDirtyStates() {
