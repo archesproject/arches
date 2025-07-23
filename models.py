@@ -119,14 +119,24 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
     def aliased_data(self, value):
         self._aliased_data = value
 
-    def save(self, *, request=None, index=True, force_admin=False, **kwargs):
+    def save(
+        self, *, request=None, index=True, partial=True, force_admin=False, **kwargs
+    ):
+        """
+        partial=True (HTTP PATCH): absent nodes ignored, absent child tiles ignored.
+        partial=False (HTTP PUT): absent nodes reset to default, absent child tiles deleted.
+        """
         if self.graph_publication_id and (
             self.graph_publication_id != self.graph.publication_id
         ):
             raise ValidationError(_("Graph Has Different Publication"))
 
         self._save_aliased_data(
-            request=request, index=index, force_admin=force_admin, **kwargs
+            request=request,
+            index=index,
+            partial=partial,
+            force_admin=force_admin,
+            **kwargs,
         )
 
     @classmethod
@@ -192,11 +202,13 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         self._refresh_aliased_data(using, fields, from_queryset)
 
     def _save_aliased_data(
-        self, *, request=None, index=True, force_admin=False, **kwargs
+        self, *, request=None, index=True, partial=True, force_admin=False, **kwargs
     ):
         """Raises a compound ValidationError with any failing tile values."""
         request = ensure_request(request, force_admin)
-        operation = TileTreeOperation(entry=self, request=request, save_kwargs=kwargs)
+        operation = TileTreeOperation(
+            entry=self, request=request, partial=partial, save_kwargs=kwargs
+        )
         operation.validate_and_save_tiles()
 
         # Instantiate proxy model for now, but refactor & expose this on vanilla model
@@ -253,7 +265,13 @@ class TileTree(TileModel, AliasedDataMixin):
     def parent(self, parent):
         self._parent = parent
 
-    def save(self, *, request=None, index=True, force_admin=False, **kwargs):
+    def save(
+        self, *, request=None, index=True, partial=True, force_admin=False, **kwargs
+    ):
+        """
+        partial=True (HTTP PATCH): absent nodes ignored, absent child tiles ignored.
+        partial=False (HTTP PUT): absent nodes reset to default, absent child tiles deleted.
+        """
         if (
             self.resourceinstance_id
             and self.resourceinstance.graph_publication_id
@@ -264,12 +282,6 @@ class TileTree(TileModel, AliasedDataMixin):
         ):
             raise ValidationError(_("Graph Has Different Publication"))
 
-        if arches_version < (8, 0) and self.nodegroup:
-            # Cannot supply this too early, as nodegroup might be included
-            # with the request and already instantiated to a fresh object.
-            self.nodegroup.grouping_node = self.nodegroup.node_set.get(
-                pk=models.F("nodegroup")
-            )
         request = request or self._request
         # Mimic some computations trapped on TileModel.save().
         if (
@@ -279,7 +291,11 @@ class TileTree(TileModel, AliasedDataMixin):
         ):
             self.set_next_sort_order()
         self._save_aliased_data(
-            request=request, index=index, force_admin=force_admin, **kwargs
+            request=request,
+            index=index,
+            partial=partial,
+            force_admin=force_admin,
+            **kwargs,
         )
 
     @classmethod
@@ -582,10 +598,12 @@ class TileTree(TileModel, AliasedDataMixin):
         setattr(self.aliased_data, node.alias, final_val)
 
     def _save_aliased_data(
-        self, *, request=None, index=True, force_admin=False, **kwargs
+        self, *, request=None, index=True, partial=True, force_admin=False, **kwargs
     ):
         request = ensure_request(request, force_admin)
-        operation = TileTreeOperation(entry=self, request=request, save_kwargs=kwargs)
+        operation = TileTreeOperation(
+            entry=self, request=request, partial=partial, save_kwargs=kwargs
+        )
         operation.validate_and_save_tiles()
 
         proxy_resource = Resource.objects.get(pk=self.resourceinstance_id)

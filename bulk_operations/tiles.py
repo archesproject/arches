@@ -5,6 +5,7 @@ from operator import attrgetter
 
 from django.core.exceptions import ValidationError
 from django.db import ProgrammingError, transaction
+from django.db.models import F
 from django.utils.translation import get_language, gettext as _
 
 from arches import VERSION as arches_version
@@ -30,7 +31,7 @@ NOT_PROVIDED = object()
 
 
 class TileTreeOperation:
-    def __init__(self, *, entry, request, save_kwargs=None):
+    def __init__(self, *, entry, request, partial=True, save_kwargs=None):
         self.to_insert = set()
         self.to_update = set()
         self.to_delete = set()
@@ -39,6 +40,7 @@ class TileTreeOperation:
         self.datatype_factory = DataTypeFactory()
         self.languages = Language.objects.all()
         self.request = request
+        self.partial = partial
         self.save_kwargs = save_kwargs or {}
         self.transaction_id = uuid.uuid4()
         # Store off these properties since they are expensive.
@@ -50,6 +52,13 @@ class TileTreeOperation:
             self.request.user.userprofile.deletable_nodegroups
         )
 
+        if (self.partial and self.request.method == "PUT") or (
+            not self.partial and self.request.method == "PATCH"
+        ):
+            raise ValueError(
+                f"Expected partial={not self.partial} for {self.request.method} request."
+            )
+
         if isinstance(entry, TileModel):
             self.resourceid = self.entry.resourceinstance_id
             # TODO: write perms, but don't falsify self.new_resource_created
@@ -58,6 +67,11 @@ class TileTreeOperation:
                 resourceinstance_id=self.resourceid,
                 nodegroup_id__in=[ng.pk for ng in self.nodegroups],
             ).order_by("sortorder")
+            if arches_version < (8, 0):
+                # Cannot supply this too early, as nodegroup might be included
+                # with the request and already instantiated to a fresh object.
+                grouping_node = entry.nodegroup.node_set.get(pk=F("nodegroup"))
+                entry.nodegroup.grouping_node = grouping_node
         else:
             self.resourceid = self.entry.pk
             self.nodegroups = []  # not necessary to populate.
@@ -115,9 +129,13 @@ class TileTreeOperation:
             raise
         self.after_update_all()
 
-    def validate(self):
+    def validate(self, delete_absent_children=False):
         """Move values from resource or tile to prefetched tiles, and validate.
         Raises ValidationError if new data fails datatype validation.
+
+        HTTP PUT should request delete_absent_children=True to delete child tiles
+        not in the payload.
+        HTTP PATCH should request delete_absent_children=False (default).
         """
         original_tile_data_by_tile_id = {}
         if isinstance(self.entry, TileModel):
@@ -125,6 +143,7 @@ class TileTreeOperation:
                 self.entry.nodegroup.grouping_node,
                 None,
                 original_tile_data_by_tile_id,
+                delete_siblings=False,
             )
         else:
             for grouping_node in self.grouping_nodes_by_nodegroup_id.values():
@@ -134,7 +153,7 @@ class TileTreeOperation:
                     grouping_node,
                     self.entry,
                     original_tile_data_by_tile_id,
-                    delete_siblings=True,
+                    delete_siblings=delete_absent_children,
                 )
 
         if self.errors_by_node_alias:
@@ -214,7 +233,7 @@ class TileTreeOperation:
                     grouping_node=child_nodegroup.grouping_node,
                     container=tile._incoming_tile,
                     original_tile_data_by_tile_id=original_tile_data_by_tile_id,
-                    delete_siblings=True,
+                    delete_siblings=delete_siblings,
                 )
             self._validate_and_patch_incoming_values(tile, nodes=nodes)
             tile.set_missing_keys_to_none()
@@ -286,6 +305,8 @@ class TileTreeOperation:
         from arches_querysets.models import AliasedData, TileTree
 
         for node in nodes:
+            if node.datatype == "semantic":
+                continue
             if isinstance(tile._incoming_tile, TileTree) and isinstance(
                 tile._incoming_tile.aliased_data, AliasedData
             ):
@@ -297,7 +318,10 @@ class TileTreeOperation:
                     node.alias, NOT_PROVIDED
                 )
             if value_to_validate is NOT_PROVIDED:
-                continue
+                if self.partial:
+                    continue
+                value_to_validate = TileTree.get_default_value(node)
+                tile._incoming_tile.set_aliased_data(node, value_to_validate)
             if isinstance(value_to_validate, dict):
                 value_to_validate = value_to_validate.get(
                     "node_value", value_to_validate

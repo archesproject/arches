@@ -105,6 +105,8 @@ class ArchesModelAPIMixin:
 
     def get_object(self, permission_callable=None, fill_blanks=False):
         ret = super().get_object()
+        self.permitted_nodes = ret._permitted_nodes
+
         options = self.serializer_class.Meta
         if issubclass(options.model, ResourceInstance):
             if arches_version >= (8, 0):
@@ -124,8 +126,10 @@ class ArchesModelAPIMixin:
         if permission_callable and not permission_callable(**permission_kwargs):
             # Not 404, see https://github.com/archesproject/arches/issues/11563
             raise PermissionDenied
-        ret.save = partial(ret.save, request=self.request)
-        self.permitted_nodes = ret._permitted_nodes
+
+        # Freeze some keyword arguments to the model save() method.
+        is_partial_update = self.request.method == "PATCH"
+        ret.save = partial(ret.save, request=self.request, partial=is_partial_update)
 
         if fill_blanks:
             ret.fill_blanks()
