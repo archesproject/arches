@@ -616,12 +616,11 @@ class Tile(models.TileModel):
             user_is_reviewer = False
 
         if user_is_reviewer is True or self.user_owns_provisional(user):
-            if index:
-                query = Query(se)
-                bool_query = Bool()
-                bool_query.filter(Terms(field="tileid", terms=[self.tileid]))
-                query.add_query(bool_query)
-                results = query.delete(index=TERMS_INDEX)
+            query = Query(se)
+            bool_query = Bool()
+            bool_query.filter(Terms(field="tileid", terms=[self.tileid]))
+            query.add_query(bool_query)
+            results = query.delete(index=TERMS_INDEX)
 
             self.__preDelete(request)
             self.save_edit(
