@@ -1,5 +1,6 @@
 import uuid
 from dataclasses import asdict, dataclass
+from itertools import chain
 from typing import Iterable, Mapping
 
 from django.utils.translation import gettext as _
@@ -209,7 +210,22 @@ class ReferenceDataType(BaseDataType):
             ]
             return ", ".join(best_labels)
 
-    def get_interchange_value(self, value, **kwargs):
+    def get_display_value_context_in_bulk(self, values):
+        list_item_ids = set()
+        for value in values:
+            if value:
+                for item in value:
+                    if item.get("labels"):
+                        if item_id := item["labels"][0].get("list_item_id"):
+                            list_item_ids.add(item_id)
+
+        return (
+            ListItem.objects.filter(id__in=list_item_ids)
+            .with_list_item_labels()
+            .prefetch_related("children")
+        )
+
+    def get_details(self, value, *, datatype_context=None, **kwargs):
         """
         Expects tile representation of reference datatype:
         [
@@ -264,16 +280,37 @@ class ReferenceDataType(BaseDataType):
             }
         ]
         """
-        list_item_ids = []
+        list_item_ids: set[uuid.UUID] = set()
         if value:
             for default_val in value:
-                list_item_ids.append(default_val["labels"][0]["list_item_id"])
+                list_item_ids.add(uuid.UUID(default_val["labels"][0]["list_item_id"]))
         else:
             return None
-        items = ListItem.objects.filter(id__in=list_item_ids)
-        transformed_items = [item.build_select_option() for item in items]
 
-        return transformed_items
+        if datatype_context is None:
+            datatype_context = []
+        # Get as many items from the datatypes_context as possible ...
+        transformed_items = [
+            item.build_select_option()
+            for item in datatype_context
+            if item.pk in list_item_ids
+        ]
+        # ... and fetch the rest.
+        remaining_ids_to_fetch = [
+            item_id
+            for item_id in list_item_ids
+            if ListItem(pk=item_id) not in datatype_context
+        ]
+        items_to_fetch = (
+            ListItem.objects.filter(id__in=remaining_ids_to_fetch)
+            .with_list_item_labels()
+            .prefetch_related("children")
+        )
+        remaining_transformed_items = [
+            item.build_select_option() for item in items_to_fetch
+        ]
+
+        return transformed_items + remaining_transformed_items
 
     def collects_multiple_values(self):
         return True
