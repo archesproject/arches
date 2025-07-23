@@ -222,34 +222,18 @@ class Resource(models.ResourceInstance):
     def displayname(self, context=None):
         return self.get_descriptor("name", context)
 
-    def save_edit(
+    def save(
         self,
-        user={},
-        note="",
-        edit_type="",
-        oldvalue=None,
-        newvalue=None,
+        *,
+        context=None,
+        index=True,
+        request=None,
         transaction_id=None,
+        user=None,
+        should_update_resource_instance_lifecycle_state=False,
+        current_resource_instance_lifecycle_state=None,
+        **kwargs,
     ):
-        timestamp = datetime.datetime.now()
-        edit = EditLog()
-        edit.resourceclassid = self.graph_id
-        edit.resourceinstanceid = self.resourceinstanceid
-        edit.userid = getattr(user, "id", "")
-        edit.user_email = getattr(user, "email", "")
-        edit.user_firstname = getattr(user, "first_name", "")
-        edit.user_lastname = getattr(user, "last_name", "")
-        edit.user_username = getattr(user, "username", "")
-        edit.note = note
-        edit.timestamp = timestamp
-        edit.oldvalue = oldvalue
-        edit.newvalue = newvalue
-        if transaction_id is not None:
-            edit.transactionid = transaction_id
-        edit.edittype = edit_type
-        edit.save()
-
-    def save(self, **kwargs):
         """
         Saves and indexes a single resource
 
@@ -263,18 +247,6 @@ class Resource(models.ResourceInstance):
         if not self.get_serialized_graph():
             pass
 
-        context = kwargs.pop("context", None)
-        index = kwargs.pop("index", True)
-        request = kwargs.pop("request", None)
-        transaction_id = kwargs.pop("transaction_id", None)
-        should_update_resource_instance_lifecycle_state = kwargs.pop(
-            "should_update_resource_instance_lifecycle_state", False
-        )
-        current_resource_instance_lifecycle_state = kwargs.pop(
-            "current_resource_instance_lifecycle_state", None
-        )
-        user = kwargs.pop("user", None)
-
         if request is None:
             if user is None:
                 user = {}
@@ -285,22 +257,19 @@ class Resource(models.ResourceInstance):
             self.principaluser_id = user.id
             add_to_update_fields(kwargs, "principaluser_id")
 
-        super(Resource, self).save(**kwargs)
+        super(Resource, self).save(
+            context=context,
+            index=index,
+            request=request,
+            transaction_id=transaction_id,
+            user=user,
+            should_update_resource_instance_lifecycle_state=should_update_resource_instance_lifecycle_state,
+            current_resource_instance_lifecycle_state=current_resource_instance_lifecycle_state,
+            **kwargs,
+        )
 
         if should_update_resource_instance_lifecycle_state:
-            self.save_edit(
-                user=user,
-                edit_type="update_resource_instance_lifecycle_state",
-                oldvalue=f"{current_resource_instance_lifecycle_state.name} ({current_resource_instance_lifecycle_state.id})",
-                newvalue=f"{self.resource_instance_lifecycle_state.name} ({self.resource_instance_lifecycle_state.id})",
-                transaction_id=transaction_id,
-            )
-            self.run_lifecycle_handlers(
-                current_resource_instance_lifecycle_state,
-                request=request,
-                context=context,
-            )
-            self.index(context)
+            # Saving tiles at the same time as updating lifecycle state is not supported.
             return
 
         self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
@@ -318,27 +287,6 @@ class Resource(models.ResourceInstance):
 
         if index is True:
             self.index(context)
-
-    def run_lifecycle_handlers(
-        self, current_lifecycle_state, request=None, context=None
-    ):
-        for function in [
-            function_x_graph.function.get_class_module()(function_x_graph.config, None)
-            for function_x_graph in models.FunctionXGraph.objects.filter(
-                graph_id=self.graph_id,
-                function__functiontype="lifecyclehandler",
-            ).select_related("function")
-        ]:
-            try:
-                function.on_update_lifecycle_state(
-                    self,
-                    current_state=current_lifecycle_state,
-                    new_state=self.resource_instance_lifecycle_state,
-                    request=request,
-                    context=context,
-                )
-            except NotImplementedError:
-                pass
 
     def load_tiles(self, user=None, perm="read_nodegroup"):
         """

@@ -1517,7 +1517,18 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
 
         return creatorid
 
-    def save(self, **kwargs):
+    def save(
+        self,
+        *,
+        context=None,
+        index=True,
+        request=None,
+        transaction_id=None,
+        user=None,
+        should_update_resource_instance_lifecycle_state=False,
+        current_resource_instance_lifecycle_state=None,
+        **kwargs,
+    ):
         try:
             self.graph_publication = self.graph.publication
         except ResourceInstance.graph.RelatedObjectDoesNotExist:
@@ -1531,6 +1542,70 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
         add_to_update_fields(kwargs, "resource_instance_lifecycle_state")
         add_to_update_fields(kwargs, "graph_publication")
         super(ResourceInstance, self).save(**kwargs)
+
+        if should_update_resource_instance_lifecycle_state:
+            self.save_edit(
+                user=user,
+                edit_type="update_resource_instance_lifecycle_state",
+                oldvalue=f"{current_resource_instance_lifecycle_state.name} ({current_resource_instance_lifecycle_state.id})",
+                newvalue=f"{self.resource_instance_lifecycle_state.name} ({self.resource_instance_lifecycle_state.id})",
+                transaction_id=transaction_id,
+            )
+            self.run_lifecycle_handlers(
+                current_resource_instance_lifecycle_state,
+                request=request,
+                context=context,
+            )
+            if index:
+                self.index(context)
+
+    def run_lifecycle_handlers(
+        self, current_lifecycle_state, request=None, context=None
+    ):
+        for function in [
+            function_x_graph.function.get_class_module()(function_x_graph.config, None)
+            for function_x_graph in models.FunctionXGraph.objects.filter(
+                graph_id=self.graph_id,
+                function__functiontype="lifecyclehandler",
+            ).select_related("function")
+        ]:
+            try:
+                function.on_update_lifecycle_state(
+                    self,
+                    current_state=current_lifecycle_state,
+                    new_state=self.resource_instance_lifecycle_state,
+                    request=request,
+                    context=context,
+                )
+            except NotImplementedError:
+                pass
+
+    def save_edit(
+        self,
+        user={},
+        note="",
+        edit_type="",
+        oldvalue=None,
+        newvalue=None,
+        transaction_id=None,
+    ):
+        timestamp = datetime.datetime.now()
+        edit = EditLog()
+        edit.resourceclassid = self.graph_id
+        edit.resourceinstanceid = self.resourceinstanceid
+        edit.userid = getattr(user, "id", "")
+        edit.user_email = getattr(user, "email", "")
+        edit.user_firstname = getattr(user, "first_name", "")
+        edit.user_lastname = getattr(user, "last_name", "")
+        edit.user_username = getattr(user, "username", "")
+        edit.note = note
+        edit.timestamp = timestamp
+        edit.oldvalue = oldvalue
+        edit.newvalue = newvalue
+        if transaction_id is not None:
+            edit.transactionid = transaction_id
+        edit.edittype = edit_type
+        edit.save()
 
 
 class ResourceInstanceLifecycle(models.Model):
