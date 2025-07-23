@@ -1,6 +1,6 @@
 {
     "name": "arches",
-    "version": "8.0.2",
+    "version": "8.0.3",
     "license": "AGPL-3.0-only",
     "scripts": {
         "build_development": "npm run eslint:check && npm run ts:check && cross-env webpack --config ./webpack/webpack.config.dev.js",
