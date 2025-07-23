@@ -47,7 +47,7 @@ const { $gettext } = useGettext();
 
 const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidgetData config
 
-const options = ref<ResourceInstanceListOption[]>([]);
+const options = ref<ResourceInstanceReference[]>(aliasedNodeData?.details || []);
 const isLoading = ref(false);
 const resourceResultsPage = ref(0);
 const resourceResultsTotalCount = ref(0);
@@ -68,14 +68,13 @@ watchEffect(() => {
     getOptions(1);
 });
 
+let timeoutId: ReturnType<typeof setTimeout> | undefined;
 function onFilter(event: MultiSelectFilterEvent) {
-    if (aliasedNodeData?.details) {
-        options.value = aliasedNodeData.details;
-    } else {
-        options.value = [];
-    }
-
-    getOptions(1, event.value);
+    clearTimeout(timeoutId);
+    options.value = aliasedNodeData?.details || [];
+    timeoutId = setTimeout(() => {
+        getOptions(1, event.value);
+    }, 600);
 }
 
 async function getOptions(page: number, filterTerm?: string) {
@@ -90,6 +89,8 @@ async function getOptions(page: number, filterTerm?: string) {
             aliasedNodeData?.details,
         );
 
+        //await new Promise((resolve) => setTimeout(resolve, 2500)); // simulate a delay for the loading state
+
         const references = resourceData.data.map(
             (
                 resourceRecord: ResourceInstanceDataItem,
@@ -99,11 +100,7 @@ async function getOptions(page: number, filterTerm?: string) {
             }),
         );
 
-        if (resourceData.current_page == 1) {
-            options.value = references;
-        } else {
-            options.value = [...options.value, ...references];
-        }
+        options.value = [...options.value, ...references];
 
         resourceResultsPage.value = resourceData.current_page;
         resourceResultsTotalCount.value = resourceData.total_results;
