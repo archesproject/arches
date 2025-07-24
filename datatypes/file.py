@@ -14,12 +14,20 @@ class FileListDataType(datatypes.FileListDataType):
             languages = models.Language.objects.all()
 
         language = get_language()
-        stringified_list = ",".join([file_info.get("name") for file_info in value])
-        final_value = super().transform_value_for_tile(
+
+        if isinstance(value, str):
+            stringified_list = value
+        elif isinstance(value, list) and all(
+            isinstance(file_info, dict) for file_info in value
+        ):
+            stringified_list = ",".join([file_info.get("name") for file_info in value])
+        else:
+            raise TypeError(value)
+        value = super().transform_value_for_tile(
             stringified_list, languages=languages, **kwargs
         )
 
-        for file_info in final_value:
+        for file_info in value:
             for key, val in file_info.items():
                 if key not in self.localized_metadata_keys:
                     continue
@@ -33,4 +41,4 @@ class FileListDataType(datatypes.FileListDataType):
                             "direction": lang.default_direction,
                         }
 
-        return final_value
+        return value
