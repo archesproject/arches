@@ -1,8 +1,8 @@
-import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { AliasedTileNodeValue } from "@/arches_component_lab/types.ts";
 
-export interface DateDatatypeCardXNodeXWidgetData extends CardXNodeXWidget {
-    node: CardXNodeXWidget["node"] & {
+export interface DateDatatypeCardXNodeXWidgetData extends CardXNodeXWidgetData {
+    node: CardXNodeXWidgetData["node"] & {
         config: {
             dateFormat: string;
         };

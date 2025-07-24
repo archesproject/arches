@@ -5,16 +5,18 @@ import { useGettext } from "vue3-gettext";
 import Message from "primevue/message";
 import Skeleton from "primevue/skeleton";
 
-import DefaultCardEditor from "@/arches_component_lab/cards/DefaultCard/components/DefaultCardEditor.vue";
-import DefaultCardViewer from "@/arches_component_lab/cards/DefaultCard/components/DefaultCardViewer.vue";
+import GenericCardEditor from "@/arches_component_lab/generic/GenericCard/components/GenericCardEditor.vue";
+import GenericCardViewer from "@/arches_component_lab/generic/GenericCard/components/GenericCardViewer.vue";
 
-import { fetchTileData } from "@/arches_component_lab/cards/api.ts";
-import { fetchCardXNodeXWidgetDataFromNodeGroup } from "@/arches_component_lab/cards/api.ts";
+import {
+    fetchTileData,
+    fetchCardXNodeXWidgetDataFromNodeGroup,
+} from "@/arches_component_lab/generic/GenericCard/api.ts";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
-import type { AliasedTileData } from "@/arches_component_lab/cards/types.ts";
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type { AliasedTileData } from "@/arches_component_lab/generic/GenericCard/types";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const { $gettext } = useGettext();
@@ -46,7 +48,7 @@ const emit = defineEmits([
 const isLoading = ref(false);
 const configurationError = ref();
 
-const cardXNodeXWidgetData = ref<CardXNodeXWidget[]>([]);
+const cardXNodeXWidgetData = ref<CardXNodeXWidgetData[]>([]);
 const aliasedTileData = ref<AliasedTileData>();
 
 const defaultCardEditor = useTemplateRef("defaultCardEditor");
@@ -116,7 +118,7 @@ defineExpose({
         <template v-else>
             <span>{{ cardXNodeXWidgetData[0].card.name }}</span>
 
-            <DefaultCardEditor
+            <GenericCardEditor
                 v-if="mode === EDIT"
                 ref="defaultCardEditor"
                 v-model:tile-data="aliasedTileData"
@@ -132,7 +134,7 @@ defineExpose({
                 "
                 @update:tile-data="emit('update:tileData', $event)"
             />
-            <DefaultCardViewer
+            <GenericCardViewer
                 v-else-if="mode === VIEW"
                 v-model:tile-data="aliasedTileData"
                 :card-x-node-x-widget-data="cardXNodeXWidgetData"

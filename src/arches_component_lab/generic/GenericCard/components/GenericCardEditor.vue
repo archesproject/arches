@@ -9,12 +9,15 @@ import Skeleton from "primevue/skeleton";
 
 import GenericWidget from "@/arches_component_lab/generic/GenericWidget/GenericWidget.vue";
 
-import { upsertTile } from "@/arches_component_lab/cards/api.ts";
+import { upsertTile } from "@/arches_component_lab/generic/GenericCard/api.ts";
 import { EDIT } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
-import type { AliasedTileData } from "@/arches_component_lab/cards/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types";
+import type {
+    AliasedTileNodeValue,
+    CardXNodeXWidgetData,
+} from "@/arches_component_lab/types.ts";
+import type { AliasedTileData } from "@/arches_component_lab/generic/GenericCard/types.ts";
+import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const { $gettext } = useGettext();
 
@@ -27,7 +30,7 @@ const {
     shouldShowFormButtons,
     tileData,
 } = defineProps<{
-    cardXNodeXWidgetData: CardXNodeXWidget[];
+    cardXNodeXWidgetData: CardXNodeXWidgetData[];
     graphSlug: string;
     mode: WidgetMode;
     nodegroupAlias: string;
@@ -78,18 +81,8 @@ watch(
     { deep: true },
 );
 
-// TODO: should we force widgets to coerce their values to match aliased data?
-// TODO: update this logic with querysets empty tile
-function onUpdateWidgetValue(nodeAlias: string, value: unknown) {
-    if (!aliasedData[nodeAlias]) {
-        aliasedData[nodeAlias] = {
-            node_value: value,
-            display_value: "",
-            details: [],
-        };
-    } else {
-        aliasedData[nodeAlias].node_value = value;
-    }
+function onUpdateWidgetValue(nodeAlias: string, value: AliasedTileNodeValue) {
+    aliasedData[nodeAlias] = value;
 }
 
 function resetWidgetDirtyStates() {
@@ -132,8 +125,8 @@ async function save() {
 
         resetWidgetDirtyStates();
 
+        // nextTick ensures `save` is emitted after `update:tileData`
         nextTick(() => {
-            // nextTick ensures `save` is emitted after `update:tileData`
             emit("save", updatedTileData);
         });
     } catch (error) {

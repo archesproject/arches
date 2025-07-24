@@ -14,7 +14,7 @@ import GenericWidgetLabel from "@/arches_component_lab/generic/GenericWidget/com
 import { fetchCardXNodeXWidgetData } from "@/arches_component_lab/generic/GenericWidget/api.ts";
 import { getUpdatedComponentPath } from "@/arches_component_lab/generic/GenericWidget/utils.ts";
 
-import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const {
@@ -25,7 +25,7 @@ const {
     shouldShowLabel = true,
     value,
 } = defineProps<{
-    cardXNodeXWidgetData?: CardXNodeXWidget;
+    cardXNodeXWidgetData?: CardXNodeXWidgetData;
     graphSlug: string;
     mode: WidgetMode;
     nodeAlias: string;

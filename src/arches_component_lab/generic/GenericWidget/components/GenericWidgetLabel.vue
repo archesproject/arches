@@ -3,12 +3,12 @@ import { computed } from "vue";
 
 import { VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const props = defineProps<{
     mode: WidgetMode;
-    cardXNodeXWidgetData: CardXNodeXWidget;
+    cardXNodeXWidgetData: CardXNodeXWidgetData;
 }>();
 
 const shouldShowRequiredAsterisk = computed(() => {

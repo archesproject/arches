@@ -27,7 +27,7 @@ const { nodeAlias, graphSlug, value } = defineProps<{
 
 const { $gettext } = useGettext();
 
-const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidget config
+const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidgetData config
 
 const options = ref<ResourceInstanceReference[]>([]);
 const isLoading = ref(false);
