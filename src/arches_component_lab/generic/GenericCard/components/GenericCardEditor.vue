@@ -154,7 +154,6 @@ defineExpose({ save });
         <Form
             :key="formKey"
             class="form"
-            @submit="save"
         >
             <template
                 v-for="cardXNodeXWidgetDatum in cardXNodeXWidgetData"
@@ -184,9 +183,9 @@ defineExpose({ save });
                 style="display: flex"
             >
                 <Button
-                    type="submit"
                     :disabled="isSaving"
                     :label="$gettext('Save')"
+                    @click="save"
                 />
 
                 <Button

@@ -7,11 +7,10 @@ import type { NonLocalizedTextValue } from "@/arches_component_lab/datatypes/non
 
 const { nodeAlias, value } = defineProps<{
     nodeAlias: string;
-    value: NonLocalizedTextValue | null | undefined;
+    value: NonLocalizedTextValue;
 }>();
 
-function resolver(event: FormFieldResolverOptions) {
-    console.log("resolver", event);
+function transformValue(event: FormFieldResolverOptions) {
     return {
         display_value: event.value,
         node_value: event.value,
@@ -24,12 +23,12 @@ function resolver(event: FormFieldResolverOptions) {
     <GenericFormField
         v-bind="$attrs"
         :node-alias="nodeAlias"
-        :initial-value="value?.node_value"
-        :resolver="resolver"
+        :transform-value="transformValue"
     >
         <InputText
             type="text"
             :fluid="true"
+            :model-value="value.node_value"
         />
     </GenericFormField>
 </template>

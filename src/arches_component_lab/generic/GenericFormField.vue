@@ -1,16 +1,19 @@
 <script setup lang="ts">
-import { useTemplateRef } from "vue";
+import { computed, useSlots, useTemplateRef } from "vue";
 
 import { FormField } from "@primevue/forms";
 import Message from "primevue/message";
 
 import type { FormFieldResolverOptions } from "@primevue/forms";
 
-const { nodeAlias, initialValue, validate, resolver } = defineProps<{
+const slots = useSlots();
+
+const { nodeAlias, validateValue, transformValue } = defineProps<{
     nodeAlias: string;
-    initialValue: unknown | null | undefined;
-    validate?: (event: unknown) => void;
-    resolver?: (event: FormFieldResolverOptions) => unknown | null | undefined;
+    validateValue?: (event: unknown) => void;
+    transformValue?: (
+        event: FormFieldResolverOptions,
+    ) => unknown | null | undefined;
 }>();
 
 const emit = defineEmits<{
@@ -20,31 +23,44 @@ const emit = defineEmits<{
 
 const formFieldRef = useTemplateRef("formField");
 
+const derivedInitialValue = computed(() => {
+    const defaultSlotNodes = slots.default?.();
+    const firstVNodeProps = defaultSlotNodes?.[0].props as Record<
+        string,
+        unknown
+    >;
+
+    if (!firstVNodeProps) {
+        return null;
+    }
+
+    return firstVNodeProps["value"] || firstVNodeProps["model-value"];
+});
+
 function internalValidate(event: unknown) {
-    if (validate) {
-        validate(event);
+    if (validateValue) {
+        validateValue(event);
     } else {
-        console.log("validate", event);
+        console.log("validateValue", event);
     }
 }
 
 function internalResolver(event: FormFieldResolverOptions) {
-    let resolverResult;
+    let value;
 
-    if (resolver) {
-        resolverResult = resolver(event);
+    if (transformValue) {
+        value = transformValue(event);
     } else {
-        resolverResult = event.value;
+        value = event.value;
     }
 
-    internalValidate(resolverResult);
+    internalValidate(value);
 
     // @ts-expect-error This is a bug with PrimeVue types
     emit("update:isDirty", Boolean(formFieldRef.value!.fieldAttrs.dirty));
-    emit("update:value", resolverResult);
-    // emit("update:value", event.value);
+    emit("update:value", value);
 
-    return resolverResult;
+    return value;
 }
 </script>
 
@@ -53,10 +69,10 @@ function internalResolver(event: FormFieldResolverOptions) {
         ref="formField"
         v-slot="$field"
         :name="nodeAlias"
-        :initial-value="initialValue"
         :resolver="internalResolver"
+        :initial-value="derivedInitialValue"
     >
-        <slot v-bind="$field"></slot>
+        <slot v-bind="$field" />
 
         <Message
             v-for="error in $field.errors"

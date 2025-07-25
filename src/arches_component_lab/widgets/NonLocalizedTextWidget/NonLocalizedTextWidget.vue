@@ -8,13 +8,14 @@ import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { NonLocalizedTextValue } from "@/arches_component_lab/datatypes/non-localized-text/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-defineProps<{
-    mode: WidgetMode;
-    nodeAlias: string;
-    graphSlug: string;
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
-    value: NonLocalizedTextValue | undefined;
-}>();
+const { mode, nodeAlias, graphSlug, cardXNodeXWidgetData, value } =
+    defineProps<{
+        mode: WidgetMode;
+        nodeAlias: string;
+        graphSlug: string;
+        cardXNodeXWidgetData: CardXNodeXWidgetData;
+        value: NonLocalizedTextValue;
+    }>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);
 </script>

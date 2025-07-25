@@ -15,7 +15,7 @@ import type {
 } from "@/arches_component_lab/datatypes/date/types.ts";
 
 const { value, nodeAlias, cardXNodeXWidgetData } = defineProps<{
-    value: DateValue | null | undefined;
+    value: DateValue;
     nodeAlias: string;
     cardXNodeXWidgetData: DateDatatypeCardXNodeXWidgetData;
 }>();
@@ -33,12 +33,21 @@ watchEffect(() => {
     shouldShowTime.value = convertedDateFormat.shouldShowTime;
 });
 
-function resolver(event: FormFieldResolverOptions) {
+function transformValue(event: FormFieldResolverOptions) {
     if (!event.value) {
         return null;
     }
 
-    return formatDate(event.value, cardXNodeXWidgetData.node.config.dateFormat);
+    const formattedDate = formatDate(
+        event.value,
+        cardXNodeXWidgetData.node.config.dateFormat,
+    );
+
+    return {
+        display_value: formattedDate,
+        node_value: formattedDate,
+        details: [],
+    };
 }
 </script>
 
@@ -46,8 +55,7 @@ function resolver(event: FormFieldResolverOptions) {
     <GenericFormField
         v-bind="$attrs"
         :node-alias="nodeAlias"
-        :initial-value="new Date(value?.node_value!)"
-        :resolver="resolver"
+        :transform-value="transformValue"
     >
         <DatePicker
             icon-display="input"
@@ -56,7 +64,8 @@ function resolver(event: FormFieldResolverOptions) {
             :show-time="shouldShowTime"
             :show-seconds="shouldShowTime"
             :show-icon="true"
-            @keydown.enter.prevent
+            :manual-input="true"
+            :model-value="value.node_value as unknown as Date"
         />
     </GenericFormField>
 </template>
