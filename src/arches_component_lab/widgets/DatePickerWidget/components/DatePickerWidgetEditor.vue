@@ -20,6 +20,8 @@ const props = defineProps<{
     cardXNodeXWidgetData: DateDatatypeCardXNodeXWidgetData;
 }>();
 
+type CoercedDate = Date | null;
+
 const shouldShowTime = ref(false);
 const dateFormat = ref();
 
@@ -68,7 +70,7 @@ function transformValueForForm(event: FormFieldResolverOptions) {
             :date-format="dateFormat"
             :fluid="true"
             :manual-input="false"
-            :model-value="value.node_value as unknown as Date"
+            :model-value="value.node_value as CoercedDate"
             :show-time="shouldShowTime"
             :show-seconds="shouldShowTime"
             :show-icon="true"

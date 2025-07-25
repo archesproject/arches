@@ -33,8 +33,9 @@ const props = withDefaults(
     }>(),
     {
         shouldShowFormButtons: true,
-        resourceInstanceId: null,
-        tileId: null,
+        resourceInstanceId: undefined,
+        tileData: undefined,
+        tileId: undefined,
     },
 );
 
