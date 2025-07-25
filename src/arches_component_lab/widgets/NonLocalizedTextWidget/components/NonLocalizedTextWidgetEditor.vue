@@ -23,7 +23,7 @@ function transformValueForForm(event: FormFieldResolverOptions) {
     <GenericFormField
         v-bind="$attrs"
         :node-alias="nodeAlias"
-        :transform-value="transformValueForForm"
+        :transform-value-for-form="transformValueForForm"
     >
         <InputText
             type="text"
