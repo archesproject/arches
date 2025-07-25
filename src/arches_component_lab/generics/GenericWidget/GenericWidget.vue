@@ -9,10 +9,10 @@ import {
 
 import Message from "primevue/message";
 import Skeleton from "primevue/skeleton";
-import GenericWidgetLabel from "@/arches_component_lab/generic/GenericWidget/components/GenericWidgetLabel.vue";
+import GenericWidgetLabel from "@/arches_component_lab/generics/GenericWidget/components/GenericWidgetLabel.vue";
 
-import { fetchCardXNodeXWidgetData } from "@/arches_component_lab/generic/GenericWidget/api.ts";
-import { getUpdatedComponentPath } from "@/arches_component_lab/generic/GenericWidget/utils.ts";
+import { fetchCardXNodeXWidgetData } from "@/arches_component_lab/generics/GenericWidget/api.ts";
+import { getUpdatedComponentPath } from "@/arches_component_lab/generics/GenericWidget/utils.ts";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";

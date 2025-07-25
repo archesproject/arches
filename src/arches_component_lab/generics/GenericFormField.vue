@@ -31,7 +31,11 @@ const derivedInitialValue = computed(() => {
         return null;
     }
 
-    return firstVNodeProps["value"] || firstVNodeProps["model-value"];
+    return (
+        firstVNodeProps["value"] ||
+        firstVNodeProps["model-value"] ||
+        firstVNodeProps["modelValue"]
+    );
 });
 
 function internalValidate(event: unknown) {

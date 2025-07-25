@@ -7,16 +7,16 @@ import Button from "primevue/button";
 import Message from "primevue/message";
 import Skeleton from "primevue/skeleton";
 
-import GenericWidget from "@/arches_component_lab/generic/GenericWidget/GenericWidget.vue";
+import GenericWidget from "@/arches_component_lab/generics/GenericWidget/GenericWidget.vue";
 
-import { upsertTile } from "@/arches_component_lab/generic/GenericCard/api.ts";
+import { upsertTile } from "@/arches_component_lab/generics/GenericCard/api.ts";
 import { EDIT } from "@/arches_component_lab/widgets/constants.ts";
 
 import type {
     AliasedTileNodeValue,
     CardXNodeXWidgetData,
 } from "@/arches_component_lab/types.ts";
-import type { AliasedTileData } from "@/arches_component_lab/generic/GenericCard/types.ts";
+import type { AliasedTileData } from "@/arches_component_lab/generics/GenericCard/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const { $gettext } = useGettext();

@@ -5,18 +5,18 @@ import { useGettext } from "vue3-gettext";
 import Message from "primevue/message";
 import Skeleton from "primevue/skeleton";
 
-import GenericCardEditor from "@/arches_component_lab/generic/GenericCard/components/GenericCardEditor.vue";
-import GenericCardViewer from "@/arches_component_lab/generic/GenericCard/components/GenericCardViewer.vue";
+import GenericCardEditor from "@/arches_component_lab/generics/GenericCard/components/GenericCardEditor.vue";
+import GenericCardViewer from "@/arches_component_lab/generics/GenericCard/components/GenericCardViewer.vue";
 
 import {
     fetchTileData,
     fetchCardXNodeXWidgetDataFromNodeGroup,
-} from "@/arches_component_lab/generic/GenericCard/api.ts";
+} from "@/arches_component_lab/generics/GenericCard/api.ts";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { AliasedTileData } from "@/arches_component_lab/generic/GenericCard/types";
+import type { AliasedTileData } from "@/arches_component_lab/generics/GenericCard/types";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const { $gettext } = useGettext();

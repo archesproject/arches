@@ -5,7 +5,7 @@ import { useGettext } from "vue3-gettext";
 
 import Select from "primevue/select";
 
-import GenericFormField from "@/arches_component_lab/generic/GenericFormField.vue";
+import GenericFormField from "@/arches_component_lab/generics/GenericFormField.vue";
 
 import { fetchRelatableResources } from "@/arches_component_lab/datatypes/resource-instance/api.ts";
 

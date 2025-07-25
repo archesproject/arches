@@ -1,10 +1,10 @@
 import arches from "arches";
 import Cookies from "js-cookie";
 
-import { extractFileEntriesFromPayload } from "@/arches_component_lab/generic/GenericCard/utils.ts";
+import { extractFileEntriesFromPayload } from "@/arches_component_lab/generics/GenericCard/utils.ts";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { AliasedTileData } from "@/arches_component_lab/generic/GenericCard/types.ts";
+import type { AliasedTileData } from "@/arches_component_lab/generics/GenericCard/types.ts";
 
 export async function fetchTileStructure(
     graphSlug: string,

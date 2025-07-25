@@ -4,7 +4,7 @@ import { ref, watchEffect } from "vue";
 import { convertISO8601DatetimeFormatToPrimevueDatetimeFormat } from "@/arches_component_lab/widgets/DatePickerWidget/utils.ts";
 
 import DatePicker from "primevue/datepicker";
-import GenericFormField from "@/arches_component_lab/generic/GenericFormField.vue";
+import GenericFormField from "@/arches_component_lab/generics/GenericFormField.vue";
 
 import { formatDate } from "@/arches_component_lab/datatypes/date/utils.ts";
 

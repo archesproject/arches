@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import InputText from "primevue/inputtext";
 
-import GenericFormField from "@/arches_component_lab/generic/GenericFormField.vue";
+import GenericFormField from "@/arches_component_lab/generics/GenericFormField.vue";
 
 import type { FormFieldResolverOptions } from "@primevue/forms";
 import type { URLValue } from "@/arches_component_lab/datatypes/url/types";
