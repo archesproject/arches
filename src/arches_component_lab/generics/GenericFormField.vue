@@ -55,8 +55,6 @@ function internalResolver(event: FormFieldResolverOptions) {
         value = event.value;
     }
 
-    console.log("internalResolver", value);
-
     internalValidate(value);
 
     // @ts-expect-error This is a bug with PrimeVue types
