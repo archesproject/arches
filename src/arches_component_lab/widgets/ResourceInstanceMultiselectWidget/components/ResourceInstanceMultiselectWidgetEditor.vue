@@ -24,7 +24,7 @@ import type {
 const { nodeAlias, graphSlug, value } = defineProps<{
     nodeAlias: string;
     graphSlug: string;
-    value: ResourceInstanceListValue | null | undefined;
+    value: ResourceInstanceListValue;
 }>();
 
 const { $gettext } = useGettext();
@@ -134,10 +134,17 @@ function getOption(value: string): ResourceInstanceReference | undefined {
     return options.value.find((option) => option.resource_id == value);
 }
 
-function resolver(event: FormFieldResolverOptions) {
-    return event.value.map((resourceId: string) => {
+function transformValue(event: FormFieldResolverOptions) {
+    const options = event.value.map((resourceId: string) => {
         return getOption(resourceId);
     });
+    return {
+        display_value: options
+            .map((option: ResourceInstanceReference) => option?.display_value)
+            .join(", "),
+        node_value: event.value,
+        details: options,
+    };
 }
 </script>
 
@@ -145,8 +152,7 @@ function resolver(event: FormFieldResolverOptions) {
     <GenericFormField
         v-bind="$attrs"
         :node-alias="nodeAlias"
-        :initial-value="initialValueFromTileData"
-        :resolver="resolver"
+        :transform-value="transformValue"
     >
         <MultiSelect
             display="chip"
@@ -156,6 +162,7 @@ function resolver(event: FormFieldResolverOptions) {
             :filter-placeholder="$gettext('Filter Resources')"
             :fluid="true"
             :loading="isLoading"
+            :model-value="initialValueFromTileData"
             :options="options"
             :placeholder="$gettext('Select Resources')"
             :reset-filter-on-hide="true"

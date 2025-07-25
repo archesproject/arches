@@ -22,7 +22,7 @@ import type {
 const { nodeAlias, graphSlug, value } = defineProps<{
     nodeAlias: string;
     graphSlug: string;
-    value: ResourceInstanceValue | null | undefined;
+    value: ResourceInstanceValue;
 }>();
 
 const { $gettext } = useGettext();
@@ -123,8 +123,14 @@ function getOption(value: string): ResourceInstanceReference | undefined {
     return options.value.find((option) => option.resource_id == value);
 }
 
-function resolver(event: FormFieldResolverOptions) {
-    return getOption(event.value);
+function transformValue(event: FormFieldResolverOptions) {
+    const option = getOption(event.value);
+
+    return {
+        display_value: option ? option.display_value : "",
+        node_value: event.value ? [event.value] : [],
+        details: option ? [option] : [],
+    };
 }
 </script>
 
@@ -132,8 +138,7 @@ function resolver(event: FormFieldResolverOptions) {
     <GenericFormField
         v-bind="$attrs"
         :node-alias="nodeAlias"
-        :initial-value="value?.details[0].resource_id"
-        :resolver="resolver"
+        :transform-value="transformValue"
     >
         <Select
             display="chip"
@@ -143,6 +148,7 @@ function resolver(event: FormFieldResolverOptions) {
             :filter-placeholder="$gettext('Filter Resources')"
             :fluid="true"
             :loading="isLoading"
+            :model-value="value?.details?.[0]?.resource_id"
             :options="options"
             :placeholder="$gettext('Select Resources')"
             :reset-filter-on-hide="true"

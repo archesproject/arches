@@ -8,5 +8,9 @@ export function formatDate(
         return null;
     }
 
-    return dayjs(date).format(dateFormat);
+    if (isNaN(date.getTime())) {
+        throw new Error("Invalid date");
+    } else {
+        return dayjs(date).format(dateFormat);
+    }
 }

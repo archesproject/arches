@@ -34,20 +34,26 @@ watchEffect(() => {
 });
 
 function transformValue(event: FormFieldResolverOptions) {
-    if (!event.value) {
-        return null;
+    const date = new Date(event.value);
+
+    try {
+        const formattedDate = formatDate(
+            date,
+            cardXNodeXWidgetData.node.config.dateFormat,
+        );
+
+        return {
+            display_value: formattedDate,
+            node_value: formattedDate,
+            details: [],
+        };
+    } catch (error) {
+        return {
+            display_value: event.value,
+            node_value: event.value,
+            details: [error],
+        };
     }
-
-    const formattedDate = formatDate(
-        event.value,
-        cardXNodeXWidgetData.node.config.dateFormat,
-    );
-
-    return {
-        display_value: formattedDate,
-        node_value: formattedDate,
-        details: [],
-    };
 }
 </script>
 
@@ -61,11 +67,11 @@ function transformValue(event: FormFieldResolverOptions) {
             icon-display="input"
             :date-format="dateFormat"
             :fluid="true"
+            :manual-input="false"
+            :model-value="value.node_value as unknown as Date"
             :show-time="shouldShowTime"
             :show-seconds="shouldShowTime"
             :show-icon="true"
-            :manual-input="true"
-            :model-value="value.node_value as unknown as Date"
         />
     </GenericFormField>
 </template>

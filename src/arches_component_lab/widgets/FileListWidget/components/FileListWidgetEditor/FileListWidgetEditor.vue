@@ -7,10 +7,11 @@ import GenericFormField from "@/arches_component_lab/generic/GenericFormField.vu
 import FileList from "@/arches_component_lab/widgets/FileListWidget/components/FileListWidgetEditor/components/FileList.vue";
 import FileDropZone from "@/arches_component_lab/widgets/FileListWidget/components/FileListWidgetEditor/components/FileDropZone.vue";
 
-import type { FileReference } from "@/arches_component_lab/datatypes/file-list/types.ts";
+import type { FormFieldResolverOptions } from "@primevue/forms";
 import type {
     FileListCardXNodeXWidgetData,
     FileListValue,
+    FileReference,
 } from "@/arches_component_lab/datatypes/file-list/types.ts";
 import type {
     FileData,
@@ -18,7 +19,7 @@ import type {
 } from "@/arches_component_lab/widgets/FileListWidget/types.ts";
 
 const { value, nodeAlias, cardXNodeXWidgetData } = defineProps<{
-    value: FileListValue | null | undefined;
+    value: FileListValue;
     nodeAlias: string;
     cardXNodeXWidgetData: FileListCardXNodeXWidgetData;
 }>();
@@ -84,18 +85,27 @@ function onRemoveSavedFile(field: unknown, fileIndex: number): void {
         value: [...savedFiles.value, ...pendingFiles.value],
     });
 }
+
+function transformValue(event: FormFieldResolverOptions) {
+    return {
+        display_value: event.value,
+        node_value: event.value,
+        details: [],
+    };
+}
 </script>
 
 <template>
     <GenericFormField
         v-bind="$attrs"
         :node-alias="nodeAlias"
-        :initial-value="value?.node_value"
+        :transform-value="transformValue"
     >
         <template #default="$field">
             <FileUpload
                 :accept="allowedFileTypes"
                 :name="nodeAlias"
+                :model-value="value.node_value"
                 :multiple="true"
                 :show-cancel-button="false"
                 :show-upload-button="false"

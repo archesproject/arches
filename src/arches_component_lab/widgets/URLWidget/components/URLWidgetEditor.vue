@@ -2,23 +2,34 @@
 import InputText from "primevue/inputtext";
 
 import GenericFormField from "@/arches_component_lab/generic/GenericFormField.vue";
+
+import type { FormFieldResolverOptions } from "@primevue/forms";
 import type { URLValue } from "@/arches_component_lab/datatypes/url/types";
 
 const { nodeAlias, value } = defineProps<{
     nodeAlias: string;
-    value: URLValue | null | undefined;
+    value: URLValue;
 }>();
+
+function transformValue(event: FormFieldResolverOptions) {
+    return {
+        display_value: event.value,
+        node_value: event.value,
+        details: [],
+    };
+}
 </script>
 
 <template>
     <GenericFormField
         v-bind="$attrs"
         :node-alias="nodeAlias"
-        :initial-value="value"
+        :transform-value="transformValue"
     >
         <InputText
             type="text"
             :fluid="true"
+            :model-value="value.node_value?.url"
         />
     </GenericFormField>
 </template>

@@ -13,7 +13,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    value: URLValue | null | undefined;
+    value: URLValue;
 }>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);

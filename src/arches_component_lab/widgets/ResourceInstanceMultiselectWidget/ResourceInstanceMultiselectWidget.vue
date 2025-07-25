@@ -13,7 +13,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    value: ResourceInstanceListValue | null | undefined;
+    value: ResourceInstanceListValue;
 }>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);
