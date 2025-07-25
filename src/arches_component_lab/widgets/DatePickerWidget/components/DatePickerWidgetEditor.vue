@@ -14,7 +14,7 @@ import type {
     DateValue,
 } from "@/arches_component_lab/datatypes/date/types.ts";
 
-const { value, nodeAlias, cardXNodeXWidgetData } = defineProps<{
+const props = defineProps<{
     value: DateValue;
     nodeAlias: string;
     cardXNodeXWidgetData: DateDatatypeCardXNodeXWidgetData;
@@ -26,7 +26,7 @@ const dateFormat = ref();
 watchEffect(() => {
     const convertedDateFormat =
         convertISO8601DatetimeFormatToPrimevueDatetimeFormat(
-            cardXNodeXWidgetData.node.config.dateFormat,
+            props.cardXNodeXWidgetData.node.config.dateFormat,
         );
 
     dateFormat.value = convertedDateFormat.dateFormat;
@@ -39,7 +39,7 @@ function transformValue(event: FormFieldResolverOptions) {
     try {
         const formattedDate = formatDate(
             date,
-            cardXNodeXWidgetData.node.config.dateFormat,
+            props.cardXNodeXWidgetData.node.config.dateFormat,
         );
 
         return {

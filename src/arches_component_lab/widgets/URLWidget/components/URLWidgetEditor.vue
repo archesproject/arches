@@ -6,7 +6,7 @@ import GenericFormField from "@/arches_component_lab/generic/GenericFormField.vu
 import type { FormFieldResolverOptions } from "@primevue/forms";
 import type { URLValue } from "@/arches_component_lab/datatypes/url/types";
 
-const { nodeAlias, value } = defineProps<{
+defineProps<{
     nodeAlias: string;
     value: URLValue;
 }>();

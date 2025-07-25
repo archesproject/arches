@@ -18,7 +18,7 @@ import type {
     PrimeVueFile,
 } from "@/arches_component_lab/widgets/FileListWidget/types.ts";
 
-const { value, nodeAlias, cardXNodeXWidgetData } = defineProps<{
+const props = defineProps<{
     value: FileListValue;
     nodeAlias: string;
     cardXNodeXWidgetData: FileListCardXNodeXWidgetData;
@@ -31,17 +31,17 @@ const allowedFileTypes = ref();
 const currentValues = ref();
 
 onMounted(() => {
-    const acceptedFiles = cardXNodeXWidgetData.config.acceptedFiles;
+    const acceptedFiles = props.cardXNodeXWidgetData.config.acceptedFiles;
     allowedFileTypes.value = acceptedFiles != "" ? acceptedFiles : null;
 
-    if (value) {
-        currentValues.value = value.node_value;
+    if (props.value) {
+        currentValues.value = props.value.node_value;
 
-        if (value.node_value) {
-            savedFiles.value = value.node_value.map((file) => {
+        if (props.value.node_value) {
+            savedFiles.value = props.value.node_value.map((file) => {
                 return {
                     ...file,
-                    node_id: cardXNodeXWidgetData.node.nodeid,
+                    node_id: props.cardXNodeXWidgetData.node.nodeid,
                 };
             });
         } else {
@@ -57,7 +57,7 @@ function onSelect(event: { files: PrimeVueFile[] }, field: unknown): void {
         type: file.type,
         url: file.objectURL,
         file: file,
-        node_id: cardXNodeXWidgetData.node.nodeid,
+        node_id: props.cardXNodeXWidgetData.node.nodeid,
     }));
 
     (field as { onInput: (value: unknown) => void }).onInput({

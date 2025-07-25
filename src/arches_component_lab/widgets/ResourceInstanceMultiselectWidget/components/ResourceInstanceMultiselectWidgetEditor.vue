@@ -21,7 +21,7 @@ import type {
     ResourceInstanceResult,
 } from "@/arches_component_lab/datatypes/resource-instance/types.ts";
 
-const { nodeAlias, graphSlug, value } = defineProps<{
+const props = defineProps<{
     nodeAlias: string;
     graphSlug: string;
     value: ResourceInstanceListValue;
@@ -40,8 +40,8 @@ const fetchError = ref<string | null>(null);
 const resourceResultsCurrentCount = computed(() => options.value.length);
 
 const initialValueFromTileData = computed(() => {
-    if (value?.details) {
-        return value.details.map((option) => {
+    if (props.value?.details) {
+        return props.value.details.map((option) => {
             return option.resource_id;
         });
     }
@@ -53,8 +53,8 @@ watchEffect(() => {
 });
 
 function onFilter(event: MultiSelectFilterEvent) {
-    if (value?.details) {
-        options.value = value.details;
+    if (props.value?.details) {
+        options.value = props.value.details;
     } else {
         options.value = [];
     }
@@ -67,11 +67,11 @@ async function getOptions(page: number, filterTerm?: string) {
         isLoading.value = true;
 
         const resourceData = await fetchRelatableResources(
-            graphSlug,
-            nodeAlias,
+            props.graphSlug,
+            props.nodeAlias,
             page,
             filterTerm,
-            value?.details,
+            props.value?.details,
         );
 
         const references = resourceData.data.map(

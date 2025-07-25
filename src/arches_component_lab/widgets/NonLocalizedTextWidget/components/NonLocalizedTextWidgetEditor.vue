@@ -5,7 +5,7 @@ import GenericFormField from "@/arches_component_lab/generic/GenericFormField.vu
 import type { FormFieldResolverOptions } from "@primevue/forms";
 import type { NonLocalizedTextValue } from "@/arches_component_lab/datatypes/non-localized-text/types";
 
-const { nodeAlias, value } = defineProps<{
+defineProps<{
     nodeAlias: string;
     value: NonLocalizedTextValue;
 }>();

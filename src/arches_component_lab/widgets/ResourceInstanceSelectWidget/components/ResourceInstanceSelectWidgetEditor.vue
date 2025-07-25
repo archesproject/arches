@@ -19,7 +19,7 @@ import type {
     ResourceInstanceValue,
 } from "@/arches_component_lab/datatypes/resource-instance/types.ts";
 
-const { nodeAlias, graphSlug, value } = defineProps<{
+const props = defineProps<{
     nodeAlias: string;
     graphSlug: string;
     value: ResourceInstanceValue;
@@ -42,8 +42,8 @@ watchEffect(() => {
 });
 
 function onFilter(event: SelectFilterEvent) {
-    if (value?.details) {
-        options.value = value.details;
+    if (props.value?.details) {
+        options.value = props.value.details;
     } else {
         options.value = [];
     }
@@ -56,11 +56,11 @@ async function getOptions(page: number, filterTerm?: string) {
         isLoading.value = true;
 
         const resourceData = await fetchRelatableResources(
-            graphSlug,
-            nodeAlias,
+            props.graphSlug,
+            props.nodeAlias,
             page,
             filterTerm,
-            value?.details[0].resource_id,
+            props.value?.details[0].resource_id,
         );
 
         const references = resourceData.data.map(

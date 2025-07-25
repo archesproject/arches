@@ -3,7 +3,7 @@ import arches from "arches";
 
 import type { ResourceInstanceValue } from "@/arches_component_lab/datatypes/resource-instance/types";
 
-const { value } = defineProps<{
+defineProps<{
     value: ResourceInstanceValue | null | undefined;
 }>();
 </script>

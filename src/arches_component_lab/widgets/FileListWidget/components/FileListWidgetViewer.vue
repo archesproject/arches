@@ -4,12 +4,12 @@ import { Image, Galleria } from "primevue";
 
 import type { FileListValue } from "@/arches_component_lab/datatypes/file-list/types";
 
-const { value } = defineProps<{
+const props = defineProps<{
     value: FileListValue | null | undefined;
 }>();
 
 const imageData = computed(() => {
-    return value?.node_value?.map((fileReference) => {
+    return props.value?.node_value?.map((fileReference) => {
         return {
             thumbnailImageSrc: `${fileReference.url}`,
             itemImageSrc: `${fileReference.url}`,
