@@ -10,7 +10,7 @@ defineProps<{
     value: NonLocalizedTextValue;
 }>();
 
-function transformValue(event: FormFieldResolverOptions) {
+function transformValueForForm(event: FormFieldResolverOptions) {
     return {
         display_value: event.value,
         node_value: event.value,
@@ -23,7 +23,7 @@ function transformValue(event: FormFieldResolverOptions) {
     <GenericFormField
         v-bind="$attrs"
         :node-alias="nodeAlias"
-        :transform-value="transformValue"
+        :transform-value="transformValueForForm"
     >
         <InputText
             type="text"

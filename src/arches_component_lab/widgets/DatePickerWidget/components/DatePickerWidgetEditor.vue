@@ -33,7 +33,7 @@ watchEffect(() => {
     shouldShowTime.value = convertedDateFormat.shouldShowTime;
 });
 
-function transformValue(event: FormFieldResolverOptions) {
+function transformValueForForm(event: FormFieldResolverOptions) {
     const date = new Date(event.value);
 
     try {
@@ -61,7 +61,7 @@ function transformValue(event: FormFieldResolverOptions) {
     <GenericFormField
         v-bind="$attrs"
         :node-alias="nodeAlias"
-        :transform-value="transformValue"
+        :transform-value="transformValueForForm"
     >
         <DatePicker
             icon-display="input"

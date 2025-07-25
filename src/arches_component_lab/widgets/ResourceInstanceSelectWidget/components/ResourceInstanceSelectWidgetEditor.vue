@@ -123,7 +123,7 @@ function getOption(value: string): ResourceInstanceReference | undefined {
     return options.value.find((option) => option.resource_id == value);
 }
 
-function transformValue(event: FormFieldResolverOptions) {
+function transformValueForForm(event: FormFieldResolverOptions) {
     const option = getOption(event.value);
 
     return {
@@ -138,7 +138,7 @@ function transformValue(event: FormFieldResolverOptions) {
     <GenericFormField
         v-bind="$attrs"
         :node-alias="nodeAlias"
-        :transform-value="transformValue"
+        :transform-value="transformValueForForm"
     >
         <Select
             display="chip"

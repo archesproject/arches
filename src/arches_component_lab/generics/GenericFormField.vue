@@ -11,7 +11,7 @@ const slots = useSlots();
 const props = defineProps<{
     nodeAlias: string;
     validateValue?: (event: unknown) => void;
-    transformValue?: (
+    transformValueForForm?: (
         event: FormFieldResolverOptions,
     ) => unknown | null | undefined;
 }>();
@@ -49,8 +49,8 @@ function internalValidate(event: unknown) {
 function internalResolver(event: FormFieldResolverOptions) {
     let value;
 
-    if (props.transformValue) {
-        value = props.transformValue(event);
+    if (props.transformValueForForm) {
+        value = props.transformValueForForm(event);
     } else {
         value = event.value;
     }
