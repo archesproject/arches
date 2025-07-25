@@ -21,15 +21,7 @@ import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const { $gettext } = useGettext();
 
-const {
-    cardXNodeXWidgetData,
-    graphSlug,
-    mode,
-    nodegroupAlias,
-    resourceInstanceId,
-    shouldShowFormButtons,
-    tileData,
-} = defineProps<{
+const props = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData[];
     graphSlug: string;
     mode: WidgetMode;
@@ -49,11 +41,13 @@ const formKey = ref(0);
 const isSaving = ref(false);
 const saveError = ref<Error>();
 
-const originalAliasedData = structuredClone(tileData?.aliased_data || {});
-const aliasedData = reactive(structuredClone(tileData?.aliased_data || {}));
+const originalAliasedData = structuredClone(props.tileData?.aliased_data || {});
+const aliasedData = reactive(
+    structuredClone(props.tileData?.aliased_data || {}),
+);
 
 const widgetDirtyStates = reactive(
-    cardXNodeXWidgetData.reduce<Record<string, boolean>>(
+    props.cardXNodeXWidgetData.reduce<Record<string, boolean>>(
         (dirtyStatesMap, widgetDatum) => {
             dirtyStatesMap[widgetDatum.node.alias] = false;
             return dirtyStatesMap;
@@ -66,7 +60,7 @@ watch(
     aliasedData,
     () => {
         emit("update:tileData", {
-            ...tileData,
+            ...props.tileData,
             aliased_data: toRaw(aliasedData),
         });
     },
@@ -104,14 +98,14 @@ async function save() {
 
     try {
         const updatedTileData = await upsertTile(
-            graphSlug,
-            nodegroupAlias,
+            props.graphSlug,
+            props.nodegroupAlias,
             {
-                ...(tileData as AliasedTileData),
+                ...(props.tileData as AliasedTileData),
                 aliased_data: toRaw(aliasedData),
             },
-            tileData?.tileid,
-            resourceInstanceId,
+            props.tileData?.tileid,
+            props.resourceInstanceId,
         );
 
         Object.assign(

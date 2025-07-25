@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, useTemplateRef } from "vue";
+import { ref, useTemplateRef, watchEffect } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Message from "primevue/message";
@@ -21,23 +21,22 @@ import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const { $gettext } = useGettext();
 
-const {
-    mode,
-    nodegroupAlias,
-    graphSlug,
-    resourceInstanceId,
-    shouldShowFormButtons = true,
-    tileData,
-    tileId,
-} = defineProps<{
-    mode: WidgetMode;
-    nodegroupAlias: string;
-    graphSlug: string;
-    resourceInstanceId?: string | null;
-    shouldShowFormButtons?: boolean;
-    tileData?: AliasedTileData;
-    tileId?: string | null;
-}>();
+const props = withDefaults(
+    defineProps<{
+        mode: WidgetMode;
+        nodegroupAlias: string;
+        graphSlug: string;
+        resourceInstanceId?: string | null;
+        shouldShowFormButtons?: boolean;
+        tileData?: AliasedTileData;
+        tileId?: string | null;
+    }>(),
+    {
+        shouldShowFormButtons: true,
+        resourceInstanceId: null,
+        tileId: null,
+    },
+);
 
 const emit = defineEmits([
     "update:widgetDirtyStates",
@@ -47,18 +46,22 @@ const emit = defineEmits([
 
 const isLoading = ref(true);
 const configurationError = ref();
-
 const cardXNodeXWidgetData = ref<CardXNodeXWidgetData[]>([]);
 const aliasedTileData = ref<AliasedTileData>();
 
 const defaultCardEditor = useTemplateRef("defaultCardEditor");
 
-onMounted(async () => {
+watchEffect(async () => {
+    isLoading.value = true;
+
     try {
         const cardXNodeXWidgetDataPromise =
-            fetchCardXNodeXWidgetDataFromNodeGroup(graphSlug, nodegroupAlias);
+            fetchCardXNodeXWidgetDataFromNodeGroup(
+                props.graphSlug,
+                props.nodegroupAlias,
+            );
 
-        if (!tileData && !tileId && !resourceInstanceId) {
+        if (!props.tileData && !props.tileId && !props.resourceInstanceId) {
             throw new Error(
                 $gettext(
                     "No tile data, tile ID, or resource instance ID provided.",
@@ -66,20 +69,20 @@ onMounted(async () => {
             );
         }
 
-        if (tileData) {
-            aliasedTileData.value = structuredClone(tileData);
-        } else if (tileId) {
+        if (props.tileData) {
+            aliasedTileData.value = props.tileData;
+        } else if (props.tileId) {
             const aliasedTileDataPromise = fetchTileData(
-                graphSlug,
-                nodegroupAlias,
-                tileId,
+                props.graphSlug,
+                props.nodegroupAlias,
+                props.tileId,
             );
             aliasedTileData.value = await aliasedTileDataPromise;
-        } else if (resourceInstanceId) {
+        } else if (props.resourceInstanceId) {
             // TODO: Replace with querysets call for empty tile structure
             // @ts-expect-error this is an incomplete tile structure
             aliasedTileData.value = {
-                resourceinstance: resourceInstanceId,
+                resourceinstance: props.resourceInstanceId,
                 aliased_data: {},
             };
         }
