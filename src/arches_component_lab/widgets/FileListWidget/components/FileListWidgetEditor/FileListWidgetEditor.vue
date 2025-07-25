@@ -3,22 +3,23 @@ import { onMounted, ref } from "vue";
 
 import FileUpload from "primevue/fileupload";
 
-import GenericFormField from "@/arches_component_lab/generic/GenericFormField.vue";
+import GenericFormField from "@/arches_component_lab/generics/GenericFormField.vue";
 import FileList from "@/arches_component_lab/widgets/FileListWidget/components/FileListWidgetEditor/components/FileList.vue";
 import FileDropZone from "@/arches_component_lab/widgets/FileListWidget/components/FileListWidgetEditor/components/FileDropZone.vue";
 
-import type { FileReference } from "@/arches_component_lab/datatypes/file-list/types.ts";
+import type { FormFieldResolverOptions } from "@primevue/forms";
 import type {
     FileListCardXNodeXWidgetData,
     FileListValue,
+    FileReference,
 } from "@/arches_component_lab/datatypes/file-list/types.ts";
 import type {
     FileData,
     PrimeVueFile,
 } from "@/arches_component_lab/widgets/FileListWidget/types.ts";
 
-const { value, nodeAlias, cardXNodeXWidgetData } = defineProps<{
-    value: FileListValue | null | undefined;
+const props = defineProps<{
+    value: FileListValue;
     nodeAlias: string;
     cardXNodeXWidgetData: FileListCardXNodeXWidgetData;
 }>();
@@ -30,17 +31,17 @@ const allowedFileTypes = ref();
 const currentValues = ref();
 
 onMounted(() => {
-    const acceptedFiles = cardXNodeXWidgetData.config.acceptedFiles;
+    const acceptedFiles = props.cardXNodeXWidgetData.config.acceptedFiles;
     allowedFileTypes.value = acceptedFiles != "" ? acceptedFiles : null;
 
-    if (value) {
-        currentValues.value = value.node_value;
+    if (props.value) {
+        currentValues.value = props.value.node_value;
 
-        if (value.node_value) {
-            savedFiles.value = value.node_value.map((file) => {
+        if (props.value.node_value) {
+            savedFiles.value = props.value.node_value.map((file) => {
                 return {
                     ...file,
-                    node_id: cardXNodeXWidgetData.node.nodeid,
+                    node_id: props.cardXNodeXWidgetData.node.nodeid,
                 };
             });
         } else {
@@ -56,7 +57,7 @@ function onSelect(event: { files: PrimeVueFile[] }, field: unknown): void {
         type: file.type,
         url: file.objectURL,
         file: file,
-        node_id: cardXNodeXWidgetData.node.nodeid,
+        node_id: props.cardXNodeXWidgetData.node.nodeid,
     }));
 
     (field as { onInput: (value: unknown) => void }).onInput({
@@ -84,18 +85,27 @@ function onRemoveSavedFile(field: unknown, fileIndex: number): void {
         value: [...savedFiles.value, ...pendingFiles.value],
     });
 }
+
+function transformValueForForm(event: FormFieldResolverOptions) {
+    return {
+        display_value: event.value,
+        node_value: event.value,
+        details: [],
+    };
+}
 </script>
 
 <template>
     <GenericFormField
         v-bind="$attrs"
         :node-alias="nodeAlias"
-        :initial-value="value?.node_value"
+        :transform-value="transformValueForForm"
     >
         <template #default="$field">
             <FileUpload
                 :accept="allowedFileTypes"
                 :name="nodeAlias"
+                :model-value="value.node_value"
                 :multiple="true"
                 :show-cancel-button="false"
                 :show-upload-button="false"

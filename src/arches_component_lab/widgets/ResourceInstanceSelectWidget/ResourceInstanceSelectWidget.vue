@@ -4,7 +4,7 @@ import ResourceInstanceSelectWidgetViewer from "@/arches_component_lab/widgets/R
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 import type { ResourceInstanceValue } from "@/arches_component_lab/datatypes/resource-instance/types";
 
@@ -12,8 +12,8 @@ defineProps<{
     mode: WidgetMode;
     nodeAlias: string;
     graphSlug: string;
-    cardXNodeXWidgetData: CardXNodeXWidget;
-    value: ResourceInstanceValue | null | undefined;
+    cardXNodeXWidgetData: CardXNodeXWidgetData;
+    value: ResourceInstanceValue;
 }>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);

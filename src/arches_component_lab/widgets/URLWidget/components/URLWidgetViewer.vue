@@ -4,8 +4,8 @@ import type { URLValue } from "@/arches_component_lab/datatypes/url/types.ts";
 
 const { $gettext } = useGettext();
 
-const { value } = defineProps<{
-    value?: URLValue | null | undefined;
+defineProps<{
+    value: URLValue;
 }>();
 </script>
 

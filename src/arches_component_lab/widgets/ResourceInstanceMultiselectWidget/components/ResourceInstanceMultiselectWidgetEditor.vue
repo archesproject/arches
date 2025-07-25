@@ -7,7 +7,7 @@ import { useGettext } from "vue3-gettext";
 import Button from "primevue/button";
 import MultiSelect from "primevue/multiselect";
 
-import GenericFormField from "@/arches_component_lab/generic/GenericFormField.vue";
+import GenericFormField from "@/arches_component_lab/generics/GenericFormField.vue";
 
 import { fetchRelatableResources } from "@/arches_component_lab/datatypes/resource-instance-list/api.ts";
 
@@ -21,15 +21,15 @@ import type {
     ResourceInstanceResult,
 } from "@/arches_component_lab/datatypes/resource-instance/types.ts";
 
-const { nodeAlias, graphSlug, value } = defineProps<{
+const props = defineProps<{
     nodeAlias: string;
     graphSlug: string;
-    value: ResourceInstanceListValue | null | undefined;
+    value: ResourceInstanceListValue;
 }>();
 
 const { $gettext } = useGettext();
 
-const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidget config
+const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidgetData config
 
 const options = ref<ResourceInstanceReference[]>([]);
 const isLoading = ref(false);
@@ -40,8 +40,8 @@ const fetchError = ref<string | null>(null);
 const resourceResultsCurrentCount = computed(() => options.value.length);
 
 const initialValueFromTileData = computed(() => {
-    if (value?.details) {
-        return value.details.map((option) => {
+    if (props.value?.details) {
+        return props.value.details.map((option) => {
             return option.resource_id;
         });
     }
@@ -53,8 +53,8 @@ watchEffect(() => {
 });
 
 function onFilter(event: MultiSelectFilterEvent) {
-    if (value?.details) {
-        options.value = value.details;
+    if (props.value?.details) {
+        options.value = props.value.details;
     } else {
         options.value = [];
     }
@@ -67,11 +67,11 @@ async function getOptions(page: number, filterTerm?: string) {
         isLoading.value = true;
 
         const resourceData = await fetchRelatableResources(
-            graphSlug,
-            nodeAlias,
+            props.graphSlug,
+            props.nodeAlias,
             page,
             filterTerm,
-            value?.details,
+            props.value?.details,
         );
 
         const references = resourceData.data.map(
@@ -134,10 +134,17 @@ function getOption(value: string): ResourceInstanceReference | undefined {
     return options.value.find((option) => option.resource_id == value);
 }
 
-function resolver(event: FormFieldResolverOptions) {
-    return event.value.map((resourceId: string) => {
+function transformValueForForm(event: FormFieldResolverOptions) {
+    const options = event.value.map((resourceId: string) => {
         return getOption(resourceId);
     });
+    return {
+        display_value: options
+            .map((option: ResourceInstanceReference) => option?.display_value)
+            .join(", "),
+        node_value: event.value,
+        details: options,
+    };
 }
 </script>
 
@@ -145,8 +152,7 @@ function resolver(event: FormFieldResolverOptions) {
     <GenericFormField
         v-bind="$attrs"
         :node-alias="nodeAlias"
-        :initial-value="initialValueFromTileData"
-        :resolver="resolver"
+        :transform-value="transformValueForForm"
     >
         <MultiSelect
             display="chip"
@@ -156,6 +162,7 @@ function resolver(event: FormFieldResolverOptions) {
             :filter-placeholder="$gettext('Filter Resources')"
             :fluid="true"
             :loading="isLoading"
+            :model-value="initialValueFromTileData"
             :options="options"
             :placeholder="$gettext('Select Resources')"
             :reset-filter-on-hide="true"

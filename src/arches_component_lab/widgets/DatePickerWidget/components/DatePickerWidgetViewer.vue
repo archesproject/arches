@@ -3,7 +3,7 @@ import type { DateDatatypeCardXNodeXWidgetData } from "@/arches_component_lab/da
 import type { AliasedTileNodeValue } from "@/arches_component_lab/types";
 
 defineProps<{
-    value: AliasedTileNodeValue | null | undefined;
+    value: AliasedTileNodeValue;
     cardXNodeXWidgetData: DateDatatypeCardXNodeXWidgetData;
 }>();
 </script>

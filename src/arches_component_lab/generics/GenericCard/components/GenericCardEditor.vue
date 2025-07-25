@@ -7,27 +7,22 @@ import Button from "primevue/button";
 import Message from "primevue/message";
 import Skeleton from "primevue/skeleton";
 
-import GenericWidget from "@/arches_component_lab/generic/GenericWidget/GenericWidget.vue";
+import GenericWidget from "@/arches_component_lab/generics/GenericWidget/GenericWidget.vue";
 
-import { upsertTile } from "@/arches_component_lab/cards/api.ts";
+import { upsertTile } from "@/arches_component_lab/generics/GenericCard/api.ts";
 import { EDIT } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
-import type { AliasedTileData } from "@/arches_component_lab/cards/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types";
+import type {
+    AliasedTileNodeValue,
+    CardXNodeXWidgetData,
+} from "@/arches_component_lab/types.ts";
+import type { AliasedTileData } from "@/arches_component_lab/generics/GenericCard/types.ts";
+import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const { $gettext } = useGettext();
 
-const {
-    cardXNodeXWidgetData,
-    graphSlug,
-    mode,
-    nodegroupAlias,
-    resourceInstanceId,
-    shouldShowFormButtons,
-    tileData,
-} = defineProps<{
-    cardXNodeXWidgetData: CardXNodeXWidget[];
+const props = defineProps<{
+    cardXNodeXWidgetData: CardXNodeXWidgetData[];
     graphSlug: string;
     mode: WidgetMode;
     nodegroupAlias: string;
@@ -46,11 +41,13 @@ const formKey = ref(0);
 const isSaving = ref(false);
 const saveError = ref<Error>();
 
-const originalAliasedData = structuredClone(tileData?.aliased_data || {});
-const aliasedData = reactive(structuredClone(tileData?.aliased_data || {}));
+const originalAliasedData = structuredClone(props.tileData?.aliased_data || {});
+const aliasedData = reactive(
+    structuredClone(props.tileData?.aliased_data || {}),
+);
 
 const widgetDirtyStates = reactive(
-    cardXNodeXWidgetData.reduce<Record<string, boolean>>(
+    props.cardXNodeXWidgetData.reduce<Record<string, boolean>>(
         (dirtyStatesMap, widgetDatum) => {
             dirtyStatesMap[widgetDatum.node.alias] = false;
             return dirtyStatesMap;
@@ -63,7 +60,7 @@ watch(
     aliasedData,
     () => {
         emit("update:tileData", {
-            ...tileData,
+            ...props.tileData,
             aliased_data: toRaw(aliasedData),
         });
     },
@@ -78,18 +75,8 @@ watch(
     { deep: true },
 );
 
-// TODO: should we force widgets to coerce their values to match aliased data?
-// TODO: update this logic with querysets empty tile
-function onUpdateWidgetValue(nodeAlias: string, value: unknown) {
-    if (!aliasedData[nodeAlias]) {
-        aliasedData[nodeAlias] = {
-            node_value: value,
-            display_value: "",
-            details: [],
-        };
-    } else {
-        aliasedData[nodeAlias].node_value = value;
-    }
+function onUpdateWidgetValue(nodeAlias: string, value: AliasedTileNodeValue) {
+    aliasedData[nodeAlias] = value;
 }
 
 function resetWidgetDirtyStates() {
@@ -111,14 +98,14 @@ async function save() {
 
     try {
         const updatedTileData = await upsertTile(
-            graphSlug,
-            nodegroupAlias,
+            props.graphSlug,
+            props.nodegroupAlias,
             {
-                ...(tileData as AliasedTileData),
+                ...(props.tileData as AliasedTileData),
                 aliased_data: toRaw(aliasedData),
             },
-            tileData?.tileid,
-            resourceInstanceId,
+            props.tileData?.tileid,
+            props.resourceInstanceId,
         );
 
         Object.assign(
@@ -132,8 +119,8 @@ async function save() {
 
         resetWidgetDirtyStates();
 
+        // nextTick ensures `save` is emitted after `update:tileData`
         nextTick(() => {
-            // nextTick ensures `save` is emitted after `update:tileData`
             emit("save", updatedTileData);
         });
     } catch (error) {
@@ -161,7 +148,6 @@ defineExpose({ save });
         <Form
             :key="formKey"
             class="form"
-            @submit="save"
         >
             <template
                 v-for="cardXNodeXWidgetDatum in cardXNodeXWidgetData"
@@ -191,9 +177,9 @@ defineExpose({ save });
                 style="display: flex"
             >
                 <Button
-                    type="submit"
                     :disabled="isSaving"
                     :label="$gettext('Save')"
+                    @click="save"
                 />
 
                 <Button

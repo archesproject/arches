@@ -1,10 +1,10 @@
 import arches from "arches";
 import Cookies from "js-cookie";
 
-import { extractFileEntriesFromPayload } from "@/arches_component_lab/cards/utils.ts";
+import { extractFileEntriesFromPayload } from "@/arches_component_lab/generics/GenericCard/utils.ts";
 
-import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
-import type { AliasedTileData } from "@/arches_component_lab/cards/types.ts";
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type { AliasedTileData } from "@/arches_component_lab/generics/GenericCard/types.ts";
 
 export async function fetchTileStructure(
     graphSlug: string,
@@ -48,7 +48,7 @@ export async function fetchTileData(
 export async function fetchCardXNodeXWidgetDataFromNodeGroup(
     graphSlug: string,
     nodegroupAlias: string,
-): Promise<CardXNodeXWidget[]> {
+): Promise<CardXNodeXWidgetData[]> {
     const response = await fetch(
         arches.urls.api_card_x_node_x_widget_list_from_nodegroup(
             graphSlug,

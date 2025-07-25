@@ -5,7 +5,7 @@ import { useGettext } from "vue3-gettext";
 
 import Select from "primevue/select";
 
-import GenericFormField from "@/arches_component_lab/generic/GenericFormField.vue";
+import GenericFormField from "@/arches_component_lab/generics/GenericFormField.vue";
 
 import { fetchRelatableResources } from "@/arches_component_lab/datatypes/resource-instance/api.ts";
 
@@ -19,15 +19,15 @@ import type {
     ResourceInstanceValue,
 } from "@/arches_component_lab/datatypes/resource-instance/types.ts";
 
-const { nodeAlias, graphSlug, value } = defineProps<{
+const props = defineProps<{
     nodeAlias: string;
     graphSlug: string;
-    value: ResourceInstanceValue | null | undefined;
+    value: ResourceInstanceValue;
 }>();
 
 const { $gettext } = useGettext();
 
-const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidget config
+const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidgetData config
 
 const options = ref<ResourceInstanceReference[]>([]);
 const isLoading = ref(false);
@@ -42,8 +42,8 @@ watchEffect(() => {
 });
 
 function onFilter(event: SelectFilterEvent) {
-    if (value?.details) {
-        options.value = value.details;
+    if (props.value?.details) {
+        options.value = props.value.details;
     } else {
         options.value = [];
     }
@@ -56,11 +56,11 @@ async function getOptions(page: number, filterTerm?: string) {
         isLoading.value = true;
 
         const resourceData = await fetchRelatableResources(
-            graphSlug,
-            nodeAlias,
+            props.graphSlug,
+            props.nodeAlias,
             page,
             filterTerm,
-            value?.details[0].resource_id,
+            props.value?.details[0].resource_id,
         );
 
         const references = resourceData.data.map(
@@ -123,8 +123,14 @@ function getOption(value: string): ResourceInstanceReference | undefined {
     return options.value.find((option) => option.resource_id == value);
 }
 
-function resolver(event: FormFieldResolverOptions) {
-    return getOption(event.value);
+function transformValueForForm(event: FormFieldResolverOptions) {
+    const option = getOption(event.value);
+
+    return {
+        display_value: option ? option.display_value : "",
+        node_value: event.value ? [event.value] : [],
+        details: option ? [option] : [],
+    };
 }
 </script>
 
@@ -132,8 +138,7 @@ function resolver(event: FormFieldResolverOptions) {
     <GenericFormField
         v-bind="$attrs"
         :node-alias="nodeAlias"
-        :initial-value="value?.details[0].resource_id"
-        :resolver="resolver"
+        :transform-value="transformValueForForm"
     >
         <Select
             display="chip"
@@ -143,6 +148,7 @@ function resolver(event: FormFieldResolverOptions) {
             :filter-placeholder="$gettext('Filter Resources')"
             :fluid="true"
             :loading="isLoading"
+            :model-value="value?.details?.[0]?.resource_id"
             :options="options"
             :placeholder="$gettext('Select Resources')"
             :reset-filter-on-hide="true"

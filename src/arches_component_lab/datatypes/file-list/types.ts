@@ -1,4 +1,4 @@
-import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { AliasedTileNodeValue } from "@/arches_component_lab/types.ts";
 
 export interface FileReference {
@@ -20,8 +20,8 @@ export interface FileReference {
     description: string;
     title: string;
 }
-export interface FileListCardXNodeXWidgetData extends CardXNodeXWidget {
-    config: CardXNodeXWidget["config"] & {
+export interface FileListCardXNodeXWidgetData extends CardXNodeXWidgetData {
+    config: CardXNodeXWidgetData["config"] & {
         acceptedFiles: string;
         maxFiles: number;
         maxFilesize: number;

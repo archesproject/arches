@@ -5,37 +5,39 @@ import { useGettext } from "vue3-gettext";
 import Message from "primevue/message";
 import Skeleton from "primevue/skeleton";
 
-import DefaultCardEditor from "@/arches_component_lab/cards/DefaultCard/components/DefaultCardEditor.vue";
-import DefaultCardViewer from "@/arches_component_lab/cards/DefaultCard/components/DefaultCardViewer.vue";
+import GenericCardEditor from "@/arches_component_lab/generics/GenericCard/components/GenericCardEditor.vue";
+import GenericCardViewer from "@/arches_component_lab/generics/GenericCard/components/GenericCardViewer.vue";
 
-import { fetchTileData } from "@/arches_component_lab/cards/api.ts";
-import { fetchCardXNodeXWidgetDataFromNodeGroup } from "@/arches_component_lab/cards/api.ts";
+import {
+    fetchTileData,
+    fetchCardXNodeXWidgetDataFromNodeGroup,
+} from "@/arches_component_lab/generics/GenericCard/api.ts";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
-import type { AliasedTileData } from "@/arches_component_lab/cards/types.ts";
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type { AliasedTileData } from "@/arches_component_lab/generics/GenericCard/types";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const { $gettext } = useGettext();
 
-const {
-    mode,
-    nodegroupAlias,
-    graphSlug,
-    resourceInstanceId,
-    shouldShowFormButtons = true,
-    tileData,
-    tileId,
-} = defineProps<{
-    mode: WidgetMode;
-    nodegroupAlias: string;
-    graphSlug: string;
-    resourceInstanceId?: string | null;
-    shouldShowFormButtons?: boolean;
-    tileData?: AliasedTileData;
-    tileId?: string | null;
-}>();
+const props = withDefaults(
+    defineProps<{
+        mode: WidgetMode;
+        nodegroupAlias: string;
+        graphSlug: string;
+        resourceInstanceId?: string | null;
+        shouldShowFormButtons?: boolean;
+        tileData?: AliasedTileData;
+        tileId?: string | null;
+    }>(),
+    {
+        shouldShowFormButtons: true,
+        resourceInstanceId: undefined,
+        tileData: undefined,
+        tileId: undefined,
+    },
+);
 
 const emit = defineEmits([
     "update:widgetDirtyStates",
@@ -43,10 +45,9 @@ const emit = defineEmits([
     "save",
 ]);
 
-const isLoading = ref(false);
+const isLoading = ref(true);
 const configurationError = ref();
-
-const cardXNodeXWidgetData = ref<CardXNodeXWidget[]>([]);
+const cardXNodeXWidgetData = ref<CardXNodeXWidgetData[]>([]);
 const aliasedTileData = ref<AliasedTileData>();
 
 const defaultCardEditor = useTemplateRef("defaultCardEditor");
@@ -56,9 +57,12 @@ watchEffect(async () => {
 
     try {
         const cardXNodeXWidgetDataPromise =
-            fetchCardXNodeXWidgetDataFromNodeGroup(graphSlug, nodegroupAlias);
+            fetchCardXNodeXWidgetDataFromNodeGroup(
+                props.graphSlug,
+                props.nodegroupAlias,
+            );
 
-        if (!tileData && !tileId && !resourceInstanceId) {
+        if (!props.tileData && !props.tileId && !props.resourceInstanceId) {
             throw new Error(
                 $gettext(
                     "No tile data, tile ID, or resource instance ID provided.",
@@ -66,20 +70,20 @@ watchEffect(async () => {
             );
         }
 
-        if (tileData) {
-            aliasedTileData.value = structuredClone(tileData);
-        } else if (tileId) {
+        if (props.tileData) {
+            aliasedTileData.value = props.tileData;
+        } else if (props.tileId) {
             const aliasedTileDataPromise = fetchTileData(
-                graphSlug,
-                nodegroupAlias,
-                tileId,
+                props.graphSlug,
+                props.nodegroupAlias,
+                props.tileId,
             );
             aliasedTileData.value = await aliasedTileDataPromise;
-        } else if (resourceInstanceId) {
+        } else if (props.resourceInstanceId) {
             // TODO: Replace with querysets call for empty tile structure
             // @ts-expect-error this is an incomplete tile structure
             aliasedTileData.value = {
-                resourceinstance: resourceInstanceId,
+                resourceinstance: props.resourceInstanceId,
                 aliased_data: {},
             };
         }
@@ -116,7 +120,7 @@ defineExpose({
         <template v-else>
             <span>{{ cardXNodeXWidgetData[0].card.name }}</span>
 
-            <DefaultCardEditor
+            <GenericCardEditor
                 v-if="mode === EDIT"
                 ref="defaultCardEditor"
                 v-model:tile-data="aliasedTileData"
@@ -132,7 +136,7 @@ defineExpose({
                 "
                 @update:tile-data="emit('update:tileData', $event)"
             />
-            <DefaultCardViewer
+            <GenericCardViewer
                 v-else-if="mode === VIEW"
                 v-model:tile-data="aliasedTileData"
                 :card-x-node-x-widget-data="cardXNodeXWidgetData"

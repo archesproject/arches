@@ -1,4 +1,4 @@
-import type { AliasedTileData } from "@/arches_component_lab/cards/types.ts";
+import type { AliasedTileData } from "@/arches_component_lab/generics/GenericCard/types.ts";
 import type { AliasedTileNodeValue } from "@/arches_component_lab/types.ts";
 
 export function extractFileEntriesFromPayload(
