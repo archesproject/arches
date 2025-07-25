@@ -5,7 +5,7 @@ import { Image, Galleria } from "primevue";
 import type { FileListValue } from "@/arches_component_lab/datatypes/file-list/types";
 
 const props = defineProps<{
-    value: FileListValue | null | undefined;
+    value: FileListValue;
 }>();
 
 const imageData = computed(() => {

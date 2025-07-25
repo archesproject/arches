@@ -5,7 +5,7 @@ import type { URLValue } from "@/arches_component_lab/datatypes/url/types.ts";
 const { $gettext } = useGettext();
 
 defineProps<{
-    value?: URLValue | null | undefined;
+    value: URLValue;
 }>();
 </script>
 

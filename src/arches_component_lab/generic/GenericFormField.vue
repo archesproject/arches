@@ -8,7 +8,7 @@ import type { FormFieldResolverOptions } from "@primevue/forms";
 
 const slots = useSlots();
 
-const { nodeAlias, validateValue, transformValue } = defineProps<{
+const props = defineProps<{
     nodeAlias: string;
     validateValue?: (event: unknown) => void;
     transformValue?: (
@@ -25,10 +25,7 @@ const formFieldRef = useTemplateRef("formField");
 
 const derivedInitialValue = computed(() => {
     const defaultSlotNodes = slots.default?.();
-    const firstVNodeProps = defaultSlotNodes?.[0].props as Record<
-        string,
-        unknown
-    >;
+    const firstVNodeProps = defaultSlotNodes?.[0].props;
 
     if (!firstVNodeProps) {
         return null;
@@ -38,8 +35,8 @@ const derivedInitialValue = computed(() => {
 });
 
 function internalValidate(event: unknown) {
-    if (validateValue) {
-        validateValue(event);
+    if (props.validateValue) {
+        props.validateValue(event);
     } else {
         console.log("validateValue", event);
     }
@@ -48,8 +45,8 @@ function internalValidate(event: unknown) {
 function internalResolver(event: FormFieldResolverOptions) {
     let value;
 
-    if (transformValue) {
-        value = transformValue(event);
+    if (props.transformValue) {
+        value = props.transformValue(event);
     } else {
         value = event.value;
     }

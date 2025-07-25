@@ -2,7 +2,7 @@
 import type { NonLocalizedTextValue } from "@/arches_component_lab/datatypes/non-localized-text/types";
 
 defineProps<{
-    value: NonLocalizedTextValue | null | undefined;
+    value: NonLocalizedTextValue;
 }>();
 </script>
 
