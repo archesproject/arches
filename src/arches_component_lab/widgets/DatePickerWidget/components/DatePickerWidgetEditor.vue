@@ -47,11 +47,11 @@ function transformValue(event: FormFieldResolverOptions) {
             node_value: formattedDate,
             details: [],
         };
-    } catch (error) {
+    } catch (_error) {
         return {
             display_value: event.value,
             node_value: event.value,
-            details: [error],
+            details: [],
         };
     }
 }
