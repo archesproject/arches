@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, useTemplateRef, watchEffect } from "vue";
+import { onMounted, ref, useTemplateRef } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Message from "primevue/message";
@@ -45,7 +45,7 @@ const emit = defineEmits([
     "save",
 ]);
 
-const isLoading = ref(false);
+const isLoading = ref(true);
 const configurationError = ref();
 
 const cardXNodeXWidgetData = ref<CardXNodeXWidgetData[]>([]);
@@ -53,9 +53,7 @@ const aliasedTileData = ref<AliasedTileData>();
 
 const defaultCardEditor = useTemplateRef("defaultCardEditor");
 
-watchEffect(async () => {
-    isLoading.value = true;
-
+onMounted(async () => {
     try {
         const cardXNodeXWidgetDataPromise =
             fetchCardXNodeXWidgetDataFromNodeGroup(graphSlug, nodegroupAlias);
