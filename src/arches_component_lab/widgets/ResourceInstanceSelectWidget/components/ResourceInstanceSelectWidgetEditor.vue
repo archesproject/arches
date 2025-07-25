@@ -60,7 +60,7 @@ async function getOptions(page: number, filterTerm?: string) {
             props.nodeAlias,
             page,
             filterTerm,
-            props.value?.details[0].resource_id,
+            props.value?.details?.[0]?.resource_id,
         );
 
         const references = resourceData.data.map(
@@ -138,7 +138,7 @@ function transformValueForForm(event: FormFieldResolverOptions) {
     <GenericFormField
         v-bind="$attrs"
         :node-alias="nodeAlias"
-        :transform-value="transformValueForForm"
+        :transform-value-for-form="transformValueForForm"
     >
         <Select
             display="chip"
