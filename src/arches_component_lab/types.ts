@@ -21,6 +21,7 @@ export interface CardXNodeXWidgetData {
     sortorder: number;
     visible: boolean;
     widget: {
+        widgetid: string;
         component: string;
     };
 }

@@ -9,6 +9,8 @@ from arches.app.utils.response import JSONResponse
 # TODO: Replace with DataTypeFactory from arches_querysets
 from arches.app.datatypes.datatypes import DataTypeFactory
 
+from arches_component_lab.models import WidgetMapping
+
 
 def serialize_card_x_node_x_widget(widget, datatype_factory):
     data = JSONDeserializer().deserialize(JSONSerializer().serialize(widget))
@@ -72,6 +74,12 @@ class CardXNodeXWidgetView(View):
         serialized = serialize_card_x_node_x_widget(
             card_x_node_x_widget, DataTypeFactory()
         )
+
+        # Updates component path to declared arches_component_lab widget path
+        serialized["widget"]["component"] = WidgetMapping.objects.get(
+            widget_id=serialized["widget"]["widgetid"]
+        ).component
+
         return JSONResponse(serialized)
 
 
@@ -125,4 +133,12 @@ class CardXNodeXWidgetListFromNodegroupView(View):
             serialize_card_x_node_x_widget(widget_instance, datatype_factory)
             for widget_instance in widget_instances
         ]
+
+        # Update component paths to declared arches_component_lab widget paths
+        widget_mappings = WidgetMapping.objects.all()
+        for serialized_datum in serialized_data:
+            serialized_datum["widget"]["component"] = widget_mappings.get(
+                widget_id=serialized_datum["widget"]["widgetid"]
+            ).component
+
         return JSONResponse(serialized_data)
