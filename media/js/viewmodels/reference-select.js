@@ -39,19 +39,22 @@ export default function(params) {
         if (!(ko.unwrap(value) instanceof Array)) {
             return true;
         }
-        const valueUris = ko.unwrap(value).map(val=>ko.unwrap(val.uri));
-        return JSON.stringify(selection) !== JSON.stringify(valueUris);
+        const valueIds = ko.unwrap(value).map(val=>{
+            const listItemLabels = ko.unwrap(val.labels);
+            return ko.unwrap(listItemLabels[0]?.list_item_id);
+        });
+        return JSON.stringify(selection) !== JSON.stringify(valueIds);
     };
 
     this.selectionValue.subscribe(selection => {
         if (selection) {
             if (!(selection instanceof Array)) { selection = [selection]; }
             if (self.valueAndSelectionDiffer(self.value, selection)) {
-                const newItem = selection.map(uri => {
+                const newItem = selection.map(id => {
                     return {
-                        "labels": NAME_LOOKUP[uri].labels,
-                        "list_id": NAME_LOOKUP[uri]["list_id"],
-                        "uri": uri
+                        "labels": NAME_LOOKUP[id].labels,
+                        "list_id": NAME_LOOKUP[id]["list_id"],
+                        "uri": NAME_LOOKUP[id]["uri"],
                     };
                 });
                 self.value(newItem);
@@ -63,7 +66,10 @@ export default function(params) {
 
     this.value.subscribe(val => {
         if (val?.length) {
-            self.selectionValue(val.map(item=>ko.unwrap(item.uri)));
+            self.selectionValue(val.map(item=>{
+                const listItemLabels = ko.unwrap(item.labels);
+                return ko.unwrap(listItemLabels[0]?.list_item_id);
+            }));
         } else {
             self.selectionValue(null);
         }
@@ -89,8 +95,8 @@ export default function(params) {
             processResults: function(data) {
                 const items = data.items; 
                 items.forEach(item => {
-                    item["list_id"] = item.id;
-                    item.id = item.uri;
+                    item["list_id"] = item.list_id;
+                    item.uri = item.uri;
                     item.disabled = item.guide;
                     item.labels = item.values.filter(val => self.isLabel(val));
                 });
@@ -110,15 +116,20 @@ export default function(params) {
 
             if (item.uri) {
                 const text = self.getPrefLabel(item.labels) || arches.translations.searching + '...';
-                NAME_LOOKUP[item.uri] = {"prefLabel": text, "labels": item.labels, "list_id": item.list_id};
+                NAME_LOOKUP[item.labels[0].list_item_id] = {
+                    "prefLabel": text,
+                    "labels": item.labels,
+                    "list_id": item.list_id,
+                    "uri": item.uri,
+                };
                 return indentation + text;
             }
         },
         templateSelection: function(item) {
             if (!item.uri) { // option has a different shape when coming from initSelection vs templateResult
-                return item.text; 
+                return item.text;
             } else {
-                return NAME_LOOKUP[item.uri]["prefLabel"];
+                return NAME_LOOKUP[item.labels[0].list_item_id]["prefLabel"];
             }
         },
         escapeMarkup: function(markup) { return markup; },
@@ -127,11 +138,13 @@ export default function(params) {
 
             const setSelectionData = function(data) {
                 const valueData = koMapping.toJS(self.value());
+
                 valueData.forEach(function(value) {
-                    NAME_LOOKUP[value.uri] = {
+                    NAME_LOOKUP[value.labels[0].list_item_id] = {
                             "prefLabel": self.getPrefLabel(value.labels),
                             "labels": value.labels,
                             "list_id": value.list_id,
+                            "uri": value.uri,
                         };
                 });
     
@@ -139,12 +152,12 @@ export default function(params) {
                     valueData.forEach(function(data) {
                         const option = new Option(
                             self.getPrefLabel(data.labels),
-                            data.uri,
+                            data.labels[0].list_item_id,
                             true, 
                             true
                         );
                         $(el).append(option);
-                        self.selectionValue().push(data.uri);
+                        self.selectionValue().push(data.labels[0].list_item_id);
                     });
                     self.select2Config.initComplete = true;
                 }
