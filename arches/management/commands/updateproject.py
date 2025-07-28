@@ -39,6 +39,8 @@ class Command(BaseCommand):  # pragma: no cover
             self.stdout.write("Operation aborted.")
 
     def update_to_v8_1(self):
+        self.stdout.write("Updating project to version 8.1...")
+
         # Replaces eslint.config.mjs
         self.stdout.write("Updating eslint.config.mjs...")
 
@@ -55,6 +57,8 @@ class Command(BaseCommand):  # pragma: no cover
         self.stdout.write("Project successfully updated to version 8.1")
 
     def update_to_v8(self):
+        self.stdout.write("Updating project to version 8.0...")
+
         # Removes:
         #   `.frontend-configuration-settings.json`
         #   `.tsconfig-paths.json`
