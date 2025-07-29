@@ -40,13 +40,6 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
                 case str():
                     # TODO: handle multiple graph configs, requires db?
                     transformed.append(self.from_id_string(inner_val))
-                case dict():
-                    # TODO: reassess if needed.
-                    # TODO: handle multiple graph configs, requires db?
-                    if interchange_value := inner_val.get("resource_id"):
-                        transformed.append(self.from_id_string(interchange_value))
-                    else:
-                        transformed.append(inner_val)
                 case _:
                     transformed.append(inner_val)
         return transformed
