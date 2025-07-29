@@ -2,7 +2,7 @@ import type { AliasedTileNodeValue } from "@/arches_component_lab/types.ts";
 
 export interface AliasedTileData {
     aliased_data: {
-        [key: string]: AliasedTileNodeValue;
+        [key: string]: AliasedTileNodeValue | AliasedTileData;
     };
     nodegroup: string;
     parenttile: string | null;
