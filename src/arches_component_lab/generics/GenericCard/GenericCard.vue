@@ -15,8 +15,10 @@ import {
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { AliasedTileData } from "@/arches_component_lab/generics/GenericCard/types";
+import type {
+    AliasedTileData,
+    CardXNodeXWidgetData,
+} from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const { $gettext } = useGettext();

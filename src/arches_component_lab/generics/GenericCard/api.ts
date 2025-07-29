@@ -3,8 +3,10 @@ import Cookies from "js-cookie";
 
 import { extractFileEntriesFromPayload } from "@/arches_component_lab/generics/GenericCard/utils.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { AliasedTileData } from "@/arches_component_lab/generics/GenericCard/types.ts";
+import type {
+    AliasedTileData,
+    CardXNodeXWidgetData,
+} from "@/arches_component_lab/types.ts";
 
 export async function fetchTileStructure(
     graphSlug: string,

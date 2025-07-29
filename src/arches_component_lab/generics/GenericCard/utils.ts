@@ -1,14 +1,13 @@
-import type { AliasedTileData } from "@/arches_component_lab/generics/GenericCard/types.ts";
-import type { AliasedTileNodeValue } from "@/arches_component_lab/types.ts";
+import type { AliasedTileData } from "@/arches_component_lab/types.ts";
 
 export function extractFileEntriesFromPayload(
     payload: AliasedTileData,
 ): { file: File; nodeId: string }[] {
     const collectedEntries: { file: File; nodeId: string }[] = [];
 
-    function traverseObject(currentObject: {
-        [key: string]: AliasedTileNodeValue | AliasedTileData;
-    }): void {
+    function traverseObject(
+        currentObject: AliasedTileData["aliased_data"],
+    ): void {
         for (const [_key, value] of Object.entries(currentObject)) {
             if (value instanceof File) {
                 const nodeId = currentObject.node_id;
@@ -23,19 +22,13 @@ export function extractFileEntriesFromPayload(
                 for (const arrayItem of value) {
                     if (arrayItem && typeof arrayItem === "object") {
                         traverseObject(
-                            arrayItem as {
-                                [key: string]:
-                                    | AliasedTileNodeValue
-                                    | AliasedTileData;
-                            },
+                            arrayItem as unknown as AliasedTileData["aliased_data"],
                         );
                     }
                 }
             } else if (value && typeof value === "object") {
                 traverseObject(
-                    value as unknown as {
-                        [key: string]: AliasedTileNodeValue | AliasedTileData;
-                    },
+                    value as unknown as AliasedTileData["aliased_data"],
                 );
             }
         }
