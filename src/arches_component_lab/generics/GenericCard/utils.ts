@@ -7,7 +7,7 @@ export function extractFileEntriesFromPayload(
     const collectedEntries: { file: File; nodeId: string }[] = [];
 
     function traverseObject(currentObject: {
-        [key: string]: AliasedTileNodeValue;
+        [key: string]: AliasedTileNodeValue | AliasedTileData;
     }): void {
         for (const [_key, value] of Object.entries(currentObject)) {
             if (value instanceof File) {
@@ -24,14 +24,18 @@ export function extractFileEntriesFromPayload(
                     if (arrayItem && typeof arrayItem === "object") {
                         traverseObject(
                             arrayItem as {
-                                [key: string]: AliasedTileNodeValue;
+                                [key: string]:
+                                    | AliasedTileNodeValue
+                                    | AliasedTileData;
                             },
                         );
                     }
                 }
             } else if (value && typeof value === "object") {
                 traverseObject(
-                    value as unknown as { [key: string]: AliasedTileNodeValue },
+                    value as unknown as {
+                        [key: string]: AliasedTileNodeValue | AliasedTileData;
+                    },
                 );
             }
         }
