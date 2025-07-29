@@ -6,11 +6,11 @@ import ItemImages from "@/arches_controlled_lists/components/editor/ItemImages.v
 import ItemType from "@/arches_controlled_lists/components/editor/ItemType.vue";
 import ItemURI from "@/arches_controlled_lists/components/editor/ItemURI.vue";
 import ValueEditor from "@/arches_controlled_lists/components/editor/ValueEditor.vue";
-
-import { ALT_LABEL, PREF_LABEL } from "@/arches_component_lab/constants.ts";
 import {
     displayedRowKey,
     itemKey,
+    ALT_LABEL,
+    PREF_LABEL,
     NOTE,
 } from "@/arches_controlled_lists/constants.ts";
 

@@ -1,9 +1,9 @@
 import type { InjectionKey, Ref } from "vue";
-import type { Language } from "@/arches_component_lab/types";
 import type {
     ControlledListItem,
     DisplayedRowRefAndSetter,
     IsEditingRefAndSetter,
+    Language,
 } from "@/arches_controlled_lists/types";
 
 // Injection keys
@@ -24,6 +24,10 @@ export const PRIMARY = "primary";
 export const SECONDARY = "secondary";
 export const SUCCESS = "success";
 export const DEFAULT_ERROR_TOAST_LIFE = 8000;
+
+export const PREF_LABEL = "prefLabel";
+export const ALT_LABEL = "altLabel";
+export const HIDDEN_LABEL = "hiddenLabel";
 
 // Django model choices
 export const METADATA_CHOICES = {

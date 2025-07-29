@@ -2,16 +2,19 @@
 import { inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import { getItemLabel } from "@/arches_component_lab/utils.ts";
 import {
     itemKey,
     selectedLanguageKey,
     systemLanguageKey,
 } from "@/arches_controlled_lists/constants.ts";
 
+import { getItemLabel } from "@/arches_controlled_lists/utils.ts";
+
 import type { Ref } from "vue";
-import type { Language } from "@/arches_component_lab/types";
-import type { ControlledListItem } from "@/arches_controlled_lists/types";
+import type {
+    ControlledListItem,
+    Language,
+} from "@/arches_controlled_lists/types";
 
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 const systemLanguage = inject(systemLanguageKey) as Language;

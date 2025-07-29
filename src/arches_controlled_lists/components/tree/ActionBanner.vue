@@ -4,19 +4,21 @@ import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
 
-import { getItemLabel } from "@/arches_component_lab/utils.ts";
 import {
     selectedLanguageKey,
     systemLanguageKey,
     CONTRAST,
     SECONDARY,
 } from "@/arches_controlled_lists/constants.ts";
-import { shouldUseContrast } from "@/arches_controlled_lists/utils.ts";
+import {
+    getItemLabel,
+    shouldUseContrast,
+} from "@/arches_controlled_lists/utils.ts";
 
 import type { Ref } from "vue";
 import type { TreeSelectionKeys } from "primevue/tree";
 import type { TreeNode } from "primevue/treenode";
-import type { Language } from "@/arches_component_lab/types";
+import type { Language } from "@/arches_controlled_lists/types";
 
 const isMultiSelecting = defineModel<boolean>("isMultiSelecting", {
     required: true,

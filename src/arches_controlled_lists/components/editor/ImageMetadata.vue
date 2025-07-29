@@ -34,13 +34,13 @@ import AddMetadata from "@/arches_controlled_lists/components/editor/AddMetadata
 
 import type { Ref } from "vue";
 import type { DataTableRowEditInitEvent } from "primevue/datatable";
-import type { Language } from "@/arches_component_lab/types";
 import type {
     ControlledListItem,
     ControlledListItemImage,
     ControlledListItemImageMetadata,
     IsEditingRefAndSetter,
     LabeledChoice,
+    Language,
     NewOrExistingControlledListItemImageMetadata,
 } from "@/arches_controlled_lists/types";
 

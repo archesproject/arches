@@ -10,13 +10,14 @@ import Select from "primevue/select";
 import Textarea from "primevue/textarea";
 import { useToast } from "primevue/usetoast";
 
-import { ALT_LABEL, PREF_LABEL } from "@/arches_component_lab/constants.ts";
 import { deleteValue, upsertValue } from "@/arches_controlled_lists/api.ts";
 import {
+    ALT_LABEL,
     DEFAULT_ERROR_TOAST_LIFE,
     ERROR,
     NOTE,
     NOTE_CHOICES,
+    PREF_LABEL,
     isEditingKey,
     itemKey,
 } from "@/arches_controlled_lists/constants.ts";
@@ -29,10 +30,10 @@ import AddValue from "@/arches_controlled_lists/components/editor/AddValue.vue";
 
 import type { Ref } from "vue";
 import type { DataTableRowEditInitEvent } from "primevue/datatable";
-import type { Language } from "@/arches_component_lab/types";
 import type {
     ControlledListItem,
     IsEditingRefAndSetter,
+    Language,
     Value,
     ValueCategory,
     ValueType,

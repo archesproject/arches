@@ -7,7 +7,6 @@ import InputText from "primevue/inputtext";
 import ProgressSpinner from "primevue/progressspinner";
 import { useToast } from "primevue/usetoast";
 
-import { getItemLabel } from "@/arches_component_lab/utils.ts";
 import {
     createItem,
     createList,
@@ -26,6 +25,7 @@ import {
 import {
     dataIsNew,
     findNodeInTree,
+    getItemLabel,
     itemAsNode,
     listAsNode,
     nodeIsList,
@@ -37,11 +37,11 @@ import MoveRow from "@/arches_controlled_lists/components/tree/MoveRow.vue";
 import type { ComponentPublicInstance, Ref } from "vue";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree";
 import type { TreeNode } from "primevue/treenode";
-import type { Language } from "@/arches_component_lab/types";
 import type {
     ControlledList,
     ControlledListItem,
     IconLabels,
+    Language,
     MoveLabels,
     NewControlledListItem,
     NewValue,
