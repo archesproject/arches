@@ -375,8 +375,8 @@ class ListItem(models.Model):
             for value in self.list_item_values.all():
                 new_list_item_value = ListItemValue(
                     list_item=new_item,
-                    valuetype=value.valuetype,
-                    language=value.language,
+                    valuetype_id=value.valuetype_id,
+                    language_id=value.language_id,
                     value=value.value,
                 )
                 new_item_values.append(new_list_item_value)
