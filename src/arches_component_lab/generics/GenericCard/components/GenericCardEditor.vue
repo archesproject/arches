@@ -13,10 +13,10 @@ import { upsertTile } from "@/arches_component_lab/generics/GenericCard/api.ts";
 import { EDIT } from "@/arches_component_lab/widgets/constants.ts";
 
 import type {
-    AliasedTileNodeValue,
+    AliasedNodeData,
+    AliasedTileData,
     CardXNodeXWidgetData,
 } from "@/arches_component_lab/types.ts";
-import type { AliasedTileData } from "@/arches_component_lab/generics/GenericCard/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const { $gettext } = useGettext();
@@ -75,7 +75,7 @@ watch(
     { deep: true },
 );
 
-function onUpdateWidgetValue(nodeAlias: string, value: AliasedTileNodeValue) {
+function onUpdateWidgetValue(nodeAlias: string, value: AliasedNodeData) {
     aliasedData[nodeAlias] = value;
 }
 
@@ -104,7 +104,7 @@ async function save() {
                 ...(props.tileData as AliasedTileData),
                 aliased_data: toRaw(aliasedData),
             },
-            props.tileData?.tileid,
+            props.tileData?.tileid ? props.tileData.tileid : undefined,
             props.resourceInstanceId,
         );
 
