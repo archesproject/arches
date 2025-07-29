@@ -355,7 +355,7 @@ class ListItem(models.Model):
             child.get_child_uris(uris)
         return uris
 
-    def duplicate_under_new_parent(self, parents=None):
+    def duplicate_under_new_parent(self, parents):
         """
         Duplicates the ListItem and its children under the given parent(s),
         returning the new ListItem and its new ListItemValues, for implementer to save.
@@ -373,14 +373,12 @@ class ListItem(models.Model):
             )
             new_items.append(new_item)
             for value in self.list_item_values.all():
-                value.pk = None
                 new_list_item_value = ListItemValue(
                     list_item=new_item,
                     valuetype=value.valuetype,
                     language=value.language,
                     value=value.value,
                 )
-                value.list_item = new_item
                 new_item_values.append(new_list_item_value)
         return new_items, new_item_values
 

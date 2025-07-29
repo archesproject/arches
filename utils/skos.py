@@ -1,6 +1,6 @@
 import uuid
 import re
-from itertools import chain
+from collections import defaultdict
 from django.db.models import Q, prefetch_related_objects
 from django.db import transaction
 from rdflib import Namespace, RDF
@@ -21,11 +21,12 @@ class SKOSReader(SKOSReader):
         self.lists = {}
         self.list_items = {}
         self.list_item_values = []
-        self.relations = {}  # dict of list_item: [parent, ...]
+        self.relations = defaultdict(list)  # dict of list_item: [parent, ...]
 
     """
-    This class extends the SKOSReader to provide additional functionality
-    specific to the Arches controlled lists application.
+    This class extends the SKOSReader to import RDF graphs into Arches controlled lists.
+    It ingests SKOS ConceptSchemes as Lists, Concepts as ListItems, and their relationships
+    as ListItem parent-child relationships. It also handles ListItemValues for notes and labels.
     """
 
     def save_controlled_lists_from_skos(
@@ -147,13 +148,9 @@ class SKOSReader(SKOSReader):
 
                     elif predicate == SKOS.broader:
                         parent = self.generate_uuidv5_from_subject(baseuuid, object)
-                        if list_item not in self.relations:
-                            self.relations[list_item] = []
                         self.relations[list_item].append(parent)
                     elif predicate == SKOS.narrower:
                         child = self.generate_uuidv5_from_subject(baseuuid, object)
-                        if child not in self.relations:
-                            self.relations[child] = []
                         self.relations[child].append(list_item)
 
                     elif predicate == ARCHES.sortorder:
