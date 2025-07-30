@@ -21,6 +21,10 @@ class CardinalityNResourceInstanceField(ArrayField):
     pass
 
 
+class CardinalityNResourceInstanceListField(ArrayField):
+    pass
+
+
 class CardinalityNLocalizedStringField(ArrayField):
     pass
 

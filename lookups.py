@@ -3,6 +3,7 @@ from psycopg2.extensions import AsIs, QuotedString
 
 from arches_querysets.fields import (
     CardinalityNResourceInstanceField,
+    CardinalityNResourceInstanceListField,
     CardinalityNLocalizedStringField,
     CardinalityNTextField,
     ResourceInstanceListField,
@@ -108,6 +109,20 @@ class ArrayResourceInstanceId(JSONPathFilter, Lookup):
         params = (*lhs_params, *rhs_params)
         return (
             "TO_JSONB(%s) @? '$[*][*].resourceId ? (@ == \"%s\")'" % (lhs, rhs),
+            params,
+        )
+
+
+@CardinalityNResourceInstanceListField.register_lookup
+class ArrayAnyResourceInstanceId(JSONPathFilter, Lookup):
+    lookup_name = "ids_contain"
+
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
+        params = (*lhs_params, *rhs_params)
+        return (
+            "TO_JSONB(%s) @? '$[*][*][*].resourceId ? (@ == \"%s\")'" % (lhs, rhs),
             params,
         )
 

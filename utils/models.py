@@ -27,6 +27,7 @@ from arches.app.models.models import ResourceInstance, TileModel
 
 from arches_querysets.fields import (
     CardinalityNResourceInstanceField,
+    CardinalityNResourceInstanceListField,
     CardinalityNLocalizedStringField,
     CardinalityNTextField,
     LocalizedStringField,
@@ -63,8 +64,8 @@ class CardinalityNSubquery(ArraySubquery):
         match self.query.output_field:
             case ResourceInstanceField():
                 array_wrapper = CardinalityNResourceInstanceField
-            # case ResourceInstanceListField():
-            #     array_wrapper = CardinalityNResourceInstanceListField
+            case ResourceInstanceListField():
+                array_wrapper = CardinalityNResourceInstanceListField
             case LocalizedStringField():
                 array_wrapper = CardinalityNLocalizedStringField
             # case UUIDField():
