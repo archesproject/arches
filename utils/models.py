@@ -27,10 +27,11 @@ from arches.app.models.models import ResourceInstance, TileModel
 
 from arches_querysets.fields import (
     CardinalityNResourceInstanceField,
-    CardinalityNStringField,
+    CardinalityNLocalizedStringField,
+    CardinalityNTextField,
+    LocalizedStringField,
     ResourceInstanceField,
     ResourceInstanceListField,
-    StringField,
 )
 
 
@@ -46,7 +47,7 @@ DATATYPE_OUTPUT_FIELDS = {
     "number": FloatField(),
     "non-localized-string": TextField(),
     "date": DateTimeField(),
-    "string": StringField(),
+    "string": LocalizedStringField(),
     "url": JSONField(),
     "resource-instance": ResourceInstanceField(),
     "resource-instance-list": ResourceInstanceListField(),
@@ -64,14 +65,14 @@ class CardinalityNSubquery(ArraySubquery):
                 array_wrapper = CardinalityNResourceInstanceField
             # case ResourceInstanceListField():
             #     array_wrapper = CardinalityNResourceInstanceListField
-            case StringField():
-                array_wrapper = CardinalityNStringField
+            case LocalizedStringField():
+                array_wrapper = CardinalityNLocalizedStringField
             # case UUIDField():
             #     array_wrapper = CardinalityNUUIDField
             # case JSONField():  # concept-list, url
             #     array_wrapper = ArrayTextField
-            # case TextField():
-            #     array_wrapper = CardinalityNTextField
+            case TextField():
+                array_wrapper = CardinalityNTextField
             case _:
                 array_wrapper = ArrayField
         return array_wrapper(self.query.output_field)

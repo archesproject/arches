@@ -12,7 +12,7 @@ class ResourceInstanceListField(JSONField):
     pass
 
 
-class StringField(JSONField):
+class LocalizedStringField(JSONField):
     pass
 
 
@@ -21,7 +21,7 @@ class CardinalityNResourceInstanceField(ArrayField):
     pass
 
 
-class CardinalityNStringField(ArrayField):
+class CardinalityNLocalizedStringField(ArrayField):
     pass
 
 
