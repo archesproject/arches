@@ -19,6 +19,43 @@ from arches_querysets.utils.models import (
 NOT_PROVIDED = object()
 
 
+class NodeAliasValuesMixin:
+    def values(self, *args, **kwargs):
+        """Allow using a node_alias as a field name in a values() query."""
+        # This is just sugar so that the following works:
+        # .values("my_alias")
+        # rather than the long form:
+        # .values(my_alias=models.F("my_alias"))
+        args_copy = [*args]
+        kwargs_copy = {**kwargs}
+        fields_needing_promotion = [
+            arg
+            for arg in args
+            if arg in self.query.annotations
+            and arg not in self.query.annotation_select
+            and arg not in kwargs
+        ]
+        for field in fields_needing_promotion[:]:
+            # values() can promote aliases to annotations via **kwargs
+            kwargs_copy[field] = models.F(field)
+            args_copy.remove(field)
+        return super().values(*args_copy, **kwargs_copy)
+
+    def values_list(self, *args, **kwargs):
+        """Allow using a node_alias as a field name in a values_list() query."""
+        qs = self
+        if fields_needing_promotion := [
+            arg
+            for arg in args
+            if arg in self.query.annotations and arg not in self.query.annotation_select
+        ]:
+            # values_list() cannot promote aliases via kwargs like annotate().
+            qs = self.annotate(
+                **{field: models.F(field) for field in fields_needing_promotion}
+            )
+        return models.QuerySet.values_list(qs, *args, **kwargs)
+
+
 class TileTreeManager(models.Manager):
     def get_queryset(self):
         qs = super().get_queryset().select_related("nodegroup")
@@ -43,7 +80,7 @@ class TileTreeManager(models.Manager):
         return qs
 
 
-class TileTreeQuerySet(models.QuerySet):
+class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._as_representation = False
@@ -238,7 +275,7 @@ class TileTreeQuerySet(models.QuerySet):
         return clone
 
 
-class ResourceTileTreeQuerySet(models.QuerySet):
+class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._as_representation = False
@@ -255,7 +292,7 @@ class ResourceTileTreeQuerySet(models.QuerySet):
         as_representation=False,
         user=None,
     ):
-        """Annotates a ResourceTileTreeQuerySet with tile data unpacked
+        """Aliases a ResourceTileTreeQuerySet with tile data unpacked
         and mapped onto nodegroup aliases, e.g.:
 
         >>> concepts = ResourceTileTree.objects.get_tiles("concept")
