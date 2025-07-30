@@ -1,4 +1,4 @@
-"""Wrapping the Django fields allows registering lookups per datatype."""
+"""Wrapping the Django fields allows registering datatype-specific lookups."""
 
 from django.contrib.postgres.fields import ArrayField
 from django.db.models import JSONField
@@ -9,6 +9,10 @@ class ResourceInstanceField(JSONField):
 
 
 class ResourceInstanceListField(JSONField):
+    pass
+
+
+class ConceptListField(JSONField):
     pass
 
 
@@ -25,9 +29,21 @@ class CardinalityNResourceInstanceListField(ArrayField):
     pass
 
 
+class CardinalityNConceptListField(ArrayField):
+    pass
+
+
 class CardinalityNLocalizedStringField(ArrayField):
     pass
 
 
 class CardinalityNTextField(ArrayField):
+    pass
+
+
+class CardinalityNUUIDField(ArrayField):
+    pass
+
+
+class CardinalityNJSONField(ArrayField):
     pass

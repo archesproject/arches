@@ -26,10 +26,14 @@ from arches import VERSION as arches_version
 from arches.app.models.models import ResourceInstance, TileModel
 
 from arches_querysets.fields import (
+    CardinalityNConceptListField,
+    CardinalityNJSONField,
     CardinalityNResourceInstanceField,
     CardinalityNResourceInstanceListField,
     CardinalityNLocalizedStringField,
     CardinalityNTextField,
+    CardinalityNUUIDField,
+    ConceptListField,
     LocalizedStringField,
     ResourceInstanceField,
     ResourceInstanceListField,
@@ -40,9 +44,10 @@ DATATYPES_NEEDING_KEY_TEXT_TRANSFORM = {
     "non-localized-string",
     "date",
     "concept",
+    "concept-list",
     "node-value",
 }
-DATATYPES_NEEDING_CAST = {"boolean", "date", "number"}
+DATATYPES_NEEDING_CAST = {"boolean", "concept-list", "date", "number"}
 DATATYPE_OUTPUT_FIELDS = {
     "boolean": BooleanField(),
     "number": FloatField(),
@@ -53,7 +58,7 @@ DATATYPE_OUTPUT_FIELDS = {
     "resource-instance": ResourceInstanceField(),
     "resource-instance-list": ResourceInstanceListField(),
     "concept": UUIDField(),
-    "concept-list": JSONField(),
+    "concept-list": ConceptListField(),
     "node-value": UUIDField(),
 }
 
@@ -68,10 +73,12 @@ class CardinalityNSubquery(ArraySubquery):
                 array_wrapper = CardinalityNResourceInstanceListField
             case LocalizedStringField():
                 array_wrapper = CardinalityNLocalizedStringField
-            # case UUIDField():
-            #     array_wrapper = CardinalityNUUIDField
-            # case JSONField():  # concept-list, url
-            #     array_wrapper = ArrayTextField
+            case UUIDField():
+                array_wrapper = CardinalityNUUIDField
+            case ConceptListField():
+                array_wrapper = CardinalityNConceptListField
+            case JSONField():  # e.g. url
+                array_wrapper = CardinalityNJSONField
             case TextField():
                 array_wrapper = CardinalityNTextField
             case _:
@@ -121,7 +128,7 @@ def generate_node_alias_expressions(nodes, *, defer, only, model):
         if issubclass(model, ResourceInstance):
             tile_values_query = get_tile_values_for_resource(node, nodes)
         elif issubclass(model, TileModel):
-            # TODO: Investigate consistency with prior branch.
+            ### TODO: Investigate consistency with prior branch.
             if node.datatype in {"non-localized-string"}:
                 tile_values_query = KT(f"data__{node.pk}")
             else:
@@ -172,7 +179,6 @@ def get_tile_values_for_resource(node, permitted_nodes):
     )
 
     if many:
-        # return ArraySubquery(tile_query)
         return CardinalityNSubquery(tile_query)
     else:
         return tile_query
@@ -189,8 +195,6 @@ def get_node_value_expression(node, many: bool):
         default = Cast(default, output_field=output_field)
     else:
         default = ExpressionWrapper(default, output_field=output_field)
-    if many:
-        output_field = ArrayField(base_field=output_field)
     return Case(When(**{node_lookup: None}, then=Value(None)), default=default)
 
 
