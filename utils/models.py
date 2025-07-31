@@ -128,11 +128,7 @@ def generate_node_alias_expressions(nodes, *, defer, only, model):
         if issubclass(model, ResourceInstance):
             tile_values_query = get_tile_values_for_resource(node, nodes)
         elif issubclass(model, TileModel):
-            ### TODO: Investigate consistency with prior branch.
-            if node.datatype in {"non-localized-string"}:
-                tile_values_query = KT(f"data__{node.pk}")
-            else:
-                tile_values_query = F(f"data__{node.pk}")
+            tile_values_query = get_node_value_expression(node, False)
         else:
             raise ValueError
         alias_expressions[alias] = tile_values_query
