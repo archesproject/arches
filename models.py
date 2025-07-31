@@ -126,8 +126,10 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         partial=True (HTTP PATCH): absent nodes ignored, absent child tiles ignored.
         partial=False (HTTP PUT): absent nodes reset to default, absent child tiles deleted.
         """
-        if self.graph_publication_id and (
-            self.graph_publication_id != self.graph.publication_id
+        if (
+            arches_version >= (8, 0)
+            and self.graph_publication_id
+            and (self.graph_publication_id != self.graph.publication_id)
         ):
             raise ValidationError(_("Graph Has Different Publication"))
 
@@ -274,7 +276,8 @@ class TileTree(TileModel, AliasedDataMixin):
         partial=False (HTTP PUT): absent nodes reset to default, absent child tiles deleted.
         """
         if (
-            self.resourceinstance_id
+            arches_version >= (8, 0)
+            and self.resourceinstance_id
             and self.resourceinstance.graph_publication_id
             and (
                 self.resourceinstance.graph_publication_id
