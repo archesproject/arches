@@ -47,18 +47,13 @@ class ConceptDataType(concept_types.ConceptDataType):
 
 class ConceptListDataType(concept_types.ConceptListDataType):
     def transform_value_for_tile(self, value, **kwargs):
-        if not isinstance(value, list):
-            value = [value]
-        concept_id_strings = []
-        for inner in value:
-            if isinstance(inner, dict) and (
-                concept_details := inner.get("concept_details")
-            ):
-                concept_id_strings.extend(
-                    [detail["valueid"] for detail in concept_details]
-                )
-        joined_concept_id_strings = ",".join(concept_id_strings)
-        return super().transform_value_for_tile(joined_concept_id_strings, **kwargs)
+        if not value:
+            return []
+        if isinstance(value, list):
+            if all(isinstance(val, Value) for val in value):
+                return [str(val.pk) for val in value]
+            return value
+        return super().transform_value_for_tile(value, **kwargs)
 
     def to_python(self, value, **kwargs):
         return self.get_instances(value) or None
