@@ -1,15 +1,16 @@
-from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import DatabaseError
 from django.db.models import Q
+from django.utils.translation import gettext as _
 from django.views.generic import View
 
 from arches import VERSION as arches_version
 from arches.app.models import models
-from arches.app.utils.response import JSONResponse
+from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
+from arches.app.utils.response import JSONResponse, JSONErrorResponse
 
 # TODO: Replace with DataTypeFactory from arches_querysets
 from arches.app.datatypes.datatypes import DataTypeFactory
-
-from arches_component_lab.models import WidgetMapping
 
 
 def serialize_card_x_node_x_widget(widget, datatype_factory):
@@ -29,15 +30,6 @@ def serialize_card_x_node_x_widget(widget, datatype_factory):
         JSONSerializer().serialize(widget.widget)
     )
     del data["widget_id"]
-
-    try:
-        pass
-        # datatype = datatype_factory.get_instance(widget.node.datatype)
-        # data["config"]["defaultValue"] = datatype.get_interchange_value(
-        #     data["config"].get("defaultValue", None)
-        # )
-    except AttributeError:
-        pass
 
     return data
 
@@ -71,16 +63,22 @@ class CardXNodeXWidgetView(View):
                 config=default_widget.defaultconfig,
             )
 
-        serialized = serialize_card_x_node_x_widget(
+        serialized_widget = serialize_card_x_node_x_widget(
             card_x_node_x_widget, DataTypeFactory()
         )
 
-        # Updates component path to declared arches_component_lab widget path
-        serialized["widget"]["component"] = WidgetMapping.objects.get(
-            widget_id=serialized["widget"]["widgetid"]
-        ).component
+        try:
+            # Updates component path to declared arches_component_lab widget path
+            serialized_widget["widget"][
+                "component"
+            ] = card_x_node_x_widget.widget.widgetmapping.component
+        except DatabaseError:
+            return JSONErrorResponse(
+                message=_("Database error occurred while fetching widget mapping."),
+                status=503,
+            )
 
-        return JSONResponse(serialized)
+        return JSONResponse(serialized_widget)
 
 
 class CardXNodeXWidgetListFromNodegroupView(View):
@@ -129,16 +127,22 @@ class CardXNodeXWidgetListFromNodegroupView(View):
                         )
                     )
 
-        serialized_data = [
-            serialize_card_x_node_x_widget(widget_instance, datatype_factory)
-            for widget_instance in widget_instances
-        ]
+        serialized_widgets = []
+        for widget_instance in widget_instances:
+            serialized_widget = serialize_card_x_node_x_widget(
+                widget_instance, datatype_factory
+            )
 
-        # Update component paths to declared arches_component_lab widget paths
-        widget_mappings = WidgetMapping.objects.all()
-        for serialized_datum in serialized_data:
-            serialized_datum["widget"]["component"] = widget_mappings.get(
-                widget_id=serialized_datum["widget"]["widgetid"]
-            ).component
+            try:
+                serialized_widget["widget"][
+                    "component"
+                ] = widget_instance.widget.widgetmapping.component
+            except ObjectDoesNotExist:
+                return JSONErrorResponse(
+                    message=_("Database error occurred while fetching widget mapping."),
+                    status=503,
+                )
 
-        return JSONResponse(serialized_data)
+            serialized_widgets.append(serialized_widget)
+
+        return JSONResponse(serialized_widgets)

@@ -5,15 +5,15 @@ from arches.app.models.models import Widget
 
 class WidgetMapping(models.Model):
     id = models.UUIDField(primary_key=True)
-    widget = models.ForeignKey(
+    widget = models.OneToOneField(
         Widget,
         on_delete=models.CASCADE,
     )
-    component = models.TextField(unique=True)
+    component = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
-        return f"{self.widget.name} → {self.component}"
+        widget_name = self.widget.name if self.widget else "<no widget>"
+        return f"{widget_name} → {self.component}"
 
     class Meta:
         managed = True
-        db_table = "widget_mappings"
