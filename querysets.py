@@ -3,7 +3,7 @@ from collections import defaultdict
 from operator import attrgetter
 from slugify import slugify
 
-from django.core.exceptions import ValidationError
+from django.core.exceptions import FieldError, ValidationError
 from django.db import models
 from django.utils.translation import gettext as _
 
@@ -54,6 +54,17 @@ class NodeAliasValuesMixin:
                 **{field: models.F(field) for field in fields_needing_promotion}
             )
         return models.QuerySet.values_list(qs, *args, **kwargs)
+
+    def aggregate(self, *args, **kwargs):
+        """Handle the "promotion" of .alias() to .annotate() for .aggregate()."""
+        try:
+            return super().aggregate(*args, **kwargs)
+        except FieldError as e:
+            # Hopefully Django will support this out of the box, see:
+            # https://code.djangoproject.com/ticket/36480#comment:3
+            node_alias = e.args[0].split("'")[1]
+            with_annotation = self.annotate(**{node_alias: models.F(node_alias)})
+            return with_annotation.aggregate(*args, **kwargs)
 
 
 class TileTreeManager(models.Manager):

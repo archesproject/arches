@@ -57,6 +57,9 @@ class GraphTestCase(TestCase):
                             node.nodegroup.save()
         graph_proxy.publish(user=None)
         cls.graph.publication = graph_proxy.publication
+        for resource in [cls.resource_42, cls.resource_none]:
+            resource.publication = cls.graph.publication
+            resource.save()
 
     @classmethod
     def create_graph(cls):

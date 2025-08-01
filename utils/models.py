@@ -17,7 +17,7 @@ from django.db.models import (
     Value,
     When,
 )
-from django.db.models.functions import Cast
+from django.db.models.functions import Cast, NullIf
 from django.db.models.fields.json import KT
 from django.http import HttpRequest
 from django.utils.functional import cached_property
@@ -175,7 +175,12 @@ def get_tile_values_for_resource(node, permitted_nodes):
     )
 
     if many:
-        return CardinalityNSubquery(tile_query)
+        # None is a better representation than [None] for this subquery.
+        # The python representation on aliased_data will still be [].
+        return NullIf(
+            CardinalityNSubquery(tile_query),
+            Value([None]),
+        )
     else:
         return tile_query
 
