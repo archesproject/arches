@@ -1,5 +1,4 @@
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import DatabaseError
 from django.db.models import Q
 from django.utils.translation import gettext as _
 from django.views.generic import View
@@ -68,11 +67,10 @@ class CardXNodeXWidgetView(View):
         )
 
         try:
-            # Updates component path to declared arches_component_lab widget path
             serialized_widget["widget"][
                 "component"
             ] = card_x_node_x_widget.widget.widgetmapping.component
-        except DatabaseError:
+        except ObjectDoesNotExist:
             return JSONErrorResponse(
                 message=_("Database error occurred while fetching widget mapping."),
                 status=503,
