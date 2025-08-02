@@ -387,7 +387,7 @@ class TileTree(TileModel, AliasedDataMixin):
         if not getattr(self, "_nodegroup_alias", None):
             # But perform a last-minute check just in case. This will
             # also run if the node alias is null.
-            if grouping_node := Node.objects.first(pk=self.nodegroup_id):
+            if grouping_node := Node.objects.filter(pk=self.nodegroup_id).first():
                 self._nodegroup_alias = grouping_node.alias
         return self._nodegroup_alias
 
