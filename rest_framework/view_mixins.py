@@ -37,7 +37,6 @@ class ArchesModelAPIMixin:
     def setup(self, request, *args, **kwargs):
         options = self.serializer_class.Meta
         self.graph_slug = options.graph_slug or kwargs.get("graph")
-        # Future: accept list via GET query param
         self.nodegroup_alias = kwargs.get("nodegroup_alias")
 
         if issubclass(options.model, TileModel):
@@ -51,7 +50,7 @@ class ArchesModelAPIMixin:
             self.resource_ids = None
         self.fill_blanks = request.GET.get("fill_blanks", "f").lower().startswith("t")
 
-        # Initialize a variable to hold the permitted nodes nodes materialized
+        # Initialize a variable to hold the permitted nodes materialized
         # by the underlying queryset (populated by get_object() for detail
         # views or filter_queryset() for list views).
         self.permitted_nodes = []
@@ -138,6 +137,14 @@ class ArchesModelAPIMixin:
 
     def filter_queryset(self, queryset):
         self.permitted_nodes = queryset._permitted_nodes
+
+        if data_filters := {
+            param.split("aliased_data__", maxsplit=1)[1]: value
+            for param, value in self.request.GET.items()
+            if param.startswith("aliased_data__")
+        }:
+            queryset = queryset.filter(**data_filters)
+
         return super().filter_queryset(queryset)
 
     def create(self, request, *args, **kwargs):
