@@ -26,6 +26,7 @@ export interface CardXNodeXWidgetData {
     };
     config: {
         defaultValue: unknown | null;
+        placeholder?: string;
     };
     id: string;
     label: string;
