@@ -3,9 +3,12 @@ import InputText from "primevue/inputtext";
 import GenericFormField from "@/arches_component_lab/generics/GenericFormField.vue";
 
 import type { FormFieldResolverOptions } from "@primevue/forms";
-import type { NonLocalizedTextValue } from "@/arches_component_lab/datatypes/non-localized-text/types";
+
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type { NonLocalizedTextValue } from "@/arches_component_lab/datatypes/non-localized-text/types.ts";
 
 defineProps<{
+    cardXNodeXWidgetData: CardXNodeXWidgetData;
     nodeAlias: string;
     value: NonLocalizedTextValue;
 }>();
@@ -27,6 +30,7 @@ function transformValueForForm(event: FormFieldResolverOptions) {
     >
         <InputText
             type="text"
+            :placeholder="cardXNodeXWidgetData.config.placeholder"
             :fluid="true"
             :model-value="value.node_value"
         />

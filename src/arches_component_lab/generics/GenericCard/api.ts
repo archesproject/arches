@@ -8,33 +8,22 @@ import type {
     CardXNodeXWidgetData,
 } from "@/arches_component_lab/types.ts";
 
-export async function fetchTileStructure(
-    graphSlug: string,
-    nodegroupAlias: string,
-): Promise<AliasedTileData> {
-    const response = await fetch(
-        arches.urls.api_resource(graphSlug, nodegroupAlias),
-    );
-
-    try {
-        const parsed = await response.json();
-        if (response.ok) {
-            return parsed;
-        }
-        throw new Error(parsed.message);
-    } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
-    }
-}
-
 export async function fetchTileData(
     graphSlug: string,
     nodegroupAlias: string,
-    tileId: string | null | undefined,
+    tileId?: string | null | undefined,
 ): Promise<AliasedTileData> {
-    const response = await fetch(
-        arches.urls.api_tile(graphSlug, nodegroupAlias, tileId),
-    );
+    let response;
+
+    if (tileId) {
+        response = await fetch(
+            arches.urls.api_tile(graphSlug, nodegroupAlias, tileId),
+        );
+    } else {
+        response = await fetch(
+            arches.urls.api_tile_blank(graphSlug, nodegroupAlias),
+        );
+    }
 
     try {
         const parsed = await response.json();

@@ -15,6 +15,7 @@ from arches_component_lab.views.api.card_x_node_x_widget import (
 )
 
 from arches_querysets.rest_framework.generic_views import (
+    ArchesTileBlankView,
     ArchesTileDetailView,
     ArchesTileListCreateView,
 )
@@ -51,14 +52,14 @@ urlpatterns = [
         name="api-card-data",
     ),
     path(
+        "arches-component-lab/api/tile/<slug:graph>/<slug:nodegroup_alias>/blank",
+        ArchesTileBlankView.as_view(),
+        name="api-tile-blank",
+    ),
+    path(
         "arches-component-lab/api/tile/<slug:graph>/<slug:nodegroup_alias>/<uuid:pk>",
         ArchesTileDetailView.as_view(),
         name="api-tile",
-    ),
-    path(
-        "arches-component-lab/api/tile/<slug:graph>/<slug:nodegroup_alias>",
-        ArchesTileDetailView.as_view(),
-        name="api-foo",
     ),
     path(
         "arches-component-lab/api/tile-list-create/<slug:graph>/<slug:nodegroup_alias>/<uuid:pk>",
