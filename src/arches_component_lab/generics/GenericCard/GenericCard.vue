@@ -58,12 +58,6 @@ watchEffect(async () => {
     isLoading.value = true;
 
     try {
-        const cardXNodeXWidgetDataPromise =
-            fetchCardXNodeXWidgetDataFromNodeGroup(
-                props.graphSlug,
-                props.nodegroupAlias,
-            );
-
         if (!props.tileData && !props.tileId && !props.resourceInstanceId) {
             throw new Error(
                 $gettext(
@@ -72,22 +66,20 @@ watchEffect(async () => {
             );
         }
 
+        const cardXNodeXWidgetDataPromise =
+            fetchCardXNodeXWidgetDataFromNodeGroup(
+                props.graphSlug,
+                props.nodegroupAlias,
+            );
+
         if (props.tileData) {
             aliasedTileData.value = props.tileData;
-        } else if (props.tileId) {
-            const aliasedTileDataPromise = fetchTileData(
+        } else {
+            aliasedTileData.value = await fetchTileData(
                 props.graphSlug,
                 props.nodegroupAlias,
                 props.tileId,
             );
-            aliasedTileData.value = await aliasedTileDataPromise;
-        } else if (props.resourceInstanceId) {
-            // TODO: Replace with querysets call for empty tile structure
-            // @ts-expect-error this is an incomplete tile structure
-            aliasedTileData.value = {
-                resourceinstance: props.resourceInstanceId,
-                aliased_data: {},
-            };
         }
 
         cardXNodeXWidgetData.value = await cardXNodeXWidgetDataPromise;
