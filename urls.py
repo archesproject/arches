@@ -5,8 +5,10 @@ from django.urls import include, path
 
 from arches_querysets.apps import ArchesQuerySetsConfig
 from arches_querysets.rest_framework.generic_views import (
+    ArchesResourceBlankView,
     ArchesResourceDetailView,
     ArchesResourceListCreateView,
+    ArchesTileBlankView,
     ArchesTileDetailView,
     ArchesTileListCreateView,
 )
@@ -24,6 +26,11 @@ arches_rest_framework_urls = [
         name="api-resource",
     ),
     path(
+        "api/resource/<slug:graph>/blank",
+        ArchesResourceBlankView.as_view(),
+        name="api-resource-blank",
+    ),
+    path(
         "api/tile/<slug:graph>/<slug:nodegroup_alias>",
         ArchesTileListCreateView.as_view(),
         name="api-tiles",
@@ -32,6 +39,11 @@ arches_rest_framework_urls = [
         "api/tile/<slug:graph>/<slug:nodegroup_alias>/<uuid:pk>",
         ArchesTileDetailView.as_view(),
         name="api-tile",
+    ),
+    path(
+        "api/tile/<slug:graph>/<slug:nodegroup_alias>/blank",
+        ArchesTileBlankView.as_view(),
+        name="api-tile-blank",
     ),
 ]
 

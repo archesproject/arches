@@ -19,16 +19,21 @@ from arches.app.models.models import (
 )
 
 from arches_querysets.datatypes.datatypes import DataTypeFactory
-from arches_querysets.models import GraphWithPrefetching
+from arches_querysets.models import GraphWithPrefetching, ResourceTileTree
 
 
 class GraphTestCase(TestCase):
+    # We can eventually remove this switch if/when other tests are updated.
+    test_child_nodegroups = False
+
     @classmethod
     def setUpTestData(cls):
         cls.datatype_factory = DataTypeFactory()  # custom!
         cls.create_graph()
         cls.create_nodegroups_and_grouping_nodes()
         cls.create_data_collecting_nodes()
+        if cls.test_child_nodegroups:
+            cls.create_child_nodegroups()
         cls.create_edges()
         cls.create_cards()
         cls.create_widgets()
@@ -36,11 +41,20 @@ class GraphTestCase(TestCase):
         cls.create_resources()
         cls.create_tiles_with_data()
         cls.create_tiles_with_none()
+        if cls.test_child_nodegroups:
+            cls.create_child_tiles()
         cls.create_relations()
 
         graph_proxy = Graph.objects.get(pk=cls.graph.pk)
         if arches_version < (8, 0):
             graph_proxy.refresh_from_database()
+            if cls.test_child_nodegroups:
+                # Repair parent nodegroup link broken by get_nodegroups()!
+                for node in graph_proxy.nodes.values():
+                    if node.nodegroup == cls.nodegroup_1_child:
+                        if node.nodegroup.parentnodegroup != cls.nodegroup_1:
+                            node.nodegroup.parentnodegroup = cls.nodegroup_1
+                            node.nodegroup.save()
         graph_proxy.publish(user=None)
         cls.graph.publication = graph_proxy.publication
 
@@ -78,7 +92,7 @@ class GraphTestCase(TestCase):
 
     @classmethod
     def create_data_collecting_nodes(cls):
-        cls.datatypes = DDataType.objects.all()
+        cls.datatypes = DDataType.objects.exclude(datatype="semantic")
         cls.data_nodes_1 = [
             Node(
                 datatype=datatype.pk,
@@ -104,12 +118,6 @@ class GraphTestCase(TestCase):
             for datatype in cls.datatypes
         ]
         cls.data_nodes = Node.objects.bulk_create(cls.data_nodes_1 + cls.data_nodes_n)
-        cls.nodes = [
-            cls.root_node,
-            cls.grouping_node_1,
-            cls.grouping_node_n,
-            *cls.data_nodes,
-        ]
 
         # Set each node as an attribute, e.g. self.string_node_n
         for node in cls.data_nodes:
@@ -126,11 +134,20 @@ class GraphTestCase(TestCase):
     def create_edges(cls):
         def get_node_to_append_to(node):
             if node.pk == node.nodegroup.pk:
+                if node.nodegroup.parentnodegroup_id:
+                    if node == cls.nodegroup_1_child:
+                        return cls.grouping_node_1
+                    else:
+                        return cls.grouping_node_n
                 return cls.root_node
             if node.nodegroup == cls.nodegroup_1:
                 return cls.grouping_node_1
             if node.nodegroup == cls.nodegroup_n:
                 return cls.grouping_node_n
+            if node.nodegroup == cls.nodegroup_1_child:
+                return cls.grouping_node_1_child
+            if node.nodegroup == cls.nodegroup_n_child:
+                return cls.grouping_node_n_child
             raise ValueError
 
         edges = [
@@ -140,19 +157,21 @@ class GraphTestCase(TestCase):
                 ontologyproperty="",
                 graph=cls.graph,
             )
-            for node in cls.nodes
-            if node is not cls.root_node
+            for node in cls.graph.node_set.exclude(pk=cls.root_node.pk)
         ]
         cls.edges = Edge.objects.bulk_create(edges)
 
     @classmethod
     def create_cards(cls):
+        nodegroups = [cls.nodegroup_1, cls.nodegroup_n]
+        if cls.test_child_nodegroups:
+            nodegroups.extend([cls.nodegroup_1_child, cls.nodegroup_n_child])
         cards = [
             CardModel(
                 graph=cls.graph,
                 nodegroup=nodegroup,
             )
-            for nodegroup in [cls.nodegroup_1, cls.nodegroup_n]
+            for nodegroup in nodegroups
         ]
         cards = CardModel.objects.bulk_create(cards)
 
@@ -164,7 +183,7 @@ class GraphTestCase(TestCase):
                 widget_id=cls.find_default_widget_id(node, cls.datatypes),
                 card=node.nodegroup.cardmodel_set.all()[0],
             )
-            for node in [n for n in cls.nodes if n.datatype != "semantic"]
+            for node in cls.data_nodes
         ]
         CardXNodeXWidget.objects.bulk_create(node_widgets)
 
@@ -408,6 +427,65 @@ class GraphTestCase(TestCase):
             rxr.created = datetime.datetime.now()
             rxr.modified = datetime.datetime.now()
         ResourceXResource.objects.bulk_create(rxrs)
+
+    @classmethod
+    def create_child_nodegroups(cls):
+        cls.nodegroup_1_child, cls.grouping_node_1_child = cls.create_nodegroup(
+            "datatypes_1_child", "1", parent_nodegroup=cls.nodegroup_1
+        )
+        cls.nodegroup_n_child, cls.grouping_node_n_child = cls.create_nodegroup(
+            "datatypes_n_child", "n", parent_nodegroup=cls.nodegroup_n
+        )
+
+        # Clone nodes.
+        for node in cls.data_nodes:
+            node.pk = uuid.uuid4()
+            node.name = node.name + "-child"
+            node.alias = node.alias + "_child"
+            node.nodegroup = (
+                cls.nodegroup_1_child
+                if node.nodegroup == cls.nodegroup_1
+                else cls.nodegroup_n_child
+            )
+
+        Node.objects.bulk_create(cls.data_nodes)
+        cls.data_nodes = cls.graph.node_set.exclude(datatype="semantic")
+
+    @classmethod
+    def create_child_tiles(cls):
+        cls.cardinality_1_child_tile = TileModel.objects.create(
+            nodegroup=cls.nodegroup_1_child,
+            resourceinstance=cls.resource_42,
+            data={},
+            parenttile=cls.cardinality_1_tile,
+        )
+        cls.cardinality_n_child_tile = TileModel.objects.create(
+            nodegroup=cls.nodegroup_n_child,
+            resourceinstance=cls.resource_42,
+            data={},
+            parenttile=cls.cardinality_n_tile,
+        )
+
+        # Create data for the child non-localized-string node only.
+        # TileModel.save() will initialize the other nodes to None.
+        cls.non_localized_string_child_node = Node.objects.get(
+            alias="non_localized_string_child"
+        )
+        cls.non_localized_string_child_node_n = Node.objects.get(
+            alias="non_localized_string_n_child"
+        )
+        cls.cardinality_1_child_tile.data = {
+            str(cls.non_localized_string_child_node.pk): "child-1-value",
+        }
+        cls.cardinality_1_child_tile.save()
+        cls.cardinality_n_child_tile.data = {
+            str(cls.non_localized_string_child_node_n.pk): "child-n-value",
+        }
+        cls.cardinality_n_child_tile.save()
+
+        cls.resource = ResourceTileTree.get_tiles(
+            "datatype_lookups", as_representation=True
+        ).get(pk=cls.resource_42.pk)
 
     @classmethod
     def find_default_widget_id(cls, node, datatypes):

@@ -19,11 +19,19 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 from arches_querysets.datatypes.datatypes import DataTypeFactory
 from arches_querysets.models import AliasedData, ResourceTileTree, TileTree
+from arches_querysets.utils.models import ensure_request
 from arches_querysets.rest_framework.field_mixins import NodeValueMixin
 
 
 def _make_tile_serializer(
-    *, nodegroup_alias, cardinality, sortorder, slug, permitted_nodes, nodes="__all__"
+    *,
+    nodegroup_alias,
+    cardinality,
+    sortorder,
+    slug,
+    permitted_nodes,
+    nodes="__all__",
+    exclude_children=False,
 ) -> type["ArchesTileSerializer"]:
     """
     DRF encourages a declarative programming style with classes. You, as
@@ -32,14 +40,19 @@ def _make_tile_serializer(
     classes on the fly by default.
     """
 
+    init_kwargs = {
+        "required": False,
+        "allow_null": False,
+        "permitted_nodes": permitted_nodes,
+        "graph_slug": slug,
+        "root_node": nodegroup_alias,
+    }
+
+    single_serializer = SingleNodegroupAliasedDataSerializer(**init_kwargs)
+    multi_serializer = TileAliasedDataSerializer(**init_kwargs)
+
     class DynamicTileSerializer(ArchesTileSerializer):
-        aliased_data = TileAliasedDataSerializer(
-            required=False,
-            allow_null=False,
-            permitted_nodes=permitted_nodes,
-            graph_slug=slug,
-            root_node=nodegroup_alias,
-        )
+        aliased_data = single_serializer if exclude_children else multi_serializer
 
         class Meta:
             model = TileTree
@@ -142,12 +155,24 @@ class NodeFetcherMixin:
     def nodegroup_alias(self):
         return self.context.get("nodegroup_alias")
 
+    def ensure_context(
+        self, *, graph_slug, permitted_nodes, nodegroup_alias=None, request=None
+    ):
+        """The view provides a context, so this is mainly here for script usage."""
+        return {
+            "graph_slug": graph_slug,
+            "permitted_nodes": permitted_nodes,
+            "nodegroup_alias": nodegroup_alias,
+            "request": ensure_request(request),
+        }
+
 
 class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
     class Meta:
         graph_slug = None
         nodegroups = "__all__"
         fields = "__all__"
+        exclude_children = False
 
     def __init__(self, instance=None, data=empty, **kwargs):
         super().__init__(instance, data, **kwargs)
@@ -195,6 +220,7 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
                         cardinality=node.nodegroup.cardinality,
                         permitted_nodes=self.permitted_nodes,
                         sortorder=sortorder,
+                        exclude_children=options.exclude_children,
                     )
 
         return field_map
@@ -222,6 +248,14 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
         return attrs
 
 
+class ResourceTopNodegroupsAliasedDataSerializer(ResourceAliasedDataSerializer):
+    class Meta:
+        graph_slug = None
+        nodegroups = "__all__"
+        fields = "__all__"
+        exclude_children = True
+
+
 class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
     serializer_field_mapping = {
         model_field: _wrap_serializer_field(serializer_field)
@@ -234,6 +268,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         # If None, supply by a route providing a <slug:nodegroup_alias> component
         root_node = None
         fields = "__all__"
+        exclude_children = False
 
     def __init__(self, instance=None, data=empty, **kwargs):
         self._permitted_nodes = kwargs.pop("permitted_nodes", [])
@@ -284,9 +319,8 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         if arches_version < (8, 0):
             nodegroup_aliases = self.get_nodegroup_aliases()
 
-        # __all__ now includes one level of child nodegroups.
-        # TODO: do all, or allow specifying a branch origin.
-        if self.__class__.Meta.fields == "__all__":
+        # __all__ includes children as well.
+        if self.__class__.Meta.fields == "__all__" and not self.Meta.exclude_children:
             child_query = (
                 self._root_node.nodegroup.children
                 if arches_version >= (8, 0)
@@ -426,6 +460,16 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         return attrs
 
 
+class SingleNodegroupAliasedDataSerializer(TileAliasedDataSerializer):
+    class Meta:
+        model = TileTree
+        graph_slug = None
+        # If None, supply by a route providing a <slug:nodegroup_alias> component
+        root_node = None
+        fields = "__all__"
+        exclude_children = True
+
+
 class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
     # These fields are declared here in full instead of massaged via
     # "extra_kwargs" in class Meta to support subclassing by TileAliasedDataSerializer.
@@ -455,9 +499,16 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         root_node = None
         fields = "__all__"
 
-    def __init__(self, instance=None, data=empty, **kwargs):
+    def __init__(self, instance=None, data=empty, *, context=None, **kwargs):
         self._graph_slug = kwargs.pop("graph_slug", None)
         self._permitted_nodes = kwargs.pop("permitted_nodes", [])
+        if not context:
+            context = self.ensure_context(
+                graph_slug=self._graph_slug,
+                permitted_nodes=self._permitted_nodes,
+                nodegroup_alias=kwargs.pop("nodegroup_alias", None),
+            )
+        kwargs["context"] = context
         super().__init__(instance, data, **kwargs)
         self._child_nodegroup_aliases = []
 
@@ -520,6 +571,12 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         return instance, True
 
 
+class ArchesSingleNodegroupSerializer(ArchesTileSerializer):
+    aliased_data = SingleNodegroupAliasedDataSerializer(
+        required=False, allow_null=False
+    )
+
+
 class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
     # aliased_data is a virtual field not inferred by serializers.ModelSerializer.
     aliased_data = ResourceAliasedDataSerializer(required=False, allow_null=False)
@@ -545,20 +602,18 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             "resource_instance_lifecycle_state",
         )
         extra_kwargs = {
-            "resourceinstanceid": {"initial": uuid.uuid4, "allow_null": True},
+            "resourceinstanceid": {"initial": None, "allow_null": True},
             "graph": {"allow_null": True},
         }
 
-    def __init__(self, *args, graph_slug=None, permitted_nodes=None, **kwargs):
-        if not kwargs.get("context"):
-            # The view provides a context, so this is mainly here for CLI usage.
-            self.parent = None
-            context = {
-                "graph_slug": graph_slug,
-                "permitted_nodes": permitted_nodes or self.find_permitted_nodes(),
-            }
-            kwargs = {**kwargs, "context": context}
-
+    def __init__(
+        self, *args, graph_slug=None, permitted_nodes=None, context=None, **kwargs
+    ):
+        if not context:
+            context = self.ensure_context(
+                graph_slug=graph_slug, permitted_nodes=permitted_nodes
+            )
+        kwargs["context"] = context
         super().__init__(*args, **kwargs)
 
     def build_relational_field(self, field_name, relation_info):
@@ -614,6 +669,12 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         return obj.graph_publication_id and (
             obj.graph_publication_id != obj.graph.publication_id
         )
+
+
+class ArchesResourceTopNodegroupsSerializer(ArchesResourceSerializer):
+    aliased_data = ResourceTopNodegroupsAliasedDataSerializer(
+        required=False, allow_null=False
+    )
 
 
 # Workaround for I18n_string fields
