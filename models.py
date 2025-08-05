@@ -15,5 +15,3 @@ class WidgetMapping(models.Model):
         widget_name = self.widget.name if self.widget else "<no widget>"
         return f"{widget_name} → {self.component}"
 
-    class Meta:
-        managed = True
