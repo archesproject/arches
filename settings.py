@@ -58,7 +58,7 @@ SECRET_KEY = "django-insecure-7xnft806s-44r+zchr-*f4cpss&@e6-5r_o0gn+apw6zb*#$p7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ROOT_URLCONF = "arches_querysets.urls"
+ROOT_URLCONF = "arches_querysets.arches_querysets_urls"
 ROOT_HOSTCONF = "arches_querysets.hosts"
 
 DEFAULT_HOST = "arches_querysets"
