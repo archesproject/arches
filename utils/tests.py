@@ -450,6 +450,12 @@ class GraphTestCase(TestCase):
 
         Node.objects.bulk_create(cls.data_nodes)
         cls.data_nodes = cls.graph.node_set.exclude(datatype="semantic")
+        cls.data_nodes_1 = cls.graph.node_set.filter(nodegroup=cls.nodegroup_1).exclude(
+            datatype="semantic"
+        )
+        cls.data_nodes_n = cls.graph.node_set.filter(nodegroup=cls.nodegroup_n).exclude(
+            datatype="semantic"
+        )
 
     @classmethod
     def create_child_tiles(cls):
