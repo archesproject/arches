@@ -14,4 +14,3 @@ class WidgetMapping(models.Model):
     def __str__(self):
         widget_name = self.widget.name if self.widget else "<no widget>"
         return f"{widget_name} → {self.component}"
-
