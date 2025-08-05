@@ -3,12 +3,7 @@ from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
 from django.urls import include, path
 
-from arches_component_lab.views.api.card import CardDataView
 from arches_component_lab.views.api.relatable_resources import RelatableResourcesView
-from arches_component_lab.views.api.widgets import (
-    WidgetDataView,
-    NodeDataView,
-)
 from arches_component_lab.views.api.card_x_node_x_widget import (
     CardXNodeXWidgetView,
     CardXNodeXWidgetListFromNodegroupView,
@@ -27,29 +22,14 @@ urlpatterns = [
         name="api-relatable-resources",
     ),
     path(
-        "arches-component-lab/api/widget-data/<slug:graph_slug>/<slug:node_alias>",
+        "arches-component-lab/api/card-x-node-x-widget-data/<slug:graph_slug>/<slug:node_alias>",
         CardXNodeXWidgetView.as_view(),
         name="api-card-x-node-x-widget",
-    ),
-    path(
-        "arches-component-lab/api/widget-data/<slug:graph_slug>/<slug:node_alias>",
-        WidgetDataView.as_view(),
-        name="api-widget-data",
-    ),
-    path(
-        "arches-component-lab/api/node-data/<slug:graph_slug>/<slug:node_alias>",
-        NodeDataView.as_view(),
-        name="api-node-data",
     ),
     path(
         "arches-component-lab/api/card-x-node-x-widget-list-from-nodegroup/<slug:graph_slug>/<slug:nodegroup_alias>",
         CardXNodeXWidgetListFromNodegroupView.as_view(),
         name="api-card-x-node-x-widget-list-from-nodegroup",
-    ),
-    path(
-        "arches-component-lab/api/card-data/<slug:graph_slug>/<slug:nodegroup_alias>",
-        CardDataView.as_view(),
-        name="api-card-data",
     ),
     path(
         "arches-component-lab/api/tile/<slug:graph>/<slug:nodegroup_alias>/blank",

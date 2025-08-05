@@ -12,7 +12,8 @@ import Skeleton from "primevue/skeleton";
 import GenericWidgetLabel from "@/arches_component_lab/generics/GenericWidget/components/GenericWidgetLabel.vue";
 
 import { fetchCardXNodeXWidgetData } from "@/arches_component_lab/generics/GenericWidget/api.ts";
-import { getUpdatedComponentPath } from "@/arches_component_lab/generics/GenericWidget/utils.ts";
+
+import { removeVueExtension } from "@/arches_component_lab/generics/GenericWidget/utils.ts";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
@@ -44,13 +45,11 @@ const widgetComponent = computed(() => {
         return null;
     }
 
-    const updatedComponentPath = getUpdatedComponentPath(
-        resolvedCardXNodeXWidgetData.value.widget.component,
-    );
-
     return defineAsyncComponent(async () => {
         try {
-            return await import(`@/${updatedComponentPath}.vue`);
+            return await import(
+                `@/${removeVueExtension(resolvedCardXNodeXWidgetData.value!.widget.component)}.vue`
+            );
         } catch (err) {
             configurationError.value = err as Error;
         }

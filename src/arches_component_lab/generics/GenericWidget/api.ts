@@ -1,9 +1,9 @@
 import arches from "arches";
 
-export const fetchCardXNodeXWidgetData = async (
+export async function fetchCardXNodeXWidgetData(
     graphSlug: string,
     nodeAlias: string,
-) => {
+) {
     const response = await fetch(
         arches.urls.api_card_x_node_x_widget(graphSlug, nodeAlias),
     );
@@ -17,4 +17,4 @@ export const fetchCardXNodeXWidgetData = async (
     } catch (error) {
         throw new Error((error as Error).message || response.statusText);
     }
-};
+}
