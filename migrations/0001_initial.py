@@ -25,8 +25,5 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={
-                "managed": True,
-            },
         ),
     ]
