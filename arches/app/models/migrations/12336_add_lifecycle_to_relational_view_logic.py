@@ -11,12 +11,12 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL(
             format_file_into_sql(
-                "2025-07-24__12336__arches_instance_view_update.sql",
-                "sql/functions/2025",
+                "12336__arches_instance_view_update.sql",
+                "sql/functions",
             ),
             format_file_into_sql(
-                "2022-08-05__8770__arches_instance_view_update.sql",
-                "sql/functions/2022",
+                "8770__arches_instance_view_update.sql",
+                "sql/functions",
             ),
         ),
     ]
