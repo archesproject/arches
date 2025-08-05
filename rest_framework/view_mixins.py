@@ -14,6 +14,7 @@ from arches.app.utils.permission_backend import (
     user_can_edit_resource,
     user_can_read_resource,
 )
+from arches.app.utils.string_utils import str_to_bool
 
 
 class MetadataWithWidgetConfig(SimpleMetadata):
@@ -138,8 +139,13 @@ class ArchesModelAPIMixin:
     def filter_queryset(self, queryset):
         self.permitted_nodes = queryset._permitted_nodes
 
+        # Parse ORM lookpus from query params starting with "aliased_data__"
+        # This is a quick-n-dirty riff on https://github.com/miki725/django-url-filter
+        # minus some features like negation (`!=`)
         if data_filters := {
-            param.split("aliased_data__", maxsplit=1)[1]: value
+            param.split("aliased_data__", maxsplit=1)[1]: (
+                str_to_bool(value) if param.endswith("__isnull") else value
+            )
             for param, value in self.request.GET.items()
             if param.startswith("aliased_data__")
         }:
