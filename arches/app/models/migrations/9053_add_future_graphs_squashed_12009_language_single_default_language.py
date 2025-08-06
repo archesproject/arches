@@ -872,6 +872,26 @@ class Migration(migrations.Migration):
                 to="models.node",
             ),
         ),
+        migrations.AddConstraint(
+            model_name="node",
+            constraint=models.CheckConstraint(
+                condition=models.Q(
+                    ("istopnode", True), ("nodegroup__isnull", False), _connector="OR"
+                ),
+                name="has_nodegroup_or_istopnode",
+            ),
+        ),
+        migrations.AddConstraint(
+            model_name="nodegroup",
+            constraint=models.CheckConstraint(
+                condition=models.Q(
+                    ("grouping_node", models.F("pk")),
+                    ("grouping_node__isnull", True),
+                    _connector="OR",
+                ),
+                name="grouping_node_matches_pk_or_null",
+            ),
+        ),
         migrations.AlterField(
             model_name="nodegroup",
             name="cardinality",
@@ -895,26 +915,6 @@ class Migration(migrations.Migration):
         migrations.RunPython(
             code=add_grouping_node,
             reverse_code=remove_grouping_node,
-        ),
-        migrations.AddConstraint(
-            model_name="node",
-            constraint=models.CheckConstraint(
-                condition=models.Q(
-                    ("istopnode", True), ("nodegroup__isnull", False), _connector="OR"
-                ),
-                name="has_nodegroup_or_istopnode",
-            ),
-        ),
-        migrations.AddConstraint(
-            model_name="nodegroup",
-            constraint=models.CheckConstraint(
-                condition=models.Q(
-                    ("grouping_node", models.F("pk")),
-                    ("grouping_node__isnull", True),
-                    _connector="OR",
-                ),
-                name="grouping_node_matches_pk_or_null",
-            ),
         ),
         migrations.AlterField(
             model_name="resourceinstance",
