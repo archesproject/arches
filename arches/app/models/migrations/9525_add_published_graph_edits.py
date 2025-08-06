@@ -115,5 +115,5 @@ class Migration(migrations.Migration):
                 ],
             ),
         ),
-        migrations.RunPython(create_draft_graphs, delete_draft_graphs),
+        migrations.RunPython(create_draft_graphs, delete_draft_graphs, elidable=True),
     ]
