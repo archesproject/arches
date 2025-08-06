@@ -267,6 +267,8 @@ def get_recursive_prefetches(lookup_str, *, recursive_part="children", depth):
 
 
 def append_tiles_recursively(resource_or_tile):
+    from arches_querysets.models import TileTree
+
     if not vars(resource_or_tile.aliased_data):
         raise RuntimeError("aliased_data is empty")
 
@@ -278,9 +280,10 @@ def append_tiles_recursively(resource_or_tile):
                 continue
 
             tiles = getattr(resource_or_tile.aliased_data, alias)
-            if not isinstance(tiles, list):
-                tiles = [tiles]
-            for tile in tiles:
+        if not isinstance(tiles, list):
+            tiles = [tiles]
+        for tile in tiles:
+            if isinstance(tile, TileTree):
                 tile.fill_blanks()
 
 

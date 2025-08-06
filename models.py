@@ -526,7 +526,7 @@ class TileTree(TileModel, AliasedDataMixin):
     def find_nodegroup_from_alias_or_pk(alias=None, *, permitted_nodes, pk=None):
         """Some of this complexity can be removed when dropping 7.6."""
         for permitted_node in permitted_nodes:
-            if permitted_node.alias == alias or permitted_node.pk == pk:
+            if (alias and permitted_node.alias == alias) or permitted_node.pk == pk:
                 permitted_node.nodegroup._nodegroup_alias = permitted_node.alias
                 return permitted_node.nodegroup
         raise RuntimeError
