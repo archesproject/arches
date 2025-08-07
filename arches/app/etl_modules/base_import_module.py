@@ -324,7 +324,10 @@ class BaseImportModule:
             with zipfile.ZipFile(content, "r") as zip_ref:
                 files = zip_ref.infolist()
                 for file in files:
-                    if file.filename.split(".")[-1] == "xlsx":
+                    if (
+                        file.filename.split(".")[-1] == "xlsx"
+                        and "uploadedfiles/" not in file.filename
+                    ):
                         self.cumulative_files_size += file.file_size
                     if not file.filename.startswith("__MACOSX"):
                         if not file.is_dir():
@@ -334,10 +337,11 @@ class BaseImportModule:
                             result["summary"][
                                 "cumulative_files_size"
                             ] = self.cumulative_files_size
-                        default_storage.save(
-                            os.path.join(self.temp_dir, file.filename),
-                            File(zip_ref.open(file)),
-                        )
+
+                            default_storage.save(
+                                os.path.join(self.temp_dir, file.filename),
+                                File(zip_ref.open(file)),
+                            )
         elif content.name.split(".")[-1] == "xlsx":
             self.cumulative_files_size += content.size
             result["summary"]["files"][content.name] = {
@@ -351,7 +355,7 @@ class BaseImportModule:
 
         has_valid_excel_file = False
         for file in result["summary"]["files"]:
-            if file.split(".")[-1] == "xlsx":
+            if file.split(".")[-1] == "xlsx" and "uploadedfiles/" not in file:
                 try:
                     uploaded_file_path = os.path.join(self.temp_dir, file)
                     opened_file = default_storage.open(uploaded_file_path)
