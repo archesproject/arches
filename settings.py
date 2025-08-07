@@ -56,7 +56,7 @@ SECRET_KEY = "django-insecure-=2sbet4-w$k4#^slj4l7!p!2+%8hmm!(w5m6=h$x#l08_d**gh
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ROOT_URLCONF = "arches_component_lab.urls"
+ROOT_URLCONF = "arches_component_lab.arches_component_lab_urls"
 ROOT_HOSTCONF = "arches_component_lab.hosts"
 
 DEFAULT_HOST = "arches_component_lab"
