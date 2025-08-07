@@ -18,6 +18,7 @@ from django.db.models.constraints import UniqueConstraint
 from django.db.models.expressions import CombinedExpression
 from django.db.models.functions import Concat, Lower
 from django.utils import translation
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from arches.app.const import ExtensionType
@@ -2067,7 +2068,7 @@ class UserProfile(models.Model):
     phone = models.CharField(max_length=16, blank=True)
     encrypted_mfa_hash = models.CharField(max_length=128, null=True, blank=True)
 
-    @property
+    @cached_property
     def viewable_nodegroups(self):
         from arches.app.utils.permission_backend import get_nodegroups_by_perm
 
@@ -2078,7 +2079,7 @@ class UserProfile(models.Model):
             )
         )
 
-    @property
+    @cached_property
     def editable_nodegroups(self):
         from arches.app.utils.permission_backend import get_nodegroups_by_perm
 
@@ -2089,7 +2090,7 @@ class UserProfile(models.Model):
             )
         )
 
-    @property
+    @cached_property
     def deletable_nodegroups(self):
         from arches.app.utils.permission_backend import get_nodegroups_by_perm
 
