@@ -116,7 +116,7 @@ class NodeFetcherMixin:
             # 1. From __init__(), e.g. TileAliasedDataSerializer
             getattr(self, "_graph_slug", None)
             # 2. From Meta options
-            or self.__class__.Meta.graph_slug
+            or self.Meta.graph_slug
             # 3. From generic view
             or self.context.get("graph_slug")
             # 4. From settings
@@ -249,13 +249,12 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
 
     def get_default_field_names(self, declared_fields, model_info):
         field_names = super().get_default_field_names(declared_fields, model_info)
-        options = self.__class__.Meta
-        if options.fields != "__all__":
+        if self.Meta.fields != "__all__":
             raise NotImplementedError  # TODO...
-        if options.nodegroups == "__all__":
+        if self.Meta.nodegroups == "__all__":
             field_names.extend(self._root_node_aliases)
         else:
-            field_names.extend(options.nodegroups)
+            field_names.extend(self.Meta.nodegroups)
         return field_names
 
     def to_internal_value(self, data):
@@ -337,7 +336,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         self.finalize_initial_values(field_map)
 
         # __all__ includes children as well.
-        if self.__class__.Meta.fields == "__all__" and not self.Meta.exclude_children:
+        if self.Meta.fields == "__all__" and not self.Meta.exclude_children:
             child_query = (
                 self._root_node.nodegroup.children
                 # arches_version==9.0.0
@@ -376,7 +375,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
 
     def get_default_field_names(self, declared_fields, model_info):
         field_names = []
-        if self.__class__.Meta.fields == "__all__":
+        if self.Meta.fields == "__all__":
             for sibling_node in self._root_node.nodegroup.node_set.all():
                 if sibling_node.datatype != "semantic":
                     field_names.append(sibling_node.alias)
@@ -559,6 +558,14 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
                 ret["parenttile"] = None
         return ret
 
+    def to_internal_value(self, data):
+        ret = super().to_internal_value(data)
+        # arches_version==9.0.0
+        if arches_version < (8, 0):
+            # Simulate field default provided by Arches 8+.
+            ret["data"] = {}
+        return ret
+
     def get_default_field_names(self, declared_fields, model_info):
         field_names = super().get_default_field_names(declared_fields, model_info)
         try:
@@ -568,9 +575,7 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         return field_names
 
     def create(self, validated_data):
-        # arches_version==9.0.0
-        if arches_version < (8, 0):
-            validated_data["data"] = {}
+        # Provide some additional context to TileTree.__init__()
         validated_data["__request"] = self.context["request"]
         validated_data["__as_representation"] = True
         graph_filters = models.Q(slug=self.graph_slug)
@@ -693,15 +698,14 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         return attrs
 
     def create(self, validated_data):
-        options = self.__class__.Meta
         # TODO: we probably want a queryset method to do one-shot
         # creates with tile data
         without_tile_data = validated_data.copy()
         without_tile_data.pop("aliased_data", None)
         # TODO: decide on "blank" interface.
-        instance_without_tile_data = options.model.mro()[1](**without_tile_data)
+        instance_without_tile_data = self.Meta.model.mro()[1](**without_tile_data)
         instance_without_tile_data.save()
-        instance_from_factory = options.model.get_tiles(
+        instance_from_factory = self.Meta.model.get_tiles(
             graph_slug=self.graph_slug,
             as_representation=True,
         ).get(pk=instance_without_tile_data.pk)

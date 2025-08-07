@@ -152,6 +152,12 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
                 raise ValueError(f"No nodes found for graph with slug: {graph_slug}")
 
         alias_expressions = generate_node_alias_expressions(self.model, nodes)
+
+        # arches_version==9.0.0
+        if arches_version < (8, 0):
+            msg = "arches-querysets requires all nodes to have an alias."
+            assert None not in alias_expressions, msg
+
         if graph_query is None:
             if "graph_query" in qs._hints:
                 graph_query = qs._hints["graph_query"]

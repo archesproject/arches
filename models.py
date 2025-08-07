@@ -86,6 +86,8 @@ class AliasedDataMixin:
             for field in db_instance._meta.concrete_fields:
                 setattr(self, field.attname, getattr(db_instance, field.attname))
             self.aliased_data = db_instance.aliased_data
+            if isinstance(self, TileModel) and self.parenttile_id:
+                self.parenttile = TileModel.objects.get(pk=self.parenttile_id)
             self._tile_trees = from_queryset[0]._tile_trees
 
 
@@ -358,7 +360,8 @@ class TileTree(TileModel, AliasedDataMixin):
                 not self.parenttile_id
                 or self.nodegroup.parentnodegroup_id != self.parenttile.nodegroup_id
             ):
-                raise ValidationError(_("Wrong parent tile for parent nodegroup."))
+                msg = _("Wrong parent tile for parent nodegroup.")
+                raise ValidationError({self.find_nodegroup_alias(): msg})
         # Exclude parenttile to ensure batch creations of parent & child do not fail.
         new_exclude = [*(exclude or []), "parenttile"]
         super().clean_fields(exclude=new_exclude)
@@ -441,8 +444,23 @@ class TileTree(TileModel, AliasedDataMixin):
 
     @classmethod
     def create_blank_tile(
-        cls, *, nodegroup=None, nodegroup_alias=None, container, graph_nodes
+        cls,
+        *,
+        nodegroup=None,
+        nodegroup_alias=None,
+        container,
+        graph_nodes,
+        caller=None,
     ):
+        """
+        Provide either a nodegroup model instance or a nodegroup_alias for which
+        to create a blank tile populated with default node values. If `container`
+        is a ResourceTileTree or TileTree, the new tile will be inserted into the
+        container's aliased_data, and blank child tiles will be created as well.
+        If `container` is None, the operation is done in the reverse direction:
+        the new tile becomes the container (parent), and `caller` is inserted into
+        the new tile's aliased_data.
+        """
         if not nodegroup and not nodegroup_alias:
             raise ValueError("nodegroup or nodegroup_alias is required.")
         nodegroup, nodegroup_alias = cls.find_nodegroup_and_alias_from_alias_or_pk(
@@ -451,14 +469,21 @@ class TileTree(TileModel, AliasedDataMixin):
             graph_nodes=graph_nodes,
         )
 
-        if isinstance(container, ResourceInstance):
+        parent_tile = None
+        if container is None:
+            if not isinstance(caller, TileTree):
+                raise ValueError
+            resource = caller.resourceinstance
+        elif isinstance(container, ResourceInstance):
             resource = container
-            parent_tile = None
-        else:
+            caller = container
+        elif isinstance(container, TileModel):
             resource = container.resourceinstance
             parent_tile = container
+            caller = container
+        else:  # pragma: no cover
+            raise ValueError
 
-        # Initialize a blank tile with nested data.
         blank_tile = cls(
             resourceinstance=resource,
             nodegroup=nodegroup,
@@ -469,7 +494,7 @@ class TileTree(TileModel, AliasedDataMixin):
                 if node.datatype != "semantic"
             },
         )
-        blank_tile.sync_private_attributes(container)
+        blank_tile.sync_private_attributes(caller)
 
         # Finalize the aliased data according to the value of self._as_representation.
         # (e.g. either a dict of node_value, display_value, & details, or call to_python().)
@@ -478,32 +503,39 @@ class TileTree(TileModel, AliasedDataMixin):
                 node_value = blank_tile.data.get(str(node.pk))
                 blank_tile.set_aliased_data(node, node_value)
 
-        # Attach the blank tile to the container.
-        try:
-            aliased_data_value = getattr(container.aliased_data, nodegroup_alias)
-        except AttributeError:
-            aliased_data_value = None if nodegroup.cardinality == "1" else []
-            setattr(container.aliased_data, nodegroup_alias, aliased_data_value)
-        if isinstance(aliased_data_value, list):
-            aliased_data_value.append(blank_tile)
-        elif aliased_data_value is None:
-            setattr(container.aliased_data, nodegroup_alias, blank_tile)
-        else:
-            msg = "Attempted to append to a populated cardinality-1 nodegroup"
-            raise RuntimeError(msg)
+        def insert_into_aliased_data(nodegroup_alias, item, target):
+            try:
+                aliased_data_value = getattr(target.aliased_data, nodegroup_alias)
+            except AttributeError:
+                aliased_data_value = None if nodegroup.cardinality == "1" else []
+                setattr(target.aliased_data, nodegroup_alias, aliased_data_value)
+            if isinstance(aliased_data_value, list):
+                aliased_data_value.append(item)
+            elif aliased_data_value is None:
+                setattr(target.aliased_data, nodegroup_alias, item)
+            else:
+                msg = "Attempted to append to a populated cardinality-1 nodegroup"
+                raise RuntimeError(msg)
 
-        children = (
-            nodegroup.children.all()
-            # arches_version==9.0.0
-            if arches_version >= (8, 0)
-            else nodegroup.nodegroup_set.all()
-        )
-        for child_nodegroup in children:
-            cls.create_blank_tile(
-                nodegroup=child_nodegroup,
-                container=blank_tile,
-                graph_nodes=graph_nodes,
+        if container is None:
+            insert_into_aliased_data(
+                caller.find_nodegroup_alias(), item=caller, target=blank_tile
             )
+        else:
+            insert_into_aliased_data(nodegroup_alias, item=blank_tile, target=container)
+
+            children = (
+                nodegroup.children.all()
+                # arches_version==9.0.0
+                if arches_version >= (8, 0)
+                else nodegroup.nodegroup_set.all()
+            )
+            for child_nodegroup in children:
+                cls.create_blank_tile(
+                    nodegroup=child_nodegroup,
+                    container=blank_tile,
+                    graph_nodes=graph_nodes,
+                )
 
         return blank_tile
 
@@ -596,8 +628,11 @@ class TileTree(TileModel, AliasedDataMixin):
         self, *, request=None, index=True, partial=True, force_admin=False, **kwargs
     ):
         request = ensure_request(request, force_admin)
+        # The `entry` for the TileTreeOperation is usually self, but it could
+        # be a higher parent tile in the tree if blank parents were backfilled.
+        entry = self.backfill_parent_tiles()
         operation = TileTreeOperation(
-            entry=self, request=request, partial=partial, save_kwargs=kwargs
+            entry=entry, request=request, partial=partial, save_kwargs=kwargs
         )
         operation.validate_and_save_tiles()
 
@@ -624,6 +659,17 @@ class TileTree(TileModel, AliasedDataMixin):
                 as_representation=getattr(self, "_as_representation", False),
             )
         self._refresh_aliased_data(using, fields, from_queryset)
+
+    def backfill_parent_tiles(self):
+        if self.nodegroup.parentnodegroup_id and not self.parenttile_id:
+            self.parenttile = self.parent = TileTree.create_blank_tile(
+                nodegroup=self.nodegroup.parentnodegroup,
+                container=None,
+                graph_nodes=self.resourceinstance.graph.node_set.all(),
+                caller=self,
+            )
+            return self.parenttile.backfill_parent_tiles()
+        return self
 
     def _tile_update_is_noop(self, original_data):
         """Skipping no-op tile saves avoids regenerating RxR rows, at least
