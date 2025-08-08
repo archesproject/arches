@@ -1374,18 +1374,50 @@ class FileListDataType(BaseDataType):
 
     def transform_value_for_tile(self, value, **kwargs):
         """
-        Accepts a comma delimited string of file paths as 'value' to create a file datatype value
-        with corresponding file record in the files table for each path. Only the basename of each path is used, so
-        the accuracy of the full path is not important. However the name of each file must match the name of a file in
-        the directory from which Arches will request files. By default, this is the directory in a project as defined
-        in settings.UPLOADED_FILES_DIR.
-
+        Accepts a comma delimited string of file paths as 'value'
+        or a dictionary / a list of dictionaries as following
+        {
+            "name": "",
+            "altText": "",
+            "attribution": "",
+            "description": "",
+            "title": ""
+        }
+        Creates a file datatype value with corresponding file record in the files table for each path.
+        Only the basename of each path is used, so the accuracy of the full path is not important.
+        However the name of each file must match the name of a file in the directory from which Arches will request files.
+        By default, this is the directory in a project as defined in settings.UPLOADED_FILES_DIR.
         """
+
+        # if the value is None, return
+        if not value:
+            return value
 
         mime = MimeTypes()
         tile_data = []
         source_path = kwargs.get("path")
-        for file_path in [filename.strip() for filename in value.split(",")]:
+
+        # check if value is a string (csv) or a dictionay (a list of dictionaries)
+        try:
+            value = ast.literal_eval(value)
+        except ValueError:
+            pass
+
+        # check if resulting value is a string or a list of dictionaries
+        if isinstance(value, str):
+            files = [filename.strip() for filename in value.split(",")] # a list of file paths
+        elif isinstance(value, list) and all(
+            isinstance(file_info, dict) for file_info in value
+        ):
+            files = value # a list of dictionaries with file information
+        else:
+            raise TypeError(value)
+
+        if isinstance(value, (dict, str)):
+            files = [value]
+
+        for file_info in files:
+            file_path = file_info if isinstance(file_info, str) else file_info.get("name")
             tile_file = {}
             try:
                 file_stats = os.stat(file_path)
@@ -1429,6 +1461,23 @@ class FileListDataType(BaseDataType):
             compatible_renderers = self.get_compatible_renderers(tile_file)
             if len(compatible_renderers) == 1:
                 tile_file["renderer"] = compatible_renderers[0]
+
+            # if files includes metadata, add metadata to the tile_file
+            localized_metadata_keys = {"altText", "attribution", "description", "title"}
+            languages = models.Language.objects.all()
+            language = get_language()
+
+            if isinstance(file_info, dict):
+                for key in localized_metadata_keys:
+                    val = file_info.get(key, "")
+                    if not isinstance(val, dict):
+                        tile_file[key] = {}
+                    for lang in languages:
+                        if lang.code not in tile_file[key]:
+                            tile_file[key][lang.code] = {
+                                "value": val if lang.code == language else "",
+                                "direction": lang.default_direction,
+                            }
             tile_data.append(tile_file)
         return json.loads(json.dumps(tile_data))
 
