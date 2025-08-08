@@ -2604,7 +2604,7 @@ class SpatialView(models.Model):
                     ("valid_language_count", "integer"),
                 ],
                 func=format_file_into_sql(
-                    "arches_update_spatial_views.sql", "sql/triggers"
+                    "__arches_update_spatial_views.sql", "sql/triggers"
                 ),
             )
         ]
