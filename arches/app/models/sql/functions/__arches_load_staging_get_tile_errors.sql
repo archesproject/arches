@@ -1,12 +1,8 @@
-from django.db import migrations
-
-
-UPDATE_LOAD_STAGING_GET_TILE_ERRORS_FUNCTION = f"""
     CREATE OR REPLACE FUNCTION public.__arches_load_staging_get_tile_errors(json_obj jsonb)
     RETURNS text
     LANGUAGE plpgsql AS
 
-    $func$
+    $$
     DECLARE
         _key   text;
         _value jsonb;
@@ -31,18 +27,4 @@ UPDATE_LOAD_STAGING_GET_TILE_ERRORS_FUNCTION = f"""
         END LOOP;
         RETURN _result;
     END;
-    $func$;
-"""
-
-
-class Migration(migrations.Migration):
-    dependencies = [
-        ("models", "12284_resource_fields_read_only"),
-    ]
-
-    operations = [
-        migrations.RunSQL(
-            UPDATE_LOAD_STAGING_GET_TILE_ERRORS_FUNCTION,
-            migrations.RunSQL.noop,  # No reverse operation needed
-        ),
-    ]
+    $$;

@@ -287,15 +287,12 @@ class TileExcelImporter(BaseImportModule):
                     nodegroup_id = worksheet.cell(
                         2, self.get_nodegroup_id_column(worksheet)
                     ).value
-                    print("ME ME ME", nodegroup_id)
                     graphid = str(
                         Node.objects.filter(nodegroup_id=nodegroup_id)[0].graph_id
                     )
                     break
                 except (IndexError, ValidationError):
                     pass
-            else:
-                print("nope")
         return graphid
 
     def stage_files(self, files, summary, cursor):
