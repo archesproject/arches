@@ -8,5 +8,6 @@ sql_items = [
         "__arches_instance_view_update",
         format_file_into_sql("__arches_instance_view_update.sql", "sql/functions"),
         reverse_sql="drop function __arches_instance_view_update;",
+        replace=True,
     ),
 ]
