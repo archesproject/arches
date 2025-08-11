@@ -8,13 +8,15 @@ from rest_framework.metadata import SimpleMetadata
 from rest_framework.settings import api_settings
 
 from arches import VERSION as arches_version
-from arches.app.models.models import ResourceInstance, TileModel
+from arches.app.models.models import Node, ResourceInstance, TileModel
 from arches.app.utils.permission_backend import (
     user_can_delete_resource,
     user_can_edit_resource,
     user_can_read_resource,
 )
 from arches.app.utils.string_utils import str_to_bool
+
+from arches_querysets.rest_framework.utils import get_nodegroup_alias_lookup
 
 
 class MetadataWithWidgetConfig(SimpleMetadata):
@@ -39,6 +41,7 @@ class ArchesModelAPIMixin:
         options = self.serializer_class.Meta
         self.graph_slug = options.graph_slug or kwargs.get("graph")
         self.nodegroup_alias = kwargs.get("nodegroup_alias")
+        self.nodegroup_alias_lookup = get_nodegroup_alias_lookup(self.graph_slug)
 
         if issubclass(options.model, TileModel):
             self.nodegroup_alias = options.root_node or self.nodegroup_alias
@@ -101,6 +104,7 @@ class ArchesModelAPIMixin:
             "graph_slug": self.graph_slug,
             "permitted_nodes": self.permitted_nodes,
             "nodegroup_alias": self.nodegroup_alias,
+            "nodegroup_alias_lookup": self.nodegroup_alias_lookup,
         }
 
     def get_object(self, permission_callable=None, fill_blanks=False):

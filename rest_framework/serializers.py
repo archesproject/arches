@@ -1,6 +1,5 @@
-import uuid
 from collections import defaultdict
-from functools import lru_cache, partial
+from functools import partial
 
 from django.conf import settings
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
@@ -21,6 +20,7 @@ from arches_querysets.datatypes.datatypes import DataTypeFactory
 from arches_querysets.models import AliasedData, ResourceTileTree, TileTree
 from arches_querysets.utils.models import ensure_request
 from arches_querysets.rest_framework.field_mixins import NodeValueMixin
+from arches_querysets.rest_framework.utils import get_nodegroup_alias_lookup
 
 
 def _make_tile_serializer(
@@ -30,6 +30,7 @@ def _make_tile_serializer(
     sortorder,
     slug,
     permitted_nodes,
+    nodegroup_alias_lookup=None,
     nodes="__all__",
     exclude_children=False,
 ) -> type["ArchesTileSerializer"]:
@@ -46,6 +47,7 @@ def _make_tile_serializer(
         "permitted_nodes": permitted_nodes,
         "graph_slug": slug,
         "root_node": nodegroup_alias,
+        "nodegroup_alias_lookup": nodegroup_alias_lookup,
     }
 
     single_serializer = SingleNodegroupAliasedDataSerializer(**init_kwargs)
@@ -68,6 +70,7 @@ def _make_tile_serializer(
         allow_null=True,
         graph_slug=slug,
         permitted_nodes=permitted_nodes,
+        nodegroup_alias_lookup=nodegroup_alias_lookup,
         style={"alias": nodegroup_alias, "sortorder": sortorder},
     )
 
@@ -156,13 +159,21 @@ class NodeFetcherMixin:
         return self.context.get("nodegroup_alias")
 
     def ensure_context(
-        self, *, graph_slug, permitted_nodes, nodegroup_alias=None, request=None
+        self,
+        *,
+        graph_slug,
+        permitted_nodes,
+        nodegroup_alias=None,
+        nodegroup_alias_lookup=None,
+        request=None,
     ):
         """The view provides a context, so this is mainly here for script usage."""
         return {
             "graph_slug": graph_slug,
             "permitted_nodes": permitted_nodes,
             "nodegroup_alias": nodegroup_alias,
+            "nodegroup_alias_lookup": nodegroup_alias_lookup
+            or get_nodegroup_alias_lookup(graph_slug),
             "request": ensure_request(request),
         }
 
@@ -219,6 +230,7 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
                         nodegroup_alias=node.alias,
                         cardinality=node.nodegroup.cardinality,
                         permitted_nodes=self.permitted_nodes,
+                        nodegroup_alias_lookup=self.context["nodegroup_alias_lookup"],
                         sortorder=sortorder,
                         exclude_children=options.exclude_children,
                     )
@@ -272,6 +284,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
 
     def __init__(self, instance=None, data=empty, **kwargs):
         self._permitted_nodes = kwargs.pop("permitted_nodes", [])
+        self._nodegroup_alias_lookup = kwargs.pop("nodegroup_alias_lookup", {})
         self._graph_slug = kwargs.pop("graph_slug", None)
         self._root_node = kwargs.pop("root_node", None)
         super().__init__(instance, data, **kwargs)
@@ -285,15 +298,6 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         ret = super().__deepcopy__(memo)
         ret._permitted_nodes = self._permitted_nodes
         return ret
-
-    # TODO: uncache this
-    @staticmethod
-    @lru_cache(maxsize=1)
-    def get_nodegroup_aliases():
-        return {
-            node.pk: node.alias
-            for node in Node.objects.filter(pk=models.F("nodegroup_id")).only("alias")
-        }
 
     def get_value(self, dictionary):
         """Avoid the branch that treats MultiPart data input as HTML."""
@@ -316,9 +320,6 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         field_map = super().get_fields()
         self.finalize_initial_values(field_map)
 
-        if arches_version < (8, 0):
-            nodegroup_aliases = self.get_nodegroup_aliases()
-
         # __all__ includes children as well.
         if self.__class__.Meta.fields == "__all__" and not self.Meta.exclude_children:
             child_query = (
@@ -327,10 +328,9 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
                 else self._root_node.nodegroup.nodegroup_set
             )
             for child_nodegroup in child_query.all():
-                if arches_version >= (8, 0):
-                    child_nodegroup_alias = child_nodegroup.grouping_node.alias
-                else:
-                    child_nodegroup_alias = nodegroup_aliases[child_nodegroup.pk]
+                child_nodegroup_alias = self.context["nodegroup_alias_lookup"][
+                    child_nodegroup.pk
+                ]
                 self._child_nodegroup_aliases.append(child_nodegroup_alias)
 
                 if (
@@ -342,6 +342,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
                         sortorder = child_nodegroup.cardmodel_set.all()[0].sortorder
                     field_map[child_nodegroup_alias] = _make_tile_serializer(
                         nodegroup_alias=child_nodegroup_alias,
+                        nodegroup_alias_lookup=self.context["nodegroup_alias_lookup"],
                         cardinality=child_nodegroup.cardinality,
                         slug=self.graph_slug,
                         permitted_nodes=self.permitted_nodes,
@@ -507,6 +508,7 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
                 graph_slug=self._graph_slug,
                 permitted_nodes=self._permitted_nodes,
                 nodegroup_alias=kwargs.pop("nodegroup_alias", None),
+                nodegroup_alias_lookup=kwargs.pop("nodegroup_alias_lookup", {}),
             )
         kwargs["context"] = context
         super().__init__(instance, data, **kwargs)
@@ -607,11 +609,19 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         }
 
     def __init__(
-        self, *args, graph_slug=None, permitted_nodes=None, context=None, **kwargs
+        self,
+        *args,
+        graph_slug=None,
+        permitted_nodes=None,
+        nodegroup_alias_lookup=None,
+        context=None,
+        **kwargs,
     ):
         if not context:
             context = self.ensure_context(
-                graph_slug=graph_slug, permitted_nodes=permitted_nodes
+                graph_slug=graph_slug,
+                permitted_nodes=permitted_nodes,
+                nodegroup_alias_lookup=nodegroup_alias_lookup,
             )
         kwargs["context"] = context
         super().__init__(*args, **kwargs)
