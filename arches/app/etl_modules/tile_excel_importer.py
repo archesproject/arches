@@ -155,12 +155,12 @@ class TileExcelImporter(BaseImportModule):
         If no nodegroup id is found, returns None.
         """
         index = 1
-        for col in worksheet.iter_cols():
-            print(col[0].value, index)
-            if col[0].value == "nodegroup_id":
-                return index
-            else:
-                index += 1
+        for row in worksheet.iter_rows(1, 1, None, None):
+            for cell in row:
+                if cell.value == "nodegroup_id":
+                    return index
+                else:
+                    index += 1
         return worksheet.max_column
 
     def process_worksheet(self, worksheet, cursor, node_lookup, nodegroup_lookup):
@@ -281,7 +281,6 @@ class TileExcelImporter(BaseImportModule):
 
     def get_graphid(self, workbook):
         for worksheet in workbook.worksheets:
-            print(worksheet, self.get_nodegroup_id_column(worksheet))
             if worksheet.cell(2, self.get_nodegroup_id_column(worksheet)).value:
                 try:
                     nodegroup_id = worksheet.cell(
