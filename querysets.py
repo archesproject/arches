@@ -241,7 +241,9 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
 
     def _set_child_tile_data(self, tile):
         child_tiles = getattr(tile, "_tile_trees", [])
-        for child_tile in sorted(child_tiles, key=attrgetter("sortorder")):
+        for child_tile in sorted(
+            child_tiles, key=lambda tile_item: tile_item.sortorder or 0
+        ):
             child_nodegroup_alias = child_tile.find_nodegroup_alias()
             if child_tile.nodegroup.cardinality == "1" and child_nodegroup_alias:
                 # TODO(arches_version): remove `and child_nodegroup_alias`
