@@ -217,7 +217,9 @@ class BaseImportModule:
                     load_event.successful = False
                     load_event.complete = True
                     load_event.load_end_time = datetime.now()
-                    load_event.error_message = _("Unable to parse file. If including extra .xlsx files in a zip file, be sure they are in an 'uploadedfiles' directory")
+                    load_event.error_message = _(
+                        "Unable to parse file. If including extra .xlsx files in a zip file, be sure they are in an 'uploadedfiles' directory"
+                    )
                     load_event.save()
                     raise FileValidationError
                 self.check_tile_cardinality(cursor)
