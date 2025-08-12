@@ -3,7 +3,12 @@ import {
     HIDDEN_LABEL,
     PREF_LABEL,
 } from "@/arches_controlled_lists/constants.ts";
-import { getItemLabel, rankLabel } from "@/arches_controlled_lists/utils.ts";
+import {
+    getItemLabel,
+    rankLabel,
+    reorderItems,
+} from "@/arches_controlled_lists/utils.ts";
+import { controlled_lists } from "../../../tests/fixtures/data/sample_list_api_response.json";
 
 import type { Label } from "@/arches_controlled_lists/types";
 
@@ -93,5 +98,29 @@ describe("getItemLabel() util", () => {
                 systemLanguageCode,
             ).language_id,
         ).toEqual(systemLanguageCode);
+    });
+});
+
+describe("reorderItems() util", () => {
+    it("reorders a set of siblings from 0", () => {
+        reorderItems(
+            controlled_lists[0],
+            controlled_lists[0].items[0],
+            controlled_lists[0].items,
+            false,
+        );
+        expect(controlled_lists[0].items.map((item) => item.sortorder)).toEqual(
+            [0, 1],
+        );
+        expect(
+            controlled_lists[0].items[0].children.map(
+                (child) => child.sortorder,
+            ),
+        ).toEqual([0]);
+        expect(
+            controlled_lists[0].items[1].children.map(
+                (child) => child.sortorder,
+            ),
+        ).toEqual([0]);
     });
 });

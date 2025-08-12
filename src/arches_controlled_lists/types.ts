@@ -87,7 +87,7 @@ export interface ControlledListItem {
     values: Value[];
     images: ControlledListItemImage[];
     children: ControlledListItem[];
-    parent_id: string;
+    parent_id: string | null;
     depth: number;
 }
 

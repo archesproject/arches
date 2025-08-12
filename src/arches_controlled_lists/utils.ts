@@ -212,32 +212,8 @@ export const reorderItems = (
     siblings: ControlledListItem[],
     up: boolean,
 ) => {
-    /* This isn't child's play because sort order is "flat", whereas
-    reordering involves moving hierarchy subsets.
-
-    With this tree:
-        1
-        |- 2
-        |- 3
-        4
-        5
-
-    Moving the first item "down" one should result in:
-        1
-        2
-        |- 3
-        |- 4
-        5
-
-        (1 -> 4)
-        (2 -> 1)
-        (3 -> 2)
-        (4 -> 3)
-        (5 -> 5)
-
-    We're going to accomplish this by reordering the moved item among
-    its immediate siblings, and then recalculating sort order through the
-    entire list. The python view will just care that the sortorder
+    /* Recalculate sort order through the entire list after a move operation.
+    The python view will just care that the sortorder
     value is correct, not that the items actually present in that order
     in the JSON data, but we're still going to reorder the JSON so we can
     use it to update client state if the server returns an empty success msg.
@@ -273,11 +249,10 @@ export const reorderItems = (
         }
     }
 
-    let acc = 0;
-    const recalculateSortOrderRecursive = (
+    function recalculateSortOrderRecursive(
         parent: Selectable,
         items: ControlledListItem[],
-    ) => {
+    ) {
         // Patch in the reordered siblings.
         if (
             patchSiblings &&
@@ -290,12 +265,12 @@ export const reorderItems = (
             }
             items = reorderedSiblings;
         }
-        for (const thisItem of items) {
-            thisItem.sortorder = acc;
-            acc += 1;
+        // Renumber siblings starting at 0.
+        items.forEach((thisItem, i) => {
+            thisItem.sortorder = i;
             recalculateSortOrderRecursive(thisItem, thisItem.children);
-        }
-    };
+        });
+    }
 
     recalculateSortOrderRecursive(list, list.items);
 };
