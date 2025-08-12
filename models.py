@@ -1,5 +1,4 @@
 import logging
-import sys
 import uuid
 from types import SimpleNamespace
 from typing import Mapping
@@ -22,10 +21,7 @@ from arches.app.models.models import (
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from arches.app.utils.permission_backend import (
-    get_nodegroups_by_perm,
-    user_is_resource_reviewer,
-)
+from arches.app.utils.permission_backend import user_is_resource_reviewer
 
 from arches_querysets.bulk_operations.tiles import TileTreeOperation
 from arches_querysets.datatypes.datatypes import DataTypeFactory
@@ -39,8 +35,6 @@ from arches_querysets.querysets import (
 from arches_querysets.utils.models import (
     append_tiles_recursively,
     ensure_request,
-    get_recursive_prefetches,
-    get_nodegroups_here_and_below,
     pop_arches_model_kwargs,
 )
 
@@ -107,9 +101,6 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         )
         super().__init__(*args, **other_kwargs)
         self.aliased_data = AliasedData(**arches_model_kwargs)
-        self._permitted_nodes = Node.objects.none()
-        # Data-collecting nodes that were queried
-        self._queried_nodes = Node.objects.none()
         self._as_representation = False
 
     @property
@@ -149,10 +140,8 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         graph_slug,
         *,
         resource_ids=None,
-        defer=None,
-        only=None,
         as_representation=False,
-        user=None,
+        nodes=None,
     ):
         """Return a chainable QuerySet for a requested graph's instances,
         with tile data keyed by node and nodegroup aliases.
@@ -162,17 +151,15 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         return cls.objects.get_tiles(
             graph_slug,
             resource_ids=resource_ids,
-            defer=defer,
-            only=only,
             as_representation=as_representation,
-            user=user,
+            nodes=nodes,
         )
 
     def append_tile(self, nodegroup_alias):
         TileTree.create_blank_tile(
             nodegroup_alias=nodegroup_alias,
             container=self,
-            permitted_nodes=self._permitted_nodes,
+            permitted_nodes=self.graph.node_set.all(),
         )
 
     def fill_blanks(self):
@@ -194,14 +181,12 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
             user=user, edit_type=edit_type, transaction_id=transaction_id
         )
 
-    def refresh_from_db(self, using=None, fields=None, from_queryset=None, user=None):
+    def refresh_from_db(self, using=None, fields=None, from_queryset=None):
         if from_queryset is None:
             # TODO: symptom that we need a backreference to the queryset args.
             from_queryset = self.__class__.get_tiles(
                 self.graph.slug,
-                only={node.alias for node in self._queried_nodes},
                 as_representation=getattr(self, "_as_representation", False),
-                user=user,
             )
         self._refresh_aliased_data(using, fields, from_queryset)
 
@@ -226,9 +211,7 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
             self.save_edit(user=request.user, transaction_id=operation.transaction_id)
 
         self.refresh_from_db(
-            using=kwargs.get("using"),
-            fields=kwargs.get("update_fields"),
-            user=request.user if request else None,
+            using=kwargs.get("using"), fields=kwargs.get("update_fields")
         )
 
 
@@ -250,9 +233,7 @@ class TileTree(TileModel, AliasedDataMixin):
             "aliased_data", None
         ) or AliasedData(**arches_model_kwargs)
         self._parent = None
-        self._permitted_nodes = Node.objects.none()
-        # Data-collecting nodes that were queried
-        self._queried_nodes = Node.objects.none()
+        self._sealed = False
 
     @property
     def aliased_data(self):
@@ -269,6 +250,19 @@ class TileTree(TileModel, AliasedDataMixin):
     @parent.setter
     def parent(self, parent):
         self._parent = parent
+
+    @property
+    def sealed(self):
+        """
+        A boolean set when this instance is yielded from a QuerySet signifying
+        that its .nodegroup and .resourceinstance.graph attributes are safe to use
+        (i.e. have been replaced with instances having related objects prefetched.)
+        """
+        return self._sealed
+
+    @sealed.setter
+    def sealed(self, value):
+        self._sealed = value
 
     def save(
         self, *, request=None, index=True, partial=True, force_admin=False, **kwargs
@@ -313,60 +307,26 @@ class TileTree(TileModel, AliasedDataMixin):
         nodegroup_alias,
         *,
         resource_ids=None,
-        defer=None,
-        only=None,
         as_representation=False,
-        user=None,
+        nodes=None,
+        depth=20,
     ):
         """See `arches_querysets.querysets.TileTreeQuerySet.get_tiles`."""
-
-        source_graph = GraphWithPrefetching.prefetch(
-            graph_slug, resource_ids=resource_ids, user=user
-        )
-        for node in source_graph.permitted_nodes:
-            if node.alias == nodegroup_alias:
-                entry_node = node
-                break
-        else:
-            raise Node.DoesNotExist(f"graph: {graph_slug} node: {nodegroup_alias}")
-
-        if not entry_node.nodegroup:
-            raise ValueError(f'"{nodegroup_alias}" is a top node.')
-
-        entry_node_and_nodes_below = []
-        for nodegroup in get_nodegroups_here_and_below(entry_node.nodegroup):
-            entry_node_and_nodes_below.extend(
-                [
-                    node
-                    for node in nodegroup.node_set.all()
-                    if node in source_graph.permitted_nodes
-                ]
-            )
-
-        qs = cls.objects.filter(nodegroup_id=entry_node.pk)
-        if resource_ids:
-            qs = qs.filter(resourceinstance_id__in=resource_ids)
-
-        filtered_only = [
-            branch_node.alias
-            for branch_node in entry_node_and_nodes_below
-            if not only or branch_node.alias in only
-        ]
-
-        return qs.get_tiles(
+        return cls.objects.get_tiles(
             graph_slug=graph_slug,
             nodegroup_alias=nodegroup_alias,
-            permitted_nodes=entry_node_and_nodes_below,
-            defer=defer,
-            only=filtered_only,
+            resource_ids=resource_ids,
             as_representation=as_representation,
-            entry_node=entry_node,
+            nodes=nodes,
+            depth=depth,
         )
 
     def serialize(self, **kwargs):
-        """Prevent serialization of properties (would cause cycles)."""
+        """Prevent serialization of the vanilla .data field, as well as properties
+        (serializing .parent would cause cycles)."""
         options = {**kwargs}
-        options["exclude"] = {"data", "parent"} | set(options.pop("exclude", {}))
+        ignored_props = {"data", "parent", "sealed"}
+        options["exclude"] = ignored_props | set(options.pop("exclude", {}))
         return JSONSerializer().handle_model(self, **options)
 
     def clean_fields(self, exclude=None):
@@ -385,12 +345,12 @@ class TileTree(TileModel, AliasedDataMixin):
         super().clean_fields(exclude=new_exclude)
 
     def find_nodegroup_alias(self):
-        # TileTreeManager provides grouping_node on 7.6
-        if self.nodegroup_id and hasattr(self.nodegroup, "grouping_node"):
-            return self.nodegroup.grouping_node.alias
+        # arches_version==9.0.0
+        if arches_version >= (8, 0):
+            return super().find_nodegroup_alias()
         if not getattr(self, "_nodegroup_alias", None):
-            # But perform a last-minute check just in case. This will
-            # also run if the node alias is null.
+            # TileTreeManager provides "_nodegroup_alias" annotation on 7.6, but perform
+            # a last-minute check just in case. Also runs if the node alias is null.
             if grouping_node := Node.objects.filter(pk=self.nodegroup_id).first():
                 self._nodegroup_alias = grouping_node.alias
         return self._nodegroup_alias
@@ -441,26 +401,36 @@ class TileTree(TileModel, AliasedDataMixin):
         return tile
 
     def sync_private_attributes(self, source):
-        self._as_representation = source._as_representation
-        self._queried_nodes = source._queried_nodes
-        self._permitted_nodes = source._permitted_nodes
+        if isinstance(source, models.QuerySet):
+            self._as_representation = source._hints.get("as_representation", False)
+        else:
+            self._as_representation = source._as_representation
 
     def append_tile(self, nodegroup_alias):
         TileTree.create_blank_tile(
             nodegroup_alias=nodegroup_alias,
             container=self,
-            permitted_nodes=self._permitted_nodes,
+            permitted_nodes=(
+                self.resourceinstance.graph.node_set.all()
+                if self.resourceinstance_id
+                else None
+            ),
         )
 
     @classmethod
     def create_blank_tile(
         cls, *, nodegroup=None, nodegroup_alias=None, container, permitted_nodes
     ):
+        if not permitted_nodes:
+            # cancel the perms check somehow
+            assert False
         if not nodegroup:
             if not nodegroup_alias:
                 raise ValueError("nodegroup or nodegroup_alias is required.")
             nodegroup = cls.find_nodegroup_from_alias_or_pk(
-                nodegroup_alias, permitted_nodes=permitted_nodes
+                # XXX: rename
+                nodegroup_alias,
+                permitted_nodes=permitted_nodes,
             )
 
         if not nodegroup_alias:
@@ -519,7 +489,7 @@ class TileTree(TileModel, AliasedDataMixin):
             cls.create_blank_tile(
                 nodegroup=child_nodegroup,
                 container=blank_tile,
-                permitted_nodes=permitted_nodes,
+                permitted_nodes=permitted_nodes,  # XXX rename
             )
 
         return blank_tile
@@ -629,15 +599,13 @@ class TileTree(TileModel, AliasedDataMixin):
             fields=kwargs.get("update_fields", None),
         )
 
-    def refresh_from_db(self, using=None, fields=None, from_queryset=None, user=None):
+    def refresh_from_db(self, using=None, fields=None, from_queryset=None):
         if from_queryset is None:
             # TODO: symptom that we need a backreference to the queryset args.
             from_queryset = self.__class__.get_tiles(
                 self.resourceinstance.graph.slug,
                 nodegroup_alias=self.find_nodegroup_alias(),
-                only={node.alias for node in self._queried_nodes},
                 as_representation=getattr(self, "_as_representation", False),
-                user=user,
             )
         self._refresh_aliased_data(using, fields, from_queryset)
 
@@ -714,102 +682,3 @@ class GraphWithPrefetching(GraphModel):
     class Meta:
         proxy = True
         db_table = "graphs"
-
-    @classmethod
-    def prefetch(cls, graph_slug=None, *, resource_ids=None, user=None):
-        """Return a graph with necessary prefetches for
-        TileTree._prefetch_related_objects(), which is what builds the shape
-        of the tile graph.
-
-        This method also checks nodegroup permissions for read.
-        """
-        if resource_ids and not graph_slug:
-            graph_query = cls.objects.filter(resourceinstance__in=resource_ids)
-        elif graph_slug:
-            # arches_version==9.0.0
-            if arches_version >= (8, 0):
-                graph_query = cls.objects.filter(
-                    slug=graph_slug, source_identifier=None
-                )
-            else:
-                graph_query = cls.objects.filter(slug=graph_slug)
-        else:
-            raise ValueError("graph_slug or resource_ids must be provided")
-
-        # arches_version==9.0.0
-        if arches_version >= (8, 0):
-            children = "children"
-        else:
-            children = "nodegroup_set"
-
-        prefetches = [
-            "node_set__cardxnodexwidget_set",
-            "node_set__nodegroup__parentnodegroup",
-            "node_set__nodegroup__node_set",
-            "node_set__nodegroup__node_set__cardxnodexwidget_set",
-            "node_set__nodegroup__cardmodel_set",
-            *get_recursive_prefetches(
-                f"node_set__nodegroup__{children}", depth=12, recursive_part=children
-            ),
-            *get_recursive_prefetches(
-                f"node_set__nodegroup__{children}__node_set",
-                depth=12,
-                recursive_part=children,
-            ),
-            *get_recursive_prefetches(
-                f"node_set__nodegroup__{children}__cardmodel_set",
-                depth=12,
-                recursive_part=children,
-            ),
-            *get_recursive_prefetches(
-                f"node_set__nodegroup__{children}__node_set__cardxnodexwidget_set",
-                depth=12,
-                recursive_part=children,
-            ),
-        ]
-
-        if user:
-            permitted_nodegroups = get_nodegroups_by_perm(user, "models.read_nodegroup")
-            permitted_nodes_prefetch = models.Prefetch(
-                "node_set",
-                queryset=Node.objects.filter(nodegroup__in=permitted_nodegroups),
-                # Intentionally not using to_attr until we can make that
-                # play nicely with other prefetches.
-            )
-            prefetches.insert(0, permitted_nodes_prefetch)
-
-        try:
-            graph = graph_query.prefetch_related(*prefetches).get()
-        except cls.DoesNotExist as e:
-            if sys.version_info >= (3, 11):
-                e.add_note(f"No graph found with slug: {graph_slug}")
-            raise
-
-        graph._annotate_grouping_node()
-
-        return graph
-
-    @property
-    def permitted_nodes(self):
-        """Permission filtering is accomplished by permitted_nodes_prefetch."""
-        return self.node_set.all()
-
-    def _annotate_grouping_node(self):
-        nodegroups = set()
-        grouping_node_map = {}
-        for node in self.permitted_nodes:
-            if node.nodegroup_id == node.pk:
-                grouping_node_map[node.pk] = node
-                if node.nodegroup:
-                    nodegroups.add(node.nodegroup)
-        for nodegroup in nodegroups:
-            nodegroup.grouping_node = grouping_node_map.get(nodegroup.pk)
-            # arches_version==9.0.0
-            if arches_version >= (8, 0):
-                child_nodegroups = nodegroup.children.all()
-            else:
-                child_nodegroups = nodegroup.nodegroup_set.all()
-            for child_nodegroup in child_nodegroups:
-                child_nodegroup.grouping_node = grouping_node_map.get(
-                    child_nodegroup.pk
-                )

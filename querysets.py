@@ -5,6 +5,7 @@ from slugify import slugify
 
 from django.core.exceptions import FieldError, ValidationError
 from django.db import models
+from django.db.models.query import ModelIterable
 from django.utils.translation import gettext as _
 
 from arches import VERSION as arches_version
@@ -13,7 +14,7 @@ from arches.app.models.models import Node
 from arches_querysets.datatypes.datatypes import DataTypeFactory
 from arches_querysets.utils.models import (
     generate_node_alias_expressions,
-    filter_nodes_by_highest_parent,
+    get_recursive_prefetches,
 )
 
 NOT_PROVIDED = object()
@@ -69,14 +70,11 @@ class NodeAliasValuesMixin:
 
 class TileTreeManager(models.Manager):
     def get_queryset(self):
-        qs = super().get_queryset().select_related("nodegroup")
+        qs = super().get_queryset().select_related("resourceinstance")
         # arches_version==9.0.0
         if arches_version >= (8, 0):
-            qs = qs.select_related("nodegroup__grouping_node")
-            qs = qs.prefetch_related(
-                "nodegroup__children__node_set",
-                "resourceinstance__from_resxres__to_resource",
-            )
+            # XXX could get this from resource queryset
+            qs = qs.prefetch_related("resourceinstance__from_resxres__to_resource")
         else:
             # Annotate nodegroup_alias on Arches 7.6.
             qs = qs.annotate(
@@ -93,24 +91,16 @@ class TileTreeManager(models.Manager):
 
 
 class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._as_representation = False
-        self._queried_nodes = []
-        self._permitted_nodes = []
-        self._entry_node = None
-
     def get_tiles(
         self,
         graph_slug,
         nodegroup_alias=None,
         *,
-        permitted_nodes,
-        defer=None,
-        only=None,
+        resource_ids=None,
         as_representation=False,
         depth=20,
-        entry_node=None,
+        nodes=None,
+        _graph_query=None,  # internal arg only
     ):
         """
         Entry point for filtering arches data by nodegroups.
@@ -131,68 +121,93 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
             - True: calls to_json() datatype methods
             - False: calls to_python() datatype methods
         """
-        self._as_representation = as_representation
+        from arches_querysets.models import GraphWithPrefetching
 
-        deferred_node_aliases = {
-            n.alias
-            for n in permitted_nodes
-            if getattr(n.nodegroup, "nodegroup_alias", None) in (defer or [])
-        }
-        only_node_aliases = {
-            n.alias
-            for n in permitted_nodes
-            if getattr(n.nodegroup, "nodegroup_alias", None) in (only or [])
-        }
-        queried_nodes, alias_expressions = generate_node_alias_expressions(
-            permitted_nodes,
-            defer=deferred_node_aliases,
-            only=only_node_aliases,
-            model=self.model,
+        if nodegroup_alias:
+            qs = self.filter(
+                nodegroup__node__alias=nodegroup_alias,
+                nodegroup__node__graph__slug=graph_slug,
+            )
+        else:
+            qs = self.filter(nodegroup__node__graph__slug=graph_slug)
+        if resource_ids:
+            qs = qs.filter(resourceinstance_id__in=resource_ids)
+
+        if not nodes:
+            # Violates laziness of QuerySets, but can be made fully lazy
+            # by providing a `nodes` argument doing the same query.
+            filters = models.Q(graph__slug=graph_slug)
+            # arches_version==9.0.0
+            if arches_version >= (8, 0):
+                filters &= models.Q(source_identifier=None)
+            nodes = (
+                Node.objects.filter(filters)
+                .exclude(datatype="semantic")
+                .exclude(nodegroup=None)
+                .select_related("nodegroup__parentnodegroup")
+            )
+
+        alias_expressions = generate_node_alias_expressions(self.model, nodes)
+        qs._add_hints(
+            as_representation=as_representation,
+            graph_slug=graph_slug,
+            graph_query=_graph_query,
         )
-
-        self._permitted_nodes = permitted_nodes  # permitted nodes below entry point
-        self._queried_nodes = queried_nodes
-        self._entry_node = entry_node
-
-        qs = self.filter(nodegroup_id__in={n.nodegroup_id for n in self._queried_nodes})
 
         # Future: see various solutions mentioned here for avoiding
         # "magic number" depth traversal (but the magic number is harmless,
         # causes no additional queries beyond actual depth):
         # https://forum.djangoproject.com/t/prefetching-relations-to-arbitrary-depth/39328
         if depth:
+            if qs._hints.get("graph_query") is None:
+                qs._add_hints(
+                    graph_query=GraphWithPrefetching.objects.prefetch(
+                        qs._hints["graph_slug"]
+                    )
+                )
+            child_tile_query = (
+                self.model.objects.get_queryset()
+                .get_tiles(
+                    graph_slug=graph_slug,
+                    as_representation=as_representation,
+                    depth=depth - 1,
+                    nodes=nodes,
+                    _graph_query=qs._hints["graph_query"],
+                )
+                .distinct()
+            )
+
             qs = qs.prefetch_related(
                 models.Prefetch(
                     # arches_version==9.0.0
                     "children" if arches_version >= (8, 0) else "tilemodel_set",
-                    queryset=self.model.objects.get_queryset().get_tiles(
-                        graph_slug=graph_slug,
-                        permitted_nodes=permitted_nodes,
-                        defer=defer,
-                        only=only,
-                        as_representation=as_representation,
-                        depth=depth - 1,
-                    ),
+                    queryset=child_tile_query,
                     # Using to_attr ensures the query results materialize into
                     # TileTree objects rather than TileModel objects. This isn't
                     # usually an issue, but something in the way we're overriding
                     # ORM internals seems to require this.
+                    # XXX?
                     to_attr="_tile_trees",
                 )
             )
 
         return qs.alias(**alias_expressions)
 
-    def _prefetch_related_objects(self):
+    def _fetch_all(self):
         """Hook into QuerySet evaluation to customize the result."""
-        # Overriding _fetch_all() doesn't work here: causes dupe child tiles.
-        # Perhaps these manual annotations could be scheduled another way?
-        super()._prefetch_related_objects()
-        try:
-            self._set_aliased_data()
-        except (TypeError, ValueError, ValidationError) as e:
-            # These errors are caught by DRF, so re-raise as something else.
-            raise RuntimeError(e) from e
+        if issubclass(self._iterable_class, ModelIterable):
+            if "graph_query" in self._hints:
+                self._iterable_class = TileTreeIterable
+            # else: .get_tiles() was not called: no need to set richer representations.
+        # else: values()/values_list() queries: no need to set richer representations.
+        super()._fetch_all()
+
+        if issubclass(self._iterable_class, ModelIterable):
+            try:
+                self._set_aliased_data()
+            except (TypeError, ValueError, ValidationError) as e:
+                # These errors are caught by DRF, so re-raise as something else.
+                raise RuntimeError(e) from e
 
     def _set_aliased_data(self):
         """
@@ -201,30 +216,29 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         Fetch display values in bulk.
         Attach child tiles to parent tiles and vice versa.
         """
-        for tile in self._result_cache:
-            if not isinstance(tile, self.model):
-                return
-            break
+        from arches_querysets.models import AliasedData
 
         aliased_data_to_update = {}
         values_by_datatype = defaultdict(list)
         datatype_contexts = {}
         for tile in self._result_cache:
+            if tile.aliased_data is None:
+                tile.aliased_data = AliasedData()
+            else:
+                return  # already set
             tile.sync_private_attributes(self)
-            for node in self._queried_nodes:
-                if node.nodegroup_id == tile.nodegroup_id:
-                    datatype_instance = DataTypeFactory().get_instance(node.datatype)
-                    tile_data = datatype_instance.get_tile_data(tile)
-                    node_value = tile_data.get(str(node.pk))
-                    if node_value is None:
-                        # Datatype methods assume tiles always have all keys, but we've
-                        # seen problems in the wild.
-                        tile_data[str(node.pk)] = None
-                    aliased_data_to_update[(tile, node)] = node_value
-                    values_by_datatype[node.datatype].append(node_value)
-                elif node.nodegroup.parentnodegroup_id == tile.nodegroup_id:
-                    empty_value = None if node.nodegroup.cardinality == "1" else []
-                    setattr(tile.aliased_data, tile.find_nodegroup_alias(), empty_value)
+            for node in tile.nodegroup.node_set.all():
+                if node.datatype == "semantic":
+                    continue
+                datatype_instance = DataTypeFactory().get_instance(node.datatype)
+                tile_data = datatype_instance.get_tile_data(tile)
+                node_value = tile_data.get(str(node.pk))
+                if node_value is None:
+                    # Datatype methods assume tiles always have all keys, but we've
+                    # seen problems in the wild.
+                    tile_data[str(node.pk)] = None
+                aliased_data_to_update[(tile, node)] = node_value
+                values_by_datatype[node.datatype].append(node_value)
 
         # Get datatype context querysets.
         for datatype, values in values_by_datatype.items():
@@ -281,32 +295,39 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
                     None if child_nodegroup.cardinality == "1" else [],
                 )
 
-    def _clone(self):
-        """Persist private attributes through the life of the QuerySet."""
-        clone = super()._clone()
-        clone._queried_nodes = self._queried_nodes
-        clone._permitted_nodes = self._permitted_nodes
-        clone._entry_node = self._entry_node
-        clone._as_representation = self._as_representation
-        return clone
+
+class TileTreeIterable(ModelIterable):
+    def __iter__(self):
+        """
+        Ensure every tile and nodegroup in the tree has a reference to the
+        prefetched graph via
+        - tile -> resourceinstance -> graph
+        - tile -> nodegroup -> grouping_node & node_set
+
+        Set .aliased_data to None as a sentinel so that TileTreeQuerySet._set_aliased_data()
+        knows to run only once.
+        """
+        graph = next(iter(self.queryset._hints["graph_query"]))
+        nodegroup_map = {
+            node.nodegroup_id: node.nodegroup for node in graph.node_set.all()
+        }
+        for tile_tree in super().__iter__():
+            if not tile_tree.sealed:
+                tile_tree.resourceinstance.graph = graph
+                tile_tree.nodegroup = nodegroup_map[tile_tree.nodegroup_id]
+                tile_tree.sealed = True
+                tile_tree.aliased_data = None
+            yield tile_tree
 
 
 class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._as_representation = False
-        self._queried_nodes = []
-        self._permitted_nodes = []
-
     def get_tiles(
         self,
         graph_slug=None,
         *,
         resource_ids=None,
-        defer=None,
-        only=None,
         as_representation=False,
-        user=None,
+        nodes=None,
     ):
         """Aliases a ResourceTileTreeQuerySet with tile data unpacked
         and mapped onto nodegroup aliases, e.g.:
@@ -316,10 +337,6 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         With slightly fewer keystrokes:
 
         >>> concepts = ResourceTileTree.get_tiles("concept")
-
-        Or direct certain nodegroups with defer/only as in the QuerySet interface:
-
-        >>> partial_concepts = ResourceTileTree.get_tiles("concept", only=["ng1", "ng2"])
 
         Django QuerySet methods are available for efficient queries:
         >>> concepts.count()
@@ -358,55 +375,64 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
             - True: calls to_json() datatype methods
             - False: calls to_python() datatype methods
         """
-        from arches_querysets.models import GraphWithPrefetching, TileTree
+        from arches_querysets.models import TileTree
 
-        self._as_representation = as_representation
+        self._add_hints(as_representation=as_representation)
 
-        source_graph = GraphWithPrefetching.prefetch(
-            graph_slug, resource_ids=resource_ids, user=user
-        )
-        self._permitted_nodes = source_graph.permitted_nodes
-        deferred_node_aliases = {
-            n.alias
-            for n in filter_nodes_by_highest_parent(self._permitted_nodes, defer or [])
-        }
-        only_node_aliases = {
-            n.alias
-            for n in filter_nodes_by_highest_parent(self._permitted_nodes, only or [])
-        }
-        queried_nodes, alias_expressions = generate_node_alias_expressions(
-            self._permitted_nodes,
-            defer=deferred_node_aliases,
-            only=only_node_aliases,
-            model=self.model,
-        )
+        if not nodes:
+            # Violates laziness of QuerySets, but can be made fully lazy
+            # by providing a `nodes` argument doing the same query.
+            # XXX: factor this out somewhere
+            nodes = (
+                Node.objects.filter(graph__slug=graph_slug)
+                .exclude(datatype="semantic")
+                .exclude(nodegroup=None)
+                .select_related("nodegroup__parentnodegroup")
+            )
 
-        self._queried_nodes = queried_nodes
+        alias_expressions = generate_node_alias_expressions(self.model, nodes)
 
         if resource_ids:
             qs = self.filter(pk__in=resource_ids)
         else:
-            qs = self.filter(graph=source_graph)
-        return qs.prefetch_related(
-            models.Prefetch(
-                "tilemodel_set",
-                queryset=TileTree.objects.get_tiles(
-                    graph_slug=graph_slug,
-                    permitted_nodes=self._permitted_nodes,
-                    as_representation=as_representation,
+            filters = models.Q(graph__slug=graph_slug)
+            # arches_version==9.0.0
+            if arches_version >= (8, 0):
+                filters &= models.Q(graph__source_identifier=None)
+            qs = self.filter(filters)
+
+        return (
+            # XXX should select_related("graph") be here or in get_queryset() or nowhere?
+            qs.prefetch_related(
+                models.Prefetch(
+                    "tilemodel_set",
+                    queryset=TileTree.objects.get_tiles(
+                        graph_slug=graph_slug,
+                        as_representation=as_representation,
+                        nodes=nodes,
+                    ).distinct(),  # XXX had distinct here... ensure no problem, add test
+                    to_attr="_tile_trees",
                 ),
-                to_attr="_tile_trees",
-            ),
-        ).alias(**alias_expressions)
+            ).alias(**alias_expressions)
+        )
 
     def _fetch_all(self):
         """Hook into QuerySet evaluation to customize the result."""
+        if issubclass(self._iterable_class, ModelIterable):
+            if "as_representation" in self._hints:
+                self._iterable_class = ResourceTileTreeIterable
+            # else: .get_tiles() was not called: no need to set richer representations.
+        # else: values()/values_list() queries: no need to set richer representations.
+
         super()._fetch_all()
-        try:
-            self._set_aliased_data()
-        except (TypeError, ValueError, ValidationError) as e:
-            # These errors are caught by DRF, so re-raise as something else.
-            raise RuntimeError from e
+
+        if issubclass(self._iterable_class, ModelIterable):
+            try:
+                self._set_aliased_data()
+            except (TypeError, ValueError, ValidationError) as e:
+                # These errors are caught by DRF, so re-raise as something else.
+                raise RuntimeError(e) from e
+        # else: values()/values_list() queries
 
     def _set_aliased_data(self):
         """
@@ -414,20 +440,38 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         Attach resource instances to all fetched tiles.
         Memoize fetched grouping node aliases (and graph source nodes).
         """
+        from arches_querysets.models import AliasedData, GraphWithPrefetching
+
+        if not self._result_cache:
+            return
+        for resource in self._result_cache:
+            if resource.aliased_data is None:
+                resource.aliased_data = AliasedData()
+            else:
+                return  # already processed
+        for resource in self._result_cache:
+            for tile in getattr(resource, "_tile_trees", []):
+                graph = tile.resourceinstance.graph
+                break
+            else:
+                continue
+            break
+        else:
+            graph = GraphWithPrefetching.objects.prefetch(
+                graph_slug=self._result_cache[0].graph.slug
+            ).get()
+
         grouping_nodes = {}
-        for node in self._permitted_nodes:
+        for node in graph.node_set.all():
             if not node.nodegroup:
                 continue
-            grouping_node = node.nodegroup.grouping_node
-            grouping_nodes[grouping_node.pk] = grouping_node
+            if getattr(node, "source_identifier", None):
+                continue
+            if node.pk == node.nodegroup_id:
+                grouping_nodes[node.pk] = node
 
         for resource in self._result_cache:
-            if not isinstance(resource, self.model):
-                # For a .values() query, we will lack instances.
-                continue
-            resource._permitted_nodes = self._permitted_nodes
-            resource._queried_nodes = self._queried_nodes
-            resource._as_representation = self._as_representation
+            resource._as_representation = self._hints.get("as_representation", False)
 
             # Prepare empty aliased data containers.
             for grouping_node in grouping_nodes.values():
@@ -447,18 +491,21 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
                 else:
                     setattr(resource.aliased_data, nodegroup_alias, tile)
 
-    def _clone(self):
-        """Persist private attributes through the life of the QuerySet."""
-        clone = super()._clone()
-        clone._queried_nodes = self._queried_nodes
-        clone._permitted_nodes = self._permitted_nodes
-        clone._as_representation = self._as_representation
-        return clone
+
+class ResourceTileTreeIterable(ModelIterable):
+    def __iter__(self):
+        """
+        Set .aliased_data to None as a sentinel so that
+        ResourceTileTreeQuerySet._set_aliased_data() knows to run only once.
+        """
+        for resource_tile_tree in super().__iter__():
+            resource_tile_tree.aliased_data = None
+            yield resource_tile_tree
 
 
-# arches_version==9.0.0: remove
+# TODO (arches_version==9.0.0): remove all but prefetch() method dropping 7.6
 class GraphWithPrefetchingQuerySet(models.QuerySet):  # pragma: no cover
-    """Backport of Arches 8.0 GraphQuerySet."""
+    """Backport of Arches 8.0 GraphQuerySet, plus one method for custom prefetches."""
 
     def make_name_unique(self, name, names_to_check, suffix_delimiter="_"):
         """
@@ -553,3 +600,65 @@ class GraphWithPrefetchingQuerySet(models.QuerySet):  # pragma: no cover
 
         # ensures entity returned matches database entity
         return self.get(pk=graph_model.graphid)
+
+    def prefetch(self, graph_slug=None, *, resource_ids=None):
+        """Return a graph with necessary prefetches for
+        TileTree._prefetch_related_objects(), which is what builds the shape
+        of the tile graph.
+        """
+        qs = self
+        if resource_ids and not graph_slug:
+            qs = qs.filter(resourceinstance__in=resource_ids)
+        elif graph_slug:
+            # arches_version==9.0.0
+            if arches_version >= (8, 0):
+                qs = qs.filter(slug=graph_slug, source_identifier=None)
+            else:
+                qs = qs.filter(slug=graph_slug)
+        else:
+            raise ValueError("graph_slug or resource_ids must be provided")
+
+        # arches_version==9.0.0
+        if arches_version >= (8, 0):
+            children = "children"
+        else:
+            children = "nodegroup_set"
+
+        prefetches = [
+            "node_set__cardxnodexwidget_set",
+            "node_set__nodegroup__parentnodegroup",
+            "node_set__nodegroup__node_set",
+            "node_set__nodegroup__node_set__cardxnodexwidget_set",
+            "node_set__nodegroup__cardmodel_set",
+            *get_recursive_prefetches(
+                f"node_set__nodegroup__{children}", depth=12, recursive_part=children
+            ),
+            *get_recursive_prefetches(
+                f"node_set__nodegroup__{children}__node_set",
+                depth=12,
+                recursive_part=children,
+            ),
+            *get_recursive_prefetches(
+                f"node_set__nodegroup__{children}__cardmodel_set",
+                depth=12,
+                recursive_part=children,
+            ),
+            *get_recursive_prefetches(
+                f"node_set__nodegroup__{children}__node_set__cardxnodexwidget_set",
+                depth=12,
+                recursive_part=children,
+            ),
+        ]
+
+        return qs.prefetch_related(*prefetches)[:1]
+
+    def _fetch_all(self):
+        """Derive each grouping_node instead of fetching it."""
+        super()._fetch_all()
+        for graph in self._result_cache or []:  # XXX consider memo'ing this as done.
+            for node in graph.node_set.all():
+                if node.nodegroup:
+                    for sibling_node in node.nodegroup.node_set.all():
+                        if sibling_node.pk == node.nodegroup.pk:
+                            node.nodegroup.grouping_node = sibling_node
+                            break

@@ -12,7 +12,7 @@ from rest_framework.fields import empty
 
 from arches import VERSION as arches_version
 from arches.app.models.fields.i18n import I18n_JSON, I18n_String
-from arches.app.models.models import EditLog, Node, NodeGroup
+from arches.app.models.models import EditLog, GraphModel, Node, NodeGroup
 from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
@@ -127,10 +127,12 @@ class NodeFetcherMixin:
     @property
     def permitted_nodes(self):
         if not self._permitted_nodes:
-            self._permitted_nodes = (
-                self.context.get("permitted_nodes") or self._find_permitted_nodes()
-            )
+            self.permitted_nodes = self._find_permitted_nodes()
         return self._permitted_nodes
+
+    @permitted_nodes.setter
+    def permitted_nodes(self, value):
+        self._permitted_nodes = value
 
     def _find_permitted_nodes(self):
         node_filters = models.Q(
@@ -163,7 +165,6 @@ class NodeFetcherMixin:
         self,
         *,
         graph_slug,
-        permitted_nodes,
         nodegroup_alias=None,
         nodegroup_alias_lookup=None,
         request=None,
@@ -171,7 +172,6 @@ class NodeFetcherMixin:
         """The view provides a context, so this is mainly here for script usage."""
         return {
             "graph_slug": graph_slug,
-            "permitted_nodes": permitted_nodes,
             "nodegroup_alias": nodegroup_alias,
             "nodegroup_alias_lookup": nodegroup_alias_lookup
             or get_nodegroup_alias_lookup(graph_slug),
@@ -188,9 +188,11 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
 
     def __init__(self, instance=None, data=empty, **kwargs):
         super().__init__(instance, data, **kwargs)
+        # ???
         self._permitted_nodes = []
         self._root_node_aliases = []
 
+    # XXX?
     def __deepcopy__(self, memo):
         ret = super().__deepcopy__(memo)
         ret._permitted_nodes = self._permitted_nodes
@@ -204,13 +206,13 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
         field_map = super().get_fields()
         self._root_node_aliases = []
         options = self.__class__.Meta
-        if options.nodegroups == "__all__":
+        if options.nodegroups == "__all__":  # XXX
             only = self.context.get("nodegroup_alias")
         else:
             only = options.nodegroups
 
         # Create serializers for top-level nodegroups.
-        for node in self.permitted_nodes:
+        for node in self.permitted_nodes:  # XXX
             if (
                 not node.nodegroup_id
                 or node.nodegroup.parentnodegroup_id
@@ -284,6 +286,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         exclude_children = False
 
     def __init__(self, instance=None, data=empty, **kwargs):
+        # XXX
         self._permitted_nodes = kwargs.pop("permitted_nodes", [])
         self._nodegroup_alias_lookup = kwargs.pop("nodegroup_alias_lookup", {})
         self._graph_slug = kwargs.pop("graph_slug", None)
@@ -295,6 +298,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             # DRF's default URL field name ("url")
             self.url_field_name = "__nonexistent__"
 
+    ### ?
     def __deepcopy__(self, memo):
         ret = super().__deepcopy__(memo)
         ret._permitted_nodes = self._permitted_nodes
@@ -504,11 +508,11 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
 
     def __init__(self, instance=None, data=empty, *, context=None, **kwargs):
         self._graph_slug = kwargs.pop("graph_slug", None)
+        # ???
         self._permitted_nodes = kwargs.pop("permitted_nodes", [])
         if not context:
             context = self.ensure_context(
                 graph_slug=self._graph_slug,
-                permitted_nodes=self._permitted_nodes,
                 nodegroup_alias=kwargs.pop("nodegroup_alias", None),
                 nodegroup_alias_lookup=kwargs.pop("nodegroup_alias_lookup", {}),
             )
@@ -534,23 +538,29 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         return field_names
 
     def create(self, validated_data):
-        options = self.__class__.Meta
-        qs = options.model.get_tiles(
-            graph_slug=self.graph_slug,
-            nodegroup_alias=self.nodegroup_alias,
-            only=None,
-            as_representation=True,
-            user=self.context["request"].user,
-        )
-        validated_data["nodegroup_id"] = qs._entry_node.nodegroup_id
         # arches_version==9.0.0
         if arches_version < (8, 0):
             validated_data["data"] = {}
         validated_data["__request"] = self.context["request"]
         validated_data["__as_representation"] = True
-        resource, resource_created = self.create_resource_if_missing(
-            validated_data, entry_node=qs._entry_node
+        graph_filters = models.Q(slug=self.graph_slug)
+        # arches_version==9.0.0
+        if arches_version >= (8, 0):
+            graph_filters &= models.Q(source_identifier=None)
+        graph = (
+            GraphModel.objects.filter(graph_filters)
+            .annotate(
+                entry_nodegroup_id=NodeGroup.objects.filter(
+                    node__graph=models.OuterRef("pk"),
+                    node__alias=self.nodegroup_alias,
+                ).values("pk")[:1]
+            )
+            .get()
         )
+        resource, resource_created = self.create_resource_if_missing(
+            validated_data, graph
+        )
+        validated_data["nodegroup_id"] = graph.entry_nodegroup_id
         try:
             created = super().create(validated_data)
         except:
@@ -563,14 +573,14 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             raise
         return created
 
-    def create_resource_if_missing(self, validated_data, entry_node):
+    def create_resource_if_missing(self, validated_data, graph):
         if instance := validated_data.get("resourceinstance"):
             return instance, False
         # Would like to do the following, but we don't yet have a ResourceTileTree.save()
         # method handling a fast path for empty creates:
         # ResourceSubclass = self.fields["resourceinstance"].queryset.model
         # So hardcode the Resource(Proxy)Model for now.
-        instance = Resource(graph=entry_node.graph)
+        instance = Resource(graph=graph)
         instance.save(request=validated_data["__request"])
         validated_data["resourceinstance"] = instance
         return instance, True
@@ -623,7 +633,6 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         if not context:
             context = self.ensure_context(
                 graph_slug=graph_slug,
-                permitted_nodes=permitted_nodes,
                 nodegroup_alias_lookup=nodegroup_alias_lookup,
             )
         kwargs["context"] = context
@@ -659,9 +668,8 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         instance_without_tile_data.save()
         instance_from_factory = options.model.get_tiles(
             graph_slug=self.graph_slug,
-            only=None,
             as_representation=True,
-            user=self.context["request"].user,
+            # XXX user check?
         ).get(pk=instance_without_tile_data.pk)
         # TODO: decide whether to override update() instead of using partial().
         instance_from_factory.save = partial(

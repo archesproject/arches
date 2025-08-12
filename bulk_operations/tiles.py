@@ -5,7 +5,7 @@ from operator import attrgetter
 
 from django.core.exceptions import ValidationError
 from django.db import ProgrammingError, transaction
-from django.db.models import F
+from django.db.models import F, Q
 from django.utils.translation import get_language, gettext as _
 
 from arches import VERSION as arches_version
@@ -89,35 +89,32 @@ class TileTreeOperation:
         self.new_resource_created = bool(existing_tiles)
 
     def _get_grouping_node_lookup(self):
-        from arches_querysets.models import ResourceTileTree, TileTree
+        from arches_querysets.models import TileTree
 
-        lookup = {}
-        if not self.entry._permitted_nodes:
-            self.entry._permitted_nodes = Node.objects.filter(
-                nodegroup__in=self.editable_nodegroups
-            )
-        if isinstance(self.entry, ResourceTileTree):
-            for node in self.entry._permitted_nodes:
-                if node.pk == node.nodegroup_id:
-                    lookup[node.pk] = node
-        elif isinstance(self.entry, TileTree):
-            for nodegroup in self.nodegroups:
-                # arches_version==9.0.0
-                if arches_version >= (8, 0):
-                    if nodegroup.grouping_node in self.entry._permitted_nodes:
-                        lookup[nodegroup.pk] = nodegroup.grouping_node
-                else:
-                    for node in nodegroup.node_set.all():
-                        if (
-                            node.pk == node.nodegroup_id
-                            and node in self.entry._permitted_nodes
-                        ):
-                            lookup[node.pk] = node
-                            break
+        if isinstance(self.entry, TileTree):
+            graph = self.entry.resourceinstance.graph
         else:
-            raise TypeError
-
-        return lookup
+            graph = self.entry.graph
+        filters = Q(pk=F("nodegroup_id"), graph__slug=graph.slug)
+        # arches_version==9.0.0
+        if arches_version >= (8, 0):
+            filters &= Q(source_identifier=None)
+            return {
+                node.pk: node
+                for node in Node.objects.filter(filters).select_related(
+                    "nodegroup__grouping_node__nodegroup__parentnodegroup"
+                )
+            }
+        else:
+            ret = {
+                node.pk: node
+                for node in Node.objects.filter(filters).select_related(
+                    "nodegroup__parentnodegroup"
+                )
+            }
+            for node_id, node in ret.items():
+                node.nodegroup.grouping_node = ret[node_id]
+            return ret
 
     def validate_and_save_tiles(self):
         self.validate()
@@ -144,7 +141,7 @@ class TileTreeOperation:
         original_tile_data_by_tile_id = {}
         if isinstance(self.entry, TileModel):
             self._update_tile(
-                self.entry.nodegroup.grouping_node,
+                self.grouping_nodes_by_nodegroup_id[self.entry.nodegroup_id],
                 None,
                 original_tile_data_by_tile_id,
                 delete_siblings=False,
@@ -562,6 +559,7 @@ class TileTreeOperation:
         aliases = []
         for widget_label_or_node_name in error_names:
             widget = CardXNodeXWidget.objects.filter(
+                # XXX
                 node__in=self.entry._permitted_nodes,
                 # Awkward due to I18n_JSON
                 label__contains={get_language(): widget_label_or_node_name},
@@ -570,7 +568,9 @@ class TileTreeOperation:
                 node = widget.node
             else:
                 node = Node.objects.filter(
-                    pk__in=self.entry._permitted_nodes, name=widget_label_or_node_name
+                    # XXX
+                    pk__in=self.entry._permitted_nodes,
+                    name=widget_label_or_node_name,
                 ).first()
             if node:
                 aliases.append(node.alias)

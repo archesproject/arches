@@ -92,11 +92,11 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
                 if arches_version >= (8, 0):
                     relations = models.ResourceXResource.objects.filter(
                         to_resource_id=target_resource_id
-                    )
+                    ).select_related("to_resource")
                 else:
                     relations = models.ResourceXResource.objects.filter(
                         resourceinstanceidto_id=target_resource_id
-                    )
+                    ).select_related("resourceinstanceidto")
 
             for relation in relations:
                 to_resource_id = (

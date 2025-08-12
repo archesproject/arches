@@ -8,7 +8,7 @@ from rest_framework.metadata import SimpleMetadata
 from rest_framework.settings import api_settings
 
 from arches import VERSION as arches_version
-from arches.app.models.models import Node, ResourceInstance, TileModel
+from arches.app.models.models import ResourceInstance, TileModel
 from arches.app.utils.permission_backend import (
     user_can_delete_resource,
     user_can_edit_resource,
@@ -53,44 +53,31 @@ class ArchesModelAPIMixin:
         else:
             self.resource_ids = None
         self.fill_blanks = request.GET.get("fill_blanks", "f").lower().startswith("t")
-
-        # Initialize a variable to hold the permitted nodes materialized
-        # by the underlying queryset (populated by get_object() for detail
-        # views or filter_queryset() for list views).
-        self.permitted_nodes = []
-
         return super().setup(request, *args, **kwargs)
 
     def get_queryset(self):
         options = self.serializer_class.Meta
-        if options.fields == "__all__":
-            fields = None
-        else:
-            fields = options.fields
+        # if options.fields == "__all__":
+        #     fields = None
+        # else:
+        #     fields = options.fields
 
         if issubclass(options.model, ResourceInstance):
-            if options.nodegroups == "__all__":
-                if self.nodegroup_alias:
-                    only = [self.nodegroup_alias]
-                else:
-                    only = None
-            else:
-                only = options.nodegroups
-            return options.model.get_tiles(
+            # XXX only
+            qs = options.model.get_tiles(
                 self.graph_slug,
-                only=only,
                 resource_ids=self.resource_ids,
                 as_representation=True,
-                user=self.request.user,
+                # XXX user check
             ).select_related("graph")
+            return qs
         if issubclass(options.model, TileModel):
             qs = options.model.get_tiles(
                 self.graph_slug,
                 self.nodegroup_alias,
-                only=fields,
+                ### xxx only
                 as_representation=True,
                 resource_ids=self.resource_ids,
-                user=self.request.user,
             ).select_related("nodegroup", "resourceinstance__graph")
             if self.resource_ids:
                 return qs.filter(resourceinstance__in=self.resource_ids)
@@ -102,14 +89,14 @@ class ArchesModelAPIMixin:
         return {
             **super().get_serializer_context(),
             "graph_slug": self.graph_slug,
-            "permitted_nodes": self.permitted_nodes,
+            # XXX: rename, remove
+            # "permitted_nodes": self.permitted_nodes,
             "nodegroup_alias": self.nodegroup_alias,
             "nodegroup_alias_lookup": self.nodegroup_alias_lookup,
         }
 
     def get_object(self, permission_callable=None, fill_blanks=False):
         ret = super().get_object()
-        self.permitted_nodes = ret._permitted_nodes
 
         options = self.serializer_class.Meta
         if issubclass(options.model, ResourceInstance):
@@ -142,8 +129,6 @@ class ArchesModelAPIMixin:
         return ret
 
     def filter_queryset(self, queryset):
-        self.permitted_nodes = queryset._permitted_nodes
-
         # Parse ORM lookpus from query params starting with "aliased_data__"
         # This is a quick-n-dirty riff on https://github.com/miki725/django-url-filter
         # minus some features like negation (`!=`)

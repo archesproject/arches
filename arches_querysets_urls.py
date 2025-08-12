@@ -3,10 +3,13 @@ from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
 from django.urls import include, path
 
+# from debug_toolbar.toolbar import debug_toolbar_urls
+
 from arches_querysets.apps import ArchesQuerySetsConfig
 
 app_name = ArchesQuerySetsConfig.name
 urlpatterns = [
+    # *debug_toolbar_urls(),
     path("", include("arches_querysets.urls")),
 ]
 

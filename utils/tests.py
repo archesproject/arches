@@ -1,6 +1,7 @@
 import datetime
 import uuid
 
+from django.db.models import prefetch_related_objects
 from django.test import TestCase
 
 from arches import VERSION as arches_version
@@ -59,7 +60,7 @@ class GraphTestCase(TestCase):
         graph_proxy.publish(user=None)
         cls.graph.publication = graph_proxy.publication
         for resource in [cls.resource_42, cls.resource_none]:
-            resource.publication = cls.graph.publication
+            resource.graph_publication = cls.graph.publication
             resource.save()
 
     @classmethod
@@ -124,6 +125,7 @@ class GraphTestCase(TestCase):
             for datatype in cls.datatypes
         ]
         cls.data_nodes = Node.objects.bulk_create(cls.data_nodes_1 + cls.data_nodes_n)
+        prefetch_related_objects(cls.data_nodes, "nodegroup")
 
         # Set each node as an attribute, e.g. self.string_node_n
         for node in cls.data_nodes:
@@ -242,17 +244,32 @@ class GraphTestCase(TestCase):
 
     @classmethod
     def create_resources(cls):
-        cls.resource_42 = ResourceInstance.objects.create(
-            graph=cls.graph,
-            descriptors={"en": {"name": "Resource referencing 42"}},
-            name="Resource referencing 42",
-            graph_publication_id=cls.graph.publication_id,
-        )
+        if arches_version >= (8, 0):
+            from arches.app.models.models import ResourceInstanceLifecycleState
+
+            state = ResourceInstanceLifecycleState.objects.first()
+
+        resource_with_data_kwargs = {
+            "graph": cls.graph,
+            "descriptors": {"en": {"name": "Resource referencing 42"}},
+            "name": "Resource referencing 42",
+            "graph_publication_id": cls.graph.publication_id,
+        }
+        resource_without_data_kwargs = {
+            "graph": cls.graph,
+            "descriptors": {"en": {"name": "Resource referencing None"}},
+            "name": "Resource referencing None",
+            "graph_publication_id": cls.graph.publication_id,
+        }
+
+        # arches_version==9.0.0
+        if arches_version >= (8, 0):
+            resource_with_data_kwargs["resource_instance_lifecycle_state"] = state
+            resource_without_data_kwargs["resource_instance_lifecycle_state"] = state
+
+        cls.resource_42 = ResourceInstance.objects.create(**resource_with_data_kwargs)
         cls.resource_none = ResourceInstance.objects.create(
-            graph=cls.graph,
-            descriptors={"en": {"name": "Resource referencing None"}},
-            name="Resource referencing None",
-            graph_publication_id=cls.graph.publication_id,
+            **resource_without_data_kwargs
         )
 
     @classmethod
@@ -458,7 +475,9 @@ class GraphTestCase(TestCase):
             )
 
         Node.objects.bulk_create(cls.data_nodes)
-        cls.data_nodes = cls.graph.node_set.exclude(datatype="semantic")
+        cls.data_nodes = cls.graph.node_set.exclude(datatype="semantic").select_related(
+            "nodegroup"
+        )
         cls.data_nodes_1 = cls.graph.node_set.filter(nodegroup=cls.nodegroup_1).exclude(
             datatype="semantic"
         )
@@ -498,7 +517,7 @@ class GraphTestCase(TestCase):
         }
         cls.cardinality_n_child_tile.save()
 
-        cls.resource = ResourceTileTree.get_tiles(
+        cls.resource_42 = ResourceTileTree.get_tiles(
             "datatype_lookups", as_representation=True
         ).get(pk=cls.resource_42.pk)
 

@@ -104,21 +104,12 @@ def get_invalid_aliases(instance_or_class):
     )
 
 
-def generate_node_alias_expressions(nodes, *, defer, only, model):
-    if defer and only and (overlap := defer.intersection(only)):
-        raise ValueError(f"Got intersecting defer/only nodes: {overlap}")
+def generate_node_alias_expressions(model, nodes):
     alias_expressions = {}
     invalid_names = get_invalid_aliases(model)
 
-    queried_nodes = []
     for node in nodes:
-        if node.datatype == "semantic":
-            continue
-        if node.nodegroup_id is None:
-            continue
         if getattr(node, "source_identifier_id", None):
-            continue
-        if (defer and node.alias in defer) or (only and node.alias not in only):
             continue
         alias = node.alias
         if node.alias in invalid_names:
@@ -132,12 +123,11 @@ def generate_node_alias_expressions(nodes, *, defer, only, model):
         else:
             raise ValueError
         alias_expressions[alias] = tile_values_query
-        queried_nodes.append(node)
 
     if not alias_expressions:
         raise ValueError("All fields were excluded.")
 
-    return queried_nodes, alias_expressions
+    return alias_expressions
 
 
 def pop_arches_model_kwargs(kwargs, model_fields):
@@ -153,6 +143,7 @@ def pop_arches_model_kwargs(kwargs, model_fields):
     return arches_model_data, without_model_data
 
 
+# XXX
 def get_tile_values_for_resource(node, permitted_nodes):
     """
     Return a tile values query expression for use in a ResourceTileTreeQuerySet.
@@ -162,6 +153,7 @@ def get_tile_values_for_resource(node, permitted_nodes):
     multiple tiles for cardinality-1 nodegroups might appear if there
     are cardinality-N parents anywhere.
     """
+    # XXX
     many = any_nodegroup_in_hierarchy_is_cardinality_n(node.nodegroup, permitted_nodes)
     expression = get_node_value_expression(node, many)
     tile_query = (
@@ -234,6 +226,7 @@ def filter_nodes_by_highest_parent(nodes, aliases):
 
 def any_nodegroup_in_hierarchy_is_cardinality_n(nodegroup, permitted_nodes):
     # Avoid verbose prefetching by just building a lookup locally.
+    # XXX
     parent_nodegroup_lookup = {
         node.nodegroup.parentnodegroup_id: node.nodegroup.parentnodegroup
         for node in permitted_nodes
@@ -273,17 +266,17 @@ def append_tiles_recursively(resource_or_tile):
     if not vars(resource_or_tile.aliased_data):
         raise RuntimeError("aliased_data is empty")
 
-    for alias, tiles in vars(resource_or_tile.aliased_data).items():
-        if tiles in (None, []):
+    for alias, maybe_tiles in vars(resource_or_tile.aliased_data).items():
+        if maybe_tiles in (None, []):
             try:
                 resource_or_tile.append_tile(alias)
             except RuntimeError:  # not a nodegroup or nodegroup not permitted
                 continue
 
-            tiles = getattr(resource_or_tile.aliased_data, alias)
-        if not isinstance(tiles, list):
-            tiles = [tiles]
-        for tile in tiles:
+            maybe_tiles = getattr(resource_or_tile.aliased_data, alias)
+        if not isinstance(maybe_tiles, list):
+            maybe_tiles = [maybe_tiles]
+        for tile in maybe_tiles:
             if isinstance(tile, TileTree):
                 tile.fill_blanks()
 
