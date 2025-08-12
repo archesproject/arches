@@ -66,6 +66,28 @@ class List(models.Model):
     def serialize(self, depth_map=None, flat=False, permitted_nodegroups=None):
         if depth_map is None:
             depth_map = defaultdict(int)
+        if flat:
+            list_items_lookup = {str(item.pk): item for item in self.list_items.all()}
+
+            def get_path(item):
+                parent_id = item["parent_id"]
+                path = [item["id"]]
+                loop_breaker = 0
+                while parent_id and loop_breaker < 1000:
+                    path.insert(0, parent_id)
+                    if parent_id := list_items_lookup[parent_id].parent_id:
+                        parent_id = str(parent_id)
+                    loop_breaker += 1
+                return path
+
+            sort_fn = lambda item: (
+                tuple(
+                    list_items_lookup[item_in_path].sortorder
+                    for item_in_path in get_path(item)
+                )
+            )
+        else:
+            sort_fn = lambda item: item["sortorder"]
         data = {
             "id": str(self.id),
             "name": self.name,
@@ -77,7 +99,7 @@ class List(models.Model):
                     for item in self.list_items.all()
                     if flat or item.parent_id is None
                 ],
-                key=lambda item: item["sortorder"],
+                key=sort_fn,
             ),
         }
         if hasattr(self, "node_ids"):
