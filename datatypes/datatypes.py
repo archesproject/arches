@@ -1,8 +1,8 @@
 import uuid
 from dataclasses import asdict, dataclass
-from itertools import chain
 from typing import Iterable, Mapping
 
+from django.db.models import F
 from django.utils.translation import gettext as _
 
 from arches.app.datatypes.base import BaseDataType
@@ -184,7 +184,7 @@ class ReferenceDataType(BaseDataType):
             return None
         return (
             ListItem.objects.filter(list_id=list_id, list_item_values__value=value)
-            .order_by("sortorder")
+            .order_by(F("parent").asc(nulls_first=True), "sortorder")
             .first()
         )
 
