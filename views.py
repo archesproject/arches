@@ -180,19 +180,23 @@ class ListItemView(APIBase):
             return JSONErrorResponse(status=HTTPStatus.BAD_REQUEST)
 
         try:
-            controlled_list = (
-                List.objects.filter(pk=list_id)
-                .annotate(max_sortorder=Max("list_items__sortorder", default=-1))
-                .get()
-            )
+            controlled_list = List.objects.get(pk=list_id)
         except List.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.BAD_REQUEST)
 
         try:
+            if parent_id:
+                max_existing_sort = ListItem.objects.filter(pk=parent_id).aggregate(
+                    max=Max("children__sortorder", default=-1)
+                )["max"]
+            else:
+                max_existing_sort = controlled_list.list_items.filter(
+                    parent=None
+                ).aggregate(max=Max("sortorder", default=-1))["max"]
             item = ListItem(
                 list=controlled_list,
-                sortorder=controlled_list.max_sortorder + 1,
                 parent_id=parent_id,
+                sortorder=max_existing_sort + 1,
             )
             item.full_clean()
             item.save()
