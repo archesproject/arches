@@ -6,10 +6,6 @@ import Skeleton from "primevue/skeleton";
 import ReferenceSelectWidgetEditor from "@/arches_controlled_lists/widgets/ReferenceSelectWidget/components/ReferenceSelectWidgetEditor.vue";
 import ReferenceSelectWidgetViewer from "@/arches_controlled_lists/widgets/ReferenceSelectWidget/components/ReferenceSelectWidgetViewer.vue";
 
-import {
-    fetchWidgetData,
-    fetchNodeData,
-} from "@/arches_component_lab/widgets/api.ts";
 import { EDIT, VIEW } from "@/arches_controlled_lists/widgets/constants.ts";
 
 import type { WidgetMode } from "@/arches_controlled_lists/widgets/types.ts";
@@ -33,8 +29,8 @@ const nodeData = ref();
 const widgetData = ref();
 
 onMounted(async () => {
-    widgetData.value = await fetchWidgetData(props.graphSlug, props.nodeAlias);
-    nodeData.value = await fetchNodeData(props.graphSlug, props.nodeAlias);
+    // widgetData.value = await fetchWidgetData(props.graphSlug, props.nodeAlias);
+    // nodeData.value = await fetchNodeData(props.graphSlug, props.nodeAlias);
 
     isLoading.value = false;
 });
