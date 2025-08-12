@@ -1405,11 +1405,13 @@ class FileListDataType(BaseDataType):
 
         # check if resulting value is a string or a list of dictionaries
         if isinstance(value, str):
-            files = [filename.strip() for filename in value.split(",")] # a list of file paths
+            files = [
+                filename.strip() for filename in value.split(",")
+            ]  # a list of file paths
         elif isinstance(value, list) and all(
             isinstance(file_info, dict) for file_info in value
         ):
-            files = value # a list of dictionaries with file information
+            files = value  # a list of dictionaries with file information
         else:
             raise TypeError(value)
 
@@ -1417,7 +1419,9 @@ class FileListDataType(BaseDataType):
             files = [value]
 
         for file_info in files:
-            file_path = file_info if isinstance(file_info, str) else file_info.get("name")
+            file_path = (
+                file_info if isinstance(file_info, str) else file_info.get("name")
+            )
             tile_file = {}
             try:
                 file_stats = os.stat(file_path)
