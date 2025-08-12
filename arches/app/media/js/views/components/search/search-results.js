@@ -270,7 +270,7 @@ define([
                                 point = result._source.points[0].point;
                             }
 
-                            const thumbnailUrl = `/thumbnail/${result._source.resourceinstanceid}`;
+                            const thumbnailUrl = arches.urls.thumbnail(result._source.resourceinstanceid);
                             const thumbnailResponse =
                                 arches.searchThumbnails == "True"
                                     ? await fetch(thumbnailUrl, {
