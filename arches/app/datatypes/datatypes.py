@@ -1389,7 +1389,6 @@ class FileListDataType(BaseDataType):
         By default, this is the directory in a project as defined in settings.UPLOADED_FILES_DIR.
         """
 
-        # if the value is None, return
         if not value:
             return value
 
@@ -1400,23 +1399,22 @@ class FileListDataType(BaseDataType):
         # check if value is a string (csv) or a dictionay (a list of dictionaries)
         try:
             value = ast.literal_eval(value)
-        except ValueError:
+        except (ValueError, SyntaxError):
             pass
 
-        # check if resulting value is a string or a list of dictionaries
+        # the data can be a string, a dictionary or a list of dictionaries
         if isinstance(value, str):
             files = [
                 filename.strip() for filename in value.split(",")
-            ]  # a list of file paths
+            ]
         elif isinstance(value, list) and all(
             isinstance(file_info, dict) for file_info in value
         ):
-            files = value  # a list of dictionaries with file information
+            files = value
+        elif isinstance(value, dict):
+            files = [value]
         else:
             raise TypeError(value)
-
-        if isinstance(value, (dict, str)):
-            files = [value]
 
         for file_info in files:
             file_path = (
