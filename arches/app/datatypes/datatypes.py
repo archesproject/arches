@@ -1404,9 +1404,7 @@ class FileListDataType(BaseDataType):
 
         # the data can be a string, a dictionary or a list of dictionaries
         if isinstance(value, str):
-            files = [
-                filename.strip() for filename in value.split(",")
-            ]
+            files = [filename.strip() for filename in value.split(",")]
         elif isinstance(value, list) and all(
             isinstance(file_info, dict) for file_info in value
         ):
