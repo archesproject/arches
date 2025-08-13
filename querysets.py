@@ -1,11 +1,11 @@
 import uuid
 from collections import defaultdict
-from operator import attrgetter
 from slugify import slugify
 
 from django.core.exceptions import FieldError, ValidationError
 from django.db import models
 from django.db.models.query import ModelIterable
+from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 
 from arches import VERSION as arches_version
@@ -69,12 +69,14 @@ class NodeAliasValuesMixin:
 
 
 class TileTreeManager(models.Manager):
+    # XXX evaluate whether some of these should get pushed into get_tiles()
     def get_queryset(self):
         qs = super().get_queryset().select_related("resourceinstance")
         # arches_version==9.0.0
         if arches_version >= (8, 0):
             # XXX could get this from resource queryset
             qs = qs.prefetch_related("resourceinstance__from_resxres__to_resource")
+            qs = qs.select_related("nodegroup__grouping_node")
         else:
             # Annotate nodegroup_alias on Arches 7.6.
             qs = qs.annotate(
@@ -193,6 +195,11 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
 
         return qs.alias(**alias_expressions)
 
+    @cached_property
+    def grouping_node_lookup(self):
+        graph_nodes = next(iter(self._hints["graph_query"])).node_set.all()
+        return {node.pk: node for node in graph_nodes if node.pk == node.nodegroup_id}
+
     def _fetch_all(self):
         """Hook into QuerySet evaluation to customize the result."""
         if issubclass(self._iterable_class, ModelIterable):
@@ -260,7 +267,9 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         for child_tile in sorted(
             child_tiles, key=lambda tile_item: tile_item.sortorder or 0
         ):
-            child_nodegroup_alias = child_tile.find_nodegroup_alias()
+            child_nodegroup_alias = child_tile.find_nodegroup_alias(
+                self.grouping_node_lookup
+            )
             if child_tile.nodegroup.cardinality == "1" and child_nodegroup_alias:
                 # TODO(arches_version==9.0.0): remove `and child_nodegroup_alias`
                 # which can no longer be null as of v8.
@@ -402,18 +411,22 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
                 filters &= models.Q(graph__source_identifier=None)
             qs = self.filter(filters)
 
-        return qs.prefetch_related(
-            models.Prefetch(
-                "tilemodel_set",
-                queryset=TileTree.objects.get_tiles(
-                    graph_slug=graph_slug,
-                    as_representation=as_representation,
-                    nodes=nodes,
-                    graph_query=graph_query,
-                ).distinct(),  # XXX had distinct here... ensure no problem, add test
-                to_attr="_tile_trees",
-            ),
-        ).alias(**alias_expressions)
+        return (
+            qs.select_related("graph")
+            .prefetch_related(
+                models.Prefetch(
+                    "tilemodel_set",
+                    queryset=TileTree.objects.get_tiles(
+                        graph_slug=graph_slug,
+                        as_representation=as_representation,
+                        nodes=nodes,
+                        graph_query=graph_query,
+                    ).distinct(),  # XXX had distinct here... ensure no problem, add test
+                    to_attr="_tile_trees",
+                ),
+            )
+            .alias(**alias_expressions)
+        )
 
     def _fetch_all(self):
         """Hook into QuerySet evaluation to customize the result."""
@@ -654,6 +667,8 @@ class GraphWithPrefetchingQuerySet(models.QuerySet):  # pragma: no cover
     def _fetch_all(self):
         """Derive each grouping_node instead of fetching it."""
         super()._fetch_all()
+        if not isinstance(self._iterable_class, ModelIterable):
+            return
         for graph in self._result_cache or []:  # XXX consider memo'ing this as done.
             for node in graph.node_set.all():
                 if node.nodegroup:

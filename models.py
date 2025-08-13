@@ -202,7 +202,11 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         operation.validate_and_save_tiles()
 
         # Run side effects trapped on Resource.save()
-        proxy_resource = Resource.objects.get(pk=self.pk)
+        proxy_resource = (
+            Resource.objects.filter(pk=self.pk)
+            .select_related("graph__publication")
+            .get()
+        )
         proxy_resource.save_descriptors()
         if index:
             proxy_resource.index()
@@ -344,9 +348,11 @@ class TileTree(TileModel, AliasedDataMixin):
         new_exclude = [*(exclude or []), "parenttile"]
         super().clean_fields(exclude=new_exclude)
 
-    def find_nodegroup_alias(self):
+    def find_nodegroup_alias(self, grouping_node_lookup=None):
         # arches_version==9.0.0
         if arches_version >= (8, 0):
+            if grouping_node_lookup:
+                self.nodegroup.grouping_node = grouping_node_lookup[self.nodegroup_id]
             return super().find_nodegroup_alias()
         if not getattr(self, "_nodegroup_alias", None):
             # TileTreeManager provides "_nodegroup_alias" annotation on 7.6, but perform
@@ -579,7 +585,11 @@ class TileTree(TileModel, AliasedDataMixin):
         )
         operation.validate_and_save_tiles()
 
-        proxy_resource = Resource.objects.get(pk=self.resourceinstance_id)
+        proxy_resource = (
+            Resource.objects.filter(pk=self.resourceinstance_id)
+            .select_related("graph__publication")
+            .get()
+        )
         proxy_resource.save_descriptors()
         if index:
             proxy_resource.index()

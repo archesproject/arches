@@ -99,7 +99,9 @@ class GraphTestCase(TestCase):
 
     @classmethod
     def create_data_collecting_nodes(cls):
-        cls.datatypes = DDataType.objects.exclude(datatype="semantic")
+        cls.datatypes = DDataType.objects.exclude(datatype="semantic").select_related(
+            "defaultwidget"
+        )
         cls.data_nodes_1 = [
             Node(
                 datatype=datatype.pk,
@@ -141,7 +143,7 @@ class GraphTestCase(TestCase):
     @classmethod
     def create_edges(cls):
         def get_node_to_append_to(node):
-            if node.pk == node.nodegroup.pk:
+            if node.pk == node.nodegroup_id:
                 if node.nodegroup.parentnodegroup_id:
                     if node == cls.nodegroup_1_child:
                         return cls.grouping_node_1
@@ -165,7 +167,9 @@ class GraphTestCase(TestCase):
                 ontologyproperty="",
                 graph=cls.graph,
             )
-            for node in cls.graph.node_set.exclude(pk=cls.root_node.pk)
+            for node in cls.graph.node_set.exclude(pk=cls.root_node.pk).select_related(
+                "nodegroup"
+            )
         ]
         cls.edges = Edge.objects.bulk_create(edges)
 
@@ -199,7 +203,7 @@ class GraphTestCase(TestCase):
     def add_default_values_for_widgets(cls):
         node_widgets = CardXNodeXWidget.objects.filter(
             node__graph=cls.graph,
-        )
+        ).select_related("node")
         cls.default_vals_by_nodeid = {}
         cls.default_vals_by_datatype = {
             "non-localized-string": "The answer to life, the universe, and everything.",

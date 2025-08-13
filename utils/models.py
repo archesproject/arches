@@ -200,7 +200,7 @@ def get_nodegroups_here_and_below(start_nodegroup):
             children_attr = nodegroup.children
         else:
             children_attr = nodegroup.nodegroup_set
-        for child_nodegroup in children_attr.all():
+        for child_nodegroup in children_attr.prefetch_related("node_set__nodegroup"):
             accumulate(child_nodegroup)
 
     accumulate(start_nodegroup)

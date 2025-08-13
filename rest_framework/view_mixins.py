@@ -79,6 +79,8 @@ class ArchesModelAPIMixin:
                 as_representation=True,
                 # XXX user check
             ).select_related("graph")
+            if arches_version >= (8, 0):
+                qs = qs.select_related("resource_instance_lifecycle_state")
             return qs
         if issubclass(options.model, TileModel):
             qs = options.model.get_tiles(
