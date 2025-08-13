@@ -40,12 +40,12 @@ class RelatableResourcesView(View):
 
         if filter_term:
             resources = resources.filter(
-                 Q(**{"descriptors__{}__name__icontains".format(language): filter_term})
+                Q(**{"descriptors__{}__name__icontains".format(language): filter_term})
             )
 
-        resources = resources.order_by("graph", "pk")  
-        resources.count = lambda self=None: 1_000_000_000  
-        paginator = Paginator(resources, items_per_page) 
+        resources = resources.order_by("graph", "pk")
+        resources.count = lambda self=None: 1_000_000_000
+        paginator = Paginator(resources, items_per_page)
 
         offset = (int(paginator.get_page(page_number).number) - 1) * int(items_per_page)
         limit = (int(offset)) + int(items_per_page)
