@@ -8,7 +8,7 @@ from rest_framework.metadata import SimpleMetadata
 from rest_framework.settings import api_settings
 
 from arches import VERSION as arches_version
-from arches.app.models.models import ResourceInstance, TileModel
+from arches.app.models.models import Node, ResourceInstance, TileModel
 from arches.app.utils.permission_backend import (
     user_can_delete_resource,
     user_can_edit_resource,
@@ -16,6 +16,7 @@ from arches.app.utils.permission_backend import (
 )
 from arches.app.utils.string_utils import str_to_bool
 
+from arches_querysets.models import TileTree
 from arches_querysets.rest_framework.utils import get_nodegroup_alias_lookup
 
 
@@ -53,6 +54,13 @@ class ArchesModelAPIMixin:
         else:
             self.resource_ids = None
         self.fill_blanks = request.GET.get("fill_blanks", "f").lower().startswith("t")
+
+        # Graph nodes are supplied by the underlying queryset, either by
+        # get_object() for detail views or filter_queryset() for list views.
+        # creates don't have to worry about getting the same graph objects
+        # from the retrieval operation: falls back to NodeFetcherMixin._find_graph_nodes()
+        self.graph_nodes = Node.objects.none()
+
         return super().setup(request, *args, **kwargs)
 
     def get_queryset(self):
@@ -89,14 +97,17 @@ class ArchesModelAPIMixin:
         return {
             **super().get_serializer_context(),
             "graph_slug": self.graph_slug,
-            # XXX: rename, remove
-            # "permitted_nodes": self.permitted_nodes,
+            "graph_nodes": self.graph_nodes,
             "nodegroup_alias": self.nodegroup_alias,
             "nodegroup_alias_lookup": self.nodegroup_alias_lookup,
         }
 
     def get_object(self, permission_callable=None, fill_blanks=False):
         ret = super().get_object()
+        if isinstance(ret, TileTree):
+            self.graph_nodes = ret.resourceinstance.graph.node_set.all()
+        else:
+            self.graph_nodes = ret.graph.node_set.all()
 
         options = self.serializer_class.Meta
         if issubclass(options.model, ResourceInstance):
@@ -129,6 +140,11 @@ class ArchesModelAPIMixin:
         return ret
 
     def filter_queryset(self, queryset):
+        if queryset._hints.get("graph_query") is not None:
+            self.graph_nodes = next(
+                iter(queryset._hints.get("graph_query"))
+            ).node_set.all()
+
         # Parse ORM lookpus from query params starting with "aliased_data__"
         # This is a quick-n-dirty riff on https://github.com/miki725/django-url-filter
         # minus some features like negation (`!=`)

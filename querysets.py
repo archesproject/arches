@@ -100,7 +100,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         as_representation=False,
         depth=20,
         nodes=None,
-        _graph_query=None,  # internal arg only
+        graph_query=None,
     ):
         """
         Entry point for filtering arches data by nodegroups.
@@ -148,10 +148,16 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
             )
 
         alias_expressions = generate_node_alias_expressions(self.model, nodes)
+        if graph_query is None:
+            if "graph_query" in qs._hints:
+                graph_query = qs._hints["graph_query"]
+            else:
+                graph_query = GraphWithPrefetching.objects.prefetch(graph_slug)
+
         qs._add_hints(
             as_representation=as_representation,
             graph_slug=graph_slug,
-            graph_query=_graph_query,
+            graph_query=graph_query,
         )
 
         # Future: see various solutions mentioned here for avoiding
@@ -159,12 +165,6 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         # causes no additional queries beyond actual depth):
         # https://forum.djangoproject.com/t/prefetching-relations-to-arbitrary-depth/39328
         if depth:
-            if qs._hints.get("graph_query") is None:
-                qs._add_hints(
-                    graph_query=GraphWithPrefetching.objects.prefetch(
-                        qs._hints["graph_slug"]
-                    )
-                )
             child_tile_query = (
                 self.model.objects.get_queryset()
                 .get_tiles(
@@ -172,7 +172,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
                     as_representation=as_representation,
                     depth=depth - 1,
                     nodes=nodes,
-                    _graph_query=qs._hints["graph_query"],
+                    graph_query=graph_query,
                 )
                 .distinct()
             )
@@ -323,7 +323,7 @@ class TileTreeIterable(ModelIterable):
 class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
     def get_tiles(
         self,
-        graph_slug=None,
+        graph_slug,
         *,
         resource_ids=None,
         as_representation=False,
@@ -375,9 +375,10 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
             - True: calls to_json() datatype methods
             - False: calls to_python() datatype methods
         """
-        from arches_querysets.models import TileTree
+        from arches_querysets.models import GraphWithPrefetching, TileTree
 
-        self._add_hints(as_representation=as_representation)
+        graph_query = GraphWithPrefetching.objects.prefetch(graph_slug)
+        self._add_hints(as_representation=as_representation, graph_query=graph_query)
 
         if not nodes:
             # Violates laziness of QuerySets, but can be made fully lazy
@@ -401,25 +402,23 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
                 filters &= models.Q(graph__source_identifier=None)
             qs = self.filter(filters)
 
-        return (
-            # XXX should select_related("graph") be here or in get_queryset() or nowhere?
-            qs.prefetch_related(
-                models.Prefetch(
-                    "tilemodel_set",
-                    queryset=TileTree.objects.get_tiles(
-                        graph_slug=graph_slug,
-                        as_representation=as_representation,
-                        nodes=nodes,
-                    ).distinct(),  # XXX had distinct here... ensure no problem, add test
-                    to_attr="_tile_trees",
-                ),
-            ).alias(**alias_expressions)
-        )
+        return qs.prefetch_related(
+            models.Prefetch(
+                "tilemodel_set",
+                queryset=TileTree.objects.get_tiles(
+                    graph_slug=graph_slug,
+                    as_representation=as_representation,
+                    nodes=nodes,
+                    graph_query=graph_query,
+                ).distinct(),  # XXX had distinct here... ensure no problem, add test
+                to_attr="_tile_trees",
+            ),
+        ).alias(**alias_expressions)
 
     def _fetch_all(self):
         """Hook into QuerySet evaluation to customize the result."""
         if issubclass(self._iterable_class, ModelIterable):
-            if "as_representation" in self._hints:
+            if "graph_query" in self._hints:
                 self._iterable_class = ResourceTileTreeIterable
             # else: .get_tiles() was not called: no need to set richer representations.
         # else: values()/values_list() queries: no need to set richer representations.

@@ -559,8 +559,7 @@ class TileTreeOperation:
         aliases = []
         for widget_label_or_node_name in error_names:
             widget = CardXNodeXWidget.objects.filter(
-                # XXX
-                node__in=self.entry._permitted_nodes,
+                node__in=self.entry._graph_nodes,
                 # Awkward due to I18n_JSON
                 label__contains={get_language(): widget_label_or_node_name},
             ).first()
@@ -568,8 +567,7 @@ class TileTreeOperation:
                 node = widget.node
             else:
                 node = Node.objects.filter(
-                    # XXX
-                    pk__in=self.entry._permitted_nodes,
+                    pk__in=self.entry._graph_nodes,
                     name=widget_label_or_node_name,
                 ).first()
             if node:

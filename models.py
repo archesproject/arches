@@ -159,7 +159,7 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         TileTree.create_blank_tile(
             nodegroup_alias=nodegroup_alias,
             container=self,
-            permitted_nodes=self.graph.node_set.all(),
+            graph_nodes=self.graph.node_set.all(),
         )
 
     def fill_blanks(self):
@@ -410,7 +410,7 @@ class TileTree(TileModel, AliasedDataMixin):
         TileTree.create_blank_tile(
             nodegroup_alias=nodegroup_alias,
             container=self,
-            permitted_nodes=(
+            graph_nodes=(
                 self.resourceinstance.graph.node_set.all()
                 if self.resourceinstance_id
                 else None
@@ -419,24 +419,15 @@ class TileTree(TileModel, AliasedDataMixin):
 
     @classmethod
     def create_blank_tile(
-        cls, *, nodegroup=None, nodegroup_alias=None, container, permitted_nodes
+        cls, *, nodegroup=None, nodegroup_alias=None, container, graph_nodes
     ):
-        if not permitted_nodes:
-            # cancel the perms check somehow
-            assert False
-        if not nodegroup:
-            if not nodegroup_alias:
-                raise ValueError("nodegroup or nodegroup_alias is required.")
-            nodegroup = cls.find_nodegroup_from_alias_or_pk(
-                # XXX: rename
-                nodegroup_alias,
-                permitted_nodes=permitted_nodes,
-            )
-
-        if not nodegroup_alias:
-            nodegroup_alias = cls.find_nodegroup_from_alias_or_pk(
-                pk=nodegroup.pk, permitted_nodes=permitted_nodes
-            )._nodegroup_alias
+        if not nodegroup and not nodegroup_alias:
+            raise ValueError("nodegroup or nodegroup_alias is required.")
+        nodegroup, nodegroup_alias = cls.find_nodegroup_and_alias_from_alias_or_pk(
+            nodegroup_alias,
+            pk=nodegroup.pk if nodegroup else None,
+            graph_nodes=graph_nodes,
+        )
 
         if isinstance(container, ResourceInstance):
             resource = container
@@ -489,7 +480,7 @@ class TileTree(TileModel, AliasedDataMixin):
             cls.create_blank_tile(
                 nodegroup=child_nodegroup,
                 container=blank_tile,
-                permitted_nodes=permitted_nodes,  # XXX rename
+                graph_nodes=graph_nodes,
             )
 
         return blank_tile
@@ -499,12 +490,11 @@ class TileTree(TileModel, AliasedDataMixin):
         append_tiles_recursively(self)
 
     @staticmethod
-    def find_nodegroup_from_alias_or_pk(alias=None, *, permitted_nodes, pk=None):
-        """Some of this complexity can be removed when dropping 7.6."""
-        for permitted_node in permitted_nodes:
-            if (alias and permitted_node.alias == alias) or permitted_node.pk == pk:
-                permitted_node.nodegroup._nodegroup_alias = permitted_node.alias
-                return permitted_node.nodegroup
+    def find_nodegroup_and_alias_from_alias_or_pk(alias=None, *, graph_nodes, pk=None):
+        for node in graph_nodes:
+            # arches_version==9.0.0: `if alias` is redundant, alias is not nullable in v8
+            if (alias and node.alias == alias) or node.pk == pk:
+                return (node.nodegroup, node.alias)
         raise RuntimeError
 
     @staticmethod

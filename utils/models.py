@@ -143,8 +143,7 @@ def pop_arches_model_kwargs(kwargs, model_fields):
     return arches_model_data, without_model_data
 
 
-# XXX
-def get_tile_values_for_resource(node, permitted_nodes):
+def get_tile_values_for_resource(node, graph_nodes):
     """
     Return a tile values query expression for use in a ResourceTileTreeQuerySet.
 
@@ -153,8 +152,7 @@ def get_tile_values_for_resource(node, permitted_nodes):
     multiple tiles for cardinality-1 nodegroups might appear if there
     are cardinality-N parents anywhere.
     """
-    # XXX
-    many = any_nodegroup_in_hierarchy_is_cardinality_n(node.nodegroup, permitted_nodes)
+    many = any_nodegroup_in_hierarchy_is_cardinality_n(node.nodegroup, graph_nodes)
     expression = get_node_value_expression(node, many)
     tile_query = (
         TileModel.objects.filter(
@@ -224,12 +222,11 @@ def filter_nodes_by_highest_parent(nodes, aliases):
     return filtered_nodes
 
 
-def any_nodegroup_in_hierarchy_is_cardinality_n(nodegroup, permitted_nodes):
+def any_nodegroup_in_hierarchy_is_cardinality_n(nodegroup, graph_nodes):
     # Avoid verbose prefetching by just building a lookup locally.
-    # XXX
     parent_nodegroup_lookup = {
         node.nodegroup.parentnodegroup_id: node.nodegroup.parentnodegroup
-        for node in permitted_nodes
+        for node in graph_nodes
         if node.nodegroup
     }
     cardinality_n_found = False
