@@ -73,6 +73,7 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
             return []
         related_resources = []
 
+        # arches_version==9.0.0
         if arches_version >= (8, 0):
             relations = resource.from_resxres.all()
         else:
@@ -87,6 +88,7 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
                 continue
             target_resource_id = uuid.UUID(inner_val["resourceId"])
             if not relations:
+                # arches_version==9.0.0
                 if arches_version >= (8, 0):
                     relations = models.ResourceXResource.objects.filter(
                         to_resource_id=target_resource_id
@@ -99,6 +101,7 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
             for relation in relations:
                 to_resource_id = (
                     relation.resourceinstanceidto_id
+                    # arches_version==9.0.0
                     if arches_version < (8, 0)
                     else relation.to_resource_id
                 )
@@ -106,6 +109,7 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
                     try:
                         to_resource = (
                             relation.resourceinstanceidto
+                            # arches_version==9.0.0
                             if arches_version < (8, 0)
                             else relation.to_resource
                         )

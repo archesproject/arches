@@ -149,6 +149,7 @@ INSTALLED_APPS = (
     "arches_querysets",  # Ensure the project is listed before any other arches applications
 )
 
+# arches_version==9.0.0
 if arches_version >= (8, 0):
     INSTALLED_APPS += (
         "django_recaptcha",

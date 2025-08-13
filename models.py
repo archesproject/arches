@@ -75,6 +75,7 @@ class AliasedDataMixin:
         # Commandeer the responsibility for filtering on pk from Django
         # so we can retrieve aliased data from the queryset cache.
         from_queryset = from_queryset.filter(pk=self.pk)
+        # arches_version==9.0.0
         if arches_version >= (8, 0):
             # Patch out filter(pk=...) so that when refresh_from_db() calls get(),
             # it populates the cache. TODO: ask on forum about happier path.
@@ -126,6 +127,7 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         partial=True (HTTP PATCH): absent nodes ignored, absent child tiles ignored.
         partial=False (HTTP PUT): absent nodes reset to default, absent child tiles deleted.
         """
+        # arches_version==9.0.0
         if (
             arches_version >= (8, 0)
             and self.graph_publication_id
@@ -275,6 +277,7 @@ class TileTree(TileModel, AliasedDataMixin):
         partial=True (HTTP PATCH): absent nodes ignored, absent child tiles ignored.
         partial=False (HTTP PUT): absent nodes reset to default, absent child tiles deleted.
         """
+        # arches_version==9.0.0
         if (
             arches_version >= (8, 0)
             and self.resourceinstance_id
@@ -288,6 +291,7 @@ class TileTree(TileModel, AliasedDataMixin):
 
         request = request or self._request
         # Mimic some computations trapped on TileModel.save().
+        # arches_version==9.0.0
         if (
             arches_version >= (8, 0)
             and self.sortorder is None
@@ -429,6 +433,7 @@ class TileTree(TileModel, AliasedDataMixin):
                 except:
                     pass
 
+        # arches_version==9.0.0
         if arches_version < (8, 0):
             # Simulate the default supplied by v8.
             tile.data = {}
@@ -506,6 +511,7 @@ class TileTree(TileModel, AliasedDataMixin):
 
         children = (
             nodegroup.children.all()
+            # arches_version==9.0.0
             if arches_version >= (8, 0)
             else nodegroup.nodegroup_set.all()
         )
@@ -720,6 +726,7 @@ class GraphWithPrefetching(GraphModel):
         if resource_ids and not graph_slug:
             graph_query = cls.objects.filter(resourceinstance__in=resource_ids)
         elif graph_slug:
+            # arches_version==9.0.0
             if arches_version >= (8, 0):
                 graph_query = cls.objects.filter(
                     slug=graph_slug, source_identifier=None
@@ -729,6 +736,7 @@ class GraphWithPrefetching(GraphModel):
         else:
             raise ValueError("graph_slug or resource_ids must be provided")
 
+        # arches_version==9.0.0
         if arches_version >= (8, 0):
             children = "children"
         else:
@@ -796,6 +804,7 @@ class GraphWithPrefetching(GraphModel):
                     nodegroups.add(node.nodegroup)
         for nodegroup in nodegroups:
             nodegroup.grouping_node = grouping_node_map.get(nodegroup.pk)
+            # arches_version==9.0.0
             if arches_version >= (8, 0):
                 child_nodegroups = nodegroup.children.all()
             else:

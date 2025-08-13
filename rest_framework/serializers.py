@@ -139,6 +139,7 @@ class NodeFetcherMixin:
             nodegroup__in=self.context["request"].user.userprofile.editable_nodegroups,
         )
         children = "nodegroup_set"
+        # arches_version==9.0.0
         if arches_version >= (8, 0):
             node_filters &= models.Q(source_identifier=None)
             children = "children"
@@ -324,6 +325,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         if self.__class__.Meta.fields == "__all__" and not self.Meta.exclude_children:
             child_query = (
                 self._root_node.nodegroup.children
+                # arches_version==9.0.0
                 if arches_version >= (8, 0)
                 else self._root_node.nodegroup.nodegroup_set
             )
@@ -541,6 +543,7 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             user=self.context["request"].user,
         )
         validated_data["nodegroup_id"] = qs._entry_node.nodegroup_id
+        # arches_version==9.0.0
         if arches_version < (8, 0):
             validated_data["data"] = {}
         validated_data["__request"] = self.context["request"]
@@ -628,6 +631,7 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
 
     def build_relational_field(self, field_name, relation_info):
         ret = super().build_relational_field(field_name, relation_info)
+        # arches_version==9.0.0
         if arches_version >= (8, 0) and field_name == "graph":
             ret[1]["queryset"] = ret[1]["queryset"].filter(
                 slug=self.graph_slug, source_identifier=None
@@ -674,6 +678,7 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         return updated
 
     def get_graph_has_different_publication(self, obj):
+        # arches_version==9.0.0
         if arches_version < (8, 0):
             return False
         return obj.graph_publication_id and (

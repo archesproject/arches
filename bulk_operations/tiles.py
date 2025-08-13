@@ -43,6 +43,8 @@ class TileTreeOperation:
         self.partial = partial
         self.save_kwargs = save_kwargs or {}
         self.transaction_id = uuid.uuid4()
+        # arches==9.0.0, replace these attributes by simply reading from
+        # self.request.user.userprofile, which uses @cached_property as of Arches 8.1.
         # Store off these properties since they are expensive.
         # self.viewable_nodegroups: set[str] = self.request.user.userprofile.viewable_nodegroups
         self.editable_nodegroups: set[str] = (
@@ -67,6 +69,7 @@ class TileTreeOperation:
                 resourceinstance_id=self.resourceid,
                 nodegroup_id__in=[ng.pk for ng in self.nodegroups],
             ).order_by("sortorder")
+            # arches_version==9.0.0
             if arches_version < (8, 0):
                 # Cannot supply this too early, as nodegroup might be included
                 # with the request and already instantiated to a fresh object.
@@ -99,6 +102,7 @@ class TileTreeOperation:
                     lookup[node.pk] = node
         elif isinstance(self.entry, TileTree):
             for nodegroup in self.nodegroups:
+                # arches_version==9.0.0
                 if arches_version >= (8, 0):
                     if nodegroup.grouping_node in self.entry._permitted_nodes:
                         lookup[nodegroup.pk] = nodegroup.grouping_node
@@ -216,6 +220,7 @@ class TileTreeOperation:
 
         nodes = grouping_node.nodegroup.node_set.all()
         for tile in to_insert | to_update:
+            # arches_version==9.0.0
             if arches_version >= (8, 0):
                 children = tile.nodegroup.children.all()
             else:
@@ -482,6 +487,7 @@ class TileTreeOperation:
                 TileModel.objects.filter(pk__in=[t.pk for t in self.to_delete]).delete()
 
             for upsert_tile in upserts:
+                # arches_version==9.0.0
                 if arches_version < (8, 0):
                     grouping_node = self.grouping_nodes_by_nodegroup_id[
                         upsert_tile.nodegroup_id

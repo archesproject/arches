@@ -46,6 +46,7 @@ class GraphTestCase(TestCase):
         cls.create_relations()
 
         graph_proxy = Graph.objects.get(pk=cls.graph.pk)
+        # arches_version==9.0.0
         if arches_version < (8, 0):
             graph_proxy.refresh_from_database()
             if cls.test_child_nodegroups:
@@ -66,6 +67,7 @@ class GraphTestCase(TestCase):
         cls.graph = GraphWithPrefetching.objects.create_graph(
             name="Datatype Lookups", is_resource=True
         )
+        # arches_version==9.0.0
         if arches_version >= (8, 0):
             cls.graph.is_active = True
             cls.graph.save()
@@ -81,6 +83,7 @@ class GraphTestCase(TestCase):
             cardinality=cardinality,
             parentnodegroup=parent_nodegroup,
         )
+        # arches_version==9.0.0
         if arches_version >= (8, 0):
             nodegroup.grouping_node = grouping_node
             nodegroup.save()
@@ -230,8 +233,10 @@ class GraphTestCase(TestCase):
                         break
                 else:
                     raise RuntimeError("Missing datatype")
+            # arches_version==9.0.0
             if arches_version < (8, 0):
                 widget.save()
+        # arches_version==9.0.0
         if arches_version >= (8, 0):
             CardXNodeXWidget.objects.bulk_update(node_widgets, ["config"])
 
@@ -370,6 +375,7 @@ class GraphTestCase(TestCase):
 
     @classmethod
     def create_relations(cls):
+        # arches_version==9.0.0
         if arches_version < (8, 0):
             from_resource_attr = "resourceinstanceidto"
             to_resource_attr = "resourceinstanceidfrom"

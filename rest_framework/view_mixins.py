@@ -113,6 +113,7 @@ class ArchesModelAPIMixin:
 
         options = self.serializer_class.Meta
         if issubclass(options.model, ResourceInstance):
+            # arches_version==9.0.0
             if arches_version >= (8, 0):
                 permission_kwargs = {"user": self.request.user, "resource": ret}
             else:

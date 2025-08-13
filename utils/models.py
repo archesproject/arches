@@ -205,6 +205,7 @@ def get_nodegroups_here_and_below(start_nodegroup):
     def accumulate(nodegroup):
         nonlocal accumulator
         accumulator.append(nodegroup)
+        # arches_version==9.0.0
         if arches_version >= (8, 0):
             children_attr = nodegroup.children
         else:

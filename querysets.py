@@ -70,6 +70,7 @@ class NodeAliasValuesMixin:
 class TileTreeManager(models.Manager):
     def get_queryset(self):
         qs = super().get_queryset().select_related("nodegroup")
+        # arches_version==9.0.0
         if arches_version >= (8, 0):
             qs = qs.select_related("nodegroup__grouping_node")
             qs = qs.prefetch_related(
@@ -162,6 +163,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         if depth:
             qs = qs.prefetch_related(
                 models.Prefetch(
+                    # arches_version==9.0.0
                     "children" if arches_version >= (8, 0) else "tilemodel_set",
                     queryset=self.model.objects.get_queryset().get_tiles(
                         graph_slug=graph_slug,
@@ -246,7 +248,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         ):
             child_nodegroup_alias = child_tile.find_nodegroup_alias()
             if child_tile.nodegroup.cardinality == "1" and child_nodegroup_alias:
-                # TODO(arches_version): remove `and child_nodegroup_alias`
+                # TODO(arches_version==9.0.0): remove `and child_nodegroup_alias`
                 # which can no longer be null as of v8.
                 setattr(tile.aliased_data, child_nodegroup_alias, child_tile)
             else:
@@ -259,6 +261,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
 
         child_nodegroups = (
             getattr(tile.nodegroup, "children")
+            # arches_version==9.0.0
             if arches_version >= (8, 0)
             else getattr(tile.nodegroup, "nodegroup_set")
         )
@@ -453,7 +456,7 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         return clone
 
 
-# TODO (arches_version): remove when dropping 7.6
+# arches_version==9.0.0: remove
 class GraphWithPrefetchingQuerySet(models.QuerySet):  # pragma: no cover
     """Backport of Arches 8.0 GraphQuerySet."""
 
