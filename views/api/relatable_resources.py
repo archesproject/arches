@@ -43,26 +43,30 @@ class RelatableResourcesView(View):
                  Q(**{"descriptors__{}__name__icontains".format(language): filter_term})
             )
 
-        offset = (int(page_number) - 1) * int(items_per_page)
+        resources = resources.order_by("graph", "pk")  
+        resources.count = lambda self=None: 1_000_000_000  
+        paginator = Paginator(resources, items_per_page) 
+
+        offset = (int(paginator.get_page(page_number).number) - 1) * int(items_per_page)
         limit = (int(offset)) + int(items_per_page)
 
         data = [
             {
-                "resourceinstanceid": resource.resourceinstanceid,
-                "display_value": resource.descriptors[language]["name"],
+                "resourceinstanceid": resource["resourceinstanceid"],
+                "display_value": resource["descriptors"][language]["name"],
             }
             for resource in resources.order_by(
                 "descriptors__{}__name".format(language)
-            )[offset:limit]
+            ).values("resourceinstanceid", "descriptors")[offset:limit]
         ]
 
         return JSONResponse(
             {
                 "graphs": graph_models,
-                "current_page": int(page_number),
-                "total_pages": 100000000000,
-                "results_per_page": items_per_page,
-                "total_results": 100000000000000,
+                "current_page": paginator.get_page(page_number).number,
+                "total_pages": paginator.num_pages,
+                "results_per_page": paginator.per_page,
+                "total_results": paginator.count,
                 "data": data,
             }
         )
