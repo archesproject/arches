@@ -282,8 +282,18 @@ def ensure_request(request, force_admin=False):
     """Allow server-side usage when not going through middleware."""
     if not request:
         request = HttpRequest()
-        if force_admin:
-            request.user = User.objects.get(username="admin")
-        else:
-            request.user = User.objects.get(username="anonymous")
+        username = "admin" if force_admin else "anonymous"
+        request.user = (
+            User.objects.filter(username=username).select_related("userprofile").get()
+        )
+
+    # arches_version==9.0.0: remove & fix call sites to check .viewable_nodegroups
+    try:
+        request.user.userprofile.cached_viewable_nodegroups
+    except AttributeError:
+        request.user.userprofile.cached_viewable_nodegroups = (
+            # This property is not cached by core until Arches 8.1
+            request.user.userprofile.viewable_nodegroups
+        )
+
     return request

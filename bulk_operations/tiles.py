@@ -46,7 +46,6 @@ class TileTreeOperation:
         # arches==9.0.0, replace these attributes by simply reading from
         # self.request.user.userprofile, which uses @cached_property as of Arches 8.1.
         # Store off these properties since they are expensive.
-        # self.viewable_nodegroups: set[str] = self.request.user.userprofile.viewable_nodegroups
         self.editable_nodegroups: set[str] = (
             self.request.user.userprofile.editable_nodegroups
         )

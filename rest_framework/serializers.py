@@ -30,6 +30,7 @@ def _make_tile_serializer(
     sortorder,
     slug,
     graph_nodes,
+    request,
     nodegroup_alias_lookup=None,
     nodes="__all__",
     exclude_children=False,
@@ -71,6 +72,7 @@ def _make_tile_serializer(
         graph_nodes=graph_nodes,
         nodegroup_alias_lookup=nodegroup_alias_lookup,
         style={"alias": nodegroup_alias, "sortorder": sortorder},
+        request=request,
     )
 
 
@@ -213,17 +215,20 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
         field_map = super().get_fields()
         self._root_node_aliases = []
         options = self.__class__.Meta
-        if options.nodegroups == "__all__":  # XXX
+        if options.nodegroups == "__all__":
             only = self.context.get("nodegroup_alias")
         else:
             only = options.nodegroups
 
         # Create serializers for top-level nodegroups.
         for node in self.graph_nodes:
+            profile = self.context["request"].user.userprofile
             if (
                 not node.nodegroup_id
+                # arches_version==9.0.0 replace cached_viewable_nodegroups with viewable_nodegroups
+                or str(node.nodegroup_id) not in profile.cached_viewable_nodegroups
                 or node.nodegroup.parentnodegroup_id
-                or not node.alias
+                or not node.alias  # arches_version==9.0.0: remove `or not node.alias`
             ):
                 continue
             if only and node.nodegroup.grouping_node.alias not in only:
@@ -243,6 +248,7 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
                         nodegroup_alias_lookup=self.context["nodegroup_alias_lookup"],
                         sortorder=sortorder,
                         exclude_children=options.exclude_children,
+                        request=self.context["request"],
                     )
 
         return field_map
@@ -329,6 +335,11 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             self._root_node = nodes_by_node_aliases.get(nodegroup_alias)
         except KeyError:
             raise RuntimeError("missing root node")
+        profile = self.context["request"].user.userprofile
+        # arches_version==9.0.0: cached_viewable_nodegroups -> viewable_nodegroups
+        if str(self._root_node.nodegroup_id) not in profile.cached_viewable_nodegroups:
+            raise PermissionError
+
         field_map = super().get_fields()
         self.finalize_initial_values(field_map)
 
@@ -341,6 +352,9 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
                 else self._root_node.nodegroup.nodegroup_set
             )
             for child_nodegroup in child_query.all():
+                # arches_version==9.0.0: cached_viewable_nodegroups -> viewable_nodegroups
+                if str(child_nodegroup.pk) not in profile.cached_viewable_nodegroups:
+                    continue
                 child_nodegroup_alias = self.context["nodegroup_alias_lookup"][
                     child_nodegroup.pk
                 ]
@@ -360,6 +374,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
                         slug=self.graph_slug,
                         graph_nodes=self.graph_nodes,
                         sortorder=sortorder,
+                        request=self.context["request"],
                     )
 
         return field_map
@@ -383,7 +398,13 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
                 f"Node with alias {field_name} not found in graph {self.graph_slug}"
             )
 
-        if node.datatype == "semantic" and node.nodegroup.grouping_node == node:
+        # arches_version==9.0.0: cached_viewable_nodegroups -> viewable_nodegroups
+        if (
+            node.datatype == "semantic"
+            and node.nodegroup.grouping_node == node
+            and str(node.nodegroup_id)
+            in self.context["request"].user.userprofile.cached_viewable_nodegroups
+        ):
             sortorder = 0
             if node.nodegroup.cardmodel_set.all():
                 sortorder = node.nodegroup.cardmodel_set.all()[0].sortorder
@@ -393,6 +414,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
                 cardinality=node.nodegroup.cardinality,
                 graph_nodes=self.graph_nodes,
                 sortorder=sortorder,
+                request=self.context["request"],
             )
         else:
             dt_instance = DataTypeFactory().get_instance(node.datatype)
@@ -522,6 +544,7 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
                 graph_nodes=self.graph_nodes,
                 nodegroup_alias=kwargs.pop("nodegroup_alias", None),
                 nodegroup_alias_lookup=kwargs.pop("nodegroup_alias_lookup", {}),
+                request=kwargs.pop("request", None),
             )
         kwargs["context"] = context
         super().__init__(instance, data, **kwargs)

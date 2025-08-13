@@ -18,6 +18,7 @@ from arches.app.utils.string_utils import str_to_bool
 
 from arches_querysets.models import TileTree
 from arches_querysets.rest_framework.utils import get_nodegroup_alias_lookup
+from arches_querysets.utils.models import ensure_request
 
 
 class MetadataWithWidgetConfig(SimpleMetadata):
@@ -94,8 +95,10 @@ class ArchesModelAPIMixin:
         raise NotImplementedError
 
     def get_serializer_context(self):
+        context = super().get_serializer_context()
         return {
-            **super().get_serializer_context(),
+            **context,
+            "request": ensure_request(context["request"]),
             "graph_slug": self.graph_slug,
             "graph_nodes": self.graph_nodes,
             "nodegroup_alias": self.nodegroup_alias,
