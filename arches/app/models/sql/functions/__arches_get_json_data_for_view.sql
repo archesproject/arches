@@ -8,7 +8,6 @@ declare
     column_info    record;
     query          text;
     result         jsonb;
-    geom           geometry;
     geometry_type  text;
     geometry_query text;
     node           public.nodes;
@@ -74,6 +73,8 @@ begin
                                 \'features\',
                                 json_agg(
                                     json_build_object(
+                                        \'id\',
+                                        uuid_generate_v4(),
                                         \'type\',
                                         \'Feature\',
                                         \'geometry\',

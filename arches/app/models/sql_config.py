@@ -21,5 +21,6 @@ sql_items = [
         "__arches_get_json_data_for_view",
         format_file_into_sql("__arches_get_json_data_for_view.sql", "sql/functions"),
         reverse_sql="drop function __arches_get_json_data_for_view;",
+        replace=True,
     ),
 ]
