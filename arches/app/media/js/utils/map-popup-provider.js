@@ -23,7 +23,12 @@ const provider = {
      * @returns {*} HTML template for the Map Popup
      */
     getPopupTemplate: function(features) {
-        return popupTemplate;
+        // needs to be synchronous, hence the use of XMLHttpRequest
+        const templateRequest = new XMLHttpRequest();
+
+        templateRequest.open("GET", popupTemplate, false);
+        templateRequest.send();
+        return templateRequest.responseText;
     },
 
     /**
