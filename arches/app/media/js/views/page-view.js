@@ -76,9 +76,9 @@ define([
                     if (!bypass && self.viewModel.dirty()) {
                         self.viewModel.navDestination(url);
                         self.viewModel.alert(new AlertViewModel(
-                            'ep-alert-blue', 
-                            arches.translations.confirmNav.title, 
-                            arches.translations.confirmNav.text, 
+                            'ep-alert-blue',
+                            arches.translations.confirmNav.title,
+                            arches.translations.confirmNav.text,
                             function() {
                                 self.viewModel.showConfirmNav(false);
                             }, function() {
@@ -173,6 +173,13 @@ define([
 
             window.addEventListener('beforeunload', function() {
                 self.viewModel.loading(true);
+            });
+
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    // If the page was restored from cache, hide the loading mask
+                    self.viewModel.loading(false);
+                }
             });
 
             Backbone.View.apply(this, arguments);

@@ -64,12 +64,6 @@ define([
             self.currentPlaceholder(self.placeholder()[self.currentLanguage().code]);
         }
 
-        self.strippedValue = ko.pureComputed(() => {
-            return $(`<span>${self.currentText()}</span>`).text();
-        });
-
-        self.strippedValue();
-
         self.defaultText = ko.observable();
         self.defaultText.subscribe(newValue => {
             const config = self.config();

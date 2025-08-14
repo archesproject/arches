@@ -1539,8 +1539,13 @@ class BulkDisambiguatedResourceInstance(APIBase):
         user = request.user
         perm = "read_nodegroup"
 
-        disambiguated_resource_instances = OrderedDict().fromkeys(resource_ids)
-        for resource in Resource.objects.filter(pk__in=resource_ids):
+        permitted_resource_ids = list(
+            filter(lambda id: user_can_read_resource(user, id), resource_ids)
+        )
+        disambiguated_resource_instances = OrderedDict().fromkeys(
+            permitted_resource_ids
+        )
+        for resource in Resource.objects.filter(pk__in=permitted_resource_ids):
             disambiguated_resource_instances[str(resource.pk)] = resource.to_json(
                 compact=compact,
                 version=version,

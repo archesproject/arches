@@ -96,7 +96,7 @@
 {% block report %}
 <!-- ko if: !ko.unwrap(hideEmptyNodes) || (ko.unwrap(hideEmptyNodes) === true && !!ko.unwrap(currentText) ) -->
 <dt data-bind="text: label, class: nodeCssClasses"></dt>
-<dd data-bind="html: strippedValue || $root.translations.none, class: nodeCssClasses"></dd>
+<dd data-bind="html: currentText || $root.translations.none, class: nodeCssClasses"></dd>
 <!-- /ko -->
 {% endblock report %}
 
@@ -107,7 +107,7 @@
 </em>
 <!-- /ko -->
 <!-- ko if: displayValue() && displayValue()[currentLanguage().code] &&  displayValue()[currentLanguage().code]['value'] && ko.unwrap(displayfullvalue) === true -->
-<div data-bind="html: displayValue() && displayValue()[currentLanguage().code] &&  displayValue()[currentLanguage().code]['value'] ? strippedValue : $root.translations.none, class: nodeCssClasses"></div>
+<div data-bind="html: displayValue() && displayValue()[currentLanguage().code] &&  displayValue()[currentLanguage().code]['value'] ? currentText : $root.translations.none, class: nodeCssClasses"></div>
 <!-- /ko -->
 <!-- ko if: !displayValue() || !displayValue()[currentLanguage().code] || !displayValue()[currentLanguage().code]['value'] -->
 <span data-bind="text: $root.translations.none, class: nodeCssClasses"></span>

@@ -25,7 +25,11 @@ const DEFAULT_THEME = {
     }
 };
 
-export default async function createVueApplication(vueComponent, themeConfiguration) {
+export default async function createVueApplication(
+    vueComponent, 
+    themeConfiguration,
+    initialProps = {},
+) {
     /**
      * This wrapper allows us to maintain a level of control inside arches-core
      * over Vue apps. For instance this allows us to abstract i18n setup/config
@@ -51,7 +55,7 @@ export default async function createVueApplication(vueComponent, themeConfigurat
             translations: respJSON['translations'],
         });
 
-        const app = createApp(vueComponent);
+        const app = createApp(vueComponent, initialProps);
 
         app.use(PrimeVue, themeConfiguration || DEFAULT_THEME);
         app.use(gettext);

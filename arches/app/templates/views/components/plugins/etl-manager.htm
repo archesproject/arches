@@ -113,7 +113,7 @@
                             </div>
                             <div class="etl-job-task-bar">
                                 <div class="task">
-                                    <!-- ko if: (event.status == "completed" || event.status == "indexed" ) && event.etl_module.reversible -->
+                                    <!-- ko if: (["completed", "indexed", "unindexed"].includes(event.status)) && event.etl_module.reversible -->
                                     <a data-bind="click: function() { $parent.reverseTransactions(event, $root.translations.warning, $root.translations.etlReverseWarningMessage)}">
                                         <span data-bind="text: $root.translations.undoImport"></span>
                                     </a>

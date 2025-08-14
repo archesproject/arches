@@ -49,6 +49,16 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
         Determintes whether or not read/edit buttons show up in search results.
         """
         result = {}
+        if user.is_superuser:
+            result["can_read"] = True
+            result["can_edit"] = True
+            result["is_principal"] = (
+                "permissions" in search_result["_source"]
+                and "principal_user" in search_result["_source"]["permissions"]
+                and user.id in search_result["_source"]["permissions"]["principal_user"]
+            )
+            return result
+
         user_read_permissions = self.get_resource_types_by_perm(
             user,
             [
@@ -73,8 +83,8 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
         if not deny_read_exists or not deny_edit_exists:
             logger.warning(
                 """
-                PROBLEM WITH INDEX - it appears that your index permissions are malformed.  
-                This can happen when switching permission frameworks and may cause search 
+                PROBLEM WITH INDEX - it appears that your index permissions are malformed.
+                This can happen when switching permission frameworks and may cause search
                 results to appear incorrectly or with invalid permissions.  You can correct it by reindexing arches.
                 """
             )

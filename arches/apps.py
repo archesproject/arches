@@ -106,6 +106,8 @@ def check_arches_compatibility(app_configs, **kwargs):
 
         try:
             project_requirements = requires(config.name)
+            if project_requirements is None:
+                raise PackageNotFoundError
         except PackageNotFoundError:
             # Not installed by pip: read pyproject.toml directly
             project_requirements = read_project_requirements_from_toml_file(config)
