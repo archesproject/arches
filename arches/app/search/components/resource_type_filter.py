@@ -19,8 +19,10 @@ details = {
 
 def get_permitted_graphids(permitted_nodegroups):
     permitted_graphids = set()
+
     for node in Node.objects.filter(nodegroup__in=permitted_nodegroups):
         permitted_graphids.add(str(node.graph_id))
+
     return permitted_graphids
 
 
