@@ -76,9 +76,8 @@ watchEffect(async () => {
                 nodegroupAlias,
                 tileId,
             );
-            if (!props.tileId && props.resourceInstanceId) {
-                aliasedTileData.value.resourceinstance =
-                    props.resourceInstanceId;
+            if (!tileId && resourceInstanceId) {
+                aliasedTileData.value.resourceinstance = resourceInstanceId;
             }
         }
 

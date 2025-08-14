@@ -7,7 +7,7 @@ export interface ResourceInstanceValue extends AliasedNodeData {
         ontologyProperty: string;
         resourceId: string;
         resourceXresourceId: string;
-    };
+    } | null;
     details: { display_value: string; resource_id: string }[];
 }
 

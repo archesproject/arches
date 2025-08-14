@@ -131,12 +131,14 @@ function onUpdateModelValue(updatedValue: string | null) {
 
     emit("update:value", {
         display_value: option ? option.display_value : "",
-        node_value: {
-            inverseOntologyProperty: "",
-            ontologyProperty: "",
-            resourceId: updatedValue ?? "",
-            resourceXresourceId: "",
-        },
+        node_value: updatedValue
+            ? {
+                  inverseOntologyProperty: "",
+                  ontologyProperty: "",
+                  resourceId: updatedValue,
+                  resourceXresourceId: "",
+              }
+            : null,
         details: option ? [option] : [],
     });
 }
