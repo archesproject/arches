@@ -195,7 +195,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
                 )
             )
 
-        return qs.alias(**alias_expressions)
+        return qs.alias(**alias_expressions).order_by("sortorder")
 
     @cached_property
     def grouping_node_lookup(self):
