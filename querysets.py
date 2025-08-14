@@ -148,6 +148,8 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
                 .exclude(nodegroup=None)
                 .select_related("nodegroup__parentnodegroup")
             )
+            if not nodes:
+                raise ValueError(f"No nodes found for graph with slug: {graph_slug}")
 
         alias_expressions = generate_node_alias_expressions(self.model, nodes)
         if graph_query is None:
@@ -392,13 +394,18 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         if not nodes:
             # Violates laziness of QuerySets, but can be made fully lazy
             # by providing a `nodes` argument doing the same query.
-            # XXX: factor this out somewhere
+            filters = models.Q(graph__slug=graph_slug)
+            # arches_version==9.0.0
+            if arches_version >= (8, 0):
+                filters &= models.Q(source_identifier=None)
             nodes = (
-                Node.objects.filter(graph__slug=graph_slug)
+                Node.objects.filter(filters)
                 .exclude(datatype="semantic")
                 .exclude(nodegroup=None)
                 .select_related("nodegroup__parentnodegroup")
             )
+            if not nodes:
+                raise ValueError(f"No nodes found for graph with slug: {graph_slug}")
 
         alias_expressions = generate_node_alias_expressions(self.model, nodes)
 

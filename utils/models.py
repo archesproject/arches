@@ -109,8 +109,6 @@ def generate_node_alias_expressions(model, nodes):
     invalid_names = get_invalid_aliases(model)
 
     for node in nodes:
-        if getattr(node, "source_identifier_id", None):
-            continue
         alias = node.alias
         if node.alias in invalid_names:
             # TODO (Arches 8.1): determine reserved namespace for node aliases

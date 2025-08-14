@@ -71,30 +71,34 @@ class ArchesModelAPIMixin:
         # else:
         #     fields = options.fields
 
-        if issubclass(options.model, ResourceInstance):
-            # XXX only
-            qs = options.model.get_tiles(
-                self.graph_slug,
-                resource_ids=self.resource_ids,
-                as_representation=True,
-                # XXX user check
-            ).select_related("graph")
-            if arches_version >= (8, 0):
-                qs = qs.select_related("resource_instance_lifecycle_state")
-            return qs
-        if issubclass(options.model, TileModel):
-            qs = options.model.get_tiles(
-                self.graph_slug,
-                self.nodegroup_alias,
-                ### xxx only
-                as_representation=True,
-                resource_ids=self.resource_ids,
-            ).select_related("nodegroup", "resourceinstance__graph")
-            if self.resource_ids:
-                return qs.filter(resourceinstance__in=self.resource_ids)
-            return qs
+        try:
+            if issubclass(options.model, ResourceInstance):
+                # XXX only
+                qs = options.model.get_tiles(
+                    self.graph_slug,
+                    resource_ids=self.resource_ids,
+                    as_representation=True,
+                    # XXX user check
+                ).select_related("graph")
+                if arches_version >= (8, 0):
+                    qs = qs.select_related("resource_instance_lifecycle_state")
+            elif issubclass(options.model, TileModel):
+                qs = options.model.get_tiles(
+                    self.graph_slug,
+                    self.nodegroup_alias,
+                    ### xxx only
+                    as_representation=True,
+                    resource_ids=self.resource_ids,
+                ).select_related("nodegroup", "resourceinstance__graph")
+                if self.resource_ids:
+                    qs = qs.filter(resourceinstance__in=self.resource_ids)
+            else:  # pragma: no cover
+                raise NotImplementedError
+        except ValueError:
+            msg = _("No nodes found for graph slug: %s") % self.graph_slug
+            raise ValidationError({api_settings.NON_FIELD_ERRORS_KEY: msg})
 
-        raise NotImplementedError
+        return qs
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
