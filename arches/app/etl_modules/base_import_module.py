@@ -218,7 +218,7 @@ class BaseImportModule:
                     load_event.complete = True
                     load_event.load_end_time = datetime.now()
                     load_event.error_message = _(
-                        "Unable to parse file. If including extra .xlsx files in a zip file, be sure they are in an 'uploadedfiles' directory"
+                        "Unable to parse file. If including extra .xlsx files in a zip file, be sure they are in an 'attachments' directory"
                     )
                     load_event.save()
                     raise FileValidationError
@@ -338,7 +338,7 @@ class BaseImportModule:
                 for file in files:
                     if (
                         file.filename.split(".")[-1] == "xlsx"
-                        and "uploadedfiles/" not in file.filename
+                        and ("attachments" + os.sep) not in file.filename
                     ):
                         self.cumulative_files_size += file.file_size
                     if not file.filename.startswith("__MACOSX"):
@@ -367,7 +367,7 @@ class BaseImportModule:
 
         has_valid_excel_file = False
         for file in result["summary"]["files"]:
-            if file.split(".")[-1] == "xlsx" and "uploadedfiles/" not in file:
+            if file.split(".")[-1] == "xlsx" and ("attachments" + os.sep) not in file:
                 try:
                     uploaded_file_path = os.path.join(self.temp_dir, file)
                     opened_file = default_storage.open(uploaded_file_path)
