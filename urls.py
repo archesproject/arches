@@ -1,6 +1,7 @@
 from django.urls import path
 
 from arches_component_lab.apps import ArchesComponentLabConfig
+from arches_component_lab.views.api.language import LanguageViewWithRequestLanguage
 from arches_component_lab.views.api.relatable_resources import RelatableResourcesView
 from arches_component_lab.views.api.card_x_node_x_widget import (
     CardXNodeXWidgetView,
@@ -16,6 +17,11 @@ from arches_querysets.rest_framework.generic_views import (
 app_name = ArchesComponentLabConfig.name
 
 urlpatterns = [
+    path(
+        "api/languages-with-request-language",
+        LanguageViewWithRequestLanguage.as_view(),
+        name="api-languages-with-request-language",
+    ),
     path(
         "api/relatable-resources/<slug:graph>/<slug:node_alias>",
         RelatableResourcesView.as_view(),

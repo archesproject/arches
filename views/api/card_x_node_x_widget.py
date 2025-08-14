@@ -4,12 +4,10 @@ from django.utils.translation import gettext as _
 from django.views.generic import View
 
 from arches import VERSION as arches_version
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
-
-# TODO: Replace with DataTypeFactory from arches_querysets
-from arches.app.datatypes.datatypes import DataTypeFactory
 
 
 def serialize_card_x_node_x_widget(widget, datatype_factory):
