@@ -76,6 +76,10 @@ watchEffect(async () => {
                 nodegroupAlias,
                 tileId,
             );
+            if (!props.tileId && props.resourceInstanceId) {
+                aliasedTileData.value.resourceinstance =
+                    props.resourceInstanceId;
+            }
         }
 
         cardXNodeXWidgetData.value = await cardXNodeXWidgetDataPromise;
