@@ -189,9 +189,11 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
 
         permitted_nodegroups = get_nodegroups_by_perm_for_user_or_group(
             user, perms, any_perm=any_perm
-        ).keys()
+        )
 
-        permitted_nodegroup_ids = [nodegroup.pk for nodegroup in permitted_nodegroups]
+        permitted_nodegroup_ids = list(
+            set(nodegroup.pk for nodegroup in permitted_nodegroups)
+        )
 
         published_permitted_nodegroups = list(
             set(
