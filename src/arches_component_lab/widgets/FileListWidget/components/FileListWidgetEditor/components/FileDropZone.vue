@@ -1,11 +1,26 @@
 <script setup lang="ts">
 import { useGettext } from "vue3-gettext";
 
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types";
+
 const { $gettext } = useGettext();
+
+const { openFileChooser, cardXNodeXWidgetData } = defineProps<{
+    openFileChooser: () => void;
+    cardXNodeXWidgetData: CardXNodeXWidgetData;
+}>();
 </script>
 
 <template>
-    <div class="upload-container">
+    <div
+        :id="cardXNodeXWidgetData.node.alias"
+        class="upload-container"
+        role="button"
+        tabindex="0"
+        @click="openFileChooser"
+        @keydown.enter.prevent="openFileChooser"
+        @keydown.space.prevent="openFileChooser"
+    >
         <i
             class="pi pi-cloud-upload upload-icon"
             aria-hidden="true"
@@ -47,5 +62,14 @@ const { $gettext } = useGettext();
 .upload-subtitle {
     font-size: 1rem;
     color: var(--p-text-muted-color);
+}
+
+.upload-container {
+    outline: none;
+}
+.upload-container:focus {
+    outline: 0.25rem solid var(--p-primary-color);
+    outline-offset: 0.25rem;
+    border-radius: var(--p-content-border-radius, 1rem);
 }
 </style>

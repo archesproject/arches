@@ -16,16 +16,15 @@ defineProps<{
     value: URLValue;
 }>();
 
-const emit = defineEmits(["update:isDirty", "update:value"]);
+const emit = defineEmits(["update:value"]);
 </script>
 
 <template>
     <URLWidgetEditor
         v-if="mode === EDIT"
-        :node-alias="nodeAlias"
+        :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :value="value"
         @update:value="emit('update:value', $event)"
-        @update:is-dirty="emit('update:isDirty', $event)"
     />
     <URLWidgetViewer
         v-if="mode === VIEW"

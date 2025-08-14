@@ -16,17 +16,17 @@ defineProps<{
     value: ResourceInstanceListValue;
 }>();
 
-const emit = defineEmits(["update:isDirty", "update:value"]);
+const emit = defineEmits(["update:value"]);
 </script>
 
 <template>
     <ResourceInstanceMultiselectWidgetEditor
         v-if="mode === EDIT"
+        :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :graph-slug="graphSlug"
         :node-alias="nodeAlias"
         :value="value"
         @update:value="emit('update:value', $event)"
-        @update:is-dirty="emit('update:isDirty', $event)"
     />
     <ResourceInstanceMultiselectWidgetViewer
         v-if="mode === VIEW"

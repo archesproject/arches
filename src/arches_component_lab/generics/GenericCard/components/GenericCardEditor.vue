@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { reactive, toRaw, ref, watch, nextTick } from "vue";
+import {
+    reactive,
+    toRaw,
+    ref,
+    watch,
+    nextTick,
+    useTemplateRef,
+    computed,
+} from "vue";
 import { useGettext } from "vue3-gettext";
 
 import { Form } from "@primevue/forms";
@@ -10,7 +18,6 @@ import Skeleton from "primevue/skeleton";
 import GenericWidget from "@/arches_component_lab/generics/GenericWidget/GenericWidget.vue";
 
 import { upsertTile } from "@/arches_component_lab/generics/GenericCard/api.ts";
-import { EDIT } from "@/arches_component_lab/widgets/constants.ts";
 
 import type {
     AliasedNodeData,
@@ -21,46 +28,117 @@ import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const { $gettext } = useGettext();
 
-const props = defineProps<{
+// Prevents spamming i18n functions on panel drag
+const SAVE = $gettext("Save");
+const CANCEL = $gettext("Cancel");
+
+const {
+    cardXNodeXWidgetData,
+    graphSlug,
+    mode,
+    nodegroupAlias,
+    resourceInstanceId,
+    selectedNodeAlias,
+    shouldShowFormButtons = true,
+    tileData,
+    widgetDirtyStates = {},
+} = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData[];
     graphSlug: string;
     mode: WidgetMode;
     nodegroupAlias: string;
     resourceInstanceId: string | null | undefined;
+    selectedNodeAlias?: string | null;
     shouldShowFormButtons: boolean | undefined;
     tileData?: AliasedTileData;
+    widgetDirtyStates?: Record<string, boolean>;
 }>();
 
 const emit = defineEmits([
-    "update:widgetDirtyStates",
     "update:tileData",
+    "update:widgetDirtyStates",
+    "update:widgetFocusStates",
     "save",
+    "reset",
 ]);
+
+const genericWidgetRefs = useTemplateRef("genericWidget");
 
 const formKey = ref(0);
 const isSaving = ref(false);
 const saveError = ref<Error>();
 
-const originalAliasedData = structuredClone(props.tileData?.aliased_data || {});
-const aliasedData = reactive(
-    structuredClone(props.tileData?.aliased_data || {}),
-);
+const originalAliasedData = structuredClone(tileData?.aliased_data || {});
+const aliasedData = reactive(structuredClone(tileData?.aliased_data || {}));
 
-const widgetDirtyStates = reactive(
-    props.cardXNodeXWidgetData.reduce<Record<string, boolean>>(
+const areButtonsDisabled = computed(() => {
+    return Object.values(widgetDirtyStates).every((dirty) => !dirty);
+});
+
+const localWidgetDirtyStates = reactive(
+    cardXNodeXWidgetData.reduce<Record<string, boolean>>(
         (dirtyStatesMap, widgetDatum) => {
-            dirtyStatesMap[widgetDatum.node.alias] = false;
+            if (widgetDirtyStates) {
+                dirtyStatesMap[widgetDatum.node.alias] =
+                    widgetDirtyStates[widgetDatum.node.alias] || false;
+            } else {
+                dirtyStatesMap[widgetDatum.node.alias] = false;
+            }
+
             return dirtyStatesMap;
         },
         {},
     ),
 );
 
+const localWidgetFocusedStates = reactive(
+    cardXNodeXWidgetData.reduce<Record<string, boolean>>(
+        (focusedStatesMap, widgetDatum) => {
+            focusedStatesMap[widgetDatum.node.alias] = false;
+            return focusedStatesMap;
+        },
+        {},
+    ),
+);
+
+watch(
+    () => selectedNodeAlias,
+    async (nodeAlias) => {
+        if (!nodeAlias) return;
+
+        await nextTick();
+
+        // The loop guards against race conditions
+        for (let attemptCount = 0; attemptCount < 5; attemptCount += 1) {
+            const widgetComponentRefs = genericWidgetRefs.value;
+            if (!Array.isArray(widgetComponentRefs)) return;
+
+            for (const widgetComponentRef of widgetComponentRefs) {
+                const widgetRootElement = widgetComponentRef?.$el;
+                if (!widgetRootElement) continue;
+
+                const inputElementToFocus = widgetRootElement.querySelector(
+                    `#${nodeAlias}`,
+                );
+                if (inputElementToFocus) {
+                    inputElementToFocus.focus();
+                    return;
+                }
+            }
+
+            await new Promise<void>((resolve) => {
+                return requestAnimationFrame(() => resolve());
+            });
+        }
+    },
+    { immediate: true, flush: "post" },
+);
+
 watch(
     aliasedData,
     () => {
         emit("update:tileData", {
-            ...props.tileData,
+            ...tileData,
             aliased_data: toRaw(aliasedData),
         });
     },
@@ -68,28 +146,49 @@ watch(
 );
 
 watch(
-    widgetDirtyStates,
-    (newValue) => {
-        emit("update:widgetDirtyStates", newValue);
+    () => ({ ...localWidgetDirtyStates }),
+    (newDirtyMap) => {
+        emit("update:widgetDirtyStates", newDirtyMap);
     },
-    { deep: true },
 );
+
+watch(
+    () => ({ ...localWidgetFocusedStates }),
+    (newFocusedMap) => {
+        emit("update:widgetFocusStates", newFocusedMap);
+    },
+);
+
+function onUpdateWidgetDirtyState(nodeAlias: string, isDirty: boolean) {
+    localWidgetDirtyStates[nodeAlias] = isDirty;
+}
+
+function onUpdateWidgetFocusedState(nodeAlias: string, isFocused: boolean) {
+    localWidgetFocusedStates[nodeAlias] = isFocused;
+}
 
 function onUpdateWidgetValue(nodeAlias: string, value: AliasedNodeData) {
     aliasedData[nodeAlias] = value;
 }
 
-function resetWidgetDirtyStates() {
-    Object.keys(widgetDirtyStates).forEach((nodeAlias) => {
-        widgetDirtyStates[nodeAlias] = false;
-    });
-}
-
 function resetForm() {
     resetWidgetDirtyStates();
 
-    Object.assign(aliasedData, structuredClone(originalAliasedData));
+    const originalAliasedDataClone = structuredClone(originalAliasedData);
+
+    Object.assign(aliasedData, originalAliasedDataClone);
     formKey.value += 1;
+
+    // nextTick ensures `reset` is emitted after `update:tileData`
+    nextTick(() => {
+        emit("reset", originalAliasedDataClone);
+    });
+}
+
+function resetWidgetDirtyStates() {
+    Object.keys(localWidgetDirtyStates).forEach((nodeAlias) => {
+        localWidgetDirtyStates[nodeAlias] = false;
+    });
 }
 
 async function save() {
@@ -98,14 +197,14 @@ async function save() {
 
     try {
         const updatedTileData = await upsertTile(
-            props.graphSlug,
-            props.nodegroupAlias,
+            graphSlug,
+            nodegroupAlias,
             {
-                ...(props.tileData as AliasedTileData),
+                ...(tileData as AliasedTileData),
                 aliased_data: toRaw(aliasedData),
             },
-            props.tileData?.tileid ? props.tileData.tileid : undefined,
-            props.resourceInstanceId,
+            tileData?.tileid ? tileData.tileid : undefined,
+            resourceInstanceId,
         );
 
         Object.assign(
@@ -155,14 +254,27 @@ defineExpose({ save });
             >
                 <GenericWidget
                     v-if="cardXNodeXWidgetDatum.visible"
-                    v-model:is-dirty="
-                        widgetDirtyStates[cardXNodeXWidgetDatum.node.alias]
+                    ref="genericWidget"
+                    :is-dirty="
+                        localWidgetDirtyStates[cardXNodeXWidgetDatum.node.alias]
                     "
-                    :mode="mode"
-                    :graph-slug="graphSlug"
-                    :node-alias="cardXNodeXWidgetDatum.node.alias"
                     :card-x-node-x-widget-data="cardXNodeXWidgetDatum"
+                    :graph-slug="graphSlug"
+                    :mode="mode"
+                    :node-alias="cardXNodeXWidgetDatum.node.alias"
                     :value="aliasedData[cardXNodeXWidgetDatum.node.alias]"
+                    @update:is-dirty="
+                        onUpdateWidgetDirtyState(
+                            cardXNodeXWidgetDatum.node.alias,
+                            $event,
+                        )
+                    "
+                    @update:is-focused="
+                        onUpdateWidgetFocusedState(
+                            cardXNodeXWidgetDatum.node.alias,
+                            $event,
+                        )
+                    "
                     @update:value="
                         onUpdateWidgetValue(
                             cardXNodeXWidgetDatum.node.alias,
@@ -174,18 +286,24 @@ defineExpose({ save });
 
             <div
                 v-if="shouldShowFormButtons"
-                style="display: flex"
+                class="form-action-buttons"
             >
                 <Button
-                    :disabled="isSaving"
-                    :label="$gettext('Save')"
+                    :disabled="areButtonsDisabled"
+                    :loading="isSaving"
+                    severity="success"
+                    size="small"
+                    icon="pi pi-check"
+                    :label="SAVE"
                     @click="save"
                 />
-
                 <Button
-                    v-if="mode === EDIT"
+                    :disabled="areButtonsDisabled"
                     type="button"
-                    :label="$gettext('Cancel')"
+                    severity="warn"
+                    size="small"
+                    icon="pi pi-undo"
+                    :label="CANCEL"
                     @click="resetForm"
                 />
             </div>
@@ -198,5 +316,13 @@ defineExpose({ save });
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+}
+
+.form-action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding-top: 1rem;
+    flex-wrap: wrap;
 }
 </style>

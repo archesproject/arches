@@ -16,18 +16,15 @@ defineProps<{
     value: NonLocalizedTextValue;
 }>();
 
-const emit = defineEmits(["update:isDirty", "update:value"]);
+const emit = defineEmits(["update:value"]);
 </script>
 
 <template>
     <NonLocalizedTextWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :graph-slug="graphSlug"
-        :node-alias="nodeAlias"
         :value="value"
         @update:value="emit('update:value', $event)"
-        @update:is-dirty="emit('update:isDirty', $event)"
     />
     <NonLocalizedTextWidgetViewer
         v-if="mode === VIEW"

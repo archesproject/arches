@@ -9,35 +9,46 @@ import {
 
 import Message from "primevue/message";
 import Skeleton from "primevue/skeleton";
+
 import GenericWidgetLabel from "@/arches_component_lab/generics/GenericWidget/components/GenericWidgetLabel.vue";
+import GenericFormField from "@/arches_component_lab/generics/GenericWidget/components/GenericFormField.vue";
 
+import { EDIT } from "@/arches_component_lab/widgets/constants.ts";
 import { fetchCardXNodeXWidgetData } from "@/arches_component_lab/generics/GenericWidget/api.ts";
-
 import { removeVueExtension } from "@/arches_component_lab/generics/GenericWidget/utils.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type {
+    AliasedNodeData,
+    CardXNodeXWidgetData,
+} from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-const props = withDefaults(
-    defineProps<{
-        cardXNodeXWidgetData?: CardXNodeXWidgetData;
-        graphSlug: string;
-        mode: WidgetMode;
-        nodeAlias: string;
-        shouldShowLabel?: boolean;
-        value?: unknown | null | undefined;
-    }>(),
-    {
-        cardXNodeXWidgetData: undefined,
-        shouldShowLabel: true,
-        value: undefined,
-    },
-);
+const {
+    cardXNodeXWidgetData,
+    graphSlug,
+    isDirty = false,
+    mode,
+    nodeAlias,
+    shouldShowLabel = true,
+    value,
+} = defineProps<{
+    cardXNodeXWidgetData?: CardXNodeXWidgetData;
+    graphSlug: string;
+    isDirty?: boolean;
+    mode: WidgetMode;
+    nodeAlias: string;
+    shouldShowLabel?: boolean;
+    value?: unknown | null | undefined;
+}>();
 
-const emit = defineEmits(["update:isDirty", "update:value"]);
+const emit = defineEmits([
+    "update:isDirty",
+    "update:isFocused",
+    "update:value",
+]);
 
 const isLoading = ref(false);
-const resolvedCardXNodeXWidgetData = shallowRef(props.cardXNodeXWidgetData);
+const resolvedCardXNodeXWidgetData = shallowRef(cardXNodeXWidgetData);
 const configurationError = ref<Error>();
 
 const widgetComponent = computed(() => {
@@ -57,8 +68,8 @@ const widgetComponent = computed(() => {
 });
 
 const widgetValue = computed(() => {
-    if (props.value !== undefined) {
-        return props.value;
+    if (value !== undefined) {
+        return value;
     } else if (resolvedCardXNodeXWidgetData.value) {
         return resolvedCardXNodeXWidgetData.value.config.defaultValue;
     } else {
@@ -75,8 +86,8 @@ watchEffect(async () => {
 
     try {
         resolvedCardXNodeXWidgetData.value = await fetchCardXNodeXWidgetData(
-            props.graphSlug,
-            props.nodeAlias,
+            graphSlug,
+            nodeAlias,
         );
     } catch (error) {
         configurationError.value = error as Error;
@@ -91,6 +102,8 @@ watchEffect(async () => {
         class="widget"
         :data-graph-slug="graphSlug"
         :data-node-alias="nodeAlias"
+        @focusin="() => emit('update:isFocused', true)"
+        @focusout="() => emit('update:isFocused', false)"
     >
         <Skeleton
             v-if="isLoading"
@@ -103,38 +116,50 @@ watchEffect(async () => {
         >
             {{ configurationError.message }}
         </Message>
-        <label
-            v-else-if="widgetComponent && resolvedCardXNodeXWidgetData"
-            class="widget-label-container"
-        >
+        <template v-else-if="widgetComponent && resolvedCardXNodeXWidgetData">
             <GenericWidgetLabel
                 v-if="shouldShowLabel"
                 :mode="mode"
                 :card-x-node-x-widget-data="resolvedCardXNodeXWidgetData"
             />
 
-            <!-- Placing the component inside the label allows for inherit association with grandchild input -->
+            <GenericFormField
+                v-if="mode === EDIT"
+                :is-dirty="isDirty"
+                :node-alias="nodeAlias"
+                :value="widgetValue as AliasedNodeData"
+                @update:value="emit('update:value', $event)"
+                @update:is-dirty="emit('update:isDirty', $event)"
+            >
+                <component
+                    :is="widgetComponent"
+                    :key="resolvedCardXNodeXWidgetData.id"
+                    :card-x-node-x-widget-data="resolvedCardXNodeXWidgetData"
+                    :graph-slug="graphSlug"
+                    :mode="mode"
+                    :node-alias="nodeAlias"
+                    :value="widgetValue"
+                    @update:value="emit('update:value', $event)"
+                    @update:is-dirty="emit('update:isDirty', $event)"
+                />
+            </GenericFormField>
+
             <component
                 :is="widgetComponent"
+                v-else
                 :key="resolvedCardXNodeXWidgetData.id"
                 :card-x-node-x-widget-data="resolvedCardXNodeXWidgetData"
                 :graph-slug="graphSlug"
                 :mode="mode"
                 :node-alias="nodeAlias"
                 :value="widgetValue"
-                @update:value="emit('update:value', $event)"
-                @update:is-dirty="emit('update:isDirty', $event)"
             />
-        </label>
+        </template>
     </div>
 </template>
 
 <style scoped>
 .widget {
-    display: flex;
-    flex-direction: column;
-}
-.widget-label-container {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;

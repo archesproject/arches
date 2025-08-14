@@ -1,11 +1,8 @@
 import dayjs from "dayjs";
 
-export function formatDate(
-    date: Date | null,
-    dateFormat: string,
-): string | null {
+export function formatDate(date: Date | null, dateFormat: string): string {
     if (!date) {
-        return null;
+        return "";
     }
 
     if (isNaN(date.getTime())) {

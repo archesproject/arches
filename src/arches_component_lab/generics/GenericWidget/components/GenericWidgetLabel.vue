@@ -19,7 +19,10 @@ const shouldShowRequiredAsterisk = computed(() => {
 </script>
 
 <template>
-    <div class="widget-label">
+    <label
+        class="widget-label"
+        :for="cardXNodeXWidgetData.node.alias"
+    >
         <div
             v-tooltip="{
                 value: $gettext('This field is required.'),
@@ -47,7 +50,7 @@ const shouldShowRequiredAsterisk = computed(() => {
                 style="font-size: 0.75rem; padding-top: 0.25rem"
             />
         </div>
-    </div>
+    </label>
 </template>
 
 <style scoped>

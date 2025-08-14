@@ -1,38 +1,38 @@
 <script setup lang="ts">
 import InputText from "primevue/inputtext";
-import GenericFormField from "@/arches_component_lab/generics/GenericFormField.vue";
-
-import type { FormFieldResolverOptions } from "@primevue/forms";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { NonLocalizedTextValue } from "@/arches_component_lab/datatypes/non-localized-text/types.ts";
 
-defineProps<{
+const { cardXNodeXWidgetData, value } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    nodeAlias: string;
     value: NonLocalizedTextValue;
 }>();
 
-function transformValueForForm(event: FormFieldResolverOptions) {
-    return {
-        display_value: event.value,
-        node_value: event.value,
+const emit = defineEmits<{
+    (event: "update:value", updatedValue: NonLocalizedTextValue): void;
+}>();
+
+function onUpdateModelValue(updatedValue: string | undefined) {
+    if (updatedValue === undefined) {
+        updatedValue = "";
+    }
+
+    emit("update:value", {
+        display_value: updatedValue,
+        node_value: updatedValue,
         details: [],
-    };
+    });
 }
 </script>
 
 <template>
-    <GenericFormField
-        v-bind="$attrs"
-        :node-alias="nodeAlias"
-        :transform-value-for-form="transformValueForForm"
-    >
-        <InputText
-            type="text"
-            :placeholder="cardXNodeXWidgetData.config.placeholder"
-            :fluid="true"
-            :model-value="value.node_value"
-        />
-    </GenericFormField>
+    <InputText
+        type="text"
+        :fluid="true"
+        :model-value="value.node_value || ''"
+        :placeholder="cardXNodeXWidgetData.config.placeholder"
+        :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
+        @update:model-value="onUpdateModelValue($event)"
+    />
 </template>

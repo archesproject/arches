@@ -1,35 +1,37 @@
 <script setup lang="ts">
 import InputText from "primevue/inputtext";
 
-import GenericFormField from "@/arches_component_lab/generics/GenericFormField.vue";
-
-import type { FormFieldResolverOptions } from "@primevue/forms";
 import type { URLValue } from "@/arches_component_lab/datatypes/url/types";
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-defineProps<{
-    nodeAlias: string;
+const { cardXNodeXWidgetData, value } = defineProps<{
+    cardXNodeXWidgetData: CardXNodeXWidgetData;
     value: URLValue;
 }>();
 
-function transformValueForForm(event: FormFieldResolverOptions) {
-    return {
-        display_value: event.value,
-        node_value: event.value,
-        details: [],
+const emit = defineEmits<{
+    (event: "update:value", updatedValue: URLValue): void;
+}>();
+
+function onUpdateModelValue(updatedValue: string | undefined) {
+    const formattedValue = {
+        url: updatedValue ?? "",
+        url_label: updatedValue ?? "",
     };
+    emit("update:value", {
+        display_value: JSON.stringify(formattedValue),
+        node_value: formattedValue,
+        details: [],
+    });
 }
 </script>
 
 <template>
-    <GenericFormField
-        v-bind="$attrs"
-        :node-alias="nodeAlias"
-        :transform-value-for-form="transformValueForForm"
-    >
-        <InputText
-            type="text"
-            :fluid="true"
-            :model-value="value.node_value?.url"
-        />
-    </GenericFormField>
+    <InputText
+        type="text"
+        :fluid="true"
+        :model-value="value.node_value?.url ?? ''"
+        :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
+        @update:model-value="onUpdateModelValue($event)"
+    />
 </template>

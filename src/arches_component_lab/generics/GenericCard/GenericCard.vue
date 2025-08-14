@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, useTemplateRef, watchEffect } from "vue";
-import { useGettext } from "vue3-gettext";
 
 import Message from "primevue/message";
 import Skeleton from "primevue/skeleton";
@@ -21,30 +20,34 @@ import type {
 } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-const { $gettext } = useGettext();
-
-const props = withDefaults(
-    defineProps<{
-        mode: WidgetMode;
-        nodegroupAlias: string;
-        graphSlug: string;
-        resourceInstanceId?: string | null;
-        shouldShowFormButtons?: boolean;
-        tileData?: AliasedTileData;
-        tileId?: string | null;
-    }>(),
-    {
-        shouldShowFormButtons: true,
-        resourceInstanceId: undefined,
-        tileData: undefined,
-        tileId: undefined,
-    },
-);
+const {
+    mode,
+    nodegroupAlias,
+    graphSlug,
+    resourceInstanceId,
+    selectedNodeAlias,
+    shouldShowFormButtons = true,
+    tileData,
+    tileId,
+    widgetDirtyStates,
+} = defineProps<{
+    mode: WidgetMode;
+    nodegroupAlias: string;
+    graphSlug: string;
+    resourceInstanceId?: string | null;
+    selectedNodeAlias?: string | null;
+    shouldShowFormButtons?: boolean;
+    tileData?: AliasedTileData;
+    tileId?: string | null;
+    widgetDirtyStates?: Record<string, boolean>;
+}>();
 
 const emit = defineEmits([
-    "update:widgetDirtyStates",
     "update:tileData",
+    "update:widgetDirtyStates",
+    "update:widgetFocusStates",
     "save",
+    "reset",
 ]);
 
 const isLoading = ref(true);
@@ -58,27 +61,20 @@ watchEffect(async () => {
     isLoading.value = true;
 
     try {
-        if (!props.tileData && !props.tileId && !props.resourceInstanceId) {
-            throw new Error(
-                $gettext(
-                    "No tile data, tile ID, or resource instance ID provided.",
-                ),
-            );
+        if (!tileData && !tileId && !resourceInstanceId) {
+            throw new Error();
         }
 
         const cardXNodeXWidgetDataPromise =
-            fetchCardXNodeXWidgetDataFromNodeGroup(
-                props.graphSlug,
-                props.nodegroupAlias,
-            );
+            fetchCardXNodeXWidgetDataFromNodeGroup(graphSlug, nodegroupAlias);
 
-        if (props.tileData) {
-            aliasedTileData.value = props.tileData;
+        if (tileData) {
+            aliasedTileData.value = tileData;
         } else {
             aliasedTileData.value = await fetchTileData(
-                props.graphSlug,
-                props.nodegroupAlias,
-                props.tileId,
+                graphSlug,
+                nodegroupAlias,
+                tileId,
             );
         }
 
@@ -118,17 +114,23 @@ defineExpose({
                 v-if="mode === EDIT"
                 ref="defaultCardEditor"
                 v-model:tile-data="aliasedTileData"
+                :widget-dirty-states="widgetDirtyStates"
                 :card-x-node-x-widget-data="cardXNodeXWidgetData"
                 :graph-slug="graphSlug"
                 :mode="mode"
                 :nodegroup-alias="nodegroupAlias"
                 :resource-instance-id="resourceInstanceId"
+                :selected-node-alias="selectedNodeAlias"
                 :should-show-form-buttons="shouldShowFormButtons"
                 @save="emit('save', $event)"
+                @reset="emit('reset', $event)"
+                @update:tile-data="emit('update:tileData', $event)"
                 @update:widget-dirty-states="
                     emit('update:widgetDirtyStates', $event)
                 "
-                @update:tile-data="emit('update:tileData', $event)"
+                @update:widget-focus-states="
+                    emit('update:widgetFocusStates', $event)
+                "
             />
             <GenericCardViewer
                 v-else-if="mode === VIEW"
