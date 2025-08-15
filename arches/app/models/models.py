@@ -737,7 +737,7 @@ class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
         if (
             self.isresource
             and not self.source_identifier_id
-            and not self.resource_instance_lifecycle
+            and not self.resource_instance_lifecycle_id
         ):
             self.resource_instance_lifecycle_id = (
                 settings.DEFAULT_RESOURCE_INSTANCE_LIFECYCLE_ID
