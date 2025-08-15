@@ -2449,11 +2449,11 @@ class NodeValueDataType(BaseDataType):
     def get_display_value(self, tile, node, **kwargs):
         datatype_factory = DataTypeFactory()
         try:
-            value_node = models.Node.objects.get(nodeid=node.config["nodeid"])
             data = self.get_tile_data(tile)
             tileid = data[str(node.nodeid)]
             if tileid:
                 value_tile = models.TileModel.objects.get(tileid=tileid)
+                value_node = models.Node.objects.get(nodeid=node.config["nodeid"])
                 datatype = datatype_factory.get_instance(value_node.datatype)
                 return datatype.get_display_value(value_tile, value_node)
             return ""
