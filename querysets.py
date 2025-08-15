@@ -169,16 +169,12 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         # causes no additional queries beyond actual depth):
         # https://forum.djangoproject.com/t/prefetching-relations-to-arbitrary-depth/39328
         if depth:
-            child_tile_query = (
-                self.model.objects.get_queryset()
-                .get_tiles(
-                    graph_slug=graph_slug,
-                    as_representation=as_representation,
-                    depth=depth - 1,
-                    nodes=nodes,
-                    graph_query=graph_query,
-                )
-                .distinct()
+            child_tile_query = self.model.objects.get_queryset().get_tiles(
+                graph_slug=graph_slug,
+                as_representation=as_representation,
+                depth=depth - 1,
+                nodes=nodes,
+                graph_query=graph_query,
             )
 
             qs = qs.prefetch_related(
@@ -190,12 +186,14 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
                     # TileTree objects rather than TileModel objects. This isn't
                     # usually an issue, but something in the way we're overriding
                     # ORM internals seems to require this.
-                    # XXX?
                     to_attr="_tile_trees",
                 )
             )
 
-        return qs.alias(**alias_expressions).order_by("sortorder")
+        # Provide the alias_expressions to the ORM.
+        # Use .distinct() because the inner join above ("nodegroup__node__graph__slug")
+        # can produce duplicates.
+        return qs.alias(**alias_expressions).order_by("sortorder").distinct()
 
     @cached_property
     def grouping_node_lookup(self):
@@ -429,7 +427,7 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
                         as_representation=as_representation,
                         nodes=nodes,
                         graph_query=graph_query,
-                    ).distinct(),  # XXX had distinct here... ensure no problem, add test
+                    ),
                     to_attr="_tile_trees",
                 ),
             )
