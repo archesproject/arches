@@ -198,7 +198,7 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
 
     def __init__(self, instance=None, data=empty, **kwargs):
         super().__init__(instance, data, **kwargs)
-        self._graph_nodes = []
+        self.graph_nodes = kwargs.pop("graph_nodes", [])
         self._root_node_aliases = []
 
     def __deepcopy__(self, memo):
@@ -660,11 +660,14 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         context=None,
         **kwargs,
     ):
+        self._graph_slug = graph_slug
+        self._graph_nodes = graph_nodes or context.get("graph_nodes") or []
         if not context:
             context = self.ensure_context(
-                graph_slug=graph_slug,
-                graph_nodes=graph_nodes,
-                nodegroup_alias_lookup=nodegroup_alias_lookup,
+                graph_slug=self.graph_slug,
+                graph_nodes=self.graph_nodes,
+                nodegroup_alias_lookup=nodegroup_alias_lookup or {},
+                request=kwargs.pop("request", None),
             )
         kwargs["context"] = context
         super().__init__(*args, **kwargs)

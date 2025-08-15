@@ -517,8 +517,12 @@ class ResourceTileTreeIterable(ModelIterable):
         Set .aliased_data to None as a sentinel so that
         ResourceTileTreeQuerySet._set_aliased_data() knows to run only once.
         """
+        graph = next(iter(self.queryset._hints["graph_query"]))
         for resource_tile_tree in super().__iter__():
-            resource_tile_tree.aliased_data = None
+            if not resource_tile_tree.sealed:
+                resource_tile_tree.graph = graph
+                resource_tile_tree.sealed = True
+                resource_tile_tree.aliased_data = None
             yield resource_tile_tree
 
 

@@ -60,6 +60,8 @@ class AliasedData(SimpleNamespace):
 
 
 class AliasedDataMixin:
+    """Don't implement properties: https://github.com/archesproject/arches/issues/12310"""
+
     def _refresh_aliased_data(self, using, fields, from_queryset):
         try:
             del self._tile_trees
@@ -102,6 +104,7 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         super().__init__(*args, **other_kwargs)
         self.aliased_data = AliasedData(**arches_model_kwargs)
         self._as_representation = False
+        self._sealed = False
 
     @property
     def aliased_data(self):
@@ -110,6 +113,18 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
     @aliased_data.setter
     def aliased_data(self, value):
         self._aliased_data = value
+
+    @property
+    def sealed(self):
+        """
+        A boolean set when this instance is yielded from a QuerySet signifying its
+        related .graph has been replaced with an instance w/ related objects prefetched.
+        """
+        return self._sealed
+
+    @sealed.setter
+    def sealed(self, value):
+        self._sealed = value
 
     def save(
         self, *, request=None, index=True, partial=True, force_admin=False, **kwargs
@@ -258,9 +273,9 @@ class TileTree(TileModel, AliasedDataMixin):
     @property
     def sealed(self):
         """
-        A boolean set when this instance is yielded from a QuerySet signifying
-        that its .nodegroup and .resourceinstance.graph attributes are safe to use
-        (i.e. have been replaced with instances having related objects prefetched.)
+        A boolean set when this instance is yielded from a QuerySet signifying its
+        related .nodegroup and .resourceinstance.graph have been replaced with
+        instances w/ related objects prefetched.
         """
         return self._sealed
 
