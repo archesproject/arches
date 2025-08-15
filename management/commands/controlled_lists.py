@@ -145,10 +145,18 @@ class Command(BaseCommand):
             ).values_list("value", flat=True)
         )
 
+        if len(collections_to_migrate) == 1 and collections_to_migrate[0] == "":
+            collections_in_db = list(
+                Value.objects.filter(
+                    valuetype__in=["prefLabel", "identifier"],
+                    concept__nodetype="Collection",
+                ).values_list("value", flat=True)
+            )
+
         failed_collections = [
             collection
             for collection in collections_to_migrate
-            if collection not in collections_in_db
+            if collection not in collections_in_db and collection != ""
         ]
 
         if len(failed_collections) > 0:
