@@ -69,12 +69,12 @@ class NodeAliasValuesMixin:
 
 
 class TileTreeManager(models.Manager):
-    # XXX evaluate whether some of these should get pushed into get_tiles()
+    # TODO: evaluate whether some of these should get pushed into get_tiles()
     def get_queryset(self):
         qs = super().get_queryset().select_related("resourceinstance")
         # arches_version==9.0.0
         if arches_version >= (8, 0):
-            # XXX could get this from resource queryset
+            # TODO: could get this once?
             qs = qs.prefetch_related("resourceinstance__from_resxres__to_resource")
             qs = qs.select_related("nodegroup__grouping_node")
         else:

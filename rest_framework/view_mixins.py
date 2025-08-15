@@ -66,19 +66,12 @@ class ArchesModelAPIMixin:
 
     def get_queryset(self):
         options = self.serializer_class.Meta
-        # if options.fields == "__all__":
-        #     fields = None
-        # else:
-        #     fields = options.fields
-
         try:
             if issubclass(options.model, ResourceInstance):
-                # XXX only
                 qs = options.model.get_tiles(
                     self.graph_slug,
                     resource_ids=self.resource_ids,
                     as_representation=True,
-                    # XXX user check
                 ).select_related("graph")
                 if arches_version >= (8, 0):
                     qs = qs.select_related("resource_instance_lifecycle_state")
@@ -86,7 +79,6 @@ class ArchesModelAPIMixin:
                 qs = options.model.get_tiles(
                     self.graph_slug,
                     self.nodegroup_alias,
-                    ### xxx only
                     as_representation=True,
                     resource_ids=self.resource_ids,
                 ).select_related("nodegroup", "resourceinstance__graph")

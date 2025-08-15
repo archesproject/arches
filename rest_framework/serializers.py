@@ -201,12 +201,6 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
         self.graph_nodes = kwargs.pop("graph_nodes", [])
         self._root_node_aliases = []
 
-    def __deepcopy__(self, memo):
-        """TODO: still needed?"""
-        ret = super().__deepcopy__(memo)
-        ret._graph_nodes = self._graph_nodes
-        return ret
-
     def get_value(self, dictionary):
         """Avoid the branch that treats MultiPart data input as HTML."""
         return dictionary.get(self.field_name, empty)
@@ -311,7 +305,6 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             self.url_field_name = "__nonexistent__"
 
     def __deepcopy__(self, memo):
-        """TODO: Still needed?"""
         ret = super().__deepcopy__(memo)
         ret._graph_slug = self._graph_slug
         ret._graph_nodes = self._graph_nodes
@@ -711,7 +704,6 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         instance_from_factory = options.model.get_tiles(
             graph_slug=self.graph_slug,
             as_representation=True,
-            # XXX user check?
         ).get(pk=instance_without_tile_data.pk)
         # TODO: decide whether to override update() instead of using partial().
         instance_from_factory.save = partial(
