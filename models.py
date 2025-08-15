@@ -372,8 +372,9 @@ class TileTree(TileModel, AliasedDataMixin):
         if not getattr(self, "_nodegroup_alias", None):
             # TileTreeManager provides "_nodegroup_alias" annotation on 7.6, but perform
             # a last-minute check just in case. Also runs if the node alias is null.
-            if grouping_node := Node.objects.filter(pk=self.nodegroup_id).first():
-                self._nodegroup_alias = grouping_node.alias
+            for node in self.nodegroup.node_set.all():
+                if node.pk == self.nodegroup.pk:
+                    self._nodegroup_alias = node.alias
         return self._nodegroup_alias
 
     @classmethod

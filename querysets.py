@@ -403,6 +403,7 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
                 .exclude(datatype="semantic")
                 .exclude(nodegroup=None)
                 .select_related("nodegroup__parentnodegroup")
+                .order_by()
             )
             if not nodes:
                 raise ValueError(f"No nodes found for graph with slug: {graph_slug}")
@@ -625,10 +626,7 @@ class GraphWithPrefetchingQuerySet(models.QuerySet):  # pragma: no cover
         return self.get(pk=graph_model.graphid)
 
     def prefetch(self, graph_slug=None, *, resource_ids=None):
-        """Return a graph with necessary prefetches for
-        TileTree._prefetch_related_objects(), which is what builds the shape
-        of the tile graph.
-        """
+        """Return a graph with necessary prefetches for setting aliased_data."""
         qs = self
         if resource_ids and not graph_slug:
             qs = qs.filter(resourceinstance__in=resource_ids)
@@ -650,24 +648,18 @@ class GraphWithPrefetchingQuerySet(models.QuerySet):  # pragma: no cover
         prefetches = [
             "node_set__cardxnodexwidget_set",
             "node_set__nodegroup__parentnodegroup",
-            "node_set__nodegroup__node_set",
             "node_set__nodegroup__node_set__cardxnodexwidget_set",
             "node_set__nodegroup__cardmodel_set",
             *get_recursive_prefetches(
                 f"node_set__nodegroup__{children}", depth=12, recursive_part=children
             ),
             *get_recursive_prefetches(
-                f"node_set__nodegroup__{children}__node_set",
+                f"node_set__nodegroup__{children}__node_set__cardxnodexwidget_set",
                 depth=12,
                 recursive_part=children,
             ),
             *get_recursive_prefetches(
                 f"node_set__nodegroup__{children}__cardmodel_set",
-                depth=12,
-                recursive_part=children,
-            ),
-            *get_recursive_prefetches(
-                f"node_set__nodegroup__{children}__node_set__cardxnodexwidget_set",
                 depth=12,
                 recursive_part=children,
             ),

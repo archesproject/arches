@@ -131,7 +131,7 @@ class NodeFetcherMixin:
 
     @property
     def graph_nodes(self):
-        if not getattr(self, "_graph_nodes", None):
+        if not self._graph_nodes:
             graph_nodes = []
             if getattr(self, "parent", None) and isinstance(
                 self.parent, NodeFetcherMixin
@@ -351,6 +351,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
                 if arches_version >= (8, 0)
                 else self._root_node.nodegroup.nodegroup_set
             )
+            flat_node_lookup = {node.pk: node for node in self.context["graph_nodes"]}
             for child_nodegroup in child_query.all():
                 # arches_version==9.0.0: cached_viewable_nodegroups -> viewable_nodegroups
                 if str(child_nodegroup.pk) not in profile.cached_viewable_nodegroups:
@@ -359,6 +360,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
                     child_nodegroup.pk
                 ]
                 self._child_nodegroup_aliases.append(child_nodegroup_alias)
+                child_nodegroup = flat_node_lookup[child_nodegroup.pk].nodegroup
 
                 if (
                     child_nodegroup_alias in nodes_by_node_aliases
@@ -536,8 +538,13 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         fields = "__all__"
 
     def __init__(self, instance=None, data=empty, *, context=None, **kwargs):
-        self._graph_slug = kwargs.pop("graph_slug", None)
-        self._graph_nodes = kwargs.pop("graph_nodes", [])
+        # TODO(next): reduce number of paths through this code
+        self._graph_slug = kwargs.pop(
+            "graph_slug", context.get("graph_slug", None) if context else None
+        )
+        self._graph_nodes = kwargs.pop(
+            "graph_nodes", context.get("graph_nodes", None) if context else None
+        )
         if not context:
             context = self.ensure_context(
                 graph_slug=self.graph_slug,
@@ -661,7 +668,8 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         **kwargs,
     ):
         self._graph_slug = graph_slug
-        self._graph_nodes = graph_nodes or context.get("graph_nodes") or []
+        # TODO(next): simplify supplying context
+        self._graph_nodes = graph_nodes or (context or {}).get("graph_nodes") or []
         if not context:
             context = self.ensure_context(
                 graph_slug=self.graph_slug,

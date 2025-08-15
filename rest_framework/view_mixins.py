@@ -2,6 +2,7 @@ from functools import partial
 from itertools import chain
 
 from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db.models import Q
 from django.utils.translation import gettext as _
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.metadata import SimpleMetadata
@@ -17,7 +18,6 @@ from arches.app.utils.permission_backend import (
 from arches.app.utils.string_utils import str_to_bool
 
 from arches_querysets.models import TileTree
-from arches_querysets.rest_framework.utils import get_nodegroup_alias_lookup
 from arches_querysets.utils.models import ensure_request
 
 
@@ -43,7 +43,7 @@ class ArchesModelAPIMixin:
         options = self.serializer_class.Meta
         self.graph_slug = options.graph_slug or kwargs.get("graph")
         self.nodegroup_alias = kwargs.get("nodegroup_alias")
-        self.nodegroup_alias_lookup = get_nodegroup_alias_lookup(self.graph_slug)
+        self.nodegroup_alias_lookup = {}
 
         if issubclass(options.model, TileModel):
             self.nodegroup_alias = options.root_node or self.nodegroup_alias
@@ -102,14 +102,39 @@ class ArchesModelAPIMixin:
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        return {
+        ret = {
             **context,
             "request": ensure_request(context["request"]),
             "graph_slug": self.graph_slug,
-            "graph_nodes": self.graph_nodes,
+            "graph_nodes": self.graph_nodes or self._find_graph_nodes(),
             "nodegroup_alias": self.nodegroup_alias,
-            "nodegroup_alias_lookup": self.nodegroup_alias_lookup,
         }
+        if not ret.get("nodegroup_alias_lookup"):
+            ret["nodegroup_alias_lookup"] = {
+                node.pk: node.alias
+                for node in ret["graph_nodes"]
+                if node.pk == node.nodegroup_id
+            }
+        return ret
+
+    def _find_graph_nodes(self):
+        node_filters = Q(graph__slug=self.graph_slug, nodegroup__isnull=False)
+        children = "nodegroup_set"
+        # arches_version==9.0.0
+        if arches_version >= (8, 0):
+            node_filters &= Q(source_identifier=None)
+            children = "children"
+
+        return (
+            Node.objects.filter(node_filters)
+            .select_related("nodegroup")
+            .prefetch_related(
+                "nodegroup__node_set",
+                "nodegroup__cardmodel_set",
+                f"nodegroup__{children}",
+                "cardxnodexwidget_set",
+            )
+        )
 
     def get_object(self, permission_callable=None, fill_blanks=False):
         ret = super().get_object()
@@ -117,6 +142,11 @@ class ArchesModelAPIMixin:
             self.graph_nodes = ret.resourceinstance.graph.node_set.all()
         else:
             self.graph_nodes = ret.graph.node_set.all()
+        self.nodegroup_alias_lookup = {
+            node.pk: node.alias
+            for node in self.graph_nodes
+            if node.pk == node.nodegroup_id
+        }
 
         options = self.serializer_class.Meta
         if issubclass(options.model, ResourceInstance):
@@ -153,6 +183,11 @@ class ArchesModelAPIMixin:
             self.graph_nodes = next(
                 iter(queryset._hints.get("graph_query"))
             ).node_set.all()
+            self.nodegroup_alias_lookup = {
+                node.pk: node.alias
+                for node in self.graph_nodes
+                if node.pk == node.nodegroup_id
+            }
 
         # Parse ORM lookpus from query params starting with "aliased_data__"
         # This is a quick-n-dirty riff on https://github.com/miki725/django-url-filter

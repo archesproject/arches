@@ -1,7 +1,7 @@
 import datetime
 import uuid
 
-from django.db.models import prefetch_related_objects
+from django.db.models import F, OuterRef, prefetch_related_objects
 from django.test import TestCase
 
 from arches import VERSION as arches_version
@@ -61,7 +61,13 @@ class GraphTestCase(TestCase):
         cls.graph.publication = graph_proxy.publication
         for resource in [cls.resource_42, cls.resource_none]:
             resource.graph_publication = cls.graph.publication
-            resource.save()
+        # resource.save() might complain about differing publications, but
+        # we're trying to sync the publications here, so sidestep it.
+        ResourceInstance.objects.annotate(
+            graph_pub_id=Graph.objects.filter(resourceinstance=OuterRef("pk")).values(
+                "publication"
+            )[:1]
+        ).update(graph_publication=F("graph_pub_id"))
 
     @classmethod
     def create_graph(cls):
@@ -503,6 +509,18 @@ class GraphTestCase(TestCase):
             data={},
             parenttile=cls.cardinality_n_tile,
         )
+        cls.cardinality_1_child_tile_none = TileModel.objects.create(
+            nodegroup=cls.nodegroup_1_child,
+            resourceinstance=cls.resource_none,
+            data={},
+            parenttile=cls.cardinality_1_tile_none,
+        )
+        cls.cardinality_n_child_tile_none = TileModel.objects.create(
+            nodegroup=cls.nodegroup_n_child,
+            resourceinstance=cls.resource_none,
+            data={},
+            parenttile=cls.cardinality_n_tile_none,
+        )
 
         # Create data for the child non-localized-string node only.
         # TileModel.save() will initialize the other nodes to None.
@@ -524,6 +542,9 @@ class GraphTestCase(TestCase):
         cls.resource_42 = ResourceTileTree.get_tiles(
             "datatype_lookups", as_representation=True
         ).get(pk=cls.resource_42.pk)
+        cls.resource_none = ResourceTileTree.get_tiles(
+            "datatype_lookups", as_representation=True
+        ).get(pk=cls.resource_none.pk)
 
     @classmethod
     def find_default_widget_id(cls, node, datatypes):
