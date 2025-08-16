@@ -500,8 +500,8 @@ class Graph(models.GraphModel):
         with transaction.atomic():
             super(Graph, self).save()
 
-            for nodegroup in self.get_nodegroups():
-                nodegroup.save()
+            # for nodegroup in self.get_nodegroups():
+            #     nodegroup.save()
 
             se = SearchEngineFactory().create()
             datatype_factory = DataTypeFactory()
