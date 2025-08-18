@@ -313,6 +313,12 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         ret._graph_nodes = self._graph_nodes
         return ret
 
+    @classmethod
+    def register_custom_datatype_field(cls, model_field, serializer_field):
+        cls.serializer_field_mapping[model_field] = _wrap_serializer_field(
+            serializer_field
+        )
+
     def get_value(self, dictionary):
         """Avoid the branch that treats MultiPart data input as HTML."""
         return dictionary.get(self.field_name, empty)
