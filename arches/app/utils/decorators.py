@@ -96,7 +96,7 @@ def can_edit_resource_instance(redirect_to_report=False):
             if user_can_edit_resource(request.user, resourceid=resourceid):
                 return function(request, *args, **kwargs)
             else:
-                if redirect_to_report:
+                if redirect_to_report is True:
                     url = reverse("resource_report", kwargs={"resourceid": resourceid})
                     return HttpResponseRedirect(f"{url}?redirected=true")
                 else:
