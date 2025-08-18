@@ -1,8 +1,19 @@
 import django.db.models
 
-from arches.app.datatypes import datatypes
+from arches.app.datatypes.datatypes import (
+    BooleanDataType,
+    DateDataType,
+    NonLocalizedStringDataType,
+    NumberDataType,
+)
 
 from arches_querysets.datatypes import *
+from arches_querysets.fields import (
+    ConceptListField,
+    LocalizedStringField,
+    ResourceInstanceField,
+    ResourceInstanceListField,
+)
 
 
 class DataTypeFactory(datatypes.DataTypeFactory):
@@ -24,13 +35,26 @@ class DataTypeFactory(datatypes.DataTypeFactory):
         if model_field := getattr(instance, "model_field", None):
             return model_field
         match instance:
-            case datatypes.NumberDataType():
+            case NumberDataType():
                 return django.db.models.FloatField(null=True)
-            case datatypes.DateDataType():
-                return django.db.models.DateField(null=True)
-            case datatypes.BooleanDataType():
+            case DateDataType():
+                return django.db.models.DateTimeField(null=True)
+            case BooleanDataType():
                 return django.db.models.BooleanField(null=True)
-            case datatypes.NonLocalizedStringDataType():
-                return django.db.models.CharField(null=True)
-            case _:
+            case NonLocalizedStringDataType():
+                return django.db.models.TextField(null=True)
+            case StringDataType():
+                return LocalizedStringField(null=True)
+            case ResourceInstanceListDataType():
+                # must precede ResourceInstanceDataType
+                return ResourceInstanceListField(null=True)
+            case ResourceInstanceDataType():
+                return ResourceInstanceField(null=True)
+            case ConceptListDataType():
+                return ConceptListField(null=True)
+            case ConceptDataType(), NodeValueDataType():
+                return django.db.models.UUIDField(null=True)
+            case URLDataType():
                 return django.db.models.JSONField(null=True)
+            case _:
+                return django.db.models.TextField(null=True)

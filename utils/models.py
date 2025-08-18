@@ -4,12 +4,9 @@ from django.contrib.auth.models import User
 from django.contrib.postgres.expressions import ArraySubquery
 from django.contrib.postgres.fields import ArrayField
 from django.db.models import (
-    BooleanField,
     Case,
-    DateTimeField,
     ExpressionWrapper,
     F,
-    FloatField,
     JSONField,
     OuterRef,
     TextField,
@@ -25,6 +22,7 @@ from django.utils.functional import cached_property
 from arches import VERSION as arches_version
 from arches.app.models.models import ResourceInstance, TileModel
 
+from arches_querysets.datatypes.datatypes import DataTypeFactory
 from arches_querysets.fields import (
     CardinalityNConceptListField,
     CardinalityNJSONField,
@@ -48,19 +46,6 @@ DATATYPES_NEEDING_KEY_TEXT_TRANSFORM = {
     "node-value",
 }
 DATATYPES_NEEDING_CAST = {"boolean", "concept-list", "date", "number"}
-DATATYPE_OUTPUT_FIELDS = {
-    "boolean": BooleanField(),
-    "number": FloatField(),
-    "non-localized-string": TextField(),
-    "date": DateTimeField(),
-    "string": LocalizedStringField(),
-    "url": JSONField(),
-    "resource-instance": ResourceInstanceField(),
-    "resource-instance-list": ResourceInstanceListField(),
-    "concept": UUIDField(),
-    "concept-list": ConceptListField(),
-    "node-value": UUIDField(),
-}
 
 
 class CardinalityNSubquery(ArraySubquery):
@@ -175,7 +160,9 @@ def get_tile_values_for_resource(node, graph_nodes):
 
 def get_node_value_expression(node, many: bool):
     node_lookup = f"data__{node.pk}"
-    output_field = DATATYPE_OUTPUT_FIELDS.get(node.datatype, TextField())
+    factory = DataTypeFactory()
+    instance = factory.get_instance(node.datatype)
+    output_field = factory.get_model_field(instance)
     if node.datatype in DATATYPES_NEEDING_KEY_TEXT_TRANSFORM:
         default = KT(node_lookup)
     else:
