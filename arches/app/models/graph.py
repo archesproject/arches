@@ -175,6 +175,12 @@ class Graph(models.GraphModel):
         Updates card, edge, and node data from the database, bypassing the
         cached version of the graph
         """
+
+        # If this graph is not persisted yet, skip any DB refresh work entirely.
+        # This avoids FK errors while the graph and its related rows are mid-create.
+        if not models.GraphModel.objects.filter(pk=self.pk).exists():
+            return
+
         self.refresh_from_db()
 
         self.nodes = {}
@@ -500,7 +506,7 @@ class Graph(models.GraphModel):
         with transaction.atomic():
             super(Graph, self).save()
 
-            for nodegroup in self.get_nodegroups():
+            for nodegroup in self.get_nodegroups(force_recalculation=True):
                 nodegroup.save()
 
             se = SearchEngineFactory().create()
@@ -1590,13 +1596,11 @@ class Graph(models.GraphModel):
         if self.should_use_published_graph() and not force_recalculation:
             return super().get_nodegroups()
         else:
-            prefetch_related_objects(list(self.nodes.values()), "nodegroup")
             nodegroups = set()
-            for node in self.nodes.values():
+            for node in self.node_set.prefetch_related("nodegroup"):
                 if node.is_collector:
                     nodegroups.add(node.nodegroup)
-            prefetch_related_objects(list(self.cards.values()), "nodegroup")
-            for card in self.cards.values():
+            for card in self.cardmodel_set.prefetch_related("nodegroup"):
                 try:
                     nodegroups.add(card.nodegroup)
                 except models.NodeGroup.DoesNotExist:
@@ -1886,10 +1890,8 @@ class Graph(models.GraphModel):
         if self.should_use_published_graph() and not force_recalculation:
             return super().get_cards()
 
-        prefetch_related_objects(list(self.cards.values()), "constraintmodel_set")
-
         cards = []
-        for card in self.cards.values():
+        for card in self.cardmodel_set.prefetch_related("constraintmodel_set"):
             if self.isresource:
                 if not card.name:
                     card.name = self.nodes[card.nodegroup_id].name
@@ -1929,10 +1931,13 @@ class Graph(models.GraphModel):
             return super().get_card_x_node_x_widgets()
         else:
             widgets = []
-            if self.widgets:
-                for widget in self.widgets.values():
+
+            for card in self.cardmodel_set.prefetch_related("nodegroup"):
+                card_x_node_x_widgets = list(card.cardxnodexwidget_set.all())
+
+                for card_x_node_x_widget in card_x_node_x_widgets:
                     widget_dict = JSONSerializer().serializeToPython(
-                        widget, use_raw_i18n_json=use_raw_i18n_json
+                        card_x_node_x_widget, use_raw_i18n_json=use_raw_i18n_json
                     )
                     widgets.append(widget_dict)
 
