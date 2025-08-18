@@ -91,21 +91,25 @@ def _wrap_serializer_field(serializer_field_class) -> type:
 
 def _handle_nested_aliased_data(data, *, fields_map) -> AliasedData:
     all_data = AliasedData(**data)
-    for field_name, tile_serializer in fields_map.items():
-        if not isinstance(tile_serializer, ArchesTileSerializer):
-            continue
+    for field_name, serializer in fields_map.items():
         field_data = getattr(all_data, field_name, None)
-        tile_serializer.initial_data = field_data
-        # Later: could look into batching these exceptions up.
-        tile_serializer.is_valid(raise_exception=True)
-        if tile_serializer.validated_data:
-            if getattr(tile_serializer, "many", False):
-                tile_or_tiles = [
-                    TileTree(**data) for data in tile_serializer.validated_data
-                ]
-            else:
-                tile_or_tiles = TileTree(**tile_serializer.validated_data)
-            setattr(all_data, field_name, tile_or_tiles)
+        if isinstance(serializer, ArchesTileSerializer) or (
+            isinstance(serializer, serializers.ListSerializer)
+            and isinstance(serializer.child, ArchesTileSerializer)
+        ):
+            serializer.initial_data = field_data
+            # Later: could look into batching these exceptions up.
+            serializer.is_valid(raise_exception=True)
+            if serializer.validated_data:
+                if getattr(serializer, "many", False):
+                    tile_or_tiles = [
+                        TileTree(**data) for data in serializer.validated_data
+                    ]
+                else:
+                    tile_or_tiles = TileTree(**serializer.validated_data)
+                setattr(all_data, field_name, tile_or_tiles)
+        else:
+            setattr(all_data, field_name, serializer.to_internal_value(field_data))
     return all_data
 
 
