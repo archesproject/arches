@@ -19,10 +19,10 @@ type FormFieldExposed = {
     };
 };
 
-const { isDirty, nodeAlias, value } = defineProps<{
+const { isDirty, nodeAlias, aliasedNodeData } = defineProps<{
     isDirty: boolean;
     nodeAlias: string;
-    value: AliasedNodeData;
+    aliasedNodeData: AliasedNodeData;
 }>();
 
 const emit = defineEmits<{
@@ -33,7 +33,7 @@ const emit = defineEmits<{
 const formFieldRef = useTemplateRef<FormFieldExposed>("formField");
 
 // cannot inline, this allows the dirty state to be set on first input
-const initialValue = Object.freeze({ ...value });
+const initialValue = Object.freeze({ ...aliasedNodeData });
 
 watchEffect(() => {
     if (isDirty) {
@@ -42,7 +42,7 @@ watchEffect(() => {
 });
 
 watch(
-    () => value,
+    () => aliasedNodeData,
     (newValue, oldValue) => {
         if (newValue !== oldValue) {
             emit("update:value", newValue);
@@ -63,8 +63,8 @@ function markFormFieldAsDirty() {
 }
 
 function resolver() {
-    validate(value);
-    return value;
+    validate(aliasedNodeData);
+    return aliasedNodeData;
 }
 
 function validate(aliasedNodeData: AliasedNodeData) {

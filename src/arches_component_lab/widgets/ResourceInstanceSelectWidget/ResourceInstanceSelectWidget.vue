@@ -13,7 +13,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    value: ResourceInstanceValue;
+    aliasedNodeData: ResourceInstanceValue;
 }>();
 
 const emit = defineEmits(["update:value"]);
@@ -25,11 +25,11 @@ const emit = defineEmits(["update:value"]);
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :graph-slug="graphSlug"
         :node-alias="nodeAlias"
-        :value="value"
+        :aliased-node-data="aliasedNodeData"
         @update:value="emit('update:value', $event)"
     />
     <ResourceInstanceSelectWidgetViewer
         v-if="mode === VIEW"
-        :value="value"
+        :aliased-node-data="aliasedNodeData"
     />
 </template>

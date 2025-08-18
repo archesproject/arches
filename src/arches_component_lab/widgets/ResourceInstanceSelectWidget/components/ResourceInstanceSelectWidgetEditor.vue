@@ -19,11 +19,11 @@ import type {
 
 const { $gettext } = useGettext();
 
-const { cardXNodeXWidgetData, nodeAlias, graphSlug, value } = defineProps<{
+const { cardXNodeXWidgetData, nodeAlias, graphSlug, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
     nodeAlias: string;
     graphSlug: string;
-    value: ResourceInstanceValue;
+    aliasedNodeData: ResourceInstanceValue;
 }>();
 
 const emit = defineEmits<{
@@ -53,7 +53,7 @@ async function getOptions(page: number, filterTerm?: string) {
             nodeAlias,
             page,
             filterTerm,
-            value?.details?.[0]?.resource_id,
+            aliasedNodeData?.details?.[0]?.resource_id,
         );
 
         const references = resourceData.data.map(
@@ -85,8 +85,8 @@ function getOption(value: string): ResourceInstanceReference | undefined {
 }
 
 function onFilter(event: SelectFilterEvent) {
-    if (value?.details) {
-        options.value = value.details;
+    if (aliasedNodeData?.details) {
+        options.value = aliasedNodeData.details;
     } else {
         options.value = [];
     }
@@ -154,7 +154,7 @@ function onUpdateModelValue(updatedValue: string | null) {
         :fluid="true"
         :label-id="cardXNodeXWidgetData.node.alias"
         :loading="isLoading"
-        :model-value="value?.details?.[0]?.resource_id"
+        :model-value="aliasedNodeData?.details?.[0]?.resource_id"
         :options="options"
         :placeholder="$gettext('Select Resources')"
         :reset-filter-on-hide="true"

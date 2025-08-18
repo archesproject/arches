@@ -30,7 +30,7 @@ const {
     mode,
     nodeAlias,
     shouldShowLabel = true,
-    value,
+    aliasedNodeData,
 } = defineProps<{
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
     graphSlug: string;
@@ -38,7 +38,7 @@ const {
     mode: WidgetMode;
     nodeAlias: string;
     shouldShowLabel?: boolean;
-    value?: unknown | null | undefined;
+    aliasedNodeData?: unknown | null | undefined;
 }>();
 
 const emit = defineEmits([
@@ -68,8 +68,8 @@ const widgetComponent = computed(() => {
 });
 
 const widgetValue = computed(() => {
-    if (value !== undefined) {
-        return value;
+    if (aliasedNodeData !== undefined) {
+        return aliasedNodeData;
     } else if (resolvedCardXNodeXWidgetData.value) {
         return resolvedCardXNodeXWidgetData.value.config.defaultValue;
     } else {
@@ -127,7 +127,7 @@ watchEffect(async () => {
                 v-if="mode === EDIT"
                 :is-dirty="isDirty"
                 :node-alias="nodeAlias"
-                :value="widgetValue as AliasedNodeData"
+                :aliased-node-data="widgetValue as AliasedNodeData"
                 @update:value="emit('update:value', $event)"
                 @update:is-dirty="emit('update:isDirty', $event)"
             >
@@ -138,7 +138,7 @@ watchEffect(async () => {
                     :graph-slug="graphSlug"
                     :mode="mode"
                     :node-alias="nodeAlias"
-                    :value="widgetValue"
+                    :aliased-node-data="widgetValue"
                     @update:value="emit('update:value', $event)"
                     @update:is-dirty="emit('update:isDirty', $event)"
                 />
@@ -152,7 +152,7 @@ watchEffect(async () => {
                 :graph-slug="graphSlug"
                 :mode="mode"
                 :node-alias="nodeAlias"
-                :value="widgetValue"
+                :aliased-node-data="widgetValue"
             />
         </template>
     </div>

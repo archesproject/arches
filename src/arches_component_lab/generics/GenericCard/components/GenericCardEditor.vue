@@ -262,7 +262,7 @@ defineExpose({ save });
                     :graph-slug="graphSlug"
                     :mode="mode"
                     :node-alias="cardXNodeXWidgetDatum.node.alias"
-                    :value="aliasedData[cardXNodeXWidgetDatum.node.alias]"
+                    :aliased-node-data="aliasedData[cardXNodeXWidgetDatum.node.alias]"
                     @update:is-dirty="
                         onUpdateWidgetDirtyState(
                             cardXNodeXWidgetDatum.node.alias,

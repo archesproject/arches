@@ -2,10 +2,10 @@
 import type { NonLocalizedTextValue } from "@/arches_component_lab/datatypes/non-localized-text/types";
 
 defineProps<{
-    value: NonLocalizedTextValue;
+    aliasedNodeData: NonLocalizedTextValue;
 }>();
 </script>
 
 <template>
-    <div>{{ value?.display_value }}</div>
+    <div>{{ aliasedNodeData?.display_value }}</div>
 </template>

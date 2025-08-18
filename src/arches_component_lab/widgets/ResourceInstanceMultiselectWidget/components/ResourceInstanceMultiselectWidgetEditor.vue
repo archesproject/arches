@@ -19,11 +19,11 @@ import type {
 } from "@/arches_component_lab/datatypes/resource-instance/types.ts";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-const { cardXNodeXWidgetData, nodeAlias, graphSlug, value } = defineProps<{
+const { cardXNodeXWidgetData, nodeAlias, graphSlug, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
     nodeAlias: string;
     graphSlug: string;
-    value: ResourceInstanceListValue;
+    aliasedNodeData: ResourceInstanceListValue;
 }>();
 
 const emit = defineEmits<{
@@ -43,8 +43,8 @@ const fetchError = ref<string | null>(null);
 const resourceResultsCurrentCount = computed(() => options.value.length);
 
 const initialValueFromTileData = computed(() => {
-    if (value?.details) {
-        return value.details.map((option) => {
+    if (aliasedNodeData?.details) {
+        return aliasedNodeData.details.map((option) => {
             return option.resource_id;
         });
     }
@@ -56,8 +56,8 @@ watchEffect(() => {
 });
 
 function onFilter(event: MultiSelectFilterEvent) {
-    if (value?.details) {
-        options.value = value.details;
+    if (aliasedNodeData?.details) {
+        options.value = aliasedNodeData.details;
     } else {
         options.value = [];
     }
@@ -74,7 +74,7 @@ async function getOptions(page: number, filterTerm?: string) {
             nodeAlias,
             page,
             filterTerm,
-            value?.details,
+            aliasedNodeData?.details,
         );
 
         const references = resourceData.data.map(

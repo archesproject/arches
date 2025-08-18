@@ -13,7 +13,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: StringCardXNodeXWidgetData;
-    value: StringValue;
+    aliasedNodeData: StringValue;
 }>();
 
 const emit = defineEmits(["update:value"]);
@@ -23,12 +23,12 @@ const emit = defineEmits(["update:value"]);
     <RichTextWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="value"
+        :aliased-node-data="aliasedNodeData"
         @update:value="emit('update:value', $event)"
     />
     <RichTextWidgetViewer
         v-if="mode === VIEW"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="value"
+        :aliased-node-data="aliasedNodeData"
     />
 </template>

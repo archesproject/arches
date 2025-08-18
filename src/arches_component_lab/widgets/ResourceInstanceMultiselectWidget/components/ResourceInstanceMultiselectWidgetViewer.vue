@@ -4,12 +4,12 @@ import arches from "arches";
 import type { ResourceInstanceListValue } from "@/arches_component_lab/datatypes/resource-instance-list/types";
 
 defineProps<{
-    value: ResourceInstanceListValue;
+    aliasedNodeData: ResourceInstanceListValue;
 }>();
 </script>
 <template>
     <div
-        v-for="resourceInstanceDetail in value?.details"
+        v-for="resourceInstanceDetail in aliasedNodeData?.details"
         :key="resourceInstanceDetail.resource_id"
     >
         <a

@@ -5,11 +5,11 @@ import type {
 } from "@/arches_component_lab/datatypes/date/types.ts";
 
 defineProps<{
-    value: DateValue;
+    aliasedNodeData: DateValue;
     cardXNodeXWidgetData: DateDatatypeCardXNodeXWidgetData;
 }>();
 </script>
 
 <template>
-    <div>{{ value?.display_value }}</div>
+    <div>{{ aliasedNodeData?.display_value }}</div>
 </template>

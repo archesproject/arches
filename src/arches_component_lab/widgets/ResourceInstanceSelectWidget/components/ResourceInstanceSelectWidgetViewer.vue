@@ -4,15 +4,15 @@ import arches from "arches";
 import type { ResourceInstanceValue } from "@/arches_component_lab/datatypes/resource-instance/types";
 
 defineProps<{
-    value: ResourceInstanceValue;
+    aliasedNodeData: ResourceInstanceValue;
 }>();
 </script>
 <template>
-    <div :key="value?.details[0].resource_id">
+    <div :key="aliasedNodeData?.details[0].resource_id">
         <a
-            :href="`${arches.urls.resource_editor}${value?.details[0].resource_id}`"
+            :href="`${arches.urls.resource_editor}${aliasedNodeData?.details[0].resource_id}`"
         >
-            {{ value?.details[0].display_value }}
+            {{ aliasedNodeData?.details[0].display_value }}
         </a>
     </div>
 </template>

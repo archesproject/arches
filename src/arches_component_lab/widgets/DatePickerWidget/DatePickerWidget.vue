@@ -15,7 +15,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: DateDatatypeCardXNodeXWidgetData;
-    value: DateValue;
+    aliasedNodeData: DateValue;
 }>();
 
 const emit = defineEmits(["update:value"]);
@@ -25,12 +25,12 @@ const emit = defineEmits(["update:value"]);
     <DatePickerWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="value"
+        :aliased-node-data="aliasedNodeData"
         @update:value="emit('update:value', $event)"
     />
     <DatePickerWidgetViewer
         v-if="mode === VIEW"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :value="value"
+        :aliased-node-data="aliasedNodeData"
     />
 </template>

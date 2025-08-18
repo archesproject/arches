@@ -12,9 +12,9 @@ import type {
     DateValue,
 } from "@/arches_component_lab/datatypes/date/types.ts";
 
-const { value, cardXNodeXWidgetData } = defineProps<{
+const { aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
     cardXNodeXWidgetData: DateDatatypeCardXNodeXWidgetData;
-    value: DateValue;
+    aliasedNodeData: DateValue;
 }>();
 
 const emit = defineEmits<{
@@ -69,7 +69,7 @@ function onUpdateModelValue(updatedValue: string) {
         :fluid="true"
         :input-id="cardXNodeXWidgetData.node.alias"
         :manual-input="false"
-        :model-value="new Date(value?.node_value as string) || null"
+        :model-value="new Date(aliasedNodeData?.node_value as string) || null"
         :show-time="shouldShowTime"
         :show-seconds="shouldShowTime"
         :show-icon="true"

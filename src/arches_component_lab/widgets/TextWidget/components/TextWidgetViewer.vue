@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { StringValue } from "@/arches_component_lab/datatypes/string/types";
 
-defineProps<{ value?: StringValue }>();
+defineProps<{ aliasedNodeData?: StringValue }>();
 </script>
 
 <template>
-    <div>{{ value?.display_value }}</div>
+    <div>{{ aliasedNodeData?.display_value }}</div>
 </template>

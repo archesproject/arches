@@ -15,9 +15,9 @@ import type { StringValue } from "@/arches_component_lab/datatypes/string/types.
 
 const { $gettext } = useGettext();
 
-const { cardXNodeXWidgetData, value } = defineProps<{
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData: StringCardXNodeXWidgetData;
-    value: StringValue;
+    aliasedNodeData: StringValue;
 }>();
 
 const emit = defineEmits<{
@@ -42,7 +42,7 @@ watchEffect(async () => {
 });
 
 watch(languages, () => {
-    const workingObject = { ...value.node_value };
+    const workingObject = { ...aliasedNodeData.node_value };
     for (const language of languages.value) {
         if (!workingObject[language.code]) {
             workingObject[language.code] = {

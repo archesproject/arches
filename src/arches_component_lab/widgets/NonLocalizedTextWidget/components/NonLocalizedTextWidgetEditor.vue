@@ -4,9 +4,9 @@ import InputText from "primevue/inputtext";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { NonLocalizedTextValue } from "@/arches_component_lab/datatypes/non-localized-text/types.ts";
 
-const { cardXNodeXWidgetData, value } = defineProps<{
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    value: NonLocalizedTextValue;
+    aliasedNodeData: NonLocalizedTextValue;
 }>();
 
 const emit = defineEmits<{
@@ -30,7 +30,7 @@ function onUpdateModelValue(updatedValue: string | undefined) {
     <InputText
         type="text"
         :fluid="true"
-        :model-value="value.node_value || ''"
+        :model-value="aliasedNodeData.node_value || ''"
         :placeholder="cardXNodeXWidgetData.config.placeholder"
         :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
         @update:model-value="onUpdateModelValue($event)"
