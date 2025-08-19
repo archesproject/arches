@@ -62,7 +62,6 @@ class TileTreeOperation:
 
         if isinstance(entry, TileModel):
             self.resourceid = self.entry.resourceinstance_id
-            # TODO: write perms, but don't falsify self.new_resource_created
             self.nodegroups = get_nodegroups_here_and_below(self.entry.nodegroup)
             existing_tiles = (
                 entry.__class__.objects.filter(
