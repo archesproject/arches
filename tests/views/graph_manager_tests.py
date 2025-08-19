@@ -218,7 +218,7 @@ class GraphManagerViewTests(ArchesTestCase):
         graph = json.loads(response.content)
 
         graph["name"] = "new graph name"
-        graph["root"] = {"datatype": "semantic", "config": None}
+        graph["root"] = {"datatype": "semantic", "config": {}, "name": "new graph name"}
         graph["nodegroups"] = []
         post_data = {"graph": graph, "relatable_resource_ids": [str(self.ROOT_ID)]}
         post_data = JSONSerializer().serialize(post_data)
