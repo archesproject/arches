@@ -16,11 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-"""This module contains commands for building Arches."""
-
 from django.core.management.base import BaseCommand
 from openpyxl import Workbook, styles
-from operator import itemgetter
 from django.db import connection
 from arches.app.models.card import Card
 from arches.app.models.models import Node
@@ -48,7 +45,7 @@ class Command(BaseCommand):
             "--dest",
             action="store",
             dest="dest",
-            default="",
+            required=True,
             help="Destination (directory and filename) where template should be saved. e.g. ~/Documents/mytemplate.xlsx",
         )
         parser.add_argument(
@@ -56,7 +53,7 @@ class Command(BaseCommand):
             "--graph",
             action="store",
             dest="graph",
-            default="",
+            required=True,
             help="Graphid for your template",
         )
 
@@ -195,12 +192,13 @@ def create_tile_excel_workbook(graphid, tiledata=None):
         first_sheet = True
         for row in rows:
             card_name = str(Card.objects.get(nodegroup=row["nodegroupid"]).name)
+            sheet_name = card_name.replace("/", "_")
             if first_sheet is True:
                 sheet = wb.active
-                sheet.title = card_name
+                sheet.title = sheet_name
                 first_sheet = False
             else:
-                sheet = wb.create_sheet(title=card_name)
+                sheet = wb.create_sheet(title=sheet_name)
             sheet[f"A1"] = "tileid"
             sheet[f"B1"] = "parenttile_id"
             sheet[f"C1"] = "resourceinstance_id"
@@ -217,7 +215,8 @@ def create_tile_excel_workbook(graphid, tiledata=None):
 
         if tiledata is not None:
             for card_name, tiles in tiledata.items():
-                sheet = wb[card_name]
+                sheet_name = card_name.replace("/", "_")
+                sheet = wb[sheet_name]
                 for tile in tiles:
                     row_number = sheet.max_row + 1
                     sheet[f"A{row_number}"] = str(tile["tileid"])
