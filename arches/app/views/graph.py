@@ -136,6 +136,9 @@ class GraphSettingsView(GraphBaseView):
             ]["cardinality"]
             nodegroup.save()
 
+        # refresh the graph to ensure nodegroup changes are reflected
+        graph.refresh_from_database()
+
         # update root node
         root_node = models.Node.objects.get(graph_id=graphid, istopnode=True)
         root_node.set_relatable_resources(data.get("relatable_resource_ids"))
@@ -158,9 +161,6 @@ class GraphSettingsView(GraphBaseView):
             root_node.config = data["graph"]["root"]["config"]
 
         root_node.save()
-
-        # refresh the graph to ensure all changes are reflected
-        graph.refresh_from_database()
 
         # update graph metadata
         data_keys = [
