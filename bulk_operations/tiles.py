@@ -76,7 +76,11 @@ class TileTreeOperation:
             if arches_version < (8, 0):
                 # Cannot supply this too early, as nodegroup might be included
                 # with the request and already instantiated to a fresh object.
-                grouping_node = entry.nodegroup.node_set.get(pk=F("nodegroup"))
+                grouping_node = [
+                    node
+                    for node in entry.resourceinstance.graph.node_set.all()
+                    if node.pk == node.nodegroup_id
+                ][0]
                 entry.nodegroup.grouping_node = grouping_node
         else:
             self.resourceid = self.entry.pk
