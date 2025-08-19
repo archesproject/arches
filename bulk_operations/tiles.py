@@ -486,13 +486,9 @@ class TileTreeOperation:
                 TileModel.objects.filter(pk__in=[t.pk for t in self.to_delete]).delete()
 
             for upsert_tile in upserts:
-                # arches_version==9.0.0
-                if arches_version < (8, 0):
-                    grouping_node = self.grouping_nodes_by_nodegroup_id[
-                        upsert_tile.nodegroup_id
-                    ]
-                else:
-                    grouping_node = upsert_tile.nodegroup.grouping_node
+                grouping_node = self.grouping_nodes_by_nodegroup_id[
+                    upsert_tile.nodegroup_id
+                ]
                 for node in grouping_node.nodegroup.node_set.all():
                     datatype = self.datatype_factory.get_instance(node.datatype)
                     datatype.post_tile_save(
