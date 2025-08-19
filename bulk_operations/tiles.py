@@ -391,9 +391,9 @@ class TileTreeOperation:
             for insert in self.to_insert
         ]
         update_proxies = list(
-            Tile.objects.filter(
-                pk__in=[tile.pk for tile in self.to_update]
-            ).prefetch_related("nodegroup__cardmodel_set")
+            Tile.objects.filter(pk__in=[tile.pk for tile in self.to_update])
+            .select_related("resourceinstance__graph")
+            .prefetch_related("nodegroup__cardmodel_set")
         )
         upsert_proxies = insert_proxies + update_proxies
         delete_proxies = Tile.objects.filter(
