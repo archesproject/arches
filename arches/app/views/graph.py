@@ -152,10 +152,6 @@ class GraphSettingsView(GraphBaseView):
             else None
         )
         root_node.name = data["graph"]["root"]["name"]
-        graph.root.name = root_node.name
-
-        if root_node.ontologyclass:
-            graph.root.ontologyclass = root_node.ontologyclass
 
         if graph.isresource is False and "root" in data["graph"]:
             root_node.config = data["graph"]["root"]["config"]
@@ -183,6 +179,10 @@ class GraphSettingsView(GraphBaseView):
         for key, value in data.get("graph").items():
             if key in data_keys:
                 setattr(graph, key, value)
+
+        graph.root.name = root_node.name
+        if root_node.ontologyclass:
+            graph.root.ontologyclass = root_node.ontologyclass
 
         try:
             graph.save()
