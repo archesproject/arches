@@ -16,11 +16,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from guardian.shortcuts import assign_perm
-from arches.app.models.models import Node
+from arches.app.models.models import Node, NodeGroup
 from arches.app.models.resource import Resource
+from arches.app.search.components.resource_type_filter import get_permitted_graphids
 from arches.app.utils.permission_backend import user_can_read_resource
 from arches.app.utils.permission_backend import user_has_resource_model_permissions
 from arches.app.utils.permission_backend import get_restricted_users
+from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from tests.base_test import ArchesTestCase
 
 # these tests can be run from the command line via
@@ -123,3 +125,29 @@ class PermissionTests(ArchesTestCase):
         for result in results:
             with self.subTest(user=result[0], restriction=result[1]):
                 self.assertTrue(result[2])
+
+    def test_get_permitted_graphids(self):
+        """
+        Tests if a user has access to a resource model based on nodegroup access
+
+        """
+
+        nodegroups = NodeGroup.objects.filter(
+            node__graph_id=self.data_type_graphid
+        ).distinct()
+        permitted_nodegroups = get_nodegroups_by_perm(
+            self.user, "models.read_nodegroup"
+        )
+        graphids = get_permitted_graphids(permitted_nodegroups)
+        with self.subTest(graphids):
+            self.assertTrue(self.data_type_graphid in graphids)
+
+        for nodegroup in nodegroups:
+            assign_perm("no_access_to_nodegroup", self.user, nodegroup)
+
+        permitted_nodegroups = get_nodegroups_by_perm(
+            self.user, "models.read_nodegroup"
+        )
+        graphids = get_permitted_graphids(permitted_nodegroups)
+        with self.subTest(graphids):
+            self.assertTrue(self.data_type_graphid not in graphids)

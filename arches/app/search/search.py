@@ -187,7 +187,7 @@ class SearchEngine(object):
                 else:
                     self.logger.warning(
                         "%s: WARNING: failed to delete document by query: %s \nException detail: %s\n"
-                        % (datetime.now(), body, detail)
+                        % (datetime.now(), query, detail)
                     )
                     raise detail
             except Exception as detail:

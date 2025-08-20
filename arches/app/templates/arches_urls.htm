@@ -32,6 +32,7 @@
     buffer="{% url 'buffer'%}"
     config="{% url 'config' %}"
     node="{% url 'node' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
+    thumbnail='(resourceid) => {return "{% url "thumbnail" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", resourceid)}'
     graph_nodes='(graphid)=>{return "{% url "graph_nodes" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
     nodegroup="{% url 'nodegroup' %}"
     node_layer="{% url 'node_layer' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
@@ -118,6 +119,7 @@
     api_resource_report='(resourceid)=>{return "{% url "api_resource_report" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", resourceid)}'
     api_bulk_resource_report="{% url 'api_bulk_resource_report' %}"
     api_bulk_disambiguated_resource_instance="{% url 'api_bulk_disambiguated_resource_instance' %}"
+    api_instance_permissions = "{% url 'api_instance_permissions' %}"
     api_resources='(resourceid)=>{return "{% url "resources" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", resourceid)}'
     api_search_component_data='"{% url "api_search_component_data" "aaaa"%}".replace("aaaa", "")'
     api_user="{% url 'api_user' %}"

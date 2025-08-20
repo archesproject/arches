@@ -149,11 +149,25 @@ class TileExcelImporter(BaseImportModule):
         tile_value_json = JSONSerializer().serialize(tile_value)
         return tile_value_json, tile_valid
 
+    def get_nodegroup_id_column(self, worksheet):
+        """
+        Returns the index of the column that contains the nodegroup id.
+        If no nodegroup id is found, returns None.
+        """
+        index = 1
+        for row in worksheet.iter_rows(1, 1, None, None):
+            for cell in row:
+                if cell.value == "nodegroup_id":
+                    return index
+                else:
+                    index += 1
+        return worksheet.max_column
+
     def process_worksheet(self, worksheet, cursor, node_lookup, nodegroup_lookup):
         data_node_lookup = {}
         row_count = 0
 
-        nodegroupid_column = int(worksheet.max_column)
+        nodegroupid_column = self.get_nodegroup_id_column(worksheet)
         maybe_nodegroup = worksheet.cell(row=2, column=nodegroupid_column).value
         if maybe_nodegroup:
             nodegroup_alias = nodegroup_lookup[maybe_nodegroup]["alias"]
@@ -251,9 +265,11 @@ class TileExcelImporter(BaseImportModule):
     def validate_uploaded_file(self, workbook):
         graphid = None
         for worksheet in workbook.worksheets:
-            if worksheet.cell(2, worksheet.max_column).value:
+            if worksheet.cell(2, self.get_nodegroup_id_column(worksheet)).value:
                 try:
-                    nodegroup_id = worksheet.cell(2, worksheet.max_column).value
+                    nodegroup_id = worksheet.cell(
+                        2, self.get_nodegroup_id_column(worksheet)
+                    ).value
                     graphid = str(
                         Node.objects.filter(nodegroup_id=nodegroup_id)[0].graph_id
                     )
@@ -265,9 +281,11 @@ class TileExcelImporter(BaseImportModule):
 
     def get_graphid(self, workbook):
         for worksheet in workbook.worksheets:
-            if worksheet.cell(2, worksheet.max_column).value:
+            if worksheet.cell(2, self.get_nodegroup_id_column(worksheet)).value:
                 try:
-                    nodegroup_id = worksheet.cell(2, worksheet.max_column).value
+                    nodegroup_id = worksheet.cell(
+                        2, self.get_nodegroup_id_column(worksheet)
+                    ).value
                     graphid = str(
                         Node.objects.filter(nodegroup_id=nodegroup_id)[0].graph_id
                     )
@@ -281,7 +299,7 @@ class TileExcelImporter(BaseImportModule):
             self.stage_excel_file(file, summary, cursor)
 
     def stage_excel_file(self, file, summary, cursor):
-        if file.endswith("xlsx"):
+        if file.endswith("xlsx") and ("attachments" + os.sep) not in file:
             summary["files"][file]["worksheets"] = []
             uploaded_file_path = os.path.join(
                 settings.UPLOADED_FILES_DIR, "tmp", self.loadid, file

@@ -25,30 +25,30 @@
             <div class='rr-table-row'>
                 <div class="rr-table-row-initial">
                     <div class='rr-table-column icon-column'>
-                        <button 
+                        <button
                             data-bind="
-                                click: function(){$data.removeRelationship($data)}, 
-                                clickBubble: false, 
-                                attr: {'aria-label': $root.translations.removeRelatedResourceModel($data.name)}, 
+                                click: function(){$data.removeRelationship($data)},
+                                clickBubble: false,
+                                attr: {'aria-label': $root.translations.removeRelatedResourceModel($data.name)},
                             "
                         >
                             <i class="fa fa-trash"></i>
                         </button>
                     </div>
                     <div class='rr-table-column icon-column'>
-                        <button 
-                            tabindex="0"    
+                        <button
+                            tabindex="0"
                             data-bind="
                             click: function() {self.toggleSelectedResource($data)},
                             attr: {'aria-label': $root.translations.configureRelatedResourceRelationship},
-                            clickBubble: false," 
+                            clickBubble: false,"
                             style="cursor: pointer;">
                             <i class="fa fa-gear"></i>
                         </button>
                     </div>
                     <div class="rr-table-column" style="flex-grow: 1;">
                         <div class="rr-table-instance-label" data-bind="text: $data.name"></div>
-                        
+
                     </div>
                 </div>
                 <div class="rr-table-row-panel" data-bind="if: self.selectedResourceType() === $data, visible: self.selectedResourceType() === $data, css: { 'rr-table-border': self.selectedResourceType() === $data} ">
@@ -76,18 +76,18 @@
                                 </span>
 
                                 <span class="col-xs-12">
-                                    <select 
-                                        style="width:100%; display:inline-block; margin: 3px 0px;" 
+                                    <select
+                                        style="width:100%; display:inline-block; margin: 3px 0px;"
                                         data-bind="
                                             select2Query: {
                                                 select2Config: self.getSelect2ConfigForOntologyProperties(
-                                                    $data.ontologyProperty, 
-                                                    self.rootOntologyClass, 
-                                                    $data.ontologyClass, 
-                                                    $root.translations.selectAnOntologyProperty, 
+                                                    $data.ontologyProperty,
+                                                    self.rootOntologyClass,
+                                                    $data.ontologyClass,
+                                                    $root.translations.selectAnOntologyProperty,
                                                     true
                                                 )
-                                            }, 
+                                            },
                                             attr: {'aria-label': $root.translations.defaultRelationshipToResource($data.name)}
                                         "
                                     ></select>
@@ -114,10 +114,10 @@
                                     <select style="width:100%; display:inline-block; margin: 3px 0px;" data-bind="
                                         select2Query: {
                                             select2Config: self.getSelect2ConfigForOntologyProperties(
-                                                $data.inverseOntologyProperty, 
-                                                $data.ontologyClass, 
-                                                self.rootOntologyClass, 
-                                                $root.translations.selectAnOntologyProperty, 
+                                                $data.inverseOntologyProperty,
+                                                $data.ontologyClass,
+                                                self.rootOntologyClass,
+                                                $root.translations.selectAnOntologyProperty,
                                                 true
                                             )
                                         },
@@ -148,7 +148,7 @@
                                     params: {
                                         node: {'config': {'rdmCollection': $data.relationshipCollection() }},
                                         value: $data.relationshipConcept,
-                                    }, 
+                                    },
                                 },
                                 attr: {'aria-label': $root.translations.relationshipConcept}
                                 "></div>
@@ -171,7 +171,7 @@
                                 "></div>
                             </div>
                         </div>
-                    </div> 
+                    </div>
                 </div>
             </div>
         </div>
@@ -180,9 +180,9 @@
     <div class="relative">
         <span class="col-xs-12 control-label widget-input-label">
             <span data-bind="text: $root.translations.searchStringText"></span>
-            
-            <i 
-                class="fa fa-eye" 
+
+            <i
+                class="fa fa-eye"
                 style="cursor: pointer;"
                 tabindex="0"
                 data-bind="
@@ -195,10 +195,10 @@
             ></i>
         </span>
     </div>
-    
+
     <div class="col-xs-12" style="padding-bottom: 10px;">
-        <input 
-            type="text" 
+        <input
+            type="text"
             class="form-control"
             data-bind="
                 attr: {placeholder: $root.translations.enterSearchStringHere + '...',
@@ -232,7 +232,7 @@
 </div>
 <div class="col-md-8 col-lg-9 resource-instance-search" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
     <!-- ko component: {
-        name:  datatype.datatype.includes('list') ? 'resource-instance-multiselect-widget' : 'resource-instance-select-widget',
+        name: 'resource-instance-multiselect-widget',
         params: {
             config: {
                 placeholder: $root.translations.selectAResource,

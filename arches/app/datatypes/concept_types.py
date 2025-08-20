@@ -1,38 +1,33 @@
-from arches.app.utils.betterJSONSerializer import JSONSerializer
-import uuid
 import csv
 import logging
+import uuid
+
+from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import gettext as _
-from arches.app.models import models
-from arches.app.models import concept
-from django.core.cache import cache
-from arches.app.models.system_settings import settings
-from arches.app.datatypes.base import BaseDataType
-from arches.app.datatypes.datatypes import DataTypeFactory, get_value_from_jsonld
-from arches.app.models.concept import (
-    get_preflabel_from_valueid,
-    get_preflabel_from_conceptid,
-    get_valueids_from_concept_label,
-)
-from arches.app.search.elasticsearch_dsl_builder import (
-    Bool,
-    Match,
-    Range,
-    Term,
-    Nested,
-    Exists,
-    Terms,
-)
-from arches.app.utils.date_utils import ExtendedDateFormat
+from rdflib import ConjunctiveGraph as Graph
 
 # for the RDF graph export helper functions
-from rdflib import Namespace, URIRef, Literal, BNode
-from rdflib import ConjunctiveGraph as Graph
-from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS, SKOS
-from arches.app.models.concept import ConceptValue
-from arches.app.models.concept import Concept
-from io import StringIO
+from rdflib import Literal, Namespace, URIRef
+from rdflib.namespace import RDF, RDFS
+
+from arches.app.datatypes.base import BaseDataType
+from arches.app.datatypes.datatypes import DataTypeFactory, get_value_from_jsonld
+from arches.app.models import models
+from arches.app.models.concept import (
+    Concept,
+    ConceptValue,
+    get_preflabel_from_conceptid,
+    get_preflabel_from_valueid,
+    get_valueids_from_concept_label,
+)
+from arches.app.models.system_settings import settings
+from arches.app.search.elasticsearch_dsl_builder import (
+    Exists,
+    Match,
+)
+from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.utils.date_utils import ExtendedDateFormat
 
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
@@ -110,7 +105,7 @@ class BaseConceptDataType(BaseDataType):
         cache_value = cache.get("concept-" + str(concept.conceptid), "no result")
         if cache_value == "no result":
             for value in concept.value_set.select_related("valuetype"):
-                if value.valuetype.valuetype in ("min_year" "max_year"):
+                if value.valuetype.valuetype in ("min_year", "max_year"):
                     date_range[value.valuetype.valuetype] = value.value
             if "min_year" in date_range and "max_year" in date_range:
                 result = date_range
@@ -176,7 +171,7 @@ class BaseConceptDataType(BaseDataType):
                 else:
                     query.must(match_query)
 
-        except KeyError as e:
+        except KeyError:
             pass
 
     def append_in_list_search_filters(self, value, node, query, match_any=True):
@@ -198,7 +193,7 @@ class BaseConceptDataType(BaseDataType):
                             query.must_not(match_q)
                 query.filter(Exists(field=field_name))
 
-        except KeyError as e:
+        except KeyError:
             pass
 
 
@@ -271,8 +266,9 @@ class ConceptDataType(BaseConceptDataType):
         return value
 
     def transform_export_values(self, value, *args, **kwargs):
-        concept_export_value_type = kwargs.get("concept_export_value_type", None)
-        return self.get_concept_export_value(value, concept_export_value_type)
+        if value is not None:
+            concept_export_value_type = kwargs.get("concept_export_value_type", None)
+            return self.get_concept_export_value(value, concept_export_value_type)
 
     def get_pref_label(self, nodevalue, lang="en-US"):
         return get_preflabel_from_valueid(nodevalue, lang)["value"]
@@ -288,9 +284,12 @@ class ConceptDataType(BaseConceptDataType):
         data = self.get_tile_data(tile)
         if data:
             val = data[str(node.nodeid)]
-            value_data = JSONSerializer().serializeToPython(
-                self.get_value(uuid.UUID(val))
-            )
+            if val is None:
+                value_data = {}
+            else:
+                value_data = JSONSerializer().serializeToPython(
+                    self.get_value(uuid.UUID(val))
+                )
             return self.compile_json(tile, node, **value_data)
 
     def get_rdf_uri(self, node, data, which="r", c=None):
@@ -326,7 +325,7 @@ class ConceptDataType(BaseConceptDataType):
         try:
             # assume a list, and as this is a ConceptDataType, assume a single entry
             json_ld_node = json_ld_node[0]
-        except KeyError as e:
+        except KeyError:
             pass
 
         concept_uri = json_ld_node.get("@id")
@@ -452,13 +451,15 @@ class ConceptListDataType(BaseConceptDataType):
         return ret
 
     def transform_export_values(self, value, *args, **kwargs):
-        new_values = []
-        for val in value:
-            new_val = self.get_concept_export_value(
-                val, kwargs.get("concept_export_value_type", None)
-            )
-            new_values.append(new_val)
-        return ",".join(new_values)
+        if value is not None:
+            new_values = []
+            for val in value:
+                new_val = self.get_concept_export_value(
+                    val, kwargs.get("concept_export_value_type", None)
+                )
+                new_values.append(new_val)
+
+            return ",".join(new_values)
 
     def get_display_value(self, tile, node, **kwargs):
         new_values = []
@@ -473,7 +474,7 @@ class ConceptListDataType(BaseConceptDataType):
         new_values = []
         data = self.get_tile_data(tile)
         if data:
-            for val in data[str(node.nodeid)]:
+            for val in data[str(node.nodeid)] or []:
                 new_val = self.get_value(uuid.UUID(val))
                 new_values.append(new_val)
         return self.compile_json(tile, node, concept_details=new_values)

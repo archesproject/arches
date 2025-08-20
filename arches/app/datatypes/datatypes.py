@@ -1,70 +1,61 @@
+import ast
 import copy
-import uuid
-import json
 import decimal
-from arches.app.datatypes.core.util import get_value_from_jsonld
-from arches.app.utils.file_validator import FileValidator
-import filetype
-import base64
-import re
+import json
 import logging
 import os
-from pathlib import Path
-import ast
-import time
+import re
+import uuid
 from datetime import date, datetime
 from mimetypes import MimeTypes
+from pathlib import Path
 
+from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.files import File
 from django.core.files.images import get_image_dimensions
-from django.db.models import fields
+from django.core.files.storage import default_storage
+from django.db import connection
+from django.utils.translation import get_language
+from django.utils.translation import gettext as _
+
+# One benefit of shifting to python3.x would be to use
+# importlib.util.LazyLoader to load rdflib (and other lesser
+# used but memory soaking libs)
+from rdflib import BNode, Literal, Namespace, URIRef
+from rdflib import ConjunctiveGraph as Graph
+from rdflib.namespace import DC, DCTERMS, RDF, RDFS, XSD
 
 from arches.app.const import ExtensionType
 from arches.app.datatypes.base import BaseDataType
+from arches.app.datatypes.core.util import get_value_from_jsonld
 from arches.app.models import models
 from arches.app.models.concept import get_preflabel_from_valueid
-from arches.app.models.system_settings import settings
 from arches.app.models.fields.i18n import I18n_JSONField, I18n_String
-from arches.app.utils.date_utils import ExtendedDateFormat
-from arches.app.utils.module_importer import get_class_from_modulename
-from arches.app.utils.permission_backend import user_is_resource_reviewer
-from arches.app.utils.geo_utils import GeoUtils
-from arches.app.utils.i18n import get_localized_value
-from arches.app.utils.string_utils import str_to_bool
+from arches.app.models.system_settings import settings
 from arches.app.search.elasticsearch_dsl_builder import (
     Bool,
     Dsl,
     Exists,
     Match,
+    Nested,
+    Prefix,
     Query,
     Range,
     RangeDSLException,
     Term,
     Terms,
     Wildcard,
-    Prefix,
-    Nested,
 )
+from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.search_term import SearchTerm
-from arches.app.search.mappings import RESOURCES_INDEX
-from django.core.cache import cache
-from django.core.files import File
-from django.core.files.base import ContentFile
-from django.core.files.storage import FileSystemStorage, default_storage
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.exceptions import ValidationError
-from django.db import connection, transaction
-from django.utils.translation import get_language, gettext as _
-
-from elasticsearch import Elasticsearch
-from elasticsearch.exceptions import NotFoundError
-
-# One benefit of shifting to python3.x would be to use
-# importlib.util.LazyLoader to load rdflib (and other lesser
-# used but memory soaking libs)
-from rdflib import Namespace, URIRef, Literal, BNode
-from rdflib import ConjunctiveGraph as Graph
-from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
+from arches.app.utils.date_utils import ExtendedDateFormat
+from arches.app.utils.file_validator import FileValidator
+from arches.app.utils.i18n import get_localized_value
+from arches.app.utils.module_importer import get_class_from_modulename
+from arches.app.utils.permission_backend import user_is_resource_reviewer
+from arches.app.utils.string_utils import str_to_bool
 
 # do not delete, used by module importer
 from .core import *
@@ -321,7 +312,7 @@ class StringDataType(BaseDataType):
                     query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
                 else:
                     query.must(match_query)
-        except KeyError as e:
+        except KeyError:
             pass
 
     def is_a_literal_in_rdf(self):
@@ -354,7 +345,7 @@ class StringDataType(BaseDataType):
             if match is not None:
                 language = match.groups()[1]
                 value = match.groups()[0]
-        except Exception as e:
+        except Exception:
             pass
 
         try:
@@ -406,6 +397,7 @@ class StringDataType(BaseDataType):
                     return raw_value[current_language]["value"]
                 except KeyError:
                     pass
+        return ""
 
     def default_es_mapping(self):
         """
@@ -442,8 +434,9 @@ class StringDataType(BaseDataType):
 
     def to_json(self, tile, node):
         data = self.get_tile_data(tile)
+        value_data = data.get(str(node.nodeid)) or {}
         if data:
-            return self.compile_json(tile, node, **data.get(str(node.nodeid)))
+            return self.compile_json(tile, node, **value_data)
 
     def pre_structure_tile_data(self, tile, nodeid, **kwargs):
         all_language_codes = {lang.code for lang in kwargs["languages"]}
@@ -491,6 +484,7 @@ class NumberDataType(BaseDataType):
             display_value = data.get(str(node.nodeid))
             if display_value is not None:
                 return str(display_value)
+        return ""
 
     def transform_value_for_tile(self, value, **kwargs):
         try:
@@ -572,7 +566,7 @@ class NumberDataType(BaseDataType):
         value = get_value_from_jsonld(json_ld_node)
         try:
             return value[0]  # should already be cast as a number in the JSON
-        except (AttributeError, KeyError) as e:
+        except (AttributeError, KeyError):
             pass
 
     def default_es_mapping(self):
@@ -618,6 +612,7 @@ class BooleanDataType(BaseDataType):
             raw_value = data.get(str(node.nodeid))
             if raw_value is not None:
                 return str(raw_value)
+        return ""
 
         # TODO: When APIv1 is retired, replace the body of get_display_value with the following
         # data = self.get_tile_data(tile)
@@ -653,7 +648,7 @@ class BooleanDataType(BaseDataType):
             elif value["val"] != "" and value["val"] is not None:
                 term = True if value["val"] == "t" else False
                 query.must(Term(field="tiles.data.%s" % (str(node.pk)), term=term))
-        except KeyError as e:
+        except KeyError:
             pass
 
     def to_rdf(self, edge_info, edge):
@@ -680,7 +675,7 @@ class BooleanDataType(BaseDataType):
         value = get_value_from_jsonld(json_ld_node)
         try:
             return value[0]
-        except (AttributeError, KeyError) as e:
+        except (AttributeError, KeyError):
             pass
 
     def default_es_mapping(self):
@@ -788,14 +783,17 @@ class DateDataType(BaseDataType):
         return converted_dt
 
     def transform_export_values(self, value, *args, **kwargs):
-        valid_date_format, valid = self.get_valid_date_format(value)
-        if valid:
-            value = datetime.strptime(value, valid_date_format).strftime(
-                settings.DATE_IMPORT_EXPORT_FORMAT
-            )
-        else:
-            logger.warning(_("{value} is an invalid date format").format(**locals()))
-        return value
+        if value is not None:
+            valid_date_format, valid = self.get_valid_date_format(value)
+            if valid:
+                value = datetime.strptime(value, valid_date_format).strftime(
+                    settings.DATE_IMPORT_EXPORT_FORMAT
+                )
+            else:
+                logger.warning(
+                    _("{value} is an invalid date format").format(**locals())
+                )
+            return value
 
     def add_missing_colon_to_timezone(self, value):
         """
@@ -878,7 +876,7 @@ class DateDataType(BaseDataType):
         value = get_value_from_jsonld(json_ld_node)
         try:
             return value[0]
-        except (AttributeError, KeyError) as e:
+        except (AttributeError, KeyError):
             pass
 
     def default_es_mapping(self):
@@ -898,7 +896,7 @@ class DateDataType(BaseDataType):
                 new_date_format
             )
         except TypeError:
-            value = data[str(node.nodeid)]
+            value = data[str(node.nodeid)] or ""
         return value
 
 
@@ -940,7 +938,7 @@ class EDTFDataType(BaseDataType):
         try:
             value = data[str(node.nodeid)]["value"]
         except TypeError:
-            value = data[str(node.nodeid)]
+            value = data[str(node.nodeid)] or ""
         return value
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
@@ -1227,7 +1225,7 @@ class FileListDataType(BaseDataType):
                     "provisional": provisional,
                 }
                 document["strings"].append(val)
-        except (KeyError, TypeError) as e:
+        except (KeyError, TypeError):
             for k, pe in tile.provisionaledits.items():
                 for f in pe["value"][nodeid]:
                     val = {
@@ -1250,7 +1248,7 @@ class FileListDataType(BaseDataType):
                 )
                 query.must(search_query)
 
-        except KeyError as e:
+        except KeyError:
             pass
 
     def get_search_terms(self, nodevalue, nodeid):
@@ -1391,7 +1389,7 @@ class FileListDataType(BaseDataType):
                 file_stats = os.stat(file_path)
                 tile_file["lastModified"] = file_stats.st_mtime
                 tile_file["size"] = file_stats.st_size
-            except FileNotFoundError as e:
+            except FileNotFoundError:
                 pass
             tile_file["status"] = "uploaded"
             tile_file["name"] = os.path.basename(file_path)
@@ -1438,7 +1436,7 @@ class FileListDataType(BaseDataType):
             for file in tile.data[nodeid]:
                 try:
                     if file["file_id"]:
-                        if file["url"] == f'{settings.MEDIA_URL}{file["file_id"]}':
+                        if file["url"] == f"{settings.MEDIA_URL}{file['file_id']}":
                             val = uuid.UUID(
                                 file["file_id"]
                             )  # to test if file_id is uuid
@@ -1465,15 +1463,16 @@ class FileListDataType(BaseDataType):
                     logger.warning(_("This file's fileid is not a valid UUID"))
 
     def transform_export_values(self, value, *args, **kwargs):
-        return ",".join(
-            [
-                settings.MEDIA_URL
-                + settings.UPLOADED_FILES_DIR
-                + "/"
-                + str(file["name"])
-                for file in value
-            ]
-        )
+        if value is not None:
+            return ",".join(
+                [
+                    settings.MEDIA_URL
+                    + settings.UPLOADED_FILES_DIR
+                    + "/"
+                    + str(file["name"])
+                    for file in value
+                ]
+            )
 
     def is_a_literal_in_rdf(self):
         return False
@@ -1692,7 +1691,7 @@ class DomainDataType(BaseDomainDataType):
                     )
                     > 0
                 )
-            except ValueError as e:
+            except ValueError:
                 found_option = (
                     True if self.get_option_id_from_text(value) is not None else False
                 )
@@ -1752,26 +1751,27 @@ class DomainDataType(BaseDomainDataType):
             return ""
 
     def transform_export_values(self, value, *args, **kwargs):
-        ret = ""
-        if (
-            kwargs["concept_export_value_type"] is None
-            or kwargs["concept_export_value_type"] == ""
-            or kwargs["concept_export_value_type"] == "label"
-        ):
-            ret = self.get_localized_option_text(
-                models.Node.objects.get(nodeid=kwargs["node"]), value
-            )
-        elif kwargs["concept_export_value_type"] == "both":
-            ret = (
-                value
-                + "|"
-                + self.get_localized_option_text(
+        if value is not None:
+            ret = ""
+            if (
+                kwargs["concept_export_value_type"] is None
+                or kwargs["concept_export_value_type"] == ""
+                or kwargs["concept_export_value_type"] == "label"
+            ):
+                ret = self.get_localized_option_text(
                     models.Node.objects.get(nodeid=kwargs["node"]), value
                 )
-            )
-        elif kwargs["concept_export_value_type"] == "id":
-            ret = value
-        return ret
+            elif kwargs["concept_export_value_type"] == "both":
+                ret = (
+                    value
+                    + "|"
+                    + self.get_localized_option_text(
+                        models.Node.objects.get(nodeid=kwargs["node"]), value
+                    )
+                )
+            elif kwargs["concept_export_value_type"] == "id":
+                ret = value
+            return ret
 
     def append_search_filters(self, value, node, query, request):
         try:
@@ -1789,7 +1789,7 @@ class DomainDataType(BaseDomainDataType):
                 else:
                     query.must(search_query)
 
-        except KeyError as e:
+        except KeyError:
             pass
 
     def to_rdf(self, edge_info, edge):
@@ -1957,29 +1957,30 @@ class DomainListDataType(BaseDomainDataType):
         return ",".join(new_values)
 
     def transform_export_values(self, value, *args, **kwargs):
-        new_values = []
-        for val in value:
-            if (
-                kwargs["concept_export_value_type"] is None
-                or kwargs["concept_export_value_type"] == ""
-                or kwargs["concept_export_value_type"] == "label"
-            ):
-                new_values.append(
-                    self.get_localized_option_text(
-                        models.Node.objects.get(nodeid=kwargs["node"]), val
+        if value is not None:
+            new_values = []
+            for val in value:
+                if (
+                    kwargs["concept_export_value_type"] is None
+                    or kwargs["concept_export_value_type"] == ""
+                    or kwargs["concept_export_value_type"] == "label"
+                ):
+                    new_values.append(
+                        self.get_localized_option_text(
+                            models.Node.objects.get(nodeid=kwargs["node"]), val
+                        )
                     )
-                )
-            elif kwargs["concept_export_value_type"] == "both":
-                new_values.append(
-                    val
-                    + "|"
-                    + self.get_localized_option_text(
-                        models.Node.objects.get(nodeid=kwargs["node"]), val
+                elif kwargs["concept_export_value_type"] == "both":
+                    new_values.append(
+                        val
+                        + "|"
+                        + self.get_localized_option_text(
+                            models.Node.objects.get(nodeid=kwargs["node"]), val
+                        )
                     )
-                )
-            elif kwargs["concept_export_value_type"] == "id":
-                new_values.append(val)
-        return ",".join(new_values)
+                elif kwargs["concept_export_value_type"] == "id":
+                    new_values.append(val)
+            return ",".join(new_values)
 
     def append_search_filters(self, value, node, query, request):
         try:
@@ -1996,7 +1997,7 @@ class DomainListDataType(BaseDomainDataType):
                     query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
                 else:
                     query.must(search_query)
-        except KeyError as e:
+        except KeyError:
             pass
 
     def to_rdf(self, edge_info, edge):
@@ -2127,21 +2128,23 @@ class ResourceInstanceDataType(BaseDataType):
 
         resourceid = None
         data = self.get_tile_data(tile)
-        nodevalue = self.get_nodevalues(data[str(node.nodeid)])
+        if data:
+            nodevalue = self.get_nodevalues(data[str(node.nodeid)])
 
-        items = []
-        for resourceXresource in nodevalue:
-            try:
-                resourceid = resourceXresource["resourceId"]
-                related_resource = Resource.objects.get(pk=resourceid)
-                displayname = related_resource.displayname()
-                if displayname is not None:
-                    items.append(displayname)
-            except (TypeError, KeyError):
-                pass
-            except:
-                logger.info(f'Resource with id "{resourceid}" not in the system.')
-        return ", ".join(items)
+            items = []
+            for resourceXresource in nodevalue:
+                try:
+                    resourceid = resourceXresource["resourceId"]
+                    related_resource = Resource.objects.get(pk=resourceid)
+                    displayname = related_resource.displayname()
+                    if displayname is not None:
+                        items.append(displayname)
+                except (TypeError, KeyError):
+                    pass
+                except:
+                    logger.info(f'Resource with id "{resourceid}" not in the system.')
+            return ", ".join(items)
+        return ""
 
     def get_relationship_display_value(self, relationship_valueid):
         preflabel = get_preflabel_from_valueid(relationship_valueid, get_language())
@@ -2151,10 +2154,6 @@ class ResourceInstanceDataType(BaseDataType):
             return None
 
     def to_json(self, tile, node):
-        from arches.app.models.resource import (
-            Resource,
-        )  # import here rather than top to avoid circular import
-
         data = self.get_tile_data(tile)
         if data:
             nodevalue = self.get_nodevalues(data[str(node.nodeid)])
@@ -2167,6 +2166,7 @@ class ResourceInstanceDataType(BaseDataType):
                 except:
                     resourceid = resourceXresource["resourceId"]
                     logger.info(f'Resource with id "{resourceid}" not in the system.')
+            return self.compile_json(tile, node)
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         nodevalue = self.get_nodevalues(nodevalue)

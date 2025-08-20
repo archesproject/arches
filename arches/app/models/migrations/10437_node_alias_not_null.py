@@ -2,9 +2,8 @@
 
 from django.db import migrations, models
 
-# Once GraphModel.create_node_alias is a static method, we can remove this import.
-# Until then, this is safe to use in a migration, because it doesn't use Graph
-# fields (and thus is a lot like a static method).
+# Not standard to import a model that's not a *historical* model,
+# but we need to access functionality trapped on create_node_alias().
 from arches.app.models.graph import Graph
 
 
@@ -16,9 +15,16 @@ class Migration(migrations.Migration):
 
     def create_node_aliases(apps, schema_editor):
         Node = apps.get_model("models", "Node")
+        GraphModel = apps.get_model("models", "GraphModel")
         nodes_needing_alias = Node.objects.filter(alias__isnull=True)
         for node in nodes_needing_alias:
-            Graph.objects.get(pk=node.graph_id).create_node_alias(node)
+            # We didn't fetch Graph from get_model(), so we can't use it
+            # to fetch data. Use the vanilla model to fetch data, and place
+            # the only relevant data (dict of nodes) on a dummy instance.
+            graph = GraphModel.objects.get(pk=node.graph_id)
+            dummy = Graph()
+            dummy.nodes = graph.node_set.in_bulk()
+            dummy.create_node_alias(node)
         Node.objects.bulk_update(nodes_needing_alias, ["alias"])
 
     operations = [

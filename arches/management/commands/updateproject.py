@@ -3,6 +3,7 @@ import arches
 import os
 import shutil
 
+from django.core import management
 from django.core.management.base import BaseCommand
 from arches.app.models.system_settings import settings
 
@@ -267,6 +268,9 @@ from arches.settings_utils import generate_frontend_configuration"""
             except FileNotFoundError:
                 pass
 
+        management.call_command(
+            "graph", "publish", "--update"
+        )  # ensure graphs are v8 serialized
         self.stdout.write("Done!")
         self.stdout.write("Project successfully updated to version 8.0")
 

@@ -75,9 +75,9 @@ var PageView = Backbone.View.extend({
                 if (!bypass && self.viewModel.dirty()) {
                     self.viewModel.navDestination(url);
                     self.viewModel.alert(new AlertViewModel(
-                        'ep-alert-blue', 
-                        arches.translations.confirmNav.title, 
-                        arches.translations.confirmNav.text, 
+                        'ep-alert-blue',
+                        arches.translations.confirmNav.title,
+                        arches.translations.confirmNav.text,
                         function() {
                             self.viewModel.showConfirmNav(false);
                         }, function() {
@@ -169,6 +169,13 @@ var PageView = Backbone.View.extend({
         });
 
         self.viewModel.translations = arches.translations;
+
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                // If the page was restored from cache, hide the loading mask
+                self.viewModel.loading(false);
+            }
+        });
 
         window.addEventListener('beforeunload', function() {
             self.viewModel.loading(true);

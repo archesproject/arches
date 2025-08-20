@@ -534,6 +534,86 @@ class ResourceTests(ArchesTestCase):
             result = test_resource.delete(user=user)
             self.assertFalse(result)
 
+    def test_calculate_descriptors(self):
+        """
+        this is a test for the ticket #12272
+        Test that descriptors are calculated correctly when
+        saving a resource instance with tiles appended directly
+        """
+
+        graph = Graph.objects.create_graph(
+            name="Descriptor Test Graph", is_resource=True
+        )
+        node_group = models.NodeGroup.objects.create()
+        string_node = models.Node.objects.create(
+            graph=graph,
+            nodegroup=node_group,
+            name="String Node",
+            datatype="string",
+            istopnode=False,
+        )
+        graph.add_node(string_node)
+
+        edge = models.Edge.objects.create(
+            graph=graph, domainnode=graph.root, rangenode=string_node
+        )
+        graph.add_edge(edge)
+        graph.add_card(
+            models.CardModel(
+                graph=graph,
+                nodegroup=node_group,
+                description="Test Card",
+            )
+        )
+
+        # Configure the primary descriptor to use the string node
+        models.FunctionXGraph.objects.create(
+            graph=graph,
+            function_id="60000000-0000-0000-0000-000000000001",
+            config={
+                "descriptor_types": {
+                    "name": {
+                        "nodegroup_id": str(node_group.nodegroupid),
+                        "string_template": "<String Node>",
+                    },
+                    "map_popup": {
+                        "nodegroup_id": str(node_group.nodegroupid),
+                        "string_template": "<String Node>",
+                    },
+                    "description": {
+                        "nodegroup_id": str(node_group.nodegroupid),
+                        "string_template": "<String Node>",
+                    },
+                },
+            },
+        )
+        user = User.objects.get(username="admin")
+        graph.save(validate=False)
+        # Publish the graph to make it available for resources
+        graph.publish(user=user)
+
+        resource = Resource(graph=graph)
+        tile = Tile(
+            nodegroup=node_group,
+            resourceinstance=resource,
+            data={
+                str(string_node.pk): {
+                    "en": {"value": "test value", "direction": "ltr"},
+                }
+            },
+            sortorder=0,
+        )
+        resource.tiles.append(tile)
+        resource.save()
+
+        for display_type in (
+            resource.displayname,
+            resource.displaydescription,
+            resource.map_popup,
+        ):
+            with self.subTest(display_type=display_type):
+                self.assertEqual(display_type(), "test value")
+
     def test_recalculate_descriptors_prefetch_related_objects(self):
         r1 = Resource(graph_id=self.search_model_graphid)
         r2 = Resource(graph_id=self.search_model_graphid)

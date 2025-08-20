@@ -2,19 +2,20 @@ import decimal
 import json
 import os
 import uuid
+from string import Template
+
+from django.contrib.gis.geos import GeometryCollection, GEOSGeometry, Polygon
+from django.db import connection
+from django.utils.translation import gettext as _
+from rdflib import ConjunctiveGraph as Graph
+from rdflib import Literal, URIRef
+
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.search.elasticsearch_dsl_builder import Match
 from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
 from arches.app.utils.geo_utils import GeoUtils
-from django.contrib.gis.geos import GEOSGeometry
-from django.contrib.gis.geos import GeometryCollection
-from django.contrib.gis.geos import Polygon
-from django.db import connection
-from django.utils.translation import gettext as _
-from rdflib import URIRef, Literal, ConjunctiveGraph as Graph
-from string import Template
 
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
@@ -162,10 +163,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         return arches_geojson
 
     def transform_export_values(self, value, *args, **kwargs):
-        wkt_geoms = []
-        for feature in value["features"]:
-            wkt_geoms.append(GEOSGeometry(json.dumps(feature["geometry"])))
-        return GeometryCollection(wkt_geoms)
+        if value is not None:
+            wkt_geoms = []
+            for feature in value["features"]:
+                wkt_geoms.append(GEOSGeometry(json.dumps(feature["geometry"])))
+            return GeometryCollection(wkt_geoms)
 
     def update(self, tile, data, nodeid=None, action=None):
         new_features_array = tile.data[nodeid]["features"] + data["features"]
@@ -239,7 +241,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     type="phrase",
                 )
                 query.must(match_query)
-        except KeyError as e:
+        except KeyError:
             pass
 
     def split_geom(self, feature, max_feature_in_bytes=32766):
@@ -435,7 +437,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 f"Bad Data in GeoJSON, should be JSON string: {json_ld_node}"
             )
         if "features" not in val or type(val["features"]) != list:
-            raise ValueError(f"GeoJSON must have features array")
+            raise ValueError("GeoJSON must have features array")
         for f in val["features"]:
             if "properties" not in f:
                 f["properties"] = {}
