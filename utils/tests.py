@@ -24,17 +24,13 @@ from arches_querysets.models import GraphWithPrefetching, ResourceTileTree
 
 
 class GraphTestCase(TestCase):
-    # We can eventually remove this switch if/when other tests are updated.
-    test_child_nodegroups = False
-
     @classmethod
     def setUpTestData(cls):
         cls.datatype_factory = DataTypeFactory()  # custom!
         cls.create_graph()
         cls.create_nodegroups_and_grouping_nodes()
         cls.create_data_collecting_nodes()
-        if cls.test_child_nodegroups:
-            cls.create_child_nodegroups()
+        cls.create_child_nodegroups()
         cls.create_edges()
         cls.create_cards()
         cls.create_widgets()
@@ -42,21 +38,19 @@ class GraphTestCase(TestCase):
         cls.create_resources()
         cls.create_tiles_with_data()
         cls.create_tiles_with_none()
-        if cls.test_child_nodegroups:
-            cls.create_child_tiles()
+        cls.create_child_tiles()
         cls.create_relations()
 
         graph_proxy = Graph.objects.get(pk=cls.graph.pk)
         # arches_version==9.0.0
         if arches_version < (8, 0):
             graph_proxy.refresh_from_database()
-            if cls.test_child_nodegroups:
-                # Repair parent nodegroup link broken by get_nodegroups()!
-                for node in graph_proxy.nodes.values():
-                    if node.nodegroup == cls.nodegroup_1_child:
-                        if node.nodegroup.parentnodegroup != cls.nodegroup_1:
-                            node.nodegroup.parentnodegroup = cls.nodegroup_1
-                            node.nodegroup.save()
+            # Repair parent nodegroup link broken by get_nodegroups()!
+            for node in graph_proxy.nodes.values():
+                if node.nodegroup == cls.nodegroup_1_child:
+                    if node.nodegroup.parentnodegroup != cls.nodegroup_1:
+                        node.nodegroup.parentnodegroup = cls.nodegroup_1
+                        node.nodegroup.save()
         graph_proxy.publish(user=None)
         cls.graph.publication = graph_proxy.publication
         for resource in [cls.resource_42, cls.resource_none]:
@@ -135,16 +129,21 @@ class GraphTestCase(TestCase):
         cls.data_nodes = Node.objects.bulk_create(cls.data_nodes_1 + cls.data_nodes_n)
         prefetch_related_objects(cls.data_nodes, "nodegroup")
 
-        # Set each node as an attribute, e.g. self.string_node_n
-        for node in cls.data_nodes:
-            attname = node.datatype.replace("-", "_")
-            attname += "_node_1" if node.nodegroup.cardinality == "1" else "_node_n"
-            setattr(cls, attname, node)
+        cls.setNodesOnClass()
 
         cls.node_value_node_1.config["nodeid"] = str(cls.date_node_1.pk)
         cls.node_value_node_1.save()
         cls.node_value_node_n.config["nodeid"] = str(cls.date_node_n.pk)
         cls.node_value_node_n.save()
+
+    @classmethod
+    def setNodesOnClass(cls):
+        """Set each node as an attribute, e.g. self.string_node_n"""
+        for node in cls.data_nodes:
+            attname = node.datatype.replace("-", "_") + "_node"
+            attname += "_1" if node.nodegroup.cardinality == "1" else "_n"
+            attname += "_child" if node.nodegroup.parentnodegroup_id else ""
+            setattr(cls, attname, node)
 
     @classmethod
     def create_edges(cls):
@@ -182,8 +181,7 @@ class GraphTestCase(TestCase):
     @classmethod
     def create_cards(cls):
         nodegroups = [cls.nodegroup_1, cls.nodegroup_n]
-        if cls.test_child_nodegroups:
-            nodegroups.extend([cls.nodegroup_1_child, cls.nodegroup_n_child])
+        nodegroups.extend([cls.nodegroup_1_child, cls.nodegroup_n_child])
         cards = [
             CardModel(
                 graph=cls.graph,
@@ -485,6 +483,8 @@ class GraphTestCase(TestCase):
             )
 
         Node.objects.bulk_create(cls.data_nodes)
+
+        # Refresh class attributes.
         cls.data_nodes = cls.graph.node_set.exclude(datatype="semantic").select_related(
             "nodegroup"
         )
@@ -494,6 +494,7 @@ class GraphTestCase(TestCase):
         cls.data_nodes_n = cls.graph.node_set.filter(nodegroup=cls.nodegroup_n).exclude(
             datatype="semantic"
         )
+        cls.setNodesOnClass()
 
     @classmethod
     def create_child_tiles(cls):
