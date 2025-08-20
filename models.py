@@ -688,12 +688,6 @@ class TileTree(TileModel, AliasedDataMixin):
 
         return True
 
-    @staticmethod
-    def _resource_value_to_python(tile_val):
-        if tile_val is None or len(tile_val) != 1:
-            return tile_val
-        return tile_val[0]
-
     def _apply_provisional_edit(
         self, proxy, existing_data, existing_provisional_edits, *, user=None
     ):
