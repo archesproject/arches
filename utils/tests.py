@@ -105,7 +105,7 @@ class GraphTestCase(TestCase):
         cls.data_nodes_1 = [
             Node(
                 datatype=datatype.pk,
-                alias=datatype.pk.replace("-", "_"),
+                alias=datatype.pk.replace("-", "_") + "_alias",
                 name=datatype.pk,
                 istopnode=False,
                 nodegroup=cls.nodegroup_1,
@@ -117,7 +117,7 @@ class GraphTestCase(TestCase):
         cls.data_nodes_n = [
             Node(
                 datatype=datatype.pk,
-                alias=datatype.pk.replace("-", "_") + "_n",
+                alias=datatype.pk.replace("-", "_") + "_alias_n",
                 name=datatype.pk + "-n",
                 istopnode=False,
                 nodegroup=cls.nodegroup_n,
@@ -526,10 +526,10 @@ class GraphTestCase(TestCase):
         # Create data for the child non-localized-string node only.
         # TileModel.save() will initialize the other nodes to None.
         cls.non_localized_string_child_node = Node.objects.get(
-            alias="non_localized_string_child"
+            alias="non_localized_string_alias_child"
         )
         cls.non_localized_string_child_node_n = Node.objects.get(
-            alias="non_localized_string_n_child"
+            alias="non_localized_string_alias_n_child"
         )
         cls.cardinality_1_child_tile.data = {
             str(cls.non_localized_string_child_node.pk): "child-1-value",
