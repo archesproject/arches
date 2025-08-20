@@ -719,6 +719,7 @@ dl.inline-flex dd {
     flex-direction: column;
     background-color: #fff;
     width:100%;
+    height: inherit;
 }
 
 .branch-csv-etl,
@@ -767,6 +768,7 @@ dl.inline-flex dd {
 
 .branch-xl-metadata-container {
     padding: 0px 15px;
+    overflow: hidden;
 }
 
 .branch-csv-etl-load-summmary {
@@ -8206,6 +8208,10 @@ div.row.widget-wrapper.report-header:hover {
 .map-report-header-container {
     height: 500px;
     background: #fbfbfb;
+}
+
+.plugin-main {
+    height: inherit;
 }
 
 .plugin-main .map-report-header-container {
