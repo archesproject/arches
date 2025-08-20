@@ -1,6 +1,6 @@
 {
     "name": "arches",
-    "version": "8.0.4",
+    "version": "8.1.0",
     "license": "AGPL-3.0-only",
     "scripts": {
         "build_development": "npm run eslint:check && npm run ts:check && cross-env webpack --config ./webpack/webpack.config.dev.js",
@@ -90,7 +90,7 @@
         "webpack-bundle-tracker": "^3.1.0"
     },
     "devDependencies": {
-        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/8.0.x"
+        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/8.1.x"
     },
     "nodeModulesPaths": {
         "nifty": "plugins/nifty",
