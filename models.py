@@ -173,6 +173,14 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         )
 
     def append_tile(self, nodegroup_alias):
+        grouping_node_aliases = {
+            node.alias
+            for node in self.graph.node_set.all()
+            if node.pk == node.nodegroup_id
+        }
+        if nodegroup_alias not in grouping_node_aliases:
+            raise ValueError(nodegroup_alias)
+
         TileTree.create_blank_tile(
             nodegroup_alias=nodegroup_alias,
             container=self,
@@ -432,6 +440,13 @@ class TileTree(TileModel, AliasedDataMixin):
             self._as_representation = source._as_representation
 
     def append_tile(self, nodegroup_alias):
+        grouping_node_aliases = {
+            node.alias
+            for node in self.resourceinstance.graph.node_set.all()
+            if node.pk == node.nodegroup_id
+        }
+        if nodegroup_alias not in grouping_node_aliases:
+            raise ValueError(nodegroup_alias)
         TileTree.create_blank_tile(
             nodegroup_alias=nodegroup_alias,
             container=self,

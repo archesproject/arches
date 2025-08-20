@@ -252,7 +252,7 @@ def append_tiles_recursively(resource_or_tile):
         if maybe_tiles in (None, []):
             try:
                 resource_or_tile.append_tile(alias)
-            except RuntimeError:  # not a nodegroup or nodegroup not permitted
+            except (ValueError, RuntimeError):  # not a nodegroup or alias not found
                 continue
 
             maybe_tiles = getattr(resource_or_tile.aliased_data, alias)

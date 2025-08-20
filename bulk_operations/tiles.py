@@ -334,11 +334,11 @@ class TileTreeOperation:
         """
         Call datatype methods when merging value_to_validate into the tile.
 
-        1. transform_value_for_tile()
-        2. pre_structure_tile_data()
-        3. clean()
-        4. validate()
-        5. pre_tile_save()
+        1. transform_value_for_tile() -- type coercion
+        2. pre_structure_tile_data() -- insert missing dictionary keys
+        3. clean() -- replace empty values
+        4. validate() -- check business logic, don't mutate data
+        5. pre_tile_save() -- run side effects
 
         TODO: move this to BaseDataType.full_clean()?
         https://github.com/archesproject/arches/issues/10851#issuecomment-2427305853
