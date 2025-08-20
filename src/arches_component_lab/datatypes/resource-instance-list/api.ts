@@ -1,12 +1,12 @@
 import arches from "arches";
-import type { ResourceInstanceReference } from "@/arches_component_lab/datatypes/resource-instance/types.ts";
+import type { ResourceInstanceListOption } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
 
 export const fetchRelatableResources = async (
     graphSlug: string,
     nodeAlias: string,
     page: number,
     filterTerm?: string,
-    initialValues?: ResourceInstanceReference[] | null | undefined,
+    initialValues?: ResourceInstanceListOption[] | null | undefined,
 ) => {
     const params = new URLSearchParams();
 

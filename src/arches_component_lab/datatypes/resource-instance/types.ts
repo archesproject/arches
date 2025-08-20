@@ -7,13 +7,19 @@ export interface ResourceInstanceValue extends AliasedNodeData {
 }
 
 export interface ResourceInstanceReference {
-    resource_id: string;
+    resourceId: string;
     ontologyProperty?: string;
     resourceXresourceId?: string;
     inverseOntologyProperty?: string;
 }
 
-export interface ResourceInstanceResult {
-    resourceinstanceid: string;
+export interface ResourceInstanceDataItem {
     display_value: string;
+    order_field: number;
+    resourceinstanceid: string;
+}
+
+export interface ResourceInstanceSelectOption {
+    display_value: string;
+    resource_id: string;
 }

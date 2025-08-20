@@ -14,7 +14,10 @@ defineProps<{
         v-if="aliasedNodeData?.node_value.url"
         :href="aliasedNodeData?.node_value.url"
     >
-        {{ aliasedNodeData?.node_value?.url_label || aliasedNodeData?.node_value?.url }}
+        {{
+            aliasedNodeData?.node_value?.url_label ||
+            aliasedNodeData?.node_value?.url
+        }}
     </a>
 
     <span v-else>
