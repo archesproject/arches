@@ -17,12 +17,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import uuid
+from http import HTTPStatus
 
 from arches.app.views.resource import ResourcePermissionDataView
 from tests.base_test import ArchesTestCase
 from django.db import connection
 from django.urls import reverse
-from arches.app.models.models import EditLog
+from arches.app.models.models import EditLog, Graph
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from tests.utils.search_test_utils import sync_es
@@ -63,6 +64,18 @@ class ResourceViewTests(ArchesTestCase):
             edit.userid = user.id
             edit.save()
         cls.resource = Resource.objects.get(pk=cls.resource_instance_id)
+        cls.graph = Graph(cls.resource.graph_id)
+
+    def test_resource_editor_view(self):
+        self.graph.publish()
+        self.client.login(username="admin", password="admin")
+
+        url = reverse(
+            "resource_editor", kwargs={"resourceid": self.resource_instance_id}
+        )
+
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_resource_instance_permission_assignment(self):
         """
