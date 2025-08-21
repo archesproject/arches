@@ -55,6 +55,26 @@ export const createList = async (name: string) => {
     }
 };
 
+export const importList = async (file: File, overwriteOption: string) => {
+    const formData = new FormData();
+    formData.append("skosfile", file);
+    formData.append("overwrite_option", overwriteOption);
+    const response = await fetch(arches.urls.controlled_list_add, {
+        method: "POST",
+        headers: { "X-CSRFToken": getToken() },
+        body: formData,
+    });
+    try {
+        const parsed = await response.json();
+        if (response.ok) {
+            return parsed;
+        }
+        throw new Error(parsed.message);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
+    }
+};
+
 export const createItem = async (item: NewControlledListItem) => {
     const response = await fetch(arches.urls.controlled_list_item_add, {
         method: "POST",

@@ -1,5 +1,6 @@
 from http import HTTPStatus
 from uuid import UUID
+import filetype
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -10,6 +11,7 @@ from django.utils.translation import gettext as _
 from arches.app.models.utils import field_names
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.decorators import group_required
+from arches.app.utils.file_validator import FileValidator
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
 from arches.app.utils.string_utils import str_to_bool
@@ -22,6 +24,7 @@ from arches_controlled_lists.models import (
     ListItemValue,
     NodeProxy,
 )
+from arches_controlled_lists.utils.skos import SKOSReader
 
 
 def _prefetch_terms(request):
@@ -91,16 +94,46 @@ class ListView(APIBase):
         group_required("RDM Administrator", raise_exception=True), name="dispatch"
     )
     def post(self, request):
-        data = JSONDeserializer().deserialize(request.body)
-        lst = List(name=data.get("name", None))
-        try:
-            lst.full_clean()  # applies default name
-        except ValidationError as ve:
-            return JSONErrorResponse(
-                message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
-            )
-        lst.save()
-        return JSONResponse(lst.serialize(), status=HTTPStatus.CREATED)
+        skosfile = request.FILES.get("skosfile", None)
+        overwrite_option = request.POST.get("overwrite_option", None)
+        if skosfile and overwrite_option:
+            try:
+                # Do minimal file validation to mock file checking in FileValidator
+                extension = skosfile.name.split(".")[-1]
+                guessed_file_type = filetype.guess(skosfile)
+
+                # guessed_file_type will be None if the file is xml
+                if extension != "xml" or guessed_file_type is not None:
+                    return JSONErrorResponse(
+                        message=(
+                            f"File extension {extension}/{guessed_file_type.extension} not allowed"
+                        ),
+                        status=HTTPStatus.BAD_REQUEST,
+                    )
+
+                skos = SKOSReader()
+                rdf = skos.read_file(skosfile)
+                concepts = skos.save_controlled_lists_from_skos(
+                    rdf, overwrite_options=overwrite_option
+                )
+            # Wide catch is because Arches SKOSReader raises generic Exceptions
+            except Exception as error:
+                return JSONErrorResponse(
+                    message=(str(error)), status=HTTPStatus.BAD_REQUEST
+                )
+            return JSONResponse(concepts, status=HTTPStatus.OK)
+
+        else:
+            data = JSONDeserializer().deserialize(request.body)
+            lst = List(name=data.get("name", None))
+            try:
+                lst.full_clean()  # applies default name
+            except ValidationError as ve:
+                return JSONErrorResponse(
+                    message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+                )
+            lst.save()
+            return JSONResponse(lst.serialize(), status=HTTPStatus.CREATED)
 
     @method_decorator(
         group_required("RDM Administrator", raise_exception=True), name="dispatch"

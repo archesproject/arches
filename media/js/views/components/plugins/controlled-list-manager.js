@@ -19,7 +19,15 @@ const ControlledListsPreset = definePreset(ArchesPreset, {
         iconSize: '1.2rem',
         colorScheme: {
             light: {
-                primary: palette(ArchesPreset.primitive.arches.blue),  
+                primary: palette(ArchesPreset.primitive.arches.blue),
+                dialog: {
+                    headerTextColor: "{slate.50}",
+                },  
+            },
+            dark: {
+                dialog: {
+                    headerTextColor: "{slate.50}",
+                },
             },
         },
     },
