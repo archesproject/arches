@@ -1609,6 +1609,24 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
         edit.save()
 
 
+class ResourceIdentifier(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    resourceid = models.ForeignKey(
+        blank=False,
+        on_delete=models.CASCADE,
+        to="models.ResourceInstance",
+        related_name="resource_identifiers",
+        editable=False,
+    )
+    identifier = models.TextField()
+    source = models.TextField()
+    identifier_type = models.TextField(blank=True)
+
+    class Meta:
+        db_table = "resource_identifiers"
+        managed = True
+
+
 class ResourceInstanceLifecycle(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid4)
     name = I18n_TextField()
