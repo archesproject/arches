@@ -2,7 +2,7 @@ import uuid
 from dataclasses import asdict, dataclass
 from typing import Iterable, Mapping
 
-from django.db.models import F
+from django.db.models import F, JSONField
 from django.utils.translation import gettext as _
 
 from arches.app.datatypes.base import BaseDataType
@@ -10,6 +10,19 @@ from arches.app.models.models import Node
 from arches.app.models.graph import GraphValidationError
 
 from arches_controlled_lists.models import ListItem
+
+try:
+    import rest_framework.fields
+except:
+    pass
+else:
+
+    class ReferenceSerializer(rest_framework.fields.JSONField):
+        def to_internal_value(self, data):
+            return ReferenceDataType().to_python(data)
+
+
+class ReferenceField(JSONField): ...
 
 
 @dataclass(kw_only=True)
@@ -29,6 +42,8 @@ class Reference:
 
 
 class ReferenceDataType(BaseDataType):
+    model_field = ReferenceField(null=True)
+
     def to_python(
         self, value: Iterable[Mapping] | None, **kwargs
     ) -> list[Reference] | None:
@@ -153,12 +168,10 @@ class ReferenceDataType(BaseDataType):
 
         final_tile_values = []
         for single_value in pre_processed_values:
-            found_item: ListItem | None = None
+            found_item: ListItem | Reference | None = None
             match single_value:
                 case Reference():
-                    found_item = ListItem.objects.filter(
-                        pk=single_value.labels[0].list_item_id
-                    ).first()
+                    found_item = single_value
                 case uuid.UUID():
                     found_item = ListItem.objects.filter(pk=list_item_id).first()
                 case str():
@@ -175,7 +188,10 @@ class ReferenceDataType(BaseDataType):
                     raise TypeError(type(single_value))
 
             if found_item:
-                final_tile_values.append(found_item.build_tile_value())
+                if isinstance(found_item, Reference):
+                    final_tile_values.append(asdict(found_item))
+                else:
+                    final_tile_values.append(found_item.build_tile_value())
 
         return final_tile_values
 
