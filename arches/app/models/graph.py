@@ -551,6 +551,8 @@ class Graph(models.GraphModel):
                     unique_fields={"pk"},
                 )
 
+            for edge in self.edges.values():
+                edge.clean()
             models.Edge.objects.bulk_create(
                 self.edges.values(),
                 update_conflicts=True,
