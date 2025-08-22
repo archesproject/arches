@@ -16,6 +16,10 @@ class ConceptListField(JSONField):
     pass
 
 
+class DomainListField(JSONField):
+    pass
+
+
 class LocalizedStringField(JSONField):
     pass
 

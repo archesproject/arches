@@ -3,6 +3,7 @@ import django.db.models
 from arches.app.datatypes.datatypes import (
     BooleanDataType,
     DateDataType,
+    DomainListDataType,
     NonLocalizedStringDataType,
     NumberDataType,
 )
@@ -10,6 +11,7 @@ from arches.app.datatypes.datatypes import (
 from arches_querysets.datatypes import *
 from arches_querysets.fields import (
     ConceptListField,
+    DomainListField,
     LocalizedStringField,
     ResourceInstanceField,
     ResourceInstanceListField,
@@ -56,5 +58,7 @@ class DataTypeFactory(datatypes.DataTypeFactory):
                 return django.db.models.UUIDField(null=True)
             case URLDataType():
                 return django.db.models.JSONField(null=True)
+            case DomainListDataType():
+                return DomainListField(null=True)
             case _:
                 return django.db.models.TextField(null=True)
