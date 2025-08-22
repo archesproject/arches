@@ -1,32 +1,30 @@
 <script setup lang="ts">
-import { onMounted, ref, toRef } from "vue";
+import { computed, ref, watchEffect } from "vue";
 
-import { FormField } from "@primevue/forms";
-import Message from "primevue/message";
 import TreeSelect from "primevue/treeselect";
 
-import { fetchWidgetOptions } from "@/arches_controlled_lists/widgets/api.ts";
+import { fetchWidgetOptions } from "@/arches_controlled_lists/datatypes/reference-select/api.ts";
 
 import type { Ref } from "vue";
-import type { FormFieldResolverOptions } from "@primevue/forms";
 import type { TreeExpandedKeys } from "primevue/tree";
-import type {
-    ReferenceSelectTreeNode,
-    ReferenceSelectFetchedOption,
-} from "@/arches_controlled_lists/widgets/types";
 
-const props = defineProps<{
-    value: ReferenceSelectFetchedOption[] | undefined;
-    nodeConfig: {
-        multiValue: boolean;
-        controlledList: string;
-    };
-    widgetConfig: {
-        placeholder: string;
-        defaultValue: ReferenceSelectFetchedOption[] | undefined;
-    };
-    nodeAlias: string;
-    graphSlug: string;
+import type {
+    ReferenceSelectDatatypeCardXNodeXWidgetData,
+    ReferenceSelectDetails,
+    ReferenceSelectTreeNode,
+    ReferenceSelectValue,
+} from "@/arches_controlled_lists/datatypes/reference-select/types.ts";
+
+const { aliasedNodeData, cardXNodeXWidgetData, graphSlug, nodeAlias } =
+    defineProps<{
+        aliasedNodeData: ReferenceSelectValue;
+        cardXNodeXWidgetData: ReferenceSelectDatatypeCardXNodeXWidgetData;
+        graphSlug: string;
+        nodeAlias: string;
+    }>();
+
+const emit = defineEmits<{
+    (event: "update:value", updatedValue: ReferenceSelectValue): void;
 }>();
 
 const options = ref<ReferenceSelectTreeNode[]>();
@@ -34,60 +32,24 @@ const isLoading = ref(false);
 const optionsError = ref<string | null>(null);
 const expandedKeys: Ref<TreeExpandedKeys> = ref({});
 
-const initialVal = toRef(
-    extractInitialOrDefaultValue(
-        props.nodeConfig.multiValue,
-        props.value,
-        props.widgetConfig.defaultValue,
-    ),
-);
-
-onMounted(() => {
-    const defaultVal = props.widgetConfig.defaultValue;
-    options.value = [
-        ...optionsAsNodes(props.value ? props.value : []),
-        ...optionsAsNodes(defaultVal ? defaultVal : []),
-    ];
+const initialValueFromTileData = computed(() => {
+    if (aliasedNodeData?.details) {
+        return aliasedNodeData.details.reduce<Record<string, boolean>>(
+            (acc, option) => {
+                acc[option.list_item_id] = true;
+                return acc;
+            },
+            {},
+        );
+    }
+    return {};
 });
 
-function extractInitialOrDefaultValue(
-    multiVal: boolean,
-    initialVal: ReferenceSelectFetchedOption[] | undefined,
-    defaultVal: ReferenceSelectFetchedOption[] | undefined,
-) {
-    let extractedVals: object | undefined = undefined;
-    if (multiVal) {
-        if (initialVal) {
-            extractedVals = initialVal?.reduce((acc, reference) => {
-                const formatted = formatValForPrimevue(reference);
-                return { ...acc, ...formatted };
-            }, {});
-        } else if (defaultVal) {
-            extractedVals = defaultVal?.reduce((acc, reference) => {
-                const formatted = formatValForPrimevue(reference);
-                return { ...acc, ...formatted };
-            }, {});
-        }
-    } else {
-        if (initialVal && initialVal.length > 0) {
-            extractedVals = formatValForPrimevue(initialVal[0]);
-        } else if (defaultVal && defaultVal.length > 0) {
-            extractedVals = formatValForPrimevue(defaultVal[0]);
-        }
-    }
-    return extractedVals;
-}
+watchEffect(() => {
+    getOptions();
+});
 
-function formatValForPrimevue(val: ReferenceSelectFetchedOption | undefined) {
-    if (!val) {
-        return undefined;
-    }
-    return { [val?.list_item_id]: true };
-}
-
-function optionAsNode(
-    item: ReferenceSelectFetchedOption,
-): ReferenceSelectTreeNode {
+function optionAsNode(item: ReferenceSelectTreeNode): ReferenceSelectTreeNode {
     expandedKeys.value = {
         ...expandedKeys.value,
         [item.list_item_id]: true,
@@ -96,12 +58,12 @@ function optionAsNode(
         key: item.list_item_id,
         label: item.display_value,
         children: item.children?.map(optionAsNode),
-        data: item,
+        data: item as unknown as ReferenceSelectDetails,
     };
 }
 
 function optionsAsNodes(
-    items: ReferenceSelectFetchedOption[],
+    items: ReferenceSelectTreeNode[],
 ): ReferenceSelectTreeNode[] {
     if (items.length > 0) {
         return items.map(optionAsNode);
@@ -112,11 +74,9 @@ function optionsAsNodes(
 async function getOptions() {
     isLoading.value = true;
     try {
-        const fetchedLists = await fetchWidgetOptions(
-            props.graphSlug,
-            props.nodeAlias,
-        );
-        options.value = fetchedLists ? optionsAsNodes(fetchedLists) : [];
+        const widgetOptions = await fetchWidgetOptions(graphSlug, nodeAlias);
+
+        options.value = optionsAsNodes(widgetOptions);
     } catch (error) {
         optionsError.value = (error as Error).message;
     } finally {
@@ -124,83 +84,65 @@ async function getOptions() {
     }
 }
 
-// let timeout: ReturnType<typeof setTimeout>;
+function onUpdateModelValue(
+    updatedValue: { [key: string]: boolean } | null,
+): void {
+    if (!updatedValue) {
+        emit("update:value", {
+            node_value: [],
+            display_value: "",
+            details: [],
+        });
 
-function resolver(options: FormFieldResolverOptions) {
-    // return new Promise((resolve) => {
-    //     if (timeout) clearTimeout(timeout);
-
-    //     timeout = setTimeout(() => {
-    //         resolve(validate(e));
-    //     }, 500);
-    // });
-    const nodeAlias = props.nodeAlias;
-    if (options.value) {
-        options.value = Object.entries(options.value).reduce<string[]>(
-            (keys, [key, val]) => {
-                if (val === true) keys.push(key);
-                return keys;
-            },
-            [],
-        );
+        return;
     }
-    const { errors } = validate(options);
-    return {
-        errors,
-        values: { [nodeAlias]: options.value },
-    };
-}
 
-function validate(e: FormFieldResolverOptions) {
-    console.log("validate", e);
-    // API call to validate the input
-    // if (true) {
-    //     return {};
-    // } else {
-    //     return {
-    //         errors: [
-    //             { message: "This is an error message" },
-    //             { message: "This is also an error message" },
-    //         ],
-    //     };
-    // }
-    return { errors: [] };
+    const nodeValue = [];
+    const details = [];
+
+    for (const updatedListItemId of Object.keys(updatedValue)) {
+        const option = options.value?.find(
+            (option) => option.key === updatedListItemId,
+        );
+
+        if (option) {
+            const listId = option.data.list_item_values.find(
+                (item) => item.list_item_id === updatedListItemId,
+            )?.id;
+
+            nodeValue.push({
+                list_id: listId!,
+                labels: option.data.list_item_values,
+                uri: option.data.uri,
+            });
+            details.push(option.data);
+        }
+    }
+
+    const displayValue = details.map((item) => item.display_value).join(", ");
+
+    emit("update:value", {
+        node_value: nodeValue,
+        display_value: displayValue,
+        details: details,
+    });
 }
 </script>
 
 <template>
-    <Message
-        v-if="optionsError"
-        severity="error"
-    >
-        {{ optionsError }}
-    </Message>
-    <FormField
-        v-else
-        v-slot="$field"
-        :name="props.nodeAlias"
-        :resolver="resolver"
-        :initial-value="initialVal"
-    >
-        <TreeSelect
-            style="display: flex"
-            option-value="list_item_id"
-            :fluid="true"
-            :loading="isLoading"
-            :options="options"
-            :expanded-keys="expandedKeys"
-            :placeholder="widgetConfig.placeholder"
-            :selection-mode="nodeConfig.multiValue ? 'multiple' : 'single'"
-            :show-clear="true"
-            @before-show="getOptions"
-        />
-        <Message
-            v-for="error in $field.errors"
-            :key="error.message"
-            severity="error"
-            size="small"
-        >
-            {{ error.message }}
-        </Message>
-    </FormField>
+    <TreeSelect
+        style="display: flex"
+        option-value="list_item_id"
+        :fluid="true"
+        :loading="isLoading"
+        :options="options"
+        :expanded-keys="expandedKeys"
+        :model-value="initialValueFromTileData"
+        :placeholder="cardXNodeXWidgetData.config.placeholder"
+        :selection-mode="
+            cardXNodeXWidgetData.node.config.multiValue ? 'multiple' : 'single'
+        "
+        :show-clear="true"
+        @update:model-value="onUpdateModelValue($event)"
+    />
 </template>
