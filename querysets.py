@@ -27,33 +27,31 @@ class NodeAliasValuesMixin:
         # .values("my_alias")
         # rather than the long form:
         # .values(my_alias=models.F("my_alias"))
-        args_copy = [*args]
+        args_copy = list(set(args))
         kwargs_copy = {**kwargs}
-        fields_needing_promotion = [
-            arg
-            for arg in args
-            if arg in self.query.annotations
-            and arg not in self.query.annotation_select
-            and arg not in kwargs
-        ]
-        for field in fields_needing_promotion[:]:
-            # values() can promote aliases to annotations via **kwargs
-            kwargs_copy[field] = models.F(field)
-            args_copy.remove(field)
+        for arg in args:
+            field_name = arg.split(models.constants.LOOKUP_SEP)[0]
+            if (
+                field_name in self.query.annotations
+                and field_name not in self.query.annotation_select
+                and arg not in kwargs
+            ):
+                # values() can promote aliases to annotations via **kwargs
+                kwargs_copy[arg] = models.F(arg)
+                args_copy.remove(arg)
         return super().values(*args_copy, **kwargs_copy)
 
     def values_list(self, *args, **kwargs):
         """Allow using a node_alias as a field name in a values_list() query."""
         qs = self
-        if fields_needing_promotion := [
-            arg
-            for arg in args
-            if arg in self.query.annotations and arg not in self.query.annotation_select
-        ]:
-            # values_list() cannot promote aliases via kwargs like annotate().
-            qs = self.annotate(
-                **{field: models.F(field) for field in fields_needing_promotion}
-            )
+        for arg in args:
+            field_name = arg.split(models.constants.LOOKUP_SEP)[0]
+            if (
+                field_name in qs.query.annotations
+                and field_name not in qs.query.annotation_select
+            ):
+                # values_list() cannot promote aliases via kwargs like annotate().
+                qs = qs.annotate(**{arg: models.F(arg)})
         return models.QuerySet.values_list(qs, *args, **kwargs)
 
     def aggregate(self, *args, **kwargs):
