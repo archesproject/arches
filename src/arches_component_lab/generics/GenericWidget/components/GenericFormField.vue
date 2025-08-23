@@ -1,21 +1,22 @@
 <script setup lang="ts">
 import { useTemplateRef, watchEffect, watch } from "vue";
 
-import { FormField } from "@primevue/forms";
+import { FormField, type FormFieldResolverOptions } from "@primevue/forms";
 import Message from "primevue/message";
 
 import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
 
-type FieldStates = {
-    dirty: boolean;
-    pristine: boolean;
-    touched: boolean;
-};
-
-type FormFieldExposed = {
+type FormFieldType = {
     field: {
-        states: FieldStates;
+        states: {
+            dirty: boolean;
+            pristine: boolean;
+            touched: boolean;
+        };
         errors: Array<{ message: string }>;
+        props: {
+            onChange: (event: { value: AliasedNodeData }) => void;
+        };
     };
 };
 
@@ -30,7 +31,7 @@ const emit = defineEmits<{
     (e: "update:isDirty", dirty: boolean): void;
 }>();
 
-const formFieldRef = useTemplateRef<FormFieldExposed>("formField");
+const formFieldRef = useTemplateRef<FormFieldType>("formField");
 
 // cannot inline, this allows the dirty state to be set on first input
 const initialValue = Object.freeze({ ...aliasedNodeData });
@@ -62,17 +63,25 @@ function markFormFieldAsDirty() {
     formFieldRef.value.field.states.touched = true;
 }
 
-function resolver() {
-    validate(aliasedNodeData);
-    return aliasedNodeData;
+function resolver(
+    updatedAliasedNodeData: FormFieldResolverOptions,
+): AliasedNodeData {
+    validate(updatedAliasedNodeData as unknown as AliasedNodeData);
+    return updatedAliasedNodeData as unknown as AliasedNodeData;
 }
 
 function validate(aliasedNodeData: AliasedNodeData) {
     console.log("validateValue", aliasedNodeData);
 }
+
+function onUpdateValue(updatedAliasedNodeData: AliasedNodeData) {
+    formFieldRef.value?.field.props.onChange({ value: updatedAliasedNodeData });
+}
 </script>
 
 <template>
+    <slot :on-update-value="onUpdateValue" />
+
     <FormField
         ref="formField"
         v-slot="$field"
@@ -80,8 +89,6 @@ function validate(aliasedNodeData: AliasedNodeData) {
         :resolver="resolver"
         :initial-value="initialValue"
     >
-        <slot v-bind="$field" />
-
         <Message
             v-for="error in $field.errors"
             :key="error.message"

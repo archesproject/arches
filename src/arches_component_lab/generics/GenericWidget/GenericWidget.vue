@@ -13,7 +13,7 @@ import Skeleton from "primevue/skeleton";
 import GenericWidgetLabel from "@/arches_component_lab/generics/GenericWidget/components/GenericWidgetLabel.vue";
 import GenericFormField from "@/arches_component_lab/generics/GenericWidget/components/GenericFormField.vue";
 
-import { EDIT } from "@/arches_component_lab/widgets/constants.ts";
+import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { fetchCardXNodeXWidgetData } from "@/arches_component_lab/generics/GenericWidget/api.ts";
 import { removeVueExtension } from "@/arches_component_lab/generics/GenericWidget/utils.ts";
 
@@ -125,11 +125,10 @@ watchEffect(async () => {
 
             <GenericFormField
                 v-if="mode === EDIT"
+                v-slot="{ onUpdateValue }"
+                :aliased-node-data="widgetValue as AliasedNodeData"
                 :is-dirty="isDirty"
                 :node-alias="nodeAlias"
-                :aliased-node-data="widgetValue as AliasedNodeData"
-                @update:value="emit('update:value', $event)"
-                @update:is-dirty="emit('update:isDirty', $event)"
             >
                 <component
                     :is="widgetComponent"
@@ -139,14 +138,13 @@ watchEffect(async () => {
                     :mode="mode"
                     :node-alias="nodeAlias"
                     :aliased-node-data="widgetValue"
-                    @update:value="emit('update:value', $event)"
-                    @update:is-dirty="emit('update:isDirty', $event)"
+                    @update:value="onUpdateValue($event)"
                 />
             </GenericFormField>
 
             <component
                 :is="widgetComponent"
-                v-else
+                v-else-if="mode === VIEW"
                 :key="resolvedCardXNodeXWidgetData.id"
                 :card-x-node-x-widget-data="resolvedCardXNodeXWidgetData"
                 :graph-slug="graphSlug"
