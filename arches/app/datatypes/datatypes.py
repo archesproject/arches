@@ -1397,7 +1397,7 @@ class FileListDataType(BaseDataType):
         # check if value is a string (csv) or a dictionay (a list of dictionaries)
         try:
             value = deserialize_json_like_string(value)
-        except (ValueError, SyntaxError):
+        except json.decoder.JSONDecodeError:
             pass
 
         # the data can be a string, a dictionary or a list of dictionaries
