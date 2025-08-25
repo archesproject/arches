@@ -1,3 +1,4 @@
+import json
 from typing import Union, Any, Dict
 from django.http import QueryDict
 
@@ -18,3 +19,12 @@ def get_str_kwarg_as_bool(
     if isinstance(value, bool):
         return value
     return str_to_bool(str(value))
+
+
+def deserialize_json_like_string(val, depth=2):
+    if isinstance(val, str) and depth>=0:
+        if val.replace(" ","").startswith("{'") or val.replace(" ","").startswith("[{'"):
+            val = val.replace("'", '"')
+        res = json.loads(val)
+        return deserialize_json_like_string(res, depth=depth-1)
+    return(val)

@@ -55,7 +55,7 @@ from arches.app.utils.file_validator import FileValidator
 from arches.app.utils.i18n import get_localized_value
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.permission_backend import user_is_resource_reviewer
-from arches.app.utils.string_utils import str_to_bool
+from arches.app.utils.string_utils import str_to_bool, deserialize_json_like_string
 
 # do not delete, used by module importer
 from .core import *
@@ -1396,7 +1396,7 @@ class FileListDataType(BaseDataType):
 
         # check if value is a string (csv) or a dictionay (a list of dictionaries)
         try:
-            value = ast.literal_eval(value)
+            value = deserialize_json_like_string(value)
         except (ValueError, SyntaxError):
             pass
 
