@@ -62,7 +62,7 @@ const emit = defineEmits([
     "reset",
 ]);
 
-const deepClone = function(obj: unknown) {
+const deepClone = function (obj: unknown) {
     return JSON.parse(JSON.stringify(obj));
 };
 
@@ -211,10 +211,7 @@ async function save() {
             resourceInstanceId,
         );
 
-        Object.assign(
-            aliasedData,
-            deepClone(updatedTileData.aliased_data),
-        );
+        Object.assign(aliasedData, deepClone(updatedTileData.aliased_data));
         Object.assign(
             originalAliasedData,
             deepClone(updatedTileData.aliased_data),
