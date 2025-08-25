@@ -17,7 +17,7 @@ from django.db import connection
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.decorators import load_data_async
 from arches.app.etl_modules.save import save_to_tiles
-from arches.app.models.models import ETLModule, Node
+from arches.app.models.models import ETLModule, Node, LoadEvent
 from arches.app.models.system_settings import settings
 from arches.app.utils.decorators import user_created_transaction_match
 from arches.app.utils.file_validator import FileValidator
@@ -209,7 +209,19 @@ class BaseImportModule:
     ):
         try:
             with connection.cursor() as cursor:
-                self.stage_files(files, summary, cursor)
+                try:
+                    self.stage_files(files, summary, cursor)
+                except Exception as e:
+                    load_event = LoadEvent.objects.get(loadid=loadid)
+                    load_event.status = "failed"
+                    load_event.successful = False
+                    load_event.complete = True
+                    load_event.load_end_time = datetime.now()
+                    load_event.error_message = _(
+                        "Unable to parse file. If including extra .xlsx files in a zip file, be sure they are in an 'attachments' directory"
+                    )
+                    load_event.save()
+                    raise FileValidationError
                 self.check_tile_cardinality(cursor)
                 result["validation"] = self.validate(loadid)
                 if len(result["validation"]["data"]) == 0:
@@ -324,7 +336,10 @@ class BaseImportModule:
             with zipfile.ZipFile(content, "r") as zip_ref:
                 files = zip_ref.infolist()
                 for file in files:
-                    if file.filename.split(".")[-1] == "xlsx":
+                    if (
+                        file.filename.split(".")[-1] == "xlsx"
+                        and ("attachments" + os.sep) not in file.filename
+                    ):
                         self.cumulative_files_size += file.file_size
                     if not file.filename.startswith("__MACOSX"):
                         if not file.is_dir():
@@ -334,10 +349,11 @@ class BaseImportModule:
                             result["summary"][
                                 "cumulative_files_size"
                             ] = self.cumulative_files_size
-                        default_storage.save(
-                            os.path.join(self.temp_dir, file.filename),
-                            File(zip_ref.open(file)),
-                        )
+
+                            default_storage.save(
+                                os.path.join(self.temp_dir, file.filename),
+                                File(zip_ref.open(file)),
+                            )
         elif content.name.split(".")[-1] == "xlsx":
             self.cumulative_files_size += content.size
             result["summary"]["files"][content.name] = {
@@ -351,7 +367,7 @@ class BaseImportModule:
 
         has_valid_excel_file = False
         for file in result["summary"]["files"]:
-            if file.split(".")[-1] == "xlsx":
+            if file.split(".")[-1] == "xlsx" and ("attachments" + os.sep) not in file:
                 try:
                     uploaded_file_path = os.path.join(self.temp_dir, file)
                     opened_file = default_storage.open(uploaded_file_path)

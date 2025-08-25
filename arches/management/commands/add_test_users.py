@@ -85,6 +85,8 @@ class Command(BaseCommand):
         except Exception as e:
             print(e)
 
+        plugins = models.Plugin.objects.all()
+        etl_modules = models.ETLModule.objects.all()
         for profile in profiles:
             try:
                 user = User.objects.create_user(
@@ -96,13 +98,11 @@ class Command(BaseCommand):
                     user.is_staff = True
                     user.first_name = "Dev"
                     user.last_name = "User"
-                    plugins = models.Plugin.objects.all()
                     for plugin in plugins:
                         assign_perm("change_plugin", user, plugin)
                         assign_perm("add_plugin", user, plugin)
                         assign_perm("delete_plugin", user, plugin)
                         assign_perm("view_plugin", user, plugin)
-                    etl_modules = models.ETLModule.objects.all()
                     for etl_module in etl_modules:
                         assign_perm("view_etlmodule", user, etl_module)
                 user.save()

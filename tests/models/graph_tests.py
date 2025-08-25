@@ -2930,3 +2930,44 @@ class DraftGraphTests(ArchesTestCase):
         self._compare_serialized_updated_source_graph_and_serialized_draft_graph(
             serialized_updated_source_graph, serialized_draft_graph
         )
+
+    def test_get_functions_x_graphs(self):
+        """
+        Test that an invalid function_x_graph property in a published graph returns valid function_x_graph objects
+
+        """
+
+        graph = Graph.objects.create_graph(name="TEST RESOURCE")
+        graph.delete_draft_graph()
+
+        graph.append_branch(
+            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
+            graphid=self.NODE_NODETYPE_GRAPHID,
+        )
+
+        node_dict = {}
+        for key, value in graph.nodes.items():
+            node_dict[str(key)] = str(value.nodeid)
+
+        graph.add_function_x_graph(
+            {
+                "id": str(uuid.uuid4()),
+                "function_id": "60000000-0000-0000-0000-000000000001",
+                "graph_id": graph.graphid,
+                "config": {"test": node_dict},
+            }
+        )
+
+        graph.save()
+        graph.publish()
+        graph.publication_id
+        functions_x_graphs_1 = graph.get_functions_x_graphs()
+
+        # save invalid functions_x_graphs value to publication's serialized graph
+        publication = graph.publication.publishedgraph_set.get(language_id="en")
+        publication.serialized_graph["functions_x_graphs"] = [
+            "60000000-0000-0000-0000-000000000001",
+        ]
+        publication.save()
+        functions_x_graphs_2 = graph.get_functions_x_graphs()
+        self.assertEqual(functions_x_graphs_1, functions_x_graphs_2)

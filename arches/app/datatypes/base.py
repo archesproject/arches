@@ -75,14 +75,6 @@ class BaseDataType(object):
         """
         return value
 
-    def get_interchange_value(self, value, **kwargs):
-        """
-        Transforms values for use in api's that will provide data for programmatic use on the frontend.
-        The interchange value is a shape that is more useful on the frontend than the node value shape.
-        The return value can be more or less complex than the value passed in, depending on the datatype.
-        """
-        return value
-
     def update(self, tile, data, nodeid, action):
         """
         Updates the tile.data value of a given datatype and returns the updated
@@ -247,10 +239,7 @@ class BaseDataType(object):
         else:
             return data
 
-    def get_display_value(self, tile, node, **kwargs):
-        """
-        Returns a list of concept values for a given node
-        """
+    def get_display_value(self, tile, node, **kwargs) -> str:
         data = self.get_tile_data(tile)
 
         if data:
@@ -258,6 +247,7 @@ class BaseDataType(object):
 
             if display_value:
                 return str(display_value)
+        return ""  # TODO (arches_version): configure this with a setting in 8.1
 
     def get_search_terms(self, nodevalue, nodeid=None):
         """

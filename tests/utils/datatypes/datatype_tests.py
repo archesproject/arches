@@ -23,12 +23,15 @@ from django.conf import settings
 
 from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.models.graph import Graph
 from arches.app.models.models import (
+    DDataType,
     GraphModel,
     Language,
     Node,
     ResourceInstance,
     ResourceInstanceLifecycle,
+    TileModel,
 )
 from arches.app.models.tile import Tile
 from tests.base_test import ArchesTestCase
@@ -36,6 +39,35 @@ from tests.base_test import ArchesTestCase
 
 # these tests can be run from the command line via
 # python manage.py test tests.utils.datatypes.datatype_tests --settings="tests.test_settings"
+
+
+class AllDataTypeTests(ArchesTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.factory = DataTypeFactory()
+        cls.graph = Graph.objects.create_graph(
+            name="AllDataTypeTests graph", is_resource=True
+        )
+        # Reuse this mock node for all datatypes.
+        cls.mock_node = Node.objects.create(
+            istopnode=True, graph=cls.graph, datatype="node-value"
+        )
+        # Add enough config properties to make all datatypes happy.
+        cls.mock_node.config = {"falseLabel": "False", "nodeid": str(cls.mock_node.pk)}
+        cls.mock_node.save()
+        cls.datatypes = DDataType.objects.exclude(pk="semantic").values_list(
+            "pk", flat=True
+        )
+
+    def test_as_json_handles_none(self):
+        mock_tile = TileModel(data={str(self.mock_node.pk): None}, provisionaledits={})
+        for datatype in self.datatypes:
+            instance = self.factory.get_instance(datatype)
+            with self.subTest(datatype=datatype):
+                self.assertEqual(
+                    instance.to_json(mock_tile, self.mock_node)["@display_value"],
+                    "",
+                )
 
 
 class BaseDataTypeTests(ArchesTestCase):
@@ -55,11 +87,6 @@ class BaseDataTypeTests(ArchesTestCase):
         )
 
         self.assertEqual(base.get_tile_data(tile_holding_only_none), tile_data)
-
-    def test_get_interchange_value(self):
-        base = BaseDataType()
-        value = "test values should be the same"
-        self.assertEqual(base.get_interchange_value(value), value)
 
 
 class BooleanDataTypeTests(ArchesTestCase):

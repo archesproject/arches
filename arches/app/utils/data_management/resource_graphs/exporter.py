@@ -234,7 +234,7 @@ def get_graphs_for_export(graphids=None):
                 JSONSerializer().serialize(
                     ResourceInstanceLifecycle.objects.get(
                         pk=resource_instance_lifecycle_id
-                    )
+                    ).serialize(use_raw_i18n_json=True)
                 )
             )
 

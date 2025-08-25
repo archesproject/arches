@@ -121,6 +121,44 @@ class GraphSettingsView(GraphBaseView):
         graph = Graph.objects.filter(graphid=graphid).select_for_update().get()
         data = JSONDeserializer().deserialize(request.body)
 
+        # update nodegroups
+        nodegroup_ids_to_serialized_nodegroups = {}
+        for serialized_nodegroup in data["graph"]["nodegroups"]:
+            nodegroup_ids_to_serialized_nodegroups[
+                serialized_nodegroup["nodegroupid"]
+            ] = serialized_nodegroup
+
+        for nodegroup in models.NodeGroup.objects.filter(
+            nodegroupid__in=nodegroup_ids_to_serialized_nodegroups.keys()
+        ):
+            nodegroup.cardinality = nodegroup_ids_to_serialized_nodegroups[
+                str(nodegroup.nodegroupid)
+            ]["cardinality"]
+            nodegroup.save()
+
+        # refresh the graph to ensure nodegroup changes are reflected
+        graph.refresh_from_database()
+
+        # update root node
+        root_node = models.Node.objects.get(graph_id=graphid, istopnode=True)
+        root_node.set_relatable_resources(data.get("relatable_resource_ids"))
+        try:
+            root_node.datatype = data["graph"]["root"]["datatype"]
+        except KeyError as e:
+            print(e, "Cannot find root node datatype")
+        root_node.ontologyclass = (
+            data.get("ontology_class")
+            if data.get("graph").get("ontology_id") is not None
+            else None
+        )
+        root_node.name = data["graph"]["root"]["name"]
+
+        if graph.isresource is False and "root" in data["graph"]:
+            root_node.config = data["graph"]["root"]["config"]
+
+        root_node.save()
+
+        # update graph metadata
         data_keys = [
             "iconclass",
             "name",
@@ -142,54 +180,21 @@ class GraphSettingsView(GraphBaseView):
             if key in data_keys:
                 setattr(graph, key, value)
 
-        node = models.Node.objects.get(graph_id=graphid, istopnode=True)
-        node.set_relatable_resources(data.get("relatable_resource_ids"))
-        try:
-            node.datatype = data["graph"]["root"]["datatype"]
-        except KeyError as e:
-            print(e, "Cannot find root node datatype")
-        node.ontologyclass = (
-            data.get("ontology_class")
-            if data.get("graph").get("ontology_id") is not None
-            else None
-        )
-        node.name = graph.name
-        graph.root.name = node.name
-
-        if node.ontologyclass:
-            graph.root.ontologyclass = node.ontologyclass
-
-        if graph.isresource is False and "root" in data["graph"]:
-            node.config = data["graph"]["root"]["config"]
-
-        nodegroup_ids_to_serialized_nodegroups = {}
-        for serialized_nodegroup in data["graph"]["nodegroups"]:
-            nodegroup_ids_to_serialized_nodegroups[
-                serialized_nodegroup["nodegroupid"]
-            ] = serialized_nodegroup
-
-        for nodegroup in models.NodeGroup.objects.filter(
-            nodegroupid__in=nodegroup_ids_to_serialized_nodegroups.keys()
-        ):
-            nodegroup.cardinality = nodegroup_ids_to_serialized_nodegroups[
-                str(nodegroup.nodegroupid)
-            ]["cardinality"]
-            nodegroup.save()
-            node.save()
+        graph.root.name = root_node.name
+        if root_node.ontologyclass:
+            graph.root.ontologyclass = root_node.ontologyclass
 
         try:
             graph.save()
         except GraphValidationError as e:
             return JSONErrorResponse(e.title, e.message)
 
-        graph.refresh_from_database()
-
         return JSONResponse(
             {
                 "success": True,
                 "graph": graph,
                 "relatable_resource_ids": [
-                    res.nodeid for res in node.get_relatable_resources()
+                    res.nodeid for res in root_node.get_relatable_resources()
                 ],
             }
         )

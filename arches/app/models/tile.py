@@ -443,6 +443,7 @@ class Tile(models.TileModel):
         resource_creation = kwargs.pop("resource_creation", False)
         note = "resource creation" if resource_creation else None
         context = kwargs.pop("context", None)
+        resource = kwargs.pop("resource", None)
         transaction_id = kwargs.pop("transaction_id", None)
         provisional_edit_log_details = kwargs.pop("provisional_edit_log_details", None)
         creating_new_tile = True
@@ -549,9 +550,10 @@ class Tile(models.TileModel):
                     **kwargs,
                 )
 
-            resource = Resource.objects.select_related("graph__publication").get(
-                pk=self.resourceinstance_id
-            )
+            if resource is None:
+                resource = Resource.objects.select_related("graph__publication").get(
+                    pk=self.resourceinstance_id
+                )
             resource.save_descriptors(context={"tile": self})
 
             if index:

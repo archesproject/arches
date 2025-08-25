@@ -256,8 +256,7 @@ export default ko.components.register(componentName, {
                         if (result._source.points.length > 0) {
                             point = result._source.points[0].point;
                         }
-
-                        const thumbnailUrl = `/thumbnail/${result._source.resourceinstanceid}`;
+                        const thumbnailUrl = arches.urls.thumbnail(result._source.resourceinstanceid);
                         const thumbnailResponse =
                             arches.searchThumbnails == "True"
                                 ? await fetch(thumbnailUrl, {

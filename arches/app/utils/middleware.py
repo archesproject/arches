@@ -19,7 +19,11 @@ class SetAnonymousUser(MiddlewareMixin):
         # used for all OAuth resourse requests
         if request.path != reverse("oauth2:authorize") and request.user.is_anonymous:
             try:
-                request.user = User.objects.get(username="anonymous")
+                request.user = (
+                    User.objects.filter(username="anonymous")
+                    .select_related("userprofile")
+                    .get()
+                )
             except Exception:
                 pass
 

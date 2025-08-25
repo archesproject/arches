@@ -122,3 +122,8 @@ if DOCKER:
         from arches.settings_docker import *
     except ImportError:
         pass
+
+
+# Tests shouldn't depend on celery running, so overwrite after settings_local import
+# This is enough to fool check_if_celery_available()
+CELERY_BROKER_URL = ""

@@ -9,7 +9,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "12009_language_single_default_language"),
+        ("models", "12343_generate_geom_feature_id"),
     ]
 
     operations = [
