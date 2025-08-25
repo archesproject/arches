@@ -62,14 +62,18 @@ const emit = defineEmits([
     "reset",
 ]);
 
+const deepClone = function(obj: unknown) {
+    return JSON.parse(JSON.stringify(obj));
+};
+
 const genericWidgetRefs = useTemplateRef("genericWidget");
 
 const formKey = ref(0);
 const isSaving = ref(false);
 const saveError = ref<Error>();
 
-const originalAliasedData = structuredClone(tileData?.aliased_data || {});
-const aliasedData = reactive(structuredClone(tileData?.aliased_data || {}));
+const originalAliasedData = deepClone(tileData?.aliased_data || {});
+const aliasedData = reactive(deepClone(tileData?.aliased_data || {}));
 
 const areButtonsDisabled = computed(() => {
     return Object.values(widgetDirtyStates).every((dirty) => !dirty);
@@ -174,7 +178,7 @@ function onUpdateWidgetValue(nodeAlias: string, value: AliasedNodeData) {
 function resetForm() {
     resetWidgetDirtyStates();
 
-    const originalAliasedDataClone = structuredClone(originalAliasedData);
+    const originalAliasedDataClone = deepClone(originalAliasedData);
 
     Object.assign(aliasedData, originalAliasedDataClone);
     formKey.value += 1;
@@ -209,11 +213,11 @@ async function save() {
 
         Object.assign(
             aliasedData,
-            structuredClone(updatedTileData.aliased_data),
+            deepClone(updatedTileData.aliased_data),
         );
         Object.assign(
             originalAliasedData,
-            structuredClone(updatedTileData.aliased_data),
+            deepClone(updatedTileData.aliased_data),
         );
 
         resetWidgetDirtyStates();
