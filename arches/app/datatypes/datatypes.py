@@ -1217,23 +1217,34 @@ class FileListDataType(BaseDataType):
             tile.data[nodeid] = None
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
+        def add_to_document(f, provisional):
+            metadata_fields = ["title", "description", "altText", "attribution"]
+            val = {
+                "string": f["name"],
+                "nodegroup_id": tile.nodegroup_id,
+                "provisional": provisional,
+            }
+            document["strings"].append(val)
+            for field in metadata_fields:
+                if field in f:
+                    print(field, f)
+                    for lang in f[field].keys():
+                        if f[field][lang]["value"]:
+                            document["strings"].append(
+                                {
+                                    "string": f[field][lang]["value"],
+                                    "language": lang,
+                                    "nodegroup_id": tile.nodegroup_id,
+                                    "provisional": provisional,
+                                }
+                            )
         try:
             for f in tile.data[str(nodeid)]:
-                val = {
-                    "string": f["name"],
-                    "nodegroup_id": tile.nodegroup_id,
-                    "provisional": provisional,
-                }
-                document["strings"].append(val)
+                add_to_document(f, provisional=provisional)
         except (KeyError, TypeError):
-            for k, pe in tile.provisionaledits.items():
+            for pe in tile.provisionaledits.values():
                 for f in pe["value"][nodeid]:
-                    val = {
-                        "string": f["name"],
-                        "nodegroup_id": tile.nodegroup_id,
-                        "provisional": provisional,
-                    }
-                    document["strings"].append(val)
+                    add_to_document(f, provisional=provisional)
 
     def append_search_filters(self, value, node, query, request):
         try:
