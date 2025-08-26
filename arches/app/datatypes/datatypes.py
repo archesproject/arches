@@ -1238,6 +1238,7 @@ class FileListDataType(BaseDataType):
                                     "provisional": provisional,
                                 }
                             )
+
         try:
             for f in tile.data[str(nodeid)]:
                 add_to_document(f, provisional=provisional)

@@ -22,9 +22,11 @@ def get_str_kwarg_as_bool(
 
 
 def deserialize_json_like_string(val, depth=2):
-    if isinstance(val, str) and depth>=0:
-        if val.replace(" ","").startswith("{'") or val.replace(" ","").startswith("[{'"):
+    if isinstance(val, str) and depth >= 0:
+        if val.replace(" ", "").startswith("{'") or val.replace(" ", "").startswith(
+            "[{'"
+        ):
             val = val.replace("'", '"')
         res = json.loads(val)
-        return deserialize_json_like_string(res, depth=depth-1)
-    return(val)
+        return deserialize_json_like_string(res, depth=depth - 1)
+    return val
