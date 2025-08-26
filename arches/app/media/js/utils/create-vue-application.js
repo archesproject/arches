@@ -7,7 +7,7 @@ import StyleClass from 'primevue/styleclass';
 import ToastService from 'primevue/toastservice';
 import Tooltip from 'primevue/tooltip';
 
-import Aura from '@primevue/themes/aura';
+import Aura from '@primeuix/themes/aura';
 
 import { createApp } from 'vue';
 import { createGettext } from "vue3-gettext";
