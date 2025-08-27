@@ -554,9 +554,16 @@ class TileTreeOperation:
         """
         error_names = [name.strip() for name in error.message.split(":")[1].split(", ")]
         aliases = []
+
+        from arches_querysets.models import TileTree
+
+        if isinstance(self.entry, TileTree):
+            nodes = self.entry.resourceinstance.graph.node_set.all()
+        else:
+            nodes = self.entry.graph.node_set.all()
         for widget_label_or_node_name in error_names:
             widget = CardXNodeXWidget.objects.filter(
-                node__in=self.entry._graph_nodes,
+                node__in=nodes,
                 # Awkward due to I18n_JSON
                 label__contains={get_language(): widget_label_or_node_name},
             ).first()
@@ -564,7 +571,7 @@ class TileTreeOperation:
                 node = widget.node
             else:
                 node = Node.objects.filter(
-                    pk__in=self.entry._graph_nodes,
+                    pk__in=nodes,
                     name=widget_label_or_node_name,
                 ).first()
             if node:
