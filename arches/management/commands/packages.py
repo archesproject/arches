@@ -784,6 +784,22 @@ class Command(BaseCommand):
                 print(e)
                 print("Failed to load sql files")
 
+        @transaction.atomic
+        def load_users(package_dir, users_directory):
+            user_files = sorted(
+                glob.glob(os.path.join(package_dir, users_directory, "*.csv"))
+            )
+            try:
+                with connection.cursor() as cursor:
+                    for user_file in user_files:
+                        management.call_command(
+                            "add_users", operation="csv_users", source=user_file
+                        )
+                        self.stdout.write("  %s" % user_file)
+            except Exception as e:
+                self.stdout.write(e)
+                self.stdout.write("Failed to load user files")
+
         def load_resource_views(package_dir):
             resource_views = sorted(
                 glob.glob(
@@ -1295,6 +1311,8 @@ class Command(BaseCommand):
         self.update_resource_geojson_geometries()
         print("loading post sql")
         load_sql(package_location, "post_sql")
+        print("loading users")
+        load_users(package_location, "users")
         print("loading templates")
         load_templates(package_location)
         if defer_indexing is True:

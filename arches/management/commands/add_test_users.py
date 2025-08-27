@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from django.core.management.base import BaseCommand
+from django.core import management
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
@@ -34,85 +35,4 @@ class Command(BaseCommand):
         parser.add_argument("operation", nargs="?")
 
     def handle(self, *args, **options):
-        self.add_users()
-
-    def add_users(self):
-        profiles = (
-            {
-                "name": "tester1",
-                "email": "tester1@test.com",
-                "password": "Test12345!",
-                "groups": ["Graph Editor", "Resource Editor"],
-            },
-            {
-                "name": "tester2",
-                "email": "tester2@test.com",
-                "password": "Test12345!",
-                "groups": ["Graph Editor", "Resource Editor"],
-            },
-            {
-                "name": "tester3",
-                "email": "tester3@test.com",
-                "password": "Test12345!",
-                "groups": ["Graph Editor", "Resource Editor"],
-            },
-            {
-                "name": "dev",
-                "email": "dev@test.com",
-                "password": "dev",
-                "groups": [
-                    "Graph Editor",
-                    "Resource Editor",
-                    "Resource Exporter",
-                    "Resource Reviewer",
-                    "Application Administrator",
-                    "Crowdsource Editor",
-                    "Guest",
-                    "RDM Administrator",
-                    "Resource Reviewer",
-                    "System Administrator",
-                    "Developer",
-                ],
-            },
-        )
-
-        try:
-            dev_group = Group.objects.create(name="Developer")
-            dev_perms = Permission.objects.all().values("id")
-            perm_ids = [int(perm["id"]) for perm in dev_perms]
-            for permission in perm_ids:
-                dev_group.permissions.add(permission)
-        except Exception as e:
-            print(e)
-
-        plugins = models.Plugin.objects.all()
-        etl_modules = models.ETLModule.objects.all()
-        for profile in profiles:
-            try:
-                user = User.objects.create_user(
-                    username=profile["name"],
-                    email=profile["email"],
-                    password=profile["password"],
-                )
-                if user.username == "dev":
-                    user.is_staff = True
-                    user.first_name = "Dev"
-                    user.last_name = "User"
-                    for plugin in plugins:
-                        assign_perm("change_plugin", user, plugin)
-                        assign_perm("add_plugin", user, plugin)
-                        assign_perm("delete_plugin", user, plugin)
-                        assign_perm("view_plugin", user, plugin)
-                    for etl_module in etl_modules:
-                        assign_perm("view_etlmodule", user, etl_module)
-                user.save()
-                print(
-                    f"Added test user: {user.username}, password: {profile['password']}"
-                )
-
-                for group_name in profile["groups"]:
-                    group = Group.objects.get(name=group_name)
-                    group.user_set.add(user)
-
-            except Exception as e:
-                print(e)
+        management.call_command("add_users", power_user=True)
