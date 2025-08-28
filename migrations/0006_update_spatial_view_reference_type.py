@@ -17,12 +17,12 @@ class Migration(migrations.Migration):
         AS $BODY$
             DECLARE
                 reference_label     TEXT;
-                preferred_label TEXT := '';
+                preferred_label     TEXT := '';
                 reference_data      JSONB;
                 reference           JSONB;
             BEGIN
                 IF nodevalue IS NULL THEN
-                    RAISE NOTICE '%', reference_label;
+                    RETURN '';
                 END IF;
 
                 FOREACH reference_data IN ARRAY ARRAY(SELECT jsonb_array_elements(nodevalue)) LOOP
