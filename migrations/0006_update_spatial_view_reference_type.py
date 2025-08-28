@@ -42,8 +42,7 @@ class Migration(migrations.Migration):
                         WHEN v.languageid = normalized_lang_id THEN 10
                         WHEN v.languageid = base_lang_id THEN 5
                         ELSE 2
-                    END
-                    ) DESC
+                    END) DESC
                 LIMIT 1;
                 IF preferred_label IS NULL THEN
                     preferred_label := '';
