@@ -2277,16 +2277,22 @@ class ResourceInstanceDataType(BaseDataType):
                     }
                 )
             else:
-                document["strings"].append(
-                    {
-                        "string": Resource.objects.get(
-                            pk=relatedResourceItem["resourceId"]
-                        ).displayname(),
-                        "nodegroup_id": tile.nodegroup_id,
-                        "nodeid": nodeid,
-                        "provisional": provisional,
-                    }
-                )
+                try:
+                    document["strings"].append(
+                        {
+                            "string": Resource.objects.get(
+                                pk=relatedResourceItem["resourceId"]
+                            ).displayname(),
+                            "nodegroup_id": tile.nodegroup_id,
+                            "nodeid": nodeid,
+                            "provisional": provisional,
+                        }
+                    )
+                except Resource.DoesNotExist as e:
+                    logger.error(
+                        f"Resource with id {relatedResourceItem['resourceId']} not found"
+                    )
+                    # raise e
             for ontology_property_item in [
                 relatedResourceItem.get("ontologyProperty", ""),
                 relatedResourceItem.get("inverseOntologyProperty", ""),
