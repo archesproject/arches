@@ -17,6 +17,7 @@ from mimetypes import MimeTypes
 
 from django.core.files.images import get_image_dimensions
 from django.db.models import fields
+from django.contrib.auth.models import User
 
 from arches.app.const import ExtensionType
 from arches.app.datatypes.base import BaseDataType
@@ -1317,14 +1318,15 @@ class FileListDataType(BaseDataType):
         if data:
             return self.compile_json(tile, node, file_details=data[str(node.nodeid)])
 
-    def post_tile_save(self, tile, nodeid, request):
-        if request is not None:
+    def post_tile_save(self, tile, nodeid, request, **kwargs):
+        userid = kwargs.pop("userid", None)
+        if request is not None or userid is not None:
             # this does not get called when saving data from the mobile app
             previously_saved_tile = models.TileModel.objects.filter(pk=tile.tileid)
-            user = request.user
-            if hasattr(request.user, "userprofile") is not True:
-                models.UserProfile.objects.create(user=request.user)
-            user_is_reviewer = user_is_resource_reviewer(request.user)
+            user = request.user if request else User.objects.get(pk=userid)
+            if hasattr(user, "userprofile") is not True:
+                models.UserProfile.objects.create(user=user)
+            user_is_reviewer = user_is_resource_reviewer(user)
             current_tile_data = self.get_tile_data(tile)
             if previously_saved_tile.count() == 1:
                 previously_saved_tile_data = self.get_tile_data(
