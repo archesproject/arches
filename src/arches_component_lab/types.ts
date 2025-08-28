@@ -50,6 +50,12 @@ export interface StringCardXNodeXWidgetData extends CardXNodeXWidgetData {
     };
 }
 
+export interface ConceptRadioCardXNodeXWidgetData extends CardXNodeXWidgetData {
+    config: CardXNodeXWidgetData["config"] & {
+        groupDirection: string | null;
+    };
+}
+
 export interface Language {
     code: string;
     default_direction: "ltr" | "rtl";

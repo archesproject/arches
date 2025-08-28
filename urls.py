@@ -7,6 +7,7 @@ from arches_component_lab.views.api.card_x_node_x_widget import (
     CardXNodeXWidgetView,
     CardXNodeXWidgetListFromNodegroupView,
 )
+from arches_component_lab.views.api.concept import ConceptsTreeView
 
 from arches_querysets.rest_framework.generic_views import (
     ArchesTileBlankView,
@@ -36,6 +37,11 @@ urlpatterns = [
         "api/card-x-node-x-widget-list-from-nodegroup/<slug:graph_slug>/<slug:nodegroup_alias>",
         CardXNodeXWidgetListFromNodegroupView.as_view(),
         name="api-card-x-node-x-widget-list-from-nodegroup",
+    ),
+    path(
+        "api/concepts/<slug:graph_slug>/<slug:node_alias>",
+        ConceptsTreeView.as_view(),
+        name="api-concepts-tree",
     ),
     path(
         "api/tile/<slug:graph>/<slug:nodegroup_alias>/blank",
