@@ -8,12 +8,56 @@ class Migration(migrations.Migration):
     ]
 
     forward_sql = """
+        CREATE OR REPLACE FUNCTION __arches_get_preferred_label(
+            item_id UUID,
+            language_id TEXT DEFAULT 'en'
+        )
+        RETURNS TEXT
+        LANGUAGE 'plpgsql'
+        AS $BODY$
+            DECLARE
+                preferred_label     TEXT := '';
+                normalized_lang_id  TEXT;
+                base_lang_id        TEXT;
+            BEGIN
+                IF item_id IS NULL THEN
+                    RETURN preferred_label;
+                END IF;
+
+                normalized_lang_id := replace(language_id, '_', '-');
+                base_lang_id := split_part(normalized_lang_id, '-', 1);
+
+                SELECT v.value
+                INTO preferred_label
+                FROM  arches_controlled_lists_listitemvalue v
+                JOIN arches_controlled_lists_listitem i ON v.list_item_id = i.id
+                WHERE i.id = item_id
+                ORDER BY
+                    (CASE
+                        WHEN v.valuetype_id = 'prefLabel' THEN 10
+                        WHEN v.valuetype_id = 'altLabel' THEN 4
+                        ELSE 1
+                    END) *
+                    (CASE
+                        WHEN v.languageid = normalized_lang_id THEN 10
+                        WHEN v.languageid = base_lang_id THEN 5
+                        ELSE 2
+                    END
+                    ) DESC
+                LIMIT 1;
+                IF preferred_label IS NULL THEN
+                    preferred_label := '';
+                END IF;
+                RETURN preferred_label;
+            END;
+        $BODY$;
+
         CREATE OR REPLACE FUNCTION __arches_get_reference_label(
             nodevalue JSONB,
-            language_id TEXT
+            language_id TEXT DEFAULT 'en'
         )
-            RETURNS TEXT
-            LANGUAGE 'plpgsql'
+        RETURNS TEXT
+        LANGUAGE 'plpgsql'
         AS $BODY$
             DECLARE
                 reference_label     TEXT;
@@ -24,18 +68,8 @@ class Migration(migrations.Migration):
                 IF nodevalue IS NULL THEN
                     RETURN '';
                 END IF;
-
                 FOREACH reference_data IN ARRAY ARRAY(SELECT jsonb_array_elements(nodevalue)) LOOP
-                    preferred_label := '';
-                    FOREACH reference IN ARRAY ARRAY(SELECT jsonb_array_elements(reference_data -> 'labels')) LOOP
-                        IF (reference ->> 'language_id') = language_id AND (reference ->> 'valuetype_id') = 'prefLabel' THEN
-                            preferred_label = reference ->> 'value';
-                        END IF;
-                        EXIT WHEN preferred_label <> '';
-                    END LOOP;
-                    IF preferred_label = '' THEN
-                        preferred_label := reference_data -> 'labels' -> 0 ->> 'value';
-                    END IF;
+                    preferred_label = __arches_get_preferred_label((reference_data -> 'labels' -> 0 ->> 'list_item_id')::UUID, language_id);
                     reference_label := CONCAT_WS(', ', reference_label, preferred_label);
                 END LOOP;                    
                 RETURN reference_label;
@@ -46,10 +80,8 @@ class Migration(migrations.Migration):
             in_tiledata JSONb,
             in_nodeid UUID,
             language_id TEXT DEFAULT 'en')
-            RETURNS TEXT
-            LANGUAGE 'plpgsql'
-            COST 100
-            VOLATILE PARALLEL UNSAFE
+        RETURNS TEXT
+        LANGUAGE 'plpgsql'
         AS $BODY$
             DECLARE
                 display_value   TEXT := '';
@@ -178,6 +210,7 @@ class Migration(migrations.Migration):
         $BODY$;
 
         DROP FUNCTION IF EXISTS __arches_get_reference_label(JSONB, TEXT);
+        DROP FUNCTION IF EXISTS __arches_get_preferred_label(UUID, TEXT);
     """
 
     operations = [
