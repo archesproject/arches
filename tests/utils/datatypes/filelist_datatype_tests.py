@@ -1,12 +1,12 @@
 from django.utils.translation import get_language
 from arches.app.datatypes.datatypes import DataTypeFactory
-from tests.base_test import ArchesTestCase
+from django.test import TestCase
 
 # these tests can be run from the command line via
 # python manage.py test tests.utils.datatypes.filelist_datatype_tests --settings="tests.test_settings"
 
 
-class FileListDataTypeTests(ArchesTestCase):
+class FileListDataTypeTests(TestCase):
 
     def test_tile_transform(self):
         value1 = "testfile1.png,testfile2.png"
@@ -21,10 +21,10 @@ class FileListDataTypeTests(ArchesTestCase):
             },
             {
                 "name": "testfile4.png",
-                "altText": "Test File 4",
-                "attribution": "archesproject",
-                "description": "A File for Testing",
-                "title": "Test File 4",
+                "altText": {"en": {"value": "Test File 4", "direction": "ltr"}},
+                "attribution": {"en": {"value": "archesproject", "direction": "ltr"}},
+                "description": {"en": {"value": "A File for Testing", "direction": "ltr"}},
+                "title": {"en": {"value": "Test File 4", "direction": "ltr"}},
             },
         ]
 

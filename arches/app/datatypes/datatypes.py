@@ -1227,7 +1227,6 @@ class FileListDataType(BaseDataType):
             document["strings"].append(val)
             for field in metadata_fields:
                 if field in f:
-                    print(field, f)
                     for lang in f[field].keys():
                         if f[field][lang]["value"]:
                             document["strings"].append(
