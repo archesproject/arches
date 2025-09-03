@@ -61,7 +61,7 @@ class Migration(migrations.Migration):
             DECLARE
 				labels_jsonb jsonb := '[]'::jsonb;
 			BEGIN
-                IF nodevalue IS NULL THEN
+                IF jsonb_typeof(nodevalue) != 'array' THEN
                     RETURN labels_jsonb;
                 END IF;
 				
