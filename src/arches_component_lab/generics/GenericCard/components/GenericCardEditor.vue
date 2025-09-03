@@ -41,7 +41,6 @@ const {
     selectedNodeAlias,
     shouldShowFormButtons = true,
     tileData,
-    widgetDirtyStates = {},
 } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData[];
     graphSlug: string;
@@ -51,7 +50,6 @@ const {
     selectedNodeAlias?: string | null;
     shouldShowFormButtons: boolean | undefined;
     tileData?: AliasedTileData;
-    widgetDirtyStates?: Record<string, boolean>;
 }>();
 
 const emit = defineEmits([
@@ -76,19 +74,13 @@ const originalAliasedData = deepClone(tileData?.aliased_data || {});
 const aliasedData = reactive(deepClone(tileData?.aliased_data || {}));
 
 const areButtonsDisabled = computed(() => {
-    return Object.values(widgetDirtyStates).every((dirty) => !dirty);
+    return Object.values(localWidgetDirtyStates).every((dirty) => !dirty);
 });
 
 const localWidgetDirtyStates = reactive(
     cardXNodeXWidgetData.reduce<Record<string, boolean>>(
         (dirtyStatesMap, widgetDatum) => {
-            if (widgetDirtyStates) {
-                dirtyStatesMap[widgetDatum.node.alias] =
-                    widgetDirtyStates[widgetDatum.node.alias] || false;
-            } else {
-                dirtyStatesMap[widgetDatum.node.alias] = false;
-            }
-
+            dirtyStatesMap[widgetDatum.node.alias] = false;
             return dirtyStatesMap;
         },
         {},

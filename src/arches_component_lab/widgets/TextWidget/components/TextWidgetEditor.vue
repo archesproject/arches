@@ -99,7 +99,7 @@ function onUpdateModelValue(updatedValue: string | undefined) {
             type="text"
             :fluid="true"
             :form-input="true"
-            :maxlength="cardXNodeXWidgetData.config.maxLength"
+            :maxlength="cardXNodeXWidgetData.config.maxLength ?? undefined"
             :model-value="singleInputValue"
             :placeholder="cardXNodeXWidgetData.config.placeholder"
             :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"

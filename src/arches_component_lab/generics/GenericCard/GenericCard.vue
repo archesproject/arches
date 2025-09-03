@@ -29,7 +29,6 @@ const {
     shouldShowFormButtons = true,
     tileData,
     tileId,
-    widgetDirtyStates,
 } = defineProps<{
     mode: WidgetMode;
     nodegroupAlias: string;
@@ -39,7 +38,6 @@ const {
     shouldShowFormButtons?: boolean;
     tileData?: AliasedTileData;
     tileId?: string | null;
-    widgetDirtyStates?: Record<string, boolean>;
 }>();
 
 const emit = defineEmits([
@@ -117,7 +115,6 @@ defineExpose({
                 v-if="mode === EDIT"
                 ref="defaultCardEditor"
                 v-model:tile-data="aliasedTileData"
-                :widget-dirty-states="widgetDirtyStates"
                 :card-x-node-x-widget-data="cardXNodeXWidgetData"
                 :graph-slug="graphSlug"
                 :mode="mode"

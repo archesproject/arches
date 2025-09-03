@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useTemplateRef, watchEffect, watch } from "vue";
+import { useTemplateRef, watchEffect } from "vue";
 
 import { FormField, type FormFieldResolverOptions } from "@primevue/forms";
 import Message from "primevue/message";
@@ -42,17 +42,6 @@ watchEffect(() => {
     }
 });
 
-watch(
-    () => aliasedNodeData,
-    (newValue, oldValue) => {
-        if (newValue !== oldValue) {
-            emit("update:value", newValue);
-            emit("update:isDirty", true);
-        }
-    },
-    { deep: true },
-);
-
 function markFormFieldAsDirty() {
     if (!formFieldRef.value) {
         return;
@@ -75,7 +64,14 @@ function validate(aliasedNodeData: AliasedNodeData) {
 }
 
 function onUpdateValue(updatedAliasedNodeData: AliasedNodeData) {
+    if (aliasedNodeData === updatedAliasedNodeData) {
+        return;
+    }
+
     formFieldRef.value?.field.props.onChange({ value: updatedAliasedNodeData });
+
+    emit("update:value", updatedAliasedNodeData);
+    emit("update:isDirty", true);
 }
 </script>
 

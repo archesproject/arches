@@ -69,9 +69,10 @@ const widgetComponent = computed(() => {
 
 const widgetValue = computed(() => {
     if (aliasedNodeData !== undefined) {
-        return aliasedNodeData;
+        return aliasedNodeData as AliasedNodeData;
     } else if (resolvedCardXNodeXWidgetData.value) {
-        return resolvedCardXNodeXWidgetData.value.config.defaultValue;
+        return resolvedCardXNodeXWidgetData.value.config
+            .defaultValue as AliasedNodeData;
     } else {
         return null;
     }
@@ -126,9 +127,11 @@ watchEffect(async () => {
             <GenericFormField
                 v-if="mode === EDIT"
                 v-slot="{ onUpdateValue }"
-                :aliased-node-data="widgetValue as AliasedNodeData"
+                :aliased-node-data="widgetValue!"
                 :is-dirty="isDirty"
                 :node-alias="nodeAlias"
+                @update:is-dirty="emit('update:isDirty', $event)"
+                @update:value="emit('update:value', $event)"
             >
                 <component
                     :is="widgetComponent"
