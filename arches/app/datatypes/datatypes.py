@@ -1478,15 +1478,14 @@ class FileListDataType(BaseDataType):
 
             if isinstance(file_info, dict):
                 for key in localized_metadata_keys:
+                    tile_file[key] = {}
                     val = file_info.get(key, "")
-                    if not isinstance(val, dict):
-                        tile_file[key] = {}
                     for lang in languages:
-                        if lang.code not in tile_file[key]:
-                            tile_file[key][lang.code] = {
-                                "value": val if lang.code == language else "",
-                                "direction": lang.default_direction,
-                            }
+                        metadata_value = val if isinstance(val, str) else val.get(lang.code, {}).get("value", "")
+                        tile_file[key][lang.code] = {
+                            "value": metadata_value,
+                            "direction": lang.default_direction,
+                        }
             tile_data.append(tile_file)
         return json.loads(json.dumps(tile_data))
 
