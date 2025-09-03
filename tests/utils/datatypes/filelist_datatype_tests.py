@@ -23,7 +23,9 @@ class FileListDataTypeTests(TestCase):
                 "name": "testfile4.png",
                 "altText": {"en": {"value": "Test File 4", "direction": "ltr"}},
                 "attribution": {"en": {"value": "archesproject", "direction": "ltr"}},
-                "description": {"en": {"value": "A File for Testing", "direction": "ltr"}},
+                "description": {
+                    "en": {"value": "A File for Testing", "direction": "ltr"}
+                },
                 "title": {"en": {"value": "Test File 4", "direction": "ltr"}},
             },
         ]

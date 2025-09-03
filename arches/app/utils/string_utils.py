@@ -24,7 +24,7 @@ def get_str_kwarg_as_bool(
 def deserialize_json_like_string(val, depth=2):
     """
     Takes string intended as JSON that cannot be deserialized to a dictionary by `json.loads`
-    and returns a dictionary. If a string uses single quotes around keys and values 
+    and returns a dictionary. If a string uses single quotes around keys and values
     e.g. "{'foo':'bar'}", these are converted to double quotes. If a string has escaped
     quotes e.g. "[{\\"foo\\":\\"bar\\"}]", these are recursively deserialized until `json.loads`
     returns a dictionary. This function serves as a more secure alternative to `ast.literal_eval`.

@@ -1481,7 +1481,11 @@ class FileListDataType(BaseDataType):
                     tile_file[key] = {}
                     val = file_info.get(key, "")
                     for lang in languages:
-                        metadata_value = val if isinstance(val, str) else val.get(lang.code, {}).get("value", "")
+                        metadata_value = (
+                            val
+                            if isinstance(val, str)
+                            else val.get(lang.code, {}).get("value", "")
+                        )
                         tile_file[key][lang.code] = {
                             "value": metadata_value,
                             "direction": lang.default_direction,
