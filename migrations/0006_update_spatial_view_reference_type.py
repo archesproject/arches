@@ -51,28 +51,32 @@ class Migration(migrations.Migration):
             END;
         $BODY$;
 
-        CREATE OR REPLACE FUNCTION __arches_get_reference_label(
+        CREATE OR REPLACE FUNCTION __arches_get_reference_label_list(
             nodevalue JSONB,
             language_id TEXT DEFAULT 'en'
         )
-        RETURNS TEXT
+        RETURNS JSONB
         LANGUAGE 'plpgsql'
         AS $BODY$
             DECLARE
-                reference_label     TEXT;
-                preferred_label     TEXT := '';
-                reference_data      JSONB;
-                reference           JSONB;
-            BEGIN
+				labels_jsonb jsonb := '[]'::jsonb;
+			BEGIN
                 IF nodevalue IS NULL THEN
-                    RETURN '';
+                    RETURN labels_jsonb;
                 END IF;
-                FOREACH reference_data IN ARRAY ARRAY(SELECT jsonb_array_elements(nodevalue)) LOOP
-                    preferred_label = __arches_get_preferred_label((reference_data -> 'labels' -> 0 ->> 'list_item_id')::UUID, language_id);
-                    reference_label := CONCAT_WS(', ', reference_label, preferred_label);
-                END LOOP;                    
-                RETURN reference_label;
-            END;                            
+				
+				SELECT COALESCE(jsonb_agg(label), '[]'::jsonb)
+	            INTO labels_jsonb
+	            FROM (
+	                SELECT __arches_get_preferred_label(
+					    (reference_data -> 'labels' -> 0 ->> 'list_item_id')::UUID,
+					    language_id
+					) AS label
+					FROM jsonb_array_elements(nodevalue) AS reference_data
+	            ) sub;
+	
+	            RETURN labels_jsonb;				
+            END;                             
         $BODY$;
 
         CREATE OR REPLACE FUNCTION public.__arches_get_node_display_value(
@@ -115,7 +119,7 @@ class Migration(migrations.Migration):
                     WHEN 'concept-list' THEN
                         display_value := __arches_get_concept_list_label(in_tiledata -> in_nodeid::TEXT);
                     WHEN 'reference' THEN
-                        display_value := __arches_get_reference_label(in_tiledata -> in_nodeid::TEXT, language_id);
+                        display_value := (select STRING_AGG(elem, ', ') FROM jsonb_array_elements_text(__arches_get_reference_label_list(in_tiledata -> in_nodeid::TEXT, language_id)) elem);
                     WHEN 'edtf' THEN
                         display_value := (in_tiledata ->> in_nodeid::TEXT);
                     WHEN 'file-list' THEN
@@ -208,7 +212,7 @@ class Migration(migrations.Migration):
             end;
         $BODY$;
 
-        DROP FUNCTION IF EXISTS __arches_get_reference_label(JSONB, TEXT);
+        DROP FUNCTION IF EXISTS __arches_get_reference_label_list(JSONB, TEXT);
         DROP FUNCTION IF EXISTS __arches_get_preferred_label(UUID, TEXT);
     """
 
