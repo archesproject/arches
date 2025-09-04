@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
     ]
 
     forward_sql = """
-        CREATE OR REPLACE FUNCTION __arches_get_preferred_label(
+        CREATE OR REPLACE FUNCTION __arches_controlled_lists_get_preferred_label(
             item_id UUID,
             language_id TEXT DEFAULT 'en'
         )
@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
             END;
         $BODY$;
 
-        CREATE OR REPLACE FUNCTION __arches_get_reference_label_list(
+        CREATE OR REPLACE FUNCTION __arches_controlled_lists_get_reference_label_list(
             nodevalue JSONB,
             language_id TEXT DEFAULT 'en'
         )
@@ -68,7 +68,7 @@ class Migration(migrations.Migration):
 				SELECT COALESCE(jsonb_agg(label), '[]'::jsonb)
 	            INTO labels_jsonb
 	            FROM (
-	                SELECT __arches_get_preferred_label(
+	                SELECT __arches_controlled_lists_get_preferred_label(
 					    (reference_data -> 'labels' -> 0 ->> 'list_item_id')::UUID,
 					    language_id
 					) AS label
@@ -119,7 +119,7 @@ class Migration(migrations.Migration):
                     WHEN 'concept-list' THEN
                         display_value := __arches_get_concept_list_label(in_tiledata -> in_nodeid::TEXT);
                     WHEN 'reference' THEN
-                        display_value := (select STRING_AGG(elem, ', ') FROM jsonb_array_elements_text(__arches_get_reference_label_list(in_tiledata -> in_nodeid::TEXT, language_id)) elem);
+                        display_value := (select STRING_AGG(elem, ', ') FROM jsonb_array_elements_text(__arches_controlled_lists_get_reference_label_list(in_tiledata -> in_nodeid::TEXT, language_id)) elem);
                     WHEN 'edtf' THEN
                         display_value := (in_tiledata ->> in_nodeid::TEXT);
                     WHEN 'file-list' THEN
@@ -212,8 +212,8 @@ class Migration(migrations.Migration):
             end;
         $BODY$;
 
-        DROP FUNCTION IF EXISTS __arches_get_reference_label_list(JSONB, TEXT);
-        DROP FUNCTION IF EXISTS __arches_get_preferred_label(UUID, TEXT);
+        DROP FUNCTION IF EXISTS __arches_controlled_lists_get_reference_label_list(JSONB, TEXT);
+        DROP FUNCTION IF EXISTS __arches_controlled_lists_get_preferred_label(UUID, TEXT);
     """
 
     operations = [
