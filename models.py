@@ -466,7 +466,7 @@ class ListItemValue(models.Model):
         null=True,
         blank=True,
     )
-    value = models.CharField(max_length=1024, null=False, blank=True)
+    value = models.TextField(null=False, blank=True)
 
     class Meta:
         constraints = [
