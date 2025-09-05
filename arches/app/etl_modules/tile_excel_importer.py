@@ -136,13 +136,16 @@ class TileExcelImporter(BaseImportModule):
                         ),
                     )
 
-                tile_value[nodeid] = {
-                    "value": value,
-                    "valid": valid,
-                    "source": source_value,
-                    "notes": error_message,
-                    "datatype": datatype,
-                }
+                if value is not None:
+                    tile_value[nodeid] = {
+                        "value": value,
+                        "valid": valid,
+                        "source": source_value,
+                        "notes": error_message,
+                        "datatype": datatype,
+                    }
+                else:
+                    tile_value[nodeid] = None
             except KeyError:
                 pass
 
