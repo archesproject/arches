@@ -23,4 +23,10 @@ sql_items = [
         reverse_sql="drop function __arches_get_json_data_for_view;",
         replace=True,
     ),
+    SQLItem(
+        "__arches_staging_to_tile",
+        format_file_into_sql("__arches_staging_to_tile.sql", "sql/functions"),
+        reverse_sql="drop function __arches_staging_to_tile;",
+        replace=True,
+    ),
 ]
