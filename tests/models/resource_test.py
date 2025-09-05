@@ -722,11 +722,13 @@ class ResourceTests(ArchesTestCase):
                 str(string_node.pk): {
                     "en": {"value": "test value", "direction": "ltr"},
                 },
-                str(resource_instance_node.pk): {
-                    "resourceId": str(resource.pk),
-                    "ontologyProperty": "",
-                    "inverseOntologyProperty": "",
-                },
+                str(resource_instance_node.pk): [
+                    {
+                        "resourceId": str(resource.pk),
+                        "ontologyProperty": "",
+                        "inverseOntologyProperty": "",
+                    }
+                ],
             },
             sortorder=0,
         )
