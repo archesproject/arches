@@ -14,7 +14,7 @@ requires-python = ">=3.11"
 description = "Arches is an open-source, web-based, geospatial information system for cultural heritage inventory and management."
 keywords = ["django", "arches", "cultural heritage"]
 classifiers = [
-    "Development Status :: 5 - Production/Stable",
+    "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Intended Audience :: Information Technology",
