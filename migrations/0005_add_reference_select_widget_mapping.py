@@ -27,6 +27,7 @@ def revert_reference_select_widget_mapping(apps, schema_editor):
 class Migration(migrations.Migration):
     dependencies = [
         ("arches_controlled_lists", "0004_reconfigure_listitem_sortorder_constraints"),
+        ("arches_component_lab", "0002_populate_widget_mappings"),
     ]
 
     operations = [
