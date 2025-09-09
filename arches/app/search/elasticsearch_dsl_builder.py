@@ -102,11 +102,14 @@ class Query(Dsl):
             return self.se.search(index=index, scroll=self.scroll, **self.dsl)
 
     def count(self, index="", **kwargs):
-        if (
-            not "minimum_should_match" in self.dsl["query"]["bool"]
-            and len(self.dsl["query"]["bool"]["should"]) > 0
-        ):
-            self.dsl["query"]["bool"]["minimum_should_match"] = 1
+        try:
+            if (
+                not "minimum_should_match" in self.dsl["query"]["bool"]
+                and len(self.dsl["query"]["bool"]["should"]) > 0
+            ):
+                self.dsl["query"]["bool"]["minimum_should_match"] = 1
+        except (KeyError, TypeError):
+            pass
         return self.se.count(index=index, **self.dsl)
 
     def delete(self, index="", **kwargs):
