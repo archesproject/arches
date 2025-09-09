@@ -98,7 +98,6 @@ function onUpdateModelValue(updatedValue: string | undefined) {
         <InputText
             type="text"
             :fluid="true"
-            :form-input="true"
             :maxlength="cardXNodeXWidgetData.config.maxLength ?? undefined"
             :model-value="singleInputValue"
             :placeholder="cardXNodeXWidgetData.config.placeholder"

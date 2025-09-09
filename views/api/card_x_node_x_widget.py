@@ -53,6 +53,13 @@ class CardXNodeXWidgetView(View):
             datatype_factory = DataTypeFactory()
             d_data_type = datatype_factory.datatypes[node.datatype]
             default_widget = d_data_type.defaultwidget
+
+            if default_widget is None:  # handle semantic nodes
+                return JSONErrorResponse(
+                    message=_("No widget is configured for this node."),
+                    status=404,
+                )
+
             card_x_node_x_widget = models.CardXNodeXWidget(
                 node=node,
                 card=node.nodegroup.cardmodel_set.first(),
