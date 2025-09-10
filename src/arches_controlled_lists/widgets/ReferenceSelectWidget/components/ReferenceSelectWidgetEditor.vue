@@ -101,22 +101,30 @@ function onUpdateModelValue(
     const details = [];
 
     for (const updatedListItemId of Object.keys(updatedValue)) {
-        const option = options.value?.find(
-            (option) => option.key === updatedListItemId,
-        );
+        const optionsQueue = [...(options.value || [])];
+        let selectedOption: ReferenceSelectTreeNode | undefined;
 
-        if (option) {
-            const listId = option.data.list_item_values.find(
-                (item) => item.list_item_id === updatedListItemId,
-            )?.id;
+        for (const option of optionsQueue) {
+            if (option.key === updatedListItemId) {
+                selectedOption = option;
+                break;
+            }
 
-            nodeValue.push({
-                list_id: listId!,
-                labels: option.data.list_item_values,
-                uri: option.data.uri,
-            });
-            details.push(option.data);
+            if (option.children) {
+                optionsQueue.push(...option.children);
+            }
         }
+
+        const listId = selectedOption?.data.list_item_values.find(
+            (item) => item.list_item_id === updatedListItemId,
+        )?.id;
+
+        nodeValue.push({
+            list_id: listId!,
+            labels: selectedOption!.data.list_item_values,
+            uri: selectedOption!.data.uri,
+        });
+        details.push(selectedOption!.data);
     }
 
     const displayValue = details.map((item) => item.display_value).join(", ");
