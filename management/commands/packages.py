@@ -7,7 +7,7 @@ from django.db import transaction
 from arches.management.commands.packages import Command as PackagesCommand
 from arches.app.models import models
 from arches_controlled_lists.models import List, ListItem, ListItemValue
-from arches_controlled_lists.utils.skos import SKOSReader
+from arches_controlled_lists.utils.skos import SKOSReader, SKOSWriter
 
 
 class Command(PackagesCommand):
@@ -25,8 +25,16 @@ class Command(PackagesCommand):
             "--file_name",
             type=str,
             dest="file_name",
-            default="export_controlled_lists.xlsx",
-            help="The name of the file to export to. Default is export_controlled_lists.xlsx",
+            default="export_controlled_lists",
+            help="The name of the file to export to. Default is export_controlled_lists",
+        )
+
+        parser.add_argument(
+            "-cl",
+            "--controlled_lists",
+            type=str,
+            dest="controlled_lists",
+            help="A comma-separated list of controlled list names to export. If not provided, all controlled lists will be exported.",
         )
 
     def handle(self, *args, **options):
@@ -36,7 +44,12 @@ class Command(PackagesCommand):
             self.import_controlled_lists(options["source"], options["overwrite"])
 
         if options["operation"] == "export_controlled_lists":
-            self.export_controlled_lists(options["dest_dir"], options["file_name"])
+            self.export_controlled_lists(
+                options["dest_dir"],
+                options["file_name"],
+                options["controlled_lists"],
+                options["format"],
+            )
 
     def import_controlled_lists(self, source, overwrite_options):
         if source.lower().endswith(".xml"):
@@ -154,21 +167,37 @@ class Command(PackagesCommand):
 
         return instance_pks
 
-    def export_controlled_lists(self, data_dest, file_name):
-        wb = openpyxl.Workbook()
-        ws = wb.active
-        ws.title = "List"
-        self.export_model_to_sheet(ws, List)
-        self.export_model_to_sheet(wb, ListItem)
-        self.export_model_to_sheet(wb, ListItemValue)
+    def export_controlled_lists(
+        self, data_dest, file_name, controlled_lists, format="pretty-xml"
+    ):
+        if format == "xlsx":
+            wb = openpyxl.Workbook()
+            ws = wb.active
+            ws.title = "List"
+            self.export_model_to_sheet(ws, List)
+            self.export_model_to_sheet(wb, ListItem)
+            self.export_model_to_sheet(wb, ListItemValue)
 
-        if data_dest != "" and data_dest != ".":
-            wb.save(os.path.join(data_dest, file_name))
-            self.stdout.write(f"Data exported successfully to {file_name}")
-        else:
-            self.stdout.write(
-                "No destination directory specified. Please rerun this command with the '-d' parameter populated."
-            )
+            if data_dest != "" and data_dest != ".":
+                wb.save(os.path.join(data_dest, file_name))
+                self.stdout.write(f"Data exported successfully to {file_name}")
+            else:
+                self.stdout.write(
+                    "No destination directory specified. Please rerun this command with the '-d' parameter populated."
+                )
+
+        elif format == "pretty-xml":
+            try:
+                parsed_lists = [lst.strip() for lst in controlled_lists.split(",")]
+            except:
+                parsed_lists = None
+            skos = SKOSWriter()
+            skos_file = skos.write_controlled_lists(parsed_lists, format=format)
+
+            if data_dest != "" and data_dest != ".":
+                with open(os.path.join(data_dest, f"{file_name}.xml"), "wb") as file:
+                    file.write(skos_file)
+                self.stdout.write(f"Data exported successfully to {file_name}.xml")
 
     def export_model_to_sheet(self, wb, model):
         # For the first sheet (List), use blank sheet that is initiallized with workbook

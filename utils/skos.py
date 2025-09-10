@@ -3,12 +3,13 @@ import re
 from collections import defaultdict
 from django.db.models import Q, prefetch_related_objects
 from django.db import transaction
-from rdflib import Namespace, RDF
+from rdflib import Literal, Namespace, RDF
 from rdflib.namespace import SKOS, DCTERMS
 from rdflib.graph import Graph
 from arches.app.models import models
 from arches.app.models.system_settings import settings
-from arches.app.utils.skos import SKOSReader
+from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.utils.skos import SKOSReader, SKOSWriter
 from arches_controlled_lists.models import List, ListItem, ListItemValue
 
 # define the ARCHES namespace
@@ -237,3 +238,76 @@ class SKOSReader(SKOSReader):
             return uuid.UUID(matches.group(0))
         else:
             return uuid.uuid5(baseuuid, str(subject))
+
+
+class SKOSWriter(SKOSReader):
+    def write_controlled_lists(self, lists, format):
+
+        export_lists = List.objects.filter(name__in=lists)
+        export_list_items = (
+            ListItem.objects.filter(list__in=export_lists)
+            .with_list_item_labels()
+            .prefetch_related("parent", "children")
+        )
+
+        # get empty RDF graph
+        rdf_graph = Graph()
+
+        # bind the namespaces
+        rdf_graph.bind("arches", ARCHES)
+        rdf_graph.bind("skos", SKOS)
+        rdf_graph.bind("dcterms", DCTERMS)
+
+        serializer = JSONSerializer()
+
+        for lst in export_lists:
+            # Lists are stored as ConceptSchemes
+            rdf_graph.add((ARCHES[str(lst.id)], RDF.type, SKOS.ConceptScheme))
+            rdf_graph.add((ARCHES[str(lst.id)], DCTERMS.title, Literal(lst.name)))
+
+        for lst_item in export_list_items:
+            # ListItems are stored as Concepts
+            rdf_graph.add((ARCHES[str(lst_item.id)], RDF.type, SKOS.Concept))
+            rdf_graph.add(
+                (ARCHES[str(lst_item.id)], DCTERMS.identifier, Literal(lst_item.uri))
+            )
+            rdf_graph.add(
+                (ARCHES[str(lst_item.id)], SKOS.inScheme, ARCHES[str(lst_item.list.id)])
+            )
+
+            if lst_item.sortorder is not None:
+                rdf_graph.add(
+                    (
+                        ARCHES[str(lst_item.id)],
+                        ARCHES["sortorder"],
+                        Literal(lst_item.sortorder),
+                    )
+                )
+
+            if lst_item.parent:
+                rdf_graph.add(
+                    (
+                        ARCHES[str(lst_item.id)],
+                        SKOS.broader,
+                        ARCHES[str(lst_item.parent.id)],
+                    )
+                )
+
+            for child in lst_item.children.all():
+                rdf_graph.add(
+                    (ARCHES[str(lst_item.id)], SKOS.narrower, ARCHES[str(child.id)])
+                )
+
+            for label in lst_item.list_item_labels:
+                predicate = (
+                    SKOS[label.valuetype.valuetype] or ARCHES[label.valuetype.valuetype]
+                )
+                rdf_graph.add(
+                    (
+                        ARCHES[str(lst_item.id)],
+                        predicate,
+                        Literal(label.value, lang=label.language.code),
+                    )
+                )
+
+        return rdf_graph.serialize(format=format)
