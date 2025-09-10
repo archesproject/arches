@@ -218,7 +218,7 @@ class ReferenceDataType(BaseDataType):
         value = node_data.get(str(node.pk), None)
         references = self.to_python(value)
         if not references:
-            return _("(Empty)")
+            return ""
         else:
             best_labels = [
                 ListItem.find_best_label_from_set(reference.labels, requested_language)
