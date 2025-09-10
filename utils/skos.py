@@ -244,11 +244,9 @@ class SKOSWriter(SKOSReader):
     def write_controlled_lists(self, lists, format):
 
         export_lists = List.objects.filter(name__in=lists)
-        export_list_items = (
-            ListItem.objects.filter(list__in=export_lists)
-            .with_list_item_labels()
-            .prefetch_related("parent", "children")
-        )
+        export_list_items = ListItem.objects.filter(
+            list__in=export_lists
+        ).prefetch_related("list_item_values", "parent", "children")
 
         # get empty RDF graph
         rdf_graph = Graph()
@@ -298,10 +296,9 @@ class SKOSWriter(SKOSReader):
                     (ARCHES[str(lst_item.id)], SKOS.narrower, ARCHES[str(child.id)])
                 )
 
-            for label in lst_item.list_item_labels:
-                predicate = (
-                    SKOS[label.valuetype.valuetype] or ARCHES[label.valuetype.valuetype]
-                )
+            for label in lst_item.list_item_values.all():
+                valuetype = label.valuetype.valuetype
+                predicate = SKOS[valuetype] or ARCHES[valuetype]
                 rdf_graph.add(
                     (
                         ARCHES[str(lst_item.id)],
