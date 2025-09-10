@@ -618,7 +618,7 @@ class TileTree(TileModel, AliasedDataMixin):
             ret["details"] = []
         if ret["display_value"] in empty_display_values:
             # Future: upstream this into datatype methods (another hook?)
-            ret["display_value"] = _("(Empty)")
+            ret["display_value"] = ""
         return ret
 
     def set_aliased_data(self, node, node_value, datatype_contexts=None):
