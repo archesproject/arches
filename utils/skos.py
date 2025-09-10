@@ -241,13 +241,7 @@ class SKOSReader(SKOSReader):
 
 
 class SKOSWriter(SKOSReader):
-    def write_controlled_lists(self, lists, format):
-
-        export_lists = List.objects.filter(name__in=lists)
-        export_list_items = ListItem.objects.filter(
-            list__in=export_lists
-        ).prefetch_related("list_item_values", "parent", "children")
-
+    def write_controlled_lists(self, lists, list_items, format):
         # get empty RDF graph
         rdf_graph = Graph()
 
@@ -256,14 +250,12 @@ class SKOSWriter(SKOSReader):
         rdf_graph.bind("skos", SKOS)
         rdf_graph.bind("dcterms", DCTERMS)
 
-        serializer = JSONSerializer()
-
-        for lst in export_lists:
+        for lst in lists:
             # Lists are stored as ConceptSchemes
             rdf_graph.add((ARCHES[str(lst.id)], RDF.type, SKOS.ConceptScheme))
             rdf_graph.add((ARCHES[str(lst.id)], DCTERMS.title, Literal(lst.name)))
 
-        for lst_item in export_list_items:
+        for lst_item in list_items:
             # ListItems are stored as Concepts
             rdf_graph.add((ARCHES[str(lst_item.id)], RDF.type, SKOS.Concept))
             rdf_graph.add(
@@ -296,15 +288,23 @@ class SKOSWriter(SKOSReader):
                     (ARCHES[str(lst_item.id)], SKOS.narrower, ARCHES[str(child.id)])
                 )
 
-            for label in lst_item.list_item_values.all():
-                valuetype = label.valuetype.valuetype
+            for value in lst_item.list_item_values.all():
+                valuetype = value.valuetype.valuetype
                 predicate = SKOS[valuetype] or ARCHES[valuetype]
-                rdf_graph.add(
-                    (
-                        ARCHES[str(lst_item.id)],
-                        predicate,
-                        Literal(label.value, lang=label.language.code),
+                if value.language:
+                    rdf_graph.add(
+                        (
+                            ARCHES[str(lst_item.id)],
+                            predicate,
+                            Literal(value.value, lang=value.language.code),
+                        )
                     )
-                )
+                elif value.valuetype == ARCHES["image"]:
+                    # TODO: handle images?
+                    pass
+                else:
+                    rdf_graph.add(
+                        (ARCHES[str(lst_item.id)], predicate, Literal(value.value))
+                    )
 
         return rdf_graph.serialize(format=format)

@@ -167,9 +167,7 @@ class Command(PackagesCommand):
 
         return instance_pks
 
-    def export_controlled_lists(
-        self, data_dest, file_name, controlled_lists, format="pretty-xml"
-    ):
+    def export_controlled_lists(self, data_dest, file_name, controlled_lists, format):
         if format == "xlsx":
             wb = openpyxl.Workbook()
             ws = wb.active
@@ -179,25 +177,39 @@ class Command(PackagesCommand):
             self.export_model_to_sheet(wb, ListItemValue)
 
             if data_dest != "" and data_dest != ".":
-                wb.save(os.path.join(data_dest, file_name))
-                self.stdout.write(f"Data exported successfully to {file_name}")
+                wb.save(os.path.join(data_dest, f"{file_name}.xlsx"))
+                self.stdout.write(f"Data exported successfully to {file_name}.xlsx")
             else:
                 self.stdout.write(
                     "No destination directory specified. Please rerun this command with the '-d' parameter populated."
                 )
 
-        elif format == "pretty-xml":
-            try:
-                parsed_lists = [lst.strip() for lst in controlled_lists.split(",")]
-            except:
-                parsed_lists = None
+        elif format == "skos-rdf":
+            parsed_lists = [lst.strip() for lst in controlled_lists.split(",")]
+            if parsed_lists != [""]:
+                export_lists = List.objects.filter(name__in=parsed_lists)
+                export_list_items = ListItem.objects.filter(
+                    list__in=export_lists
+                ).prefetch_related("list_item_values", "parent", "children")
+            else:
+                export_lists = List.objects.all()
+                export_list_items = ListItem.objects.all().prefetch_related(
+                    "list_item_values", "parent", "children"
+                )
             skos = SKOSWriter()
-            skos_file = skos.write_controlled_lists(parsed_lists, format=format)
+            skos_file = skos.write_controlled_lists(
+                export_lists, export_list_items, format="pretty-xml"
+            )
 
             if data_dest != "" and data_dest != ".":
                 with open(os.path.join(data_dest, f"{file_name}.xml"), "wb") as file:
                     file.write(skos_file)
                 self.stdout.write(f"Data exported successfully to {file_name}.xml")
+
+        else:
+            self.stdout.write(
+                f"The specified format {format} is not supported. Please rerun this command with a supported format."
+            )
 
     def export_model_to_sheet(self, wb, model):
         # For the first sheet (List), use blank sheet that is initiallized with workbook
