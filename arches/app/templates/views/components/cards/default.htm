@@ -326,7 +326,8 @@
                             expanded: self.expanded,
                             graph: self.form.graph,
                             type: "resource-editor",
-                            disabled: !self.card.isWritable && !self.preview
+                            disabled: !self.card.isWritable && !self.preview,
+                            ...self.getNodeOptions?.(widget.node_id(), widget.configJSON())
                         }
                     }, css:{ "active": widget.selected, "hover": widget.hovered, "widget-preview": self.preview
                 }, click: function(data, e) { if (!widget.selected() && self.preview) {widget.selected(true);}

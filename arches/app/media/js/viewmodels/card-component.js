@@ -316,5 +316,76 @@ export default function(params) {
         }
     };
 
+    this.getNodeOptions = (nodeId, widgetConfig) => {
+        const options = params.nodeOptions?.[nodeId] || {};
+        const nodeOptions = {};
+        
+        if (!options) return;
+
+        // Default handlers
+        this.handlers = {
+            config(context) {
+                const { options, widgetConfig } = context;
+                options.config = ko.observable(Object.assign(widgetConfig, options.config));
+            },
+            node(context) {
+                const { params, nodeId, options } = context;
+                const originalNode = params.form.nodeLookup[nodeId];
+                options.node = Object.assign(originalNode, options.node);
+            },
+            widget: (context) => {
+                const { options, nodeId } = context;
+                const widget = context.self.form.card().widgets().filter(widget => widget.node_id() === nodeId)[0];
+                
+                const allKeys = new Set([...Object.keys(options.widget), ...Object.keys(widget)]);
+                
+                allKeys.forEach(key => {
+                    if (key in options.widget) {
+                        if (ko.isObservable(widget[key])) {
+                            widget[key](options.widget[key]);
+                        } else {
+                            widget[key] = options.widget[key];
+                        }
+                    } else {
+                        options.widget[key] = widget[key];
+                    }
+                });
+            },
+            default(context, key) {
+                const { options } = context;
+                options[key] = ko.observable(options[key]);
+            }
+        };
+
+        // Apply custom handlers to modify widget
+        if (params.customHandlers) {
+            Object.keys(params.customHandlers).forEach(key => {
+                this.handlers[key] = (context) => params.customHandlers[key](context);
+            });
+        }
+
+        // supply context of the card component to the handlers
+        const context = {
+            self: this,
+            params,
+            nodeId,
+            widgetConfig,
+            options,
+            handlers: this.handlers
+        };
+
+        // Process options with handlers
+        Object.keys(options).forEach(key => {
+            if (key in this.handlers) {
+                this.handlers[key](context);
+            } else {
+                this.handlers.default(context, key);
+            }
+        });
+
+        Object.assign(nodeOptions, options);
+        return nodeOptions;
+    };
+
     this.initialize();
 };
