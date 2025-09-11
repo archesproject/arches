@@ -1,9 +1,18 @@
 <script setup lang="ts">
+import { computed } from "vue";
+import DOMPurify from "dompurify";
 import type { StringValue } from "@/arches_component_lab/datatypes/string/types";
 
-defineProps<{ aliasedNodeData?: StringValue }>();
+const { aliasedNodeData } = defineProps<{ aliasedNodeData?: StringValue }>();
+
+const cleanHtml = computed(() =>
+    DOMPurify.sanitize(aliasedNodeData?.display_value ?? "", {
+        USE_PROFILES: { html: true },
+    }),
+);
 </script>
 
 <template>
-    <div>{{ aliasedNodeData?.display_value }}</div>
+    <!-- eslint-disable-next-line vue/no-v-html -->
+    <div v-html="cleanHtml"></div>
 </template>
