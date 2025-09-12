@@ -1,7 +1,7 @@
-// eslint-disable-next-line
-// @ts-nocheck
-
 import { definePreset, palette } from "@primeuix/themes";
+
+// eslint-disable-next-line
+// @ts-ignore: This is a workaround for wonky PrimeVue exports after v1.20
 import Aura from "@primeuix/themes/aura";
 
 const archesColors = Object.freeze({
