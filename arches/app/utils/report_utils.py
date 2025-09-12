@@ -7,13 +7,17 @@ def get_resource_relationship_type_label(relationship_types, lang=None):
     if lang is None:
         lang = get_language()
 
-    relationship_type_values = Value.objects.filter(
-        valueid__in=relationship_types,
-    ).select_related("concept").prefetch_related(
-        Prefetch(
-            "concept__value_set",
-            queryset=Value.objects.order_by("pk"),
-        ),
+    relationship_type_values = (
+        Value.objects.filter(
+            valueid__in=relationship_types,
+        )
+        .select_related("concept")
+        .prefetch_related(
+            Prefetch(
+                "concept__value_set",
+                queryset=Value.objects.order_by("pk"),
+            ),
+        )
     )
 
     preflabel_lookup = {
@@ -33,6 +37,4 @@ def get_resource_relationship_type_label(relationship_types, lang=None):
         for rel_type in relationship_type_values
     }
 
-
     return preflabel_lookup
-
