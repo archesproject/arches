@@ -906,7 +906,7 @@ class Resource(models.ResourceInstance):
         }
         relationship_type_values = (
             models.Value.objects.filter(
-                value__in=relationship_types,
+                valueid__in=relationship_types,
             )
             .select_related("concept")
             .prefetch_related(
