@@ -1,4 +1,4 @@
-/* eslint-disable */
+// eslint-disable-next-line
 // @ts-nocheck
 
 import { definePreset, palette } from "@primeuix/themes";
