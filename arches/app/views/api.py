@@ -39,6 +39,7 @@ from arches.app.views.resource import (
     RelatedResourcesView,
     get_resource_relationship_types,
 )
+from arches.app.utils.report_utils import get_resource_relationship_type_label
 from arches.app.utils.skos import SKOSWriter
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.utils.decorators import group_required
@@ -1360,14 +1361,10 @@ class ResourceReport(APIBase):
             }
             for resource_model in resource_models
         ]
-
-        resource_relationship_types = {
-            resource_relationship_type["id"]: resource_relationship_type["text"]
-            for resource_relationship_type in get_resource_relationship_types()[
-                "values"
-            ]
-        }
-
+        inverse_relationship = {x['inverserelationshiptype'] for x in resource_relationships if x['inverserelationshiptype']}
+        forward_relationship = {x['relationshiptype'] for x in resource_relationships if x['relationshiptype']}
+        relationship_types = list(inverse_relationship | forward_relationship)
+        resource_relationship_types = get_resource_relationship_type_label(relationship_types)
         for related_resource in related_resources:
             for summary in related_resource_summary:
                 if related_resource["graph_id"] == summary["graphid"]:

@@ -23,7 +23,7 @@ from time import time
 from uuid import UUID
 from types import SimpleNamespace
 from django.db import transaction
-from django.db.models import Count, F, Prefetch, Q
+from django.db.models import Count, F, Q
 from django.contrib.auth.models import User, Group
 from django.forms.models import model_to_dict
 from django.core.exceptions import ObjectDoesNotExist
@@ -56,6 +56,8 @@ from arches.app.utils.permission_backend import (
     get_filtered_instances,
     get_nodegroups_by_perm,
 )
+from arches.app.utils.report_utils import get_resource_relationship_type_label
+
 import django.dispatch
 from arches.app.datatypes.datatypes import DataTypeFactory
 
@@ -904,36 +906,8 @@ class Resource(models.ResourceInstance):
             for relation in permitted_relation_dicts
             if relation["relationshiptype"]
         }
-        relationship_type_values = (
-            models.Value.objects.filter(
-                valueid__in=relationship_types,
-            )
-            .select_related("concept")
-            .prefetch_related(
-                Prefetch(
-                    "concept__value_set",
-                    # Begin with an order, so that if rank_label()
-                    # produces ties, we still have a deterministic result.
-                    queryset=models.Value.objects.order_by("pk"),
-                ),
-            )
-        )
-        preflabel_lookup = {
-            str(rel_type.pk): (
-                sorted(
-                    rel_type.concept.value_set.all(),
-                    key=lambda label: rank_label(
-                        kind=label.valuetype_id,
-                        source_lang=label.language_id,
-                        target_lang=lang,
-                    ),
-                    reverse=True,
-                )[0].value
-                if rel_type.concept.value_set.all()
-                else ""
-            )
-            for rel_type in relationship_type_values
-        }
+
+        preflabel_lookup = get_resource_relationship_type_label(relationship_types)
 
         for relation in permitted_relation_dicts:
             relation["relationshiptype_label"] = preflabel_lookup.get(
