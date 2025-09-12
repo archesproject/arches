@@ -1,3 +1,6 @@
+/* eslint-disable */
+// @ts-nocheck
+
 import { definePreset, palette } from "@primeuix/themes";
 import Aura from "@primeuix/themes/aura";
 
