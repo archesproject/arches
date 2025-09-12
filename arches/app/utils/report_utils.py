@@ -1,12 +1,9 @@
-import logging
-
 from django.core.exceptions import ValidationError
 from django.db.models import Prefetch
 
 from arches.app.models.models import Value
 from arches.app.utils.i18n import rank_label, get_language
 
-logger = logging.getLogger(__name__)
 
 def get_resource_relationship_type_label(relationship_types, lang=None):
     preflabel_lookup = {}
