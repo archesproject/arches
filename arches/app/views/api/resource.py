@@ -30,7 +30,7 @@ from arches.app.utils.permission_backend import (
     get_nodegroups_by_perm,
     user_is_resource_reviewer,
 )
-from arches.app.utils.report_utils import get_resource_relationship_type_label
+from arches.app.utils.resource_relationship_utils import get_resource_relationship_type_label
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.views.api import APIBase
 from arches.app.views.resource import RelatedResourcesView

@@ -43,7 +43,7 @@ def get_resource_relationship_type_label(relationship_types, lang=None):
             for rel_type in relationship_type_values
         }
     except ValidationError:
-        # If relationship_type is not a uuids, ListItem or Ontology Property
+        # If relationship_type is not a uuid, ListItem or Ontology Property
         try:
             relationship_type_values = ListItem.objects.filter(
                 uri__in=relationship_types,
