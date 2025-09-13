@@ -55,7 +55,9 @@ from arches.app.utils.permission_backend import (
     get_filtered_instances,
     get_nodegroups_by_perm,
 )
-from arches.app.utils.resource_relationship_utils import get_resource_relationship_type_label
+from arches.app.utils.resource_relationship_utils import (
+    get_resource_relationship_type_label,
+)
 
 import django.dispatch
 from arches.app.datatypes.datatypes import DataTypeFactory
