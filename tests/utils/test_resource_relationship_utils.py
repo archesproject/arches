@@ -1,4 +1,4 @@
-from arches.app.utils.report_utils import get_resource_relationship_type_label
+from arches.app.utils.resource_relationship_utils import get_resource_relationship_type_label
 from django.test import TestCase
 import uuid
 

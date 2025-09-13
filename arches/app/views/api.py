@@ -39,7 +39,7 @@ from arches.app.views.resource import (
     RelatedResourcesView,
     get_resource_relationship_types,
 )
-from arches.app.utils.report_utils import get_resource_relationship_type_label
+from arches.app.utils.resource_relationship_utils import get_resource_relationship_type_label
 from arches.app.utils.skos import SKOSWriter
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.utils.decorators import group_required

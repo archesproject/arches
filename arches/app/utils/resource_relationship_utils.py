@@ -39,7 +39,7 @@ def get_resource_relationship_type_label(relationship_types, lang=None):
             for rel_type in relationship_type_values
         }
     except ValidationError:
-        # If relationship_type is not a uuids, ie. ontology property
+        # If relationship_type is not a uuid, ie. ontology property
         pass
 
     return preflabel_lookup

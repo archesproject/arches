@@ -40,7 +40,6 @@ from arches.app.search.es_mapping_modifier import EsMappingModifierFactory
 from arches.app.tasks import index_resource
 from arches.app.utils import import_class_from_string, task_management
 from arches.app.utils import permission_backend
-from arches.app.utils.i18n import rank_label
 from arches.app.utils.label_based_graph import LabelBasedGraph
 from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedGraphV2
 from arches.app.utils.permission_backend import (
@@ -56,7 +55,7 @@ from arches.app.utils.permission_backend import (
     get_filtered_instances,
     get_nodegroups_by_perm,
 )
-from arches.app.utils.report_utils import get_resource_relationship_type_label
+from arches.app.utils.resource_relationship_utils import get_resource_relationship_type_label
 
 import django.dispatch
 from arches.app.datatypes.datatypes import DataTypeFactory
