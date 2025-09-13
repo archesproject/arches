@@ -7,6 +7,8 @@ import StyleClass from 'primevue/styleclass';
 import ToastService from 'primevue/toastservice';
 import Tooltip from 'primevue/tooltip';
 
+// eslint-disable-next-line
+// @ts-ignore: This is a workaround for PrimeVue theme import issues after v1.20
 import Aura from '@primeuix/themes/aura';
 
 import { createApp } from 'vue';
