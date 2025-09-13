@@ -1362,14 +1362,14 @@ class ResourceReport(APIBase):
             for resource_model in resource_models
         ]
         inverse_relationship = {
-            x["inverserelationshiptype"]
-            for x in resource_relationships
-            if x["inverserelationshiptype"]
+            relation["inverserelationshiptype"]
+            for relation in resource_relationships
+            if relation["inverserelationshiptype"]
         }
         forward_relationship = {
-            x["relationshiptype"]
-            for x in resource_relationships
-            if x["relationshiptype"]
+            relation["relationshiptype"]
+            for relation in resource_relationships
+            if relation["relationshiptype"]
         }
         relationship_types = list(inverse_relationship | forward_relationship)
         resource_relationship_types = get_resource_relationship_type_label(
