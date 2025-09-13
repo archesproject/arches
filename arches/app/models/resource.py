@@ -907,7 +907,9 @@ class Resource(models.ResourceInstance):
             if relation["relationshiptype"]
         }
 
-        preflabel_lookup = get_resource_relationship_type_label(relationship_types, lang)
+        preflabel_lookup = get_resource_relationship_type_label(
+            relationship_types, lang
+        )
 
         for relation in permitted_relation_dicts:
             relation["relationshiptype_label"] = preflabel_lookup.get(
