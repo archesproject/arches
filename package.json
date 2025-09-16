@@ -1,6 +1,6 @@
 {
     "name": "arches",
-    "version": "7.6.16",
+    "version": "7.6.17",
     "license": "AGPL-3.0-only",
     "scripts": {
         "build_development": "npm run eslint:check && npm run ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 webpack --config ./webpack/webpack.config.dev.js",
