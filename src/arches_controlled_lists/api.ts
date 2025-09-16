@@ -75,6 +75,18 @@ export const importList = async (file: File, overwriteOption: string) => {
     }
 };
 
+export const exportList = async (listIds: string[]) => {
+    const response = await fetch(arches.urls.controlled_list_export(listIds));
+    try {
+        if (response.ok) {
+            const blob = await response.blob();
+            return blob;
+        }
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
+    }
+};
+
 export const createItem = async (item: NewControlledListItem) => {
     const response = await fetch(arches.urls.controlled_list_item_add, {
         method: "POST",

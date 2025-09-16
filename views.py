@@ -11,7 +11,6 @@ from django.utils.translation import gettext as _
 from arches.app.models.utils import field_names
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.decorators import group_required
-from arches.app.utils.file_validator import FileValidator
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
 from arches.app.utils.string_utils import str_to_bool
@@ -24,7 +23,7 @@ from arches_controlled_lists.models import (
     ListItemValue,
     NodeProxy,
 )
-from arches_controlled_lists.utils.skos import SKOSReader
+from arches_controlled_lists.utils.skos import SKOSReader, SKOSWriter
 
 
 def _prefetch_terms(request):
@@ -198,6 +197,32 @@ class ListView(APIBase):
             )
         list_to_delete.delete()
         return JSONResponse(status=HTTPStatus.NO_CONTENT)
+
+
+@method_decorator(
+    group_required("RDM Administrator", raise_exception=True), name="dispatch"
+)
+class ListExportView(APIBase):
+    def get(self, request, list_ids):
+        try:
+            export_lists = List.objects.filter(pk__in=[list_ids])
+            export_list_items = ListItem.objects.filter(
+                list__in=export_lists
+            ).prefetch_related("list_item_values", "parent", "children")
+        except List.DoesNotExist:
+            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
+
+        skos = SKOSWriter()
+        rdf = skos.write_controlled_lists(
+            export_lists, export_list_items, format="pretty-xml"
+        )
+
+        response = JSONResponse(rdf, status=HTTPStatus.OK)
+        response["Content-Type"] = "application/xml"
+        response["Content-Disposition"] = (
+            f'attachment; filename="{export_lists[0].name}.xml"'
+        )
+        return response
 
 
 @method_decorator(
