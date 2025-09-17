@@ -11,7 +11,7 @@ from django.core.checks.messages import ERROR, WARNING
 from semantic_version import SimpleSpec, Version
 
 from arches import __version__
-from arches.app.utils.frontend_configuration_utils import (
+from arches.app.utils.frontend_configuration_utils.generate_frontend_configuration import (
     generate_frontend_configuration,
 )
 
