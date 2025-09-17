@@ -628,8 +628,6 @@ class SearchTests(ArchesTestCase):
         # add delay to allow for indexes to be updated
         time.sleep(1)
 
-        test_graph.unpublish()
-
         user = User.objects.get(username="admin")
 
         factory = RequestFactory()
