@@ -7,7 +7,9 @@ from django.urls import clear_url_caches, include, path, re_path
 from django.conf.urls.i18n import i18n_patterns
 from django.views import View
 
-from arches.app.utils.frontend_configuration_utils.generate_urls_json import generate_urls_json
+from arches.app.utils.frontend_configuration_utils.generate_urls_json import (
+    generate_urls_json,
+)
 
 
 @override_settings(STATIC_URL="/static/", MEDIA_URL="/media/")
@@ -60,7 +62,12 @@ class TestGenerateUrlsJson(TestCase):
         root_with_i18n_patterns = i18n_patterns(
             path("", include(arches_core_patterns)),
             path("", include(arches_core_patterns)),
-            path("", include((arches_core_patterns, "arches_core"), namespace="arches_querysets")),
+            path(
+                "",
+                include(
+                    (arches_core_patterns, "arches_core"), namespace="arches_querysets"
+                ),
+            ),
             path("", include(misc_app_patterns)),
             path("admin/model/<str:object_id>", AdminLikeView.as_view()),
         )
@@ -96,7 +103,9 @@ class TestGenerateUrlsJson(TestCase):
 
         self.assertIn("arches:update_published_graph", urls_by_name)
         entry = urls_by_name["arches:update_published_graph"][0]
-        self.assertEqual(entry["url"], "/{language_code}/graph/{graphid}/update_published_graph")
+        self.assertEqual(
+            entry["url"], "/{language_code}/graph/{graphid}/update_published_graph"
+        )
         self.assertEqual(entry["params"], ["language_code", "graphid"])
 
         self.assertNotIn("arches_querysets:update_published_graph", urls_by_name)
@@ -117,10 +126,22 @@ class TestGenerateUrlsJson(TestCase):
         self.assertEqual(weird["params"], ["language_code", "slug", "identifier"])
 
         self.assertIn("admin", urls_by_name)
-        self.assertEqual(urls_by_name["admin"], [{"url": "/{language_code}/admin/{url}", "params": ["language_code", "url"]}])
+        self.assertEqual(
+            urls_by_name["admin"],
+            [
+                {
+                    "url": "/{language_code}/admin/{url}",
+                    "params": ["language_code", "url"],
+                }
+            ],
+        )
 
-        self.assertEqual(urls_by_name["testproject:static_url"], [{"url": "/static/", "params": []}])
-        self.assertEqual(urls_by_name["testproject:media_url"], [{"url": "/media/", "params": []}])
+        self.assertEqual(
+            urls_by_name["testproject:static_url"], [{"url": "/static/", "params": []}]
+        )
+        self.assertEqual(
+            urls_by_name["testproject:media_url"], [{"url": "/media/", "params": []}]
+        )
 
     def test_without_i18n_routes(self):
         with override_settings(ROOT_URLCONF=self.root_plain_module.__name__):
@@ -128,7 +149,9 @@ class TestGenerateUrlsJson(TestCase):
             urls_by_name = generate_urls_json()
 
         self.assertIn("admin", urls_by_name)
-        self.assertEqual(urls_by_name["admin"], [{"url": "/admin/{url}", "params": ["url"]}])
+        self.assertEqual(
+            urls_by_name["admin"], [{"url": "/admin/{url}", "params": ["url"]}]
+        )
         self.assertIn("plainproject:static_url", urls_by_name)
         self.assertIn("plainproject:media_url", urls_by_name)
 
@@ -147,7 +170,11 @@ class TestGenerateUrlsJson(TestCase):
         AlphaDetailView.__module__ = "alpha_app.views"
 
         alpha_patterns = [
-            path("alpha/<uuid:item_id>/<slug:slug>/detail", AlphaDetailView.as_view(), name="alpha_detail"),
+            path(
+                "alpha/<uuid:item_id>/<slug:slug>/detail",
+                AlphaDetailView.as_view(),
+                name="alpha_detail",
+            ),
         ]
         alpha_root_patterns = i18n_patterns(path("", include(alpha_patterns)))
 
@@ -162,29 +189,63 @@ class TestGenerateUrlsJson(TestCase):
             urls_by_name = generate_urls_json()
 
         alpha_entry = urls_by_name["alpha_app:alpha_detail"][0]
-        self.assertEqual(alpha_entry["url"], "/{language_code}/alpha/{item_id}/{slug}/detail")
+        self.assertEqual(
+            alpha_entry["url"], "/{language_code}/alpha/{item_id}/{slug}/detail"
+        )
         self.assertEqual(alpha_entry["params"], ["language_code", "item_id", "slug"])
 
     def test_force_script_name_with_i18n(self):
-        with override_settings(ROOT_URLCONF=self.root_with_i18n_module.__name__, FORCE_SCRIPT_NAME="/proxy"):
+        with override_settings(
+            ROOT_URLCONF=self.root_with_i18n_module.__name__, FORCE_SCRIPT_NAME="/proxy"
+        ):
             clear_url_caches()
             urls_by_name = generate_urls_json()
 
-        self.assertEqual(urls_by_name["arches:update_published_graph"][0]["url"], "/proxy/{language_code}/graph/{graphid}/update_published_graph")
-        self.assertEqual(urls_by_name["arches:tileserver"][0]["url"], "/proxy/{language_code}/tileserver/{path}")
-        self.assertEqual(urls_by_name["misc_app:misc"][0]["url"], "/proxy/{language_code}/misc/{number}")
-        self.assertEqual(urls_by_name["arches:weird_regex"][0]["url"], "/proxy/{language_code}/weird/{slug}/{identifier}")
-        self.assertEqual(urls_by_name["admin"], [{"url": "/{language_code}/admin/{url}", "params": ["language_code", "url"]}])
-        self.assertEqual(urls_by_name["testproject:static_url"], [{"url": "/static/", "params": []}])
-        self.assertEqual(urls_by_name["testproject:media_url"], [{"url": "/media/", "params": []}])
+        self.assertEqual(
+            urls_by_name["arches:update_published_graph"][0]["url"],
+            "/proxy/{language_code}/graph/{graphid}/update_published_graph",
+        )
+        self.assertEqual(
+            urls_by_name["arches:tileserver"][0]["url"],
+            "/proxy/{language_code}/tileserver/{path}",
+        )
+        self.assertEqual(
+            urls_by_name["misc_app:misc"][0]["url"],
+            "/proxy/{language_code}/misc/{number}",
+        )
+        self.assertEqual(
+            urls_by_name["arches:weird_regex"][0]["url"],
+            "/proxy/{language_code}/weird/{slug}/{identifier}",
+        )
+        self.assertEqual(
+            urls_by_name["admin"],
+            [
+                {
+                    "url": "/{language_code}/admin/{url}",
+                    "params": ["language_code", "url"],
+                }
+            ],
+        )
+        self.assertEqual(
+            urls_by_name["testproject:static_url"], [{"url": "/static/", "params": []}]
+        )
+        self.assertEqual(
+            urls_by_name["testproject:media_url"], [{"url": "/media/", "params": []}]
+        )
 
     def test_force_script_name_without_i18n(self):
-        from arches.app.utils.frontend_configuration_utils.generate_urls_json import generate_urls_json
+        from arches.app.utils.frontend_configuration_utils.generate_urls_json import (
+            generate_urls_json,
+        )
 
-        with override_settings(ROOT_URLCONF=self.root_plain_module.__name__, FORCE_SCRIPT_NAME="/proxy/"):
+        with override_settings(
+            ROOT_URLCONF=self.root_plain_module.__name__, FORCE_SCRIPT_NAME="/proxy/"
+        ):
             clear_url_caches()
             urls_by_name = generate_urls_json()
 
-        self.assertEqual(urls_by_name["admin"], [{"url": "/admin/{url}", "params": ["url"]}])
+        self.assertEqual(
+            urls_by_name["admin"], [{"url": "/admin/{url}", "params": ["url"]}]
+        )
         self.assertIn("plainproject:static_url", urls_by_name)
         self.assertIn("plainproject:media_url", urls_by_name)

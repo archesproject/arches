@@ -77,11 +77,15 @@ def _path_has_i18n_prefix(path_string):
     return bool(segments and segments[0] == "{language_code}")
 
 
-def _walk_url_patterns(url_patterns, accumulated_prefix, namespace_stack, collected_entries):
+def _walk_url_patterns(
+    url_patterns, accumulated_prefix, namespace_stack, collected_entries
+):
     for url_object in url_patterns:
         if isinstance(url_object, URLPattern):
             origin_application_name = _get_pattern_origin_application_name(url_object)
-            effective_namespace = _select_effective_namespace(namespace_stack, origin_application_name)
+            effective_namespace = _select_effective_namespace(
+                namespace_stack, origin_application_name
+            )
 
             route_text = _interpolate_route(url_object.pattern)
             joined_path = _join_paths(accumulated_prefix, route_text)
@@ -108,10 +112,18 @@ def _walk_url_patterns(url_patterns, accumulated_prefix, namespace_stack, collec
                 continue
 
             if url_object.name:
-                route_name = effective_namespace + ":" + url_object.name if effective_namespace else url_object.name
+                route_name = (
+                    effective_namespace + ":" + url_object.name
+                    if effective_namespace
+                    else url_object.name
+                )
             else:
                 base_segment = _first_significant_path_segment(path_string) or "unnamed"
-                route_name = effective_namespace + ":" + base_segment if effective_namespace else base_segment
+                route_name = (
+                    effective_namespace + ":" + base_segment
+                    if effective_namespace
+                    else base_segment
+                )
 
             force_script_name = ""
             if settings.FORCE_SCRIPT_NAME:
@@ -130,8 +142,12 @@ def _walk_url_patterns(url_patterns, accumulated_prefix, namespace_stack, collec
             next_namespace_stack = list(namespace_stack)
             namespace_value = getattr(url_object, "namespace", "")
             if namespace_value:
-                namespace_origin_application = _get_resolver_origin_application_name(url_object)
-                next_namespace_stack.append((namespace_value, namespace_origin_application))
+                namespace_origin_application = _get_resolver_origin_application_name(
+                    url_object
+                )
+                next_namespace_stack.append(
+                    (namespace_value, namespace_origin_application)
+                )
 
             if isinstance(url_object.pattern, LocalePrefixPattern):
                 resolver_route_text = "{language_code}"
@@ -139,7 +155,12 @@ def _walk_url_patterns(url_patterns, accumulated_prefix, namespace_stack, collec
                 resolver_route_text = _interpolate_route(url_object.pattern)
 
             next_prefix = _join_paths(accumulated_prefix, resolver_route_text)
-            _walk_url_patterns(url_object.url_patterns, next_prefix, next_namespace_stack, collected_entries)
+            _walk_url_patterns(
+                url_object.url_patterns,
+                next_prefix,
+                next_namespace_stack,
+                collected_entries,
+            )
 
 
 def generate_urls_json():
@@ -150,7 +171,10 @@ def generate_urls_json():
     grouped_by_route_name = {}
     for collected_value in collected_entries.values():
         route_name = collected_value["name"]
-        route_entry = {"url": collected_value["url"], "params": collected_value["params"]}
+        route_entry = {
+            "url": collected_value["url"],
+            "params": collected_value["params"],
+        }
         existing_list = grouped_by_route_name.setdefault(route_name, [])
         if route_entry not in existing_list:
             existing_list.append(route_entry)
@@ -170,6 +194,4 @@ def generate_urls_json():
         if special_entry not in existing_list:
             existing_list.append(special_entry)
 
-    return {
-        name: grouped_by_route_name[name] for name in sorted(grouped_by_route_name)
-    }
+    return {name: grouped_by_route_name[name] for name in sorted(grouped_by_route_name)}
