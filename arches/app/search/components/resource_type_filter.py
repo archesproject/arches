@@ -26,7 +26,7 @@ def get_permitted_graphids(permitted_nodegroups):
     permitted_and_published_graphids = set(
         str(graphid)
         for graphid in GraphModel.objects.filter(graphid__in=permitted_graphids)
-        .exclude(publication=None)
+        .exclude(is_active=False)
         .values_list("graphid", flat=True)
     )
 
