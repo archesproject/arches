@@ -3,6 +3,7 @@ import sys
 
 import openpyxl
 from django.db import transaction
+from django.db.models import Q
 
 from arches.management.commands.packages import Command as PackagesCommand
 from arches.app.models import models
@@ -187,7 +188,9 @@ class Command(PackagesCommand):
         elif format == "skos-rdf":
             parsed_lists = [lst.strip() for lst in controlled_lists.split(",")]
             if parsed_lists != [""]:
-                export_lists = List.objects.filter(name__in=parsed_lists)
+                export_lists = List.objects.filter(
+                    Q(name__in=parsed_lists) | Q(id__in=parsed_lists)
+                )
                 export_list_items = ListItem.objects.filter(
                     list__in=export_lists
                 ).prefetch_related("list_item_values", "parent", "children")
