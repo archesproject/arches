@@ -1,6 +1,7 @@
 from http import HTTPStatus
 from uuid import UUID
 import filetype
+import json
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -203,26 +204,32 @@ class ListView(APIBase):
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
 class ListExportView(APIBase):
-    def get(self, request, list_ids):
+    def post(self, request):
+        list_ids = json.loads(request.body).get("list_ids", [])
         try:
-            export_lists = List.objects.filter(pk__in=[list_ids])
+            export_lists = List.objects.filter(pk__in=list_ids)
             export_list_items = ListItem.objects.filter(
                 list__in=export_lists
             ).prefetch_related("list_item_values", "parent", "children")
         except List.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
 
-        skos = SKOSWriter()
-        rdf = skos.write_controlled_lists(
-            export_lists, export_list_items, format="pretty-xml"
-        )
+        if len(export_lists) != 0:
+            skos = SKOSWriter()
+            rdf = skos.write_controlled_lists(
+                export_lists, export_list_items, format="pretty-xml"
+            )
 
-        response = JSONResponse(rdf, status=HTTPStatus.OK)
-        response["Content-Type"] = "application/xml"
-        response["Content-Disposition"] = (
-            f'attachment; filename="{export_lists[0].name}.xml"'
-        )
-        return response
+            response = JSONResponse(rdf, status=HTTPStatus.OK)
+            response["Content-Type"] = "application/xml"
+            response["Content-Disposition"] = (
+                f'attachment; filename="{export_lists[0].name}.xml"'
+            )
+            return response
+        else:
+            return JSONErrorResponse(
+                message=_("No lists found to export."), status=HTTPStatus.BAD_REQUEST
+            )
 
 
 @method_decorator(

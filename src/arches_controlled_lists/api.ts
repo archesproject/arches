@@ -76,7 +76,14 @@ export const importList = async (file: File, overwriteOption: string) => {
 };
 
 export const exportList = async (listIds: string[]) => {
-    const response = await fetch(arches.urls.controlled_list_export(listIds));
+    const response = await fetch(arches.urls.controlled_list_export, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getToken(),
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ list_ids: listIds }),
+    });
     try {
         if (response.ok) {
             const blob = await response.blob();

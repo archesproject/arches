@@ -23,7 +23,7 @@ urlpatterns = [
     ),
     path("api/controlled_list", ListView.as_view(), name="controlled_list_add"),
     path(
-        "api/controlled_list_export/<uuid:list_ids>",
+        "api/controlled_list_export",
         ListExportView.as_view(),
         name="controlled_list_export",
     ),

@@ -4,9 +4,11 @@ import { useGettext } from "vue3-gettext";
 
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
+import Button from "primevue/button";
 import SplitButton from "primevue/splitbutton";
 
 import ImportList from "@/arches_controlled_lists/components/misc/ImportList.vue";
+import ExportList from "@/arches_controlled_lists/components/misc/ExportList.vue";
 
 import {
     deleteItems,
@@ -142,6 +144,14 @@ function onImport() {
     showImportList.value = false;
     importDialogKey.value++;
     fetchListsAndPopulateTree();
+}
+
+const showExportList = ref(false);
+const exportDialogKey = ref(0);
+
+function openExportDialog() {
+    exportDialogKey.value++;
+    showExportList.value = true;
 }
 
 const toDelete = computed(() => {
@@ -317,6 +327,21 @@ await fetchListsAndPopulateTree();
                     },
                 }"
                 @click="confirmDelete"
+            />
+            <Button
+                class="list-button"
+                :label="$gettext('Export')"
+                :aria-label="$gettext('Export lists')"
+                :disabled="!tree.length"
+                :severity="shouldUseContrast() ? CONTRAST : PRIMARY"
+                :style="{ width: '100%', fontSize: 'inherit' }"
+                icon="pi pi-external-link"
+                @click="openExportDialog"
+            />
+            <ExportList
+                v-if="showExportList"
+                :key="exportDialogKey"
+                :lists="tree"
             />
         </div>
     </div>
