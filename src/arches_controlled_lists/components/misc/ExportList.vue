@@ -92,19 +92,25 @@ onMounted(() => {
         }"
     >
         <template #default>
-            <MultiSelect
-                v-model="selectedListIds"
-                :options="listOptions"
-                option-label="name"
-                option-value="id"
-                :placeholder="$gettext('Select lists to export')"
-                :filter="true"
-                :filter-placeholder="$gettext('Search lists...')"
-                :style="{ width: '100%' }"
-                :max-selected-labels="3"
-                display="chip"
-                :show-clear="true"
-            />
+            <div class="select-container">
+                <label id="export-list-select">{{
+                    $gettext("Select controlled list(s) to export")
+                }}</label>
+                <MultiSelect
+                    v-model="selectedListIds"
+                    :options="listOptions"
+                    option-label="name"
+                    option-value="id"
+                    :placeholder="$gettext('Select list(s)')"
+                    :filter="true"
+                    :filter-placeholder="$gettext('Search lists...')"
+                    :style="{ width: '100%' }"
+                    :max-selected-labels="3"
+                    :show-clear="true"
+                    display="chip"
+                    aria-labelledby="export-list-select"
+                />
+            </div>
         </template>
         <template #footer>
             <Button
@@ -123,8 +129,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.export-button {
-    font-size: 1.25rem;
-    border-radius: 0;
+.select-container {
+    padding: 2rem 0;
 }
 </style>

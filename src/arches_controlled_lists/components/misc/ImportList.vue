@@ -170,9 +170,6 @@ async function submit() {
     </Dialog>
 </template>
 <style scoped>
-.form {
-    margin-top: 1rem;
-}
 .p-radiobutton {
     vertical-align: unset;
 }

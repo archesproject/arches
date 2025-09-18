@@ -312,6 +312,19 @@ await fetchListsAndPopulateTree();
                 :key="importDialogKey"
                 @imported="onImport"
             />
+            <Button
+                class="list-button"
+                :label="$gettext('Export')"
+                :aria-label="$gettext('Export lists')"
+                :disabled="!tree.length"
+                :severity="shouldUseContrast() ? CONTRAST : PRIMARY"
+                @click="openExportDialog"
+            />
+            <ExportList
+                v-if="showExportList"
+                :key="exportDialogKey"
+                :lists="tree"
+            />
             <SplitButton
                 class="list-button"
                 :label="$gettext('Delete')"
@@ -327,21 +340,6 @@ await fetchListsAndPopulateTree();
                     },
                 }"
                 @click="confirmDelete"
-            />
-            <Button
-                class="list-button"
-                :label="$gettext('Export')"
-                :aria-label="$gettext('Export lists')"
-                :disabled="!tree.length"
-                :severity="shouldUseContrast() ? CONTRAST : PRIMARY"
-                :style="{ width: '100%', fontSize: 'inherit' }"
-                icon="pi pi-external-link"
-                @click="openExportDialog"
-            />
-            <ExportList
-                v-if="showExportList"
-                :key="exportDialogKey"
-                :lists="tree"
             />
         </div>
     </div>
