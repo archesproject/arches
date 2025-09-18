@@ -23,7 +23,7 @@ from time import time
 from uuid import UUID
 from types import SimpleNamespace
 from django.db import transaction
-from django.db.models import Count, F, Prefetch, Q
+from django.db.models import Count, F, Q
 from django.contrib.auth.models import User, Group
 from django.forms.models import model_to_dict
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
@@ -41,7 +41,6 @@ from arches.app.search.es_mapping_modifier import EsMappingModifierFactory
 from arches.app.tasks import index_resource
 from arches.app.utils import import_class_from_string, task_management
 from arches.app.utils import permission_backend
-from arches.app.utils.i18n import rank_label
 from arches.app.utils.label_based_graph import LabelBasedGraph
 from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedGraphV2
 from arches.app.utils.permission_backend import (
@@ -58,6 +57,10 @@ from arches.app.utils.permission_backend import (
     get_filtered_instances,
     get_nodegroups_by_perm,
 )
+from arches.app.utils.resource_relationship_utils import (
+    get_resource_relationship_type_label,
+)
+
 import django.dispatch
 from arches.app.datatypes.datatypes import DataTypeFactory
 
@@ -939,36 +942,10 @@ class Resource(models.ResourceInstance):
             for relation in permitted_relation_dicts
             if relation["relationshiptype"]
         }
-        relationship_type_values = (
-            models.Value.objects.filter(
-                value__in=relationship_types,
-            )
-            .select_related("concept")
-            .prefetch_related(
-                Prefetch(
-                    "concept__value_set",
-                    # Begin with an order, so that if rank_label()
-                    # produces ties, we still have a deterministic result.
-                    queryset=models.Value.objects.order_by("pk"),
-                ),
-            )
+
+        preflabel_lookup = get_resource_relationship_type_label(
+            relationship_types, lang
         )
-        preflabel_lookup = {
-            str(rel_type.pk): (
-                sorted(
-                    rel_type.concept.value_set.all(),
-                    key=lambda label: rank_label(
-                        kind=label.valuetype_id,
-                        source_lang=label.language_id,
-                        target_lang=lang,
-                    ),
-                    reverse=True,
-                )[0].value
-                if rel_type.concept.value_set.all()
-                else ""
-            )
-            for rel_type in relationship_type_values
-        }
 
         for relation in permitted_relation_dicts:
             relation["relationshiptype_label"] = preflabel_lookup.get(
