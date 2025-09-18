@@ -1057,6 +1057,7 @@
             "icon": "{{ resource.iconclass }}"
         },{% endfor %}]'
         user-email='{{ user.email }}'
+        user-name='{% if user.username == "" %}anonymous{% else %}{{ user.username }}{% endif %}'
         use-semantic-relationships="{{ app_settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS|lower }}"
         version="{{ app_settings.VERSION }}"
 
