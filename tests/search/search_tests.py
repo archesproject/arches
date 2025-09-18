@@ -240,6 +240,8 @@ class SearchTests(ArchesTestCase):
         resourceinstanceid = "bbbbbbbb-d645-4c50-bafc-c677ea95f060"
         resource = Resource(uuid.UUID(resourceinstanceid))
         resource.graph_id = graphid
+        resource.graph.is_active = True
+        resource.graph.save()
         resource.save(user=user, transaction_id=uuid.uuid4())
         tile_data = {}
         tile_data[geojson_nodeid] = {
@@ -353,6 +355,8 @@ class SearchTests(ArchesTestCase):
         resource = Resource(uuid.UUID(resourceinstanceid))
         user = User.objects.get(username="admin")
         resource.graph_id = self.allDataTypeGraphId
+        resource.graph.is_active = True
+        resource.graph.save()
         resource.save(user=user, transaction_id=uuid.uuid4())
         tile_data = {}
         tile_data[non_localized_string_nodeid] = "Etiwanda Avenue Street Trees"
@@ -397,6 +401,8 @@ class SearchTests(ArchesTestCase):
         resourceinstanceid = "bbbbbbbb-d645-4c50-bafc-c677ea95f060"
         resource = Resource(uuid.UUID(resourceinstanceid))
         resource.graph_id = graphid
+        resource.graph.is_active = True
+        resource.graph.save()
         resource.save(user=user, transaction_id=uuid.uuid4())
         tile_data = {}
         tile_data[filelist_nodeid] = [
@@ -460,6 +466,8 @@ class SearchTests(ArchesTestCase):
         resource = Resource(uuid.UUID(resourceinstanceid))
         user = User.objects.get(username="admin")
         resource.graph_id = self.allDataTypeGraphId
+        resource.graph.is_active = True
+        resource.graph.save()
         resource.save(user=user, transaction_id=uuid.uuid4())
         tile_data = {}
         tile_data[non_localized_string_nodeid] = "Etiwanda Avenue Street Trees"
@@ -509,6 +517,8 @@ class SearchTests(ArchesTestCase):
         graph = Graph.objects.get(
             graphid=cardinality_graphid,
         )
+        graph.is_active = True
+        graph.save()
         graph.publish(user=user)
         new_cardinality_resource_1 = Resource(graph_id=cardinality_graphid)
         new_cardinality_resource_1.save(
@@ -521,6 +531,8 @@ class SearchTests(ArchesTestCase):
         )
         new_cardinality_resource_2.index()
         new_resource_1 = Resource(graph_id=graphid)
+        new_resource_1.graph.is_active = True
+        new_resource_1.graph.save()
         new_resource_1.save(user=user, transaction_id=uuid.uuid4(), index=False)
         new_resource_1.index()
         new_resource_2 = Resource(graph_id=graphid)

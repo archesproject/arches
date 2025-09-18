@@ -58,6 +58,7 @@ class SpatialSearchTests(ArchesTestCase):
             os.path.join("tests/fixtures/resource_graphs/Search Test Model.json"), "r"
         ) as f:
             archesfile = JSONDeserializer().deserialize(f)
+        archesfile["graph"][0]["is_active"] = True
         ResourceGraphImporter(archesfile["graph"])
 
         cls.search_model_graphid = "d291a445-fa5f-11e6-afa8-14109fd34195"
