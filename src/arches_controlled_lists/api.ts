@@ -131,6 +131,35 @@ export const patchItem = async (
     }
 };
 
+export const copyItem = async (
+    source_id: string,
+    target_item_id: string | null,
+    target_list_id: string,
+    copy_children: boolean,
+) => {
+    const response = await fetch(
+        arches.urls.controlled_list_item_copy(source_id),
+        {
+            method: "POST",
+            headers: { "X-CSRFToken": getToken() },
+            body: JSON.stringify({
+                target_item_id,
+                target_list_id,
+                copy_children,
+            }),
+        },
+    );
+    if (response.ok) {
+        return response.json();
+    }
+    try {
+        const error = await response.json();
+        throw new Error(error.message);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
+    }
+};
+
 export const patchList = async (
     list: ControlledList,
     field: "name" | "sortorder" | "children" | "searchable",

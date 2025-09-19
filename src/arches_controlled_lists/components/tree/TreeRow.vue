@@ -11,6 +11,7 @@ import {
     createItem,
     createList,
     patchList,
+    copyItem,
     upsertValue,
 } from "@/arches_controlled_lists/api.ts";
 import {
@@ -73,12 +74,14 @@ const newListFormValue = defineModel<string>("newListFormValue", {
 });
 const filterValue = defineModel<string>("filterValue", { required: true });
 
-const { isMultiSelecting, node, iconLabels, moveLabels } = defineProps<{
-    isMultiSelecting: boolean;
-    iconLabels: IconLabels;
-    moveLabels: MoveLabels;
-    node: TreeNode;
-}>();
+const { isMultiSelecting, shouldCopyChildren, node, iconLabels, moveLabels } =
+    defineProps<{
+        shouldCopyChildren: boolean;
+        isMultiSelecting: boolean;
+        iconLabels: IconLabels;
+        moveLabels: MoveLabels;
+        node: TreeNode;
+    }>();
 const { setDisplayedRow }: { setDisplayedRow: RowSetter } =
     inject(displayedRowKey)!;
 
@@ -168,6 +171,42 @@ const setParent = async (parentNode: TreeNode) => {
         });
         return;
     }
+    awaitingMove.value = false;
+    // Clear custom classes added in <Tree> pass-through
+    rerenderTree.value += 1;
+    movingItem.value = undefined;
+    refetcher.value += 1;
+};
+
+const copyItemTo = async (parentNode: TreeNode) => {
+    let list_id: string;
+    let parent_id: string | null;
+
+    if (nodeIsList(parentNode)) {
+        list_id = parentNode.key;
+        parent_id = null;
+    } else {
+        list_id = parentNode.data.list_id;
+        parent_id = parentNode.key;
+    }
+
+    try {
+        await copyItem(
+            movingItem.value!.data.id,
+            parent_id,
+            list_id,
+            shouldCopyChildren,
+        );
+    } catch (error) {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Copy failed"),
+            detail: error instanceof Error ? error.message : undefined,
+        });
+        return;
+    }
+
     awaitingMove.value = false;
     // Clear custom classes added in <Tree> pass-through
     rerenderTree.value += 1;
@@ -318,26 +357,22 @@ const acceptNewListShortcutEntry = async () => {
                 style="height: 2rem"
             />
             <!-- turn off escaping: vue template sanitizes -->
-            <Button
-                v-else-if="showMoveHereButton(node.key)"
-                class="move-target"
-                type="button"
-                :severity="shouldUseContrast() ? CONTRAST : SECONDARY"
-                :label="
-                    $gettext(
-                        'Move %{item} here',
-                        {
-                            item: getItemLabel(
-                                movingItem.data,
-                                selectedLanguage.code,
-                                systemLanguage.code,
-                            ).value,
-                        },
-                        true,
-                    )
-                "
-                @click="setParent(node)"
-            />
+            <div v-else-if="showMoveHereButton(node.key)">
+                <Button
+                    class="move-target"
+                    type="button"
+                    :severity="shouldUseContrast() ? CONTRAST : SECONDARY"
+                    :label="$gettext('Move here')"
+                    @click="setParent(node)"
+                />
+                <Button
+                    class="move-target"
+                    type="button"
+                    :severity="shouldUseContrast() ? CONTRAST : SECONDARY"
+                    :label="$gettext('Copy here')"
+                    @click="copyItemTo(node)"
+                />
+            </div>
         </div>
         <div
             v-else-if="!isNewList(node) && !isNewItem(node)"

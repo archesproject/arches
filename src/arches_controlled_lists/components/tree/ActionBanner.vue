@@ -3,6 +3,7 @@ import { inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
+import ToggleSwitch from "primevue/toggleswitch";
 
 import {
     selectedLanguageKey,
@@ -21,6 +22,9 @@ import type { TreeNode } from "primevue/treenode";
 import type { Language } from "@/arches_controlled_lists/types";
 
 const isMultiSelecting = defineModel<boolean>("isMultiSelecting", {
+    required: true,
+});
+const shouldCopyChildren = defineModel<boolean>("shouldCopyChildren", {
     required: true,
 });
 const movingItem = defineModel<TreeNode>("movingItem");
@@ -46,31 +50,46 @@ const abandonMove = () => {
         v-if="movingItem"
         class="action-banner"
     >
-        <!-- turn off escaping: vue template sanitizes -->
-        {{
-            $gettext(
-                "Selecting new parent for: %{item}",
-                {
-                    item: getItemLabel(
-                        movingItem.data,
-                        selectedLanguage.code,
-                        systemLanguage.code,
-                    ).value,
-                },
-                true,
-            )
-        }}
-        <Button
-            type="button"
-            class="banner-button"
-            :severity="shouldUseContrast() ? CONTRAST : SECONDARY"
-            :label="$gettext('Abandon')"
-            @click="abandonMove"
-        />
+        <div class="action-banner-content">
+            <!-- turn off escaping: vue template sanitizes -->
+            {{
+                $gettext(
+                    "Selecting new parent for: %{item}",
+                    {
+                        item: getItemLabel(
+                            movingItem.data,
+                            selectedLanguage.code,
+                            systemLanguage.code,
+                        ).value,
+                    },
+                    true,
+                )
+            }}
+            <Button
+                type="button"
+                class="banner-button"
+                :severity="shouldUseContrast() ? CONTRAST : SECONDARY"
+                :label="$gettext('Abandon')"
+                @click="abandonMove"
+            />
+        </div>
+        <div class="action-banner-content copy-children-option">
+            <div class="value-editor-title">
+                <label for="copyChildrenSwitch">
+                    {{ $gettext("Include children (copy only)?") }}
+                </label>
+            </div>
+            <div class="copy-children-switch">
+                <ToggleSwitch
+                    v-model="shouldCopyChildren"
+                    input-id="copyChildrenSwitch"
+                />
+            </div>
+        </div>
     </div>
     <div
         v-else-if="isMultiSelecting"
-        class="action-banner"
+        class="action-banner action-banner-content"
     >
         {{ $gettext("Select additional items to delete") }}
         <Button
@@ -91,11 +110,13 @@ const abandonMove = () => {
     background: var(--p-amber-300);
     color: var(--p-slate-950);
     font-weight: 800;
-    height: 5rem;
     font-size: small;
+    padding: 1rem;
+}
+
+.action-banner-content {
     display: flex;
     justify-content: space-between;
-    padding: 1rem;
     align-items: center;
 }
 
@@ -104,5 +125,15 @@ const abandonMove = () => {
     text-wrap: nowrap;
     font-size: unset;
     border-radius: 2px;
+}
+
+.action-banner-content.copy-children-option {
+    padding-top: 0.5rem;
+    gap: 1rem;
+    justify-content: flex-start;
+}
+
+.value-editor-title label {
+    cursor: pointer;
 }
 </style>

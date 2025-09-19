@@ -6,6 +6,7 @@ import json
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Max
+from django.db.utils import IntegrityError
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 
@@ -458,3 +459,45 @@ class ListOptionsView(APIBase):
             item.build_select_option() for item in list_items if item.parent_id is None
         ]
         return JSONResponse(serialized)
+
+
+class ListItemCopyView(APIBase):
+    @method_decorator(
+        group_required("RDM Administrator", raise_exception=True), name="dispatch"
+    )
+    def post(self, request, item_id):
+        data = JSONDeserializer().deserialize(request.body)
+        try:
+            target_list_id = data["target_list_id"]
+            target_item_id = data.get("target_item_id", None)
+            copy_children = data.get("copy_children", False)
+        except KeyError:
+            return JSONErrorResponse(status=HTTPStatus.BAD_REQUEST)
+
+        try:
+            item_to_copy = ListItem.objects.get(pk=item_id)
+            if target_item_id:
+                parent = ListItem.objects.get(id=target_item_id)
+            else:
+                parent = List.objects.get(id=target_list_id)
+        except (ListItem.DoesNotExist, List.DoesNotExist):
+            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
+
+        new_children, new_children_values = item_to_copy.duplicate_under_new_parent(
+            [parent], include_children=copy_children, force_sortorder=True
+        )
+        try:
+            with transaction.atomic():
+                ListItem.objects.bulk_create(new_children)
+                ListItemValue.objects.bulk_create(new_children_values)
+        except IntegrityError:
+            return JSONErrorResponse(
+                message=(
+                    f"Copy disallowed: duplicates URI ({item_to_copy.uri}) in list."
+                ),
+                status=HTTPStatus.BAD_REQUEST,
+            )
+
+        return JSONResponse(
+            {"copied_list_item": new_children[0]}, status=HTTPStatus.CREATED
+        )

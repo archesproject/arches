@@ -11,6 +11,7 @@ from arches_controlled_lists.views import (
     ListItemImageView,
     ListItemImageMetadataView,
     ListItemValueView,
+    ListItemCopyView,
     ListOptionsView,
 )
 
@@ -22,6 +23,11 @@ urlpatterns = [
         name="controlled_list",
     ),
     path("api/controlled_list", ListView.as_view(), name="controlled_list_add"),
+    path(
+        "api/controlled_list_item/<uuid:item_id>/copy",
+        ListItemCopyView.as_view(),
+        name="controlled_list_item_copy",
+    ),
     path(
         "api/controlled_list_export",
         ListExportView.as_view(),
