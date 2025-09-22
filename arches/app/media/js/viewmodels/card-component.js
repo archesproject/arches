@@ -320,8 +320,6 @@ export default function(params) {
         const options = params.nodeOptions?.[nodeId] || {};
         const nodeOptions = {};
         
-        if (!options) return;
-
         // Default handlers
         this.handlers = {
             config(context) {
