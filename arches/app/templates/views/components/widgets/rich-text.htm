@@ -62,7 +62,10 @@
                     language: currentLanguage.code,
                     direction: currentDirection,
                     placeholder: currentPlaceholder,
-                    ckeditorOptions: {},
+                    ckeditorOptions: {
+                        entities_latin: false,
+                        entities_greek: false
+                    },
                     valueUpdate: 'afterkeydown',
                     attr: {disabled: disabled}
                 "></textarea>
