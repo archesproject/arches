@@ -39,3 +39,47 @@
     <!-- /ko -->
 </div>
 <!-- /ko -->
+
+<!-- ko if: $data.search -->
+<div class="col-md-4 col-lg-3">
+    <select class="resources" data-bind="
+        attr: {'data-label': node.label},
+        select2Query: {
+            select2Config:{
+                data: [
+                    { text: $root.translations.equals, id: 'eq' },
+                    { text: $root.translations.not, id: '!eq' },
+                    { text: $root.translations.hasNoValue, id: 'null' },
+                    { text: $root.translations.hasAnyValue, id: 'not_null' },
+                    { text: $root.translations.hasAnyListValue, id: 'in_list_any' },
+                    { text: $root.translations.hasAllListValues, id: 'in_list_all' },
+                    { text: $root.translations.hasNoListValues, id: 'in_list_not' }
+                ],
+                value: op
+        }}">
+    </select>
+</div>
+
+<div class="col-md-8 col-lg-9" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
+    <!-- ko if: !ko.unwrap(op).includes('in_list') -->
+    <select style="display:inline-block;"
+        data-bind="
+            attr: {'data-label': node.label},
+            select2Query: {
+                select2Config: select2Config
+            }
+        ">
+    </select>
+    <!-- /ko -->
+    <!-- ko if: ko.unwrap(op).includes('in_list') -->
+    <select style="display:inline-block;"
+        data-bind="
+            attr: {'data-label': node.label},
+            select2Query: {
+                select2Config: select2ConfigMulti
+            }
+        ">
+    </select>
+    <!-- /ko -->
+</div>
+<!-- /ko -->

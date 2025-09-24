@@ -8,6 +8,10 @@ from django.utils.translation import gettext as _
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models.models import Node
 from arches.app.models.graph import GraphValidationError
+from arches.app.search.elasticsearch_dsl_builder import (
+    Exists,
+    Match,
+)
 
 from arches_controlled_lists.models import ListItem
 
@@ -371,3 +375,30 @@ class ReferenceDataType(BaseDataType):
                         "provisional": provisional,
                     }
                 )
+
+    def append_search_filters(self, value, node, query, request):
+        # value["val"] is expected to be a list of URIs
+        try:
+            values_list = value.get("val", [])
+            if value["op"] == "null" or value["op"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif values_list:
+                field_name = f"tiles.data.{str(node.pk)}.uri"
+                operation = value["op"]
+                for val in values_list:
+                    match_query = Match(field=field_name, type="phrase", query=val)
+
+                    if operation == "in_list_any":
+                        query.should(match_query)
+                    elif operation == "in_list_all":
+                        query.must(match_query)
+                    elif operation == "in_list_not":
+                        query.must_not(match_query)
+                    elif "!" in operation:
+                        query.must_not(match_query)
+                        query.filter(Exists(field=field_name))
+                    else:
+                        query.must(match_query)
+
+        except KeyError:
+            pass
