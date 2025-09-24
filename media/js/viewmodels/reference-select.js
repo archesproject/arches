@@ -77,6 +77,7 @@ export default function(params) {
 
     this.select2Config = {
         value: self.selectionValue,
+        minimumResultsForSearch: -1,
         clickBubble: true,
         multiple: this.multiple,
         closeOnSelect: true,
