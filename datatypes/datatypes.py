@@ -377,16 +377,18 @@ class ReferenceDataType(BaseDataType):
                 )
 
     def append_search_filters(self, value, node, query, request):
-        # value["val"] is expected to be a list of URIs
+        # value["val"] is expected to be a list slimmed reference dictionaries:
+        # {"labels":[...], "uri": "..."}
         try:
             values_list = value.get("val", [])
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
             elif values_list:
-                field_name = f"tiles.data.{str(node.pk)}.uri"
+                uri_field = f"tiles.data.{str(node.pk)}.uri"
                 operation = value["op"]
                 for val in values_list:
-                    match_query = Match(field=field_name, type="phrase", query=val)
+                    uri = val.get("uri", val) if isinstance(val, dict) else val
+                    match_query = Match(field=uri_field, type="phrase", query=uri)
 
                     if operation == "in_list_any":
                         query.should(match_query)
@@ -396,7 +398,7 @@ class ReferenceDataType(BaseDataType):
                         query.must_not(match_query)
                     elif "!" in operation:
                         query.must_not(match_query)
-                        query.filter(Exists(field=field_name))
+                        query.filter(Exists(field=uri_field))
                     else:
                         query.must(match_query)
 

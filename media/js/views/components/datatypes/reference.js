@@ -24,7 +24,7 @@ const viewModel = function(params) {
         this.filterValue = ko.computed(function() {
             return {
                 op: self.op(),
-                val: extractURIs(self.searchValue())
+                val: reduceReferenceShape(self.searchValue())
             };
         });
         params.filterValue(this.filterValue());
@@ -60,16 +60,20 @@ const viewModel = function(params) {
         this.init();
     }
 
-    function extractURIs(items) {
+    // In an effort to reduce adv search URL length, only keep labels and uri
+    // TODO: Keeping labels could also be used for fuzzy text matching in the future
+    function reduceReferenceShape(items) {
         if (items?.length) {
             if (Array.isArray(items)) {
-                const uris = items.map((item) => {
-                    if (item?.uri) return item.uri;
-                    else return item;
+                const slimmedObj = items.map((item) => {
+                    return {
+                        "labels": item.labels,
+                        "uri": item.uri,
+                    }
                 });
-                return uris;
+                return slimmedObj;
             } else {
-                return [items.uri];
+                return [items];
             }
         }
         return '';
