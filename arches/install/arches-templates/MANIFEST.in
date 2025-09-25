@@ -1,1 +1,1 @@
-graft *
+exclude {{ project_name }}/settings_local.py

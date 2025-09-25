@@ -16,11 +16,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from guardian.shortcuts import assign_perm
-from arches.app.models.models import ResourceInstance, Node
+from arches.app.models.models import Node, NodeGroup
 from arches.app.models.resource import Resource
+from arches.app.search.components.resource_type_filter import get_permitted_graphids
 from arches.app.utils.permission_backend import user_can_read_resource
 from arches.app.utils.permission_backend import user_has_resource_model_permissions
 from arches.app.utils.permission_backend import get_restricted_users
+from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from tests.base_test import ArchesTestCase
 
 # these tests can be run from the command line via
@@ -37,51 +39,12 @@ class PermissionTests(ArchesTestCase):
         super().setUpTestData()
         cls.add_users()
         cls.expected_resource_count = 2
-        cls.user = User.objects.get(username="ben")
+        cls.user = cls.test_users["ben"]
         cls.group = Group.objects.get(pk=2)
         cls.legacy_load_testing_package()
-        resource = Resource.objects.get(pk=cls.resource_instance_id)
-        resource.graph_id = cls.data_type_graphid
-        resource.remove_resource_instance_permissions()
-
-    @classmethod
-    def add_users(cls):
-        profiles = (
-            {
-                "name": "ben",
-                "email": "ben@test.com",
-                "password": "Test12345!",
-                "groups": ["Graph Editor", "Resource Editor"],
-            },
-            {
-                "name": "sam",
-                "email": "sam@test.com",
-                "password": "Test12345!",
-                "groups": ["Graph Editor", "Resource Editor", "Resource Reviewer"],
-            },
-            {
-                "name": "jim",
-                "email": "jim@test.com",
-                "password": "Test12345!",
-                "groups": ["Graph Editor", "Resource Editor"],
-            },
-        )
-
-        for profile in profiles:
-            try:
-                user = User.objects.create_user(
-                    username=profile["name"],
-                    email=profile["email"],
-                    password=profile["password"],
-                )
-                user.save()
-
-                for group_name in profile["groups"]:
-                    group = Group.objects.get(name=group_name)
-                    group.user_set.add(user)
-
-            except Exception as e:
-                print(e)
+        cls.resource = Resource.objects.get(pk=cls.resource_instance_id)
+        cls.resource.graph_id = cls.data_type_graphid
+        cls.resource.remove_resource_instance_permissions()
 
     def test_user_cannot_view_without_permission(self):
         """
@@ -92,14 +55,11 @@ class PermissionTests(ArchesTestCase):
         implicit_permission = user_can_read_resource(
             self.user, self.resource_instance_id
         )
-        resource = ResourceInstance.objects.get(
-            resourceinstanceid=self.resource_instance_id
-        )
-        assign_perm("change_resourceinstance", self.group, resource)
+        assign_perm("change_resourceinstance", self.group, self.resource)
         can_access_without_view_permission = user_can_read_resource(
             self.user, self.resource_instance_id
         )
-        assign_perm("view_resourceinstance", self.group, resource)
+        assign_perm("view_resourceinstance", self.group, self.resource)
         can_access_with_view_permission = user_can_read_resource(
             self.user, self.resource_instance_id
         )
@@ -113,18 +73,15 @@ class PermissionTests(ArchesTestCase):
 
         """
 
-        resource = ResourceInstance.objects.get(
-            resourceinstanceid=self.resource_instance_id
-        )
         nodes = (
-            Node.objects.filter(graph_id=resource.graph_id)
+            Node.objects.filter(graph_id=self.resource.graph_id)
             .exclude(nodegroup__isnull=True)
             .select_related("nodegroup")
         )
         for node in nodes:
             assign_perm("no_access_to_nodegroup", self.group, node.nodegroup)
         hasperms = user_has_resource_model_permissions(
-            self.user, ["models.read_nodegroup"], resource
+            self.user, ["models.read_nodegroup"], self.resource
         )
         self.assertFalse(hasperms)
 
@@ -132,19 +89,15 @@ class PermissionTests(ArchesTestCase):
         """
         Tests that users are properly identified as restricted.
         """
-
-        resource = ResourceInstance.objects.get(
-            resourceinstanceid=self.resource_instance_id
-        )
-        assign_perm("no_access_to_resourceinstance", self.group, resource)
+        assign_perm("no_access_to_resourceinstance", self.group, self.resource)
         ben = self.user
-        jim = User.objects.get(username="jim")
-        sam = User.objects.get(username="sam")
-        admin = User.objects.get(username="admin")
-        assign_perm("view_resourceinstance", ben, resource)
-        assign_perm("change_resourceinstance", jim, resource)
+        jim = self.test_users["jim"]
+        sam = self.test_users["sam"]
+        admin = self.test_users["admin"]
+        assign_perm("view_resourceinstance", ben, self.resource)
+        assign_perm("change_resourceinstance", jim, self.resource)
 
-        restrictions = get_restricted_users(resource)
+        restrictions = get_restricted_users(self.resource)
 
         results = [
             ("jim", "cannot_read", jim.id in restrictions["cannot_read"]),
@@ -172,3 +125,29 @@ class PermissionTests(ArchesTestCase):
         for result in results:
             with self.subTest(user=result[0], restriction=result[1]):
                 self.assertTrue(result[2])
+
+    def test_get_permitted_graphids(self):
+        """
+        Tests if a user has access to a resource model based on nodegroup access
+
+        """
+
+        nodegroups = NodeGroup.objects.filter(
+            node__graph_id=self.data_type_graphid
+        ).distinct()
+        permitted_nodegroups = get_nodegroups_by_perm(
+            self.user, "models.read_nodegroup"
+        )
+        graphids = get_permitted_graphids(permitted_nodegroups)
+        with self.subTest(graphids):
+            self.assertTrue(self.data_type_graphid in graphids)
+
+        for nodegroup in nodegroups:
+            assign_perm("no_access_to_nodegroup", self.user, nodegroup)
+
+        permitted_nodegroups = get_nodegroups_by_perm(
+            self.user, "models.read_nodegroup"
+        )
+        graphids = get_permitted_graphids(permitted_nodegroups)
+        with self.subTest(graphids):
+            self.assertTrue(self.data_type_graphid not in graphids)

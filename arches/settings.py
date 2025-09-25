@@ -48,6 +48,9 @@ DATABASES = {
         "HOST": "localhost",  # Set to empty string for localhost. Not used with sqlite3.
         "PORT": "5432",  # Set to empty string for default. Not used with sqlite3.
         "POSTGIS_TEMPLATE": "template_postgis",
+        "OPTIONS": {
+            "options": "-c cursor_tuple_fraction=1",
+        },
     }
 }
 
@@ -101,6 +104,21 @@ ELASTICSEARCH_CUSTOM_INDEXES = []
 #     'name': 'my_new_custom_index',
 #     'should_update_asynchronously': False
 # }]
+
+TERM_SEARCH_TYPES = [
+    {
+        "type": "term",
+        "label": _("Term Matches"),
+        "key": "terms",
+        "module": "arches.app.search.search_term.TermSearch",
+    },
+    {
+        "type": "concept",
+        "label": _("Concepts"),
+        "key": "concepts",
+        "module": "arches.app.search.concept_search.ConceptSearch",
+    },
+]
 
 THUMBNAIL_GENERATOR = None  # "arches.app.utils.thumbnail_generator.ThumbnailGenerator"
 GENERATE_THUMBNAILS_ON_DEMAND = (
@@ -199,6 +217,7 @@ RESOURCE_EDITOR_GROUPS = ("Resource Editor", "Crowdsource Editor")
 
 # Unique session cookie ensures that logins are treated separately for each app
 SESSION_COOKIE_NAME = "arches"
+SESSION_COOKIE_SAMESITE = "Strict"
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  #<-- Only need to uncomment this for testing without an actual email server
 # EMAIL_USE_TLS = True
@@ -324,10 +343,9 @@ TEMPLATES = build_templates_config(debug=DEBUG)
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-    "arches.settings_utils.ArchesApplicationsStaticFilesFinder",
-    "arches.settings_utils.CoreArchesStaticFilesFinderBuildDirectory",
-    "arches.settings_utils.CoreArchesStaticFilesFinderMediaRoot",
-    "arches.settings_utils.CoreArchesStaticFilesFinderNodeModules",
+    "arches.settings_utils.StaticFilesFinderBuildDirectory",
+    "arches.settings_utils.StaticFilesFinderMediaRoot",
+    "arches.settings_utils.StaticFilesFinderNodeModules",
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
@@ -355,7 +373,6 @@ AUTHENTICATION_BACKENDS = (
 
 INSTALLED_APPS = (
     "webpack_loader",
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -367,16 +384,21 @@ INSTALLED_APPS = (
     "arches.app.models",
     "arches.management",
     "guardian",
-    "captcha",
+    "django_recaptcha",
     "revproxy",
     "corsheaders",
     "oauth2_provider",
     "django_celery_results",
+    "django_migrate_sql",
+    "pgtrigger",
 )
 
 # Placing this last ensures any templates provided by Arches Applications
 # take precedence over core arches templates in arches/app/templates.
-INSTALLED_APPS += ("arches.app",)
+INSTALLED_APPS += (
+    "arches.app",
+    "django.contrib.admin",
+)
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -451,7 +473,12 @@ LOGGING = {
             "handlers": ["file", "console"],
             "level": "WARNING",
             "propagate": True,
-        }
+        },
+        "django.request": {
+            "handlers": ["file", "console"],
+            "level": "WARNING",
+            "propagate": True,
+        },
     },
 }
 
@@ -504,7 +531,7 @@ NOCAPTCHA = True
 SILENCED_SYSTEM_CHECKS = ["guardian.W001"]
 
 if DEBUG is True:
-    SILENCED_SYSTEM_CHECKS += ["captcha.recaptcha_test_key_error"]
+    SILENCED_SYSTEM_CHECKS += ["django_recaptcha.recaptcha_test_key_error"]
 
 # group to assign users who self sign up via the web ui
 USER_SIGNUP_GROUP = "Crowdsource Editor"
@@ -722,13 +749,6 @@ MAP_MAX_ZOOM = 20
 # Map filter auto adjusts map extent to fit results. If False, map extent will not change when filtering results.
 MAP_FILTER_AUTO_ZOOM_ENABLED = True
 
-# If True, users can make edits to graphs that are locked
-# (generally because they have resource intances saved against them)
-# Changing this setting to True and making graph modifications may result in
-# disagreement between your Resource Models and Resource Instances potentially
-# causing your application to break.
-OVERRIDE_RESOURCE_MODEL_LOCK = False
-
 # If True, allows users to selectively enable two-factor authentication
 ENABLE_TWO_FACTOR_AUTHENTICATION = False
 
@@ -835,6 +855,8 @@ RENDERERS = [
         "exclude": "tif,tiff,psd",
     },
 ]
+
+DEFAULT_RESOURCE_INSTANCE_LIFECYCLE_ID = "7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"
 
 # --- JSON LD sortorder generating functions --- #
 #

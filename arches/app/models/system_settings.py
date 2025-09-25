@@ -95,7 +95,7 @@ class SystemSettings(LazySettings):
         # get all the possible settings defined by the Arches System Settings Graph
         for node in models.Node.objects.filter(
             graph_id=self.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
-        ):
+        ).select_related("nodegroup"):
 
             def setup_blank_setting(name, value):
                 if not self.setting_exists(name):
@@ -122,9 +122,17 @@ class SystemSettings(LazySettings):
         n_cardinality_collector_node_names = []
 
         # set any values saved in the instance of the Arches System Settings Graph
-        for tile in models.TileModel.objects.filter(
-            resourceinstance__graph_id=self.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
-        ).order_by("sortorder"):
+        for tile in (
+            models.TileModel.objects.filter(
+                resourceinstance__graph_id=self.SYSTEM_SETTINGS_RESOURCE_MODEL_ID,
+                # Get tiles only from the latest graph publication.
+                resourceinstance__graph_publication=models.F(
+                    "resourceinstance__graph__publication"
+                ),
+            )
+            .select_related("nodegroup")
+            .order_by("sortorder")
+        ):
             if tile.nodegroup.cardinality == "1":
                 for node in tile.nodegroup.node_set.all():
                     if node.datatype != "semantic":
@@ -162,7 +170,11 @@ class SystemSettings(LazySettings):
 
     def get_direct_decendent_nodes(self, node):
         nodes = []
-        for edge in models.Edge.objects.filter(domainnode=node):
+        for edge in (
+            models.Edge.objects.filter(domainnode=node)
+            .select_related("rangenode")
+            .prefetch_related("rangenode__nodegroup")
+        ):
             nodes.append(edge.rangenode)
         return nodes
 

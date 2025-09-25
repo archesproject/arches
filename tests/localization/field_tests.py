@@ -8,6 +8,7 @@ from arches.app.models.fields.i18n import (
     I18n_JSON,
     I18n_JSONField,
 )
+from arches.app.models.models import CardModel, Node
 from tests.base_test import ArchesTestCase
 from django.contrib.gis.db import models
 from django.utils import translation
@@ -15,6 +16,11 @@ from django.db import connection
 
 # these tests can be run from the command line via
 # python manage.py test tests.localization.field_tests --settings="tests.test_settings"
+
+
+class I18nTextFieldFilterTests(ArchesTestCase):
+    def test_filter_related_model_i18n_text_field(self):
+        self.assertEqual(Node.objects.filter(graph__name__en="Graph Name").count(), 0)
 
 
 class Customi18nTextFieldTests(ArchesTestCase):
@@ -227,6 +233,34 @@ class Customi18nTextFieldTests(ArchesTestCase):
         self.assertEqual(value, "precisely")
         translation.activate("de")
         self.assertEqual(value, "genau")
+
+    def test_bulk_update_heterogenous_values(self):
+        new_names = [
+            I18n_String(
+                {
+                    "en": "some",
+                    "zh": "json",
+                }
+            ),
+            I18n_String({}),
+            None,
+        ]
+        for_bulk_update = []
+        for i, dt in enumerate(CardModel.objects.all()[:3]):
+            dt.name = new_names[i]
+            for_bulk_update.append(dt)
+
+        CardModel.objects.bulk_update(for_bulk_update, fields=["name"])
+
+        for i, obj in enumerate(for_bulk_update):
+            # None is transformed to {}.
+            new_name_as_string = str(new_names[i] or {})
+            with self.subTest(new_name=new_name_as_string):
+                obj.refresh_from_db()
+                self.assertEqual(
+                    str(obj.name.raw_value).replace("'", '"'),
+                    new_name_as_string.replace("'", '"'),
+                )
 
 
 class Customi18nJSONFieldTests(ArchesTestCase):
@@ -458,23 +492,17 @@ class I18nJSONFieldBulkUpdateTests(ArchesTestCase):
             dt.defaultconfig = new_configs[i]
             for_bulk_update.append(dt)
 
-        with self.assertRaises(NotImplementedError):
-            DDataType.objects.bulk_update(for_bulk_update, fields=["defaultconfig"])
+        DDataType.objects.bulk_update(for_bulk_update, fields=["defaultconfig"])
 
-        # If the above starts failing, it's likely the underlying Django
-        # regression was fixed.
-        # https://code.djangoproject.com/ticket/35167
-
-        # In that case, remove the with statement, de-indent the bulk_update,
-        # and comment the following code back in:
-
-        # for i, obj in enumerate(for_bulk_update):
-        #     new_config_as_string = str(new_configs[i])
-        #     with self.subTest(new_config=new_config_as_string):
-        #         obj.refresh_from_db()
-        #         self.assertEqual(str(obj.defaultconfig), new_config_as_string)
-
-        # Also consider removing the code at the top of I18n_JSON._parse()
+        for i, obj in enumerate(for_bulk_update):
+            # None is transformed to {}.
+            new_config_as_string = str(new_configs[i] or {})
+            with self.subTest(new_config=new_config_as_string):
+                obj.refresh_from_db()
+                self.assertEqual(
+                    str(obj.defaultconfig.raw_value).replace("'", '"'),
+                    new_config_as_string.replace("'", '"'),
+                )
 
 
 class AsSqlTests(ArchesTestCase):
@@ -483,5 +511,16 @@ class AsSqlTests(ArchesTestCase):
         domain_value = I18n_JSON({"en": "it's a bird"})
 
         # Apostrophe in "it's" is doubly-escaped so it doesn't close the string
-        expected = "jsonb_set(None, array['en'], '\"it''s a bird\"')"
+        expected = "jsonb_set('{}'::jsonb, array['en'], '\"it''s a bird\"')"
         self.assertEqual(datatype.i18n_as_sql(domain_value, None, None), expected)
+
+    def test_percent_sign_encoding(self):
+        widget_config = I18n_JSON(
+            {
+                "i18n_properties": ["placeholder"],
+                "placeholder": "Enter text",
+                "width": "100%",
+            }
+        )
+        _, params = widget_config.as_sql(None, None)
+        self.assertEqual(json.loads(params[0])["width"], "100%")

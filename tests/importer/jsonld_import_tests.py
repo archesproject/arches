@@ -1,3 +1,4 @@
+import hashlib
 import os
 import datetime
 
@@ -33,7 +34,11 @@ class JsonLDImportTests(ArchesTestCase):
         cls.token = "abc123"
         cls.client = Client(HTTP_AUTHORIZATION="Bearer %s" % cls.token)
 
-        sql_str = CREATE_TOKEN_SQL.format(token=cls.token, user_id=1)
+        sql_str = CREATE_TOKEN_SQL.format(
+            token=cls.token,
+            user_id=1,
+            token_checksum=hashlib.sha256(cls.token.encode("utf-8")).hexdigest(),
+        )
         with connection.cursor() as cursor:
             cursor.execute(sql_str)
 
@@ -181,6 +186,11 @@ class JsonLDImportTests(ArchesTestCase):
             "37b50648-78ef-11ec-9508-faffc210b420",
         ]:
             graph = Graph.objects.get(pk=graph_id)
+
+            draft_graph_list = Graph.objects.filter(source_identifier_id=graph.pk)
+            if not len(draft_graph_list):
+                graph.create_draft_graph()
+
             graph.publish(user=User.objects.get(pk=1))
 
     @classmethod
@@ -262,7 +272,6 @@ class JsonLDImportTests(ArchesTestCase):
         with self.assertRaises(ValueError):
             data = JSONDeserializer().deserialize(data)
             reader = JsonLdReader()
-            # import ipdb; ipdb.sset_trace()
             with captured_stdout():
                 reader.read_resource(data, resourceid=resource_id, graphid=graph_id)
 
@@ -1526,7 +1535,13 @@ class JsonLDImportTests(ArchesTestCase):
         )
         tile1_parent = get_tile_by_id(tiles, tile1.parenttile_id)
 
-        self.assertEqual(tile1_parent.data, {})
+        self.assertEqual(
+            tile1_parent.data,
+            {
+                "d155a4c0-1540-11ea-b353-acde48001122": None,
+                "ddc44d9c-1540-11ea-b353-acde48001122": None,
+            },
+        )
         tile1_grandparent = get_tile_by_id(tiles, tile1_parent.parenttile_id)
         self.assertEqual(
             tile1_grandparent.data["02ec0ace-1541-11ea-b353-acde48001122"]["en"],

@@ -2,24 +2,28 @@ import fs from 'fs';
 import path from 'path';
 import vue from "@vitejs/plugin-vue";
 
-import { defineConfig } from 'vite';
+import { fileURLToPath } from 'url';
+import { defineConfig } from 'vitest/config';
 
-import type { UserConfigExport } from 'vite';
+import type { UserConfig } from 'vitest/config';
 
-
-function generateConfig(): Promise<UserConfigExport> {
+function generateConfig(): Promise<UserConfig> {
     return new Promise((resolve, reject) => {
+        const filePath = path.dirname(fileURLToPath(import.meta.url));
+
         const exclude = [
+            '**/*.d.ts',
             '**/node_modules/**',
             '**/dist/**',
             '**/install/**',
             '**/cypress/**',
-            '**/themes/**',
             '**/.{idea,git,cache,output,temp}/**',
             '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
+            '**/build/**',
+            '**/staticfiles/**',
         ];
 
-        const rawData = fs.readFileSync(path.join(__dirname, '.frontend-configuration-settings.json'), 'utf-8');
+        const rawData = fs.readFileSync(path.join(__dirname, 'frontend_configuration', 'webpack-metadata.json'), 'utf-8');
         const parsedData = JSON.parse(rawData);
 
         const alias: { [key: string]: string } = {
@@ -37,17 +41,17 @@ function generateConfig(): Promise<UserConfigExport> {
         }
 
         resolve({
-            plugins: [vue()],
+            plugins: [vue() as any],
             test: {
                 alias: alias,
                 coverage: {
-                    include: [path.join('{{ project_name }}', 'src', path.sep)],
+                    include: [path.join(parsedData['APP_RELATIVE_PATH'], 'src', path.sep)],
                     exclude: exclude,
                     reporter: [
                         ['clover', { 'file': 'coverage.xml' }],
                         'text',
                     ],
-                    reportsDirectory: path.join(__dirname, 'coverage', 'frontend'),
+                    reportsDirectory: path.join(filePath, 'coverage', 'frontend'),
                 },
                 environment: "jsdom",
                 globals: true,

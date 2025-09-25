@@ -1,5 +1,6 @@
 import uuid
 import datetime
+from http import HTTPStatus
 
 from django.contrib.auth.models import Group, User
 from django.urls import reverse
@@ -26,7 +27,7 @@ class WorkflowHistoryTests(ArchesTestCase):
         group.user_set.add(cls.editor)
 
         cls.history = WorkflowHistory.objects.create(
-            workflowid=str(uuid.uuid1()),
+            workflowid=str(uuid.uuid4()),
             workflowname="test-name",
             user=cls.admin,
             created=datetime.datetime.now(),
@@ -45,7 +46,7 @@ class WorkflowHistoryTests(ArchesTestCase):
                 "84d0578f-6061-4015-a44d-c7b64cdb0551": {
                     "value": {
                         "name": {
-                            "tileid": str(uuid.uuid1()),
+                            "tileid": str(uuid.uuid4()),
                             "value": {
                                 "en": {
                                     "direction": "ltr",
@@ -53,10 +54,10 @@ class WorkflowHistoryTests(ArchesTestCase):
                                 },
                             },
                         },
-                        "projectResourceId": str(uuid.uuid1()),
+                        "projectResourceId": str(uuid.uuid4()),
                         "type": {
-                            "tileid": str(uuid.uuid1()),
-                            "value": str(uuid.uuid1()),
+                            "tileid": str(uuid.uuid4()),
+                            "value": str(uuid.uuid4()),
                         },
                     },
                 },
@@ -67,7 +68,7 @@ class WorkflowHistoryTests(ArchesTestCase):
     def test_get_nonexistent_workflow_history(self):
         self.client.force_login(self.admin)
         response = self.client.get(
-            reverse("workflow_history", kwargs={"workflowid": uuid.uuid1()})
+            reverse("workflow_history", kwargs={"workflowid": uuid.uuid4()})
         )
 
         self.assertEqual(response.status_code, 200)
@@ -83,8 +84,9 @@ class WorkflowHistoryTests(ArchesTestCase):
                 )
             )
 
-        self.assertEqual(response.status_code, 403)
-        self.assertIn(b"Forbidden", response.content)
+        self.assertContains(
+            response, "Permission Denied", status_code=HTTPStatus.FORBIDDEN
+        )
 
         self.client.force_login(self.admin)
         response = self.client.get(
@@ -93,8 +95,7 @@ class WorkflowHistoryTests(ArchesTestCase):
             )
         )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b"sample name", response.content)
+        self.assertContains(response, "sample name", status_code=HTTPStatus.OK)
 
     def test_post_workflow_history(self):
         """Partial updates of componentdata and stepdata are allowed."""
@@ -118,7 +119,7 @@ class WorkflowHistoryTests(ArchesTestCase):
                 "ae8f2027-f2e1-447c-8763-125e65d4b666": {
                     "value": {
                         "name": {
-                            "tileid": str(uuid.uuid1()),
+                            "tileid": str(uuid.uuid4()),
                             "value": {
                                 "en": {
                                     "direction": "ltr",
@@ -126,10 +127,10 @@ class WorkflowHistoryTests(ArchesTestCase):
                                 },
                             },
                         },
-                        "projectResourceId": str(uuid.uuid1()),
+                        "projectResourceId": str(uuid.uuid4()),
                         "type": {
-                            "tileid": str(uuid.uuid1()),
-                            "value": str(uuid.uuid1()),
+                            "tileid": str(uuid.uuid4()),
+                            "value": str(uuid.uuid4()),
                         },
                     },
                 }
@@ -148,8 +149,9 @@ class WorkflowHistoryTests(ArchesTestCase):
                 content_type="application/json",
             )
 
-        self.assertEqual(response.status_code, 403)
-        self.assertIn(b"Forbidden", response.content)
+        self.assertContains(
+            response, "Permission Denied", status_code=HTTPStatus.FORBIDDEN
+        )
 
         self.client.force_login(self.admin)
         response = self.client.post(

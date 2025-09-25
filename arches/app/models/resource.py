@@ -18,21 +18,22 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
 import logging
+from collections import defaultdict
 from time import time
 from uuid import UUID
 from types import SimpleNamespace
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Count, F, Q
 from django.contrib.auth.models import User, Group
 from django.forms.models import model_to_dict
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.utils.translation import gettext as _
 from django.utils.translation import get_language
 from arches.app.models import models
 from arches.app.models.models import EditLog
 from arches.app.models.models import TileModel
-from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.models.system_settings import settings
+from arches.app.models.utils import add_to_update_fields
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.mappings import TERMS_INDEX, RESOURCES_INDEX
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms, Nested
@@ -45,7 +46,6 @@ from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedG
 from arches.app.utils.permission_backend import (
     assign_perm,
     remove_perm,
-    NotUserNorGroup,
 )
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.exceptions import (
@@ -57,6 +57,10 @@ from arches.app.utils.permission_backend import (
     get_filtered_instances,
     get_nodegroups_by_perm,
 )
+from arches.app.utils.resource_relationship_utils import (
+    get_resource_relationship_type_label,
+)
+
 import django.dispatch
 from arches.app.datatypes.datatypes import DataTypeFactory
 
@@ -221,23 +225,18 @@ class Resource(models.ResourceInstance):
     def displayname(self, context=None):
         return self.get_descriptor("name", context)
 
-    def save_edit(self, user={}, note="", edit_type="", transaction_id=None):
-        timestamp = datetime.datetime.now()
-        edit = EditLog()
-        edit.resourceclassid = self.graph_id
-        edit.resourceinstanceid = self.resourceinstanceid
-        edit.userid = getattr(user, "id", "")
-        edit.user_email = getattr(user, "email", "")
-        edit.user_firstname = getattr(user, "first_name", "")
-        edit.user_lastname = getattr(user, "last_name", "")
-        edit.note = note
-        edit.timestamp = timestamp
-        if transaction_id is not None:
-            edit.transactionid = transaction_id
-        edit.edittype = edit_type
-        edit.save()
-
-    def save(self, *args, **kwargs):
+    def save(
+        self,
+        *,
+        context=None,
+        index=True,
+        request=None,
+        transaction_id=None,
+        user=None,
+        should_update_resource_instance_lifecycle_state=False,
+        current_resource_instance_lifecycle_state=None,
+        **kwargs,
+    ):
         """
         Saves and indexes a single resource
 
@@ -247,16 +246,9 @@ class Resource(models.ResourceInstance):
         index -- True(default) to index the resource, otherwise don't index the resource
 
         """
-        # TODO: 7783 cbyrd throw error if graph is unpublished
         # This initializes serialized graph (for use in superclass?). Setup for the above. NOt sure
         if not self.get_serialized_graph():
             pass
-
-        request = kwargs.pop("request", None)
-        user = kwargs.pop("user", None)
-        index = kwargs.pop("index", True)
-        context = kwargs.pop("context", None)
-        transaction_id = kwargs.pop("transaction_id", None)
 
         if request is None:
             if user is None:
@@ -266,8 +258,23 @@ class Resource(models.ResourceInstance):
 
         if not self.principaluser_id and user:
             self.principaluser_id = user.id
+            add_to_update_fields(kwargs, "principaluser_id")
 
-        super(Resource, self).save(*args, **kwargs)
+        super(Resource, self).save(
+            context=context,
+            index=index,
+            request=request,
+            transaction_id=transaction_id,
+            user=user,
+            should_update_resource_instance_lifecycle_state=should_update_resource_instance_lifecycle_state,
+            current_resource_instance_lifecycle_state=current_resource_instance_lifecycle_state,
+            **kwargs,
+        )
+
+        if should_update_resource_instance_lifecycle_state:
+            # Saving tiles at the same time as updating lifecycle state is not supported.
+            return
+
         self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
 
         for tile in self.tiles:
@@ -278,16 +285,8 @@ class Resource(models.ResourceInstance):
                 resource_creation=True,
                 transaction_id=transaction_id,
                 context=context,
+                resource=self,
             )
-        try:
-            for perm in (
-                "view_resourceinstance",
-                "change_resourceinstance",
-                "delete_resourceinstance",
-            ):
-                assign_perm(perm, user, self)
-        except NotUserNorGroup:
-            pass
 
         if index is True:
             self.index(context)
@@ -304,7 +303,7 @@ class Resource(models.ResourceInstance):
             self.tiles = [
                 tile
                 for tile in self.tiles
-                if tile.nodegroup is not None
+                if tile.nodegroup_id is not None
                 and tile.nodegroup_id in readable_nodegroups
             ]
 
@@ -395,7 +394,7 @@ class Resource(models.ResourceInstance):
 
     def index(self, context=None):
         """
-        Indexes all the nessesary items values of a resource to support search
+        Indexes all the necessary items values of a resource to support search
 
         Keyword Arguments:
         context -- a string such as "copy" to indicate conditions under which a document is indexed
@@ -418,6 +417,7 @@ class Resource(models.ResourceInstance):
             )
             document["root_ontology_class"] = self.get_root_ontology()
             doc = JSONSerializer().serializeToPython(document)
+
             se.index_data(index=RESOURCES_INDEX, body=doc, id=self.pk)
             for term in terms:
                 se.index_data("terms", body=term["_source"], id=term["_id"])
@@ -450,7 +450,13 @@ class Resource(models.ResourceInstance):
             resource_indexed.send(sender=self.__class__, instance=self)
 
     def get_documents_to_index(
-        self, fetchTiles=True, datatype_factory=None, node_datatypes=None, context=None
+        self,
+        fetchTiles=True,
+        datatype_factory=None,
+        node_datatypes=None,
+        context=None,
+        *,
+        all_users=None,
     ):
         """
         Gets all the documents nessesary to index a single resource
@@ -461,6 +467,7 @@ class Resource(models.ResourceInstance):
         datatype_factory -- refernce to the DataTypeFactory instance
         node_datatypes -- a dictionary of datatypes keyed to node ids
         context -- a string such as "copy" to indicate conditions under which a document is indexed
+        all_users -- an iterable of User objects, e.g. User.objects.prefetch_related("groups")
 
         """
 
@@ -472,10 +479,24 @@ class Resource(models.ResourceInstance):
         document["displayname"] = None
         document["root_ontology_class"] = self.get_root_ontology()
         document["legacyid"] = self.legacyid
+        document["resource_instance_lifecycle_state_id"] = str(
+            self.resource_instance_lifecycle_state_id
+        )
 
         document["displayname"] = []
         document["displaydescription"] = []
         document["map_popup"] = []
+        document["date_created"] = self.createdtime
+        try:
+            document["date_last_edited"] = (
+                models.EditLog.objects.filter(
+                    resourceinstanceid=self.resourceinstanceid, timestamp__isnull=False
+                )
+                .latest("timestamp")
+                .timestamp
+            )
+        except ObjectDoesNotExist:
+            document["date_last_edited"] = None
         for lang in settings.LANGUAGES:
             if context is None:
                 context = {}
@@ -536,7 +557,9 @@ class Resource(models.ResourceInstance):
                 [int(self.principaluser_id)] if self.principaluser_id else []
             )
         }
-        document["permissions"].update(permission_backend.get_index_values(self))
+        document["permissions"].update(
+            permission_backend.get_index_values(self, all_users=all_users)
+        )
 
         document["strings"] = []
         document["dates"] = []
@@ -651,7 +674,6 @@ class Resource(models.ResourceInstance):
         # - that the index for the to-be-deleted resource gets deleted
 
         permit_deletion = False
-        # TODO: 7783 cbyrd throw error if graph is unpublished
         if user != {}:
             user_is_reviewer = user_is_resource_reviewer(user)
             if user_is_reviewer is False:
@@ -679,8 +701,8 @@ class Resource(models.ResourceInstance):
 
         if permit_deletion is True:
             for related_resource in models.ResourceXResource.objects.filter(
-                Q(resourceinstanceidfrom=self.resourceinstanceid)
-                | Q(resourceinstanceidto=self.resourceinstanceid)
+                Q(from_resource_id=self.resourceinstanceid)
+                | Q(to_resource_id=self.resourceinstanceid)
             ):
                 related_resource.delete(deletedResourceId=self.resourceinstanceid)
 
@@ -714,7 +736,13 @@ class Resource(models.ResourceInstance):
         else:
             instance = Resource(pk=resourceinstanceid)
             # ensure PK is UUID
-            instance.clean_fields(exclude=["graph", "graph_publication"])
+            instance.clean_fields(
+                exclude=[
+                    "graph",
+                    "graph_publication",
+                    "resource_instance_lifecycle_state",
+                ]
+            )
         resourceinstanceid = str(resourceinstanceid)
 
         # delete any related terms
@@ -781,6 +809,7 @@ class Resource(models.ResourceInstance):
         user=None,
         resourceinstance_graphid=None,
         graphs=None,
+        include_rr_count=True,
     ):
         """
         Returns an object that lists the related resources, the relationship types, and a reference to the current resource
@@ -803,7 +832,8 @@ class Resource(models.ResourceInstance):
                 models.GraphModel.objects.all()
                 .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
                 .exclude(isresource=False)
-                .exclude(publication=None)
+                .exclude(is_active=False)
+                .exclude(source_identifier__isnull=False)
             )
 
         graph_lookup = {
@@ -832,23 +862,19 @@ class Resource(models.ResourceInstance):
             start,
             limit,
             resourceinstance_graphid=None,
-            count_only=False,
         ):
-            final_query = Q(resourceinstanceidfrom_id=resourceinstanceid) | Q(
-                resourceinstanceidto_id=resourceinstanceid
+            final_query = Q(from_resource_id=resourceinstanceid) | Q(
+                to_resource_id=resourceinstanceid
             )
 
             if resourceinstance_graphid:
-                to_graph_id_filter = Q(
-                    resourceinstancefrom_graphid_id=str(self.graph_id)
-                ) & Q(resourceinstanceto_graphid_id=resourceinstance_graphid)
+                to_graph_id_filter = Q(from_resource_graph_id=str(self.graph_id)) & Q(
+                    to_resource_graph_id=resourceinstance_graphid
+                )
                 from_graph_id_filter = Q(
-                    resourceinstancefrom_graphid_id=resourceinstance_graphid
-                ) & Q(resourceinstanceto_graphid_id=str(self.graph_id))
+                    from_resource_graph_id=resourceinstance_graphid
+                ) & Q(to_resource_graph_id=str(self.graph_id))
                 final_query = final_query & (to_graph_id_filter | from_graph_id_filter)
-
-            if count_only:
-                return models.ResourceXResource.objects.filter(final_query).count()
 
             return (
                 {  # resourceinstance_graphid = "00000000-886a-374a-94a5-984f10715e3a"
@@ -876,19 +902,25 @@ class Resource(models.ResourceInstance):
                 user, ["models.read_nodegroup"]
             )
         )
+        all_resource_ids = set()
+        for relation in resource_relations["relations"]:
+            all_resource_ids.add(str(relation.to_resource_id))
+            all_resource_ids.add(str(relation.from_resource_id))
+        exclusive_set, filtered_instances = get_filtered_instances(
+            user, se, resources=list(all_resource_ids)
+        )
+        filtered_instances = filtered_instances if user is not None else []
+        permitted_relation_dicts = []
+
         for relation in resource_relations["relations"]:
             relation = model_to_dict(relation)
-            resourceid_to = relation["resourceinstanceidto"]
-            resourceid_from = relation["resourceinstanceidfrom"]
-            resourceinstanceto_graphid = relation["resourceinstanceto_graphid"]
-            resourceinstancefrom_graphid = relation["resourceinstancefrom_graphid"]
-            exclusive_set, filtered_instances = get_filtered_instances(
-                user, se, resources=[resourceid_from, resourceid_to]
-            )
-            filtered_instances = filtered_instances if user is not None else []
+            to_resource = relation["to_resource"]
+            from_resource = relation["from_resource"]
+            to_resource_graph = relation["to_resource_graph"]
+            from_resource_graph = relation["from_resource_graph"]
 
-            resourceid_to_permission = resourceid_to not in filtered_instances
-            resourceid_from_permission = resourceid_from not in filtered_instances
+            resourceid_to_permission = str(to_resource) not in filtered_instances
+            resourceid_from_permission = str(from_resource) not in filtered_instances
 
             if exclusive_set:
                 resourceid_to_permission = not (resourceid_to_permission)
@@ -897,24 +929,32 @@ class Resource(models.ResourceInstance):
             if (
                 resourceid_to_permission
                 and resourceid_from_permission
-                and str(resourceinstanceto_graphid) in readable_graphids
-                and str(resourceinstancefrom_graphid) in readable_graphids
+                and str(to_resource_graph) in readable_graphids
+                and str(from_resource_graph) in readable_graphids
             ):
-                try:
-                    preflabel = get_preflabel_from_valueid(
-                        relation["relationshiptype"], lang
-                    )
-                    relation["relationshiptype_label"] = preflabel["value"] or ""
-                except:
-                    relation["relationshiptype_label"] = (
-                        relation["relationshiptype"] or ""
-                    )
-
-                ret["resource_relationships"].append(relation)
-                instanceids.add(str(resourceid_to))
-                instanceids.add(str(resourceid_from))
+                permitted_relation_dicts.append(relation)
             else:
                 ret["total"]["value"] -= 1
+
+        # Fetch pref labels for relationship types in bulk.
+        relationship_types = {
+            relation["relationshiptype"]
+            for relation in permitted_relation_dicts
+            if relation["relationshiptype"]
+        }
+
+        preflabel_lookup = get_resource_relationship_type_label(
+            relationship_types, lang
+        )
+
+        for relation in permitted_relation_dicts:
+            relation["relationshiptype_label"] = preflabel_lookup.get(
+                relation["relationshiptype"], relation["relationshiptype"] or ""
+            )
+
+            ret["resource_relationships"].append(relation)
+            instanceids.add(str(relation["to_resource"]))
+            instanceids.add(str(relation["from_resource"]))
 
         if str(self.resourceinstanceid) in instanceids:
             instanceids.remove(str(self.resourceinstanceid))
@@ -922,15 +962,49 @@ class Resource(models.ResourceInstance):
         if len(instanceids) > 0:
             related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
             if related_resources:
+                related_resource_ids = [
+                    resource["_id"]
+                    for resource in related_resources["docs"]
+                    if resource["found"]
+                ]
+                if include_rr_count:
+                    to_counts = (
+                        models.ResourceXResource.objects.filter(
+                            to_resource__in=related_resource_ids
+                        )
+                        .values("to_resource")
+                        .annotate(to_count=Count("to_resource"))
+                        # ORDER BY NULLS LAST is necessary for "pipelined" GROUP BY, see
+                        # https://use-the-index-luke.com/sql/sorting-grouping/indexed-group-by
+                        .order_by(F("to_resource").asc(nulls_last=True))
+                    )
+                    from_counts = (
+                        models.ResourceXResource.objects.filter(
+                            from_resource__in=related_resource_ids
+                        )
+                        .values("from_resource")
+                        .annotate(from_count=Count("from_resource"))
+                        .order_by(F("from_resource").asc(nulls_last=True))
+                    )
+
+                    total_relations_by_resource_id: dict[UUID:int] = defaultdict(int)
+                    for related_resource_count in to_counts:
+                        total_relations_by_resource_id[
+                            related_resource_count["to_resource"]
+                        ] += related_resource_count["to_count"]
+                    for related_resource_count in from_counts:
+                        total_relations_by_resource_id[
+                            related_resource_count["from_resource"]
+                        ] += related_resource_count["from_count"]
+
                 for resource in related_resources["docs"]:
                     if resource["found"]:
-                        rel_count = get_relations(
-                            resourceinstanceid=resource["_id"],
-                            start=0,
-                            limit=0,
-                            count_only=True,
-                        )
-                        resource["_source"]["total_relations"] = rel_count
+                        if include_rr_count:
+                            resource["_source"]["total_relations"] = {
+                                "value": total_relations_by_resource_id[
+                                    UUID(resource["_id"])
+                                ]
+                            }
                         for descriptor_type in ("displaydescription", "displayname"):
                             descriptor = get_localized_descriptor(
                                 resource, descriptor_type
@@ -1098,6 +1172,39 @@ class Resource(models.ResourceInstance):
             assign_perm(permission, identity, self)
         self.index()
 
+    def update_resource_instance_lifecycle_state(
+        self, user, resource_instance_lifecycle_state
+    ):
+        if not user_is_resource_reviewer(user):
+            raise PermissionDenied
+
+        if (
+            self.graph.resource_instance_lifecycle.pk
+            != resource_instance_lifecycle_state.resource_instance_lifecycle.pk
+        ):
+            raise ValueError(
+                _(
+                    "The given ResourceInstanceLifecycleState is not part of the model's ResourceInstanceLifecycle."
+                )
+            )
+
+        if (
+            self.resource_instance_lifecycle_state.pk
+            != resource_instance_lifecycle_state.pk
+        ):
+            current_resource_instance_lifecycle_state = (
+                self.resource_instance_lifecycle_state
+            )
+            self.resource_instance_lifecycle_state = resource_instance_lifecycle_state
+
+            self.save(
+                user=user,
+                current_resource_instance_lifecycle_state=current_resource_instance_lifecycle_state,
+                should_update_resource_instance_lifecycle_state=True,
+            )
+
+        return self.resource_instance_lifecycle_state
+
 
 def parse_node_value(value):
     if is_uuid(value):
@@ -1114,23 +1221,3 @@ def is_uuid(value_to_test):
         return True
     except Exception:
         return False
-
-
-class PublishedModelError(Exception):
-    def __init__(self, message, code=None):
-        self.title = _("Published Model Error")
-        self.message = message
-        self.code = code
-
-    def __str__(self):
-        return repr(self.message)
-
-
-class UnpublishedModelError(Exception):
-    def __init__(self, message, code=None):
-        self.title = _("Unpublished Model Error")
-        self.message = message
-        self.code = code
-
-    def __str__(self):
-        return repr(self.message)

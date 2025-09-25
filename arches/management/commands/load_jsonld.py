@@ -18,7 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import json
-import sys
 import time
 from pathlib import Path
 
@@ -297,7 +296,9 @@ class Command(BaseCommand):
             if not graphid:
                 # Check slug
                 try:
-                    graphid = archesmodels.GraphModel.objects.get(slug=m).pk
+                    graphid = archesmodels.GraphModel.objects.get(
+                        slug=m, source_identifier=None
+                    ).pk
                 except:
                     self.stderr.write(
                         f"Couldn't find a model definition for {m}; skipping"
@@ -401,10 +402,7 @@ class Command(BaseCommand):
                                 )
                                 if not options["ignore_errors"]:
                                     short_path_to_failing_file = f"{Path(m) / b / f}"
-                                    if sys.version_info >= (3, 11):
-                                        e.add_note(short_path_to_failing_file)
-                                    else:
-                                        e.__notes__ = [short_path_to_failing_file]
+                                    e.add_note(short_path_to_failing_file)
                                     raise
                         else:
                             self.stdout.write(" ... skipped due to bad data :(")
@@ -416,6 +414,7 @@ class Command(BaseCommand):
                 break
             except:
                 raise
+
         if options["fast"] and not options["dry_run"] and self.resources:
             self.save_resources()
             self.index_resources(options["strip_search"])
@@ -502,12 +501,19 @@ class Command(BaseCommand):
         for resource in self.resources:
             resource.tiles = resource.get_flattened_tiles()
             tiles.extend(resource.tiles)
+
+            if not hasattr(resource, "resource_instance_lifecycle_state"):
+                resource.resource_instance_lifecycle_state = (
+                    resource.get_initial_resource_instance_lifecycle_state()
+                )
+
         Resource.objects.bulk_create(self.resources)
         TileModel.objects.bulk_create(tiles)
         for t in tiles:
             for nodeid in t.data.keys():
                 datatype = self.node_info[nodeid]["datatype"]
                 datatype.pre_tile_save(t, nodeid)
+                datatype.post_tile_save(t, nodeid, None)
         for resource in self.resources:
             resource.save_edit(edit_type="create")
 

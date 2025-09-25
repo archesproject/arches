@@ -11,7 +11,7 @@ jobs:
 
     services:
       postgres:
-        image: postgis/postgis:13-3.0
+        image: postgis/postgis:14-3.4
         env:
           POSTGRES_PASSWORD: postgis
           POSTGRES_DB: {{ project_name }}
@@ -52,7 +52,7 @@ jobs:
 
     services:
       postgres:
-        image: postgis/postgis:13-3.0
+        image: postgis/postgis:14-3.4
         env:
           POSTGRES_PASSWORD: postgis
           POSTGRES_DB: {{ project_name }}
@@ -63,7 +63,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.11", "3.12", "3.13"]
 
     steps:
       - uses: actions/checkout@v4

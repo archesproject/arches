@@ -39,7 +39,6 @@ import arches.app.utils.data_management.resource_graphs.exporter as graph_export
 import arches.app.utils.task_management as task_management
 from django.db.utils import IntegrityError
 from django.db import transaction, connection
-from django.utils.module_loading import import_string
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand, CommandError
 from django.core import management
@@ -82,7 +81,6 @@ class Command(BaseCommand):
             dest="operation",
             choices=[
                 "setup",
-                "install",
                 "setup_indexes",
                 "load_concept_scheme",
                 "export_business_data",
@@ -104,8 +102,7 @@ class Command(BaseCommand):
             ],
             help="Operation Type; "
             + "'setup'=Sets up the database schema and code"
-            + "'setup_indexes'=Creates the indexes in Elastic Search needed by the system"
-            + "'install'=Runs the setup file defined in your package root",
+            + "'setup_indexes'=Creates the indexes in Elastic Search needed by the system",
         )
 
         group = parser.add_mutually_exclusive_group()
@@ -334,13 +331,6 @@ class Command(BaseCommand):
 
         if options["operation"] == "setup":
             self.setup(package_name, es_install_location=options["dest_dir"])
-
-        if options["operation"] == "install":
-            warnings.warn(
-                "The install operation does nothing since Arches 7.6. "
-                "In Arches 8.0, calling this operation will raise an exception.",
-                UserWarning,
-            )
 
         if options["operation"] == "setup_indexes":
             self.setup_indexes()
@@ -663,10 +653,12 @@ class Command(BaseCommand):
                 print("Could not save system settings")
             self.export_package_settings(dest_dir, "true")
 
-    @staticmethod
-    def update_resource_geojson_geometries():
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT * FROM refresh_geojson_geometries();")
+    def update_resource_geojson_geometries(self):
+        if not connection.in_atomic_block:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT * FROM refresh_geojson_geometries();")
+        else:
+            self.stdout.write("WARNING: Not refreshing geometries - transaction active")
 
     def load_package(
         self,
@@ -1353,8 +1345,10 @@ class Command(BaseCommand):
         if graphid is False and file_format == "json":
             graphids = [
                 str(graph.graphid)
-                for graph in models.GraphModel.objects.filter(isresource=True).exclude(
-                    pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
+                for graph in (
+                    models.GraphModel.objects.filter(isresource=True)
+                    .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+                    .exclude(source_identifier__isnull=False)
                 )
             ]
         if graphid is False and file_format != "json":
@@ -1483,7 +1477,7 @@ class Command(BaseCommand):
             create_concepts = True
 
         if len(data_source) > 0:
-            transaction_id = uuid.uuid1()
+            transaction_id = uuid.uuid4()
             for source in data_source:
                 path = utils.get_valid_path(source)
                 if path is not None:

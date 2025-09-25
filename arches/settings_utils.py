@@ -1,27 +1,19 @@
-import json
 import os
-import site
 import sys
-from contextlib import contextmanager
 
 from django.apps import apps
-from django.conf import settings
 from django.contrib.staticfiles.finders import AppDirectoriesFinder
 
 
-class ArchesApplicationsStaticFilesFinder(AppDirectoriesFinder):
-    source_dir = "media"
-
-
-class CoreArchesStaticFilesFinderBuildDirectory(AppDirectoriesFinder):
+class StaticFilesFinderBuildDirectory(AppDirectoriesFinder):
     source_dir = os.path.join("app", "media", "build")
 
 
-class CoreArchesStaticFilesFinderMediaRoot(AppDirectoriesFinder):
+class StaticFilesFinderMediaRoot(AppDirectoriesFinder):
     source_dir = os.path.join("app", "media")
 
 
-class CoreArchesStaticFilesFinderNodeModules(AppDirectoriesFinder):
+class StaticFilesFinderNodeModules(AppDirectoriesFinder):
     source_dir = os.path.normpath(os.path.join("..", "node_modules"))
 
 
@@ -35,7 +27,7 @@ def list_arches_app_names():
 
 def list_arches_app_paths():
     return [
-        config.module.__path__[0]
+        os.path.realpath(config.module.__path__[0])
         for config in apps.get_app_configs()
         if getattr(config, "is_arches_application", False)
     ]
@@ -71,7 +63,7 @@ def build_staticfiles_dirs(*, app_root=None, additional_directories=None):
         return tuple(directories)
     except Exception as e:
         # Ensures error message is shown if error encountered in webpack build
-        sys.stdout.write(str(e))
+        sys.stderr.write(str(e))
         raise e
 
 
@@ -96,12 +88,19 @@ def build_templates_config(
     """
     directories = []
     try:
+        # allows for manual additions to template overrides
         if additional_directories:
             for additional_directory in additional_directories:
                 directories.append(additional_directory)
 
+        # allows for application-level overrides of generic Django templates
         if app_root:
             directories.append(os.path.join(app_root, "templates"))
+
+        # forces Arches-level overrides of generic Django templates
+        # directories.append(
+        #     os.path.join(Path(__file__).resolve().parent, "app", "templates")
+        # )
 
         return [
             {
@@ -132,92 +131,5 @@ def build_templates_config(
         ]
     except Exception as e:
         # Ensures error message is shown if error encountered in webpack build
-        sys.stdout.write(str(e))
-        raise e
-
-
-def generate_frontend_configuration():
-    try:
-        app_root_path = os.path.realpath(settings.APP_ROOT)
-        root_dir_path = os.path.realpath(settings.ROOT_DIR)
-
-        arches_app_names = list_arches_app_names()
-        arches_app_paths = list_arches_app_paths()
-        path_lookup = dict(zip(arches_app_names, arches_app_paths, strict=True))
-
-        frontend_configuration_settings_data = {
-            "_comment": "This is a generated file. Do not edit directly.",
-            "APP_ROOT": app_root_path,
-            "ARCHES_APPLICATIONS": arches_app_names,
-            "ARCHES_APPLICATIONS_PATHS": path_lookup,
-            "SITE_PACKAGES_DIRECTORY": site.getsitepackages()[0],
-            "PUBLIC_SERVER_ADDRESS": settings.PUBLIC_SERVER_ADDRESS,
-            "ROOT_DIR": root_dir_path,
-            "STATIC_URL": settings.STATIC_URL,
-            "WEBPACK_DEVELOPMENT_SERVER_PORT": settings.WEBPACK_DEVELOPMENT_SERVER_PORT,
-        }
-
-        if settings.APP_NAME == "Arches":
-            base_path = root_dir_path
-        else:
-            base_path = app_root_path
-
-        frontend_configuration_settings_path = os.path.realpath(
-            os.path.join(base_path, "..", ".frontend-configuration-settings.json")
-        )
-        sys.stdout.write(
-            f"Writing frontend configuration to: {frontend_configuration_settings_path} \n"
-        )
-
-        with open(
-            frontend_configuration_settings_path,
-            "w",
-        ) as file:
-            json.dump(frontend_configuration_settings_data, file, indent=4)
-
-        tsconfig_paths_data = {
-            "_comment": "This is a generated file. Do not edit directly.",
-            "compilerOptions": {
-                "paths": {
-                    "@/arches/*": [
-                        os.path.join(
-                            ".",
-                            os.path.relpath(
-                                root_dir_path,
-                                os.path.join(base_path, ".."),
-                            ),
-                            "app",
-                            "src",
-                            "arches",
-                            "*",
-                        )
-                    ],
-                    **{
-                        os.path.join("@", path_name, "*"): [
-                            os.path.join(
-                                ".",
-                                os.path.relpath(path, os.path.join(base_path, "..")),
-                                "src",
-                                path_name,
-                                "*",
-                            )
-                        ]
-                        for path_name, path in path_lookup.items()
-                    },
-                    "*": ["./node_modules/*"],
-                }
-            },
-        }
-
-        tsconfig_path = os.path.realpath(
-            os.path.join(base_path, "..", ".tsconfig-paths.json")
-        )
-        sys.stdout.write(f"Writing tsconfig path data to: {tsconfig_path} \n")
-
-        with open(tsconfig_path, "w") as file:
-            json.dump(tsconfig_paths_data, file, indent=4)
-
-    except Exception as e:
-        # Ensures error message is shown if error encountered
         sys.stderr.write(str(e))
         raise e

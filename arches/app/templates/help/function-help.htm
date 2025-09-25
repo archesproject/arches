@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% load i18n %}
+{% load webpack_static from webpack_loader %}
 <!-- this html is included in help-panel-base.htm -->
 <div class="ep-help-content">
     <div>
@@ -13,8 +14,8 @@
             <p>To add a Function to this Resource Model, click on it in Function Library, and notice that it is added to the list of Selected Functions. To delete a Function, use the <i class="ion-ios-trash add-tooltip" style="color:lightcoral;"></i> symbol in the upper right corner.
               {% endblocktrans %}
             <div>
-                <p><a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "adding a function - click to view" %}</a><span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/add-remove-function.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span></p>
-                <p><img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/add-remove-function.gif"></img></p>
+                <p><a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "adding a function - click to view" %}</a><span class="ep-help-img-link"><a href="{% webpack_static 'img/help/add-remove-function.gif' %}" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span></p>
+                <p><img class="reloadable-img ep-help-topic-content" src="{% webpack_static 'img/help/add-remove-function.gif' %}"></img></p>
             </div>
             {% blocktrans %}
             <p>Arches comes with three default functions (see below). However, functions are envisioned as the hook through which developers can easily customize Arches capabilities, because new Functions can be added to your individual Arches installation. Learn more <a href="https://github.com/archesproject/arches/wiki/Creating-New-Functions%2C-DataTypes%2C-and-Widgets" target="_blank">here</a>.</p>

@@ -106,34 +106,3 @@ class CreateFunction(Operation):
     def describe(self):
         return "Creates a function named %s" % self.name
         return "Creates extension %s" % self.name
-
-
-class CreateAutoPopulateUUIDField(Operation):
-    def __init__(self, table, columns):
-        self.table = table
-        self.columns = columns
-
-    def state_forwards(self, app_label, state):
-        pass
-
-    def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        for column in self.columns:
-            schema_editor.execute(
-                "ALTER TABLE {0} ALTER COLUMN {1} SET DEFAULT uuid_generate_v1mc()".format(
-                    self.table, column
-                )
-            )
-
-    def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        for column in self.columns:
-            schema_editor.execute(
-                "ALTER TABLE {0} ALTER COLUMN {1} DROP DEFAULT".format(
-                    self.table, column
-                )
-            )
-
-    def describe(self):
-        return (
-            "Sets default value for uuid column(s) %s in %s" % self.columns,
-            self.table,
-        )

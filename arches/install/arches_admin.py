@@ -122,6 +122,17 @@ class ArchesProjectCommand(TemplateCommand):
             [str(arches.VERSION[0]), str(arches.VERSION[1] + 1), "0"]
         )
         options["project_name_title_case"] = project_name.title().replace("_", "")
+        options["project_name_kebab_case"] = project_name.replace("_", "-")
+
+        if options["project_name_kebab_case"] != project_name and not target:
+            self.stdout.write(
+                self.style.NOTICE(
+                    f"Renamed the directory from {project_name} to {options['project_name_kebab_case']}. "
+                    "If this is not desired, use the --directory option to create "
+                    "a directory with the name you want. Consider using a name "
+                    "distinct from your project name."
+                )
+            )
 
         super(ArchesProjectCommand, self).handle(
             "project", project_name, target, **options
@@ -136,8 +147,7 @@ class ArchesProjectCommand(TemplateCommand):
             "pyproject.toml",
             ".pre-commit-config.yaml",
             ".github/workflows/main.yml",
-            "vitest.config.mts",
-            "vitest.setup.mts",
+            "MANIFEST.in",
         ]:  # relative to app root directory
             file = open(os.path.join(path_to_project, relative_file_path), "r")
             file_data = file.read()
@@ -147,6 +157,10 @@ class ArchesProjectCommand(TemplateCommand):
                 file_data.replace(
                     "{{ project_name_title_case }}",
                     options["project_name_title_case"],
+                )
+                .replace(
+                    "{{ project_name_kebab_case }}",
+                    options["project_name_kebab_case"],
                 )
                 .replace("{{ project_name }}", project_name)
                 .replace(
@@ -166,12 +180,23 @@ class ArchesProjectCommand(TemplateCommand):
 def command_startproject(args):
     options = vars(args)
     name = options["name"]
+    make_directory = False
+    if not options["directory"] and "_" in name:
+        # The user is supposed to create the --directory themselves. But we
+        # should do it for them if the command is the one that invented the
+        # --directory argument.
+        # RemovedInArches81Warning (Django 6 creates target dir automatically)
+        make_directory = True
+        options["directory"] = name.replace("_", "-")
     directory = options["directory"]
+
+    project_path = os.path.join(os.getcwd(), directory if directory else name)
+
+    if make_directory and not os.path.exists(project_path):
+        os.mkdir(project_path)
 
     cmd = ArchesProjectCommand()
     cmd.handle(options)
-
-    project_path = os.path.join(os.getcwd(), (directory if directory else name))
 
     os.chdir(project_path)
     subprocess.call("npm install", shell=True)

@@ -21,7 +21,7 @@ cd /home/ubuntu/arches
 pip install -e . --no-binary :all:
 
 # cd /home/ubuntu
-# arches-project create arches_dev
+# arches-admin startproject arches_dev
 # cd /home/ubuntu/arches_dev/arches_dev
 # npm install
 # cp /home/ubuntu/settings_local.py /home/ubuntu/arches_dev/arches_dev

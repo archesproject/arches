@@ -1,5 +1,7 @@
 from django.test.runner import DiscoverRunner
 
+from arches.app.models.system_settings import settings
+from arches.app.search.base_index import get_index
 from arches.app.search.mappings import (
     prepare_terms_index,
     delete_terms_index,
@@ -35,6 +37,8 @@ class ArchesTestRunner(DiscoverRunner):
         prepare_terms_index(create=True)
         prepare_concepts_index(create=True)
         prepare_search_index(create=True)
+        for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
+            get_index(index["name"]).prepare_index()
 
         return ret
 
@@ -42,5 +46,7 @@ class ArchesTestRunner(DiscoverRunner):
         delete_terms_index()
         delete_concepts_index()
         delete_search_index()
+        for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
+            get_index(index["name"]).delete_index()
 
         super().teardown_databases(old_config, **kwargs)

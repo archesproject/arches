@@ -8884,6 +8884,7 @@
             "isresource": true,
             "jsonldcontext": null,
             "name": "Activity",
+            "slug": "activity",
             "nodegroups": [
                 {
                     "cardinality": "1",

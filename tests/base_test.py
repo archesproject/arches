@@ -17,13 +17,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
-from unittest import mock
 from pathlib import Path
 
 from django.db import connection
 from django.core import management
 from django.test import TestCase
 from django.test.utils import captured_stdout
+from django.contrib.auth.models import User
+from django.contrib.auth.models import Group
 
 from arches.app.models.graph import Graph
 from arches.app.models.models import Ontology
@@ -44,8 +45,8 @@ OAUTH_CLIENT_SECRET = "7fos0s7qIhFqUmalDI1QiiYj0rAtEdVMY4hYQDQjOxltbRCBW3dIydOeM
         ap9Ke2aaAZaeMPejzafPSj96ID"
 CREATE_TOKEN_SQL = """
         INSERT INTO public.oauth2_provider_accesstoken(
-            token, expires, scope, application_id, user_id, created, updated)
-            VALUES ('{token}', '1-1-2068', 'read write', 44, {user_id}, '1-1-2018', '1-1-2018');
+            token, expires, scope, application_id, user_id, created, updated, token_checksum)
+            VALUES ('{token}', '1-1-2068', 'read write', 44, {user_id}, '1-1-2018', '1-1-2018', '{token_checksum}');
     """
 DELETE_TOKEN_SQL = (
     "DELETE FROM public.oauth2_provider_accesstoken WHERE application_id = 44;"
@@ -55,6 +56,7 @@ SYSTEM_SETINGS_GRAPH_ID = "ff623370-fa12-11e6-b98b-6c4008b05c4c"
 
 class ArchesTestCase(TestCase):
     graph_fixtures = []
+    test_users = {}
     """
     Similar to TestCase.fixtures, but uses ResourceGraphImporter to avoid flushing.
     Uses the name of the .json file (case-sensitive), not graph name.
@@ -63,7 +65,6 @@ class ArchesTestCase(TestCase):
     def __init__(self, *args, **kwargs):
         super(ArchesTestCase, self).__init__(*args, **kwargs)
         if settings.DEFAULT_BOUNDS is None:
-            management.call_command("migrate")
             if not Graph.objects.filter(pk=SYSTEM_SETINGS_GRAPH_ID).exists():
                 with open(
                     os.path.join(
@@ -94,11 +95,12 @@ class ArchesTestCase(TestCase):
             INSERT INTO public.oauth2_provider_application(
                 id, client_id, redirect_uris, client_type, authorization_grant_type,
                 client_secret,
-                name, user_id, skip_authorization, created, updated, algorithm)
+                name, user_id, skip_authorization, created, updated, algorithm, post_logout_redirect_uris, hash_client_secret, allowed_origins)
             VALUES (
                 44, '{oauth_client_id}', 'http://localhost:8000/test', 'public', 'client-credentials',
                 '{oauth_client_secret}',
-                'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000', '{jwt_algorithm}');
+                'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000', '{jwt_algorithm}', '', true, '*')
+            ON CONFLICT DO NOTHING;
         """
 
         sql = sql.format(
@@ -114,6 +116,8 @@ class ArchesTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         LanguageSynchronizer.synchronize_settings_with_db(update_published_graphs=False)
+        for user in User.objects.all():
+            cls.test_users[user.username] = user
         cls.loadOntology()
         if not cls.graph_fixtures:
             return
@@ -143,12 +147,7 @@ class ArchesTestCase(TestCase):
         )
         test_package_path = Path(test_settings.REFERENCE_DATA_FIXTURE_LOCATION).parent
 
-        with (
-            captured_stdout(),
-            mock.patch(
-                "arches.management.commands.packages.Command.update_resource_geojson_geometries"
-            ),
-        ):
+        with captured_stdout():
             management.call_command(
                 "packages",
                 [
@@ -207,3 +206,45 @@ class ArchesTestCase(TestCase):
         with connection.cursor() as cursor:
             cursor.execute(sql)
         super().tearDownClass()
+
+    @classmethod
+    def add_users(cls):
+        profiles = (
+            {
+                "name": "testuser",
+                "email": "test@test.com",
+                "password": "TestingTesting123!",
+                "groups": [],
+            },
+            {
+                "name": "ben",
+                "email": "ben@test.com",
+                "password": "Test12345!",
+                "groups": ["Graph Editor", "Resource Editor"],
+            },
+            {
+                "name": "sam",
+                "email": "sam@test.com",
+                "password": "Test12345!",
+                "groups": ["Graph Editor", "Resource Editor", "Resource Reviewer"],
+            },
+            {
+                "name": "jim",
+                "email": "jim@test.com",
+                "password": "Test12345!",
+                "groups": ["Graph Editor", "Resource Editor"],
+            },
+        )
+
+        for profile in profiles:
+            user = User.objects.create_user(
+                username=profile["name"],
+                email=profile["email"],
+                password=profile["password"],
+            )
+
+            for group_name in profile["groups"]:
+                group = Group.objects.get(name=group_name)
+                group.user_set.add(user)
+
+            cls.test_users[profile["name"]] = user

@@ -1,40 +1,45 @@
-define(['underscore', 'knockout', 'knockout-mapping', 'viewmodels/report', 'reports/map-header'], function(_, ko, koMapping, ReportViewModel) {
-    return function(params) {
-        var self = this;
-        params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing', 'geocodePlaceholder'];
+import _ from 'underscore';
+import ko from 'knockout';
+import koMapping from 'knockout-mapping';
+import ReportViewModel from 'viewmodels/report';
+import 'reports/map-header';
 
-        ReportViewModel.apply(this, [params]);
 
-        this.featureCollection = ko.computed({
-            read: function() {
-                var features = [];
-                ko.unwrap(self.tiles).forEach(function(tile) {
-                    _.each(tile.data, function(val) {
-                        if (val?.features) {
-                            features = features.concat(koMapping.toJS(val.features));
-                        }
-                    }, this);
-                }, this);
-                return {
-                    type: 'FeatureCollection',
-                    features: features
-                };
-            },
-            write: function() {
-                return;
-            }
-        });
+export default function(params) {
+    var self = this;
+    params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing', 'geocodePlaceholder'];
 
-        this.featureCount = ko.computed(function() {
-            var count = 0;
+    ReportViewModel.apply(this, [params]);
+
+    this.featureCollection = ko.computed({
+        read: function() {
+            var features = [];
             ko.unwrap(self.tiles).forEach(function(tile) {
                 _.each(tile.data, function(val) {
                     if (val?.features) {
-                        count += 1;
+                        features = features.concat(koMapping.toJS(val.features));
                     }
                 }, this);
             }, this);
-            return count;
-        });
-    };
-});
+            return {
+                type: 'FeatureCollection',
+                features: features
+            };
+        },
+        write: function() {
+            return;
+        }
+    });
+
+    this.featureCount = ko.computed(function() {
+        var count = 0;
+        ko.unwrap(self.tiles).forEach(function(tile) {
+            _.each(tile.data, function(val) {
+                if (val?.features) {
+                    count += 1;
+                }
+            }, this);
+        }, this);
+        return count;
+    });
+};

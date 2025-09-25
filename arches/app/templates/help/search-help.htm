@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 {% load i18n %}
+{% load webpack_static from webpack_loader %}
 <!-- this html is included in help-panel-base.htm -->
 <div class="ep-help-content">
     <div>
         <a href="javascript:void(0)" class="ep-help-topic-toggle" aria-expanded="false" aria-controls="intro-to-search-content" role="button"><span class="h4">{% trans "Introduction to Search" %}</span></a>
         <div class="ep-help-topic-content" id="intro-to-search-content">
-            <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/search-page-labeled.jpg" aria-hidden="true" target="_blank" tabindex="-1">{% trans "expand image in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square"></i></a></span>
-            <p><img class="reloadable-img" src="{{ STATIC_URL }}img/help/search-page-labeled.jpg" aria-hidden="true"></img></p>
+            <span class="ep-help-img-link"><a href="{% webpack_static 'img/help/search-page-labeled.jpg' %}" aria-hidden="true" target="_blank" tabindex="-1">{% trans "expand image in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square"></i></a></span>
+            <p><img class="reloadable-img" src="{% webpack_static 'img/help/search-page-labeled.jpg' %}" aria-hidden="true"></img></p>
             <div>
                 <p>{% blocktrans %}<strong>Search Bar</strong> The quickest way to search the database is to begin typing in the search bar. You'll be presented with database terminology which you can use to create one or more simple filters. The search bar also acts as an aggregator of <em>all</em> currently enabled filters.{% endblocktrans %}</p>
                 <p>{% blocktrans %}<strong>Search Tools</strong> There are a number tools you can use to explore the database, which are described in detail below.{% endblocktrans %}</p>
@@ -27,11 +28,11 @@
                     <p>
                         <a href="javascript:void(0)" class="ep-help-topic-toggle" aria-expanded="false" aria-controls="map-switch-basemap-help-gif" role="button">{% trans "How to change basemap" %}</a>
                         <span class="ep-help-img-link">
-                            <a href="{{ STATIC_URL }}img/help/map-switch-basemap.gif" target="_blank" tabindex="-1" aria-hidden="true">{% trans "expand image in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square"></i>
+                            <a href="{% webpack_static 'img/help/map-switch-basemap.gif' %}" target="_blank" tabindex="-1" aria-hidden="true">{% trans "expand image in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square"></i>
                             </a>
                         </span>
                         <div class="ep-help-topic-content">
-                            <img id="map-switch-basemap-help-gif" class="reloadable-img" src="{{ STATIC_URL }}img/help/map-switch-basemap.gif" aria-hidden="true"></img>
+                            <img id="map-switch-basemap-help-gif" class="reloadable-img" src="{% webpack_static 'img/help/map-switch-basemap.gif' %}" aria-hidden="true"></img>
                             <p>{% blocktrans %}To change the basemap, open the <strong>Basemaps</strong> tab, then click on the basemap you would like to use.{% endblocktrans %}</p>
                         </div>
                     </p>
@@ -39,11 +40,11 @@
                     <p>
                         <a href="javascript:void(0)" class="ep-help-topic-toggle" aria-expanded="false" aria-controls="search-results-layer-help-gif" role="button">{% trans "How to toggle search results layer" %}</a>
                         <span class="ep-help-img-link">
-                            <a href="{{ STATIC_URL }}img/help/map-toggle-search-results-layer.gif" target="_blank" tabindex= aria-hidden="true""-1">{% trans "expand image in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square"></i>
+                            <a href="{% webpack_static 'img/help/map-toggle-search-results-layer.gif' %}" target="_blank" tabindex= aria-hidden="true""-1">{% trans "expand image in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square"></i>
                             </a>
                         </span>
                         <div class="ep-help-topic-content">
-                            <img id="search-results-layer-help-gif" class="reloadable-img" src="{{ STATIC_URL }}img/help/map-toggle-search-results-layer.gif" aria-hidden="true"></img>
+                            <img id="search-results-layer-help-gif" class="reloadable-img" src="{% webpack_static 'img/help/map-toggle-search-results-layer.gif' %}" aria-hidden="true"></img>
                             <p>{% blocktrans %}To activate or deactivate overlays, open the <strong>Overlays</strong> tab, then use the switch to show or hide the layer on the map.{% endblocktrans %}</p>
                         </div>
                     </p>
@@ -52,11 +53,11 @@
                     <p>
                         <a href="javascript:void(0)" class="ep-help-topic-toggle" aria-expanded="false" aria-controls="map-buffer-search-help-gif" role="button">{% trans "How to search with spatial query" %}</a>
                         <span class="ep-help-img-link">
-                            <a href="{{ STATIC_URL }}img/help/map-buffer-search.gif" target="_blank" tabindex="-1" aria-hidden="true">{% trans "expand image in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square"></i>
+                            <a href="{% webpack_static 'img/help/map-buffer-search.gif' %}" target="_blank" tabindex="-1" aria-hidden="true">{% trans "expand image in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square"></i>
                             </a>
                         </span>
                         <div class="ep-help-topic-content">
-                            <img id="map-buffer-search-help-gif" class="reloadable-img" src="{{ STATIC_URL }}img/help/map-buffer-search.gif" aria-hidden="true"></img>
+                            <img id="map-buffer-search-help-gif" class="reloadable-img" src="{% webpack_static 'img/help/map-buffer-search.gif' %}" aria-hidden="true"></img>
                             <p>{% blocktrans %}To search with a spatial query, open the <strong>Filter</strong> tab, then use the <strong>Select A Filter</strong> section to draw a new geometry on the map. Additionally, you can search within a distance of your spatial filter by adjusting the <strong>Buffer</strong> distance.{% endblocktrans %}</p>
                         </div>
                     </p>
@@ -71,11 +72,11 @@
                     <p>
                         <a href="javascript:void(0)" class="ep-help-topic-toggle" aria-expanded="false" aria-controls="time-wheel-example-help-gif" role="button">{% trans "How to apply time filter with time wheel" %}</a>
                         <span class="ep-help-img-link">
-                            <a href="{{ STATIC_URL }}img/help/time-wheel-example.gif" target="_blank" tabindex="-1" aria-hidden="true">{% trans "expand image in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square"></i>
+                            <a href="{% webpack_static 'img/help/time-wheel-example.gif' %}" target="_blank" tabindex="-1" aria-hidden="true">{% trans "expand image in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square"></i>
                             </a>
                         </span>
                         <div class="ep-help-topic-content">
-                            <img id="time-wheel-example-help-gif" class="reloadable-img" src="{{ STATIC_URL }}img/help/time-wheel-example.gif" aria-hidden="true"></img>
+                            <img id="time-wheel-example-help-gif" class="reloadable-img" src="{% webpack_static 'img/help/time-wheel-example.gif' %}" aria-hidden="true"></img>
                             <p>{% blocktrans %}To filter resources using the Time Wheel, open the <strong>Date Filter</strong> tab, then click on the segment that corresponds with the desired filter on the time wheel.{% endblocktrans %}</p>
                         </div>
                     </p>
@@ -97,11 +98,11 @@
                     <p>
                         <a href="javascript:void(0)" class="ep-help-topic-toggle" aria-expanded="false" aria-controls="advanced-search-example-help-gif" role="button">{% trans "How to search for multiple words in names" %}</a>
                         <span class="ep-help-img-link">
-                            <a href="{{ STATIC_URL }}img/help/advanced-search-example.gif" target="_blank" tabindex="-1" aria-hidden="true">{% trans "expand image in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square"></i>
+                            <a href="{% webpack_static 'img/help/advanced-search-example.gif' %}" target="_blank" tabindex="-1" aria-hidden="true">{% trans "expand image in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square"></i>
                             </a>
                         </span>
                         <div class="ep-help-topic-content">
-                            <img id="advanced-search-example-help-gif" class="reloadable-img" src="{{ STATIC_URL }}img/help/advanced-search-example.gif" aria-hidden="true"></img>
+                            <img id="advanced-search-example-help-gif" class="reloadable-img" src="{% webpack_static 'img/help/advanced-search-example.gif' %}" aria-hidden="true"></img>
                             <p>{% blocktrans %}To use the Advanced Search, open the <strong>Advanced</strong> tab, then under the <strong>Search Facets</strong> panel, select the properties of Resource Types that you'd like to filter by by clicking on them. This will add them to the Advanced Search Panel. You can then structure your advanced search by adjusting the search facets in the Advanced Search Panel.{% endblocktrans %}</p>
                         </div>
                     </p>

@@ -78,6 +78,7 @@
                 "user_id": null
             },
             "iconclass": "",
+            "is_active": true,
             "is_editable": true,
             "isresource": true,
             "jsonldcontext": null,
@@ -168,7 +169,7 @@
                 "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
                 "sortorder": 0
             },
-            "slug": null,
+            "slug": "5126_ambiguous_from_concept",
             "subtitle": "",
             "template_id": "50000000-0000-0000-0000-000000000001",
             "version": ""

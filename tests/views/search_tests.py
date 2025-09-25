@@ -17,6 +17,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import json
+import uuid
+from http import HTTPStatus
 
 from tests.base_test import ArchesTestCase
 from tests.utils.search_test_utils import sync_es, get_response_json
@@ -134,16 +136,25 @@ class SearchTests(ArchesTestCase):
         cls.conceptid = response_json["subconcepts"][0]["id"]
 
         # add resource instance with only a cultural period defined
-        cls.cultural_period_resource = Resource(graph_id=cls.search_model_graphid)
+        cls.cultural_period_resourceid = str(uuid.uuid4())
+        cls.cultural_period_resource = Resource(
+            graph_id=cls.search_model_graphid,
+            resourceinstanceid=cls.cultural_period_resourceid,
+        )
         tile = Tile(
             data={cls.search_model_cultural_period_nodeid: [valueid]},
             nodegroup_id=cls.search_model_cultural_period_nodeid,
         )
+        cls.cultural_period_resource.graph.is_active = True
+        cls.cultural_period_resource.graph.save()
         cls.cultural_period_resource.tiles.append(tile)
         cls.cultural_period_resource.save()
 
         # add resource instance with a creation and destruction date defined
-        cls.date_resource = Resource(graph_id=cls.search_model_graphid)
+        cls.date_resourceid = str(uuid.uuid4())
+        cls.date_resource = Resource(
+            graph_id=cls.search_model_graphid, resourceinstanceid=cls.date_resourceid
+        )
         tile = Tile(
             data={cls.search_model_creation_date_nodeid: "1941-01-01"},
             nodegroup_id=cls.search_model_creation_date_nodeid,
@@ -166,8 +177,10 @@ class SearchTests(ArchesTestCase):
         cls.date_resource.save()
 
         # add resource instance with a creation date and a cultural period defined
+        cls.date_and_cultural_period_resourceid = str(uuid.uuid4())
         cls.date_and_cultural_period_resource = Resource(
-            graph_id=cls.search_model_graphid
+            graph_id=cls.search_model_graphid,
+            resourceinstanceid=cls.date_and_cultural_period_resourceid,
         )
         tile = Tile(
             data={cls.search_model_creation_date_nodeid: "1942-01-01"},
@@ -848,6 +861,17 @@ class SearchTests(ArchesTestCase):
             response_json = get_response_json(self.client, query=query)
         self.assertFalse(response_json["success"])
 
+        # Also test search_home route, not just search_results
+        with self.assertLogs("django.request", level="WARNING"):
+            response = self.client.get(
+                reverse("search_home"), QUERY_STRING="search-view=nonexistent"
+            )
+        self.assertContains(
+            response,
+            "Search view instance not found",
+            status_code=HTTPStatus.NOT_FOUND,
+        )
+
     def test_searchview_searchview_component_from_admin(self):
         request = HttpRequest()
         request.method = "GET"
@@ -859,8 +883,8 @@ class SearchTests(ArchesTestCase):
         self.assertTrue(searchview_component_instance is not None)
 
         search_components = searchview_component_instance.get_searchview_filters()
-        # 13 available components + search-view component
-        self.assertEqual(len(search_components), 14)
+        # 14 available components + search-view component
+        self.assertEqual(len(search_components), 15)
 
     def test_searchview_searchview_component_from_anonymous(self):
         request = HttpRequest()
@@ -873,8 +897,8 @@ class SearchTests(ArchesTestCase):
         self.assertTrue(searchview_component_instance is not None)
 
         search_components = searchview_component_instance.get_searchview_filters()
-        # 13 available components + search-view component
-        self.assertEqual(len(search_components), 14)
+        # 14 available components + search-view component
+        self.assertEqual(len(search_components), 15)
 
     def test_search_bad_json(self):
         request = HttpRequest()
@@ -946,6 +970,12 @@ class SearchTests(ArchesTestCase):
         response_json = get_response_json(self.client, query=query)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 0)
 
+    def test_ids_filter(self):
+        ids = [self.cultural_period_resourceid, self.date_resourceid]
+        query = {"ids": ids}
+        response_json = get_response_json(self.client, query=query)
+        self.assertEqual(response_json["results"]["hits"]["total"]["value"], 2)
+
 
 def extract_pks(response_json):
     return [
@@ -1001,7 +1031,9 @@ class TestEsMappingModifier(EsMappingModifier):
         return new_must_element
 
     @staticmethod
-    def add_search_filter(search_query, term):
+    def add_search_filter(
+        search_query, term, permitted_nodegroups, include_provisional
+    ):
         original_must_filter = search_query.dsl["bool"]["must"]
         search_query.dsl["bool"]["must"] = []
         for must_element in original_must_filter:

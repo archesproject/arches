@@ -95,6 +95,7 @@
             "functions_x_graphs": [],
             "graphid": "3f3f2368-9693-11e8-8ba6-14109fd34195",
             "iconclass": "",
+            "is_active": true,
             "is_editable": true,
             "isresource": true,
             "jsonldcontext": null,
@@ -237,6 +238,7 @@
                 "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E82_Actor_Appellation",
                 "sortorder": 0
             },
+            "slug": "api_test_graph_ambiguous",
             "subtitle": "",
             "version": ""
         }

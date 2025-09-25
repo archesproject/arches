@@ -367,11 +367,14 @@ class SKOSReader(object):
 
                 # insert the concept relations
                 for relation in self.relations:
-                    newrelation = models.Relation.objects.get_or_create(
-                        conceptfrom_id=relation["source"],
-                        conceptto_id=relation["target"],
-                        relationtype_id=relation["type"],
-                    )
+                    try:
+                        newrelation = models.Relation.objects.get_or_create(
+                            conceptfrom_id=relation["source"],
+                            conceptto_id=relation["target"],
+                            relationtype_id=relation["type"],
+                        )
+                    except IntegrityError as e:
+                        self.logger.warning(e)
                     # check for orphaned concepts, every concept except the concept scheme should have an edge pointing to it
                     if (
                         relation["type"] == "narrower"

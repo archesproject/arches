@@ -1,5 +1,6 @@
+import os
 import re
-import warnings
+import tomllib
 from importlib.metadata import PackageNotFoundError, requires
 from pathlib import Path
 
@@ -10,13 +11,9 @@ from django.core.checks.messages import ERROR, WARNING
 from semantic_version import SimpleSpec, Version
 
 from arches import __version__
-from arches.settings_utils import generate_frontend_configuration
-
-try:
-    import tomllib  # Python 3.11+
-except ImportError:  # pragma: no cover
-    # Python 3.10 depends on tomli instead
-    import tomli as tomllib
+from arches.app.utils.frontend_configuration_utils import (
+    generate_frontend_configuration,
+)
 
 
 class ArchesAppConfig(AppConfig):
@@ -25,32 +22,33 @@ class ArchesAppConfig(AppConfig):
     is_arches_application = False
 
     def ready(self):
-        if settings.APP_NAME.lower() == self.name:
-            generate_frontend_configuration()
+        import arches.app.signals
+
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arches.settings")
+        generate_frontend_configuration()
 
 
-### GLOBAL DEPRECATIONS ###
-FILE_TYPE_CHECKING_MSG = (
-    "Providing boolean values to FILE_TYPE_CHECKING is deprecated. "
-    "Starting with Arches 8.0, the only allowed options will be "
-    "None, 'lenient', and 'strict'."
-)
-if settings.FILE_TYPE_CHECKING in (True, False):
-    warnings.warn(FILE_TYPE_CHECKING_MSG, DeprecationWarning)
+if settings.FILE_TYPE_CHECKING not in (None, "lenient", "strict"):
+    raise ValueError("FILE_TYPE_CHECKING must be one of: None, 'lenient', 'strict'.")
 
 
 ### SYSTEM CHECKS ###
+supported_by_django_ratelimit = (
+    "django.core.cache.backends.memcached.PyLibMCCache",
+    "django.core.cache.backends.memcached.PyMemcacheCache",
+    "django.core.cache.backends.redis.RedisCache",
+)
+
+
 @register(Tags.security)
 def check_cache_backend_for_production(app_configs, **kwargs):
     errors = []
     your_cache = settings.CACHES["default"]["BACKEND"]
-    if (
-        not settings.DEBUG
-        and your_cache == "django.core.cache.backends.dummy.DummyCache"
-    ):
+    if not settings.DEBUG and your_cache not in supported_by_django_ratelimit:
         errors.append(
             Error(
-                "Using dummy cache in production",
+                "Cache backend does not support rate-limiting",
+                hint=f"Your cache: {your_cache}\n\tSupported caches: {supported_by_django_ratelimit}",
                 obj=settings.APP_NAME,
                 id="arches.E001",
             )
@@ -61,11 +59,6 @@ def check_cache_backend_for_production(app_configs, **kwargs):
 @register(Tags.security)
 def check_cache_backend(app_configs, **kwargs):
     errors = []
-    supported_by_django_ratelimit = (
-        "django.core.cache.backends.memcached.PyLibMCCache",
-        "django.core.cache.backends.memcached.PyMemcacheCache",
-        "django.core.cache.backends.redis.RedisCache",
-    )
     your_cache = settings.CACHES["default"]["BACKEND"]
     if your_cache not in supported_by_django_ratelimit:
         errors.append(
@@ -106,6 +99,8 @@ def check_arches_compatibility(app_configs, **kwargs):
 
         try:
             project_requirements = requires(config.name)
+            if project_requirements is None:
+                raise PackageNotFoundError
         except PackageNotFoundError:
             # Not installed by pip: read pyproject.toml directly
             project_requirements = read_project_requirements_from_toml_file(config)

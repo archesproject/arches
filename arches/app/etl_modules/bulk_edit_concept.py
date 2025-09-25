@@ -393,8 +393,8 @@ class BulkConceptEditor(BaseBulkEditor):
         try:
             sql = (
                 """
-                INSERT INTO load_staging (value, tileid, nodegroupid, parenttileid, resourceid, loadid, nodegroup_depth, source_description, operation, passes_validation)
-                    (SELECT tiledata, tileid, nodegroupid, parenttileid, resourceinstanceid, %(load_id)s, 0, 'bulk_edit', 'update', true
+                INSERT INTO load_staging (value, tileid, nodegroupid, parenttileid, resourceid, loadid, nodegroup_depth, source_description, operation, passes_validation, sortorder)
+                    (SELECT tiledata, tileid, nodegroupid, parenttileid, resourceinstanceid, %(load_id)s, 0, 'bulk_edit', 'update', true, sortorder
                     FROM tiles
                     WHERE nodegroupid in (SELECT nodegroupid FROM nodes WHERE nodeid = %(node_id)s)
                     AND tiledata -> %(node_id)s ? %(old_id)s

@@ -16,6 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+from django.db.models import Q
+
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from arches.app.models import models
@@ -292,3 +294,147 @@ class ConceptModelTests(ArchesTestCase):
         self.assertEqual(pl.type, "prefLabel")
         self.assertEqual(pl.value, "bier" or "beer")
         self.assertEqual(pl.language, "nl" or "es-SP")
+
+    def test_sort_subconcepts_with_special_floats(self):
+        """
+        This test checks the behavior of Concept.get() when sorting sub-concepts with special float values or string
+        values, in order to avoid a TypeError. In this case, alphabetical sorting is used instead of natural sorting of
+        natural_keys() method.
+        The problematic values are: infinity, nan, 1e1000, ...
+        """
+
+        parent = Concept()
+        parent.nodetype = "Concept"
+        parent.values = [
+            ConceptValue(
+                {
+                    "type": "prefLabel",
+                    "category": "label",
+                    "value": "Parent concept",
+                    "language": "en",
+                }
+            )
+        ]
+        parent.save()
+
+        subconcept1 = Concept()
+        subconcept1.nodetype = "Concept"
+        subconcept1.values = [
+            ConceptValue(
+                {
+                    "type": "prefLabel",
+                    "category": "label",
+                    "value": "infinity",  # infinity -> inf
+                    "language": "en",
+                }
+            )
+        ]
+        subconcept1.save()
+
+        subconcept2 = Concept()
+        subconcept2.nodetype = "Concept"
+        subconcept2.values = [
+            ConceptValue(
+                {
+                    "type": "prefLabel",
+                    "category": "label",
+                    "value": "nan",  # nan
+                    "language": "en",
+                }
+            )
+        ]
+        subconcept2.save()
+
+        subconcept3 = Concept()
+        subconcept3.nodetype = "Concept"
+        subconcept3.values = [
+            ConceptValue(
+                {
+                    "type": "prefLabel",
+                    "category": "label",
+                    "value": "1e1000",  # inf
+                    "language": "en",
+                }
+            )
+        ]
+        subconcept3.save()
+
+        subconcept4 = Concept()
+        subconcept4.nodetype = "Concept"
+        subconcept4.values = [
+            ConceptValue(
+                {
+                    "type": "prefLabel",
+                    "category": "label",
+                    "value": "Beer",
+                    "language": "en",
+                }
+            )
+        ]
+        subconcept4.save()
+
+        subconcept5 = Concept()
+        subconcept5.nodetype = "Concept"
+        subconcept5.values = [
+            ConceptValue(
+                {
+                    "type": "prefLabel",
+                    "category": "label",
+                    "value": "Pizza",
+                    "language": "en",
+                }
+            )
+        ]
+        subconcept5.save()
+
+        subconcept6 = Concept()
+        subconcept6.nodetype = "Concept"
+        subconcept6.values = [
+            ConceptValue(
+                {
+                    "type": "prefLabel",
+                    "category": "label",
+                    "value": "kung-fu",
+                    "language": "en",
+                }
+            )
+        ]
+        subconcept6.save()
+
+        subconcept7 = Concept()
+        subconcept7.nodetype = "Concept"
+        subconcept7.values = [
+            ConceptValue(
+                {
+                    "type": "prefLabel",
+                    "category": "label",
+                    "value": "2",
+                    "language": "en",
+                }
+            )
+        ]
+        subconcept7.save()
+
+        parent.add_relation(subconcept1, "narrower")
+        parent.add_relation(subconcept2, "narrower")
+        parent.add_relation(subconcept3, "narrower")
+        parent.add_relation(subconcept4, "narrower")
+        parent.add_relation(subconcept5, "narrower")
+        parent.add_relation(subconcept6, "narrower")
+        parent.add_relation(subconcept7, "narrower")
+        parent.save()
+
+        get_concept = Concept().get(
+            id=parent.id,
+            include_subconcepts=True,
+            lang="en",
+            pathway_filter=Q(relationtype="narrower"),
+        )
+
+        self.assertEqual(str(get_concept.subconcepts[0].get_sortkey("en")), "1e1000")
+        self.assertEqual(str(get_concept.subconcepts[1].get_sortkey("en")), "2")
+        self.assertEqual(str(get_concept.subconcepts[2].get_sortkey("en")), "Beer")
+        self.assertEqual(str(get_concept.subconcepts[3].get_sortkey("en")), "Pizza")
+        self.assertEqual(str(get_concept.subconcepts[4].get_sortkey("en")), "infinity")
+        self.assertEqual(str(get_concept.subconcepts[5].get_sortkey("en")), "kung-fu")
+        self.assertEqual(str(get_concept.subconcepts[6].get_sortkey("en")), "nan")

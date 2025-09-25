@@ -231,6 +231,7 @@
         }
       ],
       "iconclass": "",
+      "is_active": true,
       "functions": [],
       "nodegroups": [
         {
@@ -2696,6 +2697,7 @@
             "user_id": null
         },
       "name": "Heritage Resource Model",
+      "slug": "heritage_resource_model",
       "cards_x_nodes_x_widgets": [
         {
           "widget_id": "10000000-0000-0000-0000-000000000001",

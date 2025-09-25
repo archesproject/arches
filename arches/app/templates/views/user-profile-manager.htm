@@ -2,6 +2,7 @@
 {% load static %} 
 {% load template_tags %}
 {% load i18n %} 
+{% load webpack_static from webpack_loader %}
 
 {% block title %} 
 {{ block.super }} 
@@ -19,9 +20,7 @@
 
             <div class="profile-report relative">
 
-                <!-- Profile Top Panel Image 
-                <img class="widget-bg img-responsive" src='{{ STATIC_URL }}img/user/profile_background.png'>
-                -->
+                <!-- Profile Top Panel Image -->
 
                 <div>
                     <div class="profile-full-name">
@@ -280,78 +279,6 @@
                     </div>
                 </section>
 
-
-<!-- commenting this section out as it's not implemented as of Feb 19th - AC -->
-                <!-- My Devices -->
-<!--
-                <div class="profile-list">
-                    <div class="profile-header">
-                        My Devices
-                    </div>
--->
-
-                    <!-- No Device Registered Yet -->
-<!--
-                    <div class="">
--->
-
-                        <!-- Download panel -->
-<!--
-                        <div id="download-buttons-panel" class="">
-                            <span class="hidden-xs">You haven't registered a device yet.</span> Download the App:
-                            <div class="">
-                                <a class="download-app" href=""><img class="apple_app_store_icon" src="{{ STATIC_URL }}img/user/apple.png" alt="ios"></a>
-                                <a class="download-app" href=""><img class="android_app_store_icon" src="{{ STATIC_URL }}img/user/google.png" alt="android"></a>
-                            </div>
-                        </div>
--->
-
-                        <!-- Devices Panel -->
-<!--
-                        <div id="devices-panel" class="" style="display: none;">
-                            <div class="row">
-                                <div class="col-sm-9 col-sm-offset-3">-->
-                                    <!-- Device Listing -->
-                                    <!--<ul class="device-listing">
-                                        <li class="device-list-item">
-                                            <div class="">
-                                                <dl class="device-summary">
-                                                    <dt>Alison's iPhone 8</dt>
-                                                </dl>
-                                            </div>
-                                            <img src="img/arches/devices/smart_phone.png" alt="Tablet" class="mar-btm" style="height: 80px; margin-top: 10px; margin-left: 15px; margin-right: 15px;">
-                                            <div class="">
-                                                <dl class="device-summary">
-                                                    <dt>December 18, 2017</dt>
-                                                    <dd class="profile-label-shim">9:18:52</dd>
-                                                    <dd class="profile-label-shim">Last login</dd>
-                                                </dl>
-                                            </div>
-                                        </li>
-
-                                        <li class="device-list-item">
-                                            <div class="">
-                                                <dl class="device-summary">
-                                                    <dt>Getty iPad #14</dt>
-                                                </dl>
-                                            </div>
-                                            <img src="img/arches/devices/tablet.png" alt="Tablet" class="mar-btm" style="height: 80px; margin-top: 10px; margin-left: 15px; margin-right: 15px;">
-                                            <div class="">
-                                                <dl class="device-summary">
-                                                    <dt>November 9, 2017</dt>
-                                                    <dd class="profile-label-shim">17:45:12</dd>
-                                                    <dd class="profile-label-shim">Last login</dd>
-                                                </dl>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
--->
-
                 <!-- Notification Settings -->
                 <section>
                     <div class="profile-list">
@@ -390,19 +317,6 @@
                                                 </span>
                                             </td>
                                         </tr>
-                                        <!-- <tr>
-                                            <td>{% trans 'Exporting Search Results' %}</td>
-                                            <td>
-                                                <label class="control-label widget-input-label">
-                                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSearchExportEmailNotifs()}, click: function(){toggleSearchExportEmailNotifs(!toggleSearchExportEmailNotifs())}"><small></small></span>
-                                                </label>
-                                            </td>
-                                            <td>
-                                                <label class="control-label widget-input-label">
-                                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSearchExportWebNotifs()}, click: function(){toggleSearchExportWebNotifs(!toggleSearchExportWebNotifs())}"><small></small></span>
-                                                </label>
-                                            </td>
-                                        </tr> -->
                                         <!-- /ko -->
                                     </tbody>
                                 </table>

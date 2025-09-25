@@ -3,7 +3,6 @@ source =
     arches/
 
 omit =
-    */__init__.py
     */celery.py
     */hosts.py
     */models/migrations/*

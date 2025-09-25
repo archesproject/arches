@@ -1,4 +1,4 @@
-resourceinstanceidfrom,resourceinstanceidto,relationshiptype,datestarted,dateended,notes
+from_resource,to_resource,relationshiptype,datestarted,dateended,notes
 c73293bd-bf90-401b-beda-4ea6211fe292,3480ca1a-5c52-4962-8d20-22a33c28dcc3,1b418df3-9a1f-4850-8c94-f8342aa04e15,None,None,Hung Yue &amp; Co. was the contractor for the post-WWII basement renovation in 1947.
 efe8f176-18b6-434b-bd7a-2bb18c69b21d,1c10c4a7-20ba-497b-9ea0-f3a5723c238b,25c8215a-b978-4bda-bf56-8ac9f26f6ba7,None,None,
 6ce53fff-db7e-4952-a9d0-341bb07a9e40,1c10c4a7-20ba-497b-9ea0-f3a5723c238b,2f08188d-518f-4af0-b5b4-4e143e3226a9,None,None,

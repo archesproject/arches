@@ -3,7 +3,7 @@ from http import HTTPStatus
 from django.contrib.auth.models import Group, User
 from django.urls import reverse
 
-from arches.app.models.models import ETLModule, LoadEvent
+from arches.app.models.models import ETLModule, Graph, LoadErrors, LoadEvent
 from tests.base_test import ArchesTestCase
 
 # these tests can be run from the command line via
@@ -41,6 +41,45 @@ class ETLManagerTests(ArchesTestCase):
             reverse("etl_manager"), QUERY_STRING="action=loadEvent"
         )
         self.assertContains(response, '"user_displayname": "Full Name"')
+
+    def test_node_error_view(self):
+        error = LoadErrors.objects.create(
+            load_event=self.full_name_load_event, message="Early failure."
+        )
+
+        self.client.force_login(self.full_name_user)
+        response = self.client.get(
+            reverse("etl_manager"),
+            QUERY_STRING=f"action=nodeError&loadid={self.full_name_load_event.pk}&nodeid=null&error=null",
+        )
+        self.assertContains(response, error.message)
+
+        error.error = "ValueError"
+        error.save()
+
+        response = self.client.get(
+            reverse("etl_manager"),
+            QUERY_STRING=f"action=nodeError&loadid={self.full_name_load_event.pk}&nodeid=null&error={error.error}",
+        )
+        self.assertContains(response, error.error)
+
+        graph = Graph.objects.create_graph(name="Test graph")
+        error.node = graph.node_set.first()
+        error.save()
+
+        response = self.client.get(
+            reverse("etl_manager"),
+            QUERY_STRING=f"action=nodeError&loadid={self.full_name_load_event.pk}&nodeid={error.node_id}&error={error.error}",
+        )
+        self.assertContains(response, error.node_id)
+
+    def test_no_loadid(self):
+        self.client.force_login(self.admin)
+        with self.assertLogs("django.request", level="WARNING"):
+            response = self.client.get(
+                reverse("etl_manager"), QUERY_STRING="action=nodeError"
+            )
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
 
     def test_insufficent_permissions(self):
         self.client.force_login(self.anonymous)

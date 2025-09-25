@@ -1,11 +1,12 @@
-define(['arches', 'models/abstract'], function(arches, AbstractModel) {
-    return AbstractModel.extend({
-        url: arches.urls.concept_manage_parents,
+import arches from 'arches';
+import AbstractModel from 'models/abstract';
 
-        defaults: {
-            'id': '',
-            'added': [],
-            'deleted': []
-        }
-    });
+export default AbstractModel.extend({
+    url: arches.urls.concept_manage_parents,
+
+    defaults: {
+        'id': '',
+        'added': [],
+        'deleted': []
+    }
 });

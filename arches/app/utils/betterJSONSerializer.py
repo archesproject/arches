@@ -1,21 +1,19 @@
 import datetime
 import decimal
-import types
-import json
 import inspect
+import json
 import uuid
 from io import StringIO
 from itertools import chain
-from django.db import models, DEFAULT_DB_ALIAS
+
 from django.db.models import Model
 from django.db.models.query import QuerySet
 from django.utils.encoding import smart_str
-from django.core.serializers.python import Serializer as PythonSerializer
 from django.core.serializers.python import Deserializer as PythonDeserializer
 from django.core.serializers.json import DjangoJSONEncoder
-from django.forms.models import model_to_dict
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.files import File
+from django.utils.functional import Promise
 
 from arches.app.models.fields.i18n import I18n_JSON, I18n_String
 
@@ -92,88 +90,68 @@ class JSONSerializer(object):
 
     def handle_object(self, object, **kwargs):
         """Called to handle everything, looks for the correct handling"""
-        # print type(object)
-        # print object
-        # print inspect.isclass(object)
-        # print inspect.ismethod(object)
-        # print inspect.isfunction(object)
-        # print inspect.isbuiltin(object)
-        # print inspect.isroutine(object)
-        # print inspect.isabstract(object)
-        # print type(object) == 'staticmethod'
-        if (
-            inspect.isroutine(object)
-            or inspect.isbuiltin(object)
-            or inspect.isclass(object)
-        ):
-            raise UnableToSerializeMethodTypesError(type(object))
-        elif isinstance(object, dict):
-            return self.handle_dictionary(object)
-        elif (
-            isinstance(object, list)
-            or isinstance(object, tuple)
-            or isinstance(object, set)
-        ):
-            return self.handle_list(object)
-        elif isinstance(object, Model):
-            if hasattr(object, "serialize"):
-                serialize_function = getattr(object, "serialize")
+        match object:
+            case dict():
+                return self.handle_dictionary(object)
+            case list() | tuple() | set():
+                return self.handle_list(object, **kwargs)
+            case Model():
+                if hasattr(object, "serialize"):
+                    serialize_function = getattr(object, "serialize")
 
-                # if the model's `serialize` method leverages a cache, force it recalculate all fields instead if arg is supplied
-                if self.force_recalculation:
-                    signature = inspect.signature(serialize_function)
+                    # if the model's `serialize` method leverages a cache, force it recalculate all fields instead if arg is supplied
+                    if self.force_recalculation:
+                        signature = inspect.signature(serialize_function)
 
-                    if "force_recalculation" in [
-                        parameter.name for parameter in signature.parameters.values()
-                    ]:
-                        kwargs["force_recalculation"] = True
-                        # return self.handle_object(serialize_function(**kwargs), **kwargs)
+                        if "force_recalculation" in [
+                            parameter.name
+                            for parameter in signature.parameters.values()
+                        ]:
+                            kwargs["force_recalculation"] = True
+                            # return self.handle_object(serialize_function(**kwargs), **kwargs)
 
-                return self.handle_object(serialize_function(**kwargs), **kwargs)
-            else:
-                return self.handle_model(object, **kwargs)
-            # return PythonSerializer().serialize([object],**self.options.copy())[0]['fields']
-        elif isinstance(object, QuerySet):
-            # return super(JSONSerializer,self).serialize(object, **self.options.copy())[0]
-            ret = []
-            for item in object:
-                ret.append(self.handle_object(item, **kwargs))
-            return ret
-        elif isinstance(object, bytes):
-            return object.decode("utf-8")
-        elif (
-            isinstance(object, int)
-            or isinstance(object, float)
-            or isinstance(object, int)
-            or isinstance(object, str)
-            or isinstance(object, bool)
-            or object is None
-        ):
-            return object
-        elif (
-            isinstance(object, datetime.datetime)
-            or isinstance(object, datetime.date)
-            or isinstance(object, datetime.time)
-            or isinstance(object, decimal.Decimal)
-        ):
-            return DjangoJSONEncoder().default(object)
-        elif isinstance(object, GEOSGeometry):
-            return getattr(object, self.geom_format)
-        elif isinstance(object, File):
-            return object.name
-        elif isinstance(object, uuid.UUID):
-            return str(object)
-        elif isinstance(object, I18n_JSON) or isinstance(object, I18n_String):
-            use_raw_i18n_json = kwargs.get("use_raw_i18n_json", False)
-            return getattr(object, "serialize")(use_raw_i18n_json)
-        elif hasattr(object, "__dict__"):
-            # call an objects serialize method if it exists
-            if hasattr(object, "serialize"):
-                return getattr(object, "serialize")()
-            else:
-                return self.handle_dictionary(object.__dict__)
-        else:
-            raise UnableToSerializeError(type(object))
+                    return self.handle_object(serialize_function(**kwargs), **kwargs)
+                else:
+                    return self.handle_model(object, **kwargs)
+            case Promise():
+                return str(object)
+            case QuerySet():
+                return [self.handle_object(item, **kwargs) for item in object]
+            case bytes():
+                return object.decode("utf-8")
+            case int() | float() | str() | bool() | None:
+                return object
+            case (
+                datetime.datetime()
+                | datetime.date()
+                | datetime.time()
+                | decimal.Decimal()
+            ):
+                return DjangoJSONEncoder().default(object)
+            case GEOSGeometry():
+                return getattr(object, self.geom_format)
+            case File():
+                return object.name
+            case uuid.UUID():
+                return str(object)
+            case I18n_JSON() | I18n_String():
+                use_raw_i18n_json = kwargs.get("use_raw_i18n_json", False)
+                return getattr(object, "serialize")(use_raw_i18n_json)
+            case _:
+                if hasattr(object, "__dict__"):
+                    # call an object's serialize method if it exists
+                    if hasattr(object, "serialize"):
+                        return getattr(object, "serialize")()
+                    else:
+                        return self.handle_dictionary(object.__dict__)
+                elif (
+                    inspect.isroutine(object)
+                    or inspect.isbuiltin(object)
+                    or inspect.isclass(object)
+                ):
+                    raise UnableToSerializeMethodTypesError(type(object))
+
+                raise UnableToSerializeError(type(object))
 
     def handle_dictionary(self, d):
         """Called to handle a Dictionary"""
@@ -187,15 +165,15 @@ class JSONSerializer(object):
 
         return obj
 
-    def handle_list(self, l):
+    def handle_list(self, l, **kwargs):
         """Called to handle a list"""
         arr = []
         for item in l:
-            arr.append(self.handle_object(item))
+            arr.append(self.handle_object(item, **kwargs))
 
         return arr
 
-    # a slighty modified version of django.forms.models.model_to_dict
+    # a slightly modified version of django.forms.models.model_to_dict
     def handle_model(self, instance, **kwargs):
         """
         Returns a dict containing the data in ``instance``.
@@ -228,8 +206,6 @@ class JSONSerializer(object):
                 getattr(instance, property_name), **kwargs
             )
         for f in chain(opts.concrete_fields, opts.private_fields, opts.many_to_many):
-            if not getattr(f, "editable", False):
-                continue
             if fields and f.name not in fields:
                 continue
             if exclude and f.name in exclude:

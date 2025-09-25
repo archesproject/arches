@@ -1,6 +1,6 @@
-from __future__ import annotations
 import logging
 import uuid
+from typing import Iterable
 
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -49,6 +49,16 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
         Determintes whether or not read/edit buttons show up in search results.
         """
         result = {}
+        if user.is_superuser:
+            result["can_read"] = True
+            result["can_edit"] = True
+            result["is_principal"] = (
+                "permissions" in search_result["_source"]
+                and "principal_user" in search_result["_source"]["permissions"]
+                and user.id in search_result["_source"]["permissions"]["principal_user"]
+            )
+            return result
+
         user_read_permissions = self.get_resource_types_by_perm(
             user,
             [
@@ -73,8 +83,8 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
         if not deny_read_exists or not deny_edit_exists:
             logger.warning(
                 """
-                PROBLEM WITH INDEX - it appears that your index permissions are malformed.  
-                This can happen when switching permission frameworks and may cause search 
+                PROBLEM WITH INDEX - it appears that your index permissions are malformed.
+                This can happen when switching permission frameworks and may cause search
                 results to appear incorrectly or with invalid permissions.  You can correct it by reindexing arches.
                 """
             )
@@ -112,7 +122,12 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
         # We do not do set filtering - None is allow-all for sets.
         return None
 
-    def get_restricted_users(self, resource: ResourceInstance) -> dict[str, set[int]]:
+    def get_restricted_users(
+        self,
+        resource: ResourceInstance,
+        *,
+        all_users: Iterable[User] = User.objects.none(),
+    ) -> dict[str, set[int]]:
         """
         Takes a resource instance and identifies which users are explicitly restricted from
         reading, editing, deleting, or accessing it.
@@ -132,7 +147,7 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
             "cannot_write": set(),
             "cannot_delete": set(),
         }
-        for user in User.objects.all():
+        for user in all_users or User.objects.prefetch_related("groups"):
             default_permissions = self.get_default_permissions(
                 user, resource, all_permissions=True
             )
@@ -242,7 +257,12 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
             return restricted_ids
 
     def check_resource_instance_permissions(
-        self, user: User, resourceid: str, permission: str
+        self,
+        user: User,
+        resourceid: str | None,
+        permission: str,
+        *,
+        resource: ResourceInstance | None = None,
     ) -> ResourceInstancePermissions:
         """
         Checks if a user has permission to access a resource instance
@@ -252,16 +272,23 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
         resourceid -- the id of the resource
         permission -- the permission codename (e.g. 'view_resourceinstance') for which to check
 
+        Optional arguments:
+        resource -- provide an instance to avoid having to fetch it by ID.
         """
         result = ResourceInstancePermissions()
         try:
-            if resourceid == settings.SYSTEM_SETTINGS_RESOURCE_ID:
-                if not user.groups.filter(name="System Administrator").exists():
+            if not resource:
+                resource = ResourceInstance.objects.select_related(
+                    "resource_instance_lifecycle_state"
+                ).get(resourceinstanceid=resourceid)
+            elif resourceid:
+                raise ValueError("resourceid and resource are mutually incompatible")
+            result["resource"] = resource
+
+            if str(resource.pk) == settings.SYSTEM_SETTINGS_RESOURCE_ID:
+                if not self.user_in_group_by_name(user, ["System Administrator"]):
                     result["permitted"] = False
                     return result
-
-            resource = ResourceInstance.objects.get(resourceinstanceid=resourceid)
-            result["resource"] = resource
 
             all_perms = self.get_perms(user, resource)
 
@@ -316,8 +343,10 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
         mappings["users_with_no_access"] = {"type": "integer"}
         return mappings
 
-    def get_index_values(self, resource: Resource):
-        restrictions = self.get_restricted_users(resource)
+    def get_index_values(
+        self, resource: Resource, *, all_users: Iterable[User] = User.objects.none()
+    ):
+        restrictions = self.get_restricted_users(resource, all_users=all_users)
         permissions = {}
         permissions["users_without_read_perm"] = list(restrictions["cannot_read"])
         permissions["users_without_edit_perm"] = list(restrictions["cannot_write"])

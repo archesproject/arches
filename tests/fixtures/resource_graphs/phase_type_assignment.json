@@ -177,6 +177,7 @@
             "functions_x_graphs": [],
             "graphid": "049fc0c8-fa36-11e6-9e3e-026d961c88e6",
             "iconclass": "",
+            "is_active": true,
             "is_editable": true,
             "isresource": true,
             "jsonldcontext": null,
@@ -545,6 +546,7 @@
                 "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
                 "sortorder": null
             },
+            "slug": "her_monument_phase_type",
             "subtitle": "Describes time span and type for the Heritage Resource",
             "version": ""
         }

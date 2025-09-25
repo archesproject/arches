@@ -7,12 +7,13 @@ from tempfile import NamedTemporaryFile
 from django.core.exceptions import ValidationError
 import uuid
 from django.db import connection
-from django.http import HttpResponse
+from django.http import HttpRequest, HttpResponse
 from django.utils.translation import gettext as _
 from django.core.files.storage import default_storage
+from django.contrib.auth.models import User
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.decorators import load_data_async
-from arches.app.models.models import Node, TileModel
+from arches.app.models.models import Node, TileModel, ETLModule
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.etl_modules.base_import_module import (
@@ -24,15 +25,39 @@ from arches.management.commands.etl_template import create_tile_excel_workbook
 
 
 class TileExcelImporter(BaseImportModule):
-    def __init__(self, request=None, loadid=None, temp_dir=None):
-        self.request = request if request else None
-        self.userid = request.user.id if request else None
+    def __init__(self, request=None, loadid=None, temp_dir=None, params=None):
+        self.loadid = request.POST.get("load_id") if request else loadid
+        self.userid = (
+            request.user.id
+            if request
+            else settings.DEFAULT_RESOURCE_IMPORT_USER["userid"]
+        )
+        self.mode = "cli" if not request and params else "ui"
+        try:
+            self.user = User.objects.get(pk=self.userid)
+        except User.DoesNotExist:
+            raise User.DoesNotExist(
+                _(
+                    "The userid {} does not exist. Probably DEFAULT_RESOURCE_IMPORT_USER is not configured correctly in settings.py.".format(
+                        self.userid
+                    )
+                )
+            )
+        if not request and params:
+            request = HttpRequest()
+            request.user = self.user
+            request.method = "POST"
+            for k, v in params.items():
+                request.POST.__setitem__(k, v)
+        self.request = request
         self.moduleid = request.POST.get("module") if request else None
         self.datatype_factory = DataTypeFactory()
         self.legacyid_lookup = {}
         self.temp_path = ""
-        self.loadid = loadid if loadid else None
         self.temp_dir = temp_dir if temp_dir else None
+        self.config = (
+            ETLModule.objects.get(pk=self.moduleid).config if self.moduleid else {}
+        )
 
     @load_data_async
     def run_load_task_async(self, request):
@@ -56,7 +81,6 @@ class TileExcelImporter(BaseImportModule):
 
     def create_tile_value(
         self,
-        cell_values,
         data_node_lookup,
         node_lookup,
         nodegroup_alias,
@@ -125,11 +149,25 @@ class TileExcelImporter(BaseImportModule):
         tile_value_json = JSONSerializer().serialize(tile_value)
         return tile_value_json, tile_valid
 
+    def get_nodegroup_id_column(self, worksheet):
+        """
+        Returns the index of the column that contains the nodegroup id.
+        If no nodegroup id is found, returns None.
+        """
+        index = 1
+        for row in worksheet.iter_rows(1, 1, None, None):
+            for cell in row:
+                if cell.value == "nodegroup_id":
+                    return index
+                else:
+                    index += 1
+        return worksheet.max_column
+
     def process_worksheet(self, worksheet, cursor, node_lookup, nodegroup_lookup):
         data_node_lookup = {}
         row_count = 0
 
-        nodegroupid_column = int(worksheet.max_column)
+        nodegroupid_column = self.get_nodegroup_id_column(worksheet)
         maybe_nodegroup = worksheet.cell(row=2, column=nodegroupid_column).value
         if maybe_nodegroup:
             nodegroup_alias = nodegroup_lookup[maybe_nodegroup]["alias"]
@@ -151,6 +189,7 @@ class TileExcelImporter(BaseImportModule):
                 raise ValueError(_("All rows must have a valid resource id"))
 
             node_values = cell_values[3:-3]
+            sortorder = cell_values[-3] if cell_values[-3] else 0
             try:
                 row_count += 1
                 row_details = dict(zip(data_node_lookup[nodegroup_alias], node_values))
@@ -169,7 +208,6 @@ class TileExcelImporter(BaseImportModule):
                 )
                 legacyid, resourceid = self.set_legacy_id(resourceid)
                 tile_value_json, passes_validation = self.create_tile_value(
-                    cell_values,
                     data_node_lookup,
                     node_lookup,
                     nodegroup_alias,
@@ -189,7 +227,7 @@ class TileExcelImporter(BaseImportModule):
                         if TileModel.objects.filter(pk=tileid).exists():
                             operation = "update"
                 cursor.execute(
-                    """INSERT INTO load_staging (nodegroupid, legacyid, resourceid, tileid, parenttileid, value, loadid, nodegroup_depth, source_description, passes_validation, operation) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                    """INSERT INTO load_staging (nodegroupid, legacyid, resourceid, tileid, parenttileid, value, loadid, nodegroup_depth, source_description, passes_validation, operation, sortorder) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                     (
                         row_details["nodegroup_id"],
                         legacyid,
@@ -204,6 +242,7 @@ class TileExcelImporter(BaseImportModule):
                         ),  # source_description
                         passes_validation,
                         operation,
+                        sortorder,
                     ),
                 )
             except KeyError:
@@ -226,9 +265,11 @@ class TileExcelImporter(BaseImportModule):
     def validate_uploaded_file(self, workbook):
         graphid = None
         for worksheet in workbook.worksheets:
-            if worksheet.cell(2, worksheet.max_column).value:
+            if worksheet.cell(2, self.get_nodegroup_id_column(worksheet)).value:
                 try:
-                    nodegroup_id = worksheet.cell(2, worksheet.max_column).value
+                    nodegroup_id = worksheet.cell(
+                        2, self.get_nodegroup_id_column(worksheet)
+                    ).value
                     graphid = str(
                         Node.objects.filter(nodegroup_id=nodegroup_id)[0].graph_id
                     )
@@ -240,9 +281,11 @@ class TileExcelImporter(BaseImportModule):
 
     def get_graphid(self, workbook):
         for worksheet in workbook.worksheets:
-            if worksheet.cell(2, worksheet.max_column).value:
+            if worksheet.cell(2, self.get_nodegroup_id_column(worksheet)).value:
                 try:
-                    nodegroup_id = worksheet.cell(2, worksheet.max_column).value
+                    nodegroup_id = worksheet.cell(
+                        2, self.get_nodegroup_id_column(worksheet)
+                    ).value
                     graphid = str(
                         Node.objects.filter(nodegroup_id=nodegroup_id)[0].graph_id
                     )
@@ -256,12 +299,13 @@ class TileExcelImporter(BaseImportModule):
             self.stage_excel_file(file, summary, cursor)
 
     def stage_excel_file(self, file, summary, cursor):
-        if file.endswith("xlsx"):
+        if file.endswith("xlsx") and ("attachments" + os.sep) not in file:
             summary["files"][file]["worksheets"] = []
             uploaded_file_path = os.path.join(
                 settings.UPLOADED_FILES_DIR, "tmp", self.loadid, file
             )
-            workbook = load_workbook(filename=default_storage.open(uploaded_file_path))
+            opened_file = default_storage.open(uploaded_file_path)
+            workbook = load_workbook(filename=opened_file, read_only=True)
             graphid = self.get_graphid(workbook)
             nodegroup_lookup, nodes = self.get_graph_tree(graphid)
             node_lookup = self.get_node_lookup(nodes)
@@ -271,6 +315,8 @@ class TileExcelImporter(BaseImportModule):
                     worksheet, cursor, node_lookup, nodegroup_lookup
                 )
                 summary["files"][file]["worksheets"].append(details)
+            opened_file.close()
+
             cursor.execute(
                 """UPDATE load_event SET load_details = %s WHERE loadid = %s""",
                 (json.dumps(summary), self.loadid),

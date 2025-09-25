@@ -10954,6 +10954,7 @@
             "isresource": true,
             "jsonldcontext": null,
             "name": "Information Resource",
+            "slug": "information_resource",
             "nodegroups": [
                 {
                     "cardinality": "1",

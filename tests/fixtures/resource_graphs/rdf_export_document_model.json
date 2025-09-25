@@ -456,6 +456,7 @@
             ],
             "graphid": "fd0a5907-e11b-11e8-821b-a4d18cec433a",
             "iconclass": "",
+            "is_active": true,
             "is_editable": false,
             "isactive": true,
             "isresource": true,
@@ -869,6 +870,7 @@
                 "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E33_Linguistic_Object",
                 "sortorder": 0
             },
+            "slug": "import_test_document",
             "subtitle": "",
             "template_id": "50000000-0000-0000-0000-000000000001",
             "version": ""

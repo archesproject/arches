@@ -17,13 +17,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import uuid
+from unittest import mock
 
 from django.contrib.auth.models import User
-from tests.base_test import ArchesTestCase
+from guardian.models import GroupObjectPermission, UserObjectPermission
+
+from arches.app.const import IntegrityCheck
 from arches.app.models import models
 from arches.app.models.graph import Graph, GraphValidationError
-from arches.app.models.card import Card
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from tests.base_test import ArchesTestCase
 
 # these tests can be run from the command line via
 # python manage.py test tests.models.graph_tests --settings="tests.test_settings"
@@ -33,11 +36,15 @@ class GraphTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.NODE_NODETYPE_GRAPHID = "22000000-0000-0000-0000-000000000001"
         cls.SINGLE_NODE_GRAPHID = "22000000-0000-0000-0000-000000000000"
+        cls.NODE_NODETYPE_GRAPHID = "22000000-0000-0000-0000-000000000001"
+        cls.single_node_graph = cls.create_single_node_graph()
+        cls.node_node_type_graph = cls.create_node_node_type_graph()
+        cls.test_graph = cls.create_test_graph()
 
-        # Node Branch
-        graph_dict = {
+    @classmethod
+    def create_single_node_graph(cls):
+        graph_data = {
             "author": "Arches",
             "color": None,
             "deploymentdate": None,
@@ -47,13 +54,14 @@ class GraphTests(ArchesTestCase):
             "iconclass": "fa fa-circle",
             "isresource": False,
             "name": "Node",
+            "slug": "node",
             "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
             "subtitle": "Represents a single node in a graph.",
             "version": "v1",
         }
-        models.GraphModel.objects.create(**graph_dict).save()
+        graph_model = models.GraphModel.objects.create(**graph_data)
 
-        node_dict = {
+        node_data = {
             "config": None,
             "datatype": "semantic",
             "description": "Represents a single node in a graph",
@@ -61,15 +69,21 @@ class GraphTests(ArchesTestCase):
             "isrequired": False,
             "issearchable": True,
             "istopnode": True,
-            "name": "Node",
+            "name": "Single Node",
             "nodegroup_id": None,
             "nodeid": "20000000-0000-0000-0000-100000000000",
             "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity",
         }
-        models.Node.objects.create(**node_dict).save()
+        models.Node.objects.create(**node_data).save()
 
-        # Node/Node Type Branch
-        graph_dict = {
+        graph = Graph.objects.get(pk=graph_model.pk)
+        graph.save()
+        graph.publish()
+        return graph
+
+    @classmethod
+    def create_node_node_type_graph(cls):
+        graph_data = {
             "author": "Arches",
             "color": None,
             "deploymentdate": None,
@@ -79,21 +93,22 @@ class GraphTests(ArchesTestCase):
             "iconclass": "fa fa-angle-double-down",
             "isresource": False,
             "name": "Node/Node Type",
+            "slug": "node_node_type",
             "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
             "subtitle": "Represents a node and node type pairing",
             "version": "v1",
         }
-        models.GraphModel.objects.create(**graph_dict).save()
+        graph_model = models.GraphModel.objects.create(**graph_data)
 
-        nodegroup_dict = {
+        nodegroup_data = {
             "cardinality": "n",
             "legacygroupid": "",
             "nodegroupid": "20000000-0000-0000-0000-100000000001",
             "parentnodegroup_id": None,
         }
-        models.NodeGroup.objects.create(**nodegroup_dict).save()
+        models.NodeGroup.objects.create(**nodegroup_data).save()
 
-        card_dict = {
+        card_data = {
             "active": True,
             "cardid": "bf9ea150-3eaa-11e8-8b2b-c3a348661f61",
             "description": "Represents a node and node type pairing",
@@ -107,9 +122,9 @@ class GraphTests(ArchesTestCase):
             "sortorder": None,
             "visible": True,
         }
-        models.CardModel.objects.create(**card_dict).save()
 
-        nodes = [
+        card = models.CardModel.objects.create(**card_data)
+        nodes_data = [
             {
                 "config": None,
                 "datatype": "string",
@@ -138,10 +153,24 @@ class GraphTests(ArchesTestCase):
             },
         ]
 
-        for node in nodes:
-            models.Node.objects.create(**node).save()
+        # default_widgets_by_datatype = {
+        #     datatype.pk: datatype.defaultwidget
+        #     for datatype in models.DDataType.objects.select_related("defaultwidget")
+        # }
+        for node_data in nodes_data:
+            node = models.Node.objects.create(**node_data)
+            # This should be uncommented when it will no longer cause failures.
+            # models.CardXNodeXWidget.objects.create(
+            #     card=node.nodegroup.cardmodel_set.all()[0],
+            #     node=node,
+            #     widget=default_widgets_by_datatype[node.datatype],
+            # )
 
-        edges_dict = {
+        models.NodeGroup.objects.filter(
+            pk="20000000-0000-0000-0000-100000000001"
+        ).update(grouping_node_id="20000000-0000-0000-0000-100000000001")
+
+        edge_data = {
             "description": None,
             "domainnode_id": "20000000-0000-0000-0000-100000000001",
             "edgeid": "22200000-0000-0000-0000-000000000001",
@@ -150,42 +179,63 @@ class GraphTests(ArchesTestCase):
             "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type",
             "rangenode_id": "20000000-0000-0000-0000-100000000002",
         }
-        models.Edge.objects.create(**edges_dict).save()
+        models.Edge.objects.create(**edge_data).save()
 
-        graph = Graph.new()
-        graph.name = "TEST GRAPH"
-        graph.subtitle = "ARCHES TEST GRAPH"
-        graph.author = "Arches"
-        graph.description = "ARCHES TEST GRAPH"
-        graph.ontology_id = "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd"
-        graph.version = "v1.0.0"
-        graph.iconclass = "fa fa-building"
-        graph.nodegroups = []
-        graph.root.ontologyclass = "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"
+        graph = Graph.objects.get(pk=graph_model.pk)
         graph.save()
+        graph.publish()
+        return graph
 
-        graph.root.name = "ROOT NODE"
-        graph.root.description = "Test Root Node"
-        graph.root.datatype = "semantic"
-        graph.root.save()
+    @classmethod
+    def create_test_graph(cls):
+        test_graph = Graph.objects.create_graph()
+        draft_graph = test_graph.get_draft_graph()
 
-        cls.rootNode = graph.root
+        draft_graph.name = "TEST GRAPH"
+        draft_graph.subtitle = "ARCHES TEST GRAPH"
+        draft_graph.author = "Arches"
+        draft_graph.description = "ARCHES TEST GRAPH"
+        draft_graph.ontology_id = "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd"
+        draft_graph.version = "v1.0.0"
+        draft_graph.iconclass = "fa fa-building"
+        draft_graph.nodegroups = []
+        draft_graph.root.ontologyclass = (
+            "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"
+        )
+        draft_graph.root.name = "ROOT NODE"
+        draft_graph.root.description = "Test Root Node"
+        draft_graph.root.datatype = "semantic"
+        draft_graph.root.save()
+
+        draft_graph.save()
+
+        test_graph.promote_draft_graph_to_active_graph()
+        test_graph.publish()
+
+        cls.rootNode = test_graph.root
+        return test_graph
 
     def test_new_graph(self):
         name = "TEST NEW GRAPH"
-        author = "ARCHES TEST"
-        graph = Graph.new(name=name, is_resource=True, author=author)
+
+        user = User.objects.create(
+            username="arches_test_user",
+            first_name="TEST",
+            last_name="USER",
+        )
+
+        graph = Graph.objects.create_graph(name=name, is_resource=True, user=user)
         self.assertEqual(graph.name, name)
-        self.assertEqual(graph.author, author)
+        self.assertEqual(graph.author, "TEST USER")
         self.assertTrue(graph.isresource)
         self.assertFalse(graph.root.is_collector)
         self.assertEqual(len(graph.nodes), 1)
         self.assertEqual(len(graph.cards), 0)
         self.assertEqual(len(graph.get_nodegroups()), 0)
 
-        graph = Graph.new(name=name, is_resource=False, author=author)
+        graph = Graph.objects.create_graph(name=name, is_resource=False, user=user)
         self.assertEqual(graph.name, name)
-        self.assertEqual(graph.author, author)
+        self.assertEqual(graph.author, "TEST USER")
         self.assertFalse(graph.isresource)
         self.assertTrue(graph.root.is_collector)
         self.assertEqual(len(graph.nodes), 1)
@@ -200,6 +250,7 @@ class GraphTests(ArchesTestCase):
 
         graph_obj = {
             "name": "TEST GRAPH",
+            "slug": "test_graph",
             "subtitle": "ARCHES TEST GRAPH",
             "author": "Arches",
             "description": "ARCHES TEST GRAPH",
@@ -278,7 +329,7 @@ class GraphTests(ArchesTestCase):
 
         """
 
-        graph = Graph.objects.get(graphid=self.rootNode.graph_id)
+        graph = self.test_graph
         graph.append_branch(
             "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as",
             graphid=self.NODE_NODETYPE_GRAPHID,
@@ -308,12 +359,48 @@ class GraphTests(ArchesTestCase):
 
         """
 
-        graph = Graph.new(name="TEST RESOURCE")
+        graph = Graph.objects.create_graph(name="TEST RESOURCE")
+        graph.delete_draft_graph()
+
         graph.append_branch(
             "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
             graphid=self.NODE_NODETYPE_GRAPHID,
         )
+        graph.save()
+        graph.publish()
+
+        node_dict = {}
+        for key, value in graph.nodes.items():
+            node_dict[str(key)] = str(value.nodeid)
+
+        graph.add_function_x_graph(
+            {
+                "id": str(uuid.uuid4()),
+                "function_id": str(uuid.uuid4()),
+                "graph_id": graph.graphid,
+                "config": {"test": node_dict},
+            }
+        )
+
         graph_copy = graph.copy()["copy"]
+
+        # confirm that both graphs have the same number of functions_x_graphs
+        self.assertEqual(len(graph.functions_x_graphs), 1)
+        self.assertEqual(len(graph_copy.functions_x_graphs), 1)
+
+        # confirm that the copied graph's functions_x_graphs config is not identical
+        # (nodeids should be different)
+        self.assertNotEqual(
+            graph.functions_x_graphs[0].config, graph_copy.functions_x_graphs[0].config
+        )
+
+        # these checks ensure that the copied functions config's nodeids were replaced
+        # with the mapped ones in the new copied graph.
+        for key in list(graph.nodes.keys()):
+            self.assertIn(str(key), graph.functions_x_graphs[0].config["test"])
+
+        for key in list(graph_copy.nodes.keys()):
+            self.assertIn(str(key), graph_copy.functions_x_graphs[0].config["test"])
 
         self.assertEqual(len(graph_copy.nodes), 3)
         self.assertEqual(len(graph_copy.edges), 2)
@@ -407,19 +494,18 @@ class GraphTests(ArchesTestCase):
         test if a branch is properly appended to a graph that defines an ontology
 
         """
-
         nodes_count_before = models.Node.objects.count()
         edges_count_before = models.Edge.objects.count()
         cards_count_before = models.CardModel.objects.count()
         nodegroups_count_before = models.NodeGroup.objects.count()
 
-        graph = Graph.objects.get(pk=self.rootNode.graph.graphid)
+        graph = Graph.objects.get(pk=self.test_graph.pk)
         self.assertEqual(len(graph.nodes), 1)
         self.assertEqual(len(graph.edges), 0)
         self.assertEqual(len(graph.cards), 1)
         self.assertEqual(len(graph.get_nodegroups()), 1)
 
-        appended_graph = graph.append_branch(
+        graph.append_branch(
             "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as",
             graphid=self.NODE_NODETYPE_GRAPHID,
         )
@@ -479,17 +565,22 @@ class GraphTests(ArchesTestCase):
             )
         )
 
-        graph = Graph.new()
+        graph = Graph.objects.create_graph()
         graph.root.datatype = "string"
         graph.update_node(JSONSerializer().serializeToPython(graph.root))
 
         # create card collector graph to use for appending on to other graphs
-        collector_graph = Graph.new()
+        collector_graph = Graph.objects.create_graph()
+        collector_graph.delete_draft_graph()
+
         collector_graph.append_branch(
             "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as",
             graphid=self.NODE_NODETYPE_GRAPHID,
         )
         collector_graph.save()
+
+    def test_node_creation_sets_grouping_node(self):
+        self.assertEqual(self.rootNode.nodegroup.grouping_node, self.rootNode)
 
     def test_node_update(self):
         """
@@ -502,7 +593,7 @@ class GraphTests(ArchesTestCase):
         # number of nodegroups then remove the appended branches group and reconfirm that
         # the proper number of groups are properly relfected in the graph
 
-        graph = Graph.objects.get(pk=self.rootNode.graph.graphid)
+        graph = self.test_graph
         graph.append_branch(
             "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
             graphid=self.NODE_NODETYPE_GRAPHID,
@@ -576,7 +667,7 @@ class GraphTests(ArchesTestCase):
 
         # test moving a single node to another branch
         # this node should be grouped with it's new parent nodegroup
-        graph = Graph.objects.get(pk=self.rootNode.graph.graphid)
+        graph = self.test_graph
         branch_one = graph.append_branch(
             "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as",
             graphid=self.NODE_NODETYPE_GRAPHID,
@@ -665,7 +756,7 @@ class GraphTests(ArchesTestCase):
         for node in list(branch_two.nodes.values()):
             node.datatype = "semantic"
         graph.save()
-        graph = Graph.objects.get(pk=self.rootNode.graph.graphid)
+        graph.refresh_from_database()
         tree = graph.get_tree()
 
         self.assertEqual(len(tree["children"]), 1)
@@ -700,7 +791,7 @@ class GraphTests(ArchesTestCase):
 
         """
 
-        graph = Graph.objects.get(pk=self.rootNode.graph.graphid)
+        graph = self.test_graph
         ret = graph.get_valid_ontology_classes(nodeid=self.rootNode.nodeid)
         self.assertTrue(len(ret) == 1)
 
@@ -717,7 +808,7 @@ class GraphTests(ArchesTestCase):
         """
 
         self.rootNode.graph.ontology_id = None
-        graph = Graph.objects.get(pk=self.rootNode.graph.graphid)
+        graph = self.test_graph
 
         graph.ontology_id = None
         ret = graph.get_valid_ontology_classes(nodeid=self.rootNode.nodeid)
@@ -730,7 +821,7 @@ class GraphTests(ArchesTestCase):
 
         """
 
-        graph = Graph.objects.get(pk=self.rootNode.graph.graphid)
+        graph = self.test_graph
         graph.clear_ontology_references()
         graph.append_branch(
             "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
@@ -753,8 +844,9 @@ class GraphTests(ArchesTestCase):
         nodegroups_count_before = models.NodeGroup.objects.count()
         card_count_before = models.CardModel.objects.count()
 
-        # test that data is persisited propertly when creating a new graph
-        graph = Graph.new(is_resource=False)
+        # test that data is persisted properly when creating a new graph
+        graph = Graph.objects.create_graph(is_resource=False)
+        graph.delete_draft_graph()
 
         nodes_count_after = models.Node.objects.count()
         edges_count_after = models.Edge.objects.count()
@@ -766,7 +858,7 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(nodegroups_count_after - nodegroups_count_before, 1)
         self.assertEqual(card_count_after - card_count_before, 1)
 
-        # test that data is persisited propertly during an append opertation
+        # test that data is persisted properly during an append opertation
         graph.append_branch(
             "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
             graphid=self.NODE_NODETYPE_GRAPHID,
@@ -850,94 +942,242 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(node_count, 0)
         self.assertEqual(edge_count, 0)
 
+    def test_delete_branch(self):
+        """
+        tests that deleting the top node of a branch deletes the entire branch
+
+        """
+        graph = Graph.objects.create_graph(
+            name="TEST",
+            is_resource=False,
+        )
+        graph.delete_draft_graph()
+
+        initial_node_count = models.Node.objects.count()
+        initial_edge_count = models.Edge.objects.count()
+        initial_nodegroup_count = models.NodeGroup.objects.count()
+        initial_card_count = models.CardModel.objects.count()
+        initial_widget_count = models.CardXNodeXWidget.objects.count()
+
+        initial_graph_nodes_count = len(graph.nodes)
+        initial_graph_edges_count = len(graph.edges)
+        initial_graph_cards_count = len(graph.cards)
+        initial_graph_nodegroups_count = len(graph.get_nodegroups())
+
+        graph.append_branch(
+            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
+            graphid=self.NODE_NODETYPE_GRAPHID,
+        )
+        graph.save()
+        graph.publish()
+
+        node_count_after_append = models.Node.objects.count()
+        edge_count_after_append = models.Edge.objects.count()
+        nodegroup_count_after_append = models.NodeGroup.objects.count()
+        card_count_after_append = models.CardModel.objects.count()
+        widget_count_after_append = models.CardXNodeXWidget.objects.count()
+
+        node_for_branch = models.Node.objects.get(graph=graph, name="Node")
+        graph = graph.delete_node(node_for_branch)
+        graph.publish()
+
+        node_count_after_deletion = models.Node.objects.count()
+        edge_count_after_deletion = models.Edge.objects.count()
+        nodegroup_count_after_deletion = models.NodeGroup.objects.count()
+        card_count_after_deletion = models.CardModel.objects.count()
+        widget_count_after_deletion = models.CardXNodeXWidget.objects.count()
+
+        # assert database does not contain orphans
+        nodes_added = node_count_after_append - initial_node_count
+        nodes_removed = node_count_after_append - node_count_after_deletion
+        expected_node_count_after_deletion = (
+            initial_node_count + nodes_added - nodes_removed
+        )
+        self.assertEqual(node_count_after_deletion, expected_node_count_after_deletion)
+
+        edges_added = edge_count_after_append - initial_edge_count
+        edges_removed = edge_count_after_append - edge_count_after_deletion
+        expected_edge_count_after_deletion = (
+            initial_edge_count + edges_added - edges_removed
+        )
+        self.assertEqual(edge_count_after_deletion, expected_edge_count_after_deletion)
+
+        nodegroups_added = nodegroup_count_after_append - initial_nodegroup_count
+        nodegroups_removed = (
+            nodegroup_count_after_append - nodegroup_count_after_deletion
+        )
+        expected_nodegroup_count_after_deletion = (
+            initial_nodegroup_count + nodegroups_added - nodegroups_removed
+        )
+        self.assertEqual(
+            nodegroup_count_after_deletion, expected_nodegroup_count_after_deletion
+        )
+
+        cards_added = card_count_after_append - initial_card_count
+        cards_removed = card_count_after_append - card_count_after_deletion
+        expected_card_count_after_deletion = (
+            initial_card_count + cards_added - cards_removed
+        )
+        self.assertEqual(card_count_after_deletion, expected_card_count_after_deletion)
+
+        widgets_added = widget_count_after_append - initial_widget_count
+        widgets_removed = widget_count_after_append - widget_count_after_deletion
+        expected_widget_count_after_deletion = (
+            initial_widget_count + widgets_added - widgets_removed
+        )
+        self.assertEqual(
+            widget_count_after_deletion, expected_widget_count_after_deletion
+        )
+
+        # assert graph has correct represntation of database
+        self.assertEqual(len(graph.nodes), initial_graph_nodes_count)
+        self.assertEqual(len(graph.edges), initial_graph_edges_count)
+        self.assertEqual(len(graph.cards), initial_graph_cards_count)
+        self.assertEqual(len(graph.get_nodegroups()), initial_graph_nodegroups_count)
+
     def test_delete_node(self):
         """
-        test the node delete method
-
+        tests deleting a single node
         """
-        graph = Graph.new(name="TEST", is_resource=False, author="TEST")
-        graph.append_branch(
-            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
-            graphid=self.NODE_NODETYPE_GRAPHID,
+        graph = Graph.objects.create_graph(
+            name="TEST",
+            is_resource=False,
         )
-        graph.save()
-        node = models.Node.objects.get(graph=graph, name="Node")
+        graph.delete_draft_graph()
 
-        nodes_count_before = models.Node.objects.count()
-        edges_count_before = models.Edge.objects.count()
-        nodegroups_count_before = models.NodeGroup.objects.count()
-        card_count_before = models.CardModel.objects.count()
+        initial_graph_nodes_count = len(graph.nodes)
+        initial_graph_edges_count = len(graph.edges)
+        initial_graph_cards_count = len(graph.cards)
+        initial_graph_nodegroups_count = len(graph.get_nodegroups())
 
-        graph.delete_node(node)
-
-        nodes_count_after = models.Node.objects.count()
-        edges_count_after = models.Edge.objects.count()
-        nodegroups_count_after = models.NodeGroup.objects.count()
-        card_count_after = models.CardModel.objects.count()
-
-        self.assertEqual(nodes_count_before - nodes_count_after, 2)
-        self.assertEqual(edges_count_before - edges_count_after, 2)
-        self.assertEqual(nodegroups_count_before - nodegroups_count_after, 1)
-        self.assertEqual(card_count_before - card_count_after, 1)
-
-        graph = Graph.objects.get(graphid=graph.pk)
-        self.assertEqual(len(graph.nodes), 1)
-        self.assertEqual(len(graph.edges), 0)
-        self.assertEqual(len(graph.cards), 1)
-        self.assertEqual(len(graph.get_nodegroups()), 1)
+        initial_node_count = models.Node.objects.count()
+        initial_edge_count = models.Edge.objects.count()
+        initial_nodegroup_count = models.NodeGroup.objects.count()
+        initial_card_count = models.CardModel.objects.count()
+        initial_widget_count = models.CardXNodeXWidget.objects.count()
 
         graph.append_branch(
             "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
             graphid=self.NODE_NODETYPE_GRAPHID,
         )
         graph.save()
-        node = models.Node.objects.get(graph=graph, name="Node Type")
-        graph.delete_node(node)
-        graph = Graph.objects.get(graphid=graph.pk)
-        self.assertEqual(len(graph.nodes), 2)
-        self.assertEqual(len(graph.edges), 1)
-        self.assertEqual(len(graph.cards), 2)
-        self.assertEqual(len(graph.get_nodegroups()), 2)
+        graph.publish()
 
-    def test_derive_card_values(self):
+        node_count_after_append = models.Node.objects.count()
+        edge_count_after_append = models.Edge.objects.count()
+        nodegroup_count_after_append = models.NodeGroup.objects.count()
+        card_count_after_append = models.CardModel.objects.count()
+        widget_count_after_append = models.CardXNodeXWidget.objects.count()
+
+        node_to_delete = models.Node.objects.get(graph=graph, name="Node Type")
+        graph = graph.delete_node(node_to_delete)
+        graph.publish()
+
+        node_count_after_deletion = models.Node.objects.count()
+        edge_count_after_deletion = models.Edge.objects.count()
+        nodegroup_count_after_deletion = models.NodeGroup.objects.count()
+        card_count_after_deletion = models.CardModel.objects.count()
+        widget_count_after_deletion = models.CardXNodeXWidget.objects.count()
+
+        # assert database does not contain orphans
+        nodes_added = node_count_after_append - initial_node_count
+        nodes_removed = node_count_after_append - node_count_after_deletion
+        expected_node_count_after_deletion = (
+            initial_node_count + nodes_added - nodes_removed
+        )
+        self.assertEqual(node_count_after_deletion, expected_node_count_after_deletion)
+
+        edges_added = edge_count_after_append - initial_edge_count
+        edges_removed = edge_count_after_append - edge_count_after_deletion
+        expected_edge_count_after_deletion = (
+            initial_edge_count + edges_added - edges_removed
+        )
+        self.assertEqual(edge_count_after_deletion, expected_edge_count_after_deletion)
+
+        nodegroups_added = nodegroup_count_after_append - initial_nodegroup_count
+        nodegroups_removed = (
+            nodegroup_count_after_append - nodegroup_count_after_deletion
+        )
+        expected_nodegroup_count_after_deletion = (
+            initial_nodegroup_count + nodegroups_added - nodegroups_removed
+        )
+        self.assertEqual(
+            nodegroup_count_after_deletion, expected_nodegroup_count_after_deletion
+        )
+
+        cards_added = card_count_after_append - initial_card_count
+        cards_removed = card_count_after_append - card_count_after_deletion
+        expected_card_count_after_deletion = (
+            initial_card_count + cards_added - cards_removed
+        )
+        self.assertEqual(card_count_after_deletion, expected_card_count_after_deletion)
+
+        widgets_added = widget_count_after_append - initial_widget_count
+        widgets_removed = widget_count_after_append - widget_count_after_deletion
+        expected_widget_count_after_deletion = (
+            initial_widget_count + widgets_added - widgets_removed
+        )
+        self.assertEqual(
+            widget_count_after_deletion, expected_widget_count_after_deletion
+        )
+
+        # assert graph has correct represntation of database
+        expected_graph_nodes_count = initial_graph_nodes_count + (
+            nodes_added - nodes_removed
+        )
+        self.assertEqual(len(graph.nodes), expected_graph_nodes_count)
+
+        expected_graph_edges_count = initial_graph_edges_count + (
+            edges_added - edges_removed
+        )
+        self.assertEqual(len(graph.edges), expected_graph_edges_count)
+
+        expected_graph_cards_count = initial_graph_cards_count + (
+            cards_added - cards_removed
+        )
+        self.assertEqual(len(graph.cards), expected_graph_cards_count)
+
+        expected_graph_nodegroups_count = initial_graph_nodegroups_count + (
+            nodegroups_added - nodegroups_removed
+        )
+        self.assertEqual(len(graph.get_nodegroups()), expected_graph_nodegroups_count)
+
+    def test_derives_initial_card_values(self):
         """
-        test to make sure we get the proper name and description for display in the ui
+        Tests that cards generated with Graph intially start with values described in Graph
 
         """
-
-        # TESTING A GRAPH
-        graph = Graph.new(name="TEST", is_resource=False, author="TEST")
+        graph = Graph.objects.create_graph(
+            name="TEST",
+            is_resource=False,
+        )
         graph.description = "A test description"
 
-        self.assertEqual(len(graph.cards), 1)
-        for card in graph.get_cards():
+        for card in graph.get_cards(force_recalculation=True):
             self.assertEqual(card["name"], graph.name)
             self.assertEqual(card["description"], graph.description)
-            card = Card.objects.get(pk=card["cardid"])
-            card.name = "TEST card name"
-            card.description = "TEST card description"
-            card.save()
 
-        for card in graph.get_cards():
-            self.assertEqual(card["name"], "TEST")
-            self.assertEqual(card["description"], "A test description")
+    def test_derives_card_values(self):
+        """
+        Tests that cards in a branch have correctly derived values
+
+        """
+        graph = Graph.objects.create_graph(
+            name="TEST",
+            is_resource=False,
+        )
+        graph.delete_draft_graph()
 
         graph.append_branch(
             "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
             graphid=self.SINGLE_NODE_GRAPHID,
+            return_appended_graph=True,
         )
-        graph.save()
-
-        for node in list(graph.nodes.values()):
-            if node is not graph.root:
-                nodeJson = JSONSerializer().serializeToPython(node)
-                nodeJson["nodegroup_id"] = nodeJson["nodeid"]
-                graph.update_node(nodeJson)
+        graph.description = "A test description"
 
         graph.save()
 
-        self.assertEqual(len(graph.get_cards()), 2)
-        for card in graph.get_cards():
+        for card in graph.get_cards(force_recalculation=True):
             if str(card["nodegroup_id"]) == str(graph.root.nodegroup_id):
                 self.assertEqual(card["name"], graph.name)
                 self.assertEqual(card["description"], graph.description)
@@ -949,66 +1189,38 @@ class GraphTests(ArchesTestCase):
                     card["description"], graph.nodes[card["nodegroup_id"]].description
                 )
 
-        # TESTING A RESOURCE
-        resource_graph = Graph.new(
-            name="TEST RESOURCE", is_resource=True, author="TEST"
+    def test_derives_card_values_from_node(self):
+        """
+        Tests that cards in a resource have correctly derived values
+
+        """
+        graph = Graph.objects.create_graph(
+            name="TEST",
+            is_resource=True,
         )
-        resource_graph.description = "A test resource description"
-        resource_graph.append_branch(
-            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
-            graphid=graph.graphid,
-        )
-        resource_graph.save()
+        graph.delete_draft_graph()
 
-        self.assertEqual(len(resource_graph.get_cards()), 2)
-
-        for card in resource_graph.get_cards():
-            cardobj = Card.objects.get(pk=card["cardid"])
-            if cardobj.nodegroup.parentnodegroup is None:
-                self.assertEqual(card["name"], graph.name)
-                self.assertEqual(card["description"], graph.description)
-            else:
-                self.assertEqual(
-                    card["name"], resource_graph.nodes[card["nodegroup_id"]].name
-                )
-                self.assertEqual(
-                    card["description"],
-                    resource_graph.nodes[card["nodegroup_id"]].description,
-                )
-                self.assertTrue(
-                    len(resource_graph.nodes[card["nodegroup_id"]].name) > 0
-                )
-                self.assertTrue(
-                    len(resource_graph.nodes[card["nodegroup_id"]].description) > 0
-                )
-
-        resource_graph.delete()
-
-        # TESTING A RESOURCE
-        resource_graph = Graph.new(name="TEST", is_resource=True, author="TEST")
-        resource_graph.description = "A test description"
-        resource_graph.append_branch(
+        graph.description = "A test description"
+        graph.append_branch(
             "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
             graphid=self.NODE_NODETYPE_GRAPHID,
+            return_appended_graph=True,
         )
-        resource_graph.save()
+        graph.save()
 
-        self.assertEqual(len(resource_graph.cards), 1)
-        the_card = next(iter(list(resource_graph.cards.values())))
-        for card in resource_graph.get_cards():
-            self.assertEqual(card["name"], the_card.name)
-            self.assertEqual(card["description"], the_card.description)
+        top_card = next(iter(graph.cards.values()))
+        for card in graph.get_cards():
+            self.assertEqual(card["name"], top_card.name)
+            self.assertEqual(card["description"], top_card.description)
 
         # after removing the card name and description, the cards should take on the node name and description
-        the_card.name = ""
-        the_card.description = ""
-        for card in resource_graph.get_cards():
-            self.assertEqual(
-                card["name"], resource_graph.nodes[card["nodegroup_id"]].name
-            )
+        top_card.name = ""
+        top_card.description = ""
+        for card in graph.get_cards():
+            self.assertEqual(card["name"], graph.nodes[card["nodegroup_id"]].name)
             self.assertEqual(
                 card["description"],
-                resource_graph.nodes[card["nodegroup_id"]].description,
+                graph.nodes[card["nodegroup_id"]].description,
             )
 
     def test_get_root_nodegroup(self):
@@ -1017,7 +1229,10 @@ class GraphTests(ArchesTestCase):
 
         """
 
-        graph = Graph.new(name="TEST", is_resource=False, author="TEST")
+        graph = Graph.objects.create_graph(
+            name="TEST",
+            is_resource=False,
+        )
         graph.append_branch(
             "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
             graphid=self.NODE_NODETYPE_GRAPHID,
@@ -1034,11 +1249,15 @@ class GraphTests(ArchesTestCase):
 
         """
 
-        graph = Graph.new(name="TEST", is_resource=False, author="TEST")
+        graph = Graph.objects.create_graph(
+            name="TEST",
+            is_resource=False,
+        )
         graph.append_branch(
             "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
             graphid=self.NODE_NODETYPE_GRAPHID,
         )
+        graph.publish()
 
         for card in list(graph.cards.values()):
             if card.nodegroup.parentnodegroup is None:
@@ -1050,9 +1269,9 @@ class GraphTests(ArchesTestCase):
 
         """
 
-        graph = Graph.objects.get(graphid=self.rootNode.graph_id)
+        graph = self.test_graph
         new_node = graph.add_node(
-            {"nodeid": uuid.uuid1(), "datatype": "semantic"}
+            {"nodeid": uuid.uuid4(), "datatype": "semantic"}
         )  # A blank node with no ontology class is specified
         graph.add_edge(
             {
@@ -1073,10 +1292,10 @@ class GraphTests(ArchesTestCase):
 
         """
 
-        graph = Graph.objects.get(graphid=self.rootNode.graph_id)
+        graph = self.test_graph
         new_node = graph.add_node(
             {
-                "nodeid": uuid.uuid1(),
+                "nodeid": uuid.uuid4(),
                 "datatype": "semantic",
                 "ontologyclass": "InvalidOntologyClass",
             }
@@ -1100,7 +1319,7 @@ class GraphTests(ArchesTestCase):
 
         """
 
-        graph = Graph.objects.get(graphid=self.rootNode.graph_id)
+        graph = self.test_graph
         graph.append_branch(None, graphid=self.NODE_NODETYPE_GRAPHID)
 
         with self.assertRaises(GraphValidationError) as cm:
@@ -1114,7 +1333,7 @@ class GraphTests(ArchesTestCase):
 
         """
 
-        graph = Graph.objects.get(graphid=self.rootNode.graph_id)
+        graph = self.test_graph
         graph.append_branch(
             "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
             graphid=self.NODE_NODETYPE_GRAPHID,
@@ -1131,7 +1350,7 @@ class GraphTests(ArchesTestCase):
 
         """
 
-        graph = Graph.objects.get(graphid=self.rootNode.graph_id)
+        graph = self.test_graph
         graph.append_branch("some invalid property", graphid=self.NODE_NODETYPE_GRAPHID)
 
         with self.assertRaises(GraphValidationError) as cm:
@@ -1147,7 +1366,9 @@ class GraphTests(ArchesTestCase):
 
         """
 
-        graph = Graph.new()
+        graph = Graph.objects.create_graph()
+        graph.delete_draft_graph()
+
         graph.name = "TEST GRAPH"
         graph.ontology = None
         graph.save()
@@ -1174,7 +1395,9 @@ class GraphTests(ArchesTestCase):
             graph.save()
 
     def test_appending_a_branch_with_an_invalid_ontology_class(self):
-        graph = Graph.new()
+        graph = Graph.objects.create_graph()
+        graph.delete_draft_graph()
+
         graph.name = "TEST GRAPH"
         graph.subtitle = "ARCHES TEST GRAPH"
         graph.author = "Arches"
@@ -1201,24 +1424,1550 @@ class GraphTests(ArchesTestCase):
         with self.assertRaises(GraphValidationError) as cm:
             graph.save()
 
-    def test_appending_to_published_graph(self):
-        graph = Graph.objects.get(node=self.rootNode)
+    def test_graph_validation_of_widget_count(self):
+        # Add missing CardXNodeXWidget instances to the graph
+        # See commented out code in setUpTestData() where this should be done.
+        default_widgets_by_datatype = {
+            datatype.pk: datatype.defaultwidget
+            for datatype in models.DDataType.objects.select_related("defaultwidget")
+        }
+        for node in self.node_node_type_graph.nodes.values():
+            models.CardXNodeXWidget.objects.create(
+                card=node.nodegroup.cardmodel_set.first(),
+                node=node,
+                widget=default_widgets_by_datatype[node.datatype],
+            )
+
+        self.node_node_type_graph.refresh_from_database()
+        self.node_node_type_graph.has_unpublished_changes = True
+        superfluous_widgets = {
+            uid: models.CardXNodeXWidget(node=node)
+            for uid, node in [
+                (uuid.uuid4(), widget.node)
+                for widget in self.node_node_type_graph.widgets.values()
+            ]
+        }
+        self.node_node_type_graph.widgets |= superfluous_widgets
+        self.node_node_type_graph.has_unpublished_changes = True
+
+        with self.assertRaises(GraphValidationError) as cm:
+            self.node_node_type_graph.validate()
+        self.assertEqual(cm.exception.code, IntegrityCheck.TOO_MANY_WIDGETS.value)
+
+    def test_graph_validation_of_slug_changes(self):
+        """
+        Test that changing the slug of a graph raises a validation error for current graph publication.
+        """
+        graph = self.test_graph
+        with self.assertRaises(GraphValidationError) as raised:
+            graph.slug = "new-graph-slug"
+            graph.save()
+        exception = raised.exception
+        self.assertEqual(exception.code, 1018)
+
+    def test_add_resource_instance_lifecycle(self):
+        resource_instance_lifecycle = {
+            "id": "f7a0fd46-4c71-49cb-ae1e-778c96763440",
+            "name": "Test Lifecycle",
+            "resource_instance_lifecycle_states": [
+                {
+                    "id": "e2ac2a61-c140-43f5-bf65-3fe8ce47a594",
+                    "name": "State 1",
+                    "next_resource_instance_lifecycle_states": [
+                        "0b52dbac-405a-49e0-9151-43ebf2100e6c"
+                    ],
+                    "previous_resource_instance_lifecycle_states": [],
+                },
+                {
+                    "id": "0b52dbac-405a-49e0-9151-43ebf2100e6c",
+                    "name": "State 2",
+                    "next_resource_instance_lifecycle_states": [],
+                    "previous_resource_instance_lifecycle_states": [
+                        "e2ac2a61-c140-43f5-bf65-3fe8ce47a594"
+                    ],
+                },
+            ],
+        }
+
+        graph = Graph.objects.create_graph(
+            name="RESOURCE_INSTANCE_LIFECYCLE_TEST_GRAPH",
+            is_resource=True,
+        )
+        graph.delete_draft_graph()
+        graph.add_resource_instance_lifecycle(resource_instance_lifecycle)
+        graph.save()
+
+        lifecycle = models.ResourceInstanceLifecycle.objects.get(
+            id="f7a0fd46-4c71-49cb-ae1e-778c96763440"
+        )
+
+        self.assertEqual(lifecycle.name, "Test Lifecycle")
+
+        # Verify the states were created correctly
+        state1 = models.ResourceInstanceLifecycleState.objects.get(
+            id="e2ac2a61-c140-43f5-bf65-3fe8ce47a594"
+        )
+        state2 = models.ResourceInstanceLifecycleState.objects.get(
+            id="0b52dbac-405a-49e0-9151-43ebf2100e6c"
+        )
+        self.assertEqual(state1.name, "State 1")
+        self.assertEqual(state2.name, "State 2")
+
+        # Verify the relationships between states
+        self.assertEqual(
+            list(state1.next_resource_instance_lifecycle_states.all()), [state2]
+        )
+        self.assertEqual(
+            list(state2.previous_resource_instance_lifecycle_states.all()), [state1]
+        )
+
+        resource_instance_lifecycle_states = (
+            lifecycle.resource_instance_lifecycle_states.all()
+        )
+        # Verify the lifecycle contains the states
+        self.assertIn(state1, resource_instance_lifecycle_states)
+        self.assertIn(state2, resource_instance_lifecycle_states)
+
+    def test_geometry_config_persists_after_unpublishing_graph(self):
+
+        models.GraphModel.objects.create(
+            **{
+                "name": "Test Graph",
+                "graphid": "49a7eea8-2e2b-48e3-8b6e-650f25ec2954",
+                "isresource": True,
+                "slug": "test-graph",
+            }
+        )
+
+        models.NodeGroup.objects.create(pk="88677159-dccf-4629-9210-f6a2a7463552")
+
+        models.Node.objects.create(
+            **{
+                "name": "Top Node",
+                "graph_id": "49a7eea8-2e2b-48e3-8b6e-650f25ec2954",
+                "datatype": "semantic",
+                "istopnode": True,
+                "nodeid": "c1257d42-9275-40df-835e-5b99eee818fa",
+            }
+        )
+
+        models.Node.objects.create(
+            **{
+                "name": "GeoJSON Node",
+                "graph_id": "49a7eea8-2e2b-48e3-8b6e-650f25ec2954",
+                "datatype": "geojson-feature-collection",
+                "istopnode": False,
+                "config": {
+                    "fillColor": "rgba(130, 130, 130, 0.7)",
+                },
+                "nodeid": "88677159-dccf-4629-9210-f6a2a7463552",
+                "nodegroup_id": "88677159-dccf-4629-9210-f6a2a7463552",
+            }
+        )
+
+        models.Edge.objects.create(
+            **{
+                "domainnode_id": "c1257d42-9275-40df-835e-5b99eee818fa",
+                "edgeid": "16a8ec0d-7d8c-422a-aa33-fac1ac3a07b0",
+                "graph_id": "49a7eea8-2e2b-48e3-8b6e-650f25ec2954",
+                "rangenode_id": "88677159-dccf-4629-9210-f6a2a7463552",
+            }
+        )
+
+        graph = Graph.objects.get(pk="49a7eea8-2e2b-48e3-8b6e-650f25ec2954")
         admin = User.objects.get(username="admin")
         graph.publish(user=admin)
+        graph.create_draft_graph()
 
-        with self.assertRaises(GraphValidationError) as cm:
-            graph.append_node()
-        self.assertEqual(cm.exception.code, 1012)
-        with self.assertRaises(GraphValidationError) as cm:
-            graph.append_branch(
-                "http://www.nasa.gov/", graphid=self.NODE_NODETYPE_GRAPHID
+        draft_graph = Graph.objects.get(slug="test-graph", source_identifier=graph.pk)
+        draft_node = draft_graph.node_set.get(name="GeoJSON Node")
+        draft_node.config["fillColor"] = "rgba(200, 130, 130, 0.7)"
+        draft_node.save()
+        draft_graph.refresh_from_database()
+
+        graph = Graph.objects.get(slug="test-graph", source_identifier=None)
+        graph.promote_draft_graph_to_active_graph()
+
+        graph_from_db = Graph.objects.get(pk="49a7eea8-2e2b-48e3-8b6e-650f25ec2954")
+        self.assertEqual(
+            graph_from_db.nodes[
+                uuid.UUID("88677159-dccf-4629-9210-f6a2a7463552")
+            ].config["fillColor"],
+            "rgba(200, 130, 130, 0.7)",
+        )
+
+
+class DraftGraphTests(ArchesTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.SINGLE_NODE_GRAPHID = "22000000-0000-0000-0000-000000000000"
+        cls.NODE_NODETYPE_GRAPHID = "22000000-0000-0000-0000-000000000001"
+        cls.single_node_graph = cls.create_single_node_graph()
+        cls.node_node_type_graph = cls.create_node_node_type_graph()
+        cls.test_graph = cls.create_test_graph()
+
+    @classmethod
+    def create_single_node_graph(cls):
+        graph_data = {
+            "author": "Arches",
+            "color": None,
+            "deploymentdate": None,
+            "deploymentfile": None,
+            "description": "Represents a single node in a graph",
+            "graphid": cls.SINGLE_NODE_GRAPHID,
+            "iconclass": "fa fa-circle",
+            "isresource": False,
+            "name": "Node",
+            "slug": "node",
+            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+            "subtitle": "Represents a single node in a graph.",
+            "version": "v1",
+        }
+        graph_model = models.GraphModel.objects.create(**graph_data)
+
+        node_data = {
+            "config": None,
+            "datatype": "semantic",
+            "description": "Represents a single node in a graph",
+            "graph_id": cls.SINGLE_NODE_GRAPHID,
+            "isrequired": False,
+            "issearchable": True,
+            "istopnode": True,
+            "name": "Single Node",
+            "nodegroup_id": None,
+            "nodeid": "20000000-0000-0000-0000-100000000000",
+            "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity",
+        }
+        models.Node.objects.create(**node_data).save()
+
+        graph = Graph.objects.select_related("ontology").get(pk=graph_model.pk)
+        graph.save()
+        graph.publish()
+        return graph
+
+    @classmethod
+    def create_node_node_type_graph(cls):
+        graph_data = {
+            "author": "Arches",
+            "color": None,
+            "deploymentdate": None,
+            "deploymentfile": None,
+            "description": "Represents a node and node type pairing",
+            "graphid": cls.NODE_NODETYPE_GRAPHID,
+            "iconclass": "fa fa-angle-double-down",
+            "isresource": False,
+            "name": "Node/Node Type",
+            "slug": "node_node_type",
+            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+            "subtitle": "Represents a node and node type pairing",
+            "version": "v1",
+        }
+        graph_model = models.GraphModel.objects.create(**graph_data)
+
+        nodegroup_data = {
+            "cardinality": "n",
+            "legacygroupid": "",
+            "nodegroupid": "20000000-0000-0000-0000-100000000001",
+            "parentnodegroup_id": None,
+        }
+        models.NodeGroup.objects.create(**nodegroup_data).save()
+
+        card_data = {
+            "active": True,
+            "cardid": "bf9ea150-3eaa-11e8-8b2b-c3a348661f61",
+            "description": "Represents a node and node type pairing",
+            "graph_id": cls.NODE_NODETYPE_GRAPHID,
+            "helpenabled": False,
+            "helptext": None,
+            "helptitle": None,
+            "instructions": "",
+            "name": "Node/Node Type",
+            "nodegroup_id": "20000000-0000-0000-0000-100000000001",
+            "sortorder": None,
+            "visible": True,
+        }
+
+        card = models.CardModel.objects.create(**card_data)
+        nodes_data = [
+            {
+                "config": None,
+                "datatype": "string",
+                "description": "",
+                "graph_id": cls.NODE_NODETYPE_GRAPHID,
+                "isrequired": False,
+                "issearchable": True,
+                "istopnode": True,
+                "name": "Node",
+                "nodegroup_id": "20000000-0000-0000-0000-100000000001",
+                "nodeid": "20000000-0000-0000-0000-100000000001",
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity",
+            },
+            {
+                "config": {"rdmCollection": None},
+                "datatype": "concept",
+                "description": "",
+                "graph_id": cls.NODE_NODETYPE_GRAPHID,
+                "isrequired": False,
+                "issearchable": True,
+                "istopnode": False,
+                "name": "Node Type",
+                "nodegroup_id": "20000000-0000-0000-0000-100000000001",
+                "nodeid": "20000000-0000-0000-0000-100000000002",
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
+            },
+        ]
+
+        default_widgets_by_datatype = {
+            datatype.pk: datatype.defaultwidget
+            for datatype in models.DDataType.objects.select_related("defaultwidget")
+        }
+        for node_data in nodes_data:
+            node = models.Node.objects.create(**node_data)
+            models.CardXNodeXWidget.objects.create(
+                card=card,
+                node=node,
+                widget=default_widgets_by_datatype[node.datatype],
             )
-        self.assertEqual(cm.exception.code, 1012)
 
-    def test_appending_published_branch_to_unpublished_graph(self):
-        graph = Graph.objects.get(node=self.rootNode)
+        models.NodeGroup.objects.filter(
+            pk="20000000-0000-0000-0000-100000000001"
+        ).update(grouping_node_id="20000000-0000-0000-0000-100000000001")
+
+        edge_data = {
+            "description": None,
+            "domainnode_id": "20000000-0000-0000-0000-100000000001",
+            "edgeid": "22200000-0000-0000-0000-000000000001",
+            "graph_id": cls.NODE_NODETYPE_GRAPHID,
+            "name": None,
+            "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type",
+            "rangenode_id": "20000000-0000-0000-0000-100000000002",
+        }
+        models.Edge.objects.create(**edge_data).save()
+
+        graph = Graph.objects.get(pk=graph_model.pk)
+        graph.save()
+        graph.publish()
+        return graph
+
+    @classmethod
+    def create_test_graph(cls):
+        test_graph = Graph.objects.create_graph()
+        draft_graph = test_graph.get_draft_graph()
+
+        draft_graph.name = "TEST GRAPH"
+        draft_graph.subtitle = "ARCHES TEST GRAPH"
+        draft_graph.author = "Arches"
+        draft_graph.description = "ARCHES TEST GRAPH"
+        draft_graph.ontology_id = "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd"
+        draft_graph.version = "v1.0.0"
+        draft_graph.iconclass = "fa fa-building"
+        draft_graph.nodegroups = []
+        draft_graph.root.ontologyclass = (
+            "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"
+        )
+        draft_graph.root.name = "ROOT NODE"
+        draft_graph.root.description = "Test Root Node"
+        draft_graph.root.datatype = "semantic"
+        draft_graph.root.save()
+
+        draft_graph.save()
+
+        test_graph.promote_draft_graph_to_active_graph()
+        test_graph.publish()
+
+        cls.rootNode = test_graph.root
+        return test_graph
+
+    def _compare_serialized_updated_source_graph_and_serialized_draft_graph(
+        self, serialized_updated_source_graph, serialized_draft_graph
+    ):
+        def filter_and_sort(entity, ignore_keys):
+            if isinstance(entity, dict):
+                return {
+                    key: filter_and_sort(value, ignore_keys)
+                    for key, value in entity.items()
+                    if key not in ignore_keys
+                }
+            elif isinstance(entity, list):
+                return [filter_and_sort(item, ignore_keys) for item in entity]
+            else:
+                return entity
+
+        serialized_updated_source_nodes = {
+            (
+                node["source_identifier_id"]
+                if node.get("source_identifier_id") not in [None, "None"]
+                else node["nodeid"]
+            ): node
+            for node in serialized_updated_source_graph["nodes"]
+        }
+        serialized_editable_future_nodes = {
+            (
+                node["source_identifier_id"]
+                if node.get("source_identifier_id") not in [None, "None"]
+                else node["nodeid"]
+            ): node
+            for node in serialized_draft_graph["nodes"]
+        }
+        with self.subTest("nodes"):
+            self.assertEqual(
+                filter_and_sort(
+                    serialized_updated_source_nodes,
+                    ["graph_id", "nodeid", "nodegroup_id", "source_identifier_id"],
+                ),
+                filter_and_sort(
+                    serialized_editable_future_nodes,
+                    ["graph_id", "nodeid", "nodegroup_id", "source_identifier_id"],
+                ),
+            )
+
+        serialized_updated_source_edges = {
+            (
+                edge["source_identifier_id"]
+                if edge.get("source_identifier_id") not in [None, "None"]
+                else edge["edgeid"]
+            ): edge
+            for edge in serialized_updated_source_graph["edges"]
+        }
+        serialized_editable_future_edges = {
+            (
+                edge["source_identifier_id"]
+                if edge.get("source_identifier_id") not in [None, "None"]
+                else edge["edgeid"]
+            ): edge
+            for edge in serialized_draft_graph["edges"]
+        }
+        with self.subTest("edges"):
+            self.assertEqual(
+                filter_and_sort(
+                    serialized_updated_source_edges,
+                    [
+                        "graph_id",
+                        "edgeid",
+                        "domainnode_id",
+                        "rangenode_id",
+                        "source_identifier_id",
+                    ],
+                ),
+                filter_and_sort(
+                    serialized_editable_future_edges,
+                    [
+                        "graph_id",
+                        "edgeid",
+                        "domainnode_id",
+                        "rangenode_id",
+                        "source_identifier_id",
+                    ],
+                ),
+            )
+
+        serialized_updated_source_cards = {
+            (
+                card["source_identifier_id"]
+                if card.get("source_identifier_id") not in [None, "None"]
+                else card["cardid"]
+            ): card
+            for card in serialized_updated_source_graph["cards"]
+        }
+        serialized_editable_future_cards = {
+            (
+                card["source_identifier_id"]
+                if card.get("source_identifier_id") not in [None, "None"]
+                else card["cardid"]
+            ): card
+            for card in serialized_draft_graph["cards"]
+        }
+        with self.subTest("cards"):
+            self.assertEqual(
+                filter_and_sort(
+                    serialized_updated_source_cards,
+                    ["graph_id", "cardid", "nodegroup_id", "source_identifier_id"],
+                ),
+                filter_and_sort(
+                    serialized_editable_future_cards,
+                    ["graph_id", "cardid", "nodegroup_id", "source_identifier_id"],
+                ),
+            )
+
+        serialized_updated_source_cards_x_nodes_x_widgets = {
+            (
+                card_x_node_x_widget["source_identifier_id"]
+                if card_x_node_x_widget.get("source_identifier_id")
+                not in [None, "None"]
+                else card_x_node_x_widget["id"]
+            ): card_x_node_x_widget
+            for card_x_node_x_widget in serialized_updated_source_graph[
+                "cards_x_nodes_x_widgets"
+            ]
+        }
+        serialized_editable_future_cards_x_nodes_x_widgets = {
+            (
+                card_x_node_x_widget["source_identifier_id"]
+                if card_x_node_x_widget.get("source_identifier_id")
+                not in [None, "None"]
+                else card_x_node_x_widget["id"]
+            ): card_x_node_x_widget
+            for card_x_node_x_widget in serialized_draft_graph[
+                "cards_x_nodes_x_widgets"
+            ]
+        }
+        with self.subTest("cards_x_nodes_x_widgets"):
+            self.assertEqual(
+                filter_and_sort(
+                    serialized_updated_source_cards_x_nodes_x_widgets,
+                    ["graph_id", "id", "card_id", "node_id", "source_identifier_id"],
+                ),
+                filter_and_sort(
+                    serialized_editable_future_cards_x_nodes_x_widgets,
+                    ["graph_id", "id", "card_id", "node_id", "source_identifier_id"],
+                ),
+            )
+
+        with self.subTest("graph"):
+            self.assertEqual(
+                filter_and_sort(
+                    serialized_updated_source_graph,
+                    [
+                        "graphid",
+                        "cards",
+                        "nodes",
+                        "edges",
+                        "nodegroups",
+                        "functions",
+                        "root",
+                        "widgets",
+                        "cards_x_nodes_x_widgets",
+                        "resource_instance_lifecycle",
+                        "resource_instance_lifecycle_id",
+                        "source_identifier",
+                        "source_identifier_id",
+                        "publication_id",
+                        "has_unpublished_changes",
+                    ],
+                ),
+                filter_and_sort(
+                    serialized_draft_graph,
+                    [
+                        "graphid",
+                        "cards",
+                        "nodes",
+                        "edges",
+                        "nodegroups",
+                        "functions",
+                        "root",
+                        "widgets",
+                        "cards_x_nodes_x_widgets",
+                        "resource_instance_lifecycle",
+                        "resource_instance_lifecycle_id",
+                        "source_identifier",
+                        "source_identifier_id",
+                        "publication_id",
+                        "has_unpublished_changes",
+                    ],
+                ),
+            )
+
+    def test_publish_sets_correct_has_unpublished_changes_value(self):
+        source_graph = Graph.objects.create_graph(
+            name="TEST RESOURCE",
+            is_resource=True,
+        )
+        source_graph.delete_draft_graph()
+
+        source_graph.name = "TEST NAME"
+        source_graph.save()
+
+        self.assertEqual(source_graph.name, "TEST NAME")
+        self.assertTrue(source_graph.has_unpublished_changes)
+
+        source_graph.publish()
+        self.assertFalse(source_graph.has_unpublished_changes)
+
+        draft_graph = source_graph.create_draft_graph()
+        self.assertFalse(draft_graph.has_unpublished_changes)
+
+    def test_create_draft_graph_sets_correct_has_unpublished_changes_value(self):
+        source_graph = Graph.objects.create_graph(
+            name="TEST RESOURCE",
+            is_resource=True,
+        )
+        self.assertFalse(source_graph.has_unpublished_changes)
+
+        draft_graph = source_graph.get_draft_graph()
+        self.assertFalse(draft_graph.has_unpublished_changes)
+
+    def test_restore_state_from_serialized_graph(self):
+        source_graph = Graph.objects.create_graph(
+            name="TEST RESOURCE",
+            is_resource=True,
+        )
+        source_graph.delete_draft_graph()
+
+        source_graph.name = "TEST NAME"
+        source_graph.save()
+        source_graph.refresh_from_database()
+
+        self.assertEqual(source_graph.name, "TEST NAME")
+        self.assertTrue(source_graph.has_unpublished_changes)
+
+        published_graph = models.PublishedGraph.objects.get(
+            publication=source_graph.publication,
+            language="en",
+        )
+
+        restored_source_graph = source_graph.restore_state_from_serialized_graph(
+            published_graph.serialized_graph
+        )
+
+        self.assertFalse(restored_source_graph.has_unpublished_changes)
+        self.assertEqual(restored_source_graph.name, "TEST RESOURCE")
+
+    def test_bulk_data_manager_records_preserved_on_state_restoration(self):
+        source_graph = Graph.objects.create_graph(
+            name="TEST RESOURCE",
+            is_resource=True,
+        )
+        draft_graph = source_graph.get_draft_graph()
         admin = User.objects.get(username="admin")
-        branch = Graph.objects.get(graphid=self.NODE_NODETYPE_GRAPHID)
-        branch.publish(user=admin)
 
-        graph.append_branch("http://www.nasa.gov/", graphid=self.NODE_NODETYPE_GRAPHID)
+        result = draft_graph.append_node()
+        result["node"].datatype = "number"
+        draft_graph.save()
+        updated_source_graph = source_graph.promote_draft_graph_to_active_graph()
+        updated_source_graph.publish(user=admin)
+
+        # Record bulk data manager history.
+        nodegroup = models.NodeGroup.objects.get(
+            node__graph=source_graph, node__datatype="number"
+        )
+        event = models.LoadEvent.objects.create(
+            etl_module=models.ETLModule.objects.first(), user=admin
+        )
+        load_errors = models.LoadErrors.objects.create(
+            load_event=event, nodegroup=nodegroup, node=result["node"]
+        )
+        load_staging = models.LoadStaging.objects.create(
+            load_event=event, nodegroup=nodegroup
+        )
+
+        published_graph = models.PublishedGraph.objects.get(
+            publication=updated_source_graph.publication,
+            language="en",
+        )
+
+        updated_source_graph.restore_state_from_serialized_graph(
+            published_graph.serialized_graph
+        )
+
+        # The bulk data manager history still exists.
+        load_errors.refresh_from_db()
+        self.assertEqual(load_errors.nodegroup, nodegroup)
+        self.assertEqual(load_errors.node, result["node"])
+        load_staging.refresh_from_db()
+        self.assertEqual(load_staging.nodegroup, nodegroup)
+
+    @mock.patch("arches.app.search.search.SearchEngine.create_mapping")
+    def test_saving_draft_graph_does_not_create_es_mapping(self, mocked_create_mapping):
+        source_graph = Graph.objects.create_graph(
+            name="TEST RESOURCE",
+            is_resource=True,
+        )
+        draft_graph = source_graph.get_draft_graph()
+
+        result = draft_graph.append_node()
+        result["node"].datatype = "string"
+        draft_graph.save()
+
+        updated_source_graph = source_graph.promote_draft_graph_to_active_graph()
+
+        mocked_create_mapping.assert_called_once()
+
+        draft_graph = updated_source_graph.create_draft_graph()
+        draft_graph.save()
+
+        mocked_create_mapping.assert_called_once()
+
+    def test_node_configs_updated(self):
+        """
+        test to ensure node configs are updated when a draft graph is created
+
+        """
+        models.GraphModel.objects.create(
+            **{
+                "name": "Test Graph",
+                "graphid": "49a7eea8-2e2b-48e3-8b6e-650f25ec2954",
+                "isresource": True,
+                "slug": "test-graph",
+            }
+        )
+
+        models.NodeGroup.objects.create(pk="88677159-dccf-4629-9210-f6a2a7463552")
+
+        models.Node.objects.create(
+            **{
+                "name": "Top Node",
+                "graph_id": "49a7eea8-2e2b-48e3-8b6e-650f25ec2954",
+                "datatype": "semantic",
+                "istopnode": True,
+                "nodeid": "c1257d42-9275-40df-835e-5b99eee818fa",
+            }
+        )
+
+        models.Node.objects.create(
+            **{
+                "name": "Semantic Node",
+                "graph_id": "49a7eea8-2e2b-48e3-8b6e-650f25ec2954",
+                "datatype": "semantic",
+                "istopnode": False,
+                "config": {
+                    "i18n_properties": ["placeholder"],
+                    "placeholder": {
+                        "en": "Test Node",
+                        "es": "Nodo de prueba",
+                    },
+                    "nodeid": "c1257d42-9275-40df-835e-5b99eee818fa",
+                },
+                "nodeid": "88677159-dccf-4629-9210-f6a2a7463552",
+                "nodegroup_id": "88677159-dccf-4629-9210-f6a2a7463552",
+            }
+        )
+        models.GraphModel.objects.filter(
+            pk="49a7eea8-2e2b-48e3-8b6e-650f25ec2954"
+        ).update(has_unpublished_changes=False)
+
+        graph = Graph.objects.get(pk="49a7eea8-2e2b-48e3-8b6e-650f25ec2954")
+
+        draft_graph = graph.create_draft_graph()
+        original_semantic_node = graph.node_set.get(name="Semantic Node")
+        draft_node = draft_graph.node_set.get(name="Semantic Node")
+        draft_top_node = draft_graph.node_set.get(name="Top Node")
+
+        # config for node ids should be different between draft and original
+        self.assertNotEqual(
+            original_semantic_node.config["nodeid"], draft_node.config["nodeid"]
+        )
+        # node configs should be updated per the new node mapping
+        self.assertEqual(draft_node.config["nodeid"], str(draft_top_node.nodeid))
+
+        # ensure we don't mangle the i18n_json field when mutating
+        self.assertEqual(draft_node.config["placeholder"]["es"], "Nodo de prueba")
+
+    def test_update_empty_graph_from_draft_graph(self):
+        source_graph = Graph.objects.create_graph(
+            name="TEST RESOURCE",
+            is_resource=True,
+        )
+        draft_graph = source_graph.get_draft_graph()
+
+        draft_graph.append_branch(
+            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
+            graphid=self.NODE_NODETYPE_GRAPHID,
+        )
+        draft_graph.save()
+        draft_graph.refresh_from_database()
+        self.assertTrue(draft_graph.has_unpublished_changes)
+
+        serialized_draft_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(draft_graph)
+        )
+
+        updated_source_graph = source_graph.promote_draft_graph_to_active_graph()
+        self.assertFalse(updated_source_graph.has_unpublished_changes)
+
+        serialized_updated_source_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(updated_source_graph)
+        )
+
+        self._compare_serialized_updated_source_graph_and_serialized_draft_graph(
+            serialized_updated_source_graph, serialized_draft_graph
+        )
+
+    def test_update_graph_with_multiple_nodes_and_edges(self):
+        source_graph = Graph.objects.create_graph(
+            name="TEST RESOURCE",
+            is_resource=True,
+        )
+        draft_graph = source_graph.get_draft_graph()
+
+        draft_graph.append_branch(
+            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
+            graphid=self.NODE_NODETYPE_GRAPHID,
+        )
+        draft_graph.save()
+
+        updated_source_graph = source_graph.promote_draft_graph_to_active_graph()
+        draft_graph = updated_source_graph.create_draft_graph()
+
+        for node in list(draft_graph.nodes.values()):
+            if node.name == "Node Type":
+                node_type_node = JSONDeserializer().deserialize(
+                    JSONSerializer().serialize(node)
+                )
+
+        draft_graph.append_branch(
+            "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as",
+            graphid=self.SINGLE_NODE_GRAPHID,
+            nodeid=node_type_node["nodeid"],
+        )
+        draft_graph.save()
+
+        updated_source_graph = (
+            updated_source_graph.promote_draft_graph_to_active_graph()
+        )
+        draft_graph = updated_source_graph.create_draft_graph()
+
+        serialized_updated_draft_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(draft_graph)
+        )
+        serialized_updated_source_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(updated_source_graph)
+        )
+
+        self._compare_serialized_updated_source_graph_and_serialized_draft_graph(
+            serialized_updated_source_graph, serialized_updated_draft_graph
+        )
+
+    def test_update_graph_with_permissions(self):
+        source_graph = Graph.objects.create_graph(
+            name="TEST RESOURCE",
+            is_resource=True,
+        )
+        draft_graph = source_graph.get_draft_graph()
+
+        draft_graph.append_branch(
+            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
+            graphid=self.NODE_NODETYPE_GRAPHID,
+        )
+        draft_graph.save()
+        updated_source_graph = source_graph.promote_draft_graph_to_active_graph()
+
+        serialized_updated_source_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(updated_source_graph)
+        )
+
+        self.assertTrue(len(serialized_updated_source_graph["user_permissions"]) == 0)
+        self.assertTrue(len(serialized_updated_source_graph["group_permissions"]) == 0)
+
+        nodegroup = updated_source_graph.get_nodegroups()[:1][0]
+
+        GroupObjectPermission.objects.create(
+            group_id=1, content_object=nodegroup, permission_id=93
+        )
+        UserObjectPermission.objects.create(
+            user_id=2, content_object=nodegroup, permission_id=94
+        )
+
+        # calling `*.objects.create()` does not set dirty flag
+        updated_source_graph.has_unpublished_changes = True
+
+        serialized_updated_source_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(updated_source_graph)
+        )
+
+        updated_source_graph.publish()
+        published_graph = models.PublishedGraph.objects.get(
+            publication=updated_source_graph.publication,
+            language="en",
+        )
+        serialized_published_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(published_graph.serialized_graph)
+        )
+
+        self._compare_serialized_updated_source_graph_and_serialized_draft_graph(
+            serialized_updated_source_graph, serialized_published_graph
+        )
+
+        self.assertTrue(len(serialized_updated_source_graph["user_permissions"]) > 0)
+        self.assertTrue(len(serialized_updated_source_graph["group_permissions"]) > 0)
+
+    def test_update_graph_with_relatable_resources(self):
+        source_graph = Graph.objects.create_graph(
+            name="TEST RESOURCE",
+            is_resource=True,
+        )
+        draft_graph = source_graph.get_draft_graph()
+
+        draft_graph.root.set_relatable_resources([source_graph.root.pk])
+        draft_graph.root.save()
+        draft_graph.save()
+
+        updated_source_graph = source_graph.promote_draft_graph_to_active_graph()
+        draft_graph = updated_source_graph.create_draft_graph()
+
+        self.assertTrue(len(updated_source_graph.root.get_relatable_resources()))
+
+        serialized_draft_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(draft_graph)
+        )
+        serialized_updated_source_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(updated_source_graph)
+        )
+
+        self._compare_serialized_updated_source_graph_and_serialized_draft_graph(
+            serialized_updated_source_graph, serialized_draft_graph
+        )
+
+    def test_create_draft_graphs_does_not_pollute_database(self):
+        source_graph = Graph.objects.create_graph(
+            name="TEST RESOURCE",
+            is_resource=True,
+        )
+        draft_graph = source_graph.get_draft_graph()
+
+        draft_graph.append_branch(
+            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
+            graphid=self.NODE_NODETYPE_GRAPHID,
+        )
+        draft_graph.save()
+        updated_source_graph = source_graph.promote_draft_graph_to_active_graph()
+        draft_graph = updated_source_graph.create_draft_graph()
+
+        nodegroup_count_before = models.NodeGroup.objects.count()
+        node_count_before = models.Node.objects.count()
+        edge_count_before = models.Edge.objects.count()
+        card_count_before = models.CardModel.objects.count()
+        card_x_node_x_widget_count_before = models.CardXNodeXWidget.objects.count()
+
+        updated_source_graph.delete_draft_graph()
+        updated_source_graph.create_draft_graph()
+
+        nodegroup_count_after = models.NodeGroup.objects.count()
+        node_count_after = models.Node.objects.count()
+        edge_count_after = models.Edge.objects.count()
+        card_count_after = models.CardModel.objects.count()
+        card_x_node_x_widget_count_after = models.CardXNodeXWidget.objects.count()
+
+        self.assertEqual(nodegroup_count_before, nodegroup_count_after)
+        self.assertEqual(node_count_before, node_count_after)
+        self.assertEqual(edge_count_before, edge_count_after)
+        self.assertEqual(card_count_before, card_count_after)
+        self.assertEqual(
+            card_x_node_x_widget_count_before, card_x_node_x_widget_count_after
+        )
+
+    def test_deleting_source_graph_deletes_draft_graph_and_all_related_models(
+        self,
+    ):
+        nodegroup_count_before = models.NodeGroup.objects.count()
+        node_count_before = models.Node.objects.count()
+        edge_count_before = models.Edge.objects.count()
+        card_count_before = models.CardModel.objects.count()
+        card_x_node_x_widget_count_before = models.CardXNodeXWidget.objects.count()
+        resource_2_resource_constraints_count_before = (
+            models.Resource2ResourceConstraint.objects.count()
+        )
+
+        source_graph = Graph.objects.create_graph(
+            name="TEST RESOURCE",
+            is_resource=True,
+        )
+        draft_graph = source_graph.get_draft_graph()
+
+        draft_graph.append_branch(
+            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
+            graphid=self.NODE_NODETYPE_GRAPHID,
+        )
+        draft_graph.save()
+        updated_source_graph = source_graph.promote_draft_graph_to_active_graph()
+
+        updated_source_graph.delete()
+
+        nodegroup_count_after = models.NodeGroup.objects.count()
+        node_count_after = models.Node.objects.count()
+        edge_count_after = models.Edge.objects.count()
+        card_count_after = models.CardModel.objects.count()
+        card_x_node_x_widget_count_after = models.CardXNodeXWidget.objects.count()
+        resource_2_resource_constraints_count_after = (
+            models.Resource2ResourceConstraint.objects.count()
+        )
+
+        self.assertEqual(nodegroup_count_before, nodegroup_count_after)
+        self.assertEqual(node_count_before, node_count_after)
+        self.assertEqual(edge_count_before, edge_count_after)
+        self.assertEqual(card_count_before, card_count_after)
+        self.assertEqual(
+            card_x_node_x_widget_count_before, card_x_node_x_widget_count_after
+        )
+        self.assertEqual(
+            resource_2_resource_constraints_count_before,
+            resource_2_resource_constraints_count_after,
+        )
+
+    def test_revert_draft_graph(self):
+        source_graph = Graph.objects.create_graph(
+            name="TEST RESOURCE",
+            is_resource=True,
+        )
+
+        nodegroup_count_before = models.NodeGroup.objects.count()
+        node_count_before = models.Node.objects.count()
+        edge_count_before = models.Edge.objects.count()
+        card_count_before = models.CardModel.objects.count()
+        card_x_node_x_widget_count_before = models.CardXNodeXWidget.objects.count()
+
+        draft_graph = source_graph.get_draft_graph()
+        draft_graph.append_branch(
+            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
+            graphid=self.NODE_NODETYPE_GRAPHID,
+        )
+        draft_graph.save()
+
+        source_graph.delete_draft_graph()
+        reverted_draft_graph = source_graph.create_draft_graph()
+
+        serialized_reverted_draft_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(reverted_draft_graph)
+        )
+        serialized_source_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(source_graph)
+        )
+
+        self._compare_serialized_updated_source_graph_and_serialized_draft_graph(
+            serialized_source_graph, serialized_reverted_draft_graph
+        )
+
+        nodegroup_count_after = models.NodeGroup.objects.count()
+        node_count_after = models.Node.objects.count()
+        edge_count_after = models.Edge.objects.count()
+        card_count_after = models.CardModel.objects.count()
+        card_x_node_x_widget_count_after = models.CardXNodeXWidget.objects.count()
+
+        self.assertEqual(nodegroup_count_before, nodegroup_count_after)
+        self.assertEqual(node_count_before, node_count_after)
+        self.assertEqual(edge_count_before, edge_count_after)
+        self.assertEqual(card_count_before, card_count_after)
+        self.assertEqual(
+            card_x_node_x_widget_count_before, card_x_node_x_widget_count_after
+        )
+
+    def test_update_nodegroup(self):
+        source_graph = Graph.objects.create_graph(
+            name="TEST RESOURCE",
+            is_resource=True,
+        )
+        draft_graph = source_graph.get_draft_graph()
+
+        draft_graph.append_branch(
+            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
+            graphid=self.NODE_NODETYPE_GRAPHID,
+        )
+        draft_graph.save()
+
+        updated_source_graph = source_graph.promote_draft_graph_to_active_graph()
+        draft_graph = updated_source_graph.create_draft_graph()
+
+        nodegroup_count_before = models.NodeGroup.objects.count()
+        node_count_before = models.Node.objects.count()
+        edge_count_before = models.Edge.objects.count()
+        card_count_before = models.CardModel.objects.count()
+        card_x_node_x_widget_count_before = models.CardXNodeXWidget.objects.count()
+
+        nodegroup = draft_graph.get_nodegroups()[:1][0]
+        nodegroup.cardinality = "1"
+        nodegroup.save()
+
+        updated_source_graph = (
+            updated_source_graph.promote_draft_graph_to_active_graph()
+        )
+        draft_graph = updated_source_graph.create_draft_graph()
+
+        serialized_draft_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(draft_graph)
+        )
+        serialized_updated_source_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(updated_source_graph)
+        )
+
+        self._compare_serialized_updated_source_graph_and_serialized_draft_graph(
+            serialized_updated_source_graph, serialized_draft_graph
+        )
+
+        nodegroup = updated_source_graph.get_nodegroups()[:1][0]
+        self.assertEqual(nodegroup.cardinality, "1")
+
+        nodegroup_count_after = models.NodeGroup.objects.count()
+        node_count_after = models.Node.objects.count()
+        edge_count_after = models.Edge.objects.count()
+        card_count_after = models.CardModel.objects.count()
+        card_x_node_x_widget_count_after = models.CardXNodeXWidget.objects.count()
+
+        self.assertEqual(nodegroup_count_before, nodegroup_count_after)
+        self.assertEqual(node_count_before, node_count_after)
+        self.assertEqual(edge_count_before, edge_count_after)
+        self.assertEqual(card_count_before, card_count_after)
+        self.assertEqual(
+            card_x_node_x_widget_count_before, card_x_node_x_widget_count_after
+        )
+
+    def test_update_node(self):
+        source_graph = Graph.objects.create_graph(
+            name="TEST RESOURCE",
+            is_resource=True,
+        )
+        draft_graph = source_graph.get_draft_graph()
+
+        draft_graph.append_branch(
+            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
+            graphid=self.NODE_NODETYPE_GRAPHID,
+        )
+        draft_graph.save()
+
+        updated_source_graph = source_graph.promote_draft_graph_to_active_graph()
+        draft_graph = updated_source_graph.create_draft_graph()
+
+        nodegroup_count_before = models.NodeGroup.objects.count()
+        node_count_before = models.Node.objects.count()
+        edge_count_before = models.Edge.objects.count()
+        card_count_before = models.CardModel.objects.count()
+        card_x_node_x_widget_count_before = models.CardXNodeXWidget.objects.count()
+
+        draft_graph.root.name = "UPDATED_NODE_NAME"
+        draft_graph.save()
+
+        updated_source_graph = (
+            updated_source_graph.promote_draft_graph_to_active_graph()
+        )
+        draft_graph = updated_source_graph.create_draft_graph()
+
+        serialized_draft_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(draft_graph)
+        )
+        serialized_updated_source_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(updated_source_graph)
+        )
+
+        self._compare_serialized_updated_source_graph_and_serialized_draft_graph(
+            serialized_updated_source_graph, serialized_draft_graph
+        )
+
+        self.assertEqual(updated_source_graph.root.name, "UPDATED_NODE_NAME")
+
+        nodegroup_count_after = models.NodeGroup.objects.count()
+        node_count_after = models.Node.objects.count()
+        edge_count_after = models.Edge.objects.count()
+        card_count_after = models.CardModel.objects.count()
+        card_x_node_x_widget_count_after = models.CardXNodeXWidget.objects.count()
+
+        self.assertEqual(nodegroup_count_before, nodegroup_count_after)
+        self.assertEqual(node_count_before, node_count_after)
+        self.assertEqual(edge_count_before, edge_count_after)
+        self.assertEqual(card_count_before, card_count_after)
+        self.assertEqual(
+            card_x_node_x_widget_count_before, card_x_node_x_widget_count_after
+        )
+
+    def test_update_card(self):
+        source_graph = Graph.objects.create_graph(
+            name="TEST RESOURCE",
+            is_resource=True,
+        )
+        draft_graph = source_graph.get_draft_graph()
+
+        draft_graph.append_branch(
+            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
+            graphid=self.NODE_NODETYPE_GRAPHID,
+        )
+        draft_graph.save()
+
+        updated_source_graph = source_graph.promote_draft_graph_to_active_graph()
+        draft_graph = updated_source_graph.create_draft_graph()
+
+        nodegroup_count_before = models.NodeGroup.objects.count()
+        node_count_before = models.Node.objects.count()
+        edge_count_before = models.Edge.objects.count()
+        card_count_before = models.CardModel.objects.count()
+        card_x_node_x_widget_count_before = models.CardXNodeXWidget.objects.count()
+
+        original_card = [card for card in draft_graph.cards.values()][0]
+        original_card.description = "UPDATED_CARD_DESCRIPTION"
+        original_card.save()
+
+        updated_source_graph = (
+            updated_source_graph.promote_draft_graph_to_active_graph()
+        )
+        draft_graph = updated_source_graph.create_draft_graph()
+
+        serialized_draft_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(draft_graph)
+        )
+        serialized_updated_source_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(updated_source_graph)
+        )
+
+        self._compare_serialized_updated_source_graph_and_serialized_draft_graph(
+            serialized_updated_source_graph, serialized_draft_graph
+        )
+
+        updated_card = [
+            card
+            for card in updated_source_graph.cards.values()
+            if card.pk == original_card.source_identifier_id
+        ][0]
+        self.assertEqual(
+            updated_card.description.value, '{"en": "UPDATED_CARD_DESCRIPTION"}'
+        )
+
+        nodegroup_count_after = models.NodeGroup.objects.count()
+        node_count_after = models.Node.objects.count()
+        edge_count_after = models.Edge.objects.count()
+        card_count_after = models.CardModel.objects.count()
+        card_x_node_x_widget_count_after = models.CardXNodeXWidget.objects.count()
+
+        self.assertEqual(nodegroup_count_before, nodegroup_count_after)
+        self.assertEqual(node_count_before, node_count_after)
+        self.assertEqual(edge_count_before, edge_count_after)
+        self.assertEqual(card_count_before, card_count_after)
+        self.assertEqual(
+            card_x_node_x_widget_count_before, card_x_node_x_widget_count_after
+        )
+
+    def test_update_widget(self):
+        source_graph = Graph.objects.create_graph(
+            name="TEST RESOURCE",
+            is_resource=True,
+        )
+        draft_graph = source_graph.get_draft_graph()
+
+        draft_graph.append_branch(
+            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
+            graphid=self.NODE_NODETYPE_GRAPHID,
+        )
+        draft_graph.save()
+
+        updated_source_graph = source_graph.promote_draft_graph_to_active_graph()
+        draft_graph = updated_source_graph.create_draft_graph()
+
+        card = [card for card in draft_graph.cards.values()][0]
+
+        old_draft_widget = (
+            card.cardxnodexwidget_set.filter(
+                node_id=card.nodegroup_id, source_identifier__isnull=False
+            )
+            .get()
+            .source_identifier
+        )
+        draft_graph.widgets.pop(old_draft_widget.pk)
+        old_draft_widget.delete()
+
+        new_draft_widget = models.CardXNodeXWidget.objects.create(
+            card=card,
+            node_id=card.nodegroup_id,
+            widget=models.Widget.objects.first(),
+            label="Widget name",
+        )
+
+        draft_graph.widgets[new_draft_widget.pk] = new_draft_widget
+        draft_graph.save()
+
+        updated_source_graph = (
+            updated_source_graph.promote_draft_graph_to_active_graph()
+        )
+        draft_graph = updated_source_graph.create_draft_graph()
+
+        nodegroup_count_before = models.NodeGroup.objects.count()
+        node_count_before = models.Node.objects.count()
+        edge_count_before = models.Edge.objects.count()
+        card_count_before = models.CardModel.objects.count()
+        card_x_node_x_widget_count_before = models.CardXNodeXWidget.objects.count()
+
+        updated_widget = [
+            widget
+            for widget in draft_graph.widgets.values()
+            if widget.source_identifier_id == new_draft_widget.pk
+        ][0]
+        updated_widget.label = "UPDATED_WIDGET_NAME"
+        updated_widget.save()
+
+        updated_source_graph = (
+            updated_source_graph.promote_draft_graph_to_active_graph()
+        )
+        draft_graph = updated_source_graph.create_draft_graph()
+
+        serialized_draft_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(draft_graph)
+        )
+        serialized_updated_source_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(updated_source_graph)
+        )
+
+        self._compare_serialized_updated_source_graph_and_serialized_draft_graph(
+            serialized_updated_source_graph, serialized_draft_graph
+        )
+
+        re_updated_widget = [
+            widget
+            for widget in draft_graph.widgets.values()
+            if widget.source_identifier_id == updated_widget.source_identifier_id
+        ][0]
+        self.assertEqual(re_updated_widget.label.value, '{"en": "UPDATED_WIDGET_NAME"}')
+
+        nodegroup_count_after = models.NodeGroup.objects.count()
+        node_count_after = models.Node.objects.count()
+        edge_count_after = models.Edge.objects.count()
+        card_count_after = models.CardModel.objects.count()
+        card_x_node_x_widget_count_after = models.CardXNodeXWidget.objects.count()
+
+        self.assertEqual(nodegroup_count_before, nodegroup_count_after)
+        self.assertEqual(node_count_before, node_count_after)
+        self.assertEqual(edge_count_before, edge_count_after)
+        self.assertEqual(card_count_before, card_count_after)
+        self.assertEqual(
+            card_x_node_x_widget_count_before, card_x_node_x_widget_count_after
+        )
+
+    def test_promote_draft_graph_to_active_graph_does_not_affect_resources(self):
+        source_graph = Graph.objects.create_graph(
+            name="TEST RESOURCE",
+            is_resource=True,
+        )
+
+        nodegroup = models.NodeGroup.objects.create()
+        string_node = models.Node.objects.create(
+            pk=nodegroup.pk,
+            graph=source_graph,
+            name="String Node",
+            datatype="string",
+            istopnode=False,
+            nodegroup=nodegroup,
+        )
+        resource_instance_node = models.Node.objects.create(
+            graph=source_graph,
+            name="Resource Node",
+            datatype="resource-instance",
+            istopnode=True,
+        )
+
+        resource = models.ResourceInstance.objects.create(graph=source_graph)
+        tile = models.TileModel.objects.create(
+            nodegroup_id=nodegroup.pk,
+            resourceinstance=resource,
+            data={
+                str(string_node.pk): {
+                    "en": {"value": "test value", "direction": "ltr"},
+                },
+                str(resource_instance_node.pk): {
+                    "resourceId": str(resource.pk),
+                    "ontologyProperty": "",
+                    "inverseOntologyProperty": "",
+                },
+            },
+            sortorder=0,
+        )
+
+        serialized_resource = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(resource)
+        )
+        serialized_tile = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(tile)
+        )
+
+        resource_from_database = models.ResourceInstance.objects.get(pk=resource.pk)
+        tile_from_database = models.TileModel.objects.get(pk=tile.pk)
+
+        serialized_resource_from_database = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(resource_from_database)
+        )
+        serialized_tile_from_database = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(tile_from_database)
+        )
+
+        self.assertEqual(serialized_resource, serialized_resource_from_database)
+        self.assertEqual(serialized_tile, serialized_tile_from_database)
+
+    def test_placing_node_in_separate_card_does_not_pollute_database(self):
+        source_graph = Graph.objects.create_graph(
+            name="TEST RESOURCE",
+            is_resource=True,
+        )
+        draft_graph = source_graph.get_draft_graph()
+
+        draft_graph.append_branch(
+            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
+            graphid=self.NODE_NODETYPE_GRAPHID,
+        )
+        draft_graph.save()
+
+        updated_source_graph = source_graph.promote_draft_graph_to_active_graph()
+        draft_graph = updated_source_graph.create_draft_graph()
+
+        node = [
+            node for node in draft_graph.nodes.values() if node.alias == "node_type"
+        ][0]
+
+        nodegroup_count_before = models.NodeGroup.objects.count()
+
+        source_identifier_id = node.source_identifier_id
+        original_nodegroup_id = node.nodegroup_id
+        updated_nodegroup_id = node.pk
+
+        models.NodeGroup.objects.create(
+            **{
+                "cardinality": "n",
+                "legacygroupid": "",
+                "nodegroupid": str(updated_nodegroup_id),
+                "parentnodegroup_id": None,
+            }
+        ).save()
+
+        node.nodegroup_id = updated_nodegroup_id
+        node.save()
+
+        updated_source_graph = (
+            updated_source_graph.promote_draft_graph_to_active_graph()
+        )
+        draft_graph = updated_source_graph.create_draft_graph()
+
+        # a source_graph nodegroup and an draft_graph nodegroup have been created
+        self.assertEqual(nodegroup_count_before, models.NodeGroup.objects.count() - 2)
+
+        node = [
+            node
+            for node in draft_graph.nodes.values()
+            if node.source_identifier_id == source_identifier_id
+        ][0]
+        node.nodegroup_id = original_nodegroup_id
+        node.save()
+
+        updated_source_graph = (
+            updated_source_graph.promote_draft_graph_to_active_graph()
+        )
+        draft_graph = updated_source_graph.create_draft_graph()
+
+        serialized_draft_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(draft_graph)
+        )
+        serialized_updated_source_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(updated_source_graph)
+        )
+
+        self._compare_serialized_updated_source_graph_and_serialized_draft_graph(
+            serialized_updated_source_graph, serialized_draft_graph
+        )
+
+        # the source_graph nodegroup and the draft_graph nodegroup have been deleted
+        self.assertEqual(nodegroup_count_before, models.NodeGroup.objects.count())
+
+    def test_can_update_graph_slug(self):
+        source_graph = Graph.objects.create_graph(
+            name="TEST RESOURCE",
+            is_resource=True,
+        )
+        draft_graph = source_graph.get_draft_graph()
+
+        # test adding slug
+        draft_graph.slug = "test-resource"
+        draft_graph.save()
+
+        updated_source_graph = source_graph.promote_draft_graph_to_active_graph()
+        draft_graph = updated_source_graph.create_draft_graph()
+
+        serialized_draft_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(draft_graph)
+        )
+        serialized_updated_source_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(updated_source_graph)
+        )
+
+        self.assertEqual(serialized_updated_source_graph["slug"], "test-resource")
+
+        self._compare_serialized_updated_source_graph_and_serialized_draft_graph(
+            serialized_updated_source_graph, serialized_draft_graph
+        )
+
+        # test updating slug
+        draft_graph.slug = "test-resource-two"
+        draft_graph.save()
+
+        updated_source_graph = (
+            updated_source_graph.promote_draft_graph_to_active_graph()
+        )
+        draft_graph = updated_source_graph.create_draft_graph()
+
+        serialized_draft_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(draft_graph)
+        )
+        serialized_updated_source_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(updated_source_graph)
+        )
+
+        self.assertEqual(serialized_updated_source_graph["slug"], "test-resource-two")
+
+        self._compare_serialized_updated_source_graph_and_serialized_draft_graph(
+            serialized_updated_source_graph, serialized_draft_graph
+        )
+
+    def test_can_update_other_data_in_graph_with_slug(self):
+        source_graph = Graph.objects.create_graph(
+            name="TEST RESOURCE",
+            is_resource=True,
+        )
+        draft_graph = source_graph.get_draft_graph()
+
+        draft_graph.slug = "test-resource"
+        draft_graph.save()
+
+        updated_source_graph = source_graph.promote_draft_graph_to_active_graph()
+        draft_graph = updated_source_graph.create_draft_graph()
+
+        draft_graph.name = "TEST RESOURCE TWO"
+        draft_graph.save()
+
+        updated_source_graph = (
+            updated_source_graph.promote_draft_graph_to_active_graph()
+        )
+        draft_graph = updated_source_graph.create_draft_graph()
+
+        serialized_draft_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(draft_graph)
+        )
+        serialized_updated_source_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(updated_source_graph)
+        )
+
+        self.assertEqual(serialized_updated_source_graph["name"], "TEST RESOURCE TWO")
+
+        self._compare_serialized_updated_source_graph_and_serialized_draft_graph(
+            serialized_updated_source_graph, serialized_draft_graph
+        )
+
+    def test_get_functions_x_graphs(self):
+        """
+        Test that an invalid function_x_graph property in a published graph returns valid function_x_graph objects
+
+        """
+
+        graph = Graph.objects.create_graph(name="TEST RESOURCE")
+        graph.delete_draft_graph()
+
+        graph.append_branch(
+            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
+            graphid=self.NODE_NODETYPE_GRAPHID,
+        )
+
+        node_dict = {}
+        for key, value in graph.nodes.items():
+            node_dict[str(key)] = str(value.nodeid)
+
+        graph.add_function_x_graph(
+            {
+                "id": str(uuid.uuid4()),
+                "function_id": "60000000-0000-0000-0000-000000000001",
+                "graph_id": graph.graphid,
+                "config": {"test": node_dict},
+            }
+        )
+
+        graph.save()
+        graph.publish()
+        graph.publication_id
+        functions_x_graphs_1 = graph.get_functions_x_graphs()
+
+        # save invalid functions_x_graphs value to publication's serialized graph
+        publication = graph.publication.publishedgraph_set.get(language_id="en")
+        publication.serialized_graph["functions_x_graphs"] = [
+            "60000000-0000-0000-0000-000000000001",
+        ]
+        publication.save()
+        functions_x_graphs_2 = graph.get_functions_x_graphs()
+        self.assertEqual(functions_x_graphs_1, functions_x_graphs_2)

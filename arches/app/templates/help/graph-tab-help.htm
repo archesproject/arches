@@ -16,6 +16,17 @@
             <p>{% blocktrans %}Once you've finished creating this Resource Model or Branch make sure to set its status to "active".{% endblocktrans %}</p>
         </div>
     </div>
+    <div> 
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"> 
+            <h4>{% trans "Draft Graphs" %}</h4> 
+            &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-right"></i> 
+        </a> 
+        <div class="ep-help-topic-content"> 
+            <p>{% blocktrans %}After a graph is published, editing is restricted to safeguard any resources that rely on its current structure. In this state, you cannot add or remove nodes, adjust node settings, or modify the graph tree unless you first create a draft.{% endblocktrans %}</p>
+            <p>{% blocktrans %}To make changes, choose <strong>Draft a Model Update</strong> from the <strong>Manage…</strong> menu. This creates a separate working copy of the published graph where you can freely edit the graph. While you refine the draft, all existing resources and queries continue to use the published version—so there's no disruption to ongoing processes.{% endblocktrans %}</p>
+            <p>{% blocktrans %}Once you've completed and tested your updates in the draft, publish it to replace the current graph. After the draft becomes the current graph, you may choose to migrate resources that pointed to the previous version so they now reference the latest publication. This will ensure all dependent data and queries stay aligned with the updated graph definition.{% endblocktrans %}</p>
+        </div> 
+    </div>
     <div>
         <a href="javascript:void(0)" class="ep-help-topic-toggle">
             <h4>{% trans "Top-Level Settings" %}</h4>
@@ -102,19 +113,6 @@
             <p>{% blocktrans %}Use the graph tree on the left side of the page to construct the graph. Every new graph starts with a <strong>Top Node</strong>, which will take the name of the new Resource Model or Branch. From this node, you can either <strong>Add Child Node</strong> to add a single node, or <strong>Add Branch</strong> to add an entire existing Branch.{% endblocktrans %}</p>
             <p>{% blocktrans %}At any point during construction you can switch from <strong>Design</strong> mode to <strong>Preview</strong> to see the full shape of your graph.{% endblocktrans %}</p>
             <p>{% blocktrans %}If you have created a branch structure in a Resource Model that you would like to use in a different Resource Model, you can export it from the graph tree.{% endblocktrans %}</p>
-            <!-- NEED TO UPDATE THE GIF BELOW
-            <div class="col-xs-6">
-                <p><a href="{{ STATIC_URL }}img/help/node-manager.png" target="_blank"><img src="{{ STATIC_URL }}img/help/node-manager.png" style="border: 2px solid #eee"></img></a></p>
-            </div>
-            <p>
-				<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "add a node and branch to new graph - click to view" %}</a>
-				<span class="ep-help-img-link">
-					<a href="{{ STATIC_URL }}img/help/add-node-to-branch.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
-					</a>
-				</span>
-				<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/add-node-to-branch.gif"></img>
-			</p>
-            -->
         </div>
     </div>
     <div>

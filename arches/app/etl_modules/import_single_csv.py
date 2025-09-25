@@ -64,7 +64,8 @@ class ImportSingleCsv(BaseImportModule):
             GraphModel.objects.all()
             .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
-            .exclude(publication_id__isnull=True)
+            .exclude(is_active=False)
+            .exclude(source_identifier__isnull=False)
             .order_by(graph_name_i18n)
         )
         return {"success": True, "data": graphs}
@@ -554,8 +555,9 @@ class ImportSingleCsv(BaseImportModule):
                                 nodegroup_depth,
                                 source_description,
                                 operation,
-                                passes_validation
-                            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                                passes_validation,
+                                sortorder
+                            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                             (
                                 nodegroup,
                                 legacyid,
@@ -567,6 +569,7 @@ class ImportSingleCsv(BaseImportModule):
                                 csv_file_name,
                                 "insert",
                                 passes_validation,
+                                0,
                             ),
                         )
 

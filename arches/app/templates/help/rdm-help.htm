@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% load i18n %}
+{% load webpack_static from webpack_loader %}
 <!-- this html is included in help-panel-base.htm -->
 <div class="ep-help-content">
     <div>
@@ -30,10 +31,10 @@
 				<p>
 					<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "click to view demonstration" %}</a>
 					<span class="ep-help-img-link">
-						<a href="{{ STATIC_URL }}img/help/create-thesaurus.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+						<a href="{% webpack_static 'img/help/create-thesaurus.gif' %}" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
 						</a>
 					</span>
-					<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/create-thesaurus.gif"></img>
+					<img class="reloadable-img ep-help-topic-content" src="{% webpack_static 'img/help/create-thesaurus.gif' %}"></img>
 				</p>
             </div>
         </div>
@@ -44,10 +45,10 @@
 				<p>
 					<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "click to view demonstration" %}</a>
 					<span class="ep-help-img-link">
-						<a href="{{ STATIC_URL }}img/help/create-top-concept.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+						<a href="{% webpack_static 'img/help/create-top-concept.gif' %}" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
 						</a>
 					</span>
-					<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/create-top-concept.gif"></img>
+					<img class="reloadable-img ep-help-topic-content" src="{% webpack_static 'img/help/create-top-concept.gif' %}"></img>
 				</p>
             </div>
         </div>
@@ -58,10 +59,10 @@
 				<p>
 					<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "click to view demonstration" %}</a>
 					<span class="ep-help-img-link">
-						<a href="{{ STATIC_URL }}img/help/add-concepts.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+						<a href="{% webpack_static 'img/help/add-concepts.gif' %}" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
 						</a>
 					</span>
-					<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/add-concepts.gif"></img>
+					<img class="reloadable-img ep-help-topic-content" src="{% webpack_static 'img/help/add-concepts.gif' %}"></img>
 				</p>
             </div>
         </div>
@@ -72,10 +73,10 @@
 				<p>
 					<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "click to view demonstration" %}</a>
 					<span class="ep-help-img-link">
-						<a href="{{ STATIC_URL }}img/help/add-concept-alt-label.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+						<a href="{% webpack_static 'img/help/add-concept-alt-label.gif' %}" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
 						</a>
 					</span>
-					<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/add-concept-alt-label.gif"></img>
+					<img class="reloadable-img ep-help-topic-content" src="{% webpack_static 'img/help/add-concept-alt-label.gif' %}"></img>
 				</p>
             </div>
         </div>
@@ -86,10 +87,10 @@
 				<p>
 					<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "click to view demonstration" %}</a>
 					<span class="ep-help-img-link">
-						<a href="{{ STATIC_URL }}img/help/create-collection.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+						<a href="{% webpack_static 'img/help/create-collection.gif' %}" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
 						</a>
 					</span>
-					<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/create-collection.gif"></img>
+					<img class="reloadable-img ep-help-topic-content" src="{% webpack_static 'img/help/create-collection.gif' %}"></img>
 				</p>
             </div>
         </div>

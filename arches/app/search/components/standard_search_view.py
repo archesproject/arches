@@ -71,44 +71,49 @@ details = {
                 "layoutSortorder": 5,
             },
             {
+                "componentname": "lifecycle-state-filter",
+                "searchcomponentid": "9e40969b-78c2-40b8-898b-c29265050e2f",
+                "layoutSortorder": 6,
+            },
+            {
                 "componentname": "saved-searches",
                 "searchcomponentid": "6dc29637-43a1-4fba-adae-8d9956dcd3b9",
-                "layoutSortorder": 6,
+                "layoutSortorder": 7,
             },
             {
                 "componentname": "search-export",
                 "searchcomponentid": "9c6a5a9c-a7ec-48d2-8a25-501b55b8eff6",
-                "layoutSortorder": 7,
+                "layoutSortorder": 8,
             },
             {
                 "componentname": "search-result-details",
                 "searchcomponentid": "f5986dae-8b01-11ea-b65a-77903936669c",
-                "layoutSortorder": 8,
+                "layoutSortorder": 9,
             },
             {
                 "componentname": "sort-results",
                 "searchcomponentid": "6a2fe122-de54-4e44-8e93-b6a0cda7955c",
-                "layoutSortorder": 9,
+                "layoutSortorder": 10,
             },
             {
                 "componentname": "term-filter",
                 "searchcomponentid": "1f42f501-ed70-48c5-bae1-6ff7d0d187da",
-                "layoutSortorder": 10,
+                "layoutSortorder": 11,
             },
             {
                 "componentname": "time-filter",
                 "searchcomponentid": "7497ed4f-2085-40da-bee5-52076a48bcb1",
-                "layoutSortorder": 11,
+                "layoutSortorder": 12,
             },
             {
                 "componentname": "paging-filter",
                 "searchcomponentid": "7aff5819-651c-4390-9b9a-a61221ba52c6",
-                "layoutSortorder": 12,
+                "layoutSortorder": 13,
             },
             {
                 "componentname": "search-results",
                 "searchcomponentid": "00673743-8c1c-4cc0-bd85-c073a52e03ec",
-                "layoutSortorder": 13,
+                "layoutSortorder": 14,
                 "required": True,
                 "executionSortorder": 1,
             },
@@ -209,6 +214,13 @@ class StandardSearchView(BaseSearchView):
         sorted_query_obj = search_filter_factory.create_search_query_dict(
             list(self.request.GET.items()) + list(self.request.POST.items())
         )
+
+        if sorted_query_obj.get("sort-by", ""):
+            sorted_query_obj["sort-results"] = {
+                "sort_by": sorted_query_obj.get("sort-by", ""),
+                "sort_order": sorted_query_obj.get("sort-order", "asc"),
+            }
+
         permitted_nodegroups = get_permitted_nodegroups(self.request.user)
         include_provisional = get_provisional_type(self.request)
         try:

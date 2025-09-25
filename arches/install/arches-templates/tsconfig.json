@@ -1,21 +1,28 @@
 {
-  "extends": "./.tsconfig-paths.json",
-  "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "jsx": "preserve",
-    "jsxImportSource": "vue",
-    "strict": true,
-    "noEmit": true,
-    "noImplicitThis": false,
-    "verbatimModuleSyntax": true,
-    "useDefineForClassFields": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "types": ["vitest/globals"],
-    "allowImportingTsExtensions": true
-  }
+    "extends": "./frontend_configuration/tsconfig-paths.json",
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "jsx": "preserve",
+        "jsxImportSource": "vue",
+        "strict": true,
+        "noEmit": true,
+        "noImplicitThis": false,
+        "verbatimModuleSyntax": true,
+        "useDefineForClassFields": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "types": [
+            "vitest/globals"
+        ],
+        "allowImportingTsExtensions": true
+    },
+    "exclude": [
+        "**/*.test.ts",
+        "**/build/**",
+        "**/staticfiles/**",
+    ]
 }

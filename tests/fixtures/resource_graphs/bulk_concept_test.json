@@ -112,6 +112,7 @@
             "functions_x_graphs": [],
             "graphid": "2f4b00d2-29fb-486f-8623-9fb8d25b6de1",
             "iconclass": "",
+            "is_active": true,
             "is_editable": true,
             "isresource": true,
             "jsonldcontext": null,
@@ -229,7 +230,7 @@
                 "sortorder": 0,
                 "sourcebranchpublication_id": null
             },
-            "slug": null,
+            "slug": "bulk_concept_test",
             "subtitle": {
                 "en": ""
             },

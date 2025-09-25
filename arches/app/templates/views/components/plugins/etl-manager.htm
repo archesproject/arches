@@ -68,7 +68,7 @@
         </div>
         <!-- /ko -->
     </div>
-    <div style="height:100%" data-bind="if: activeTab() === 'details'">
+    <div style="height:100%;overflow:hidden;flex: 1;" data-bind="if: activeTab() === 'details'">
         <!-- ko if: selectedModule() -->
         <div style="width: 100%; height: inherit">
             <div style="height: inherit;">
@@ -113,7 +113,7 @@
                             </div>
                             <div class="etl-job-task-bar">
                                 <div class="task">
-                                    <!-- ko if: (event.status == "completed" || event.status == "indexed" ) && event.etl_module.reversible -->
+                                    <!-- ko if: (["completed", "indexed", "unindexed"].includes(event.status)) && event.etl_module.reversible -->
                                     <a data-bind="click: function() { $parent.reverseTransactions(event, $root.translations.warning, $root.translations.etlReverseWarningMessage)}">
                                         <span data-bind="text: $root.translations.undoImport"></span>
                                     </a>

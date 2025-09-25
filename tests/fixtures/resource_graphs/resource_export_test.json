@@ -68183,6 +68183,7 @@
                 "nodeid": "ab74afd6-fa0e-11e6-9e3e-026d961c88e6",
                 "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"
             },
+            "slug": "assets",
             "subtitle": "Describes heritage resources, which includes monuments, buildings, structures, etc.",
             "version": ""
         }

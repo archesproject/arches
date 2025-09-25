@@ -506,6 +506,7 @@
             ],
             "graphid": "c35fe0a1-df30-11e8-b280-a4d18cec433a",
             "iconclass": "",
+            "is_active": true,
             "is_editable": false,
             "isactive": true,
             "isresource": true,
@@ -948,6 +949,7 @@
                 "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
                 "sortorder": 0
             },
+            "slug": "import_test_object",
             "subtitle": "",
             "template_id": "50000000-0000-0000-0000-000000000001",
             "version": ""

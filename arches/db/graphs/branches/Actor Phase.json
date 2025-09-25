@@ -116,6 +116,7 @@
             "maplinewidth": 1, 
             "mappointsize": 3, 
             "name": "Actor Phase", 
+            "slug": "actor_phase", 
             "nodegroups": [
                 {
                     "cardinality": "n", 

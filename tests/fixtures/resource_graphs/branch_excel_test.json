@@ -77,7 +77,7 @@
                             "en": "Enter text"
                         },
                         "uneditable": false,
-                        "width": "100%%"
+                        "width": "100%"
                     },
                     "id": "376d98fb-04e9-40aa-85a5-ee22ba1f3662",
                     "label": {
@@ -166,6 +166,7 @@
             "functions_x_graphs": [],
             "graphid": "a5c3946a-a9c0-4472-9191-ffc0f35a5901",
             "iconclass": "",
+            "is_active": true,
             "is_editable": true,
             "isresource": true,
             "jsonldcontext": null,
@@ -304,7 +305,7 @@
                 "sortorder": 0,
                 "sourcebranchpublication_id": null
             },
-            "slug": null,
+            "slug": "branch_excel_test",
             "subtitle": {
                 "en": ""
             },

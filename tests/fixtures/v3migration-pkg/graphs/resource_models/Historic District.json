@@ -12626,7 +12626,7 @@
                 "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E27_Site",
                 "sortorder": 0
             },
-            "slug": null,
+            "slug": "historic_district",
             "subtitle": "Describes heritage resource groups which are groupings of heritage resources.",
             "template_id": "50000000-0000-0000-0000-000000000002",
             "version": ""

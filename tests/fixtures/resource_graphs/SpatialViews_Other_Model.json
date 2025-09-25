@@ -106,6 +106,7 @@
             ],
             "graphid": "114dd3fb-404d-4fb3-a639-1333b89cf60c",
             "iconclass": "",
+            "is_active": true,
             "is_editable": false,
             "isresource": true,
             "jsonldcontext": null,
@@ -201,7 +202,7 @@
                 "sortorder": 0,
                 "sourcebranchpublication_id": null
             },
-            "slug": null,
+            "slug": "other_model",
             "subtitle": {
                 "en": ""
             },

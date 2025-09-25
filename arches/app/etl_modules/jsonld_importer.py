@@ -2,7 +2,7 @@ import json
 import logging
 import zipfile
 from datetime import datetime
-from functools import cache, lru_cache
+from functools import lru_cache
 from pathlib import Path
 
 from django.core.files import File
@@ -49,13 +49,7 @@ def get_graph_tree_from_slug(slug):
 
 @lru_cache(maxsize=1)
 def graph_id_from_slug(slug):
-    return GraphModel.objects.get(slug=slug).pk
-
-
-@cache
-def fallback_node():
-    """Consider removing this if we make LoadStaging.nodegroup nullable."""
-    return Node.objects.filter(nodegroup__isnull=False).first()
+    return GraphModel.objects.get(slug=slug, source_identifier=None).pk
 
 
 class RedirectStdoutToLogger:
@@ -231,10 +225,8 @@ class JSONLDImporter(BaseImportModule):
             message=exception_message,
             value=str(exception.value) if has_info else None,
             datatype=exception.datatype if has_info else None,
-            node_id=exception.node_id if has_info else fallback_node().nodeid,
-            nodegroup_id=(
-                exception.nodegroup_id if has_info else fallback_node().nodegroup_id
-            ),
+            node_id=exception.node_id if has_info else None,
+            nodegroup_id=exception.nodegroup_id if has_info else None,
         )
         le.clean_fields()
         le.save()
@@ -251,7 +243,7 @@ class JSONLDImporter(BaseImportModule):
         )
 
         dummy_tile_info = {
-            str(le.node_id or fallback_node().nodeid): {
+            str(le.node_id): {
                 "value": {},
                 "valid": False,
                 "source": early_failure,
@@ -262,9 +254,7 @@ class JSONLDImporter(BaseImportModule):
 
         ls = LoadStaging(
             load_event_id=self.loadid,
-            nodegroup_id=(
-                exception.nodegroup_id if has_info else fallback_node().nodegroup_id
-            ),
+            nodegroup_id=exception.nodegroup_id if has_info else None,
             value=dummy_tile_info,
             passes_validation=False,
             source_description=early_failure,

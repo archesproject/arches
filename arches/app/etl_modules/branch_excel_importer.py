@@ -205,8 +205,9 @@ class BranchExcelImporter(BaseImportModule):
                     tile_value_json, passes_validation = self.create_tile_value(
                         cell_values, data_node_lookup, node_lookup, row_details, cursor
                     )
+                    sortorder = 0
                     cursor.execute(
-                        """INSERT INTO load_staging (nodegroupid, legacyid, resourceid, tileid, parenttileid, value, loadid, nodegroup_depth, source_description, passes_validation, operation) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                        """INSERT INTO load_staging (nodegroupid, legacyid, resourceid, tileid, parenttileid, value, loadid, nodegroup_depth, source_description, passes_validation, operation, sortorder) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                         (
                             row_details["nodegroup_id"],
                             legacyid,
@@ -221,6 +222,7 @@ class BranchExcelImporter(BaseImportModule):
                             ),  # source_description
                             passes_validation,
                             operation,
+                            sortorder,
                         ),
                     )
                 except KeyError:
@@ -256,12 +258,13 @@ class BranchExcelImporter(BaseImportModule):
             self.stage_excel_file(file, summary, cursor)
 
     def stage_excel_file(self, file, summary, cursor):
-        if file.endswith("xlsx"):
+        if file.endswith("xlsx") and ("attachments" + os.sep) not in file:
             summary["files"][file]["worksheets"] = []
             uploaded_file_path = os.path.join(
                 settings.UPLOADED_FILES_DIR, "tmp", self.loadid, file
             )
-            workbook = load_workbook(filename=default_storage.open(uploaded_file_path))
+            opened_file = default_storage.open(uploaded_file_path)
+            workbook = load_workbook(filename=opened_file, read_only=True)
             graphid = self.get_graphid(workbook)
             nodegroup_lookup, nodes = self.get_graph_tree(graphid)
             node_lookup = self.get_node_lookup(nodes)
@@ -272,6 +275,8 @@ class BranchExcelImporter(BaseImportModule):
                         worksheet, cursor, node_lookup, nodegroup_lookup
                     )
                     summary["files"][file]["worksheets"].append(details)
+            opened_file.close()
+
             cursor.execute(
                 """UPDATE load_event SET load_details = %s WHERE loadid = %s""",
                 (json.dumps(summary), self.loadid),

@@ -415,7 +415,7 @@
                             "en": "Enter text"
                         },
                         "uneditable": false,
-                        "width": "100%%"
+                        "width": "100%"
                     },
                     "id": "ef14873a-6675-4eb9-80d6-c60ffb4e59e5",
                     "label": {
@@ -633,6 +633,7 @@
             ],
             "graphid": "5db49c51-2c70-47b3-b7be-66afced863c8",
             "iconclass": "",
+            "is_active": true,
             "is_editable": false,
             "isresource": true,
             "jsonldcontext": null,
@@ -1312,7 +1313,7 @@
                 "sortorder": 0,
                 "sourcebranchpublication_id": null
             },
-            "slug": null,
+            "slug": "spatialviews_test",
             "subtitle": {
                 "en": ""
             },

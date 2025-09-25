@@ -17,16 +17,76 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import uuid
+from unittest.mock import patch
+
+from django.conf import settings
 
 from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import Language
+from arches.app.models.graph import Graph
+from arches.app.models.models import (
+    DDataType,
+    GraphModel,
+    Language,
+    Node,
+    ResourceInstance,
+    ResourceInstanceLifecycle,
+    TileModel,
+)
 from arches.app.models.tile import Tile
 from tests.base_test import ArchesTestCase
 
 
 # these tests can be run from the command line via
 # python manage.py test tests.utils.datatypes.datatype_tests --settings="tests.test_settings"
+
+
+class AllDataTypeTests(ArchesTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.factory = DataTypeFactory()
+        cls.graph = Graph.objects.create_graph(
+            name="AllDataTypeTests graph", is_resource=True
+        )
+        # Reuse this mock node for all datatypes.
+        cls.mock_node = Node.objects.create(
+            istopnode=True, graph=cls.graph, datatype="node-value"
+        )
+        # Add enough config properties to make all datatypes happy.
+        cls.mock_node.config = {"falseLabel": "False", "nodeid": str(cls.mock_node.pk)}
+        cls.mock_node.save()
+        cls.datatypes = DDataType.objects.exclude(pk="semantic").values_list(
+            "pk", flat=True
+        )
+
+    def test_as_json_handles_none(self):
+        mock_tile = TileModel(data={str(self.mock_node.pk): None}, provisionaledits={})
+        for datatype in self.datatypes:
+            instance = self.factory.get_instance(datatype)
+            with self.subTest(datatype=datatype):
+                self.assertEqual(
+                    instance.to_json(mock_tile, self.mock_node)["@display_value"],
+                    "",
+                )
+
+
+class BaseDataTypeTests(ArchesTestCase):
+    def test_get_tile_data_only_none(self):
+        base = BaseDataType()
+        node_id = str(uuid.uuid4())
+        resourceinstance_id = str(uuid.uuid4())
+        tile_data = {node_id: None}
+        tile_holding_only_none = Tile(
+            {
+                "resourceinstance_id": resourceinstance_id,
+                "parenttile_id": "",
+                "nodegroup_id": node_id,
+                "tileid": "",
+                "data": tile_data,
+            }
+        )
+
+        self.assertEqual(base.get_tile_data(tile_holding_only_none), tile_data)
 
 
 class BooleanDataTypeTests(ArchesTestCase):
@@ -57,25 +117,6 @@ class BooleanDataTypeTests(ArchesTestCase):
 
         with self.assertRaises(ValueError):
             boolean.transform_value_for_tile(None)
-
-
-class BaseDataTypeTests(ArchesTestCase):
-    def test_get_tile_data_only_none(self):
-        base = BaseDataType()
-        node_id = str(uuid.uuid4())
-        resourceinstance_id = str(uuid.uuid4())
-        tile_data = {node_id: None}
-        tile_holding_only_none = Tile(
-            {
-                "resourceinstance_id": resourceinstance_id,
-                "parenttile_id": "",
-                "nodegroup_id": node_id,
-                "tileid": "",
-                "data": tile_data,
-            }
-        )
-
-        self.assertEqual(base.get_tile_data(tile_holding_only_none), tile_data)
 
 
 class StringDataTypeTests(ArchesTestCase):
@@ -130,34 +171,6 @@ class StringDataTypeTests(ArchesTestCase):
         string.clean(tile2, nodeid)
 
         self.assertIsNotNone(tile2.data[nodeid])
-
-
-class NonLocalizedStringDataTypeTests(ArchesTestCase):
-    def test_string_validate(self):
-        string = DataTypeFactory().get_instance("non-localized-string")
-        some_errors = string.validate(float(1.2))
-        self.assertGreater(len(some_errors), 0)
-        no_errors = string.validate("Hello World")
-        self.assertEqual(len(no_errors), 0)
-
-    def test_string_clean(self):
-        string = DataTypeFactory().get_instance("non-localized-string")
-        nodeid1 = "72048cb3-adbc-11e6-9ccf-14109fd34195"
-        nodeid2 = "72048cb3-adbc-11e6-9ccf-14109fd34196"
-        resourceinstanceid = "40000000-0000-0000-0000-000000000000"
-
-        json_empty_strings = {
-            "resourceinstance_id": resourceinstanceid,
-            "parenttile_id": "",
-            "nodegroup_id": nodeid1,
-            "tileid": "",
-            "data": {nodeid1: "''", nodeid2: ""},
-        }
-        tile1 = Tile(json_empty_strings)
-        string.clean(tile1, nodeid1)
-        self.assertIsNone(tile1.data[nodeid1])
-        string.clean(tile1, nodeid2)
-        self.assertIsNone(tile1.data[nodeid2])
 
 
 class URLDataTypeTests(ArchesTestCase):
@@ -246,3 +259,56 @@ class URLDataTypeTests(ArchesTestCase):
         self.assertIsNotNone(tile1.data[nodeid])
         self.assertTrue("url_label" in tile1.data[nodeid])
         self.assertFalse(tile1.data[nodeid]["url_label"])
+
+
+class ResourceInstanceListDataTypeTests(ArchesTestCase):
+    def displayname(self, context=None):
+        return str(self.name)
+
+    @patch("arches.app.models.resource.Resource.displayname", displayname)
+    def test_to_json(self):
+        ri_list = DataTypeFactory().get_instance("resource-instance-list")
+
+        dummy_node = Node(pk=uuid.uuid4())
+        graph = GraphModel.objects.create(isresource=True)
+        lifecycle = ResourceInstanceLifecycle.objects.get(
+            pk=settings.DEFAULT_RESOURCE_INSTANCE_LIFECYCLE_ID
+        )
+        state = lifecycle.resource_instance_lifecycle_states.first()
+        resource1 = ResourceInstance.objects.create(
+            graph=graph, resource_instance_lifecycle_state=state, name="ONE"
+        )
+        resource2 = ResourceInstance.objects.create(
+            graph=graph, resource_instance_lifecycle_state=state, name="TWO"
+        )
+        tile = Tile(
+            {
+                "resourceinstance_id": uuid.uuid4(),
+                "nodegroup_id": str(dummy_node.pk),
+                "tileid": "",
+                "data": {
+                    str(dummy_node.pk): [
+                        {
+                            "resourceId": str(resource1.pk),
+                            "ontologyProperty": "",
+                            "inverseOntologyProperty": "",
+                        },
+                        {
+                            "resourceId": str(resource2.pk),
+                            "ontologyProperty": "",
+                            "inverseOntologyProperty": "",
+                        },
+                    ]
+                },
+            }
+        )
+
+        # Was 4, is now 3, should be 1-2 after fixing:
+        # https://github.com/archesproject/arches/issues/11632
+        with self.assertNumQueries(3):
+            json = ri_list.to_json(tile, dummy_node)
+        self.assertEqual(json["@display_value"], "ONE, TWO")
+        self.assertEqual(
+            [inner["display_value"] for inner in json["instance_details"]],
+            ["ONE", "TWO"],
+        )

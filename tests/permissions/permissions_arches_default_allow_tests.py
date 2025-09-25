@@ -15,7 +15,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from unittest.mock import MagicMock, Mock, patch
 
-from django.test import override_settings
 from arches.app.models.resource import Resource
 from tests.permissions.base_permissions_framework_test import (
     ArchesPermissionFrameworkTestCase,
@@ -56,16 +55,13 @@ class ArchesDefaultAllowPermissionsTests(ArchesPermissionFrameworkTestCase):
                 implicit_permission = self.framework.user_can_read_resource(
                     self.user, self.resource_instance_id
                 )
-                resource = ResourceInstance.objects.get(
-                    resourceinstanceid=self.resource_instance_id
-                )
                 can_access_without_view_permission = (
                     self.framework.user_can_read_resource(
                         self.user, self.resource_instance_id
                     )
                 )
                 self.framework.assign_perm(
-                    "view_resourceinstance", self.group, resource
+                    "view_resourceinstance", self.group, self.resource
                 )
                 can_access_with_view_permission = self.framework.user_can_read_resource(
                     self.user, self.resource_instance_id
@@ -106,10 +102,7 @@ class ArchesDefaultAllowPermissionsTests(ArchesPermissionFrameworkTestCase):
                 "arches.app.permissions.arches_default_allow.settings",
                 default_permissions,
             ):
-                resource = ResourceInstance.objects.get(
-                    resourceinstanceid=self.resource_instance_id
-                )
-                result = self.framework.get_restricted_users(resource)
+                result = self.framework.get_restricted_users(self.resource)
                 self.assertIn(self.user.id, result["no_access"])
 
     def test_get_search_ui_permissions(self):
@@ -124,6 +117,7 @@ class ArchesDefaultAllowPermissionsTests(ArchesPermissionFrameworkTestCase):
             ):
                 mock = Mock()
                 mock.id = self.user.id
+                mock.is_superuser = False
                 result = self.framework.get_search_ui_permissions(
                     mock,
                     {
@@ -148,14 +142,11 @@ class ArchesDefaultAllowPermissionsTests(ArchesPermissionFrameworkTestCase):
         implicit_permission = self.framework.user_can_read_resource(
             self.user, self.resource_instance_id
         )
-        resource = ResourceInstance.objects.get(
-            resourceinstanceid=self.resource_instance_id
-        )
-        self.framework.assign_perm("change_resourceinstance", self.group, resource)
+        self.framework.assign_perm("change_resourceinstance", self.group, self.resource)
         can_access_without_view_permission = self.framework.user_can_read_resource(
             self.user, self.resource_instance_id
         )
-        self.framework.assign_perm("view_resourceinstance", self.group, resource)
+        self.framework.assign_perm("view_resourceinstance", self.group, self.resource)
         can_access_with_view_permission = self.framework.user_can_read_resource(
             self.user, self.resource_instance_id
         )
@@ -203,17 +194,14 @@ class ArchesDefaultAllowPermissionsTests(ArchesPermissionFrameworkTestCase):
 
         """
 
-        resource = ResourceInstance.objects.get(
-            resourceinstanceid=self.resource_instance_id
-        )
-        nodes = Node.objects.filter(graph_id=resource.graph_id)
+        nodes = Node.objects.filter(graph_id=self.resource.graph_id)
         for node in nodes:
             if node.nodegroup:
                 self.framework.assign_perm(
                     "no_access_to_nodegroup", self.group, node.nodegroup
                 )
         hasperms = self.framework.user_has_resource_model_permissions(
-            self.user, ["models.read_nodegroup"], resource
+            self.user, ["models.read_nodegroup"], self.resource
         )
         self.assertFalse(hasperms)
 
@@ -222,20 +210,17 @@ class ArchesDefaultAllowPermissionsTests(ArchesPermissionFrameworkTestCase):
         Tests that users are properly identified as restricted.
         """
 
-        resource = ResourceInstance.objects.get(
-            resourceinstanceid=self.resource_instance_id
-        )
         self.framework.assign_perm(
-            "no_access_to_resourceinstance", self.group, resource
+            "no_access_to_resourceinstance", self.group, self.resource
         )
         ben = self.user
-        jim = User.objects.get(username="jim")
-        sam = User.objects.get(username="sam")
-        admin = User.objects.get(username="admin")
-        self.framework.assign_perm("view_resourceinstance", ben, resource)
-        self.framework.assign_perm("change_resourceinstance", jim, resource)
+        jim = self.test_users["jim"]
+        sam = self.test_users["sam"]
+        admin = self.test_users["admin"]
+        self.framework.assign_perm("view_resourceinstance", ben, self.resource)
+        self.framework.assign_perm("change_resourceinstance", jim, self.resource)
 
-        restrictions = self.framework.get_restricted_users(resource)
+        restrictions = self.framework.get_restricted_users(self.resource)
 
         results = [
             jim.id in restrictions["cannot_read"],

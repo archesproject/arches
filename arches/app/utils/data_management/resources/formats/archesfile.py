@@ -165,19 +165,17 @@ class ArchesFileReader(Reader):
         self, business_data, reporter, overwrite="append", prevent_indexing=False
     ):
         errors = []
+        graph_uuids = GraphModel.objects.values_list("pk", flat=True)
         last_resource = None  # only set if prevent_indexing=False
         for resource in business_data["resources"]:
             if resource["resourceinstance"] is not None:
-                if GraphModel.objects.filter(
-                    graphid=str(resource["resourceinstance"]["graph_id"])
-                ).exists():
+                graph_uuid = uuid.UUID(str(resource["resourceinstance"]["graph_id"]))
+                if graph_uuid in graph_uuids:
                     resourceinstanceid = uuid.UUID(
                         str(resource["resourceinstance"]["resourceinstanceid"])
                     )
                     defaults = {
-                        "graph_id": uuid.UUID(
-                            str(resource["resourceinstance"]["graph_id"])
-                        ),
+                        "graph_id": graph_uuid,
                         "legacyid": resource["resourceinstance"]["legacyid"],
                     }
                     new_values = {

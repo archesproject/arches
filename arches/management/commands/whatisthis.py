@@ -29,6 +29,8 @@ class Command(BaseCommand):
         ## search all models and see if the UUID matches an existing object
         objs = []
         for m in django.apps.apps.get_models():
+            if m._meta.proxy:
+                continue
             if not m.__module__.startswith("arches"):
                 continue
             if m._meta.pk.get_internal_type() != "UUIDField":

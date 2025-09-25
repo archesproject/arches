@@ -1,0 +1,195 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "views/graph/graph-base.htm" %}
+{% load static %}
+{% load template_tags %}
+{% load i18n %}
+
+{% block graph_header_title %}
+{% trans "Model History" %}
+{% endblock graph_header_title %}
+
+{% block graph_header_buttons %}
+<span style="display: flex">
+    <button 
+        class="btn btn-sm btn-danger btn-labeled fa fa-trash" 
+        data-bind="
+            attr: { disabled: graphPublicationId() === graphPublicationIdFromDatabase() },
+            click: function() { graphPublicationId() !== graphPublicationIdFromDatabase() && showDeletePublicationAlert(); }
+        "
+    >
+        <span>{% trans "Delete Model Version" %}</span>
+    </button>
+    <button 
+        class="btn btn-sm btn-primary btn-labeled fa fa-check" 
+        data-bind="
+            attr: { disabled: graphPublicationId() === graphPublicationIdFromDatabase() },
+            click: function() { graphPublicationId() !== graphPublicationIdFromDatabase() && showUpdatePublicationAlert(); }
+        "
+    >
+        <span>{% trans "Restore Model Version" %}</span>
+    </button>
+</span>
+{{ block.super }}
+{% endblock graph_header_buttons %}
+
+{% block content %}
+<div 
+    style="
+        padding: 0 20px 20px 20px; 
+        width: 100%;
+        height: calc(100vh - 105px); 
+        overflow-y: scroll;
+    "
+>
+    <fieldset>
+        <!-- ko foreach: $data.publishedGraphs() -->
+            <div 
+                style="border-bottom: 0px; border-top: 1px solid #ddd; padding-left: 20px;"
+                data-bind="
+                    attr: { 'class': $data['publicationid'] === $parent.graphPublicationId() ? 'publication active-publication' : 'publication' },
+                    click: $parent.selectPublication
+                "
+            >
+                <div style="display: flex;">
+                    <div style="display: flex; align-items: center;">
+                        <input 
+                            style="margin: 0px; cursor: pointer; pointer-events: none;" 
+                            type="radio" 
+                            data-bind="
+                                checkedValue: $data['publicationid'], 
+                                checked: $parent.graphPublicationId(),
+                            "
+                        />
+                    </div>
+    
+                    <div style="width: 120px; padding-left: 20px;">
+                        <!-- ko if: $data['publicationid'] === $parent.graphPublicationIdFromDatabase() -->
+                            <span style="color: green;"><strong>{% trans 'Current' %}</strong></span>
+                        <!-- /ko -->
+                        <!-- ko if: $data['publicationid'] !== $parent.graphPublicationIdFromDatabase() -->
+                            <span style="color: grey;"><strong>{% trans 'Inactive' %}</strong></span>
+                        <!-- /ko -->
+                    </div>
+                </div>
+
+                <div style="justify-content: center; display: flex;">
+                    <div>
+                        <span><strong>{% trans "Published Time:" %}</strong></span>
+                        <span data-bind="text: $data['published_time']"></span>
+                    </div>
+                </div>
+
+                <div style="width: 240px; justify-content: center; display: flex;">
+                    <div>
+                        <span><strong>{% trans "Publisher:" %}</strong></span>
+                        <!-- ko if: $parent['publishedUserData']()[$data.user_id] -->
+                            <!-- ko if: $parent['publishedUserData']()[$data.user_id]['first_name'] -->
+                                <span data-bind="text: $parent['publishedUserData']()[$data.user_id]['first_name']"></span>
+                            <!-- /ko -->
+                            <!-- ko if: $parent['publishedUserData']()[$data.user_id]['last_name'] -->
+                                <span data-bind="text: $parent['publishedUserData']()[$data.user_id]['last_name']">,</span>
+                            <!-- /ko -->
+                            <!-- ko if: $parent['publishedUserData']()[$data.user_id]['first_name'] || $parent['publishedUserData']()[$data.user_id]['last_name'] -->
+                                <span>|</span>
+                            <!-- /ko -->
+                            <span data-bind="text: $parent['publishedUserData']()[$data.user_id]['username']"></span>
+                        <!-- /ko -->
+                    </div>
+                </div>
+
+                <div style="justify-content: center; display: flex; padding-right: 40px;">
+                    <div>
+                        <span><strong>{% trans "Number of Resources:" %}</strong></span>
+                        <span data-bind="text: $parent['graphPublicationResourceInstanceCount']()[$data['publicationid']]"></span>
+                    </div>
+                </div>
+
+                <!-- ko ifnot: $data['publicationid'] === $parent.graphPublicationId() -->
+                    <div style="display: flex; align-items: center; width: 100%; overflow-x: hidden; padding-right: 40px;">
+                        <div style='width: 60px; flex: none;'>
+                            <strong>{% trans "Notes:" %}</strong>
+                        </div>
+    
+                        <div 
+                            style="
+                                overflow-y: hidden; 
+                            "
+                        >
+                            <div 
+                                style="    
+                                    overflow: hidden;
+                                    white-space: nowrap;
+                                    text-overflow: ellipsis;
+                                " 
+                                data-bind="text: $data['notes'] || {% quoted_trans 'None' %}" 
+                                readonly
+                            ></div>
+                        </div>
+                    </div>
+                <!-- /ko -->
+            </div>
+
+            <!-- ko if: $data['publicationid'] === $parent.graphPublicationId() -->
+                <div 
+                    style="
+                        display: flex; 
+                        background-color: #fff; 
+                        padding: 0px 60px 20px 154px; 
+                        border-left: 1px solid #ddd; 
+                        border-right: 1px solid #ddd; 
+                        cursor: pointer;
+                    "
+                >
+                    <div style="width: 60px; flex: none;">
+                        <strong>{% trans "Notes:" %}</strong>
+                    </div>
+                    <div 
+                        style="
+                            overflow-y: auto;
+                            min-height: 56px; 
+                            max-height: 180px;
+                        "
+                    >
+                        <div 
+                            style="white-space: pre-wrap; cursor: default;" 
+                            data-bind="text: $data['notes'] || {% quoted_trans 'None' %}" 
+                            readonly
+                        ></div>
+                    </div>
+                </div>
+            <!-- /ko -->
+        <!-- /ko -->
+    </fieldset>
+</div>
+
+{% endblock content %}
+
+{% block pre_require_js %}
+{{block.super}}
+<div 
+    id="graphPublicationData"
+    style="display: none;"
+    graphPublicationData='{
+        "graphs_x_published_graphs": {{graphs_x_published_graphs}},
+        "graph_publication_id": "{{graph_publication_id}}",
+        "user_ids_to_user_data": {{user_ids_to_user_data}},
+        "graph_publication_id_to_resource_instance_count": {{graph_publication_id_to_resource_instance_count}},
+    }'
+></div>
+{% endblock pre_require_js %}

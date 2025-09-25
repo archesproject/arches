@@ -179,7 +179,9 @@ class Concept(object):
                 exclude = []
 
                 if len(include) > 0:
-                    values = models.Value.objects.filter(concept=self.id)
+                    values = models.Value.objects.filter(
+                        concept=self.id
+                    ).select_related("valuetype")
                     for value in values:
                         if value.valuetype.category in include:
                             self.values.append(ConceptValue(value))
@@ -222,13 +224,24 @@ class Concept(object):
                         subconcept.relationshiptype = relation.relationtype_id
                         self.subconcepts.append(subconcept)
 
-                    self.subconcepts = sorted(
-                        self.subconcepts,
-                        key=lambda concept: self.natural_keys(
-                            concept.get_sortkey(lang)
-                        ),
-                        reverse=False,
-                    )
+                    try:
+                        self.subconcepts = sorted(
+                            self.subconcepts,
+                            key=lambda concept: self.natural_keys(
+                                concept.get_sortkey(lang)
+                            ),
+                            reverse=False,
+                        )
+                    except TypeError:
+                        self.subconcepts = sorted(
+                            self.subconcepts,
+                            key=lambda concept: [
+                                str(k)
+                                for k in self.natural_keys(concept.get_sortkey(lang))
+                            ],
+                            reverse=False,
+                        )
+
                     # self.subconcepts = sorted(self.subconcepts, key=methodcaller(
                     #     'get_sortkey', lang=lang), reverse=False)
 
@@ -1575,7 +1588,7 @@ class ConceptValue(object):
         )
 
     def get(self, id=""):
-        self.load(models.Value.objects.get(pk=id))
+        self.load(models.Value.objects.select_related("valuetype").get(pk=id))
         return self
 
     def save(self):

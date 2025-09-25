@@ -22,7 +22,7 @@
             </div>
         </div>
 
-        <div class="node-config-item" style="">
+        <div class="node-config-item">
             <div class="control-label">
                 {% trans "Template" %}
             </div>
@@ -31,12 +31,23 @@
             </div>
         </div>
 
-        <div class="node-config-item" style="">
+        <div class="node-config-item">
             <div class="control-label">
                 {% trans "Visibility" %}
             </div>
             <div class="pad-no">
-                <div data-bind="component: { name: 'views/components/simple-switch', params: {value: visible, config:{label: {% quoted_trans _("Make Widget Visible") %}, subtitle: {% quoted_trans _("Show this widget by default") %}}}}"></div>
+                <div 
+                    data-bind="component: { 
+                        name: 'views/components/simple-switch',
+                        params: {
+                            value: visible, 
+                            config: {
+                                label: {% quoted_trans _("Make Widget Visible") %}, 
+                                subtitle: {% quoted_trans _("Show this widget by default") %}
+                            }
+                        }
+                    }"
+                ></div>
             </div>
         </div>
 
@@ -48,16 +59,17 @@
                 configForm: true,
                 value: ko.observable(null),
                 node: node,
-                card: card
+                card: card,
+                graphDesignerHasDirtyWidget: $parent.hasDirtyWidget
             }
         }'></div>
         <!-- /ko -->
 
 
         <!-- ko if: ko.isObservable($data.card) -->
-        <div class="node-config-item switch-panel" data-bind="css: {'disabled': $data.checkIfImmutable() }">
+        <div class="node-config-item switch-panel">
 
-            <span class="switch switch-small arches-switch" data-bind="css: {'on': $data.node.isrequired(), 'disabled': $data.checkIfImmutable() }, click: $data.toggleRequired"><small></small></span>
+            <span class="switch switch-small arches-switch" data-bind="css: {'on': $data.node.isrequired()}, click: $data.toggleRequired"><small></small></span>
 
             <p class="control-label" style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;">
                 {% trans "Required" %}

@@ -569,46 +569,6 @@
                     "sortorder": 0,
                     "visible": true,
                     "widget_id": "10000000-0000-0000-0000-000000000009"
-                },
-                {
-                    "card_id": "c1bd336b-95bd-11e8-98d6-acde48001122",
-                    "config": {
-                        "defaultValue": "",
-                        "label": "concept list select widget",
-                        "options": [
-                            {
-                                "children": [],
-                                "collector": "",
-                                "conceptid": "cf2ed5bd-4d3c-4b34-8ba5-e4ee5ccc5b6f",
-                                "id": "acadcbfc-6f85-4d59-821d-d0ef0c5babe7",
-                                "sortorder": "",
-                                "text": "Option 1"
-                            },
-                            {
-                                "children": [],
-                                "collector": "",
-                                "conceptid": "b6ea98d2-f203-426d-9913-eff060043146",
-                                "id": "e2acecb9-0511-470b-b26b-8c0681b542f0",
-                                "sortorder": "",
-                                "text": "Option 2"
-                            },
-                            {
-                                "children": [],
-                                "collector": "",
-                                "conceptid": "bf2ca706-a122-4d75-a8d0-1b3c863ba38b",
-                                "id": "fd845a76-6bcc-4b30-8aef-602a9071b6b5",
-                                "sortorder": "",
-                                "text": "Option 3"
-                            }
-                        ],
-                        "placeholder": "Select an option"
-                    },
-                    "id": "d3cf3e54-a017-11e8-9ff8-0200ec49ad01",
-                    "label": "concept list select widget",
-                    "node_id": "318c9e2b-a017-11e8-a36c-0200ec49ad01",
-                    "sortorder": 2,
-                    "visible": true,
-                    "widget_id": "10000000-0000-0000-0000-000000000013"
                 }
             ],
             "color": null,
@@ -914,6 +874,7 @@
                 "user_id": null
             },
             "iconclass": "",
+            "is_active": true,
             "is_editable": false,
             "isresource": true,
             "jsonldcontext": null,
@@ -1601,7 +1562,7 @@
                 "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity",
                 "sortorder": 0
             },
-            "slug": null,
+            "slug": "data_type_testing_model",
             "subtitle": "Testing model created for 4.3 (and in 4.3 pre-release) for testing.  Contains all datatypes outlined in the testing script.",
             "template_id": "50000000-0000-0000-0000-000000000001",
             "version": ""

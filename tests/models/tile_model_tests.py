@@ -16,25 +16,27 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-from uuid import UUID
+from uuid import UUID, uuid4
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from tests.base_test import ArchesTestCase
-from django.db import connection
 from django.contrib.auth.models import User
-from django.db.utils import ProgrammingError
 from django.http import HttpRequest
-from arches.app.models.tile import Tile, TileValidationError
+from arches.app.const import DefaultLifecycleStates
+from arches.app.models.graph import Graph
+from arches.app.models.tile import Tile, TileCardinalityError, TileValidationError
 from arches.app.models.resource import Resource
 from arches.app.models.models import (
     CardModel,
     CardXNodeXWidget,
     Node,
     NodeGroup,
+    ResourceInstance,
     ResourceXResource,
     TileModel,
     Widget,
 )
 
+from tests.constants import *
 
 # these tests can be run from the command line via
 # python manage.py test tests.models.tile_model_tests --settings="tests.test_settings"
@@ -45,33 +47,72 @@ class TileTests(ArchesTestCase):
         "rdf_export_document_model",
         "rdf_export_object_model",
         "Cardinality Test Model",
+        "All_Datatypes",
     ]
 
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        sql = """
-        INSERT INTO public.resource_instances(resourceinstanceid, legacyid, graphid, createdtime)
-            VALUES ('40000000-0000-0000-0000-000000000000', '40000000-0000-0000-0000-000000000000', '2f7f8e40-adbc-11e6-ac7f-14109fd34195', '1/1/2000');
+        cls.add_users()
+        resources = [
+            ResourceInstance(
+                pk=CardinalityTestGraph.RESOURCE1.value,
+                legacyid=CardinalityTestGraph.RESOURCE1.value,
+                graph_id=CardinalityTestGraph.GRAPH_ID.value,
+                createdtime="1/1/2000",
+                resource_instance_lifecycle_state_id=DefaultLifecycleStates.PERPETUAL.value,
+            ),
+            ResourceInstance(
+                pk=AllDatatypesTestGraph.RESOURCE1.value,
+                legacyid=AllDatatypesTestGraph.RESOURCE1.value,
+                graph_id=AllDatatypesTestGraph.GRAPH_ID.value,
+                createdtime="1/1/2000",
+                resource_instance_lifecycle_state_id=DefaultLifecycleStates.PERPETUAL.value,
+            ),
+        ]
+        resources = ResourceInstance.objects.bulk_create(resources)
+        nodegroups = [
+            NodeGroup(pk=pk, cardinality="n")
+            for pk in [
+                "99999999-0000-0000-0000-000000000001",
+                "32999999-0000-0000-0000-000000000000",
+                "19999999-0000-0000-0000-000000000000",
+                "21111111-0000-0000-0000-000000000000",
+                "41111111-0000-0000-0000-000000000000",
+            ]
+        ]
+        nodegroups = NodeGroup.objects.bulk_create(nodegroups)
 
-        INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
-            VALUES ('99999999-0000-0000-0000-000000000001', '', 'n');
+    def create_tile(self):
+        """Can't do this in setUpTestData given count assertions in other tests."""
+        tileid = uuid4()
+        nodegroupid = "99999999-0000-0000-0000-000000000001"
+        tile = TileModel.objects.create(
+            pk=tileid,
+            resourceinstance_id=CardinalityTestGraph.RESOURCE1.value,
+            nodegroup_id=nodegroupid,
+        )
+        grouping_node = Node.objects.create(
+            pk=nodegroupid,
+            graph=tile.resourceinstance.graph,
+            nodegroup_id=nodegroupid,
+            alias="Statement",
+            datatype="semantic",
+            istopnode=False,
+        )
+        nodegroup = grouping_node.nodegroup
+        nodegroup.grouping_node = grouping_node
+        nodegroup.save()
+        return TileModel.objects.get(pk=tile.pk)
 
-        INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
-            VALUES ('32999999-0000-0000-0000-000000000000', '', 'n');
+    def test_tile_str(self):
+        sample_tile = self.create_tile()
+        self.assertEqual(f"{sample_tile}", f"Statement ({sample_tile.pk})")
 
-        INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
-            VALUES ('19999999-0000-0000-0000-000000000000', '', 'n');
-
-        INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
-            VALUES ('21111111-0000-0000-0000-000000000000', '', 'n');
-
-        INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
-            VALUES ('41111111-0000-0000-0000-000000000000', '', 'n');
-        """
-
-        with connection.cursor() as cursor:
-            cursor.execute(sql)
+    def test_tile_str_no_nodegroup(self):
+        sample_tile = self.create_tile()
+        sample_tile.nodegroup = None
+        self.assertEqual(f"{sample_tile}", f"None ({sample_tile.pk})")
 
     def test_load_from_python_dict(self):
         """
@@ -83,7 +124,7 @@ class TileTests(ArchesTestCase):
             "tiles": [
                 {
                     "tiles": [],
-                    "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+                    "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
                     "parenttile_id": "",
                     "nodegroup_id": "19999999-0000-0000-0000-000000000000",
                     "tileid": "",
@@ -102,7 +143,7 @@ class TileTests(ArchesTestCase):
                 },
                 {
                     "tiles": [],
-                    "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+                    "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
                     "parenttile_id": "",
                     "nodegroup_id": "32999999-0000-0000-0000-000000000000",
                     "tileid": "",
@@ -116,7 +157,7 @@ class TileTests(ArchesTestCase):
                     },
                 },
             ],
-            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
             "parenttile_id": "",
             "nodegroup_id": "20000000-0000-0000-0000-000000000001",
             "tileid": "",
@@ -125,7 +166,7 @@ class TileTests(ArchesTestCase):
 
         t = Tile(json)
 
-        self.assertEqual(t.resourceinstance_id, "40000000-0000-0000-0000-000000000000")
+        self.assertEqual(t.resourceinstance_id, CardinalityTestGraph.RESOURCE1.value)
         self.assertEqual(t.data, {})
         self.assertEqual(
             t.tiles[0].data["20000000-0000-0000-0000-000000000004"]["en"]["value"],
@@ -143,7 +184,7 @@ class TileTests(ArchesTestCase):
             "tiles": [
                 {
                     "tiles": [],
-                    "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+                    "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
                     "parenttile_id": "",
                     "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
                     "tileid": "",
@@ -155,7 +196,7 @@ class TileTests(ArchesTestCase):
                     },
                 }
             ],
-            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
             "parenttile_id": "",
             "nodegroup_id": "7204869c-adbc-11e6-8bec-14109fd34195",
             "tileid": "",
@@ -166,7 +207,7 @@ class TileTests(ArchesTestCase):
         t.save(index=False)
 
         tiles = Tile.objects.filter(
-            resourceinstance_id="40000000-0000-0000-0000-000000000000"
+            resourceinstance_id=CardinalityTestGraph.RESOURCE1.value
         )
 
         self.assertEqual(tiles.count(), 2)
@@ -178,7 +219,7 @@ class TileTests(ArchesTestCase):
         """
 
         json = {
-            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
             "parenttile_id": "",
             "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
             "tileid": "",
@@ -209,10 +250,10 @@ class TileTests(ArchesTestCase):
 
         """
 
-        self.user = User.objects.get(username="admin")
+        user = self.test_users["admin"]
 
         json = {
-            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
             "parenttile_id": "",
             "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
             "tileid": "",
@@ -225,7 +266,7 @@ class TileTests(ArchesTestCase):
 
         authoritative_tile = Tile(json)
         request = HttpRequest()
-        request.user = self.user
+        request.user = user
         authoritative_tile.save(index=False, request=request)
 
         self.assertEqual(authoritative_tile.is_provisional(), False)
@@ -236,12 +277,8 @@ class TileTests(ArchesTestCase):
 
         """
 
-        self.user = User.objects.create_user(
-            username="testuser", password="TestingTesting123!"
-        )
-
         json = {
-            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
             "parenttile_id": "",
             "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
             "tileid": "",
@@ -254,7 +291,8 @@ class TileTests(ArchesTestCase):
 
         provisional_tile = Tile(json)
         request = HttpRequest()
-        request.user = self.user
+        user = self.test_users["testuser"]
+        request.user = user
         provisional_tile.save(index=False, request=request)
 
         self.assertEqual(provisional_tile.is_provisional(), True)
@@ -270,7 +308,7 @@ class TileTests(ArchesTestCase):
             "tiles": [
                 {
                     "tiles": [],
-                    "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+                    "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
                     "parenttile_id": "",
                     "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
                     "tileid": "",
@@ -281,7 +319,7 @@ class TileTests(ArchesTestCase):
                     },
                 }
             ],
-            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
             "parenttile_id": "",
             "nodegroup_id": "7204869c-adbc-11e6-8bec-14109fd34195",
             "tileid": "",
@@ -290,12 +328,13 @@ class TileTests(ArchesTestCase):
 
         t = Tile(json)
         t.save(index=False)
-        self.user = User.objects.create_user(
-            username="testuser", password="TestingTesting123!"
+        user = self.test_users["testuser"]
+        login = self.client.login(
+            username=user.username,
+            password=user.password,
         )
-        login = self.client.login(username="testuser", password="TestingTesting123!")
         tiles = Tile.objects.filter(
-            resourceinstance_id="40000000-0000-0000-0000-000000000000"
+            resourceinstance_id=CardinalityTestGraph.RESOURCE1.value
         )
 
         provisional_tile = None
@@ -305,10 +344,10 @@ class TileTests(ArchesTestCase):
                 "en": {"value": "PROVISIONAL", "direction": "ltr"}
             }
         request = HttpRequest()
-        request.user = self.user
+        request.user = user
         provisional_tile.save(index=False, request=request)
         tiles = Tile.objects.filter(
-            resourceinstance_id="40000000-0000-0000-0000-000000000000"
+            resourceinstance_id=CardinalityTestGraph.RESOURCE1.value
         )
 
         provisionaledits = provisional_tile.provisionaledits
@@ -325,15 +364,13 @@ class TileTests(ArchesTestCase):
             "AUTHORITATIVE",
             provisional_tile,
         )
-        self.assertEqual(provisionaledits[str(self.user.id)]["action"], "update")
-        self.assertEqual(provisionaledits[str(self.user.id)]["status"], "review")
+        self.assertEqual(provisionaledits[str(user.id)]["action"], "update")
+        self.assertEqual(provisionaledits[str(user.id)]["status"], "review")
 
     def test_update_sortorder_provisional_tile(self):
-        self.user = User.objects.create_user(
-            username="testuser", password="TestingTesting123!"
-        )
+        user = self.test_users["testuser"]
         json = {
-            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
             "parenttile_id": "",
             "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
             "tileid": "",
@@ -345,27 +382,58 @@ class TileTests(ArchesTestCase):
         }
         provisional_tile = Tile(json)
         request = HttpRequest()
-        request.user = self.user
+        request.user = user
         provisional_tile.save(index=False, request=request)
         self.assertEqual(provisional_tile.sortorder, 0)
 
         obj, _ = TileModel.objects.update_or_create(
-            pk=provisional_tile.pk, nodegroup=provisional_tile.nodegroup
+            pk=provisional_tile.pk, nodegroup_id=provisional_tile.nodegroup_id
         )
         obj.refresh_from_db()  # give test opportunity to fail on Django 4.2+
 
         self.assertEqual(obj.sortorder, 1)
 
+    def test_is_fully_provisional(self):
+        """
+        Tests that a tile is marked as fully provisional even if it has falsey values in its data.
+        """
+        json = {
+            "resourceinstance_id": AllDatatypesTestGraph.RESOURCE1.value,
+            "parenttile_id": "",
+            "nodegroup_id": AllDatatypesTestGraph.BOOLEAN_NODE_NODEGROUP.value,
+            "tileid": "",
+            "data": {
+                str(AllDatatypesTestGraph.BOOLEAN_NODE_NODEGROUP.value): False,
+                str(AllDatatypesTestGraph.BOOLEAN_SWITCH_NODE.value): None,
+            },
+        }
+
+        tile = Tile(json)
+        tile.save(index=False)
+
+        user = self.test_users["testuser"]
+        login = self.client.login(
+            username=user.username,
+            password=user.password,
+        )
+
+        tile.data[str(AllDatatypesTestGraph.BOOLEAN_SWITCH_NODE.value)] = True
+
+        request = HttpRequest()
+        request.user = user
+        tile.save(index=False, request=request)
+        self.assertIs(tile.is_fully_provisional(), False)
+
     def test_tile_cardinality(self):
         """
         Tests that the tile is not saved if the cardinality is violated
-        by testin to save a tile with the same values as existing one
+        by testing to save a tile with the same values as an existing one.
 
         """
 
-        self.user = User.objects.get(username="admin")
+        user = self.test_users["admin"]
         first_json = {
-            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
             "parenttile_id": "",
             "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
             "tileid": "",
@@ -377,11 +445,11 @@ class TileTests(ArchesTestCase):
         }
         first_tile = Tile(first_json)
         request = HttpRequest()
-        request.user = self.user
+        request.user = user
         first_tile.save(index=False, request=request)
 
         second_json = {
-            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
             "parenttile_id": "",
             "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
             "tileid": "",
@@ -393,7 +461,7 @@ class TileTests(ArchesTestCase):
         }
         second_tile = Tile(second_json)
 
-        with self.assertRaises(ProgrammingError):
+        with self.assertRaises(TileCardinalityError):
             second_tile.save(index=False, request=request)
 
     def test_apply_provisional_edit(self):
@@ -403,7 +471,7 @@ class TileTests(ArchesTestCase):
         """
 
         json = {
-            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
             "parenttile_id": "",
             "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
             "tileid": "",
@@ -414,9 +482,7 @@ class TileTests(ArchesTestCase):
             },
         }
 
-        user = User.objects.create_user(
-            username="testuser", password="TestingTesting123!"
-        )
+        user = self.test_users["testuser"]
         provisional_tile = Tile(json)
         request = HttpRequest()
         request.user = user
@@ -437,7 +503,7 @@ class TileTests(ArchesTestCase):
         """
 
         json = {
-            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
             "parenttile_id": "",
             "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
             "tileid": "",
@@ -448,9 +514,7 @@ class TileTests(ArchesTestCase):
             },
         }
 
-        user = User.objects.create_user(
-            username="testuser", password="TestingTesting123!"
-        )
+        user = self.test_users["testuser"]
         provisional_tile = Tile(json)
         request = HttpRequest()
         request.user = user
@@ -465,7 +529,7 @@ class TileTests(ArchesTestCase):
         """
 
         json = {
-            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
             "parenttile_id": "",
             "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
             "tileid": "",
@@ -476,10 +540,8 @@ class TileTests(ArchesTestCase):
             },
         }
 
-        owner = User.objects.create_user(
-            username="testuser", password="TestingTesting123!"
-        )
-        reviewer = User.objects.get(username="admin")
+        owner = self.test_users["testuser"]
+        reviewer = self.test_users["admin"]
 
         tile1 = Tile(json)
         owner_request = HttpRequest()
@@ -498,7 +560,7 @@ class TileTests(ArchesTestCase):
     def test_delete_empty_tile(self):
         tile = Tile(
             {
-                "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+                "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
                 "parenttile_id": "",
                 "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
                 "tileid": "",
@@ -516,7 +578,7 @@ class TileTests(ArchesTestCase):
         """
 
         json = {
-            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
             "parenttile_id": "",
             "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
             "tileid": "",
@@ -527,10 +589,8 @@ class TileTests(ArchesTestCase):
             },
         }
 
-        provisional_user = User.objects.create_user(
-            username="testuser", password="TestingTesting123!"
-        )
-        reviewer = User.objects.get(username="admin")
+        provisional_user = self.test_users["testuser"]
+        reviewer = self.test_users["admin"]
 
         tile = Tile(json)
         reviewer_request = HttpRequest()
@@ -597,7 +657,7 @@ class TileTests(ArchesTestCase):
         t = Tile(json)
         t.save(index=False)
 
-        resource_instances = ResourceXResource.objects.filter(tileid=t.tileid)
+        resource_instances = ResourceXResource.objects.filter(tile=t.tileid)
         self.assertEqual(2, len(resource_instances))
 
         for ri in resource_instances:
@@ -608,22 +668,18 @@ class TileTests(ArchesTestCase):
             ):
                 expected = {
                     "inverserelationshiptype": "http://www.cidoc-crm.org/cidoc-crm/P62i_is_depicted_by",
-                    "nodeid_id": UUID("eb115780-e222-11e8-aaed-a4d18cec433a"),
+                    "node_id": UUID("eb115780-e222-11e8-aaed-a4d18cec433a"),
                     "notes": "",
                     "relationshiptype": "http://www.cidoc-crm.org/cidoc-crm/P62_depicts",
-                    "resourceinstancefrom_graphid_id": UUID(
+                    "from_resource_graph_id": UUID(
                         "c35fe0a1-df30-11e8-b280-a4d18cec433a"
                     ),
-                    "resourceinstanceidfrom_id": UUID(
-                        "654bb228-37e7-4beb-b0f9-b59b61b53577"
-                    ),
-                    "resourceinstanceidto_id": UUID(
-                        "e72844fc-7bc0-4851-89ca-5bb1c6b3ba22"
-                    ),
-                    "resourceinstanceto_graphid_id": UUID(
+                    "from_resource_id": UUID("654bb228-37e7-4beb-b0f9-b59b61b53577"),
+                    "to_resource_id": UUID("e72844fc-7bc0-4851-89ca-5bb1c6b3ba22"),
+                    "to_resource_graph_id": UUID(
                         "c35fe0a1-df30-11e8-b280-a4d18cec433a"
                     ),
-                    "tileid_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce"),
+                    "tile_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce"),
                 }
                 self.assertTrue(
                     all(item in ri_dict.items() for item in expected.items())
@@ -631,19 +687,17 @@ class TileTests(ArchesTestCase):
             else:
                 expected = {
                     "inverserelationshiptype": "http://www.cidoc-crm.org/cidoc-crm/P10i_contains",
-                    "nodeid_id": UUID("eb115780-e222-11e8-aaed-a4d18cec433a"),
+                    "node_id": UUID("eb115780-e222-11e8-aaed-a4d18cec433a"),
                     "notes": "",
                     "relationshiptype": "http://www.cidoc-crm.org/cidoc-crm/P10_falls_within",
-                    "resourceinstancefrom_graphid_id": UUID(
+                    "from_resource_graph_id": UUID(
                         "c35fe0a1-df30-11e8-b280-a4d18cec433a"
                     ),
-                    "resourceinstanceidto_id": UUID(
-                        "92b2db6a-d13f-4cc7-aec7-e4caf91b45f8"
-                    ),
-                    "resourceinstanceto_graphid_id": UUID(
+                    "to_resource_id": UUID("92b2db6a-d13f-4cc7-aec7-e4caf91b45f8"),
+                    "to_resource_graph_id": UUID(
                         "c35fe0a1-df30-11e8-b280-a4d18cec433a"
                     ),
-                    "tileid_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce"),
+                    "tile_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce"),
                 }
                 self.assertTrue(
                     all(item in ri_dict.items() for item in expected.items())
@@ -681,21 +735,17 @@ class TileTests(ArchesTestCase):
         t = Tile(json)
         t.save(index=False)
 
-        resource_instance = ResourceXResource.objects.get(tileid=t.tileid)
+        resource_instance = ResourceXResource.objects.get(tile=t.tileid)
         ri_dict = JSONSerializer().serializeToPython(resource_instance)
         expected = {
             "inverserelationshiptype": "http://www.cidoc-crm.org/cidoc-crm/P10i_contains",
-            "nodeid_id": UUID("eb115780-e222-11e8-aaed-a4d18cec433a"),
+            "node_id": UUID("eb115780-e222-11e8-aaed-a4d18cec433a"),
             "notes": "",
             "relationshiptype": "http://www.cidoc-crm.org/cidoc-crm/P62_depicts",
-            "resourceinstancefrom_graphid_id": UUID(
-                "c35fe0a1-df30-11e8-b280-a4d18cec433a"
-            ),
-            "resourceinstanceidto_id": UUID("85b2db6a-d13f-4cc7-aec7-e4caf91b45f7"),
-            "resourceinstanceto_graphid_id": UUID(
-                "c35fe0a1-df30-11e8-b280-a4d18cec433a"
-            ),
-            "tileid_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce"),
+            "from_resource_graph_id": UUID("c35fe0a1-df30-11e8-b280-a4d18cec433a"),
+            "to_resource_id": UUID("85b2db6a-d13f-4cc7-aec7-e4caf91b45f7"),
+            "to_resource_graph_id": UUID("c35fe0a1-df30-11e8-b280-a4d18cec433a"),
+            "tile_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce"),
         }
         self.assertTrue(all(item in ri_dict.items() for item in expected.items()))
 
@@ -707,7 +757,7 @@ class TileTests(ArchesTestCase):
 
         #     json = {
         #         "tiles": {},
-        #         "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+        #         "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
         #         "parenttile_id": '',
         #         "nodegroup_id": "20000000-0000-0000-0000-000000000001",
         #         "tileid": "",
@@ -726,10 +776,13 @@ class TileTests(ArchesTestCase):
 
     def test_check_for_missing_nodes(self):
         # Required file list node.
+        graph = Graph.objects.create_graph(name="Test Graph")
         node_group = NodeGroup.objects.get(
             pk=UUID("41111111-0000-0000-0000-000000000000")
         )
         required_file_list_node = Node(
+            pk=node_group.pk,
+            graph=graph,
             name="Required file list",
             datatype="file-list",
             nodegroup=node_group,
@@ -737,9 +790,11 @@ class TileTests(ArchesTestCase):
             istopnode=False,
         )
         required_file_list_node.save()
+        node_group.grouping_node = required_file_list_node
+        node_group.save()
 
         json = {
-            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
             "parenttile_id": "",
             "nodegroup_id": str(node_group.pk),
             "tileid": "",
@@ -755,7 +810,7 @@ class TileTests(ArchesTestCase):
         # Add a widget label, should appear in error msg in lieu of node name
         card = CardModel.objects.create(
             nodegroup=node_group,
-            graph_id=UUID("2f7f8e40-adbc-11e6-ac7f-14109fd34195"),
+            graph_id=CardinalityTestGraph.GRAPH_ID.value,
         )
         CardXNodeXWidget.objects.create(
             card=card,
@@ -766,3 +821,13 @@ class TileTests(ArchesTestCase):
 
         with self.assertRaisesMessage(TileValidationError, "Widget name"):
             tile.check_for_missing_nodes()
+
+    def test_save_blank_tile(self):
+        data_collecting_grouping_node_id = "72048cb3-adbc-11e6-9ccf-14109fd34195"
+        tile = Tile(
+            resourceinstance_id=UUID("40000000-0000-0000-0000-000000000000"),
+            nodegroup_id=UUID(data_collecting_grouping_node_id),
+        )
+        tile.save()
+
+        self.assertEqual(tile.data, {data_collecting_grouping_node_id: None})

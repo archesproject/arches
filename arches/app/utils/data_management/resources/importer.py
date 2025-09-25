@@ -271,13 +271,11 @@ class BusinessDataImporter(object):
         finally:
             # cleans up the ResourceXResource table, adding any graph_id values that were unavailable during package/csv load
             for res_x_res in ResourceXResource.objects.filter(
-                resourceinstanceto_graphid__isnull=True
+                to_resource_graph__isnull=True
             ):
                 # wrapping in a try allows for graceful handling of corrupted data
                 try:
-                    res_x_res.resourceinstanceto_graphid = (
-                        res_x_res.resourceinstanceidto.graph
-                    )
+                    res_x_res.to_resource_graph = res_x_res.to_resource.graph
                 except:
                     pass
 

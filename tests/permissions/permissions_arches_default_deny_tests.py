@@ -17,7 +17,7 @@ from unittest.mock import MagicMock, Mock, patch
 from tests.permissions.base_permissions_framework_test import (
     ArchesPermissionFrameworkTestCase,
 )
-from arches.app.models.models import Node, ResourceInstance
+from arches.app.models.models import Node
 from arches.app.permissions.arches_default_deny import (
     ArchesDefaultDenyPermissionFramework,
 )
@@ -66,14 +66,11 @@ class ArchesDefaultDenyPermissionTests(ArchesPermissionFrameworkTestCase):
         implicit_permission = self.framework.user_can_read_resource(
             self.user, self.resource_instance_id
         )
-        resource = ResourceInstance.objects.get(
-            resourceinstanceid=self.resource_instance_id
-        )
-        self.framework.assign_perm("change_resourceinstance", self.group, resource)
+        self.framework.assign_perm("change_resourceinstance", self.group, self.resource)
         can_access_without_view_permission = self.framework.user_can_read_resource(
             self.user, self.resource_instance_id
         )
-        self.framework.assign_perm("view_resourceinstance", self.group, resource)
+        self.framework.assign_perm("view_resourceinstance", self.group, self.resource)
         can_access_with_view_permission = self.framework.user_can_read_resource(
             self.user, self.resource_instance_id
         )
@@ -87,17 +84,14 @@ class ArchesDefaultDenyPermissionTests(ArchesPermissionFrameworkTestCase):
 
         """
 
-        resource = ResourceInstance.objects.get(
-            resourceinstanceid=self.resource_instance_id
-        )
-        nodes = Node.objects.filter(graph_id=resource.graph_id)
+        nodes = Node.objects.filter(graph_id=self.resource.graph_id)
         for node in nodes:
             if node.nodegroup:
                 self.framework.assign_perm(
                     "no_access_to_nodegroup", self.group, node.nodegroup
                 )
         hasperms = self.framework.user_has_resource_model_permissions(
-            self.user, ["models.read_nodegroup"], resource
+            self.user, ["models.read_nodegroup"], self.resource
         )
         self.assertFalse(hasperms)
 

@@ -218,8 +218,8 @@ To create it, use:
         # setup initial Elasticsearch indexes
         management.call_command("es", operation="setup_indexes")
 
-        management.call_command("migrate")
         management.call_command("createcachetable")
+        management.call_command("migrate")
 
         # import system settings graph and any saved system settings data
         settings_graph = os.path.join(
@@ -231,6 +231,8 @@ To create it, use:
         management.call_command(
             "packages", operation="import_graphs", source=settings_graph
         )
+
+        management.call_command("graph", operation="publish")
 
         settings_data = os.path.join(
             settings.ROOT_DIR, "db", "system_settings", "Arches_System_Settings.json"
@@ -251,8 +253,6 @@ To create it, use:
                 source=settings_data_local,
                 overwrite="overwrite",
             )
-
-        management.call_command("graph", operation="publish")
 
         if development:
             management.call_command("add_test_users")

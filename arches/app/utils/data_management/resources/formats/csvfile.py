@@ -305,15 +305,13 @@ class CsvWriter(Writer):
             dest = StringIO()
             csv_header = [
                 "resourcexid",
-                "resourceinstanceidfrom",
-                "resourceinstanceidto",
+                "from_resource",
+                "to_resource",
                 "relationshiptype",
-                "resourceinstancefrom_graphid",
-                "resourceinstanceto_graphid",
-                "nodeid",
-                "tileid",
-                "datestarted",
-                "dateended",
+                "from_resource_graph",
+                "to_resource_graph",
+                "node",
+                "tile",
                 "notes",
             ]
             csvwriter = csv.DictWriter(dest, delimiter=",", fieldnames=csv_header)
@@ -322,19 +320,10 @@ class CsvWriter(Writer):
             relations_file.append({"name": csv_name, "outputfile": dest})
 
             relations = ResourceXResource.objects.filter(
-                Q(resourceinstanceidfrom__in=resourceids)
-                | Q(resourceinstanceidto__in=resourceids),
-                tileid__isnull=True,
+                Q(from_resource_id__in=resourceids) | Q(to_resource_id__in=resourceids),
+                tile__isnull=True,
             ).values(*csv_header)
             for relation in relations:
-                relation["datestarted"] = (
-                    relation["datestarted"]
-                    if relation["datestarted"] is not None
-                    else ""
-                )
-                relation["dateended"] = (
-                    relation["dateended"] if relation["dateended"] is not None else ""
-                )
                 relation["notes"] = (
                     relation["notes"] if relation["notes"] is not None else ""
                 )
@@ -423,9 +412,8 @@ class TileCsvWriter(Writer):
         csvs_for_export = []
 
         tiles = self.group_tiles(
-            self.tiles.order_by(
-                "nodegroup_id"
-            ).values(),  # TODO: refactor to avoid going to the db again
+            # TODO: refactor to avoid going to the db again
+            self.tiles.order_by("nodegroup_id", "sortorder").values(),
             "nodegroup_id",
         )
         semantic_nodes = [

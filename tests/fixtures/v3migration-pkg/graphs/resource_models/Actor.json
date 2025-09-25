@@ -9639,6 +9639,7 @@
                 "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E39_Actor",
                 "sortorder": 0
             },
+            "slug": "actor",
             "subtitle": "Describes actor resources such as individual people and groups of people. ",
             "template_id": "50000000-0000-0000-0000-000000000001",
             "version": ""

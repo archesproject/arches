@@ -30,9 +30,11 @@ from arches.app.search.mappings import (
     delete_concepts_index,
     prepare_search_index,
     delete_search_index,
-    delete_resource_relations_index,
 )
 import arches.app.utils.index_database as index_database_util
+from arches.app.utils.string_utils import str_to_bool
+
+from arches.app.search.search_engine_factory import SearchEngineFactory
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +61,10 @@ class Command(BaseCommand):
                 "index_resources_by_transaction",
                 "add_index",
                 "delete_index",
+                "restore_snapshot",
+                "create_snapshot",
+                "list_snapshots",
+                "snapshot_restore_status",
             ],
             help="Operation Type; "
             + "'setup_indexes'=Creates the indexes in Elastic Search needed by the system"
@@ -70,7 +76,11 @@ class Command(BaseCommand):
             + "'index_resources_by_type'=Indexes only resources of a given resource_model/graph"
             + "'index_resources_by_transaction'=Indexes only resources of a given transaction"
             + "'add_index'=Register a new index in Elasticsearch"
-            + "'delete_index'=Deletes a named index from Elasticsearch",
+            + "'delete_index'=Deletes a named index from Elasticsearch"
+            + "'restore_snapshot'=Restores a named snapshot from Elasticsearch"
+            + "'create_snapshot'=Creates a new snapshot in specified Elasticsearch repository"
+            + "'list_snapshots'=Lists snapshots in specified Elasticsearch repository"
+            + "'snapshot_restore_status'=Lists snapshots restore status for the current indices",
         )
 
         parser.add_argument(
@@ -125,7 +135,8 @@ class Command(BaseCommand):
             action="store",
             dest="clear_index",
             default=True,
-            help="Set to True(default) to remove all the resources from the index before the reindexing operation",
+            type=str_to_bool,
+            help="Whether to remove all target resources from the index before reindexing. Accepts 'true'/'false', 'yes'/'no', 'y'/'n', 't'/'f', 'on'/'off', or '1'/'0' (case-insensitive). Default is True.",
         )
 
         parser.add_argument(
@@ -144,6 +155,24 @@ class Command(BaseCommand):
             dest="name",
             default=None,
             help="Name of the custom index",
+        )
+
+        parser.add_argument(
+            "-sn",
+            "--snapshot_name",
+            action="store",
+            dest="snapshot_name",
+            default=None,
+            help="Name of the snapshot",
+        )
+
+        parser.add_argument(
+            "-rn",
+            "--repository_name",
+            action="store",
+            dest="repository_name",
+            default=None,
+            help="Name of the snapshot repository",
         )
 
         parser.add_argument(
@@ -249,6 +278,16 @@ class Command(BaseCommand):
                 max_subprocesses=options["max_subprocesses"],
                 recalculate_descriptors=options["recalculate_descriptors"],
             )
+        if options["operation"] == "restore_snapshot":
+            self.restore_snapshot(
+                options["repository_name"], options["snapshot_name"], options
+            )
+        if options["operation"] == "create_snapshot":
+            self.create_snapshot(options["repository_name"], options["snapshot_name"])
+        if options["operation"] == "list_snapshots":
+            self.list_snapshots(options["repository_name"])
+        if options["operation"] == "snapshot_restore_status":
+            self.snapshot_restore_status()
 
     def register_index(self, name):
         es_index = get_index(name)
@@ -320,12 +359,63 @@ class Command(BaseCommand):
         else:
             self.register_index(name)
 
+    def create_snapshot(self, repository_name=None, snapshot_name=None):
+        if not repository_name:
+            print("Repaository name is required.  Use -rn or --repository_name")
+        else:
+            SearchEngineFactory().create().create_snapshot(
+                repository_name, snapshot_name
+            )
+
+    def restore_snapshot(self, repository_name=None, snapshot_name=None, options=None):
+        if not repository_name or not snapshot_name:
+            print(
+                "Snapshot name and repository name are required.  Use -sn or --snapshot_name and -rn or --repository_name"
+            )
+        else:
+            if (
+                SearchEngineFactory()
+                .create()
+                .check_snapshot(repository_name, snapshot_name)
+            ):
+                self.delete_indexes()
+                SearchEngineFactory().create().restore_snapshot(
+                    repository_name, snapshot_name
+                )
+                if SearchEngineFactory().create().restore_status() == "done":
+                    snapshot_response = (
+                        SearchEngineFactory()
+                        .create()
+                        .get_snapshot(repository_name, snapshot_name)
+                    )
+                    prepare_concepts_index(create=True)
+                    index_database_util.index_concepts(
+                        batch_size=options["batch_size"],
+                    )
+                    index_database_util.index_resources_by_time(
+                        start_time=snapshot_response["snapshots"][0]["start_time"],
+                        batch_size=options["batch_size"],
+                        quiet=options["quiet"],
+                        use_multiprocessing=options["use_multiprocessing"],
+                        max_subprocesses=options["max_subprocesses"],
+                        recalculate_descriptors=options["recalculate_descriptors"],
+                    )
+                else:
+                    print("Snapshot restore failed, manual intervention required.")
+            else:
+                print("Snapshot does not exist")
+
+    def snapshot_restore_status(self):
+        print(SearchEngineFactory().create().restore_status())
+
+    def list_snapshots(self, repository_name):
+        print(SearchEngineFactory().create().list_snapshots(repository_name))
+
     def delete_indexes(self, name=None):
         if name is None:
             delete_terms_index()
             delete_concepts_index()
             delete_search_index()
-            delete_resource_relations_index()
 
             # remove custom indexes
             for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:

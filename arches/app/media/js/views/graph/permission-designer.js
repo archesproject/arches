@@ -1,12 +1,12 @@
-define([
-    'jquery',
-    'underscore',
-    'knockout',
-    'knockout-mapping',
-    'arches',
-    'views/graph/permission-manager/identity-list',
-    'views/graph/permission-manager/permission-settings-form'
-], function($, _, ko, koMapping, arches, IdentityList, PermissionSettingsForm, data) {
+import $ from 'jquery';
+import _ from 'underscore';
+import ko from 'knockout';
+import koMapping from 'knockout-mapping';
+import arches from 'arches';
+import IdentityList from 'views/graph/permission-manager/identity-list';
+import PermissionSettingsForm from 'views/graph/permission-manager/permission-settings-form';
+
+
     /**
     * A viewmodel for managing nodegroup permissions
     *
@@ -118,7 +118,7 @@ define([
         };
     };
 
-    return PermissionDesignerViewModel;
+    export default PermissionDesignerViewModel;
     /**
     * a GraphPageView representing the graph manager page
     */
@@ -129,4 +129,3 @@ define([
     //         permissionSettingsForm: permissionSettingsForm
     //     }
     // });
-});

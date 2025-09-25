@@ -13,7 +13,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-from __future__ import annotations
+from typing import Iterable
 
 from django.contrib.auth.models import User
 
@@ -36,7 +36,12 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
         # We do not do set filtering - None is allow-all for sets.
         return None if user and user.username != "anonymous" else set()
 
-    def get_restricted_users(self, resource: ResourceInstance) -> dict[str, list[int]]:
+    def get_restricted_users(
+        self,
+        resource: ResourceInstance,
+        *,
+        all_users: Iterable[User] = User.objects.none(),
+    ) -> dict[str, list[int]]:
         pass
 
     def get_filtered_instances(
@@ -108,14 +113,22 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
         return restricted_ids
 
     def check_resource_instance_permissions(
-        self, user: User, resourceid: str, permission: str
+        self,
+        user: User,
+        resourceid: str | None,
+        permission: str,
+        *,
+        resource: ResourceInstance | None = None,
     ) -> ResourceInstancePermissions:
 
         result = ResourceInstancePermissions()
-        resource = ResourceInstance.objects.get(resourceinstanceid=resourceid)
-        if resourceid == settings.SYSTEM_SETTINGS_RESOURCE_ID:
+        if not resource:
+            resource = ResourceInstance.objects.get(resourceinstanceid=resourceid)
+        elif resourceid:
+            raise ValueError("resourceid and resource are mutually incompatible")
+        if str(resource.pk) == settings.SYSTEM_SETTINGS_RESOURCE_ID:
             result["resource"] = resource
-            if not user.groups.filter(name="System Administrator").exists():
+            if not self.user_in_group_by_name(user, ["System Administrator"]):
                 result["permitted"] = False
             else:
                 result["permitted"] = True
@@ -151,7 +164,9 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
         else:  # for default deny, explicit permissions are required.  Model level permissions are bypassed.
             return False
 
-    def get_index_values(self, resource: Resource):
+    def get_index_values(
+        self, resource: Resource, *, all_users: Iterable[User] = User.objects.none()
+    ):
         permissions = {}
         group_read_allowances = [
             group.id
@@ -216,6 +231,17 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
         self, user: User, search_result: dict, groups: list[str]
     ) -> dict:
         result = {}
+
+        if user.is_superuser:
+            result["can_read"] = True
+            result["can_edit"] = True
+            result["is_principal"] = (
+                "permissions" in search_result["_source"]
+                and "principal_user" in search_result["_source"]["permissions"]
+                and user.id in search_result["_source"]["permissions"]["principal_user"]
+            )
+            return result
+
         user_can_read = self.get_resource_types_by_perm(
             user,
             [
@@ -242,7 +268,7 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
             "permissions" in search_result["_source"]
             and "groups_edit" in search_result["_source"]["permissions"]
         )
-        result["can_read"] = user.is_superuser or (
+        result["can_read"] = (
             (
                 groups_read_exists
                 and len(
@@ -266,27 +292,23 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
 
         user_can_edit = len(self.get_editable_resource_types(user)) > 0
         result["can_edit"] = (
-            user.is_superuser
-            or (
-                groups_edit_exists
-                and len(
-                    set(
-                        search_result["_source"]["permissions"]["groups_edit"]
-                    ).intersection(set(groups))
-                )
-                > 0
-                and user_can_edit
+            groups_edit_exists
+            and len(
+                set(
+                    search_result["_source"]["permissions"]["groups_edit"]
+                ).intersection(set(groups))
             )
-            or (
-                users_edit_exists
-                and len(
-                    set(
-                        search_result["_source"]["permissions"]["users_edit"]
-                    ).intersection(set([user.id]))
+            > 0
+            and user_can_edit
+        ) or (
+            users_edit_exists
+            and len(
+                set(search_result["_source"]["permissions"]["users_edit"]).intersection(
+                    set([user.id])
                 )
-                > 0
-                and user_can_edit
             )
+            > 0
+            and user_can_edit
         )
 
         result["is_principal"] = (
@@ -297,7 +319,13 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
 
         return result
 
-    def user_can_read_resource(self, user: User, resourceid: str | None = None) -> bool:
+    def user_can_read_resource(
+        self,
+        user: User,
+        resourceid: str | None = None,
+        *,
+        resource: ResourceInstance | None = None,
+    ) -> bool:
         """
         Requires that a user be able to read an instance and read a single nodegroup of a resource
 
@@ -305,9 +333,9 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
         if user.is_authenticated:
             if user.is_superuser:
                 return True
-            if resourceid is not None and resourceid != "":
+            if resourceid:
                 result = self.check_resource_instance_permissions(
-                    user, resourceid, "view_resourceinstance"
+                    user, resourceid, "view_resourceinstance", resource=resource
                 )
                 if result is not None:
                     if result["permitted"] == "unknown":

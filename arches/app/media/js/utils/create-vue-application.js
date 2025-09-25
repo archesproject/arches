@@ -7,25 +7,18 @@ import StyleClass from 'primevue/styleclass';
 import ToastService from 'primevue/toastservice';
 import Tooltip from 'primevue/tooltip';
 
-import Aura from '@primevue/themes/aura';
-
 import { createApp } from 'vue';
 import { createGettext } from "vue3-gettext";
 
-import arches from 'arches';
+import { DEFAULT_THEME } from "@/arches/themes/default.ts";
+import { generateArchesURL } from '@/arches/utils/generate-arches-url.ts';
 
-const DEFAULT_THEME = {
-    theme: {
-        preset: Aura,
-        options: {
-            prefix: 'p',
-            darkModeSelector: 'system',
-            cssLayer: false
-        }
-    }
-};
 
-export default async function createVueApplication(vueComponent, themeConfiguration) {
+export default async function createVueApplication(
+    vueComponent, 
+    themeConfiguration = DEFAULT_THEME,
+    initialProps = {},
+) {
     /**
      * This wrapper allows us to maintain a level of control inside arches-core
      * over Vue apps. For instance this allows us to abstract i18n setup/config
@@ -39,7 +32,8 @@ export default async function createVueApplication(vueComponent, themeConfigurat
      * TODO: cbyrd #10501 - we should add an event listener that will re-fetch i18n data
      * and rebuild the app when a specific event is fired from the LanguageSwitcher component.
     **/
-    return fetch(arches.urls.api_get_frontend_i18n_data).then(function(resp) {
+
+    return fetch(generateArchesURL("get_frontend_i18n_data")).then(function(resp) {
         if (!resp.ok) {
             throw new Error(resp.statusText);
         }
@@ -51,9 +45,20 @@ export default async function createVueApplication(vueComponent, themeConfigurat
             translations: respJSON['translations'],
         });
 
-        const app = createApp(vueComponent);
+        const app = createApp(vueComponent, initialProps);
+        const darkModeClass = themeConfiguration.theme.options.darkModeSelector.substring(1);
+        const darkModeStorageKey = `arches.${darkModeClass}`;
 
-        app.use(PrimeVue, themeConfiguration || DEFAULT_THEME);
+        const darkModeToggleState = localStorage.getItem(darkModeStorageKey);
+        if (
+            darkModeToggleState === "true" ||
+            (darkModeToggleState === null &&
+                window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ) {
+            document.documentElement.classList.add(darkModeClass);
+        }
+
+        app.use(PrimeVue, themeConfiguration);
         app.use(gettext);
         app.use(ConfirmationService);
         app.use(DialogService);

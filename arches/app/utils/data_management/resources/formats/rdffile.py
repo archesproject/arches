@@ -110,7 +110,9 @@ class RdfWriter(Writer):
             nodegroup = node.nodegroup
 
             def getchildedges(node):
-                for edge in models.Edge.objects.filter(domainnode=node):
+                for edge in models.Edge.objects.filter(domainnode=node).select_related(
+                    "rangenode__nodegroup", "domainnode"
+                ):
                     if nodegroup == edge.rangenode.nodegroup:
                         edges.append(edge)
                         getchildedges(edge.rangenode)
@@ -125,7 +127,11 @@ class RdfWriter(Writer):
                     "subgraphs": {},
                     "nodedatatypes": {},
                 }
-                graph = models.GraphModel.objects.get(pk=graphid)
+                graph = (
+                    models.GraphModel.objects.filter(pk=graphid)
+                    .prefetch_related("node_set__nodegroup")
+                    .get()
+                )
                 nodegroups = set()
                 for node in graph.node_set.all():
                     graph_cache[graphid]["nodedatatypes"][
@@ -144,7 +150,9 @@ class RdfWriter(Writer):
                         "parentnode_nodegroup": None,
                     }
                     graph_cache[graphid]["subgraphs"][nodegroup]["inedge"] = (
-                        models.Edge.objects.get(rangenode_id=nodegroup.pk)
+                        models.Edge.objects.filter(rangenode_id=nodegroup.pk)
+                        .select_related("domainnode__nodegroup")
+                        .get()
                     )
                     graph_cache[graphid]["subgraphs"][nodegroup][
                         "parentnode_nodegroup"
@@ -153,7 +161,9 @@ class RdfWriter(Writer):
                     ].domainnode.nodegroup
                     graph_cache[graphid]["subgraphs"][nodegroup]["edges"] = (
                         get_nodegroup_edges_by_collector_node(
-                            models.Node.objects.get(pk=nodegroup.pk)
+                            models.Node.objects.filter(pk=nodegroup.pk)
+                            .select_related("nodegroup")
+                            .get()
                         )
                     )
 
@@ -161,13 +171,13 @@ class RdfWriter(Writer):
 
         def add_edge_to_graph(graph, domainnode, rangenode, edge, tile, graph_info):
             pkg = {}
-            pkg["d_datatype"] = graph_info["nodedatatypes"].get(str(edge.domainnode.pk))
+            pkg["d_datatype"] = graph_info["nodedatatypes"].get(str(edge.domainnode_id))
             dom_dt = self.datatype_factory.get_instance(pkg["d_datatype"])
             # Don't process any further if the domain datatype is a literal
             if dom_dt.is_a_literal_in_rdf():
                 return
 
-            pkg["r_datatype"] = graph_info["nodedatatypes"].get(str(edge.rangenode.pk))
+            pkg["r_datatype"] = graph_info["nodedatatypes"].get(str(edge.rangenode_id))
             pkg["range_tile_data"] = None
             pkg["domain_tile_data"] = None
             if str(edge.rangenode_id) in tile.data:
@@ -182,7 +192,15 @@ class RdfWriter(Writer):
 
             rng_dt = self.datatype_factory.get_instance(pkg["r_datatype"])
             pkg["d_uri"] = dom_dt.get_rdf_uri(domainnode, pkg["domain_tile_data"], "d")
-            pkg["r_uri"] = rng_dt.get_rdf_uri(rangenode, pkg["range_tile_data"], "r")
+            if rng_dt.collects_multiple_values():
+                # If the range datatype collects multiple values, then there is no get
+                # the RDF URI for the range node as it unused or looked up later.
+                # This saved db queries. re #11572
+                pkg["r_uri"] = None
+            else:
+                pkg["r_uri"] = rng_dt.get_rdf_uri(
+                    rangenode, pkg["range_tile_data"], "r"
+                )
 
             # Concept on a node that is not required, but not present
             # Nothing to do here
@@ -220,7 +238,10 @@ class RdfWriter(Writer):
                 mpkg = pkg.copy()
                 for d in pkg["d_uri"]:
                     mpkg["d_uri"] = d
-                    if type(pkg["r_uri"]) == list:
+                    if (
+                        type(pkg["r_uri"]) == list
+                        and not rng_dt.collects_multiple_values()
+                    ):
                         npkg = mpkg.copy()
                         for r in pkg["r_uri"]:
                             # compute matrix of n * m
@@ -229,7 +250,7 @@ class RdfWriter(Writer):
                     else:
                         # iterate loop on m * 1
                         graph += rng_dt.to_rdf(mpkg, edge)
-            elif type(pkg["r_uri"]) == list:
+            elif type(pkg["r_uri"]) == list and not rng_dt.collects_multiple_values():
                 npkg = pkg.copy()
                 for r in pkg["r_uri"]:
                     # compute matrix of 1 * m
@@ -244,18 +265,18 @@ class RdfWriter(Writer):
 
             # add the edges for the group of nodes that include the root (this group of nodes has no nodegroup)
             for edge in graph_cache[self.graph_id]["rootedges"]:
-                domainnode = archesproject[str(edge.domainnode.pk)]
-                rangenode = archesproject[str(edge.rangenode.pk)]
+                domainnode = archesproject[str(edge.domainnode_id)]
+                rangenode = archesproject[str(edge.rangenode_id)]
                 add_edge_to_graph(g, domainnode, rangenode, edge, None, graph_info)
 
             for tile in tiles:
                 # add all the edges for a given tile/nodegroup
                 for edge in graph_info["subgraphs"][tile.nodegroup]["edges"]:
                     domainnode = archesproject[
-                        "tile/%s/node/%s" % (str(tile.pk), str(edge.domainnode.pk))
+                        "tile/%s/node/%s" % (str(tile.pk), str(edge.domainnode_id))
                     ]
                     rangenode = archesproject[
-                        "tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))
+                        "tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode_id))
                     ]
                     add_edge_to_graph(g, domainnode, rangenode, edge, tile, graph_info)
 
@@ -271,9 +292,9 @@ class RdfWriter(Writer):
                             reverse("resources", args=[resourceinstanceid]).lstrip("/")
                         ]
                     else:
-                        domainnode = archesproject[str(edge.domainnode.pk)]
+                        domainnode = archesproject[str(edge.domainnode_id)]
                     rangenode = archesproject[
-                        "tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))
+                        "tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode_id))
                     ]
                     add_edge_to_graph(g, domainnode, rangenode, edge, tile, graph_info)
 
@@ -286,10 +307,10 @@ class RdfWriter(Writer):
                     edge = graph_info["subgraphs"][tile.nodegroup]["inedge"]
                     domainnode = archesproject[
                         "tile/%s/node/%s"
-                        % (str(tile.parenttile.pk), str(edge.domainnode.pk))
+                        % (str(tile.parenttile_id), str(edge.domainnode_id))
                     ]
                     rangenode = archesproject[
-                        "tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))
+                        "tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode_id))
                     ]
                     add_edge_to_graph(g, domainnode, rangenode, edge, tile, graph_info)
         return g
@@ -879,9 +900,9 @@ class JsonLdReader(Reader):
                     try:
                         self.printline("Found multiple matches!", indent)
                         # if this doesn't throw an error then keep the possible branch "p"
-                        for k, v in vi.items():
+                        for nested_key, nested_value in vi.items():
                             matched_branch = self.find_matching_branch(
-                                k, v, p[0], {}, tile, indent + 1
+                                nested_key, nested_value, p[0], {}, tile, indent + 1
                             )
                         possible2.append(p)
                     except Exception as e:
@@ -1055,7 +1076,7 @@ class JsonLdReader(Reader):
                     if (
                         branch[0]["datatype"].collects_multiple_values()
                         and tile
-                        and str(tile.nodegroup.pk) == branch[0]["nodegroup_id"]
+                        and str(tile.nodegroup_id) == branch[0]["nodegroup_id"]
                     ):
                         # iterating through a root node *-list type
                         pass

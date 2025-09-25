@@ -18,16 +18,29 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% extends "views/graph/graph-base.htm" %}
 {% load static %}
 {% load i18n %}
+{% load template_tags %}
 
 {% block graph_header_title %}
 {% trans "Function Manager" %}
 {% endblock graph_header_title %}
 
 {% block graph_header_buttons %}
+<!-- ko if: shouldShowUpdatePublishedGraphsButton() && !dirty() -->
+<div style="align-self: flex-end; display: flex;">
+    <button class="btn btn-md btn-warning btn-labeled fa fa-undo" data-bind="click: $data.showRestoreStateFromSerializedGraphAlert">
+        <span style="font-size: 14px;">{% trans 'Revert All Changes'%}</span>
+    </button>
+    <button class="btn btn-md btn-primary btn-labeled fa fa-check" data-bind="click: $data.showUpdatePublishedGraphsAlert">
+        <span style="font-size: 14px;">{% trans 'Update Publication'%}</span>
+    </button>
+</div>
+<!-- /ko -->
+<!-- ko if not: $data.shouldShowUpdatePublishedGraphsButton() -->
 <span style="display: flex" data-bind="if: dirty">
     <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: cancel"><span>{% trans "Discard Edits" %}</span></button>
     <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: save"><span>{% trans "Save Edits" %}</span></button>
 </span>
+<!-- /ko -->
 {{ block.super }}
 {% endblock graph_header_buttons %}
 
@@ -153,7 +166,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block pre_require_js %}
 {{block.super}}
-<div 
+<div
     id="graphFunctionsData"
     style="display: none;"
     graphFunctionsData='{

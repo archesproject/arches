@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunSQL(
-            """
+            r"""
             create extension if not exists "unaccent";
 
             create or replace function __arches_slugify(

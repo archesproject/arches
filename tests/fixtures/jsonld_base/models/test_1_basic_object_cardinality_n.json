@@ -96,6 +96,7 @@
             "functions_x_graphs": [],
             "graphid": "37b50648-78ef-11ec-9508-faffc210b420",
             "iconclass": "",
+            "is_active": true,
             "is_editable": true,
             "isactive": true,
             "isresource": true,
@@ -195,7 +196,7 @@
                 "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity",
                 "sortorder": 0
             },
-            "slug": "taco",
+            "slug": "test_1_basic_object_cardinality_n",
             "subtitle": {
                 "en": ""
             },

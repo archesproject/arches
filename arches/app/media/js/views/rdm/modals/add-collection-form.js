@@ -1,48 +1,52 @@
-define(['jquery', 'backbone', 'models/concept', 'models/value'], function($, Backbone, ConceptModel, ValueModel) {
-    return Backbone.View.extend({
+import $ from 'jquery';
+import Backbone from 'backbone';
+import ConceptModel from 'models/concept';
+import ValueModel from 'models/value';
 
-        initialize: function(e){
-            var self = this;
-            this.modal = this.$el.find('.modal');
-            this.modal.on('hidden.bs.modal', function() {
-                self.$el.find('input[type=text], textarea').val('');
-            });
 
-            this.select2 = this.$el.find('[name=language_dd]').select2({
-                minimumResultsForSearch: -1
-            });                
+export default Backbone.View.extend({
 
-            this.modal.validate({
-                ignore: null,
-                rules: {
-                    label: 'required',
-                    language_dd: 'required',
-                    scheme_group_dd: 'required'
-                },
-                submitHandler: function(form) {
-                    var label = new ValueModel({
-                        value: $(form).find('[name=label]').val(),
-                        language: $(form).find('[name=language_dd]').val(),
-                        category: 'label',
-                        type: 'prefLabel'
-                    });
+    initialize: function(e){
+        var self = this;
+        this.modal = this.$el.find('.modal');
+        this.modal.on('hidden.bs.modal', function() {
+            self.$el.find('input[type=text], textarea').val('');
+        });
 
-                    var collection = new ConceptModel({
-                        legacyoid: $(form).find('[name=label]').val(),
-                        values: [label],
-                        nodetype: 'Collection'
-                    });
+        this.select2 = this.$el.find('[name=language_dd]').select2({
+            minimumResultsForSearch: -1
+        });                
 
-                    self.modal.on('hidden.bs.modal', function(e) {
-                        collection.save(function(response, status) {
-                            self.trigger('collectionAdded', response.responseJSON);
-                        }, self);
-                    });
-                    self.modal.modal('hide');
+        this.modal.validate({
+            ignore: null,
+            rules: {
+                label: 'required',
+                language_dd: 'required',
+                scheme_group_dd: 'required'
+            },
+            submitHandler: function(form) {
+                var label = new ValueModel({
+                    value: $(form).find('[name=label]').val(),
+                    language: $(form).find('[name=language_dd]').val(),
+                    category: 'label',
+                    type: 'prefLabel'
+                });
 
-                    return false;
-                }
-            });
-        }
-    });
+                var collection = new ConceptModel({
+                    legacyoid: $(form).find('[name=label]').val(),
+                    values: [label],
+                    nodetype: 'Collection'
+                });
+
+                self.modal.on('hidden.bs.modal', function(e) {
+                    collection.save(function(response, status) {
+                        self.trigger('collectionAdded', response.responseJSON);
+                    }, self);
+                });
+                self.modal.modal('hide');
+
+                return false;
+            }
+        });
+    }
 });

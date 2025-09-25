@@ -13,12 +13,9 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-from __future__ import annotations
-
 from abc import ABCMeta, abstractmethod
-import sys
 import uuid
-from typing import Iterable
+from typing import Iterable, Literal, NotRequired, TypedDict
 
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.gis.db.models import Model
@@ -34,7 +31,7 @@ from guardian.exceptions import WrongAppError
 import guardian.shortcuts as gsc
 
 import inspect
-from arches.app.models.models import Node, NodeGroup, TileModel
+from arches.app.models.models import GraphModel, Node, NodeGroup, TileModel
 from django.db.models import Q
 from arches.app.models.system_settings import settings
 from arches.app.models.models import ResourceInstance, MapLayer
@@ -44,15 +41,10 @@ from arches.app.utils.permission_backend import (
     NotUserNorGroup as ArchesNotUserNorGroup,
 )
 
-if sys.version_info >= (3, 11):
-    from typing import NotRequired, TypedDict, Literal
 
-    class ResourceInstancePermissions(TypedDict):
-        permitted: NotRequired[bool | Literal["unknown"]]
-        resource: NotRequired[ResourceInstance]
-
-else:
-    ResourceInstancePermissions = dict
+class ResourceInstancePermissions(TypedDict):
+    permitted: NotRequired[bool | Literal["unknown"]]
+    resource: NotRequired[ResourceInstance]
 
 
 class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
@@ -215,7 +207,12 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
 
     @abstractmethod
     def check_resource_instance_permissions(
-        self, user: User, resourceid: str, permission: str
+        self,
+        user: User,
+        resourceid: str,
+        permission: str,
+        *,
+        resource: ResourceInstance | None,
     ): ...
 
     def get_groups_with_permission_for_object(
@@ -300,7 +297,11 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         return nodes.exists()
 
     def user_can_read_resource(
-        self, user: User, resourceid: str | None = None
+        self,
+        user: User,
+        resourceid: str | None = None,
+        *,
+        resource: ResourceInstance | None = None,
     ) -> bool | None:
         """
         Requires that a user be able to read an instance and read a single nodegroup of a resource
@@ -309,9 +310,9 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         if user.is_authenticated:
             if user.is_superuser:
                 return True
-            if resourceid is not None and resourceid != "":
+            if resourceid or resource:
                 result = self.check_resource_instance_permissions(
-                    user, resourceid, "view_resourceinstance"
+                    user, resourceid, "view_resourceinstance", resource=resource
                 )
                 if result is not None:
                     if result["permitted"] == "unknown":
@@ -337,18 +338,24 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         """
         nodegroups = self.get_nodegroups_by_perm(user, perms)
         graphs = (
-            Node.objects.values("graph_id")
-            .filter(
-                Q(nodegroup__in=nodegroups)
-                & ~Q(graph_id=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-                & Q(graph__isresource=True)
+            GraphModel.objects.filter(
+                node__nodegroup__in=nodegroups,
+                isresource=True,
+                source_identifier__isnull=True,
             )
-            .values_list("graph_id", flat=True)
+            .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            .values_list("pk", flat=True)
         )
 
         return list(str(graph) for graph in graphs)
 
-    def user_can_edit_resource(self, user: User, resourceid: str | None = None) -> bool:
+    def user_can_edit_resource(
+        self,
+        user: User,
+        resourceid: str | None = None,
+        *,
+        resource: ResourceInstance | None = None,
+    ) -> bool:
         """
         Requires that a user be able to edit an instance and delete a single nodegroup of a resource
 
@@ -356,15 +363,22 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         if user.is_authenticated:
             if user.is_superuser:
                 return True
-            if resourceid is not None and resourceid != "":
+            if resourceid or resource:
                 result = self.check_resource_instance_permissions(
-                    user, resourceid, "change_resourceinstance"
+                    user, resourceid, "change_resourceinstance", resource=resource
                 )
                 if result is not None:
+                    if not result[
+                        "resource"
+                    ].resource_instance_lifecycle_state.can_edit_resource_instances and not user.has_perm(
+                        "models.can_edit_all_resource_instance_lifecycle_states",
+                    ):
+                        return False
+
                     if result["permitted"] == "unknown":
-                        return user.groups.filter(
-                            name__in=settings.RESOURCE_EDITOR_GROUPS
-                        ).exists() or self.user_can_edit_model_nodegroups(
+                        return self.user_in_group_by_name(
+                            user, settings.RESOURCE_EDITOR_GROUPS
+                        ) or self.user_can_edit_model_nodegroups(
                             user, result["resource"]
                         )
                     else:
@@ -373,13 +387,17 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
                     return None
 
             return (
-                user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists()
+                self.user_in_group_by_name(user, settings.RESOURCE_EDITOR_GROUPS)
                 or len(self.get_editable_resource_types(user)) > 0
             )
         return False
 
     def user_can_delete_resource(
-        self, user: User, resourceid: str | None = None
+        self,
+        user: User,
+        resourceid: str | None = None,
+        *,
+        resource: ResourceInstance | None = None,
     ) -> bool | None:
         """
         Requires that a user be permitted to delete an instance
@@ -388,11 +406,21 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         if user.is_authenticated:
             if user.is_superuser:
                 return True
-            if resourceid is not None and resourceid != "":
+            if resourceid or resource:
                 result = self.check_resource_instance_permissions(
-                    user, resourceid, "delete_resourceinstance"
+                    user, resourceid, "delete_resourceinstance", resource=resource
                 )
                 if result is not None:
+                    if (
+                        not user.has_perm(
+                            "models.can_delete_all_resource_instance_lifecycle_states"
+                        )
+                        and not result[
+                            "resource"
+                        ].resource_instance_lifecycle_state.can_delete_resource_instances
+                    ):
+                        return False
+
                     if result["permitted"] == "unknown":
                         nodegroups = self.get_nodegroups_by_perm(
                             user, "models.delete_nodegroup"
@@ -403,9 +431,9 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
                         )
                         if len(protected_tiles) > 0:
                             return False
-                        return user.groups.filter(
-                            name__in=settings.RESOURCE_EDITOR_GROUPS
-                        ).exists() or self.user_can_delete_model_nodegroups(
+                        return self.user_in_group_by_name(
+                            user, settings.RESOURCE_EDITOR_GROUPS
+                        ) or self.user_can_delete_model_nodegroups(
                             user, result["resource"]
                         )
                     else:
@@ -496,7 +524,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         """
 
         if user.is_authenticated:
-            return user.groups.filter(name="RDM Administrator").exists()
+            return self.user_in_group_by_name(user, ["RDM Administrator"])
         return False
 
     def user_is_resource_editor(self, user: User) -> bool:
@@ -504,24 +532,27 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         Single test for whether a user is in the Resource Editor group
         """
 
-        return user.groups.filter(name="Resource Editor").exists()
+        return self.user_in_group_by_name(user, ["Resource Editor"])
 
     def user_is_resource_reviewer(self, user: User) -> bool:
         """
         Single test for whether a user is in the Resource Reviewer group
         """
 
-        return user.groups.filter(name="Resource Reviewer").exists()
+        return self.user_in_group_by_name(user, ["Resource Reviewer"])
 
     def user_is_resource_exporter(self, user: User) -> bool:
         """
         Single test for whether a user is in the Resource Exporter group
         """
 
-        return user.groups.filter(name="Resource Exporter").exists()
+        return self.user_in_group_by_name(user, ["Resource Exporter"])
 
     def user_in_group_by_name(self, user: User, names: Iterable[str]) -> bool:
-        return bool(user.groups.filter(name__in=names))
+        for group in user.groups.all():
+            if group.name in names:
+                return True
+        return False
 
     def group_required(self, user: User, *group_names: list[str]) -> bool:
         # To fully reimplement this without Django groups, the following group names must (currently) be handled:
@@ -533,7 +564,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         #  - System Administrator
 
         if user.is_authenticated:
-            if user.is_superuser or bool(user.groups.filter(name__in=group_names)):
+            if user.is_superuser or self.user_in_group_by_name(user, group_names):
                 return True
         return False
 
@@ -548,9 +579,8 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         """
         default_permissions_for_graph = []
         if isinstance(model, ResourceInstance):
-            default_permissions_for_graph = self.get_all_default_permissions(
-                model
-            )  # default permissions for nodegroups not currently supported
+            # default permissions for nodegroups not currently supported
+            default_permissions_for_graph = self.get_all_default_permissions(model)
 
         if not len(default_permissions_for_graph):
             return []
@@ -632,6 +662,9 @@ class PermissionBackend(ObjectPermissionBackend):  # type: ignore
                         "Passed perm has app label of '%s' and "
                         "given obj has '%s'" % (app_label, obj._meta.app_label)
                     )
+
+            if user_obj.is_superuser:
+                return True
 
             obj_checker: ObjectPermissionChecker = CachedObjectPermissionChecker(
                 user_obj, obj
@@ -741,7 +774,7 @@ def get_nodegroups_by_perm_for_user_or_group(
         NodeGroup,
     )
 
-    for nodegroup in NodeGroup.objects.all():
+    for nodegroup in NodeGroup.objects.only("nodegroupid").all():
         explicit_perms = checker.get_perms(nodegroup)
 
         if len(explicit_perms):

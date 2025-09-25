@@ -44,3 +44,10 @@ def check_if_celery_available():
         except Exception as e:
             logger.error(_("Unable to connect to a celery broker"))
     return result
+
+
+class CeleryNotAvailableError(Exception):
+    def __init__(self, message=None):
+        if message is None:
+            message = _("Celery is not available. Please check your configuration.")
+        super().__init__(message)

@@ -21,10 +21,11 @@ import json as jsonparser
 import logging
 import traceback
 import uuid
+from http import HTTPStatus
 import arches.app.utils.zip as arches_zip
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
-from arches.app.models.resource import Resource, PublishedModelError
+from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile, TileValidationError
 from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
@@ -77,6 +78,8 @@ class TileData(View):
             message = type(e).__name__
             if hasattr(e, "message") and e.message:
                 message += ": {0}".format(e.message)
+            elif hasattr(e, "messages") and e.messages:
+                message += ": {0}".format(e.messages[0])
         else:
             message = str(e)
         logger.error(
@@ -88,13 +91,21 @@ class TileData(View):
             )
         )
 
+        if isinstance(e, ValidationError):
+            status = HTTPStatus.BAD_REQUEST
+        else:
+            status = HTTPStatus.INTERNAL_SERVER_ERROR
+
         return JSONErrorResponse(
-            _(title), _(str(message)), {"message": message, "title": title}
+            _(title),
+            _(str(message)),
+            {"message": message, "title": title},
+            status=status,
         )
 
     def post(self, request):
         original_transaction_id = request.POST.get("transaction_id", None)
-        transaction_id = request.POST.get("transaction_id", uuid.uuid1())
+        transaction_id = request.POST.get("transaction_id", uuid.uuid4())
 
         if self.action == "update_tile":
             json = request.POST.get("data", None)
@@ -133,26 +144,14 @@ class TileData(View):
                         nodegroup=data["nodegroup_id"]
                     )[0].graph_id
                     resource.graph_id = graphid
-                    try:
-                        resource.save(user=request.user, transaction_id=transaction_id)
-                        data["resourceinstance_id"] = resource.pk
-                        resource.index()
-                    except PublishedModelError as e:
-                        message = _(
-                            "Unable to save. Please verify the model is currently unpublished."
-                        )
-                        return JSONResponse(
-                            {
-                                "status": "false",
-                                "message": [_(e.title), _(str(message))],
-                            },
-                            status=500,
-                        )
+                    resource.save(user=request.user, transaction_id=transaction_id)
+                    data["resourceinstance_id"] = resource.pk
+                    resource.index()
                 tile_id = data["tileid"]
                 resource_instance = models.ResourceInstance.objects.get(
                     pk=data["resourceinstance_id"]
                 )
-                is_active = resource_instance.graph.publication is not None
+                is_active = resource_instance.graph.is_active
                 if tile_id is not None and tile_id != "":
                     try:
                         old_tile = Tile.objects.get(pk=tile_id)
@@ -194,20 +193,6 @@ class TileData(View):
                                         )
                                         return self.handle_save_error(
                                             e, tile_id, title=title
-                                        )
-                                    except PublishedModelError as e:
-                                        message = _(
-                                            "Unable to save. Please verify the model is not currently published."
-                                        )
-                                        return JSONResponse(
-                                            {
-                                                "status": "false",
-                                                "message": [
-                                                    _(e.title),
-                                                    _(str(message)),
-                                                ],
-                                            },
-                                            status=500,
                                         )
                                     except Exception as e:
                                         title = _("Unable to save.")
@@ -309,7 +294,7 @@ class TileData(View):
                 try:
                     tile = Tile.objects.get(tileid=data["tileid"])
                     resource_instance = tile.resourceinstance
-                    is_active = resource_instance.graph.publication_id is not None
+                    is_active = resource_instance.graph.is_active
                 except ObjectDoesNotExist:
                     return JSONErrorResponse(
                         title=_("This tile is no longer available"),

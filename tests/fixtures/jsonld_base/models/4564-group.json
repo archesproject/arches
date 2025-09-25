@@ -50,6 +50,7 @@
                 "user_id": null
             },
             "iconclass": "",
+            "is_active": true,
             "is_editable": false,
             "isresource": true,
             "jsonldcontext": null,
@@ -114,7 +115,7 @@
                 "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E74_Group",
                 "sortorder": 0
             },
-            "slug": null,
+            "slug": "4564_auxiliary_group",
             "subtitle": "",
             "template_id": "50000000-0000-0000-0000-000000000001",
             "version": ""

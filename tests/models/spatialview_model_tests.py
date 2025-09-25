@@ -20,10 +20,11 @@ import random
 import os, uuid
 from django.test import TransactionTestCase
 from django.test.utils import captured_stdout
-from django.db import connection, connections
+from django.db import connection, connections, transaction
 from django.core import management
 from tests.base_test import ArchesTestCase
 from arches.app.models import models
+from arches.app.models.graph import Graph
 from arches.app.models.models import SpatialView
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
 from tests import test_settings
@@ -112,7 +113,7 @@ class SpatialViewTests(ArchesTestCase):
         l, created = models.Language.objects.get_or_create(code=language)
         return l
 
-    def generate_valid_spatiatview(self):
+    def generate_valid_spatialview(self):
         spatialview = SpatialView()
         spatialview.spatialviewid = uuid.uuid4()
         spatialview.schema = "public"
@@ -168,7 +169,7 @@ class SpatialViewTests(ArchesTestCase):
         return spatialview
 
     def test_create_spatialview_discreet_geometry(self):
-        spatialview = self.generate_valid_spatiatview()
+        spatialview = self.generate_valid_spatialview()
         spatialview.full_clean()
         spatialview.save()
 
@@ -179,7 +180,7 @@ class SpatialViewTests(ArchesTestCase):
 
     def test_create_spatialview_mixed_geometry(self):
 
-        spatialview = self.generate_valid_spatiatview()
+        spatialview = self.generate_valid_spatialview()
         spatialview.ismixedgeometrytypes = True
         spatialview.full_clean()
         spatialview.save()
@@ -193,21 +194,21 @@ class SpatialViewTests(ArchesTestCase):
         spatialview.delete()
 
     def test_create_spatialview_invalid_geometrynode(self):
-        spatialview = self.generate_valid_spatiatview()
+        spatialview = self.generate_valid_spatialview()
         spatialview.geometrynode = models.Node.objects.get(
             nodeid="7584e966-1cf8-11ef-971a-0242ac130005"
         )
-        node_type = spatialview.geometrynode.datatype
 
-        with self.assertRaises(Exception):
-            spatialview.full_clean()
-            spatialview.save()
+        with transaction.atomic():
+            with self.assertRaises(Exception):
+                spatialview.full_clean()
+                spatialview.save()
 
         with self.assertRaises(SpatialView.DoesNotExist):
             fetched_spatialview = SpatialView.objects.get(pk=spatialview.spatialviewid)
 
     def test_create_spatialview_invalid_attributenode(self):
-        spatialview = self.generate_valid_spatiatview()
+        spatialview = self.generate_valid_spatialview()
 
         # invalid nodeid
         spatialview.attributenodes.append(
@@ -229,7 +230,7 @@ class SpatialViewTests(ArchesTestCase):
             fetched_spatialview = SpatialView.objects.get(pk=spatialview.spatialviewid)
 
     def test_create_spatialview_invalid_language(self):
-        spatialview = self.generate_valid_spatiatview()
+        spatialview = self.generate_valid_spatialview()
         spatialview.language = self.get_language_instance("fr")
 
         with self.assertRaises(Exception):
@@ -240,7 +241,7 @@ class SpatialViewTests(ArchesTestCase):
             fetched_spatialview = SpatialView.objects.get(pk=spatialview.spatialviewid)
 
     def test_create_spatialview_invalid_schema(self):
-        spatialview = self.generate_valid_spatiatview()
+        spatialview = self.generate_valid_spatialview()
         spatialview.schema = "invalid"
 
         with self.assertRaises(Exception):
@@ -251,12 +252,13 @@ class SpatialViewTests(ArchesTestCase):
             fetched_spatialview = SpatialView.objects.get(pk=spatialview.spatialviewid)
 
     def test_create_spatialview_invalid_slug(self):
-        spatialview = self.generate_valid_spatiatview()
+        spatialview = self.generate_valid_spatialview()
         spatialview.slug = "1_invalid"
 
-        with self.assertRaises(Exception):
-            spatialview.full_clean()
-            spatialview.save()
+        with transaction.atomic():
+            with self.assertRaises(Exception):
+                spatialview.full_clean()
+                spatialview.save()
 
         with self.assertRaises(SpatialView.DoesNotExist):
             fetched_spatialview = SpatialView.objects.get(pk=spatialview.spatialviewid)
@@ -264,7 +266,7 @@ class SpatialViewTests(ArchesTestCase):
     def test_spatial_view_isactive_set_to_false_removes_views(self):
 
         # first create a valid spatial view that isactive=True
-        spatialview = self.generate_valid_spatiatview()
+        spatialview = self.generate_valid_spatialview()
         spatialview.full_clean()
         spatialview.save()
 
@@ -282,6 +284,20 @@ class SpatialViewTests(ArchesTestCase):
         )
 
         spatialview.delete()
+
+    def test_spatial_view_without_geometrynode(self):
+        spatialview = self.generate_valid_spatialview()
+        spatialview.geometrynode = None
+        with self.assertRaises(Exception):
+            spatialview.full_clean()
+
+    def test_spatial_with_geometrynode_in_attributenodes(self):
+        spatialview = self.generate_valid_spatialview()
+        spatialview.attributenodes.append(
+            {"nodeid": self.spatialview_geometrynode_id, "description": "Geometry Node"}
+        )
+        with self.assertRaises(Exception):
+            spatialview.full_clean()
 
 
 class SpatialViewTriggerTests(TransactionTestCase):
@@ -342,7 +358,7 @@ class SpatialViewTriggerTests(TransactionTestCase):
 
         # create a spatialview with objects to test triggers
         self.spatialview_slug = "spatialviews_test"
-        self.test_spatial_view = self.generate_valid_spatiatview()
+        self.test_spatial_view = self.generate_valid_spatialview()
         self.test_spatial_view.full_clean()
         self.test_spatial_view.save()
         self.spatialview_id = self.test_spatial_view.spatialviewid
@@ -350,11 +366,11 @@ class SpatialViewTriggerTests(TransactionTestCase):
     def get_language_instance(self, language):
         return models.Language.objects.get(code=language)
 
-    def generate_valid_spatiatview(self):
+    def generate_valid_spatialview(self):
         spatialview = SpatialView()
         spatialview.spatialviewid = uuid.uuid4()
         spatialview.schema = "public"
-        spatialview.slug = self.spatialview_slug
+        spatialview.slug = "spatialviews_test_" + str(random.randint(1, 1000))
         spatialview.description = "test description"
         spatialview.geometrynode = models.Node.objects.get(
             nodeid="95b2c8de-1cf8-11ef-971a-0242ac130005"
@@ -417,27 +433,27 @@ class SpatialViewTriggerTests(TransactionTestCase):
         with connection.cursor() as cursor:
             cursor.execute(
                 f"""
-                SELECT 
-                    gid, 
-                    tileid, 
-                    nodeid, 
-                    geom, 
-                    resourceinstanceid, 
-                    gridref, 
-                    name, 
-                    date, 
-                    concept_list, 
-                    bool, 
-                    non_local_string, 
-                    edtf_date, 
-                    count, 
-                    url, 
-                    domain, 
-                    file, 
-                    concept, 
-                    domain_list, 
-                    other_spatialviews, 
-                    other_models_list 
+                SELECT
+                    gid,
+                    tileid,
+                    nodeid,
+                    geom,
+                    resourceinstanceid,
+                    gridref,
+                    name,
+                    date,
+                    concept_list,
+                    bool,
+                    non_local_string,
+                    edtf_date,
+                    count,
+                    url,
+                    domain,
+                    file,
+                    concept,
+                    domain_list,
+                    other_spatialviews,
+                    other_models_list
                 FROM public.{self.test_spatial_view.slug}_polygon"""
             )
             rows = cursor.fetchall()
@@ -458,3 +474,19 @@ class SpatialViewTriggerTests(TransactionTestCase):
             self.assertTrue(row[17] == "george, john, ringo, Paul")  # domain_list
             self.assertTrue(row[18] == "Bat Willow")  # other_spatialviews
             self.assertTrue(row[19] == "Other Model 2")  # other_models_list
+
+    def test_restore_state_from_serialized_graph(self):
+        spatialview = self.generate_valid_spatialview()
+        spatialview.full_clean()
+        spatialview.save()
+
+        graph = Graph.objects.get(pk=spatialview.geometrynode.graph.pk)
+        graph.create_draft_graph()
+        graph.publish()
+
+        # updating graph from draft graph removes all elements
+        # including the serialized graph - then recreates them
+        graph.promote_draft_graph_to_active_graph()
+
+        # will throw if spatial view doesn't exist
+        spatialview.refresh_from_db()

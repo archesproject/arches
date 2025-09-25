@@ -4,7 +4,10 @@
 <div style="height: 100%;" id="external-page-content">
     <div class="settings-panel">
 
-        <div class="settings-panel-heading">
+        <div 
+            class="settings-panel-heading"
+            data-bind="css: { 'draft-graph': $data.graph.source_identifier_id() }"
+        >
             <div class="graph-designer-title">
                 <i data-bind='css: graph.iconclass'></i><div class="name" data-bind='text: graph.name'></div>
                 <span class="graph-crm-class" data-bind="if: graph.ontology()">
@@ -14,6 +17,13 @@
                     )
                 </span>
             </div>
+
+            <!-- ko if: $data.graph.source_identifier_id() -->
+                <div class="settings-panel-draft-label">
+                    <i class="fa fa-pencil-square-o" style="margin-right: 5px;"></i>
+                    <span>{% trans "DRAFT" %}</span>
+                </div>
+            <!-- /ko -->
         </div>
 
         <!-- Settings Forms -->
@@ -102,14 +112,37 @@
                             <div class="col-xs-12 crm-selector">
                                 <div data-bind='component: {
                                     name: graphSettingsViewModel.rootnode.datatypeConfigComponent,
-                                    params: graphSettingsViewModel.extendNode(graphSettingsViewModel.rootnode, {isEditable: true})}' style="width: 500px;">
+                                    params: graphSettingsViewModel.extendNode(graphSettingsViewModel.rootnode)
+                                }' style="width: 500px;">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <!-- /ko -->
 
-                    <div class="row widget-container graph-settings-switch">
+                    <div style="padding: 0px 10px;" class="row widget-container graph-settings-switch">
+                        <div class="form-group">
+                            <div
+                                style="position: relative; top: 18px; height: 44px; margin-top: -10px;"
+                                data-bind="component: {
+                                    name: 'views/components/simple-switch',
+                                    params: {
+                                        value: graphSettingsViewModel.graph.is_copy_immutable,
+                                    }
+                                }"
+                            ></div>
+                            <div style='padding-left: 5px;' class="col-xs-12">
+                                <div class="control-label graph-settings-switch-label">
+                                    <span>{% trans "Make Immutable" %}</span>
+                                </div>
+                                <span class="graph-settings-switch-subtitle">
+                                    {% trans "When this branch is added to a graph, it cannot be changed or modified within the graph." %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style='margin-bottom: 10px;' class="row widget-container graph-settings-switch">
                         <div class="form-group">
                             <div class="relative">
                                 <label class="col-xs-12 control-label widget-input-label">
@@ -201,13 +234,17 @@
                             </div>
 
                             <div class="col-xs-12">
-                                <input placeholder="{% trans "Slug" %}" class="form-control input-md widget-input" data-bind="textInput:graph.slug">
+                                <input placeholder="{% trans "Slug" %}" class="form-control input-md widget-input" data-bind="
+                                    textInput:graph.slug,
+                                    disable: !graph.source_identifier_id()"
+                                >
                             </div>
                         </div>
                     </div>
                     <!-- /ko -->
                 </form>
             </div>
+
 
             <div class="graph-designer-header">{% trans 'Appearance' %}</div>
             <div class="graph-settings-panel-body fade in">

@@ -34,12 +34,15 @@ admin.site.register(
         models.Widget,
         models.UserProfile,
         models.GraphModel,
+        models.ResourceInstanceLifecycle,
+        models.ResourceInstanceLifecycleState,
         models.SearchComponent,
         models.IIIFManifest,
         models.GroupMapSettings,
         models.Language,
         models.NodeGroup,
         models.SpatialView,
+        models.UserPreference,
     ]
 )
 

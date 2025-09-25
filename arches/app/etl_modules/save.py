@@ -7,7 +7,7 @@ from django.core.validators import URLValidator
 from django.db import connection
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
-from django.urls import reverse, resolve
+from django.urls import reverse, resolve, get_script_prefix
 from arches.app.models.system_settings import settings
 from arches.app.utils.index_database import index_resources_by_transaction
 import logging
@@ -187,7 +187,10 @@ def get_resourceids_from_search_url(search_url, user=None):
     params = parse_qs(urlsplit(search_url).query)
     for k, v in params.items():
         request.GET.__setitem__(k, v[0])
-    func, args, kwargs = resolve(reverse("search_results"))
+    search_results_path = reverse("search_results")
+    if search_results_path.startswith(get_script_prefix()):
+        search_results_path = search_results_path.replace(get_script_prefix(), "/")
+    func, args, kwargs = resolve(search_results_path)
     kwargs["request"] = request
     response = func(*args, **kwargs)
     results = json.loads(response.content)["results"]["hits"]["hits"]

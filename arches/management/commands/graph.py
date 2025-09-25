@@ -19,28 +19,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from django.core.management.base import BaseCommand
 from arches.app.models.graph import Graph
 from django.contrib.auth.models import User
-from django.db import connection
+from django.db import connection, transaction
 
 
 class Command(BaseCommand):
-    """
-    Commands for adding arches test users
-
-    """
+    """Commands for updating graphs."""
 
     def add_arguments(self, parser):
         parser.add_argument(
             "operation",
             nargs="?",
-            choices=[
-                "publish",
-                "unpublish",
-            ],
+            choices=["publish", "create_draft_graphs"],
             help="""
             Operation Type
-              'publish' publishes resource models indicated using the --graphs arg.
-              'unpublish' unpublishes resource models indicated using the --graphs arg.
-               Both publish and unpublish apply to all resource models if a --graphs value is not provided",
+                'publish' publishes resource models indicated using the --graphs arg.
+                'create_draft_graphs' creates an draft_graph for resource models indicated using the --graphs arg.
+
+                Operations apply to all resource models if a --graphs value is not provided,
             """,
         )
         parser.add_argument(
@@ -75,11 +70,15 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if options["graphs"]:
-            self.graphs = [
-                Graph(graphid.strip()) for graphid in options["graphs"].split(",")
-            ]
+            self.graphs = Graph.objects.filter(
+                graphid__in=[
+                    graphid.strip() for graphid in options["graphs"].split(",")
+                ]
+            )
         else:
-            self.graphs = Graph.objects.filter(isresource=True)
+            self.graphs = Graph.objects.filter(isresource=True).exclude(
+                source_identifier__isnull=False
+            )
 
         self.update_instances = True if options["update_instances"] else False
         self.update = True if options["update"] else False
@@ -87,21 +86,52 @@ class Command(BaseCommand):
         if options["operation"] == "publish":
             self.publish(options["username"])
 
-        if options["operation"] == "unpublish":
-            self.unpublish()
+        if options["operation"] == "create_draft_graphs":
+            self.create_draft_graphs()
+
+    def create_draft_graphs(self):
+        print("\nBEGIN Create draft_graphs...")
+
+        with transaction.atomic():
+            for graph in self.graphs:
+                if graph.source_identifier_id:
+                    print(
+                        "Graph %s already has a draft_graph. Skipping..." % graph.name
+                    )
+                    continue
+
+                print("\nCreating draft_graph for %s..." % graph.name)
+                graph.create_draft_graph()
+
+                print(
+                    "%s has been updated! Creating a new publication for %s."
+                    % (graph.name, graph.name)
+                )
+                graph.publish()
+
+            print("\nEND Create draft_graphs. Success!")
 
     def publish(self, username):
         user = User.objects.get(username=username)
-        print("\nPublishing ...")
+
+        if self.update:
+            print("\nUpdating Publications...")
+        else:
+            print("\nPublishing ...")
+
         graphids = []
         for graph in self.graphs:
-            print(graph.name)
+            if not graph.source_identifier_id:
+                graphids.append(str(graph.pk))
 
-            if self.update:
-                if graph.publication_id:
-                    graph.update_published_graphs()
-            else:
-                graph.publish(user)
+                print(graph.name)
+
+                if self.update:
+                    if graph.publication_id:
+                        graph.update_published_graphs()
+                else:
+                    if not graph.publication_id:
+                        graph.publish(user)
 
             graphids.append(str(graph.pk))
         if self.update_instances:
@@ -111,9 +141,3 @@ class Command(BaseCommand):
                     "update resource_instances r set graphpublicationid = publicationid from graphs g where r.graphid = g.graphid and g.graphid in %s;",
                     (graphids,),
                 )
-
-    def unpublish(self):
-        print("Unpublishing...")
-        for graph in self.graphs:
-            print(graph.name)
-            graph.unpublish()

@@ -49,6 +49,7 @@
                 "user_id": null
             },
             "iconclass": "",
+            "is_active": true,
             "is_editable": true,
             "isresource": true,
             "jsonldcontext": null,
@@ -113,6 +114,7 @@
                 "ontologyclass": null,
                 "sortorder": 0
             },
+            "slug": "graph_with_filelist",
             "subtitle": "",
             "template_id": "50000000-0000-0000-0000-000000000001",
             "version": ""

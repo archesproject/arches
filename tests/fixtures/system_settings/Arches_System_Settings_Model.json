@@ -1689,6 +1689,7 @@
                 "nodeid": "ff62303a-fa12-11e6-a889-6c4008b05c4c",
                 "ontologyclass": null
             },
+            "slug": "arches_system_settings",
             "subtitle": "System configuration",
             "version": ""
         }

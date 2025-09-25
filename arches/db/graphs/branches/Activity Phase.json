@@ -121,6 +121,7 @@
             "maplinewidth": 1, 
             "mappointsize": 3, 
             "name": "Activity Phase", 
+            "slug": "activity_phase", 
             "nodegroups": [
                 {
                     "cardinality": "n", 

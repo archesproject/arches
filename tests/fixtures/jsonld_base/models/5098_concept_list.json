@@ -59,6 +59,7 @@
                 "user_id": null
             },
             "iconclass": "",
+            "is_active": true,
             "is_editable": false,
             "isresource": true,
             "jsonldcontext": null,
@@ -141,7 +142,7 @@
                 "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E21_Person",
                 "sortorder": 0
             },
-            "slug": null,
+            "slug": "5098_bug_concept_list",
             "subtitle": "",
             "template_id": "50000000-0000-0000-0000-000000000001",
             "version": ""

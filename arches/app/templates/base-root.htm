@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% load static %}
 {% load webpack_static from webpack_loader %}
+{% load render_bundle from webpack_loader %}
 
 
 <!DOCTYPE html>
@@ -71,8 +72,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock body_content %}
 
 {% block javascript %}
-    <script src="{% webpack_static 'node_modules/requirejs/require.js' %}"></script>
-
     {% block pre_require_js %}
     {% endblock pre_require_js %}
 
@@ -81,7 +80,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     {% endblock arches_modules %}
     
     {% if main_script %}
-        <script src="{% webpack_static '' %}build/js/{{main_script}}.js"></script>
+        {% render_bundle main_script %}
     {% endif %}
 {% endblock javascript %}
 

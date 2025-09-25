@@ -1,53 +1,57 @@
-define(['jquery', 'backbone', 'models/concept', 'models/value'], function($, Backbone, ConceptModel, ValueModel) {
-    return Backbone.View.extend({
+import $ from 'jquery';
+import Backbone from 'backbone';
+import ConceptModel from 'models/concept';
+import ValueModel from 'models/value';
 
-        initialize: function(e){
-            var self = this;
-            this.modal = this.$el.find('.modal');
-            this.modal.on('hidden.bs.modal', function() {
-                self.$el.find('input[type=text], textarea').val('');
-            });
 
-            this.select2 = this.$el.find('[name=language_dd]').select2({
-                minimumResultsForSearch: -1
-            });                
+export default Backbone.View.extend({
 
-            this.modal.validate({
-                ignore: null,
-                rules: {
-                    label: 'required',
-                    language_dd: 'required',
-                    scheme_group_dd: 'required'
-                },
-                submitHandler: function(form) {
-                    var label = new ValueModel({
-                        value: $(form).find('[name=label]').val(),
-                        language: $(form).find('[name=language_dd]').val(),
-                        category: 'label',
-                        type: 'prefLabel'
-                    });
-                    var note = new ValueModel({
-                        value: $(form).find('[name=note]').val(),
-                        language: $(form).find('[name=language_dd]').val(),
-                        category: 'note',
-                        type: 'scopeNote'
-                    });
-                    var conceptscheme = new ConceptModel({
-                        legacyoid: $(form).find('[name=label]').val(),
-                        values: [label, note],
-                        nodetype: 'ConceptScheme'
-                    });
+    initialize: function(e){
+        var self = this;
+        this.modal = this.$el.find('.modal');
+        this.modal.on('hidden.bs.modal', function() {
+            self.$el.find('input[type=text], textarea').val('');
+        });
 
-                    self.modal.on('hidden.bs.modal', function(e) {
-                        conceptscheme.save(function(response, status) {
-                            self.trigger('conceptSchemeAdded', response.responseJSON);
-                        }, self);
-                    });
-                    self.modal.modal('hide');
+        this.select2 = this.$el.find('[name=language_dd]').select2({
+            minimumResultsForSearch: -1
+        });                
 
-                    return false;
-                }
-            });
-        }
-    });
+        this.modal.validate({
+            ignore: null,
+            rules: {
+                label: 'required',
+                language_dd: 'required',
+                scheme_group_dd: 'required'
+            },
+            submitHandler: function(form) {
+                var label = new ValueModel({
+                    value: $(form).find('[name=label]').val(),
+                    language: $(form).find('[name=language_dd]').val(),
+                    category: 'label',
+                    type: 'prefLabel'
+                });
+                var note = new ValueModel({
+                    value: $(form).find('[name=note]').val(),
+                    language: $(form).find('[name=language_dd]').val(),
+                    category: 'note',
+                    type: 'scopeNote'
+                });
+                var conceptscheme = new ConceptModel({
+                    legacyoid: $(form).find('[name=label]').val(),
+                    values: [label, note],
+                    nodetype: 'ConceptScheme'
+                });
+
+                self.modal.on('hidden.bs.modal', function(e) {
+                    conceptscheme.save(function(response, status) {
+                        self.trigger('conceptSchemeAdded', response.responseJSON);
+                    }, self);
+                });
+                self.modal.modal('hide');
+
+                return false;
+            }
+        });
+    }
 });
