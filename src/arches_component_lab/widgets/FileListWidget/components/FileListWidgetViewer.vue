@@ -63,4 +63,9 @@ const showThumbnails = computed(() => {
 :deep(.thumbnailImage img) {
     max-height: 5rem;
 }
+
+:deep(.p-galleria-thumbnail-item) {
+    overflow: hidden;
+    cursor: pointer;
+}
 </style>
