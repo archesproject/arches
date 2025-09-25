@@ -60,5 +60,7 @@ class DataTypeFactory(datatypes.DataTypeFactory):
                 return django.db.models.JSONField(null=True)
             case DomainListDataType():
                 return DomainListField(null=True)
+            case FileListDataType():
+                return django.db.models.JSONField(default=list, null=True)
             case _:
                 return django.db.models.TextField(null=True)

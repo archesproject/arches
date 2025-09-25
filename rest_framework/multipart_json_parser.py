@@ -14,10 +14,10 @@ class MultiPartJSONParser(MultiPartParser):
     def parse(self, stream, media_type=None, parser_context=None):
         parsed = super().parse(stream, media_type, parser_context)
 
+        data_fields = parsed.data
         file_fields = parsed.files
-        form_fields = parsed.data
 
-        raw_json = form_fields.get("json")
+        raw_json = data_fields.get("json") or file_fields.get("json").read()
         if raw_json is None:
             raise ParseError(detail="Missing 'json' part in multipart payload")
 

@@ -351,7 +351,10 @@ class TileTreeOperation:
             return
         try:
             transformed = datatype_instance.transform_value_for_tile(
-                value_to_validate, languages=self.languages, **node.config
+                value_to_validate,
+                languages=self.languages,
+                is_existing_tile=bool(tile._state.db),
+                **node.config,
             )
         except ValueError:  # BooleanDataType raises.
             # validate() will handle.
