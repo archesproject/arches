@@ -6,6 +6,7 @@ import { useToast } from "primevue/usetoast";
 import Button from "primevue/button";
 import Dialog from "primevue/dialog";
 import MultiSelect from "primevue/multiselect";
+import ProgressSpinner from "primevue/progressspinner";
 
 import { exportList } from "@/arches_controlled_lists/api.ts";
 import {
@@ -27,6 +28,7 @@ const emit = defineEmits<{
 }>();
 
 const visible = ref(true);
+const loading = ref(false);
 const listOptions = ref();
 const selectedListIds = ref<string[]>([]);
 
@@ -38,8 +40,10 @@ function extractLists() {
 }
 
 async function exportToSKOS() {
+    loading.value = true;
     const file = await exportList(selectedListIds.value).catch(
         (error: Error) => {
+            loading.value = false;
             toast.add({
                 severity: ERROR,
                 life: DEFAULT_ERROR_TOAST_LIFE,
@@ -49,6 +53,7 @@ async function exportToSKOS() {
         },
     );
     if (file) {
+        loading.value = false;
         const url = window.URL.createObjectURL(
             new Blob([file], { type: "application/xml" }),
         );
@@ -92,7 +97,14 @@ onMounted(() => {
         }"
     >
         <template #default>
-            <div class="select-container">
+            <ProgressSpinner
+                v-if="loading"
+                style="display: flex"
+            />
+            <div
+                v-else
+                class="select-container"
+            >
                 <label id="export-list-select">{{
                     $gettext("Select controlled list(s) to export")
                 }}</label>
