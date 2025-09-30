@@ -214,7 +214,28 @@ class ReferenceDataType(BaseDataType):
             tile.data[nodeid] = None
 
     def transform_export_values(self, value, *args, **kwargs):
-        return ",".join(value)
+        if value is not None:
+            # Temporarily use concept_export_value_type to determine export format
+            # TODO: when RDM/concepts are depricated update name of kwarg
+            concept_export_value_type = kwargs.get("concept_export_value_type")
+
+            new_values = []
+            for val in value:
+                if concept_export_value_type == "id":
+                    new_values.append(val["uri"])
+                elif (
+                    concept_export_value_type is None
+                    or concept_export_value_type == ""
+                    or concept_export_value_type == "label"
+                ):
+                    labels = [ReferenceLabel(**label) for label in val["labels"]]
+                    best_label = ListItem.find_best_label_from_set(
+                        labels, kwargs.get("language")
+                    )
+                    new_values.append(best_label)
+                else:
+                    new_values.append(val)
+            return ",".join(new_values)
 
     def get_display_value(self, tile, node, **kwargs):
         requested_language = kwargs.pop("language", None)
