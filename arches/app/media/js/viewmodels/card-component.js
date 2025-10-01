@@ -326,11 +326,6 @@ export default function(params) {
                 const { options, widgetConfig } = context;
                 options.config = ko.observable(Object.assign(widgetConfig, options.config));
             },
-            node(context) {
-                const { params, nodeId, options } = context;
-                const originalNode = params.form.nodeLookup[nodeId];
-                options.node = Object.assign(originalNode, options.node);
-            },
             widget: (context) => {
                 const { options, nodeId } = context;
                 const widget = context.self.form.card().widgets().filter(widget => widget.node_id() === nodeId)[0];
