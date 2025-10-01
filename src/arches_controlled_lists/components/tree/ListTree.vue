@@ -2,10 +2,15 @@
 import { inject, ref, useTemplateRef, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useGettext } from "vue3-gettext";
+import { useToast } from "primevue/usetoast";
 
 import Tree from "primevue/tree";
 
-import { displayedRowKey } from "@/arches_controlled_lists/constants.ts";
+import {
+    DEFAULT_ERROR_TOAST_LIFE,
+    ERROR,
+    displayedRowKey,
+} from "@/arches_controlled_lists/constants.ts";
 import { routeNames } from "@/arches_controlled_lists/routes.ts";
 import { findNodeInTree, nodeIsList } from "@/arches_controlled_lists/utils.ts";
 import ListTreeControls from "@/arches_controlled_lists/components/tree/ListTreeControls.vue";
@@ -23,6 +28,7 @@ import type {
     Value,
 } from "@/arches_controlled_lists/types";
 
+const toast = useToast();
 const { $gettext } = useGettext();
 
 // Defining these in the parent avoids re-running $gettext in thousands of children.
@@ -93,25 +99,38 @@ const navigate = (newRoute: RouteLocationNormalizedLoadedGeneric) => {
             if (!tree.value.length) {
                 return;
             }
-            const { found, path } = findNodeInTree(
-                tree.value,
-                newRoute.params.id as string,
-            );
-            if (found) {
-                setDisplayedRow(found.data);
-                const itemsToExpandIds = path.map(
-                    (itemInPath: TreeNode) => itemInPath.key,
+            try {
+                const { found, path } = findNodeInTree(
+                    tree.value,
+                    newRoute.params.id as string,
                 );
-                expandedKeys.value = {
-                    ...expandedKeys.value,
-                    ...Object.fromEntries(
-                        [
-                            found.data.controlled_list_id,
-                            ...itemsToExpandIds,
-                        ].map((x) => [x, true]),
+
+                if (found) {
+                    setDisplayedRow(found.data);
+                    const itemsToExpandIds = path.map(
+                        (itemInPath: TreeNode) => itemInPath.key,
+                    );
+                    expandedKeys.value = {
+                        ...expandedKeys.value,
+                        ...Object.fromEntries(
+                            [
+                                found.data.controlled_list_id,
+                                ...itemsToExpandIds,
+                            ].map((x) => [x, true]),
+                        ),
+                    };
+                    selectedKeys.value = { [found.data.id]: true };
+                }
+            } catch (error) {
+                toast.add({
+                    severity: ERROR,
+                    life: DEFAULT_ERROR_TOAST_LIFE,
+                    summary: $gettext(
+                        `List Item ${newRoute.params.id} not found`,
                     ),
-                };
-                selectedKeys.value = { [found.data.id]: true };
+                    detail: error instanceof Error ? error.message : undefined,
+                });
+                setDisplayedRow(null);
             }
             break;
         }
