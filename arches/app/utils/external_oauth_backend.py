@@ -1,4 +1,8 @@
-from typing import Tuple
+import base64
+from dataclasses import dataclass
+import time
+from typing import Optional, Tuple, Literal
+import uuid
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.backends import ModelBackend
 from django.urls import reverse
@@ -10,11 +14,130 @@ import logging
 import jwt
 from jwt import PyJWKClient
 from requests_oauthlib import OAuth2Session
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization, hashes
+from cryptography.hazmat.primitives.asymmetric import rsa, ec
+from cryptography import x509
 
 logger = logging.getLogger(__name__)
+PrivateKeyTypes = rsa.RSAPrivateKey | ec.EllipticCurvePrivateKey
+JWTAlgorithmType = Literal["RS256", "RS384", "RS512", "ES256", "ES384", "ES512"]
+JWTAlgorithm: JWTAlgorithmType = "RS256"
+HashAlgorithm = hashes.SHA1 | hashes.SHA256 | hashes.SHA384 | hashes.SHA512
+
+
+@dataclass
+class CertificateInfo:
+    """Certificate and private key information"""
+
+    certificate: x509.Certificate
+    private_key: PrivateKeyTypes
+    thumbprint: str
 
 
 class ExternalOauthAuthenticationBackend(ModelBackend):
+    def _load_private_key(
+        self, key_path: str, password: Optional[bytes] = None
+    ) -> PrivateKeyTypes:
+        """
+        Load private key from PEM file
+
+        Args:
+            key_path: Path to PEM-encoded private key file
+            password: Optional password for encrypted keys
+
+        Returns:
+            Private key object (RSA or EC)
+        """
+        with open(key_path, "rb") as f:
+            private_key = serialization.load_pem_private_key(
+                f.read(), password=password, backend=default_backend()
+            )
+        return private_key
+
+    def _load_certificate(self, cert_path: str) -> x509.Certificate:
+        """
+        Load certificate from PEM file
+
+        Args:
+            cert_path: Path to PEM-encoded certificate file
+
+        Returns:
+            X.509 certificate object
+        """
+        with open(cert_path, "rb") as f:
+            cert = x509.load_pem_x509_certificate(f.read(), default_backend())
+        return cert
+
+    def _create_client_assertion(
+        self,
+        client_id,
+        audience,
+        private_key,
+        thumbprint,
+        algorithm="RS256",
+        validity_seconds=None,
+    ):
+        if validity_seconds is None:
+            validity_seconds = 300  # default to 5 minutes
+        now = int(time.time())
+
+        headers = {"alg": algorithm, "typ": "JWT", "x5t": thumbprint}
+
+        payload = {
+            "aud": audience,
+            "exp": now + validity_seconds,
+            "iss": client_id,
+            "jti": str(uuid.uuid4()),
+            "nbf": now,
+            "sub": client_id,
+        }
+
+        token = jwt.encode(payload, private_key, algorithm=algorithm, headers=headers)
+        return token
+
+    def _load_certificate_info(
+        self,
+        certificate_path: str,
+        private_key_path: str,
+        private_key_password: bytes = None,
+    ) -> CertificateInfo:
+        """
+        Load certificate and private key, calculate thumbprint
+
+        Args:
+            config: OAuth configuration
+
+        Returns:
+            CertificateInfo with loaded cert, key, and thumbprint
+        """
+        cert = self._load_certificate(certificate_path)
+        private_key = self._load_private_key(private_key_path, private_key_password)
+        thumbprint = self._get_certificate_thumbprint(cert)
+
+        return CertificateInfo(
+            certificate=cert, private_key=private_key, thumbprint=thumbprint
+        )
+
+    def _get_certificate_thumbprint(
+        self, cert: x509.Certificate, hash_algorithm: HashAlgorithm = None
+    ) -> str:
+        """
+        Get the thumbprint of the certificate
+
+        Args:
+            cert: X.509 certificate
+            hash_algorithm: Hash algorithm to use (default: SHA-1 for Azure compatibility)
+
+        Returns:
+            Base64url-encoded thumbprint
+        """
+        if hash_algorithm is None:
+            hash_algorithm = hashes.SHA1()
+
+        thumbprint = cert.fingerprint(hash_algorithm)
+        return base64.urlsafe_b64encode(thumbprint).decode("utf-8").rstrip("=")
+
     def authenticate(self, request, sso_authentication=False, **kwargs):
         try:
             if not sso_authentication or not request:
@@ -28,7 +151,11 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
             )
             uid_claim = oauth2_settings["uid_claim"]
             client_id = oauth2_settings["app_id"]
-            app_secret = oauth2_settings["app_secret"]
+            app_secret = oauth2_settings.get("app_secret", None)
+            token_endpoint = oauth2_settings["token_endpoint"]
+            token_endpoint_auth_method = oauth2_settings.get(
+                "token_endpoint_auth_method", "client_secret_basic"
+            )
             redirect_uri = request.build_absolute_uri(
                 reverse("external_oauth_callback")
             )
@@ -44,12 +171,38 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
                 state=request.session["oauth_state"],
             )
             try:
-                token_response = oauth.fetch_token(
-                    oauth2_settings["token_endpoint"],
-                    authorization_response=request.build_absolute_uri(),
-                    client_secret=app_secret,
-                    include_client_id=True,
-                )
+
+                if token_endpoint_auth_method == "client_secret_basic":
+                    token_response = oauth.fetch_token(
+                        token_endpoint,
+                        authorization_response=request.build_absolute_uri(),
+                        client_secret=app_secret,
+                        include_client_id=True,
+                    )
+                elif token_endpoint_auth_method == "private_key_jwt":
+                    cert_info = self._load_certificate_info(
+                        oauth2_settings["public_certificate"],
+                        oauth2_settings["private_key"],
+                        oauth2_settings.get("private_key_password", None),
+                    )
+                    client_assertion = self._create_client_assertion(
+                        client_id,
+                        token_endpoint,
+                        cert_info.private_key,
+                        cert_info.thumbprint,
+                        validity_seconds=(
+                            oauth2_settings["validity_seconds"]
+                            if "validity_seconds" in oauth2_settings
+                            else None
+                        ),
+                    )
+                    token_response = oauth.fetch_token(
+                        token_endpoint,
+                        authorization_response=request.build_absolute_uri(),
+                        client_assertion=client_assertion,
+                        client_assertion_type="urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+                        include_client_id=True,
+                    )
             except Exception as e:
                 logger.error("Error getting id/access tokens", exc_info=True)
                 raise e  # raise, otherwise this will mysteriously smother.
