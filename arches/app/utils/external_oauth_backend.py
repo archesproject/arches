@@ -164,6 +164,7 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
                 if "uid_claim_source" in oauth2_settings
                 else "id_token"
             )
+            jwt_audience = oauth2_settings.get("jwt_audience", token_endpoint)
 
             oauth = OAuth2Session(
                 client_id,
@@ -187,7 +188,7 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
                     )
                     client_assertion = self._create_client_assertion(
                         client_id,
-                        token_endpoint,
+                        jwt_audience,
                         cert_info.private_key,
                         cert_info.thumbprint,
                         validity_seconds=(
