@@ -27,10 +27,10 @@ HashAlgorithm = hashes.SHA1 | hashes.SHA256 | hashes.SHA384 | hashes.SHA512
 
 
 @dataclass
-class CertificateInfo:
+class KeyInfo:
     """Certificate and private key information"""
 
-    certificate: x509.Certificate
+    public_key: x509.Certificate | rsa.RSAPublicKey | ec.EllipticCurvePublicKey
     private_key: PrivateKeyTypes
     thumbprint: str
 
@@ -69,12 +69,28 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
             cert = x509.load_pem_x509_certificate(f.read(), default_backend())
         return cert
 
+    def _load_public_key(self, public_key: str) -> x509.Certificate:
+        """
+        Load public key from PEM file
+
+        Args:
+            cert_path: Path to PEM-encoded public key file
+
+        Returns:
+            X.509 certificate object
+        """
+        with open(public_key, "rb") as f:
+            public_key = serialization.load_pem_public_key(
+                f.read(), backend=default_backend()
+            )
+        return public_key
+
     def _create_client_assertion(
         self,
         client_id,
         audience,
         private_key,
-        thumbprint,
+        thumbprint=None,
         algorithm="RS256",
         validity_seconds=None,
     ):
@@ -82,7 +98,10 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
             validity_seconds = 300  # default to 5 minutes
         now = int(time.time())
 
-        headers = {"alg": algorithm, "typ": "JWT", "x5t": thumbprint}
+        headers = {"alg": algorithm, "typ": "JWT"}
+
+        if thumbprint is not None:
+            headers["x5t"] = thumbprint
 
         payload = {
             "aud": audience,
@@ -98,10 +117,10 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
 
     def _load_certificate_info(
         self,
-        certificate_path: str,
+        public_key_path: str,
         private_key_path: str,
         private_key_password: bytes = None,
-    ) -> CertificateInfo:
+    ) -> KeyInfo:
         """
         Load certificate and private key, calculate thumbprint
 
@@ -111,12 +130,18 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
         Returns:
             CertificateInfo with loaded cert, key, and thumbprint
         """
-        cert = self._load_certificate(certificate_path)
+        try:
+            public_key = self._load_certificate(public_key_path)
+        except ValueError:
+            public_key = self._load_public_key(public_key_path)
         private_key = self._load_private_key(private_key_path, private_key_password)
-        thumbprint = self._get_certificate_thumbprint(cert)
+        if type(public_key) is x509.Certificate:
+            thumbprint = self._get_certificate_thumbprint(public_key)
+        else:
+            thumbprint = None
 
-        return CertificateInfo(
-            certificate=cert, private_key=private_key, thumbprint=thumbprint
+        return KeyInfo(
+            public_key=public_key, private_key=private_key, thumbprint=thumbprint
         )
 
     def _get_certificate_thumbprint(
@@ -165,6 +190,9 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
                 else "id_token"
             )
             jwt_audience = oauth2_settings.get("jwt_audience", token_endpoint)
+            public_key = oauth2_settings.get(
+                "public_key", oauth2_settings.get("public_certificate", None)
+            )
 
             oauth = OAuth2Session(
                 client_id,
@@ -182,7 +210,7 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
                     )
                 elif token_endpoint_auth_method == "private_key_jwt":
                     cert_info = self._load_certificate_info(
-                        oauth2_settings["public_certificate"],
+                        public_key,
                         oauth2_settings["private_key"],
                         oauth2_settings.get("private_key_password", None),
                     )
