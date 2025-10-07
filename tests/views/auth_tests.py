@@ -275,11 +275,11 @@ class AuthTests(ArchesTestCase):
             "scopes": ["openid", "email", "profile", "offline_access"],
             "validate_id_token": True,
         }
-        self.assertRaises(
+        with self.assertRaises(KeyError):
             ExternalOauthAuthenticationBackend().authenticate(
                 request=HttpRequest(), sso_authentication=True
             )
-        )
+
         ExternalOauthAuthenticationBackend().authenticate(
             request=HttpRequest(), sso_authentication=False
         )  # should not raise
