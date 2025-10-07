@@ -744,7 +744,7 @@ class DateDataType(BaseDataType):
                     value = datetime.strptime(value, valid_date_format)
                 else:
                     value = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
-            elif type(value) is date:
+            elif type(value) is date: # Use type() instead of isinstance() to distinguish between date and datetime
                 value = datetime(value.year, value.month, value.day)
 
         return self.set_timezone(value)
