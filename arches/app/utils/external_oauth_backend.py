@@ -168,7 +168,7 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
             if not sso_authentication or not request:
                 return None
 
-            oauth2_settings = ExternalOauthAuthenticationBackend.get_oauth2_settings()
+            oauth2_settings = ExternalOauthAuthenticationBackend._get_oauth2_settings()
             validate_id_token = (
                 oauth2_settings["validate_id_token"]
                 if "validate_id_token" in oauth2_settings
@@ -348,7 +348,7 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
         except User.DoesNotExist:
             return None
 
-    def get_token(user: User) -> ExternalOauthToken or None:
+    def get_token(user: User) -> Optional[ExternalOauthToken]:
         """Get the token record for a particular user"""
         try:
             token = ExternalOauthToken.objects.get(user=user)
@@ -358,7 +358,7 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
 
     def get_token_for_username(
         username: str,
-    ) -> Tuple[ExternalOauthToken, User] or None:
+    ) -> Optional[Tuple[ExternalOauthToken, User]]:
         """Get the token record (and user) for a particular username"""
         try:
             user = User.objects.get(username=username)
@@ -366,7 +366,7 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
         except User.DoesNotExist:
             return (None, None)
 
-    def get_oauth2_settings() -> dict or None:
+    def _get_oauth2_settings() -> Optional[dict]:
         """Get oauth2 settings from oidc endpoint or settings.EXTERNAL_OAUTH_CONFIGURATION"""
         oauth_settings = {**{}, **settings.EXTERNAL_OAUTH_CONFIGURATION}
         if "oidc_discovery_url" in oauth_settings:
@@ -392,7 +392,7 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
 
     def get_authorization_url(request) -> Tuple[str, str]:
         """Return authorization URL to redirect user to and XSRF state token"""
-        oauth2_settings = ExternalOauthAuthenticationBackend.get_oauth2_settings()
+        oauth2_settings = ExternalOauthAuthenticationBackend._get_oauth2_settings()
         client_id = oauth2_settings["app_id"]
         redirect_uri = request.build_absolute_uri(reverse("external_oauth_callback"))
         scope = oauth2_settings["scopes"]
