@@ -1446,6 +1446,7 @@ class FileListDataType(BaseDataType):
                     settings.UPLOADED_FILES_DIR,
                     str(tile_file["name"]),
                 )
+                file_stats = os.stat(file_path)
 
             tile_file["size"] = file_stats.st_size
             tile_file["status"] = "uploaded"
