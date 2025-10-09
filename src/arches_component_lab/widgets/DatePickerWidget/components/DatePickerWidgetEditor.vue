@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watchEffect } from "vue";
+import { computed, ref, watchEffect } from "vue";
 
 import { convertISO8601DatetimeFormatToPrimevueDatetimeFormat } from "@/arches_component_lab/widgets/DatePickerWidget/utils.ts";
 
@@ -60,6 +60,11 @@ function onUpdateModelValue(updatedValue: string) {
 
     emit("update:value", formValue);
 }
+const modelDate = computed(() =>
+    aliasedNodeData?.node_value
+        ? new Date(aliasedNodeData?.node_value as string)
+        : null,
+);
 </script>
 
 <template>
@@ -69,7 +74,7 @@ function onUpdateModelValue(updatedValue: string) {
         :fluid="true"
         :input-id="cardXNodeXWidgetData.node.alias"
         :manual-input="false"
-        :model-value="new Date(aliasedNodeData?.node_value as string) || null"
+        :model-value="modelDate"
         :show-time="shouldShowTime"
         :show-seconds="shouldShowTime"
         :show-icon="true"
