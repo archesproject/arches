@@ -1,0 +1,45 @@
+<script setup lang="ts">
+import InputNumber from "primevue/inputnumber";
+
+import type {
+    NumberCardXNodeXWidgetData,
+    NumberValue,
+} from "@/arches_component_lab/datatypes/number/types.ts";
+
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+    cardXNodeXWidgetData: NumberCardXNodeXWidgetData;
+    aliasedNodeData: NumberValue;
+}>();
+
+const emit = defineEmits<{
+    (event: "update:value", updatedValue: NumberValue): void;
+}>();
+
+function onUpdateModelValue(updatedValue: number | null) {
+    emit("update:value", {
+        display_value: updatedValue !== null ? updatedValue.toString() : "",
+        node_value: updatedValue,
+        details: [],
+    });
+}
+</script>
+
+<template>
+    <InputNumber
+        :model-value="aliasedNodeData?.node_value"
+        :fluid="true"
+        :input-id="cardXNodeXWidgetData.node.alias"
+        :placeholder="cardXNodeXWidgetData.config.placeholder"
+        :prefix="cardXNodeXWidgetData.config.prefix ?? ''"
+        :suffix="cardXNodeXWidgetData.config.suffix ?? ''"
+        :min-fraction-digits="
+            Number(cardXNodeXWidgetData.config.precision) || 0
+        "
+        :max-fraction-digits="
+            Number(cardXNodeXWidgetData.config.precision) || 0
+        "
+        :min="cardXNodeXWidgetData.config.min"
+        :max="cardXNodeXWidgetData.config.max"
+        @update:model-value="onUpdateModelValue($event)"
+    />
+</template>
