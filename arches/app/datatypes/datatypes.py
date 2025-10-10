@@ -684,6 +684,14 @@ class BooleanDataType(BaseDataType):
 
 
 class DateDataType(BaseDataType):
+    # convert javascript date formats (node config dateFormat) to python date formats
+    date_format_lookup = {
+        "YYYY-MM-DD HH:mm:ssZ": "%Y-%m-%d %H:%M:%S%z",
+        "YYYY-MM-DD": "%Y-%m-%d",
+        "YYYY-MM": "%Y-%m",
+        "YYYY": "%Y",
+    }
+
     def validate(
         self,
         value,
@@ -728,9 +736,10 @@ class DateDataType(BaseDataType):
         except:
             # The .astimezone function throws an error on Windows for dates before 1970
             value = self.backup_astimezone(value)
-        return value.isoformat(timespec="milliseconds")
+        return value.strftime("%Y-%m-%d %H:%M:%S%z")
 
     def transform_value_for_tile(self, value, **kwargs):
+        date_format = kwargs.get("dateFormat", None)
         value = None if value == "" else value
         if value is not None:
             if isinstance(value, list):
@@ -740,15 +749,21 @@ class DateDataType(BaseDataType):
                     # a year before 1000 but not BCE
                     value = value.zfill(4)
                 valid_date_format, valid = self.get_valid_date_format(value)
-                if valid:
+                if not valid:
+                    valid_date_format = settings.DATE_IMPORT_EXPORT_FORMAT
+                try:
                     value = datetime.strptime(value, valid_date_format)
-                else:
-                    value = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
+                except:
+                    return value
             # Use type() instead of isinstance() to distinguish between date and datetime
             elif type(value) is date:
                 value = datetime(value.year, value.month, value.day)
 
-        return self.set_timezone(value)
+        if date_format and date_format in self.date_format_lookup:
+            value = value.strftime(self.date_format_lookup[date_format])
+        else:
+            value = self.set_timezone(value)
+        return value
 
     def backup_astimezone(self, dt):
         def same_calendar(year):
@@ -782,19 +797,6 @@ class DateDataType(BaseDataType):
             dt.replace(year=same_calendar(dt.year)).astimezone().replace(year=dt.year)
         )
         return converted_dt
-
-    def transform_export_values(self, value, *args, **kwargs):
-        if value is not None:
-            valid_date_format, valid = self.get_valid_date_format(value)
-            if valid:
-                value = datetime.strptime(value, valid_date_format).strftime(
-                    settings.DATE_IMPORT_EXPORT_FORMAT
-                )
-            else:
-                logger.warning(
-                    _("{value} is an invalid date format").format(**locals())
-                )
-            return value
 
     def add_missing_colon_to_timezone(self, value):
         """
