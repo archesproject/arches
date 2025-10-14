@@ -34,6 +34,7 @@ export interface CardXNodeXWidgetData {
         alias: string;
         isrequired: boolean;
         nodeid: string;
+        datatype: string;
     };
     sortorder: number;
     visible: boolean;
