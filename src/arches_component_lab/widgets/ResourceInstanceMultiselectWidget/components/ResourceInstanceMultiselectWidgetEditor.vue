@@ -184,7 +184,7 @@ function onUpdateModelValue(updatedValue: string[]) {
         :loading="isLoading"
         :model-value="initialValueFromTileData"
         :options="options"
-        :placeholder="$gettext('Select Resources')"
+        :placeholder="cardXNodeXWidgetData.config.placeholder"
         :reset-filter-on-hide="true"
         :virtual-scroller-options="{
             itemSize: itemSize,

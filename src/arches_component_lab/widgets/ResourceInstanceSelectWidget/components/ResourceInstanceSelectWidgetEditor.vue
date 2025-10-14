@@ -157,7 +157,7 @@ function onUpdateModelValue(updatedValue: string | null) {
         :loading="isLoading"
         :model-value="aliasedNodeData?.details?.[0]?.resource_id"
         :options="options"
-        :placeholder="$gettext('Select Resources')"
+        :placeholder="cardXNodeXWidgetData.config.placeholder"
         :reset-filter-on-hide="true"
         :show-clear="true"
         :virtual-scroller-options="{
