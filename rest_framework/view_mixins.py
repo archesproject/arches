@@ -3,6 +3,7 @@ from itertools import chain
 
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db.models import Q
+from django.db.models.constants import LOOKUP_SEP
 from django.utils.translation import gettext as _
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.metadata import SimpleMetadata
@@ -184,14 +185,20 @@ class ArchesModelAPIMixin:
         # Parse ORM lookpus from query params starting with "aliased_data__"
         # This is a quick-n-dirty riff on https://github.com/miki725/django-url-filter
         # minus some features like negation (`!=`)
-        if data_filters := {
+        data_filters = {
             param.split("aliased_data__", maxsplit=1)[1]: (
                 str_to_bool(value) if param.endswith("__isnull") else value
             )
             for param, value in self.request.GET.items()
             if param.startswith("aliased_data__")
-        }:
-            queryset = queryset.filter(**data_filters)
+        }
+        node_aliases = [n.alias for n in self.graph_nodes]
+        for filter_value in data_filters:
+            first_filter_term = filter_value.split(LOOKUP_SEP, maxsplit=1)[0]
+            if first_filter_term not in node_aliases:
+                msg = _("Invalid filter param: %s") % first_filter_term
+                raise ValidationError(msg)
+        queryset = queryset.filter(**data_filters)
 
         return super().filter_queryset(queryset)
 
