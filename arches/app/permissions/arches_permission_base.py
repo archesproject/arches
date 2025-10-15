@@ -364,7 +364,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
                     if result["permitted"] == "unknown":
                         return user.groups.filter(
                             name__in=settings.RESOURCE_EDITOR_GROUPS
-                        ).exists() or self.user_can_edit_model_nodegroups(
+                        ).exists() and self.user_can_edit_model_nodegroups(
                             user, result["resource"]
                         )
                     else:
@@ -405,7 +405,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
                             return False
                         return user.groups.filter(
                             name__in=settings.RESOURCE_EDITOR_GROUPS
-                        ).exists() or self.user_can_delete_model_nodegroups(
+                        ).exists() and self.user_can_delete_model_nodegroups(
                             user, result["resource"]
                         )
                     else:
