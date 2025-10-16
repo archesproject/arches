@@ -66545,7 +66545,7 @@
                     "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P12i_was_present_at"
                 },
                 {
-                    "config": null,
+                    "config": {"dateFormat": "YYYY-MM-DD"},
                     "datatype": "date",
                     "description": "Represents a single node in a graph",
                     "graph_id": "ab74af76-fa0e-11e6-9e3e-026d961c88e6",
@@ -66703,7 +66703,7 @@
                     "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P87_is_identified_by"
                 },
                 {
-                    "config": null,
+                    "config": {"dateFormat": "YYYY-MM-DD"},
                     "datatype": "date",
                     "description": "Represents a single node in a graph",
                     "graph_id": "ab74af76-fa0e-11e6-9e3e-026d961c88e6",
@@ -66829,7 +66829,7 @@
                     "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span"
                 },
                 {
-                    "config": null,
+                    "config": {"dateFormat": "YYYY-MM-DD"},
                     "datatype": "date",
                     "description": "Represents a single node in a graph",
                     "graph_id": "ab74af76-fa0e-11e6-9e3e-026d961c88e6",
@@ -66923,7 +66923,7 @@
                     "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
                 },
                 {
-                    "config": null,
+                    "config": {"dateFormat": "YYYY-MM-DD"},
                     "datatype": "date",
                     "description": "Represents a single node in a graph",
                     "graph_id": "ab74af76-fa0e-11e6-9e3e-026d961c88e6",
@@ -66968,7 +66968,7 @@
                     "parentproperty": "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as"
                 },
                 {
-                    "config": null,
+                    "config": {"dateFormat": "YYYY-MM-DD"},
                     "datatype": "date",
                     "description": "Represents a single node in a graph",
                     "graph_id": "ab74af76-fa0e-11e6-9e3e-026d961c88e6",
@@ -67047,7 +67047,7 @@
                     "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P40_observed_dimension"
                 },
                 {
-                    "config": null,
+                    "config": {"dateFormat": "YYYY-MM-DD"},
                     "datatype": "date",
                     "description": "Represents a single node in a graph",
                     "graph_id": "ab74af76-fa0e-11e6-9e3e-026d961c88e6",
@@ -67186,7 +67186,7 @@
                     "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P140i_was_attributed_by"
                 },
                 {
-                    "config": null,
+                    "config": {"dateFormat": "YYYY-MM-DD"},
                     "datatype": "date",
                     "description": "Represents a single node in a graph",
                     "graph_id": "ab74af76-fa0e-11e6-9e3e-026d961c88e6",
@@ -67402,7 +67402,7 @@
                     "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type"
                 },
                 {
-                    "config": null,
+                    "config": {"dateFormat": "YYYY-MM-DD"},
                     "datatype": "date",
                     "description": "Represents a single node in a graph",
                     "graph_id": "ab74af76-fa0e-11e6-9e3e-026d961c88e6",
@@ -67528,7 +67528,7 @@
                     "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P87_is_identified_by"
                 },
                 {
-                    "config": null,
+                    "config": {"dateFormat": "YYYY-MM-DD"},
                     "datatype": "date",
                     "description": "Represents a single node in a graph",
                     "graph_id": "ab74af76-fa0e-11e6-9e3e-026d961c88e6",
@@ -67646,7 +67646,7 @@
                     "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type"
                 },
                 {
-                    "config": null,
+                    "config": {"dateFormat": "YYYY-MM-DD"},
                     "datatype": "date",
                     "description": "Represents a single node in a graph",
                     "graph_id": "ab74af76-fa0e-11e6-9e3e-026d961c88e6",
@@ -67695,7 +67695,7 @@
                     "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type"
                 },
                 {
-                    "config": null,
+                    "config": {"dateFormat": "YYYY-MM-DD"},
                     "datatype": "date",
                     "description": "Represents a single node in a graph",
                     "graph_id": "ab74af76-fa0e-11e6-9e3e-026d961c88e6",
