@@ -16,14 +16,16 @@ class DateDataTypeTests(ArchesTestCase):
         {"value": "2025-03-25 13:47:11-0600", "format": "YYYY-MM-DD HH:mm:ssZ"},
     ]
 
-    date_without_config = {"value": "2025-03-25T21:53:01.946977+0100", "format": None}
-
-    date_formats_lookup = {
-        "YYYY-MM-DD HH:mm:ssZ": "%Y-%m-%d %H:%M:%S%z",
-        "YYYY-MM-DD": "%Y-%m-%d",
-        "YYYY-MM": "%Y-%m",
-        "YYYY": "%Y",
-    }
+    dates_without_config = [
+        {
+            "value": "2025-03-25",
+            "expected_format": "%Y-%m-%d",
+        },  # valid node config dataFormat
+        {
+            "value": "2025-03-25T21:53:01.946977+0100",
+            "expected_format": "%Y-%m-%d %H:%M:%S%z",
+        },  # invalid node config dataFormat
+    ]
 
     def test_string_validate(self):
         datatype = DataTypeFactory().get_instance("date")
@@ -36,19 +38,19 @@ class DateDataTypeTests(ArchesTestCase):
         datatype = DataTypeFactory().get_instance("date")
         for date in self.sample_dates:
             config = {"dateFormat": date["format"]}
-            print("config", config)
             with self.subTest(input=date):
                 tile_value = datatype.transform_value_for_tile(date["value"], **config)
                 self.assertEqual(tile_value, date["value"])
-                # self.assertEqual(tile_value, tile_value)
 
-    def test_tile_transform_withou_config(self, **kwarg):
+    def test_tile_transform_without_config(self, **kwarg):
         datatype = DataTypeFactory().get_instance("date")
-        tile_value = datatype.transform_value_for_tile(
-            self.date_without_config["value"]
-        )
-        date_value = datetime.datetime.strptime(tile_value, "%Y-%m-%d %H:%M:%S%z")
-        self.assertEqual(date_value.year, 2025)
+        for date in self.dates_without_config:
+            with self.subTest(input=date):
+                tile_value = datatype.transform_value_for_tile(date["value"])
+                date_value = datetime.datetime.strptime(
+                    tile_value, date["expected_format"]
+                )
+                self.assertEqual(date_value.year, 2025)
 
     def test_tile_transform_python(self):
         datatype = DataTypeFactory().get_instance("date")

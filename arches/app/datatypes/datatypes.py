@@ -740,6 +740,7 @@ class DateDataType(BaseDataType):
 
     def transform_value_for_tile(self, value, **kwargs):
         date_format = kwargs.get("dateFormat", None)
+        valid_date_format = None
         value = None if value == "" else value
         if value is not None:
             if isinstance(value, list):
@@ -761,6 +762,10 @@ class DateDataType(BaseDataType):
 
         if date_format and date_format in self.date_format_lookup:
             value = value.strftime(self.date_format_lookup[date_format])
+        elif (
+            valid_date_format and valid_date_format in self.date_format_lookup.values()
+        ):
+            value = value.strftime(valid_date_format)
         else:
             value = self.set_timezone(value)
         return value
