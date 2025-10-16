@@ -1008,8 +1008,9 @@ class CsvReader(Reader):
                         errors = []
                         datatype_instance = datatype_factory.get_instance(datatype)
                         try:
+                            config = Node.objects.get(nodeid=nodeid).config
                             value = datatype_instance.transform_value_for_tile(
-                                value, nodeid=nodeid
+                                value, nodeid=nodeid, **config
                             )
                             errors = datatype_instance.validate(
                                 value,
