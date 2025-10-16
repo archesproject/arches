@@ -69,7 +69,7 @@ class NodeValue(APIBase):
                 return JSONResponse(e, status=404)
 
             # transform data to format expected by tile
-            data = datatype.transform_value_for_tile(data, format=format)
+            data = datatype.transform_value_for_tile(data, format=format, **node.config)
 
             # get existing data and append new data if operation='append'
             if operation == "append":
