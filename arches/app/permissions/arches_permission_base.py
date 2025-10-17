@@ -757,7 +757,7 @@ def get_nodegroups_by_perm_for_user_or_group(
                 if set(formatted_perms) == set(explicit_perms):
                     permitted_nodegroups[nodegroup] = explicit_perms
         elif (
-            "models.read_nodegroup" in perms
+            "models.read_nodegroup" in perms or "read_nodegroup" in perms
         ):  # if no explicit permissions, object is considered accessible by all with group permissions
             if len(perms) == 1:
                 permitted_nodegroups[nodegroup] = set()
