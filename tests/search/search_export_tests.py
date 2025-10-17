@@ -55,10 +55,12 @@ class SearchExportTests(ArchesTestCase):
 
         cls.test_resourceinstanceid = uuid.uuid4()
 
-        models.ResourceInstance.objects.get_or_create(
+        instance, created = models.ResourceInstance.objects.get_or_create(
             graph_id=cls.search_model_graphid,
             resourceinstanceid=cls.test_resourceinstanceid,
         )
+        instance.graph.is_active = True
+        instance.graph.save()
         tile_data = {}
         tile_data[cls.search_model_name_nodeid] = {
             "en": {"value": "Etiwanda Avenue Street Trees", "direction": "ltr"}

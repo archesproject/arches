@@ -145,6 +145,8 @@ class SearchTests(ArchesTestCase):
             data={cls.search_model_cultural_period_nodeid: [valueid]},
             nodegroup_id=cls.search_model_cultural_period_nodeid,
         )
+        cls.cultural_period_resource.graph.is_active = True
+        cls.cultural_period_resource.graph.save()
         cls.cultural_period_resource.tiles.append(tile)
         cls.cultural_period_resource.save()
 

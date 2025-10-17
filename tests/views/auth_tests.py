@@ -18,6 +18,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import base64
 import hashlib
+from arches.app.utils.external_oauth_backend import ExternalOauthAuthenticationBackend
+from django.http import HttpRequest
 from tests.base_test import (
     ArchesTestCase,
     OAUTH_CLIENT_ID,
@@ -256,6 +258,31 @@ class AuthTests(ArchesTestCase):
         updated_mfa_hash = user_profile.encrypted_mfa_hash
 
         self.assertNotEqual(original_mfa_hash, updated_mfa_hash)
+
+    # TODO: improve this test
+    def test_external_oauth(self):
+        """
+        Test that a user can login via an external oauth provider if the configuration is set in settings.py
+
+        """
+        settings.EXTERNAL_OAUTH_CONFIGURATION = {
+            "client_id": "fake_client_id",
+            "client_secret": "fake_client_secret",
+            "uid_claim": "user",
+            "authorization_endpoint": "https://fakeprovider.org/authorize",
+            "token_endpoint": "https://fakeprovider.org/oauth/token",
+            "user_info_endpoint": "https://fakeprovider.org/userinfo",
+            "scopes": ["openid", "email", "profile", "offline_access"],
+            "validate_id_token": True,
+        }
+        with self.assertRaises(KeyError):
+            ExternalOauthAuthenticationBackend().authenticate(
+                request=HttpRequest(), sso_authentication=True
+            )
+
+        ExternalOauthAuthenticationBackend().authenticate(
+            request=HttpRequest(), sso_authentication=False
+        )  # should not raise
 
     def test_get_oauth_token(self):
         key = "{0}:{1}".format(self.oauth_client_id, self.oauth_client_secret)

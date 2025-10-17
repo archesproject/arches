@@ -822,11 +822,22 @@ class GraphXPublishedGraph(models.Model):
     def find_publication_in_language(self, language):
         if not hasattr(self, "_published_graph_cache"):
             self._published_graph_cache = {}
-        if language not in self._published_graph_cache:
-            self._published_graph_cache[language] = self.publishedgraph_set.filter(
-                language=language
+
+        normalized_language_code = language.replace("_", "-").lower()
+        if normalized_language_code in self._published_graph_cache:
+            return self._published_graph_cache[normalized_language_code]
+
+        publication = self.publishedgraph_set.filter(
+            language__code__iexact=normalized_language_code
+        ).first()
+        if publication is None and "-" in normalized_language_code:
+            primary_language_code = normalized_language_code.split("-", 1)[0]
+            publication = self.publishedgraph_set.filter(
+                language__code__iexact=primary_language_code
             ).first()
-        return self._published_graph_cache[language]
+
+        self._published_graph_cache[normalized_language_code] = publication
+        return publication
 
     def refresh_from_db(self, *args, **kwargs):
         self._published_graph_cache = {}

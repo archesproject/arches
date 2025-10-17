@@ -838,6 +838,11 @@ class Tile(models.TileModel):
                 functionXgraph.config, self.nodegroup_id
             )
             ret.append(func)
+
+        functions = models.Function.objects.filter(Q(functiontype="global"))
+        for function in functions:
+            ret.append(function.get_class_module()())
+
         return ret
 
     def filter_by_perm(self, user, perm):

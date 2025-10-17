@@ -416,7 +416,7 @@ var Workflow = function(config) {
         });
     };
 
-    this.markWorkflowComplete = function() {
+    this.markWorkflowComplete = async function() {
         const workflowid = self.id();
         const workflowHistory = {
             workflowid,
@@ -424,7 +424,7 @@ var Workflow = function(config) {
             completed: true,
         };
 
-        fetch(arches.urls.workflow_history + workflowid, {
+        await fetch(arches.urls.workflow_history + workflowid, {
             method: 'POST',
             credentials: 'include',
             headers: {

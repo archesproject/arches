@@ -12553,6 +12553,8 @@ a.filter-tools:hover {
     aside,
     .print-btn,
     .ep-tools,
+    .mapboxgl-ctrl-geocoder,
+    .workbench-card-sidebar,
     .geocode-container,
     .geometry-tools-container,
     .geometry-editing-notifications,
@@ -12601,10 +12603,6 @@ a.filter-tools:hover {
         border-bottom: 1px solid rgba(128, 128, 128, 0.5);
     }
 
-    .mapboxgl-map {
-        display: none;
-    }
-
     .print-map {
         display: block;
         width: 100%;
@@ -12645,6 +12643,10 @@ a.filter-tools:hover {
     .resource-component-abstract {
       height: auto !important;
       overflow: visible !important;
+    }
+
+    .rp-report-container-preview .workbench-card-container.map-container {
+        width: 100%;
     }
 }
 

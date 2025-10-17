@@ -33,7 +33,7 @@ export default async function createVueApplication(
      * and rebuild the app when a specific event is fired from the LanguageSwitcher component.
     **/
 
-    return fetch(generateArchesURL("get_frontend_i18n_data")).then(function(resp) {
+    return fetch(generateArchesURL("arches:get_frontend_i18n_data")).then(function(resp) {
         if (!resp.ok) {
             throw new Error(resp.statusText);
         }

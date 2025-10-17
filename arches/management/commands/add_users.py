@@ -146,11 +146,12 @@ class Command(BaseCommand):
                 perm_ids = [int(perm["id"]) for perm in dev_perms]
                 for permission in perm_ids:
                     dev_group.permissions.add(permission)
-            except Exception as e:
-                self.stdout.write(e)
+            except:
+                self.stderr.write(traceback.format_exc())
 
         plugins = models.Plugin.objects.all()
         etl_modules = models.ETLModule.objects.all()
+        groups_dict = Group.objects.in_bulk(field_name="name")
         for profile in profiles:
             try:
                 user = User.objects.create_user(
@@ -175,10 +176,10 @@ class Command(BaseCommand):
                 )
 
                 for group_name in profile["groups"]:
-                    group = Group.objects.get(name=group_name)
+                    group = groups_dict[group_name]
                     group.user_set.add(user)
 
-            except Exception as e:
+            except:
                 self.stderr.write(traceback.format_exc())
 
     def load_users_from_csv(self, options):
