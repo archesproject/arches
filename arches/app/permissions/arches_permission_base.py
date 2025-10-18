@@ -401,7 +401,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
                         protected_tiles = {tile.nodegroup_id for tile in tiles} - set(
                             nodegroups
                         )
-                        if len(protected_tiles) > 0:
+                        if len(protected_tiles) < 1:
                             return False
                         return user.groups.filter(
                             name__in=settings.RESOURCE_EDITOR_GROUPS
