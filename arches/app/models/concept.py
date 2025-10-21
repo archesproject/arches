@@ -33,6 +33,7 @@ from arches.app.utils.i18n import capitalize_region, rank_label
 from django.utils.translation import get_language, gettext as _
 from django.db import IntegrityError
 from psycopg2.extensions import AsIs
+from arches.app.models.models import Value
 
 import logging
 
@@ -1676,6 +1677,10 @@ class ConceptValue(object):
 
 
 def get_preflabel_from_conceptid(conceptid, lang):
+    preflabels = models.Value.objects.select_related().filter(
+        concept_id=conceptid, valuetype__valuetype="prefLabel"
+    )
+
     default = {
         "category": "",
         "conceptid": "",
@@ -1684,18 +1689,12 @@ def get_preflabel_from_conceptid(conceptid, lang):
         "type": "",
         "id": "",
     }
-    query = Query(se)
-    bool_query = Bool()
-    bool_query.must(Match(field="type", query="prefLabel", type="phrase"))
-    bool_query.filter(Terms(field="conceptid", terms=[conceptid]))
-    query.add_query(bool_query)
-    preflabels = query.search(index=CONCEPTS_INDEX)["hits"]["hits"]
 
     ranked = sorted(
         preflabels,
         key=lambda prefLabel: rank_label(
-            kind=prefLabel["_source"]["type"],
-            source_lang=prefLabel["_source"]["language"],
+            kind=prefLabel.valuetype,
+            source_lang=prefLabel.language.code,
             target_lang=lang,
         ),
         reverse=True,
@@ -1703,7 +1702,15 @@ def get_preflabel_from_conceptid(conceptid, lang):
 
     if not ranked:
         return default
-    return ranked[0]["_source"]
+    print(ranked[0])
+    return {
+        "category": ranked[0].valuetype.category,
+        "conceptid": str(ranked[0].concept_id),
+        "language": ranked[0].language_id,
+        "value": ranked[0].value,
+        "type": ranked[0].valuetype_id,
+        "id": str(ranked[0].valueid),
+    }
 
 
 def get_valueids_from_concept_label(label, conceptid=None, lang=None):
@@ -1743,6 +1750,6 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None):
 
 
 def get_preflabel_from_valueid(valueid, lang):
-    concept_label = se.search(index=CONCEPTS_INDEX, id=valueid)
-    if concept_label["found"]:
-        return get_preflabel_from_conceptid(concept_label["_source"]["conceptid"], lang)
+    value = models.Value.objects.get(pk=valueid)  # verify value exists
+
+    return get_preflabel_from_conceptid(value.concept_id, lang)

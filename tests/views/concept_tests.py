@@ -1,5 +1,6 @@
 from django.urls import reverse
 from django.test.client import Client
+from arches.app.models.concept import get_preflabel_from_valueid
 
 from tests.base_test import ArchesTestCase
 
@@ -19,3 +20,11 @@ class ConceptTests(ArchesTestCase):
             )
 
         self.assertEqual(response.status_code, 404)
+
+    def test_get_preflabel_from_valueid(self):
+        # static is related to valueid
+        value_id = "ac41d9be-79db-4256-b368-2f4559cfbe55"
+
+        preflabel = get_preflabel_from_valueid(value_id, "en")["value"]
+
+        self.assertEqual(preflabel, "is related to")
