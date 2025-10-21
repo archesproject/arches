@@ -353,7 +353,7 @@ class TileTreeOperation:
             transformed = datatype_instance.transform_value_for_tile(
                 value_to_validate,
                 languages=self.languages,
-                is_existing_tile=bool(tile._state.db),
+                is_existing_tile=(not tile._state.adding),
                 **node.config,
             )
         except ValueError:  # BooleanDataType raises.
