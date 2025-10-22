@@ -1702,7 +1702,7 @@ def get_preflabel_from_conceptid(conceptid, lang):
 
     if not ranked:
         return default
-    print(ranked[0])
+
     return {
         "category": ranked[0].valuetype.category,
         "conceptid": str(ranked[0].concept_id),
