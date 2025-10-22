@@ -18,22 +18,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import re
 import uuid
-import copy
-from operator import itemgetter
-from operator import methodcaller
 from django.db import transaction, connection
 from django.db.models import Q
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
-from arches.app.search.elasticsearch_dsl_builder import Term, Query, Bool, Match, Terms
+from arches.app.search.elasticsearch_dsl_builder import Term, Query
 from arches.app.search.mappings import CONCEPTS_INDEX
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.i18n import capitalize_region, rank_label
 from django.utils.translation import get_language, gettext as _
-from django.db import IntegrityError
 from psycopg2.extensions import AsIs
-from arches.app.models.models import Value
 
 import logging
 
