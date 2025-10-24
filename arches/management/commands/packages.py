@@ -834,64 +834,6 @@ class Command(BaseCommand):
             except IndexError:
                 logger.warning("No resource models in package")
 
-        def load_concepts(package_dir, overwrite, stage, defer_indexing):
-            file_types = ["*.xml", "*.rdf"]
-
-            from time import time
-
-            start = time()
-
-            concept_data = []
-            for file_type in file_types:
-                concept_data.extend(
-                    glob.glob(
-                        os.path.join(
-                            package_dir, "reference_data", "concepts", file_type
-                        )
-                    )
-                )
-
-            bar1 = (
-                pyprind.ProgBar(len(concept_data), bar_char="█", stream=self.stdout)
-                if len(concept_data) > 1
-                else None
-            )
-            for path in concept_data:
-                if bar1 is None:
-                    print(path)
-                self.import_reference_data(path, overwrite, stage, defer_indexing)
-                if bar1 is not None:
-                    head, tail = os.path.split(path)
-                    bar1.update(item_id=tail + (" " * 10))
-
-            collection_data = []
-            for file_type in file_types:
-                collection_data.extend(
-                    glob.glob(
-                        os.path.join(
-                            package_dir, "reference_data", "collections", file_type
-                        )
-                    )
-                )
-
-            bar2 = (
-                pyprind.ProgBar(len(collection_data), bar_char="█", stream=self.stdout)
-                if len(collection_data) > 1
-                else None
-            )
-            for path in collection_data:
-                if bar2 is None:
-                    print(path)
-                self.import_reference_data(path, overwrite, stage, defer_indexing)
-                if bar2 is not None:
-                    head, tail = os.path.split(path)
-                    bar2.update(item_id=tail)
-
-            print(
-                "Total time to load concepts: %s s"
-                % (timedelta(seconds=time() - start))
-            )
-
         def load_mapbox_styles(style_paths, basemap):
             for path in style_paths:
                 style = json.load(open(path))
@@ -1276,7 +1218,7 @@ class Command(BaseCommand):
         print("loading etl modules")
         load_etl_modules(package_location)
         print("loading concepts")
-        load_concepts(
+        self.load_concepts(
             package_location, overwrite_concepts, stage_concepts, defer_indexing
         )
         print("loading resource models and branches")
@@ -1326,6 +1268,59 @@ class Command(BaseCommand):
             )
         else:
             print("package load complete")
+
+    def load_concepts(self, package_dir, overwrite, stage, defer_indexing):
+        file_types = ["*.xml", "*.rdf"]
+
+        from time import time
+
+        start = time()
+
+        concept_data = []
+        for file_type in file_types:
+            concept_data.extend(
+                glob.glob(
+                    os.path.join(package_dir, "reference_data", "concepts", file_type)
+                )
+            )
+
+        bar1 = (
+            pyprind.ProgBar(len(concept_data), bar_char="█", stream=self.stdout)
+            if len(concept_data) > 1
+            else None
+        )
+        for path in concept_data:
+            if bar1 is None:
+                print(path)
+            self.import_reference_data(path, overwrite, stage, defer_indexing)
+            if bar1 is not None:
+                head, tail = os.path.split(path)
+                bar1.update(item_id=tail + (" " * 10))
+
+        collection_data = []
+        for file_type in file_types:
+            collection_data.extend(
+                glob.glob(
+                    os.path.join(
+                        package_dir, "reference_data", "collections", file_type
+                    )
+                )
+            )
+
+        bar2 = (
+            pyprind.ProgBar(len(collection_data), bar_char="█", stream=self.stdout)
+            if len(collection_data) > 1
+            else None
+        )
+        for path in collection_data:
+            if bar2 is None:
+                print(path)
+            self.import_reference_data(path, overwrite, stage, defer_indexing)
+            if bar2 is not None:
+                head, tail = os.path.split(path)
+                bar2.update(item_id=tail)
+
+        print("Total time to load concepts: %s s" % (timedelta(seconds=time() - start)))
 
     def setup(self, package_name, es_install_location=None):
         """
