@@ -1,5 +1,7 @@
 import os
 import sys
+import glob
+import pyprind
 
 import openpyxl
 from django.db import transaction
@@ -51,6 +53,64 @@ class Command(PackagesCommand):
                 options["controlled_lists"],
                 options["format"],
             )
+
+    def load_package(
+        self,
+        source,
+        setup_db=False,
+        overwrite_concepts="ignore",
+        bulk_load=False,
+        stage_concepts="keep",
+        yes=False,
+        dev=False,
+        defer_indexing=True,
+        is_application=False,
+    ):
+
+        super().load_package(
+            source,
+            setup_db=setup_db,
+            overwrite_concepts=overwrite_concepts,
+            bulk_load=bulk_load,
+            stage_concepts=stage_concepts,
+            yes=yes,
+            dev=dev,
+            defer_indexing=defer_indexing,
+            is_application=is_application,
+        )
+
+        def load_concepts(self):
+            super().load_concepts()
+            print("Importing controlled lists...")
+            load_controlled_lists(self.package_dir, self.overwrite_options)
+
+        def load_controlled_lists(package_dir, overwrite_options):
+            file_types = ["*.xml", "*.xlsx"]
+            controlled_list_files = []
+            for file_type in file_types:
+                controlled_list_files.extend(
+                    glob.glob(
+                        os.path.join(
+                            package_dir, "reference_data", "controlled_lists", file_type
+                        )
+                    )
+                )
+
+            bar = (
+                pyprind.ProgBar(
+                    len(controlled_list_files), bar_char="█", stream=self.stdout
+                )
+                if len(controlled_list_files) > 1
+                else None
+            )
+
+            for path in controlled_list_files:
+                if bar is None:
+                    print(path)
+                self.import_controlled_lists(path, overwrite_options)
+                if bar is not None:
+                    head, tail = os.path.split(path)
+                    bar.update(item_id=tail + (" " * 10))
 
     def import_controlled_lists(self, source, overwrite_options):
         if source.lower().endswith(".xml"):
