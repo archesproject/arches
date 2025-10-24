@@ -79,10 +79,8 @@ class Command(PackagesCommand):
             is_application=is_application,
         )
 
-        def load_concepts(self):
-            super().load_concepts()
-            print("Importing controlled lists...")
-            load_controlled_lists(self.package_dir, self.overwrite_options)
+    def load_concepts(self, package_dir, overwrite, stage, defer_indexing):
+        super().load_concepts(package_dir, overwrite, stage, defer_indexing)
 
         def load_controlled_lists(package_dir, overwrite_options):
             file_types = ["*.xml", "*.xlsx"]
@@ -111,6 +109,9 @@ class Command(PackagesCommand):
                 if bar is not None:
                     head, tail = os.path.split(path)
                     bar.update(item_id=tail + (" " * 10))
+
+        print("Importing controlled lists...")
+        load_controlled_lists(package_dir, overwrite or "overwrite")
 
     def import_controlled_lists(self, source, overwrite_options):
         if source.lower().endswith(".xml"):
