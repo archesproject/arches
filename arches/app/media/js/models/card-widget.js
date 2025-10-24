@@ -32,7 +32,7 @@ export default AbstractModel.extend({
             widgets = require('widgets');
         }
         //-----------------------------------------------
-        
+
         var self = this;
         this.disposables = [];
         this.widgetLookup = widgets;
@@ -91,7 +91,7 @@ export default AbstractModel.extend({
                 var configJSON = {};
                 var config = this.get('config');
                 this.configKeys().forEach(key => {
-                    configJSON[key] = ko.toJS(this.config[key]);
+                    configJSON[key] = koMapping.toJS(this.config[key]);
                 });
                 configJSON.label = this.get('label')();
                 return configJSON;
