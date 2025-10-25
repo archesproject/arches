@@ -7,7 +7,7 @@ import uuid from "uuid";
 import geojsonExtent from "geojson-extent";
 import geojsonhint from "geojsonhint";
 import { kml } from "togeojson";
-import shpjs from "shpjsesm";
+import shp from "shpjsesm";
 import proj4 from "proj4";
 import MapboxDraw from "mapbox-gl-draw";
 import MapComponentViewModel from "views/components/map";
@@ -727,18 +727,18 @@ var viewModel = function (params) {
                                     e.target.result,
                                     "text/xml")
                             );
-                        else if (extension === "shp")
-                            geoJSON = {"type": "FeatureCollection", "features":
-                                    shpjs.parseShp(e.target.result).reduce(function(features, geometry) {
-                                        features = features.concat({"type": "Feature", "geometry": geometry, "properties": {}});
-                                        return features;
-                                    }, [])};
-                        else if (extension === "zip")
-                            shpjs.parseZip(e.target.result).then(function(parsedZip) {
-                                resolve(parsedZip);
-                            });
-                        if (extension !== "zip")
-                            resolve(geoJSON);
+                            else if (extension === "shp")
+                                shp({ shp: e.target.result }).then(
+                                    (parsedShp) => {
+                                        resolve(parsedShp);
+                                    },
+                                );
+                            else if (extension === "zip")
+                                shp(e.target.result).then(function (parsedZip) {
+                                    resolve(parsedZip);
+                                });
+                            if (!["shp", "zip"].includes(extension))
+                                resolve(geoJSON);
                     };
                     if (["shp", "zip"].includes(extension))
                         reader.readAsArrayBuffer(file);
