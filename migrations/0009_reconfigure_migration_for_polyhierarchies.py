@@ -665,7 +665,7 @@ class Migration(migrations.Migration):
     """
 
     dependencies = [
-        ('arches_controlled_lists', '0008_ensure_languages_in_sync'),
+        ("arches_controlled_lists", "0008_ensure_languages_in_sync"),
     ]
 
     operations = [
