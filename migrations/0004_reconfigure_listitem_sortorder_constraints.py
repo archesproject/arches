@@ -101,7 +101,7 @@ begin
         id,
         name,
         dynamic,
-        search_only
+        searchable
     )
     with identifier_conceptids as (
         select c.conceptid
@@ -115,7 +115,7 @@ begin
     select c.conceptid as id,
         value as name,
         false as dynamic,
-        false as search_only
+        false as searchable
     from concepts c
     full join values v on
         c.conceptid = v.conceptid
