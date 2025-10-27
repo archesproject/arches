@@ -68,7 +68,7 @@ function onUpdateValue(updatedAliasedNodeData: AliasedNodeData) {
         return;
     }
 
-    formFieldRef.value?.field.props.onChange({ value: updatedAliasedNodeData });
+    formFieldRef.value?.field?.props?.onChange({ value: updatedAliasedNodeData });
 
     emit("update:value", updatedAliasedNodeData);
     emit("update:isDirty", true);

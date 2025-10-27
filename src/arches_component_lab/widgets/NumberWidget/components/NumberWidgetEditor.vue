@@ -38,8 +38,8 @@ function onUpdateModelValue(updatedValue: number | null) {
         :max-fraction-digits="
             Number(cardXNodeXWidgetData.config.precision) || 0
         "
-        :min="cardXNodeXWidgetData.config.min"
-        :max="cardXNodeXWidgetData.config.max"
+        :min="Number(cardXNodeXWidgetData.config.min) || -Infinity"
+        :max="Number(cardXNodeXWidgetData.config.max) || Infinity"
         @update:model-value="onUpdateModelValue($event)"
     />
 </template>
