@@ -307,7 +307,6 @@ class Migration(migrations.Migration):
         );
         
         drop table if exists temp_collection_hierarchy;
-        drop table if exists temp_list_items_and_values;
 
         return format('Collection(s) %s migrated to controlled list(s)', array_to_string(collection_names, ', '));
     end;
