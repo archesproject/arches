@@ -114,48 +114,6 @@ class Command(PackagesCommand):
         load_controlled_lists(package_dir, overwrite or "overwrite")
 
     def import_controlled_lists(self, source, overwrite_options):
-        if source.lower().endswith(".xml"):
-            skos = SKOSReader()
-            rdf = skos.read_file(source)
-            skos.save_controlled_lists_from_skos(
-                rdf, overwrite_options=overwrite_options
-            )
-
-        elif source.lower().endswith(".xlsx"):
-            created_instances_pks = []
-            if os.path.exists(source):
-                wb = openpyxl.load_workbook(source)
-                with transaction.atomic():
-                    for sheet in wb.sheetnames:
-                        if sheet == "List":
-                            created_instances_pks.extend(
-                                import_sheet_to_model(wb[sheet], List)
-                            )
-                        elif sheet == "ListItem":
-                            created_instances_pks.extend(
-                                import_sheet_to_model(wb[sheet], ListItem)
-                            )
-                        elif sheet == "ListItemValue":
-                            created_instances_pks.extend(
-                                import_sheet_to_model(wb[sheet], ListItemValue)
-                            )
-                    # validate all data
-                    for model in [
-                        List,
-                        ListItem,
-                        ListItemValue,
-                    ]:
-                        for instance in model.objects.filter(
-                            pk__in=created_instances_pks
-                        ):
-                            instance.full_clean()
-                    self.stdout.write(
-                        "Data imported successfully from {0}".format(source)
-                    )
-        else:
-            self.stdout.write(
-                "The source file does not exist or is not the correct format. Please rerun this command with a valid source file."
-            )
 
         def import_sheet_to_model(sheet, model):
             fields = [
@@ -233,7 +191,90 @@ class Command(PackagesCommand):
 
             return instance_pks
 
+        if source.lower().endswith(".xml"):
+            skos = SKOSReader()
+            rdf = skos.read_file(source)
+            skos.save_controlled_lists_from_skos(
+                rdf, overwrite_options=overwrite_options
+            )
+
+        elif source.lower().endswith(".xlsx"):
+            created_instances_pks = []
+            if os.path.exists(source):
+                wb = openpyxl.load_workbook(source)
+                with transaction.atomic():
+                    for sheet in wb.sheetnames:
+                        if sheet == "List":
+                            created_instances_pks.extend(
+                                import_sheet_to_model(wb[sheet], List)
+                            )
+                        elif sheet == "ListItem":
+                            created_instances_pks.extend(
+                                import_sheet_to_model(wb[sheet], ListItem)
+                            )
+                        elif sheet == "ListItemValue":
+                            created_instances_pks.extend(
+                                import_sheet_to_model(wb[sheet], ListItemValue)
+                            )
+                    # validate all data
+                    for model in [
+                        List,
+                        ListItem,
+                        ListItemValue,
+                    ]:
+                        for instance in model.objects.filter(
+                            pk__in=created_instances_pks
+                        ):
+                            instance.full_clean()
+                    self.stdout.write(
+                        "Data imported successfully from {0}".format(source)
+                    )
+        else:
+            self.stdout.write(
+                "The source file does not exist or is not the correct format. Please rerun this command with a valid source file."
+            )
+
     def export_controlled_lists(self, data_dest, file_name, controlled_lists, format):
+
+        def export_model_to_sheet(wb, model):
+            # For the first sheet (List), use blank sheet that is initiallized with workbook
+            # otherwise, append a new sheet
+            if isinstance(wb, openpyxl.worksheet.worksheet.Worksheet):
+                ws = wb
+            else:
+                ws = wb.create_sheet(title=model.__name__)
+            fields = [
+                {"name": field.name, "datatype": field.get_internal_type()}
+                for field in model._meta.fields
+            ]
+            ws.append(field["name"] for field in fields)
+            for instance in model.objects.all():
+                row_data = []
+                for field in fields:
+                    value = getattr(instance, field["name"])
+                    if isinstance(
+                        value,
+                        (
+                            List,
+                            ListItem,
+                            ListItemValue,
+                        ),
+                    ):
+                        row_data.append(str(getattr(value, "id")) if value else "")
+                    elif isinstance(value, models.Language):
+                        row_data.append(str(value.code))
+                    elif isinstance(value, models.DValueType):
+                        row_data.append(str(value.valuetype))
+                    elif field["datatype"] == "UUIDField":
+                        row_data.append(str(value) if value else "")
+                    elif field["datatype"] == "BooleanField":
+                        row_data.append("1" if value else "0")
+                    elif field["datatype"] == "IntegerField":
+                        row_data.append(str(value))
+                    else:
+                        row_data.append(value if value else "")
+                ws.append(row_data)
+
         if format == "xlsx":
             wb = openpyxl.Workbook()
             ws = wb.active
@@ -278,42 +319,3 @@ class Command(PackagesCommand):
             self.stdout.write(
                 f"The specified format {format} is not supported. Please rerun this command with a supported format."
             )
-
-        def export_model_to_sheet(wb, model):
-            # For the first sheet (List), use blank sheet that is initiallized with workbook
-            # otherwise, append a new sheet
-            if isinstance(wb, openpyxl.worksheet.worksheet.Worksheet):
-                ws = wb
-            else:
-                ws = wb.create_sheet(title=model.__name__)
-            fields = [
-                {"name": field.name, "datatype": field.get_internal_type()}
-                for field in model._meta.fields
-            ]
-            ws.append(field["name"] for field in fields)
-            for instance in model.objects.all():
-                row_data = []
-                for field in fields:
-                    value = getattr(instance, field["name"])
-                    if isinstance(
-                        value,
-                        (
-                            List,
-                            ListItem,
-                            ListItemValue,
-                        ),
-                    ):
-                        row_data.append(str(getattr(value, "id")) if value else "")
-                    elif isinstance(value, models.Language):
-                        row_data.append(str(value.code))
-                    elif isinstance(value, models.DValueType):
-                        row_data.append(str(value.valuetype))
-                    elif field["datatype"] == "UUIDField":
-                        row_data.append(str(value) if value else "")
-                    elif field["datatype"] == "BooleanField":
-                        row_data.append("1" if value else "0")
-                    elif field["datatype"] == "IntegerField":
-                        row_data.append(str(value))
-                    else:
-                        row_data.append(value if value else "")
-                ws.append(row_data)
