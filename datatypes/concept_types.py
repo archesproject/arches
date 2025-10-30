@@ -9,10 +9,10 @@ from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializ
 class ConceptDataType(concept_types.ConceptDataType):
     def transform_value_for_tile(self, value, **kwargs):
         if isinstance(value, dict) and (value_id := value.get("valueid")):
-            return super().transform_value_for_tile(value_id)
+            return super().transform_value_for_tile(value_id, **kwargs)
         if isinstance(value, Value):
-            return super().transform_value_for_tile(str(value.pk))
-        return super().transform_value_for_tile(value)
+            return super().transform_value_for_tile(str(value.pk), **kwargs)
+        return super().transform_value_for_tile(value, **kwargs)
 
     def to_python(self, value, **kwargs):
         return self.get_instance(value)
