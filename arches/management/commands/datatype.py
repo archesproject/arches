@@ -72,7 +72,15 @@ class Command(BaseCommand):
 
         """
         utils.load_source("dt_source", source)
-        details = sys.modules["dt_source"].details
+        try:
+            details = sys.modules["dt_source"].details
+        except AttributeError:
+            sys.stderr.write(
+                "Datatype details not found in {0}, skipping datatype registration.".format(
+                    source
+                )
+            )
+            return
         self.validate_details(details)
 
         dt = models.DDataType(
