@@ -364,7 +364,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
                     if result["permitted"] == "unknown":
                         return user.groups.filter(
                             name__in=settings.RESOURCE_EDITOR_GROUPS
-                        ).exists() and self.user_can_edit_model_nodegroups(
+                        ).exists() or self.user_can_edit_model_nodegroups(
                             user, result["resource"]
                         )
                     else:
@@ -405,7 +405,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
                             return False
                         return user.groups.filter(
                             name__in=settings.RESOURCE_EDITOR_GROUPS
-                        ).exists() and self.user_can_delete_model_nodegroups(
+                        ).exists() or self.user_can_delete_model_nodegroups(
                             user, result["resource"]
                         )
                     else:
@@ -756,12 +756,13 @@ def get_nodegroups_by_perm_for_user_or_group(
             else:
                 if set(formatted_perms) == set(explicit_perms):
                     permitted_nodegroups[nodegroup] = explicit_perms
-        elif (
-            "models.read_nodegroup" in perms or "read_nodegroup" in perms
-        ):  # if no explicit permissions, object is considered accessible by all with group permissions
-            if len(perms) == 1:
-                permitted_nodegroups[nodegroup] = set()
-            elif len(perms) > 1 and any_perm:
-                permitted_nodegroups[nodegroup] = set()
+        if isinstance(user_or_group, User) and user_or_group.username == "anonymous":
+            if "models.read_nodegroup" in perms or "read_nodegroup" in perms:
+                if len(perms) == 1:
+                    permitted_nodegroups[nodegroup] = set()
+                elif len(perms) > 1 and any_perm:
+                    permitted_nodegroups[nodegroup] = set()
+        else:  # if no explicit permissions, object is considered accessible by all with group permissions
+            permitted_nodegroups[nodegroup] = set()
 
     return permitted_nodegroups
