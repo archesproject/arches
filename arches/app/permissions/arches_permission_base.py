@@ -756,7 +756,7 @@ def get_nodegroups_by_perm_for_user_or_group(
             else:
                 if set(formatted_perms) == set(explicit_perms):
                     permitted_nodegroups[nodegroup] = explicit_perms
-        if isinstance(user_or_group, User) and user_or_group.username == "anonymous":
+        elif isinstance(user_or_group, User) and user_or_group.username == "anonymous":
             if "models.read_nodegroup" in perms or "read_nodegroup" in perms:
                 if len(perms) == 1:
                     permitted_nodegroups[nodegroup] = set()
