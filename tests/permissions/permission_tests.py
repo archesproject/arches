@@ -235,8 +235,29 @@ class PermissionTests(ArchesTestCase):
         )
         self.assertTrue(nodegroup_set)
 
-        # But don't return any nodegroups if all permissions are required
+        # If all permissions are required, this is OK as long as the user is logged in
         nodegroup_set = get_nodegroups_by_perm(
             self.user, ["models.read_nodegroup", "models.delete_nodegroup"], False
+        )
+        self.assertTrue(nodegroup_set)
+
+        anonymous_user = User.objects.get(username="anonymous")
+        # Anonymous user should be able to read by default, but not delete or edit
+        nodegroup_set = get_nodegroups_by_perm(
+            anonymous_user,
+            [
+                "models.read_nodegroup",
+            ],
+        )
+
+        self.assertTrue(nodegroup_set)
+
+        nodegroup_set = get_nodegroups_by_perm(
+            anonymous_user, ["models.read_nodegroup", "models.delete_nodegroup"], False
+        )
+        self.assertFalse(nodegroup_set)
+
+        nodegroup_set = get_nodegroups_by_perm(
+            anonymous_user, ["models.read_nodegroup", "models.write_nodegroup"], False
         )
         self.assertFalse(nodegroup_set)
