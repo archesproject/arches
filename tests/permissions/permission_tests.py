@@ -207,11 +207,11 @@ class PermissionTests(ArchesTestCase):
         nodegroup_set = get_nodegroups_by_perm(self.user, "models.read_nodegroup")
         self.assertTrue(nodegroup_set)
 
-        # For the case of edit and read, access should fail because 'ben' only has implicit read access
+        # For the case of edit and delete, access should succeed because implicitly users have all read, write, and delete
         nodegroup_set = get_nodegroups_by_perm(self.user, "models.delete_nodegroup")
-        self.assertFalse(nodegroup_set)
+        self.assertTrue(nodegroup_set)
         nodegroup_set = get_nodegroups_by_perm(self.user, "models.write_nodegroup")
-        self.assertFalse(nodegroup_set)
+        self.assertTrue(nodegroup_set)
 
         # If multiple perms, if any_perm is true, user should have access to node
         nodegroup_set = get_nodegroups_by_perm(
@@ -221,7 +221,7 @@ class PermissionTests(ArchesTestCase):
         nodegroup_set = get_nodegroups_by_perm(
             self.user, ["models.read_nodegroup", "models.delete_nodegroup"], False
         )
-        self.assertFalse(nodegroup_set)
+        self.assertTrue(nodegroup_set)
 
         nodegroups = NodeGroup.objects.filter(
             node__graph_id=self.data_type_graphid
