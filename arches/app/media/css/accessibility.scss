@@ -188,6 +188,12 @@ embed:focus-visible,
     color: $map-filter-inactive-option;
 }
 
+// Tabbed reports
+.report-tab.active,
+.tab-banner {
+    background: #1E5A8F;
+}
+
 ///////////// Index page specific styles /////////////
 .application-name h1 {
     font-size: 1.3rem;
