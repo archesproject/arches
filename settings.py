@@ -166,6 +166,7 @@ INSTALLED_APPS = (
     "corsheaders",
     "oauth2_provider",
     "django_celery_results",
+    "django_migrate_sql",
     "pgtrigger",
     "arches_component_lab",
     # "silk",
