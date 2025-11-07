@@ -134,10 +134,9 @@ begin
             conceptidto as child,
             ARRAY[conceptidfrom] AS path,
             conceptidfrom as parent_id
-        from relations
-        where not exists (
-            select 1 from relations r2 where r2.conceptidto = relations.conceptidfrom
-        ) and relationtype = 'member'
+        from relations r
+        where relationtype = 'member'
+            and conceptidfrom in (select conceptid from concepts where nodetype = 'Collection')
         union all
         select ch.root_list,
             r.conceptidto,
@@ -146,6 +145,7 @@ begin
         from collection_hierarchy ch
         join relations r on ch.child = r.conceptidfrom
         where relationtype = 'member'
+            and conceptidfrom in (select conceptid from concepts where nodetype = 'Collection')
     ),
     -- Filter out any collections that are not intended to be migrated in this execution
     filtered_hierarchy as (
