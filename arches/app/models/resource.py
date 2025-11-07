@@ -459,7 +459,11 @@ class Resource(models.ResourceInstance):
                         doc, doc_id = es_index.get_documents_to_index(
                             self, document["tiles"]
                         )
-                        es_index.index_document(document=doc, id=doc_id)
+                        if isinstance(doc, list):
+                            for i in range(len(doc)):
+                                es_index.index_document(document=doc[i], id=doc_id[i])
+                        else:
+                            es_index.index_document(document=doc, id=doc_id)
 
             resource_indexed = django.dispatch.Signal()
             resource_indexed.send(sender=self.__class__, instance=self)
