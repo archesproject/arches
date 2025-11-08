@@ -50,16 +50,12 @@ const itemSize = 36; // in future iteration this should be declared in the CardX
 const options = ref<ResourceInstanceReference[]>(
     aliasedNodeData?.details || [],
 );
-const selectedOptions = ref<ResourceInstanceReference[]>(
-    aliasedNodeData?.details || [],
-);
 const isLoading = ref(false);
 const resourceResultsPage = ref(0);
 const resourceResultsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
-
 const initialValueFromTileData = computed(() => {
     if (aliasedNodeData?.details) {
         return aliasedNodeData.details.map((option) => {
@@ -103,25 +99,8 @@ async function getOptions(page: number, filterTerm?: string) {
             }),
         );
 
-        // you should be able to do this in the .map function above but for some reason
-        // this causes all the items in the dropdown to be selected
-        const selectedResourceIds = selectedOptions.value.map(
-            (option: ResourceInstanceReference) => option.resource_id,
-        );
-        references = references.filter(
-            (
-                item: Record<string, string>,
-            ): item is ResourceInstanceListOption => {
-                if (selectedResourceIds.includes(item.resource_id)) {
-                    // remove selected options from the fetched options to avoid duplicates
-                    return false;
-                }
-                return true;
-            },
-        );
-
         if (resourceData.current_page == 1) {
-            options.value = [...selectedOptions.value, ...references];
+            options.value = references;
         } else {
             options.value = [...options.value, ...references];
         }

@@ -1,13 +1,11 @@
 from django.core.paginator import Paginator
-from django.utils.decorators import method_decorator
 from django.views import View
 from django.utils.translation import get_language
 from arches.app.models.models import Node, ResourceInstance, GraphModel
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches import VERSION as arches_version
-from arches.app.utils.decorators import user_can_read_resource
-from django.db.models import Value, Case, When, Q
+from django.db.models import Q, F
 
 
 class RelatableResourcesView(View):
@@ -34,29 +32,33 @@ class RelatableResourcesView(View):
             "name", "graphid"
         )
 
-        resources = ResourceInstance.objects.filter(graph_id__in=graphs)
+        resources = (
+            ResourceInstance.objects.filter(graph_id__in=graphs)
+            .exclude(resourceinstanceid__in=initial_values)
+            .values("resourceinstanceid")
+            .annotate(display_value=F("descriptors__{}__name".format(language)))
+            .order_by("graph", "pk")
+        )
+
+        selected_resources = (
+            ResourceInstance.objects.filter(resourceinstanceid__in=initial_values)
+            .values("resourceinstanceid")
+            .annotate(display_value=F("descriptors__{}__name".format(language)))
+            .order_by("graph", "pk")
+        )
 
         if filter_term:
             resources = resources.filter(
-                Q(**{"descriptors__{}__name__icontains".format(language): filter_term})
+                Q(**{"display_value__icontains": filter_term})
             )
 
-        resources = resources.values(
-            "resourceinstanceid", "descriptors__{}__name".format(language)
-        ).order_by("graph", "pk")
         resources.count = lambda self=None: 1_000_000_000
         paginator = Paginator(resources, items_per_page)
 
-        data = [
-            {
-                "resourceinstanceid": resource["resourceinstanceid"],
-                "display_value": resource[(f"descriptors__{language}__name")],
-            }
-            for resource in sorted(
-                paginator.get_page(page_number).object_list,
-                key=lambda r: r.get(f"descriptors__{language}__name", "").lower(),
-            )
-        ]
+        data = list(selected_resources) + sorted(
+            paginator.get_page(page_number).object_list,
+            key=lambda r: r.get("display_value", "").lower(),
+        )
 
         return JSONResponse(
             {
