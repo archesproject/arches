@@ -47,7 +47,9 @@ const { $gettext } = useGettext();
 
 const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidgetData config
 
-const options = ref<ResourceInstanceReference[]>(aliasedNodeData?.details || []);
+const options = ref<ResourceInstanceReference[]>(
+    aliasedNodeData?.details || [],
+);
 const isLoading = ref(false);
 const resourceResultsPage = ref(0);
 const resourceResultsTotalCount = ref(0);
@@ -88,8 +90,6 @@ async function getOptions(page: number, filterTerm?: string) {
             filterTerm,
             aliasedNodeData?.details,
         );
-
-        //await new Promise((resolve) => setTimeout(resolve, 2500)); // simulate a delay for the loading state
 
         const references = resourceData.data.map(
             (

@@ -34,9 +34,7 @@ class RelatableResourcesView(View):
             "name", "graphid"
         )
 
-        resources = ResourceInstance.objects.filter(graph_id__in=graphs).exclude(
-            resourceinstanceid__in=initial_values
-        )
+        resources = ResourceInstance.objects.filter(graph_id__in=graphs)
 
         if filter_term:
             resources = resources.filter(
