@@ -51,9 +51,6 @@ const itemSize = 36; // in future iteration this should be declared in the CardX
 const options = ref<{ display_value: string; resource_id: string }[]>(
     aliasedNodeData?.details || [],
 );
-const selectedOptions =  ref<ResourceInstanceReference[]>(
-    aliasedNodeData?.details || [],
-);
 const isLoading = ref(false);
 const resourceResultsPage = ref(0);
 const resourceResultsTotalCount = ref(0);
