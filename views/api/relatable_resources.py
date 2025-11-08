@@ -45,7 +45,7 @@ class RelatableResourcesView(View):
             .values("resourceinstanceid")
             .annotate(display_value=F("descriptors__{}__name".format(language)))
             .order_by("graph", "pk")
-        )
+        ) if int(page_number) == 1 else []
 
         if filter_term:
             resources = resources.filter(

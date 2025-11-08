@@ -17,8 +17,8 @@ import type {
     ResourceInstanceReference,
 } from "@/arches_component_lab/datatypes/resource-instance-list/types";
 import type {
-    ResourceInstanceListOption,
     ResourceInstanceDataItem,
+    ResourceInstanceListOption,
 } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
@@ -90,7 +90,7 @@ async function getOptions(page: number, filterTerm?: string) {
             aliasedNodeData?.details,
         );
 
-        let references = resourceData.data.map(
+        const references = resourceData.data.map(
             (
                 resourceRecord: ResourceInstanceDataItem,
             ): ResourceInstanceListOption => ({
@@ -146,11 +146,8 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     await getOptions((resourceResultsPage.value || 0) + 1);
 }
 
-function getOption(value: string): {
-    display_value: string;
-    resource_id: string;
-} {
-    return options.value.find((option) => option.resource_id == value)!;
+function getOption(value: string): ResourceInstanceListOption | undefined {
+    return options.value.find((option) => option.resource_id == value);
 }
 
 function onUpdateModelValue(updatedValue: string[]) {
