@@ -86,7 +86,7 @@ async function getOptions(page: number, filterTerm?: string) {
             aliasedNodeData?.details,
         );
 
-        let references = resourceData.data.map(
+        const references = resourceData.data.map(
             (
                 resourceRecord: ResourceInstanceDataItem,
             ): ResourceInstanceListOption => ({

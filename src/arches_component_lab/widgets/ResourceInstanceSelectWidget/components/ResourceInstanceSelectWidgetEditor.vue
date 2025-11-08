@@ -102,7 +102,7 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     if (isLoading.value) {
         return;
     }
-
+    
     if (
         // if we have already fetched all the resources
         resourceResultsTotalCount.value > 0 &&
@@ -110,7 +110,7 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     ) {
         return;
     }
-
+    
     if (
         // if the user has NOT scrolled to the end of the list
         event &&
@@ -118,7 +118,7 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     ) {
         return;
     }
-
+    
     if (
         // if the dropdown is opened and we already have data
         !event &&
@@ -126,7 +126,7 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     ) {
         return;
     }
-
+    
     await getOptions((resourceResultsPage.value || 0) + 1);
 }
 
