@@ -145,7 +145,6 @@ begin
         from collection_hierarchy ch
         join relations r on ch.child = r.conceptidfrom
         where relationtype = 'member'
-            and conceptidfrom in (select conceptid from concepts where nodetype = 'Collection')
     ),
     -- Filter out any collections that are not intended to be migrated in this execution
     filtered_hierarchy as (
@@ -178,8 +177,9 @@ begin
                 fh.list_id,
                 fh.parent_id,
                 fh.path,
-                li.id as existing_item_id
+                coalesce(l.id, li.id) as existing_item_id
             from filtered_hierarchy fh
+            left join arches_controlled_lists_list l on fh.list_item_id = l.id
             left join arches_controlled_lists_listitem li on fh.list_item_id = li.id 
         ) as t
     ),
