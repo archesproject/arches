@@ -1,3 +1,4 @@
+import uuid
 from django.core.paginator import Paginator
 from django.views import View
 from django.utils.translation import get_language
@@ -32,6 +33,9 @@ class RelatableResourcesView(View):
             "name", "graphid"
         )
 
+        # import ipdb; ipdb.sset_trace()
+        
+
         resources = (
             ResourceInstance.objects.filter(graph_id__in=graphs)
             .exclude(resourceinstanceid__in=initial_values)
@@ -52,7 +56,15 @@ class RelatableResourcesView(View):
         )
 
         if filter_term:
-            resources = resources.filter(Q(**{"display_value__icontains": filter_term}))
+            try:
+                uuid.UUID(str(filter_term))
+                resources = resources.filter(
+                    Q(resourceinstanceid=str(filter_term))
+                )
+            except ValueError:
+                resources = resources.filter(
+                    Q(**{"display_value__icontains": filter_term})
+                )
 
         resources.count = lambda self=None: 1_000_000_000
         paginator = Paginator(resources, items_per_page)
@@ -61,6 +73,8 @@ class RelatableResourcesView(View):
             paginator.get_page(page_number).object_list,
             key=lambda r: r.get("display_value", "").lower(),
         )
+
+        # data = list(resources)
 
         return JSONResponse(
             {
