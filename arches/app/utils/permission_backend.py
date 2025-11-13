@@ -217,7 +217,7 @@ def get_users_with_permission_for_object(perm, obj):
     return _get_permission_framework().get_users_with_permission_for_object(perm, obj)
 
 
-def check_resource_instance_permissions(user, resourceid, permission):
+def check_resource_instance_permissions(user, resourceid, permission, resource=None):
     return _get_permission_framework().check_resource_instance_permissions(
         user, resourceid, permission
     )
