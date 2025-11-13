@@ -337,7 +337,7 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
                 result = self.check_resource_instance_permissions(
                     user, resourceid, "view_resourceinstance", resource=resource
                 )
-                if result:
+                if result["permitted"]:
                     return self.user_has_resource_model_permissions(
                         user, ["models.read_nodegroup"], result["resource"]
                     )
