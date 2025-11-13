@@ -9,10 +9,7 @@ from django.utils.translation import gettext as _
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models.models import Node
 from arches.app.models.graph import GraphValidationError
-from arches.app.search.elasticsearch_dsl_builder import (
-    Exists,
-    Match,
-)
+from arches.app.search.elasticsearch_dsl_builder import Exists, Term
 
 from arches_controlled_lists.models import ListItem
 
@@ -411,13 +408,19 @@ class ReferenceDataType(BaseDataType):
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
             elif values_list:
-                uri_field = f"tiles.data.{str(node.pk)}.uri"
-                operation = value["op"]
+                child_uris = []
                 for val in values_list:
                     uri = val.get("uri", val) if isinstance(val, dict) else val
-                    match_query = Match(field=uri_field, type="phrase", query=uri)
+                    ListItem.objects.get(uri=uri).get_child_uris(uris=child_uris)
 
-                    if operation == "in_list_any":
+                values_list = set(child_uris)
+
+                uri_field = f"tiles.data.{str(node.pk)}.uri"
+                operation = value["op"]
+                for uri in values_list:
+                    match_query = Term(field=uri_field, term=uri)
+
+                    if operation == "in_list_any" or operation == "eq":
                         query.should(match_query)
                     elif operation == "in_list_all":
                         query.must(match_query)
