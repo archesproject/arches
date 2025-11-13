@@ -304,7 +304,13 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
 
         return result
 
-    def user_can_read_resource(self, user: User, resourceid: str | None = None) -> bool:
+    def user_can_read_resource(
+        self,
+        user: User,
+        resourceid: str | None = None,
+        *,
+        resource: ResourceInstance | None = None,
+    ) -> bool:
         """
         Requires that a user be able to read an instance and read a single nodegroup of a resource
 
@@ -312,17 +318,15 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
         if user.is_authenticated:
             if user.is_superuser:
                 return True
-            if resourceid is not None and resourceid != "":
+            if resourceid or resource:
                 result = self.check_resource_instance_permissions(
-                    user, resourceid, "view_resourceinstance"
+                    user, resourceid, "view_resourceinstance", resource=resource
                 )
-                if result is not None:
-                    if result["permitted"] == "unknown":
-                        return self.user_has_resource_model_permissions(
-                            user, ["models.read_nodegroup"], result["resource"]
-                        )
-                    else:
-                        return result["permitted"]
+                if result["permitted"]:
+                    return self.user_has_resource_model_permissions(
+                        user, ["models.read_nodegroup"], result["resource"]
+                    )
+
                 else:
                     return False
 
