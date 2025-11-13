@@ -333,17 +333,15 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
         if user.is_authenticated:
             if user.is_superuser:
                 return True
-            if resourceid:
+            if resourceid or resource:
                 result = self.check_resource_instance_permissions(
                     user, resourceid, "view_resourceinstance", resource=resource
                 )
-                if result is not None:
-                    if result["permitted"] == "unknown":
-                        return self.user_has_resource_model_permissions(
-                            user, ["models.read_nodegroup"], result["resource"]
-                        )
-                    else:
-                        return result["permitted"]
+                if result is True:
+                    return self.user_has_resource_model_permissions(
+                        user, ["models.read_nodegroup"], result["resource"]
+                    )
+
                 else:
                     return False
 
