@@ -317,7 +317,7 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
                     user, resourceid, "view_resourceinstance"
                 )
                 if result is not None:
-                    if result["permitted"] == "unknown":
+                    if result["permitted"] == True:
                         return self.user_has_resource_model_permissions(
                             user, ["models.read_nodegroup"], result["resource"]
                         )
