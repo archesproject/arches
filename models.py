@@ -53,6 +53,9 @@ class AliasedData(SimpleNamespace):
             for key, val in vars(self).items()
         }
 
+    def __iter__(self):
+        return iter(vars(self).items())
+
 
 class AliasedDataMixin:
     """Don't implement properties: https://github.com/archesproject/arches/issues/12310"""
