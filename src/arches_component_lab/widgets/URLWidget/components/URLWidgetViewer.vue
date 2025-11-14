@@ -5,7 +5,7 @@ import type { URLValue } from "@/arches_component_lab/datatypes/url/types.ts";
 const { $gettext } = useGettext();
 
 defineProps<{
-    aliasedNodeData: URLValue;
+    aliasedNodeData: URLValue | null;
 }>();
 </script>
 

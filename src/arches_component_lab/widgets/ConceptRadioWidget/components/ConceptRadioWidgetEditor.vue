@@ -21,7 +21,7 @@ const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } =
     defineProps<{
         graphSlug: string;
         nodeAlias: string;
-        aliasedNodeData: ConceptValue;
+        aliasedNodeData: ConceptValue | null;
         cardXNodeXWidgetData: ConceptRadioCardXNodeXWidgetData;
     }>();
 
@@ -36,7 +36,7 @@ const flexDirection = computed(() =>
 );
 
 const options = ref<CollectionItem[]>([]);
-const selectedId = ref<string | null>(aliasedNodeData.node_value);
+const selectedId = ref<string | null>(aliasedNodeData?.node_value ?? null);
 
 const isLoading = ref(false);
 const optionsLoaded = ref(false);

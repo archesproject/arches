@@ -5,7 +5,7 @@ import type {
 } from "@/arches_component_lab/datatypes/date/types.ts";
 
 defineProps<{
-    aliasedNodeData: DateValue;
+    aliasedNodeData: DateValue | null;
     cardXNodeXWidgetData: DateDatatypeCardXNodeXWidgetData;
 }>();
 </script>

@@ -23,7 +23,7 @@ type FormFieldType = {
 const { isDirty, nodeAlias, aliasedNodeData } = defineProps<{
     isDirty: boolean;
     nodeAlias: string;
-    aliasedNodeData: AliasedNodeData;
+    aliasedNodeData: AliasedNodeData | null;
 }>();
 
 const emit = defineEmits<{

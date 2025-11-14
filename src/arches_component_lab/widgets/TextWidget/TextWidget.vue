@@ -16,7 +16,7 @@ const {
 } = defineProps<{
     mode: WidgetMode;
     cardXNodeXWidgetData: StringCardXNodeXWidgetData;
-    aliasedNodeData: StringValue;
+    aliasedNodeData: StringValue | null;
     shouldEmitSimplifiedValue: boolean;
 }>();
 

@@ -32,7 +32,7 @@ const {
     cardXNodeXWidgetData: CardXNodeXWidgetData;
     nodeAlias: string;
     graphSlug: string;
-    aliasedNodeData: ResourceInstanceListValue;
+    aliasedNodeData: ResourceInstanceListValue | null;
     shouldEmitSimplifiedValue: boolean;
 }>();
 

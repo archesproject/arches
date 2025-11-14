@@ -4,7 +4,7 @@ import arches from "arches";
 import type { ResourceInstanceListValue } from "@/arches_component_lab/datatypes/resource-instance-list/types";
 
 defineProps<{
-    aliasedNodeData: ResourceInstanceListValue;
+    aliasedNodeData: ResourceInstanceListValue | null;
 }>();
 </script>
 <template>

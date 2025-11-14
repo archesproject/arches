@@ -19,7 +19,7 @@ const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } =
     defineProps<{
         graphSlug: string;
         nodeAlias: string;
-        aliasedNodeData: ConceptValue;
+        aliasedNodeData: ConceptValue | null;
         cardXNodeXWidgetData: CardXNodeXWidgetData;
     }>();
 

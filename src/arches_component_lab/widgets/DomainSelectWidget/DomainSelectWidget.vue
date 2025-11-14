@@ -15,7 +15,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
-    aliasedNodeData: DomainValue;
+    aliasedNodeData: DomainValue | null;
 }>();
 
 const emit = defineEmits(["update:value"]);

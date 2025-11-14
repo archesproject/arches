@@ -19,7 +19,7 @@ const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } =
     defineProps<{
         graphSlug: string;
         nodeAlias: string;
-        aliasedNodeData: ConceptListValue;
+        aliasedNodeData: ConceptListValue | null;
         cardXNodeXWidgetData: CardXNodeXWidgetData;
     }>();
 
@@ -37,7 +37,7 @@ const fetchError = ref<string | null>(null);
 
 const initialValue = computed<Record<string, boolean>>(() => {
     return (
-        aliasedNodeData.node_value?.reduce(
+        aliasedNodeData?.node_value?.reduce(
             (acc: Record<string, boolean>, value: string) => {
                 return { ...acc, [value]: true };
             },

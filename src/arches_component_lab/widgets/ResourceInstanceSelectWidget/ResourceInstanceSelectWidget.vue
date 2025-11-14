@@ -20,7 +20,7 @@ const {
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    aliasedNodeData: ResourceInstanceValue;
+    aliasedNodeData: ResourceInstanceValue | null;
     shouldEmitSimplifiedValue: boolean;
 }>();
 

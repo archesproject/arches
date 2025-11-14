@@ -18,7 +18,7 @@ const { $gettext } = useGettext();
 const { cardXNodeXWidgetData, aliasedNodeData, shouldEmitSimplifiedValue } =
     defineProps<{
         cardXNodeXWidgetData: StringCardXNodeXWidgetData;
-        aliasedNodeData: StringValue;
+        aliasedNodeData: StringValue | null;
         shouldEmitSimplifiedValue: boolean;
     }>();
 
@@ -47,7 +47,7 @@ watchEffect(async () => {
 });
 
 watch(languages, () => {
-    const workingObject = { ...aliasedNodeData.node_value };
+    const workingObject = { ...aliasedNodeData?.node_value };
     for (const language of languages.value) {
         if (!workingObject[language.code]) {
             workingObject[language.code] = {

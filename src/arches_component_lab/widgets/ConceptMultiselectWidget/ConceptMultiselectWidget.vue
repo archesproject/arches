@@ -13,7 +13,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    aliasedNodeData: ConceptListValue;
+    aliasedNodeData: ConceptListValue | null;
 }>();
 
 const emit = defineEmits(["update:value"]);

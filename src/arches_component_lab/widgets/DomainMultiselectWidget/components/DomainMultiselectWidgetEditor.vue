@@ -9,7 +9,7 @@ import type {
 
 const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
-    aliasedNodeData: DomainValueList;
+    aliasedNodeData: DomainValueList | null;
 }>();
 
 const options = cardXNodeXWidgetData.node.config.options;
@@ -47,7 +47,7 @@ function onUpdateModelValue(updatedValue: string[] | null) {
         :options="options"
         :placeholder="cardXNodeXWidgetData.config.placeholder"
         :fluid="true"
-        :model-value="aliasedNodeData.node_value || []"
+        :model-value="aliasedNodeData?.node_value || []"
         @update:model-value="onUpdateModelValue($event)"
     />
 </template>

@@ -2,10 +2,10 @@
 import type { NumberValue } from "@/arches_component_lab/datatypes/number/types";
 
 defineProps<{
-    aliasedNodeData: NumberValue;
+    aliasedNodeData: NumberValue | null;
 }>();
 </script>
 
 <template>
-    <div>{{ aliasedNodeData.display_value }}</div>
+    <div>{{ aliasedNodeData?.display_value }}</div>
 </template>

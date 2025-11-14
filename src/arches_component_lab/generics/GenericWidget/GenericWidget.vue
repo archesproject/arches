@@ -72,7 +72,7 @@ const widgetComponent = computed(() => {
 const widgetValue = computed(() => {
     if (aliasedNodeData !== undefined) {
         return aliasedNodeData as AliasedNodeData;
-    } else if (resolvedCardXNodeXWidgetData.value) {
+    } else if (resolvedCardXNodeXWidgetData.value?.config?.defaultValue) {
         return resolvedCardXNodeXWidgetData.value.config
             .defaultValue as AliasedNodeData;
     } else {

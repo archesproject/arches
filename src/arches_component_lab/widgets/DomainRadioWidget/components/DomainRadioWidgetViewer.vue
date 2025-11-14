@@ -2,7 +2,7 @@
 import type { DomainValue } from "@/arches_component_lab/datatypes/domain/types.ts";
 
 defineProps<{
-    aliasedNodeData: DomainValue;
+    aliasedNodeData: DomainValue | null;
 }>();
 </script>
 

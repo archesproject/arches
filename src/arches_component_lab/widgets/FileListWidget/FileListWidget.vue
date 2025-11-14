@@ -15,7 +15,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: FileListCardXNodeXWidgetData;
-    aliasedNodeData: FileListValue;
+    aliasedNodeData: FileListValue | null;
 }>();
 
 const emit = defineEmits(["update:value"]);

@@ -2,11 +2,11 @@
 import type { ConceptValue } from "@/arches_component_lab/datatypes/concept/types.ts";
 
 const { aliasedNodeData } = defineProps<{
-    aliasedNodeData: ConceptValue;
+    aliasedNodeData: ConceptValue | null;
 }>();
 </script>
 <template>
     <div>
-        {{ aliasedNodeData.display_value }}
+        {{ aliasedNodeData?.display_value }}
     </div>
 </template>

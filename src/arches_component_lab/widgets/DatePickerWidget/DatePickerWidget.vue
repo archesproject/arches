@@ -15,7 +15,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: DateDatatypeCardXNodeXWidgetData;
-    aliasedNodeData: DateValue;
+    aliasedNodeData: DateValue | null;
 }>();
 
 const emit = defineEmits(["update:value"]);

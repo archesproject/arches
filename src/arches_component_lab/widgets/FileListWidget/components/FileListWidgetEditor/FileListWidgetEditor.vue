@@ -17,7 +17,7 @@ import type {
 } from "@/arches_component_lab/widgets/FileListWidget/types.ts";
 
 const { aliasedNodeData, nodeAlias, cardXNodeXWidgetData } = defineProps<{
-    aliasedNodeData: FileListValue;
+    aliasedNodeData: FileListValue | null;
     nodeAlias: string;
     cardXNodeXWidgetData: FileListCardXNodeXWidgetData;
 }>();
@@ -107,7 +107,7 @@ function openFileChooser(): void {
         ref="fileUploadRef"
         :accept="allowedFileTypes"
         :name="nodeAlias"
-        :model-value="aliasedNodeData.node_value"
+        :model-value="aliasedNodeData?.node_value"
         :multiple="true"
         :show-cancel-button="false"
         :show-upload-button="false"

@@ -13,7 +13,7 @@ defineProps<{
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
-    aliasedNodeData: NumberValue;
+    aliasedNodeData: NumberValue | null;
     shouldEmitSimplifiedValue: boolean;
 }>();
 

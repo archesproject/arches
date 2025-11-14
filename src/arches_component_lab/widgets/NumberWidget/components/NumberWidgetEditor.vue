@@ -9,7 +9,7 @@ import type {
 const { cardXNodeXWidgetData, aliasedNodeData, shouldEmitSimplifiedValue } =
     defineProps<{
         cardXNodeXWidgetData: NumberCardXNodeXWidgetData;
-        aliasedNodeData: NumberValue;
+        aliasedNodeData: NumberValue | null;
         shouldEmitSimplifiedValue: boolean;
     }>();
 

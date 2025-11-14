@@ -14,7 +14,7 @@ import type {
 
 const { aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
     cardXNodeXWidgetData: DateDatatypeCardXNodeXWidgetData;
-    aliasedNodeData: DateValue;
+    aliasedNodeData: DateValue | null;
 }>();
 
 const emit = defineEmits<{
