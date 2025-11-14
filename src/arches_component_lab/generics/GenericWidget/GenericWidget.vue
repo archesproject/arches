@@ -25,6 +25,7 @@ import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const {
     cardXNodeXWidgetData,
+    cardXNodeXWidgetDataOverrides,
     graphSlug,
     isDirty = false,
     mode,
@@ -34,6 +35,7 @@ const {
     shouldEmitSimplifiedValue = false,
 } = defineProps<{
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
+    cardXNodeXWidgetDataOverrides?: CardXNodeXWidgetData;
     graphSlug: string;
     isDirty?: boolean;
     mode: WidgetMode;
@@ -92,6 +94,15 @@ watchEffect(async () => {
             graphSlug,
             nodeAlias,
         );
+        if (
+            cardXNodeXWidgetDataOverrides &&
+            resolvedCardXNodeXWidgetData.value
+        ) {
+            resolvedCardXNodeXWidgetData.value = {
+                ...resolvedCardXNodeXWidgetData.value,
+                ...cardXNodeXWidgetDataOverrides,
+            };
+        }
     } catch (error) {
         configurationError.value = error as Error;
     } finally {
