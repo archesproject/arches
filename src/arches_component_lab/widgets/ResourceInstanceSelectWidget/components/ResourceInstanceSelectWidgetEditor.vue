@@ -19,16 +19,25 @@ import type {
 
 const { $gettext } = useGettext();
 
-const { cardXNodeXWidgetData, nodeAlias, graphSlug, aliasedNodeData } =
-    defineProps<{
-        cardXNodeXWidgetData: CardXNodeXWidgetData;
-        nodeAlias: string;
-        graphSlug: string;
-        aliasedNodeData: ResourceInstanceValue;
-    }>();
+const {
+    cardXNodeXWidgetData,
+    nodeAlias,
+    graphSlug,
+    aliasedNodeData,
+    shouldEmitSimplifiedValue,
+} = defineProps<{
+    cardXNodeXWidgetData: CardXNodeXWidgetData;
+    nodeAlias: string;
+    graphSlug: string;
+    aliasedNodeData: ResourceInstanceValue;
+    shouldEmitSimplifiedValue: boolean;
+}>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: ResourceInstanceValue): void;
+    (
+        event: "update:value",
+        updatedValue: ResourceInstanceValue | string[],
+    ): void;
 }>();
 
 const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidgetData config
@@ -61,7 +70,7 @@ async function getOptions(page: number, filterTerm?: string) {
             (
                 resourceRecord: ResourceInstanceDataItem,
             ): ResourceInstanceSelectOption => ({
-                display_value: resourceRecord.display_value,
+                display_value: resourceRecord.display_value ?? "",
                 resource_id: resourceRecord.resourceinstanceid,
             }),
         );
@@ -128,20 +137,31 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
 }
 
 function onUpdateModelValue(updatedValue: string | null) {
-    const option = getOption(updatedValue!);
+    const selectedValue = updatedValue ?? "";
 
-    emit("update:value", {
-        display_value: option ? option.display_value : "",
-        node_value: updatedValue
-            ? {
-                  inverseOntologyProperty: "",
-                  ontologyProperty: "",
-                  resourceId: updatedValue,
-                  resourceXresourceId: "",
-              }
-            : null,
-        details: option ? [option] : [],
-    } as ResourceInstanceValue);
+    const option = getOption(selectedValue);
+
+    if (shouldEmitSimplifiedValue) {
+        if (updatedValue === null) {
+            emit("update:value", []);
+        } else {
+            emit("update:value", [selectedValue]);
+        }
+        return;
+    } else {
+        emit("update:value", {
+            display_value: option ? option.display_value : "",
+            node_value: updatedValue
+                ? {
+                      inverseOntologyProperty: "",
+                      ontologyProperty: "",
+                      resourceId: selectedValue,
+                      resourceXresourceId: "",
+                  }
+                : null,
+            details: option ? [option] : [],
+        } as ResourceInstanceValue);
+    }
 }
 </script>
 
@@ -150,6 +170,7 @@ function onUpdateModelValue(updatedValue: string | null) {
         display="chip"
         option-label="display_value"
         option-value="resource_id"
+        style="min-height: 3rem"
         :filter="true"
         :filter-placeholder="$gettext('Filter Resources')"
         :fluid="true"

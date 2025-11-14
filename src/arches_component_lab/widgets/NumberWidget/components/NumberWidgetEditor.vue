@@ -6,21 +6,27 @@ import type {
     NumberValue,
 } from "@/arches_component_lab/datatypes/number/types.ts";
 
-const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
-    cardXNodeXWidgetData: NumberCardXNodeXWidgetData;
-    aliasedNodeData: NumberValue;
-}>();
+const { cardXNodeXWidgetData, aliasedNodeData, shouldEmitSimplifiedValue } =
+    defineProps<{
+        cardXNodeXWidgetData: NumberCardXNodeXWidgetData;
+        aliasedNodeData: NumberValue;
+        shouldEmitSimplifiedValue: boolean;
+    }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: NumberValue): void;
+    (event: "update:value", updatedValue: NumberValue | number | null): void;
 }>();
 
 function onUpdateModelValue(updatedValue: number | null) {
-    emit("update:value", {
-        display_value: updatedValue !== null ? updatedValue.toString() : "",
-        node_value: updatedValue,
-        details: [],
-    });
+    if (shouldEmitSimplifiedValue) {
+        emit("update:value", updatedValue);
+    } else {
+        emit("update:value", {
+            display_value: updatedValue !== null ? updatedValue.toString() : "",
+            node_value: updatedValue,
+            details: [],
+        });
+    }
 }
 </script>
 

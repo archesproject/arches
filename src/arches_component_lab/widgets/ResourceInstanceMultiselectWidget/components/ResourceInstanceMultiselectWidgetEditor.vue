@@ -22,16 +22,25 @@ import type {
 } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-const { cardXNodeXWidgetData, nodeAlias, graphSlug, aliasedNodeData } =
-    defineProps<{
-        cardXNodeXWidgetData: CardXNodeXWidgetData;
-        nodeAlias: string;
-        graphSlug: string;
-        aliasedNodeData: ResourceInstanceListValue;
-    }>();
+const {
+    cardXNodeXWidgetData,
+    nodeAlias,
+    graphSlug,
+    aliasedNodeData,
+    shouldEmitSimplifiedValue,
+} = defineProps<{
+    cardXNodeXWidgetData: CardXNodeXWidgetData;
+    nodeAlias: string;
+    graphSlug: string;
+    aliasedNodeData: ResourceInstanceListValue;
+    shouldEmitSimplifiedValue: boolean;
+}>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: ResourceInstanceListValue): void;
+    (
+        event: "update:value",
+        updatedValue: ResourceInstanceListValue | string[],
+    ): void;
 }>();
 
 const { $gettext } = useGettext();
@@ -85,7 +94,7 @@ async function getOptions(page: number, filterTerm?: string) {
             (
                 resourceRecord: ResourceInstanceDataItem,
             ): ResourceInstanceListOption => ({
-                display_value: resourceRecord.display_value,
+                display_value: resourceRecord.display_value ?? "",
                 resource_id: resourceRecord.resourceinstanceid,
             }),
         );
@@ -160,15 +169,19 @@ function onUpdateModelValue(updatedValue: string[]) {
         },
     );
 
-    const formattedValue = {
-        display_value: options
-            .map((option) => option?.display_value)
-            .join(", "),
-        node_value: formattedNodeValues,
-        details: options ?? [],
-    };
+    if (shouldEmitSimplifiedValue) {
+        emit("update:value", updatedValue as string[]);
+    } else {
+        const formattedValue = {
+            display_value: options
+                .map((option) => option?.display_value)
+                .join(", "),
+            node_value: formattedNodeValues,
+            details: options ?? [],
+        };
 
-    emit("update:value", formattedValue);
+        emit("update:value", formattedValue);
+    }
 }
 </script>
 
@@ -177,6 +190,7 @@ function onUpdateModelValue(updatedValue: string[]) {
         display="chip"
         option-label="display_value"
         option-value="resource_id"
+        style="min-height: 3rem"
         :filter="true"
         :filter-placeholder="$gettext('Filter Resources')"
         :fluid="true"

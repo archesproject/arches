@@ -8,12 +8,20 @@ import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { ResourceInstanceListValue } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-defineProps<{
+const {
+    mode,
+    nodeAlias,
+    graphSlug,
+    cardXNodeXWidgetData,
+    aliasedNodeData,
+    shouldEmitSimplifiedValue = false,
+} = defineProps<{
     mode: WidgetMode;
     nodeAlias: string;
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
     aliasedNodeData: ResourceInstanceListValue;
+    shouldEmitSimplifiedValue: boolean;
 }>();
 
 const emit = defineEmits(["update:value"]);
@@ -26,6 +34,7 @@ const emit = defineEmits(["update:value"]);
         :graph-slug="graphSlug"
         :node-alias="nodeAlias"
         :aliased-node-data="aliasedNodeData"
+        :should-emit-simplified-value="shouldEmitSimplifiedValue"
         @update:value="emit('update:value', $event)"
     />
     <ResourceInstanceMultiselectWidgetViewer
