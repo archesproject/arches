@@ -33,9 +33,6 @@ class RelatableResourcesView(View):
             "name", "graphid"
         )
 
-        # import ipdb; ipdb.sset_trace()
-        
-
         resources = (
             ResourceInstance.objects.filter(graph_id__in=graphs)
             .exclude(resourceinstanceid__in=initial_values)
@@ -73,8 +70,6 @@ class RelatableResourcesView(View):
             paginator.get_page(page_number).object_list,
             key=lambda r: r.get("display_value", "").lower(),
         )
-
-        # data = list(resources)
 
         return JSONResponse(
             {
