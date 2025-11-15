@@ -8,6 +8,7 @@ import Button from "primevue/button";
 import MultiSelect from "primevue/multiselect";
 
 import { fetchRelatableResources } from "@/arches_component_lab/datatypes/resource-instance-list/api.ts";
+import { debounce } from "@/arches_component_lab/utils.ts";
 
 import type { MultiSelectFilterEvent } from "primevue/multiselect";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
@@ -69,14 +70,9 @@ watchEffect(() => {
     getOptions(1);
 });
 
-let timeoutId: ReturnType<typeof setTimeout> | undefined;
-function onFilter(event: MultiSelectFilterEvent) {
-    clearTimeout(timeoutId);
-    options.value = aliasedNodeData?.details || [];
-    timeoutId = setTimeout(() => {
-        getOptions(1, event.value);
-    }, 600);
-}
+const onFilter = debounce((event: MultiSelectFilterEvent) => {
+    getOptions(1, event.value);
+}, 600);
 
 async function getOptions(page: number, filterTerm?: string) {
     try {

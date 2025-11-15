@@ -6,6 +6,7 @@ import { useGettext } from "vue3-gettext";
 import Select from "primevue/select";
 
 import { fetchRelatableResources } from "@/arches_component_lab/datatypes/resource-instance/api.ts";
+import { debounce } from "@/arches_component_lab/utils.ts";
 
 import type { SelectFilterEvent } from "primevue/select";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
@@ -58,14 +59,9 @@ watchEffect(() => {
     getOptions(1);
 });
 
-let timeoutId: ReturnType<typeof setTimeout> | undefined;
-function onFilter(event: SelectFilterEvent) {
-    clearTimeout(timeoutId);
-    // options.value = aliasedNodeData?.details || [];
-    timeoutId = setTimeout(() => {
-        getOptions(1, event.value);
-    }, 600);
-}
+const onFilter = debounce((event: SelectFilterEvent) => {
+    getOptions(1, event.value);
+}, 600);
 
 async function getOptions(page: number, filterTerm?: string) {
     try {
@@ -107,7 +103,7 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     if (isLoading.value) {
         return;
     }
-    
+
     if (
         // if we have already fetched all the resources
         resourceResultsTotalCount.value > 0 &&
@@ -115,7 +111,7 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     ) {
         return;
     }
-    
+
     if (
         // if the user has NOT scrolled to the end of the list
         event &&
@@ -123,7 +119,7 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     ) {
         return;
     }
-    
+
     if (
         // if the dropdown is opened and we already have data
         !event &&
@@ -131,7 +127,7 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     ) {
         return;
     }
-    
+
     await getOptions((resourceResultsPage.value || 0) + 1);
 }
 
