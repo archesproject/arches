@@ -106,16 +106,16 @@ class TileTreeOperation:
             filters &= Q(source_identifier=None)
             return {
                 node.pk: node
-                for node in Node.objects.filter(filters).select_related(
-                    "nodegroup__grouping_node__nodegroup__parentnodegroup"
-                )
+                for node in Node.objects.filter(filters)
+                .select_related("nodegroup__grouping_node__nodegroup__parentnodegroup")
+                .prefetch_related("nodegroup__node_set__cardxnodexwidget_set")
             }
         else:
             ret = {
                 node.pk: node
-                for node in Node.objects.filter(filters).select_related(
-                    "nodegroup__parentnodegroup"
-                )
+                for node in Node.objects.filter(filters)
+                .select_related("nodegroup__parentnodegroup")
+                .prefetch_related("nodegroup__node_set__cardxnodexwidget_set")
             }
             for node_id, node in ret.items():
                 node.nodegroup.grouping_node = ret[node_id]

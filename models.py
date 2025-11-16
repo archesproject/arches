@@ -12,12 +12,7 @@ from django.db import models
 from django.utils.translation import gettext as _
 
 from arches import VERSION as arches_version
-from arches.app.models.models import (
-    GraphModel,
-    Node,
-    ResourceInstance,
-    TileModel,
-)
+from arches.app.models.models import GraphModel, ResourceInstance, TileModel
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.utils.betterJSONSerializer import JSONSerializer
