@@ -48,7 +48,7 @@ const { $gettext } = useGettext();
 
 const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidgetData config
 
-const options = ref<ResourceInstanceReference[]>(
+const options = ref<{ display_value: string; resource_id: string }[]>(
     aliasedNodeData?.details || [],
 );
 const isLoading = ref(false);
@@ -171,7 +171,7 @@ function onUpdateModelValue(updatedValue: string[]) {
                 .join(", "),
             node_value: formattedNodeValues,
             details: options ?? [],
-        };
+        } as ResourceInstanceListValue;
 
         emit("update:value", formattedValue);
     }

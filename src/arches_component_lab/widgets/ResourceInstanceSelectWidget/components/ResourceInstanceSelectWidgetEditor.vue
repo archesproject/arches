@@ -13,7 +13,6 @@ import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
 
 import type {
     ResourceInstanceValue,
-    ResourceInstanceReference,
     ResourceInstanceDataItem,
     ResourceInstanceSelectOption,
 } from "@/arches_component_lab/datatypes/resource-instance/types.ts";
@@ -45,7 +44,7 @@ const { $gettext } = useGettext();
 
 const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidgetData config
 
-const options = ref<ResourceInstanceReference[]>(
+const options = ref<{ display_value: string; resource_id: string }[]>(
     aliasedNodeData?.details || [],
 );
 const isLoading = ref(false);
