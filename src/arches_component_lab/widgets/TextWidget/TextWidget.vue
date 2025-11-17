@@ -8,13 +8,10 @@ import type { StringCardXNodeXWidgetData } from "@/arches_component_lab/types.ts
 import type { StringValue } from "@/arches_component_lab/datatypes/string/types";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-const {
-    mode,
-    cardXNodeXWidgetData,
-    aliasedNodeData,
-    shouldEmitSimplifiedValue = false,
-} = defineProps<{
+defineProps<{
     mode: WidgetMode;
+    nodeAlias: string;
+    graphSlug: string;
     cardXNodeXWidgetData: StringCardXNodeXWidgetData;
     aliasedNodeData: StringValue | null;
     shouldEmitSimplifiedValue: boolean;
