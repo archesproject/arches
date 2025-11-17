@@ -11,15 +11,21 @@ import type {
     ReferenceSelectValue,
 } from "@/arches_controlled_lists/datatypes/reference-select/types.ts";
 
-const { mode, nodeAlias, graphSlug, cardXNodeXWidgetData, aliasedNodeData, compact=false } = 
-    defineProps<{
-        mode: WidgetMode;
-        nodeAlias: string;
-        graphSlug: string;
-        cardXNodeXWidgetData: ReferenceSelectDatatypeCardXNodeXWidgetData;
-        aliasedNodeData: ReferenceSelectValue;
-        compact: boolean;
-    }>();
+const {
+    mode,
+    nodeAlias,
+    graphSlug,
+    cardXNodeXWidgetData,
+    aliasedNodeData,
+    shouldEmitSimplifiedValue = false,
+} = defineProps<{
+    mode: WidgetMode;
+    nodeAlias: string;
+    graphSlug: string;
+    cardXNodeXWidgetData: ReferenceSelectDatatypeCardXNodeXWidgetData;
+    aliasedNodeData: ReferenceSelectValue;
+    shouldEmitSimplifiedValue?: boolean;
+}>();
 
 const emit = defineEmits(["update:value"]);
 </script>
@@ -31,7 +37,7 @@ const emit = defineEmits(["update:value"]);
         :aliased-node-data="aliasedNodeData"
         :graph-slug="graphSlug"
         :node-alias="nodeAlias"
-        :compact="compact"
+        :should-emit-simplified-value="shouldEmitSimplifiedValue"
         @update:value="emit('update:value', $event)"
     />
     <ReferenceSelectWidgetViewer

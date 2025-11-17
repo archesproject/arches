@@ -15,14 +15,19 @@ import type {
     ReferenceSelectValue,
 } from "@/arches_controlled_lists/datatypes/reference-select/types.ts";
 
-const { aliasedNodeData, cardXNodeXWidgetData, graphSlug, nodeAlias, compact } =
-    defineProps<{
-        aliasedNodeData: ReferenceSelectValue;
-        cardXNodeXWidgetData: ReferenceSelectDatatypeCardXNodeXWidgetData;
-        graphSlug: string;
-        nodeAlias: string;
-        compact: boolean;
-    }>();
+const {
+    aliasedNodeData,
+    cardXNodeXWidgetData,
+    graphSlug,
+    nodeAlias,
+    shouldEmitSimplifiedValue,
+} = defineProps<{
+    aliasedNodeData: ReferenceSelectValue;
+    cardXNodeXWidgetData: ReferenceSelectDatatypeCardXNodeXWidgetData;
+    graphSlug: string;
+    nodeAlias: string;
+    shouldEmitSimplifiedValue: boolean;
+}>();
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: ReferenceSelectValue): void;
@@ -100,7 +105,7 @@ function onUpdateModelValue(
 
     const nodeValue = [];
     const details = [];
-    const compactValue = [];
+    const simplifiedValue = [];
 
     for (const updatedListItemId of Object.keys(updatedValue)) {
         const optionsQueue = [...(options.value || [])];
@@ -128,20 +133,20 @@ function onUpdateModelValue(
         });
         details.push(selectedOption!.data);
 
-        compactValue.push(listId);
+        simplifiedValue.push(listId);
     }
 
     const displayValue = details.map((item) => item.display_value).join(", ");
 
-    if (compact) {
-        emit("update:value", compactValue)
+    if (shouldEmitSimplifiedValue) {
+        emit("update:value", simplifiedValue);
     } else {
         emit("update:value", {
             node_value: nodeValue,
             display_value: displayValue,
             details: details,
-        })
-    };
+        });
+    }
 }
 </script>
 
