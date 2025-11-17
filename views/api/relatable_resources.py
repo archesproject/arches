@@ -41,16 +41,18 @@ class RelatableResourcesView(View):
         )
 
         selected_resources = (
-            ResourceInstance.objects.filter(resourceinstanceid__in=initial_values)
-            .values("resourceinstanceid")
-            .annotate(display_value=F("descriptors__{}__name".format(language)))
-            .order_by("graph", "pk")
-        ) if int(page_number) == 1 else []
+            (
+                ResourceInstance.objects.filter(resourceinstanceid__in=initial_values)
+                .values("resourceinstanceid")
+                .annotate(display_value=F("descriptors__{}__name".format(language)))
+                .order_by("graph", "pk")
+            )
+            if int(page_number) == 1
+            else []
+        )
 
         if filter_term:
-            resources = resources.filter(
-                Q(**{"display_value__icontains": filter_term})
-            )
+            resources = resources.filter(Q(**{"display_value__icontains": filter_term}))
 
         resources.count = lambda self=None: 1_000_000_000
         paginator = Paginator(resources, items_per_page)
