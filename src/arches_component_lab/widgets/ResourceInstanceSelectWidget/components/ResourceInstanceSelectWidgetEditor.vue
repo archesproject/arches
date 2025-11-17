@@ -97,7 +97,10 @@ async function getOptions(page: number, filterTerm?: string) {
         fetchError.value = (error as Error).message;
     } finally {
         isLoading.value = false;
-        if (options.value.length - (aliasedNodeData?.details?.length ?? 0) == 0) {
+        if (
+            options.value.length - (aliasedNodeData?.details?.length ?? 0) ==
+            0
+        ) {
             emptyFilterMessage.value = $gettext("Search returned no results");
         }
     }
@@ -107,7 +110,7 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     if (isLoading.value) {
         return;
     }
-    
+
     if (
         // if we have already fetched all the resources
         resourceResultsTotalCount.value > 0 &&
@@ -115,7 +118,7 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     ) {
         return;
     }
-    
+
     if (
         // if the user has NOT scrolled to the end of the list
         event &&
@@ -123,7 +126,7 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     ) {
         return;
     }
-    
+
     if (
         // if the dropdown is opened and we already have data
         !event &&
@@ -131,7 +134,7 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     ) {
         return;
     }
-    
+
     await getOptions((resourceResultsPage.value || 0) + 1);
 }
 

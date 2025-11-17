@@ -109,7 +109,10 @@ async function getOptions(page: number, filterTerm?: string) {
         fetchError.value = (error as Error).message;
     } finally {
         isLoading.value = false;
-        if (options.value.length - (aliasedNodeData?.details?.length ?? 0) == 0) {
+        if (
+            options.value.length - (aliasedNodeData?.details?.length ?? 0) ==
+            0
+        ) {
             emptyFilterMessage.value = $gettext("Search returned no results");
         }
     }
