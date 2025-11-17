@@ -55,9 +55,7 @@ class RelatableResourcesView(View):
         if filter_term:
             try:
                 uuid.UUID(str(filter_term))
-                resources = resources.filter(
-                    Q(resourceinstanceid=str(filter_term))
-                )
+                resources = resources.filter(Q(resourceinstanceid=str(filter_term)))
             except ValueError:
                 resources = resources.filter(
                     Q(**{"display_value__icontains": filter_term})
