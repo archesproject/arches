@@ -30,7 +30,10 @@ const {
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: ReferenceSelectValue): void;
+    (
+        event: "update:value",
+        updatedValue: ReferenceSelectValue | string[],
+    ): void;
 }>();
 
 const options = ref<ReferenceSelectTreeNode[]>();
@@ -94,11 +97,15 @@ function onUpdateModelValue(
     updatedValue: { [key: string]: boolean } | null,
 ): void {
     if (!updatedValue) {
-        emit("update:value", {
-            node_value: [],
-            display_value: "",
-            details: [],
-        });
+        if (shouldEmitSimplifiedValue) {
+            emit("update:value", []);
+        } else {
+            emit("update:value", {
+                node_value: [],
+                display_value: "",
+                details: [],
+            });
+        }
 
         return;
     }
@@ -133,7 +140,7 @@ function onUpdateModelValue(
         });
         details.push(selectedOption!.data);
 
-        simplifiedValue.push(listId);
+        simplifiedValue.push(listId!);
     }
 
     const displayValue = details.map((item) => item.display_value).join(", ");
