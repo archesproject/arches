@@ -15,16 +15,25 @@ import type {
     ReferenceSelectValue,
 } from "@/arches_controlled_lists/datatypes/reference-select/types.ts";
 
-const { aliasedNodeData, cardXNodeXWidgetData, graphSlug, nodeAlias } =
-    defineProps<{
-        aliasedNodeData: ReferenceSelectValue;
-        cardXNodeXWidgetData: ReferenceSelectDatatypeCardXNodeXWidgetData;
-        graphSlug: string;
-        nodeAlias: string;
-    }>();
+const {
+    aliasedNodeData,
+    cardXNodeXWidgetData,
+    graphSlug,
+    nodeAlias,
+    shouldEmitSimplifiedValue,
+} = defineProps<{
+    aliasedNodeData: ReferenceSelectValue;
+    cardXNodeXWidgetData: ReferenceSelectDatatypeCardXNodeXWidgetData;
+    graphSlug: string;
+    nodeAlias: string;
+    shouldEmitSimplifiedValue: boolean;
+}>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: ReferenceSelectValue): void;
+    (
+        event: "update:value",
+        updatedValue: ReferenceSelectValue | string[],
+    ): void;
 }>();
 
 const options = ref<ReferenceSelectTreeNode[]>();
@@ -88,17 +97,22 @@ function onUpdateModelValue(
     updatedValue: { [key: string]: boolean } | null,
 ): void {
     if (!updatedValue) {
-        emit("update:value", {
-            node_value: [],
-            display_value: "",
-            details: [],
-        });
+        if (shouldEmitSimplifiedValue) {
+            emit("update:value", []);
+        } else {
+            emit("update:value", {
+                node_value: [],
+                display_value: "",
+                details: [],
+            });
+        }
 
         return;
     }
 
     const nodeValue = [];
     const details = [];
+    const simplifiedValue = [];
 
     for (const updatedListItemId of Object.keys(updatedValue)) {
         const optionsQueue = [...(options.value || [])];
@@ -125,15 +139,21 @@ function onUpdateModelValue(
             uri: selectedOption!.data.uri,
         });
         details.push(selectedOption!.data);
+
+        simplifiedValue.push(listId!);
     }
 
     const displayValue = details.map((item) => item.display_value).join(", ");
 
-    emit("update:value", {
-        node_value: nodeValue,
-        display_value: displayValue,
-        details: details,
-    });
+    if (shouldEmitSimplifiedValue) {
+        emit("update:value", simplifiedValue);
+    } else {
+        emit("update:value", {
+            node_value: nodeValue,
+            display_value: displayValue,
+            details: details,
+        });
+    }
 }
 </script>
 
