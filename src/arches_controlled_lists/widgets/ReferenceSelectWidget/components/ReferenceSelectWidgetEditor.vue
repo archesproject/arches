@@ -146,7 +146,10 @@ function onUpdateModelValue(
     const displayValue = details.map((item) => item.display_value).join(", ");
 
     if (shouldEmitSimplifiedValue) {
-        emit("update:value", details.map((item) => item.display_value));
+        emit(
+            "update:value",
+            details.map((item) => item.display_value),
+        );
     } else {
         emit("update:value", {
             node_value: nodeValue,
