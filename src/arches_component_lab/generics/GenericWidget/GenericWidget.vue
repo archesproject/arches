@@ -35,7 +35,7 @@ const {
     shouldEmitSimplifiedValue = false,
 } = defineProps<{
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
-    cardXNodeXWidgetDataOverrides?: CardXNodeXWidgetData;
+    cardXNodeXWidgetDataOverrides?: Partial<CardXNodeXWidgetData>;
     graphSlug: string;
     isDirty?: boolean;
     mode: WidgetMode;
