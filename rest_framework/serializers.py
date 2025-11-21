@@ -1,3 +1,4 @@
+import uuid
 from collections import defaultdict
 from functools import partial
 
@@ -12,8 +13,7 @@ from rest_framework.fields import empty
 
 from arches import VERSION as arches_version
 from arches.app.models.fields.i18n import I18n_JSON, I18n_String
-from arches.app.models.models import EditLog, GraphModel, Node, NodeGroup
-from arches.app.models.resource import Resource
+from arches.app.models.models import GraphModel, Node, NodeGroup
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 from arches_querysets.datatypes.datatypes import DataTypeFactory
@@ -190,6 +190,7 @@ class NodeFetcherMixin:
             "nodegroup_alias_lookup": nodegroup_alias_lookup
             or get_nodegroup_alias_lookup(graph_slug),
             "request": ensure_request(request),
+            "fill_blanks": False,
         }
 
 
@@ -560,9 +561,10 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         self._child_nodegroup_aliases = []
 
     def to_representation(self, data):
-        """Prevent newly minted blank tiles from serializing with pk's."""
+        """Prevent newly minted blank tiles from serializing with pk's if the
+        fill_blanks option is in force."""
         ret = super().to_representation(data)
-        if isinstance(data, TileTree):
+        if self.context["fill_blanks"] and isinstance(data, TileTree):
             if data._state.adding:
                 ret["tileid"] = None
                 ret["parenttile"] = None
@@ -570,6 +572,10 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
 
     def to_internal_value(self, data):
         ret = super().to_internal_value(data)
+        # Provide a tileid here instead of via default=uuid.uuid4 on the field definition
+        # because we also have /blank routes that use this serializer.
+        if ret.get("tileid", object()) is None:
+            ret["tileid"] = uuid.uuid4()
         # arches_version==9.0.0
         if arches_version < (8, 0):
             # Simulate field default provided by Arches 8+.
@@ -600,35 +606,11 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
                     node__alias=self.nodegroup_alias,
                 ).values("pk")[:1]
             )
+            .values("entry_nodegroup_id")
             .get()
         )
-        resource, resource_created = self.create_resource_if_missing(
-            validated_data, graph
-        )
-        validated_data["nodegroup_id"] = graph.entry_nodegroup_id
-        try:
-            created = super().create(validated_data)
-        except:
-            if resource_created:
-                # Manually manage failures instead of using transaction.atomic(), see:
-                # https://github.com/archesproject/arches/issues/12318
-                # Don't want to run model delete() which *creates* edit log entries.
-                EditLog.objects.filter(resourceinstanceid=resource.pk).delete()
-                Resource.objects.filter(pk=resource.pk).delete()
-            raise
-        return created
-
-    def create_resource_if_missing(self, validated_data, graph):
-        if instance := validated_data.get("resourceinstance"):
-            return instance, False
-        # Would like to do the following, but we don't yet have a ResourceTileTree.save()
-        # method handling a fast path for empty creates:
-        # ResourceSubclass = self.fields["resourceinstance"].queryset.model
-        # So hardcode the Resource(Proxy)Model for now.
-        instance = Resource(graph=graph)
-        instance.save(request=validated_data["__request"])
-        validated_data["resourceinstance"] = instance
-        return instance, True
+        validated_data["nodegroup_id"] = graph["entry_nodegroup_id"]
+        return super().create(validated_data)
 
 
 class ArchesSingleNodegroupSerializer(ArchesTileSerializer):
@@ -662,8 +644,17 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             "resource_instance_lifecycle_state",
         )
         extra_kwargs = {
-            "resourceinstanceid": {"initial": None, "allow_null": True},
-            "graph": {"allow_null": True},
+            # Cancel the underlying default so it can be managed by
+            # TileTreeOperation.for_new_resource
+            "resourceinstanceid": {
+                "initial": None,
+                "default": None,
+                "allow_null": True,
+            },
+            # TODO (arches_version): when Arches 8.0 is the lowest supported
+            # version, "required": False can be removed, by relying on the
+            # underlying blank=True on model.
+            "graph": {"allow_null": True, "required": False},
         }
 
     def __init__(
@@ -711,30 +702,10 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         return attrs
 
     def create(self, validated_data):
-        # TODO: we probably want a queryset method to do one-shot
-        # creates with tile data
-        without_tile_data = validated_data.copy()
-        without_tile_data.pop("aliased_data", None)
-        # TODO: decide on "blank" interface.
-        instance_without_tile_data = self.Meta.model.mro()[1](**without_tile_data)
-        instance_without_tile_data.save()
-        instance_from_factory = self.Meta.model.get_tiles(
-            graph_slug=self.graph_slug,
-            as_representation=True,
-        ).get(pk=instance_without_tile_data.pk)
-        # TODO: decide whether to override update() instead of using partial().
-        instance_from_factory.save = partial(
-            instance_from_factory.save, request=self.context["request"]
-        )
-        try:
-            updated = self.update(instance_from_factory, validated_data)
-        except:
-            # Manually manage failures instead of using transaction.atomic(), see
-            # https://github.com/archesproject/arches/issues/12318
-            EditLog.objects.filter(resourceinstanceid=instance_from_factory.pk).delete()
-            Resource.objects.filter(pk=instance_from_factory.pk).delete()
-            raise
-        return updated
+        # Provide some additional context to ResourceTileTree.__init__()
+        validated_data["__request"] = self.context["request"]
+        validated_data["__as_representation"] = True
+        return super().create(validated_data)
 
     def get_graph_has_different_publication(self, obj):
         # arches_version==9.0.0

@@ -95,12 +95,15 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         permissions = (("no_access_to_resourceinstance", "No Access"),)
 
     def __init__(self, *args, **kwargs):
+        self._as_representation = kwargs.pop("__as_representation", False)
+        self._request = kwargs.pop("__request", None)
         arches_model_kwargs, other_kwargs = pop_arches_model_kwargs(
             kwargs, self._meta.get_fields()
         )
         super().__init__(*args, **other_kwargs)
-        self.aliased_data = AliasedData(**arches_model_kwargs)
-        self._as_representation = False
+        self.aliased_data = arches_model_kwargs.pop(
+            "aliased_data", None
+        ) or AliasedData(**arches_model_kwargs)
         self._sealed = False
 
     @property
@@ -138,6 +141,7 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         ):
             raise ValidationError(_("Graph Has Different Publication"))
 
+        request = request or self._request
         self._save_aliased_data(
             request=request,
             index=index,
@@ -186,11 +190,11 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         """Initialize a blank tile with empty values for each nodegroup lacking a tile."""
         append_tiles_recursively(self)
 
-    def save_edit(self, user=None, transaction_id=None):
+    def save_edit(self, user=None, transaction_id=None, *, edit_type=None):
         """Intended to replace proxy model method eventually."""
         if self._state.adding:
             edit_type = "create"
-        else:
+        if not edit_type:
             return
 
         # Until save_edit() is a static method, work around it.
@@ -218,8 +222,12 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         operation = TileTreeOperation(
             entry=self, request=request, partial=partial, save_kwargs=kwargs
         )
+        for_new_resource = self._state.adding
+
         # This will also call ResourceInstance.save()
         operation.validate_and_save_tiles()
+        if not self.pk:
+            self.pk = operation.resourceid
 
         # Run side effects trapped on Resource.save()
         proxy_resource = (
@@ -231,8 +239,13 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         if index:
             proxy_resource.index()
 
-        if request:
-            self.save_edit(user=request.user, transaction_id=operation.transaction_id)
+        # arches_version==9.0.0
+        if arches_version < (8, 0) and request and for_new_resource:
+            self.save_edit(
+                user=request.user,
+                transaction_id=operation.transaction_id,
+                edit_type="create",
+            )
 
         self.refresh_from_db(
             using=kwargs.get("using"), fields=kwargs.get("update_fields")

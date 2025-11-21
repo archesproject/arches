@@ -101,6 +101,7 @@ class ArchesModelAPIMixin:
             "graph_slug": self.graph_slug,
             "graph_nodes": self.graph_nodes or self._find_graph_nodes(),
             "nodegroup_alias": self.nodegroup_alias,
+            "fill_blanks": self.fill_blanks,
         }
         if not ret.get("nodegroup_alias_lookup"):
             ret["nodegroup_alias_lookup"] = {

@@ -11,11 +11,13 @@ from django.utils.translation import get_language, gettext as _
 from arches import VERSION as arches_version
 from arches.app.models.models import (
     CardXNodeXWidget,
+    EditLog,
     Language,
     Node,
-    TileModel,
     ResourceInstance,
+    TileModel,
 )
+from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile, TileValidationError
 
 from arches_querysets.datatypes.datatypes import DataTypeFactory
@@ -77,7 +79,7 @@ class TileTreeOperation:
                 # with the request and already instantiated to a fresh object.
                 grouping_node = [
                     node
-                    for node in entry.resourceinstance.graph.node_set.all()
+                    for node in entry.nodegroup.node_set.all()[0].graph.node_set.all()
                     if node.pk == node.nodegroup_id
                 ][0]
                 entry.nodegroup.grouping_node = grouping_node
@@ -86,21 +88,28 @@ class TileTreeOperation:
             self.nodegroups = []  # not necessary to populate.
             existing_tiles = getattr(self.entry, "_tile_trees", [])
 
+        self.for_new_resource = self.resourceid is None
+        if self.for_new_resource:
+            self.resourceid = uuid.uuid4()
+            if isinstance(self.entry, TileModel):
+                self.entry.resourceinstance_id = self.resourceid
+
+        if isinstance(self.entry, TileModel):
+            if self.for_new_resource:
+                self.graph = self.entry.nodegroup.node_set.all()[0].graph
+            else:
+                self.graph = self.entry.resourceinstance.graph
+        else:
+            self.graph = self.entry.graph
+
         self.grouping_nodes_by_nodegroup_id = self._get_grouping_node_lookup()
         self.existing_tiles_by_nodegroup_alias = defaultdict(list)
         for tile in existing_tiles:
             alias = tile.find_nodegroup_alias(self.grouping_nodes_by_nodegroup_id)
             self.existing_tiles_by_nodegroup_alias[alias].append(tile)
-        self.new_resource_created = bool(existing_tiles)
 
     def _get_grouping_node_lookup(self):
-        from arches_querysets.models import TileTree
-
-        if isinstance(self.entry, TileTree):
-            graph = self.entry.resourceinstance.graph
-        else:
-            graph = self.entry.graph
-        filters = Q(pk=F("nodegroup_id"), graph__slug=graph.slug)
+        filters = Q(pk=F("nodegroup_id"), graph__slug=self.graph.slug)
         # arches_version==9.0.0
         if arches_version >= (8, 0):
             filters &= Q(source_identifier=None)
@@ -191,6 +200,13 @@ class TileTreeOperation:
         else:
             next_sort_order = max(t.sortorder or 0 for t in existing_tiles) + 1
 
+        if self.for_new_resource or (
+            isinstance(self.entry, ResourceInstance) and self.entry._state.adding
+        ):
+            exclude = ["resourceinstance"]
+        else:
+            exclude = []
+
         to_insert = set()
         to_update = set()
         to_delete = set()
@@ -213,7 +229,9 @@ class TileTreeOperation:
                 new_tile._incoming_tile = new_tile
                 if isinstance(container, TileModel):
                     new_tile.parenttile = container
-                new_tile.full_clean()
+                new_tile.full_clean(exclude=exclude)
+                if new_tile.pk is None:
+                    new_tile.pk = uuid.uuid4()
                 to_insert.add(new_tile)
             else:
                 original_tile_data_by_tile_id[existing_tile.pk] = {**existing_tile.data}
@@ -384,6 +402,30 @@ class TileTreeOperation:
             )
 
     def _save(self):
+        if self.for_new_resource:
+            instance = Resource(pk=self.resourceid, graph=self.graph)
+            instance.save(request=self.request, transaction_id=self.transaction_id)
+            # if entry tile needs saving, already in self.to_update or self.to_insert
+
+        # durable=True is a guard against any higher-level code trying to wrap in
+        # another transaction. Ideally durable=True would be removed, and any
+        # IntegrityErrors would not be ignored in after_update_all(), but we have
+        # some Arches projects that test with "incomplete" datasets with data
+        # integrity issues, so we can't do the natural thing (yet).
+        try:
+            self._perform_transaction()
+        except:
+            if self.for_new_resource:
+                # Manually manage failures instead of using transaction.atomic(), see:
+                # https://github.com/archesproject/arches/issues/12318
+                # Don't want to run model delete() which *creates* edit log entries.
+                EditLog.objects.filter(resourceinstanceid=instance.pk).delete()
+                Resource.objects.filter(pk=instance.pk).delete()
+            raise
+
+    def _perform_transaction(self):
+        from arches_querysets.models import ResourceTileTree
+
         # Instantiate proxy models for now, but TODO: expose this
         # functionality on vanilla models, and in bulk.
         tile_model_fields = Tile._meta.get_fields()
@@ -403,17 +445,12 @@ class TileTreeOperation:
             pk__in=[tile.pk for tile in self.to_delete]
         )
 
-        # durable=True is a guard against any higher-level code trying to wrap in
-        # another transaction. Ideally durable=True would be removed, and any
-        # IntegrityErrors would not be ignored in after_update_all(), but we have
-        # some Arches projects that test with "incomplete" datasets with data
-        # integrity issues, so we can't do the natural thing (yet).
         with transaction.atomic(durable=True):
-            if isinstance(self.entry, ResourceInstance):
-                super(ResourceInstance, self.entry).save(**self.save_kwargs)
-            # no else: if the entry point needs saving, it's already in
-            # self.to_update or self.to_insert
-
+            if not self.for_new_resource:
+                if isinstance(self.entry, ResourceTileTree):
+                    super(ResourceTileTree, self.entry).save(**self.save_kwargs)
+                elif isinstance(self.entry, ResourceInstance):
+                    self.entry.save(**self.save_kwargs)
             # Interact with the database in bulk as much as possible, but
             # run certain side effects from Tile.save() one-at-a-time until
             # proxy model methods can be refactored. Then run in bulk.
@@ -510,7 +547,7 @@ class TileTreeOperation:
                     newprovisionalvalue=insert_proxy._newprovisionalvalue,
                     provisional_edit_log_details=insert_proxy._provisional_edit_log_details,
                     transaction_id=self.transaction_id,
-                    new_resource_created=self.new_resource_created,
+                    new_resource_created=False,  # resource create edit log already saved
                     note=None,
                 )
             for update_proxy in update_proxies:
