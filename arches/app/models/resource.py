@@ -273,6 +273,7 @@ class Resource(models.ResourceInstance):
             tile.resourceinstance_id = self.resourceinstanceid
             tile.save(
                 request=request,
+                user=user,
                 index=False,
                 resource_creation=True,
                 transaction_id=transaction_id,
