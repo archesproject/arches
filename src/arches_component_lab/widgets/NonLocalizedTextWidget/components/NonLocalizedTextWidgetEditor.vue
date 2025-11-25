@@ -4,13 +4,18 @@ import InputText from "primevue/inputtext";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { NonLocalizedTextValue } from "@/arches_component_lab/datatypes/non-localized-text/types.ts";
 
-const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+const {
+    cardXNodeXWidgetData,
+    aliasedNodeData,
+    shouldEmitSimplifiedValue = false,
+} = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
     aliasedNodeData: NonLocalizedTextValue | null;
+    shouldEmitSimplifiedValue?: boolean;
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: NonLocalizedTextValue): void;
+    (event: "update:value", updatedValue: NonLocalizedTextValue | string): void;
 }>();
 
 function onUpdateModelValue(updatedValue: string | undefined) {
@@ -18,11 +23,15 @@ function onUpdateModelValue(updatedValue: string | undefined) {
         updatedValue = "";
     }
 
-    emit("update:value", {
-        display_value: updatedValue,
-        node_value: updatedValue,
-        details: [],
-    });
+    if (shouldEmitSimplifiedValue) {
+        emit("update:value", updatedValue);
+    } else {
+        emit("update:value", {
+            display_value: updatedValue,
+            node_value: updatedValue,
+            details: [],
+        });
+    }
 }
 </script>
 

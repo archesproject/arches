@@ -17,16 +17,22 @@ import {
 } from "@/arches_component_lab/datatypes/concept/utils.ts";
 import type { ConceptRadioCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } =
-    defineProps<{
-        graphSlug: string;
-        nodeAlias: string;
-        aliasedNodeData: ConceptValue | null;
-        cardXNodeXWidgetData: ConceptRadioCardXNodeXWidgetData;
-    }>();
+const {
+    graphSlug,
+    nodeAlias,
+    aliasedNodeData,
+    cardXNodeXWidgetData,
+    shouldEmitSimplifiedValue = false,
+} = defineProps<{
+    graphSlug: string;
+    nodeAlias: string;
+    aliasedNodeData: ConceptValue | null;
+    cardXNodeXWidgetData: ConceptRadioCardXNodeXWidgetData;
+    shouldEmitSimplifiedValue?: boolean;
+}>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: ConceptValue): void;
+    (event: "update:value", updatedValue: ConceptValue | string | null): void;
 }>();
 
 const flexDirection = computed(() =>
@@ -72,7 +78,11 @@ function onUpdateModelValue(selectedOption: Record<string, boolean> | null) {
         selectedOption,
         options.value,
     );
-    emit("update:value", formattedValue);
+    if (shouldEmitSimplifiedValue) {
+        emit("update:value", formattedValue.node_value);
+    } else {
+        emit("update:value", formattedValue);
+    }
 }
 </script>
 

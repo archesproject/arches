@@ -14,6 +14,7 @@ defineProps<{
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
     aliasedNodeData: ConceptListValue | null;
+    shouldEmitSimplifiedValue?: boolean;
 }>();
 
 const emit = defineEmits(["update:value"]);
@@ -26,6 +27,7 @@ const emit = defineEmits(["update:value"]);
         :graph-slug="graphSlug"
         :node-alias="nodeAlias"
         :aliased-node-data="aliasedNodeData"
+        :should-emit-simplified-value="shouldEmitSimplifiedValue"
         @update:value="emit('update:value', $event)"
     />
     <ConceptMultiSelectWidgetViewer

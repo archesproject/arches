@@ -12,13 +12,18 @@ import type {
     DateValue,
 } from "@/arches_component_lab/datatypes/date/types.ts";
 
-const { aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
+const {
+    cardXNodeXWidgetData,
+    aliasedNodeData,
+    shouldEmitSimplifiedValue = false,
+} = defineProps<{
     cardXNodeXWidgetData: DateDatatypeCardXNodeXWidgetData;
     aliasedNodeData: DateValue | null;
+    shouldEmitSimplifiedValue?: boolean;
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: DateValue): void;
+    (event: "update:value", updatedValue: DateValue | string): void;
 }>();
 
 const shouldShowTime = ref(false);
@@ -38,9 +43,10 @@ function onUpdateModelValue(updatedValue: string) {
     const date = new Date(updatedValue);
 
     let formValue;
+    let formattedDate;
 
     try {
-        const formattedDate = formatDate(
+        formattedDate = formatDate(
             date,
             cardXNodeXWidgetData.node.config.dateFormat,
         );
@@ -57,8 +63,11 @@ function onUpdateModelValue(updatedValue: string) {
             details: [],
         };
     }
-
-    emit("update:value", formValue);
+    if (shouldEmitSimplifiedValue) {
+        emit("update:value", formattedDate || updatedValue);
+    } else {
+        emit("update:value", formValue);
+    }
 }
 const modelDate = computed(() =>
     aliasedNodeData?.node_value

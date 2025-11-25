@@ -8,13 +8,18 @@ import EDTFHelpDrawer from "@/arches_component_lab/widgets/EDTFWidget/components
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { EDTFValue } from "@/arches_component_lab/datatypes/edtf/types";
 
-const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+const {
+    cardXNodeXWidgetData,
+    aliasedNodeData,
+    shouldEmitSimplifiedValue = false,
+} = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
     aliasedNodeData: EDTFValue | null;
+    shouldEmitSimplifiedValue?: boolean;
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: EDTFValue): void;
+    (event: "update:value", updatedValue: EDTFValue | string | undefined): void;
 }>();
 
 const shouldShowHelpDrawer = ref(false);
@@ -22,11 +27,15 @@ const shouldShowHelpDrawer = ref(false);
 function handleUpdateModelValue(updatedValue: string | undefined) {
     const normalizedValue = updatedValue ?? "";
 
-    emit("update:value", {
-        display_value: normalizedValue,
-        node_value: normalizedValue,
-        details: [],
-    });
+    if (shouldEmitSimplifiedValue) {
+        emit("update:value", normalizedValue);
+    } else {
+        emit("update:value", {
+            display_value: normalizedValue,
+            node_value: normalizedValue,
+            details: [],
+        });
+    }
 }
 </script>
 

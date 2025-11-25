@@ -15,16 +15,22 @@ import type {
     ConceptFetchResult,
 } from "@/arches_component_lab/datatypes/concept/types.ts";
 
-const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } =
-    defineProps<{
-        graphSlug: string;
-        nodeAlias: string;
-        aliasedNodeData: ConceptListValue | null;
-        cardXNodeXWidgetData: CardXNodeXWidgetData;
-    }>();
+const {
+    graphSlug,
+    nodeAlias,
+    aliasedNodeData,
+    cardXNodeXWidgetData,
+    shouldEmitSimplifiedValue = false,
+} = defineProps<{
+    graphSlug: string;
+    nodeAlias: string;
+    aliasedNodeData: ConceptListValue | null;
+    cardXNodeXWidgetData: CardXNodeXWidgetData;
+    shouldEmitSimplifiedValue?: boolean;
+}>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: ConceptListValue): void;
+    (event: "update:value", updatedValue: ConceptListValue | string[]): void;
 }>();
 
 const options: Ref<CollectionItem[] | null> = ref<CollectionItem[] | null>(
@@ -76,7 +82,11 @@ function onUpdateModelValue(selectedConcepts: string[]) {
         selectedConcepts,
         options.value ?? ([] as CollectionItem[]),
     );
-    emit("update:value", formattedValue);
+    if (shouldEmitSimplifiedValue) {
+        emit("update:value", formattedValue.node_value);
+    } else {
+        emit("update:value", formattedValue);
+    }
 }
 </script>
 

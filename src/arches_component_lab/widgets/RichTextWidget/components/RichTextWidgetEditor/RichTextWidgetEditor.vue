@@ -16,13 +16,21 @@ import FocusController from "./components/FocusController.vue";
 
 const { $gettext } = useGettext();
 
-const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+const {
+    cardXNodeXWidgetData,
+    aliasedNodeData,
+    shouldEmitSimplifiedValue = false,
+} = defineProps<{
     cardXNodeXWidgetData: StringCardXNodeXWidgetData;
     aliasedNodeData: StringValue | null;
+    shouldEmitSimplifiedValue?: boolean;
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: StringValue): void;
+    (
+        event: "update:value",
+        updatedValue: StringValue | Record<Language["code"], string>,
+    ): void;
 }>();
 
 const languages = ref<Language[]>([]);
@@ -72,18 +80,23 @@ function onUpdateModelValue(updatedValue: string | undefined) {
     if (updatedValue === undefined) {
         updatedValue = "";
     }
-
-    emit("update:value", {
-        display_value: updatedValue,
-        node_value: {
-            ...managedNodeValue.value,
-            [selectedLanguage.value!.code]: {
-                value: updatedValue,
-                direction: selectedLanguage.value!.default_direction,
+    if (shouldEmitSimplifiedValue) {
+        emit("update:value", {
+            [selectedLanguage.value!.code]: updatedValue,
+        });
+    } else {
+        emit("update:value", {
+            display_value: updatedValue,
+            node_value: {
+                ...managedNodeValue.value,
+                [selectedLanguage.value!.code]: {
+                    value: updatedValue,
+                    direction: selectedLanguage.value!.default_direction,
+                },
             },
-        },
-        details: [],
-    });
+            details: [],
+        });
+    }
 }
 </script>
 

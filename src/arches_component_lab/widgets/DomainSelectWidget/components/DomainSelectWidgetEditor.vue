@@ -7,27 +7,36 @@ import type {
     DomainOption,
 } from "@/arches_component_lab/datatypes/domain/types.ts";
 
-const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+const {
+    aliasedNodeData,
+    cardXNodeXWidgetData,
+    shouldEmitSimplifiedValue = false,
+} = defineProps<{
     cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
     aliasedNodeData: DomainValue | null;
+    shouldEmitSimplifiedValue?: boolean;
 }>();
 
 const options = cardXNodeXWidgetData.node.config.options;
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: DomainValue): void;
+    (event: "update:value", updatedValue: DomainValue | string | null): void;
 }>();
 
 function onUpdateModelValue(updatedValue: string | null) {
-    const updatedDisplayValue =
-        options.find((option: DomainOption) => option.id === updatedValue)
-            ?.text || "";
+    if (shouldEmitSimplifiedValue) {
+        emit("update:value", updatedValue);
+    } else {
+        const updatedDisplayValue =
+            options.find((option: DomainOption) => option.id === updatedValue)
+                ?.text || "";
 
-    emit("update:value", {
-        display_value: updatedDisplayValue,
-        node_value: updatedValue,
-        details: [],
-    });
+        emit("update:value", {
+            display_value: updatedDisplayValue,
+            node_value: updatedValue,
+            details: [],
+        });
+    }
 }
 </script>
 

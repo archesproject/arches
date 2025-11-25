@@ -8,37 +8,50 @@ import type {
     DomainOption,
 } from "@/arches_component_lab/datatypes/domain/types.ts";
 
-const { cardXNodeXWidgetData, nodeAlias, aliasedNodeData } = defineProps<{
+const {
+    cardXNodeXWidgetData,
+    nodeAlias,
+    aliasedNodeData,
+    shouldEmitSimplifiedValue = false,
+} = defineProps<{
     cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
     nodeAlias: string;
     aliasedNodeData: DomainValueList | null;
+    shouldEmitSimplifiedValue?: boolean;
 }>();
 
 const options = cardXNodeXWidgetData.node.config.options;
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: DomainValueList): void;
+    (
+        event: "update:value",
+        updatedValue: DomainValueList | string[] | null,
+    ): void;
 }>();
 
 function onUpdateModelValue(updatedValue: string[] | null) {
     if (updatedValue?.length === 0) {
         updatedValue = null;
     }
-    const updatedDisplayValue =
-        updatedValue
-            ?.map((domain) => {
-                const currentOption = options.find(
-                    (option: DomainOption) => option.id === domain,
-                );
-                return currentOption?.text;
-            })
-            .join(", ") || "";
+    if (shouldEmitSimplifiedValue) {
+        emit("update:value", updatedValue);
+    } else {
+        const updatedDisplayValue =
+            updatedValue
+                ?.map((domain) => {
+                    const currentOption = options.find(
+                        (option: DomainOption) => option.id === domain,
+                    );
+                    return currentOption?.text;
+                })
+                .join(", ") || "";
 
-    emit("update:value", {
-        display_value: updatedDisplayValue,
-        node_value: updatedValue,
-        details: [],
-    });
+        emit("update:value", {
+            display_value: updatedDisplayValue,
+            node_value: updatedValue,
+            details: [],
+        });
+    }
 }
 </script>
 

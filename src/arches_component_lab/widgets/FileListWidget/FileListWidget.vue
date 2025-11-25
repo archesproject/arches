@@ -16,6 +16,7 @@ defineProps<{
     graphSlug: string;
     cardXNodeXWidgetData: FileListCardXNodeXWidgetData;
     aliasedNodeData: FileListValue | null;
+    shouldEmitSimplifiedValue?: boolean;
 }>();
 
 const emit = defineEmits(["update:value"]);
@@ -27,6 +28,7 @@ const emit = defineEmits(["update:value"]);
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :node-alias="nodeAlias"
         :aliased-node-data="aliasedNodeData"
+        :should-emit-simplified-value="shouldEmitSimplifiedValue"
         @update:value="emit('update:value', $event)"
     />
     <FileListWidgetViewer

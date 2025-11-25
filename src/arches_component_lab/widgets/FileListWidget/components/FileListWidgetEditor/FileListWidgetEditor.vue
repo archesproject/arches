@@ -16,14 +16,23 @@ import type {
     PrimeVueFile,
 } from "@/arches_component_lab/widgets/FileListWidget/types.ts";
 
-const { aliasedNodeData, nodeAlias, cardXNodeXWidgetData } = defineProps<{
+const {
+    aliasedNodeData,
+    nodeAlias,
+    cardXNodeXWidgetData,
+    shouldEmitSimplifiedValue = false,
+} = defineProps<{
     aliasedNodeData: FileListValue | null;
     nodeAlias: string;
     cardXNodeXWidgetData: FileListCardXNodeXWidgetData;
+    shouldEmitSimplifiedValue?: boolean;
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: FileListValue): void;
+    (
+        event: "update:value",
+        updatedValue: FileListValue | FileReference[],
+    ): void;
 }>();
 
 const fileUploadRef = ref<InstanceType<typeof FileUpload> | null>(null);
@@ -60,11 +69,15 @@ function emitUpdatedValue() {
         ...pendingFiles.value,
     ] as FileReference[];
 
-    emit("update:value", {
-        display_value: JSON.stringify(allFiles),
-        node_value: allFiles,
-        details: [],
-    });
+    if (shouldEmitSimplifiedValue) {
+        emit("update:value", allFiles);
+    } else {
+        emit("update:value", {
+            display_value: JSON.stringify(allFiles),
+            node_value: allFiles,
+            details: [],
+        });
+    }
 }
 
 function onSelect(event: { files: PrimeVueFile[] }): void {
