@@ -89,7 +89,6 @@ function onUpdateModelValue(selectedOption: Record<string, boolean> | null) {
 <template>
     <RadioButtonGroup
         :model-value="selectedId"
-        :name="nodeAlias"
         :class="['button-group', flexDirection]"
         @update:model-value="onUpdateModelValue"
     >
