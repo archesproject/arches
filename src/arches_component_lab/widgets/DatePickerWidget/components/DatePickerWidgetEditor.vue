@@ -65,7 +65,7 @@ function onUpdateModelValue(updatedValue: string) {
 
             formValue = {
                 display_value: formattedDate,
-                node_value: formattedDate,
+                node_value: date.toISOString(),
                 details: [],
             };
         } catch (_error) {
