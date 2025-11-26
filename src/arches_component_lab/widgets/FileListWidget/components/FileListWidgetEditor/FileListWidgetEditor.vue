@@ -18,12 +18,10 @@ import type {
 
 const {
     aliasedNodeData,
-    nodeAlias,
     cardXNodeXWidgetData,
     shouldEmitSimplifiedValue = false,
 } = defineProps<{
     aliasedNodeData: FileListValue | null;
-    nodeAlias: string;
     cardXNodeXWidgetData: FileListCardXNodeXWidgetData;
     shouldEmitSimplifiedValue?: boolean;
 }>();
@@ -119,7 +117,6 @@ function openFileChooser(): void {
     <FileUpload
         ref="fileUploadRef"
         :accept="allowedFileTypes"
-        :name="nodeAlias"
         :model-value="aliasedNodeData?.node_value"
         :multiple="true"
         :show-cancel-button="false"

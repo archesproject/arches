@@ -10,12 +10,10 @@ import type {
 
 const {
     cardXNodeXWidgetData,
-    nodeAlias,
     aliasedNodeData,
     shouldEmitSimplifiedValue = false,
 } = defineProps<{
     cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
-    nodeAlias: string;
     aliasedNodeData: DomainValueList | null;
     shouldEmitSimplifiedValue?: boolean;
 }>();
@@ -58,7 +56,6 @@ function onUpdateModelValue(updatedValue: string[] | null) {
 <template>
     <CheckboxGroup
         :model-value="aliasedNodeData?.node_value || []"
-        :name="nodeAlias"
         class="button-group"
         @update:model-value="onUpdateModelValue($event)"
     >

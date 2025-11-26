@@ -10,12 +10,10 @@ import type {
 
 const {
     cardXNodeXWidgetData,
-    nodeAlias,
     aliasedNodeData,
     shouldEmitSimplifiedValue = false,
 } = defineProps<{
     cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
-    nodeAlias: string;
     aliasedNodeData: DomainValue | null;
     shouldEmitSimplifiedValue?: boolean;
 }>();
@@ -46,7 +44,6 @@ function onUpdateModelValue(updatedValue: string | null) {
 <template>
     <RadioButtonGroup
         :model-value="aliasedNodeData?.node_value"
-        :name="nodeAlias"
         class="button-group"
         @update:model-value="onUpdateModelValue($event)"
     >

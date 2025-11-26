@@ -25,7 +25,6 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :graph-slug="graphSlug"
-        :node-alias="nodeAlias"
         :aliased-node-data="aliasedNodeData"
         :should-emit-simplified-value="shouldEmitSimplifiedValue"
         @update:value="emit('update:value', $event)"
