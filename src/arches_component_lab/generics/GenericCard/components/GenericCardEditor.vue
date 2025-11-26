@@ -16,7 +16,6 @@ import Message from "primevue/message";
 import Skeleton from "primevue/skeleton";
 
 import GenericWidget from "@/arches_component_lab/generics/GenericWidget/GenericWidget.vue";
-
 import { upsertTile } from "@/arches_component_lab/generics/GenericCard/api.ts";
 
 import type {
@@ -28,7 +27,6 @@ import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const { $gettext } = useGettext();
 
-// Prevents spamming i18n functions on panel drag
 const SAVE = $gettext("Save");
 const CANCEL = $gettext("Cancel");
 
@@ -60,9 +58,9 @@ const emit = defineEmits([
     "reset",
 ]);
 
-const deepClone = function (obj: unknown) {
-    return JSON.parse(JSON.stringify(obj));
-};
+function deepClone<T>(sourceObject: T): T {
+    return JSON.parse(JSON.stringify(sourceObject));
+}
 
 const genericWidgetRefs = useTemplateRef("genericWidget");
 
@@ -72,10 +70,6 @@ const saveError = ref<Error>();
 
 const originalAliasedData = deepClone(tileData?.aliased_data || {});
 const aliasedData = reactive(deepClone(tileData?.aliased_data || {}));
-
-const areButtonsDisabled = computed(() => {
-    return Object.values(localWidgetDirtyStates).every((dirty) => !dirty);
-});
 
 const localWidgetDirtyStates = reactive(
     cardXNodeXWidgetData.reduce<Record<string, boolean>>(
@@ -97,35 +91,57 @@ const localWidgetFocusedStates = reactive(
     ),
 );
 
+const areButtonsDisabled = computed(() => {
+    return Object.values(localWidgetDirtyStates).every(
+        (isWidgetDirty) => !isWidgetDirty,
+    );
+});
+
+async function focusWidgetInputForNodeAlias(nodeAlias: string) {
+    for (let attemptCount = 0; attemptCount < 5; attemptCount += 1) {
+        const widgetComponentRefs = genericWidgetRefs.value;
+        if (!Array.isArray(widgetComponentRefs)) {
+            return;
+        }
+
+        const activeElement = document.activeElement as HTMLElement | null;
+
+        for (const widgetComponentRef of widgetComponentRefs) {
+            const widgetRootElement =
+                widgetComponentRef?.$el as HTMLElement | null;
+
+            if (!widgetRootElement) {
+                continue;
+            }
+
+            if (activeElement && widgetRootElement.contains(activeElement)) {
+                return;
+            }
+
+            const inputElementToFocus =
+                widgetRootElement.querySelector<HTMLElement>(`#${nodeAlias}`);
+
+            if (inputElementToFocus) {
+                inputElementToFocus.focus();
+                return;
+            }
+        }
+
+        await new Promise<void>((resolve) => {
+            requestAnimationFrame(() => resolve());
+        });
+    }
+}
+
 watch(
     () => selectedNodeAlias,
     async (nodeAlias) => {
-        if (!nodeAlias) return;
+        if (!nodeAlias) {
+            return;
+        }
 
         await nextTick();
-
-        // The loop guards against race conditions
-        for (let attemptCount = 0; attemptCount < 5; attemptCount += 1) {
-            const widgetComponentRefs = genericWidgetRefs.value;
-            if (!Array.isArray(widgetComponentRefs)) return;
-
-            for (const widgetComponentRef of widgetComponentRefs) {
-                const widgetRootElement = widgetComponentRef?.$el;
-                if (!widgetRootElement) continue;
-
-                const inputElementToFocus = widgetRootElement.querySelector(
-                    `#${nodeAlias}`,
-                );
-                if (inputElementToFocus) {
-                    inputElementToFocus.focus();
-                    return;
-                }
-            }
-
-            await new Promise<void>((resolve) => {
-                return requestAnimationFrame(() => resolve());
-            });
-        }
+        await focusWidgetInputForNodeAlias(nodeAlias);
     },
     { immediate: true, flush: "post" },
 );
@@ -143,15 +159,15 @@ watch(
 
 watch(
     () => ({ ...localWidgetDirtyStates }),
-    (newDirtyMap) => {
-        emit("update:widgetDirtyStates", newDirtyMap);
+    (newDirtyStatesMap) => {
+        emit("update:widgetDirtyStates", newDirtyStatesMap);
     },
 );
 
 watch(
     () => ({ ...localWidgetFocusedStates }),
-    (newFocusedMap) => {
-        emit("update:widgetFocusStates", newFocusedMap);
+    (newFocusedStatesMap) => {
+        emit("update:widgetFocusStates", newFocusedStatesMap);
     },
 );
 
@@ -167,6 +183,12 @@ function onUpdateWidgetValue(nodeAlias: string, value: AliasedNodeData) {
     aliasedData[nodeAlias] = value;
 }
 
+function resetWidgetDirtyStates() {
+    Object.keys(localWidgetDirtyStates).forEach((nodeAlias) => {
+        localWidgetDirtyStates[nodeAlias] = false;
+    });
+}
+
 function resetForm() {
     resetWidgetDirtyStates();
 
@@ -175,15 +197,8 @@ function resetForm() {
     Object.assign(aliasedData, originalAliasedDataClone);
     formKey.value += 1;
 
-    // nextTick ensures `reset` is emitted after `update:tileData`
     nextTick(() => {
         emit("reset", originalAliasedDataClone);
-    });
-}
-
-function resetWidgetDirtyStates() {
-    Object.keys(localWidgetDirtyStates).forEach((nodeAlias) => {
-        localWidgetDirtyStates[nodeAlias] = false;
     });
 }
 
@@ -211,12 +226,11 @@ async function save() {
 
         resetWidgetDirtyStates();
 
-        // nextTick ensures `save` is emitted after `update:tileData`
         nextTick(() => {
             emit("save", updatedTileData);
         });
-    } catch (error) {
-        saveError.value = error as Error;
+    } catch (caughtError) {
+        saveError.value = caughtError as Error;
     } finally {
         isSaving.value = false;
     }

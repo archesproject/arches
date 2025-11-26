@@ -14,6 +14,7 @@ defineProps<{
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
     aliasedNodeData: URLValue | null;
+    shouldEmitSimplifiedValue?: boolean;
 }>();
 
 const emit = defineEmits(["update:value"]);
@@ -24,6 +25,7 @@ const emit = defineEmits(["update:value"]);
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :aliased-node-data="aliasedNodeData"
+        :should-emit-simplified-value="shouldEmitSimplifiedValue"
         @update:value="emit('update:value', $event)"
     />
     <URLWidgetViewer
