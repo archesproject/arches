@@ -1,3 +1,4 @@
+from urllib.parse import urlparse, urlunparse, urlsplit, urlunsplit
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connection, models, transaction
 from django.db.models.expressions import CombinedExpression
@@ -14,7 +15,7 @@ from arches.app.models.models import (
     Value,
     Widget,
 )
-from arches_controlled_lists.models import List
+from arches_controlled_lists.models import List, ListItem
 
 
 class Command(BaseCommand):
@@ -33,8 +34,18 @@ class Command(BaseCommand):
             choices=[
                 "migrate_collections_to_controlled_lists",
                 "migrate_concept_nodes_to_reference_datatype",
+                "change_url_base",
             ],
             help="The operation to perform",
+        )
+
+        parser.add_argument(
+            "-li",
+            "--lists",
+            action="store",
+            dest="lists",
+            default=False,
+            help="A comma separated list of the listids of the resources you would like to change the url base for.  If not provided, all controlled lists will be updated.",
         )
 
         parser.add_argument(
@@ -114,6 +125,16 @@ class Command(BaseCommand):
             if not graph or graph is None:
                 raise CommandError("Please provide a graph id or slug")
             self.migrate_concept_nodes_to_reference_datatype(graph)
+        elif options["operation"] == "change_url_base":
+            if not options["host"] or options["host"] is None:
+                raise CommandError("Please provide a target host")
+            if options["lists"]:
+                list_ids = options["lists"].split(",")
+            else:
+                list_ids = []
+            self.bulk_change_url_base(
+                target_hostname=options["host"], list_ids=list_ids
+            )
 
     def migrate_collections_to_controlled_lists(
         self,
@@ -309,3 +330,76 @@ class Command(BaseCommand):
                     source_graph.name
                 )
             )
+
+    # Replaces the base URL for all list items in all controlled lists
+    def bulk_change_url_base(self, target_hostname: str, list_ids: list) -> str:
+        normalized_url = self._normalize_url(target_hostname)
+        try:
+            with transaction.atomic():
+                list_item_query = ListItem.objects.all()
+                if list_ids:
+                    list_item_query = list_item_query.filter(list_id__in=list_ids)
+                for list_item in list_item_query.all():
+                    new_uri = self._replace_hostname(list_item.uri, normalized_url)
+                    list_item.uri = new_uri
+                    list_item.save()
+        except Exception as e:
+            self.stderr.write(f"Could not change base url: {str(e)}")
+            return
+
+        self.stdout.write("Successfully changed URL base.")
+
+    # Ensure that the URL has a scheme and is properly formatted
+    def _normalize_url(self, url, default_scheme="https"):
+        if not url.startswith("//") and "://" not in url:
+            url = f"{default_scheme}://{url.lstrip('/')}"
+
+        parts = urlsplit(url)
+
+        scheme = parts.scheme or default_scheme
+
+        if parts.port is not None:
+            is_http_default = scheme == "http" and parts.port == 80
+            is_https_default = scheme == "https" and parts.port == 443
+
+            if is_http_default or is_https_default:
+                netloc = parts.hostname
+            else:
+                netloc = parts.netloc
+        else:
+            netloc = parts.netloc
+
+        return urlunsplit((scheme, netloc, parts.path, parts.query, parts.fragment))
+
+    # Replace the hostname in a given URL with the target hostname
+    def _replace_hostname(self, url_string: str, target_hostname: str) -> str:
+        try:
+            normalized_target = urlparse(target_hostname)
+            parsed_url = urlparse(url_string)
+
+            # Should never happen - but abandon ship if it does
+            if not parsed_url.netloc:
+                print(
+                    f"Warning: Invalid URL format, missing network location: {url_string}"
+                )
+                return url_string
+
+            new_netloc = normalized_target.netloc
+            new_scheme = normalized_target.scheme
+
+            updated_url = urlunparse(
+                (
+                    new_scheme,
+                    new_netloc,
+                    parsed_url.path,
+                    parsed_url.params,
+                    parsed_url.query,
+                    parsed_url.fragment,
+                )
+            )
+
+            return updated_url
+
+        except Exception as e:
+            print(f"An error occurred while processing the URL: {e}")
+            return url_string
