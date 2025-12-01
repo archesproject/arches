@@ -54,7 +54,16 @@ class AliasedData(SimpleNamespace):
         }
 
     def __iter__(self):
-        return iter(vars(self).items())
+        return iter(self._keys())
+
+    def _keys(self):
+        return vars(self).keys()
+
+    def _values(self):
+        return vars(self).values()
+
+    def _items(self):
+        return vars(self).items()
 
 
 class AliasedDataMixin:
