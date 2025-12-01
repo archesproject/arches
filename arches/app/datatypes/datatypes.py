@@ -2483,9 +2483,10 @@ class ResourceInstanceDataType(BaseDataType):
                                 build_resource_instance_object(hit)
                             )
                         else:
-                            logger.warning(
+                            logger.error(
                                 f"ResourceInstanceDataType: resource {hit['_id']} already exists in ResourceXResource (nodeid: {nodeid}, from_resourceid: {from_resourceid})"
                             )
+                            return
                     else:
                         transformed_value.append(build_resource_instance_object(hit))
 
@@ -2513,9 +2514,10 @@ class ResourceInstanceDataType(BaseDataType):
                         if not resource_x_resource_exists:
                             transformed_value.append(val)
                         else:
-                            logger.warning(
+                            logger.error(
                                 f"ResourceInstanceDataType: resource {val['resourceId']} already exists in ResourceXResource (nodeid: {nodeid}, from_resourceid: {from_resourceid})"
                             )
+                            return
                     else:
                         transformed_value.append(val)
             case _:  # default case (handles str/legacyid and any other types)
@@ -2552,14 +2554,15 @@ class ResourceInstanceDataType(BaseDataType):
                                 build_resource_instance_object(hit)
                             )
                         else:
-                            logger.warning(
+                            logger.error(
                                 f"ResourceInstanceDataType: resource {hit['_id']} already exists in ResourceXResource (nodeid: {nodeid}, from_resourceid: {from_resourceid})"
                             )
+                            return
                     else:
                         transformed_value.append(build_resource_instance_object(hit))
 
         if len(transformed_value) == 0:
-            logger.warning(
+            logger.error(
                 f"ResourceInstanceDataType: no resources found for {converted_value}"
             )
             return
