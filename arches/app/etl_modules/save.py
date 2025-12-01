@@ -88,7 +88,7 @@ def _save_to_tiles(cursor, loadid):
             number_of_resources = {}
             for resource in resources:
                 graph = json.loads(resource[0])[settings.LANGUAGE_CODE]
-                number_of_resources.update({graph: {"total": resource[1]}})
+                number_of_resources.update({graph: {"total": resource[1], "tiles": []}})
             cursor.execute(
                 """SELECT g.name graph, n.name, COUNT(*)
                     FROM load_staging l, nodes n, graphs g
