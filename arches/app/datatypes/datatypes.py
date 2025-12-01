@@ -2115,6 +2115,13 @@ class ResourceInstanceDataType(BaseDataType):
         errors = []
         if value is not None:
             from_resourceid = kwargs.get("resourceid", None)
+            if value is not None and not len(value):
+                message = _("No related resources were provided in the value.")
+                title = _("Invalid Resource Instance Datatype")
+                error_message = self.create_error_message(
+                    value, source, row_number, message, title
+                )
+                errors.append(error_message)
             relations = self.get_nodevalues(value)
             for rel in relations:
                 try:
@@ -2365,6 +2372,8 @@ class ResourceInstanceDataType(BaseDataType):
         relatable_graphs = kwargs.get("graphs", [])
         from_resourceid = kwargs.get("resourceid", None)
         nodeid = kwargs.get("nodeid", None)
+        if value is None:
+            return
         default_values_lookup = dict()
         for graph in relatable_graphs:
             if graph.get("useOntologyRelationship", False) or not graph.get(
@@ -2486,7 +2495,6 @@ class ResourceInstanceDataType(BaseDataType):
                             logger.error(
                                 f"ResourceInstanceDataType: resource {hit['_id']} already exists in ResourceXResource (nodeid: {nodeid}, from_resourceid: {from_resourceid})"
                             )
-                            return
                     else:
                         transformed_value.append(build_resource_instance_object(hit))
 
@@ -2517,7 +2525,6 @@ class ResourceInstanceDataType(BaseDataType):
                             logger.error(
                                 f"ResourceInstanceDataType: resource {val['resourceId']} already exists in ResourceXResource (nodeid: {nodeid}, from_resourceid: {from_resourceid})"
                             )
-                            return
                     else:
                         transformed_value.append(val)
             case _:  # default case (handles str/legacyid and any other types)
@@ -2557,7 +2564,6 @@ class ResourceInstanceDataType(BaseDataType):
                             logger.error(
                                 f"ResourceInstanceDataType: resource {hit['_id']} already exists in ResourceXResource (nodeid: {nodeid}, from_resourceid: {from_resourceid})"
                             )
-                            return
                     else:
                         transformed_value.append(build_resource_instance_object(hit))
 
@@ -2565,7 +2571,7 @@ class ResourceInstanceDataType(BaseDataType):
             logger.error(
                 f"ResourceInstanceDataType: no resources found for {converted_value}"
             )
-            return
+
         return transformed_value
 
     def transform_export_values(self, value, *args, **kwargs):
