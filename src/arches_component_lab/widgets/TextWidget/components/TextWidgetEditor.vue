@@ -95,6 +95,7 @@ function onUpdateModelValue(updatedValue: string | undefined) {
     <div style="display: flex; column-gap: 0.5rem">
         <Select
             v-model="selectedLanguage"
+            class="language-selector"
             :aria-label="$gettext('Select language for node value')"
             :options="languages"
             :option-label="(lang: Language) => `${lang.name} (${lang.code})`"
