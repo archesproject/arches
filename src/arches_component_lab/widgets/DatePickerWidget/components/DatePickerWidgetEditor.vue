@@ -78,11 +78,21 @@ function onUpdateModelValue(updatedValue: string) {
         emit("update:value", formValue);
     }
 }
-const modelDate = computed(() =>
-    aliasedNodeData?.node_value
-        ? new Date(aliasedNodeData?.node_value as string)
-        : null,
-);
+const modelDate = computed(() => {
+    if (!aliasedNodeData?.node_value) {
+        return null;
+    }
+    if (shouldShowTime.value) {
+        return new Date(aliasedNodeData?.node_value as string);
+    }
+    const incommingDate = new Date(aliasedNodeData?.node_value as string);
+    const day = new Date(incommingDate).getUTCDate();
+    const month = new Date(incommingDate).getUTCMonth();
+    const year = new Date(incommingDate).getUTCFullYear();
+    const correctedDate = new Date(year, month, day);
+
+    return correctedDate;
+});
 </script>
 
 <template>
