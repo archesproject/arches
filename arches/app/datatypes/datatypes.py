@@ -2394,6 +2394,7 @@ class ResourceInstanceDataType(BaseDataType):
             # "int": int,
             # "float": float,
         }
+        converted_value = None
 
         if isinstance(value, str):
             for test_method in [uuid.UUID, json.loads, ast.literal_eval]:
@@ -2401,22 +2402,24 @@ class ResourceInstanceDataType(BaseDataType):
                     converted_value = test_method(value)
                     break
                 except:
-                    converted_value = False
+                    pass
 
-            if converted_value is False and value != "":
+            if not converted_value and value:
                 converted_value = value.split(",")  # is a string, likely legacyid
                 converted_value = [val.strip() for val in converted_value if val]
                 try:
                     converted_value = [uuid.UUID(val) for val in converted_value]
                 except:
                     pass
-            elif converted_value is False or not len(converted_value):
+            elif not converted_value or not len(converted_value):
                 logger.warning("ResourceInstanceDataType: value is empty")
                 # return []
         else:
             converted_value = value
 
         value_type = None
+        if not converted_value:
+            return converted_value, value_type
         if not isinstance(converted_value, list):
             converted_value = [converted_value]
         for value_subtype_label, value_subtype_class in list(subtypes_dict.items()):
