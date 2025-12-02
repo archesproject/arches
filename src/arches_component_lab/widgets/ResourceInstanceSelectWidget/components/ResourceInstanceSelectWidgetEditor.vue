@@ -176,7 +176,6 @@ function onUpdateModelValue(updatedValue: string | null) {
         display="chip"
         option-label="display_value"
         option-value="resource_id"
-        style="min-height: 3rem"
         :filter="true"
         :filter-fields="['display_value', 'resource_id']"
         :empty-filter-message="emptyFilterMessage"
