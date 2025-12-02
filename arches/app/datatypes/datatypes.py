@@ -2428,6 +2428,9 @@ class ResourceInstanceDataType(BaseDataType):
                     value_type = value_subtype_label
                 except ValueError:
                     continue
+                except AttributeError:
+                    continue  # in case val is a bool
+
             elif isinstance(
                 converted_value[0], value_subtype_class
             ):  # this doesn't seem to work for uuid
