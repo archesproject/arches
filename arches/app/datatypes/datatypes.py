@@ -2391,8 +2391,8 @@ class ResourceInstanceDataType(BaseDataType):
             "uuid": uuid.UUID,
             "dict": dict,
             "str": str,
-            "int": int,
-            "float": float,
+            # "int": int,
+            # "float": float,
         }
 
         if isinstance(value, str):
