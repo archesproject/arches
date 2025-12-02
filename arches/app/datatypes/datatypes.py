@@ -2116,12 +2116,26 @@ class ResourceInstanceDataType(BaseDataType):
         if value is not None:
             from_resourceid = kwargs.get("resourceid", None)
             if value is not None and not len(value):
-                message = _("No related resources were provided in the value.")
-                title = _("Invalid Resource Instance Datatype")
-                error_message = self.create_error_message(
-                    value, source, row_number, message, title
+                # message = _("No related resources were provided in the value.")
+                # title = _("Invalid Resource Instance Datatype")
+                # error_message = self.create_error_message(
+                #     value, source, row_number, message, title
+                # )
+                # errors.append(error_message)
+                error_str_list = self.transform_value_for_tile(source, validate=True)
+                errors.extend(
+                    [
+                        self.create_error_message(
+                            value,
+                            source,
+                            row_number,
+                            e,
+                            _("Invalid Resource Instance Datatype"),
+                        )
+                        for e in error_str_list
+                    ]
                 )
-                errors.append(error_message)
+
             relations = self.get_nodevalues(value)
             for rel in relations:
                 try:
@@ -2350,65 +2364,29 @@ class ResourceInstanceDataType(BaseDataType):
 
         return terms
 
-    def transform_value_for_tile(self, value, **kwargs):
-        # kwargs config looks like this:
-        # {
-        #     "graphs": [
-        #         {
-        #             "name": "Person or Group",
-        #             "graphid": "ccbd1537-ac5e-11e6-84a5-026d961c88e6",
-        #             "relationshipConcept": "6f26aa04-52af-4b17-a656-674c547ade2a",
-        #             "relationshipCollection": "00000000-0000-0000-0000-000000000005",
-        #             "useOntologyRelationship": False,
-        #             "inverseRelationshipConcept": "6f26aa04-52af-4b17-a656-674c547ade2a"
-        #         }
-        #     ],
-        #     "searchDsl": "",
-        #     "searchString": ""
-        # }
-        from arches.app.search.search_engine_factory import SearchEngineFactory
+    def build_resource_instance_object(self, hit, graph_default_ontology_lookup):
         from arches.app.models.resource import Resource
 
-        relatable_graphs = kwargs.get("graphs", [])
-        from_resourceid = kwargs.get("resourceid", None)
-        nodeid = kwargs.get("nodeid", None)
-        if value is None:
-            return
-        default_values_lookup = dict()
-        for graph in relatable_graphs:
-            if graph.get("useOntologyRelationship", False) or not graph.get(
-                "relationshipConcept", None
-            ):
-                default_values_lookup[graph["graphid"]] = {
-                    "ontologyProperty": "",
-                    "inverseOntologyProperty": "",
-                }
-            else:
-                default_values_lookup[graph["graphid"]] = {
-                    "ontologyProperty": graph["relationshipConcept"],
-                    "inverseOntologyProperty": graph["inverseRelationshipConcept"],
-                }
+        resourceName = (
+            Resource.objects.get(pk=hit["_id"]).displayname() if hit["_id"] else ""
+        )
+        return {
+            "resourceId": hit["_id"],
+            "resourceName": resourceName,
+            "ontologyProperty": (
+                graph_default_ontology_lookup[hit["_source"]["graph_id"]][
+                    "ontologyProperty"
+                ]
+            ),
+            "inverseOntologyProperty": (
+                graph_default_ontology_lookup[hit["_source"]["graph_id"]][
+                    "inverseOntologyProperty"
+                ]
+            ),
+            "resourceXresourceId": str(uuid.uuid4()),
+        }
 
-        def build_resource_instance_object(hit):
-            resourceName = (
-                Resource.objects.get(pk=hit["_id"]).displayname() if hit["_id"] else ""
-            )
-            return {
-                "resourceId": hit["_id"],
-                "resourceName": resourceName,
-                "ontologyProperty": (
-                    default_values_lookup[hit["_source"]["graph_id"]][
-                        "ontologyProperty"
-                    ]
-                ),
-                "inverseOntologyProperty": (
-                    default_values_lookup[hit["_source"]["graph_id"]][
-                        "inverseOntologyProperty"
-                    ]
-                ),
-                "resourceXresourceId": str(uuid.uuid4()),
-            }
-
+    def test_for_subtype(self, value):
         subtypes_dict = {
             "uuid": uuid.UUID,
             "dict": dict,
@@ -2434,7 +2412,7 @@ class ResourceInstanceDataType(BaseDataType):
                     pass
             elif converted_value is False or not len(converted_value):
                 logger.warning("ResourceInstanceDataType: value is empty")
-                return []
+                # return []
         else:
             converted_value = value
 
@@ -2455,6 +2433,58 @@ class ResourceInstanceDataType(BaseDataType):
             ):  # this doesn't seem to work for uuid
                 value_type = value_subtype_label
                 break
+        return converted_value, value_type
+
+    def transform_value_for_tile(self, value, **kwargs):
+        # kwargs config looks like this:
+        # {
+        #     "graphs": [
+        #         {
+        #             "name": "Person or Group",
+        #             "graphid": "ccbd1537-ac5e-11e6-84a5-026d961c88e6",
+        #             "relationshipConcept": "6f26aa04-52af-4b17-a656-674c547ade2a",
+        #             "relationshipCollection": "00000000-0000-0000-0000-000000000005",
+        #             "useOntologyRelationship": False,
+        #             "inverseRelationshipConcept": "6f26aa04-52af-4b17-a656-674c547ade2a"
+        #         }
+        #     ],
+        #     "searchDsl": "",
+        #     "searchString": ""
+        # }
+        from arches.app.search.search_engine_factory import SearchEngineFactory
+
+        relatable_graphs = kwargs.get("graphs", [])
+        from_resourceid = kwargs.get("resourceid", None)
+        validate = kwargs.get("validate", False)
+        errors = []
+        nodeid = kwargs.get("nodeid", None)
+        if value is None:
+            return
+        default_values_lookup = dict()
+        for graph in relatable_graphs:
+            if graph.get("useOntologyRelationship", False) or not graph.get(
+                "relationshipConcept", None
+            ):
+                default_values_lookup[graph["graphid"]] = {
+                    "ontologyProperty": "",
+                    "inverseOntologyProperty": "",
+                }
+            else:
+                default_values_lookup[graph["graphid"]] = {
+                    "ontologyProperty": graph["relationshipConcept"],
+                    "inverseOntologyProperty": graph["inverseRelationshipConcept"],
+                }
+
+        converted_value, value_type = self.test_for_subtype(value)
+        if converted_value is False or not len(converted_value):
+            convert_error_msg = (
+                f"ResourceInstanceDataType: value could not be converted: {value}"
+            )
+            if validate:
+                errors.append(convert_error_msg)
+            else:
+                logger.error(convert_error_msg)
+                return []
 
         se = SearchEngineFactory().create()
         query = Query(se)
@@ -2468,9 +2498,11 @@ class ResourceInstanceDataType(BaseDataType):
                     index=RESOURCES_INDEX, id=[str(val) for val in converted_value]
                 )
                 if not len(results["docs"]):
-                    logger.warning(
-                        f"ResourceInstanceDataType: [uuid case] no hits in Terms query for {converted_value}"
-                    )
+                    uuid_hits_error_msg = f"ResourceInstanceDataType: [uuid case] no hits in Terms query for {converted_value}"
+                    if validate:
+                        errors.append(uuid_hits_error_msg)
+                    else:
+                        logger.warning(uuid_hits_error_msg)
                 for hit in results["docs"]:
                     if from_resourceid:
                         resource_x_resource_exists = (
@@ -2489,14 +2521,22 @@ class ResourceInstanceDataType(BaseDataType):
                         )
                         if not resource_x_resource_exists:
                             transformed_value.append(
-                                build_resource_instance_object(hit)
+                                self.build_resource_instance_object(
+                                    hit, default_values_lookup
+                                )
                             )
                         else:
-                            logger.error(
-                                f"ResourceInstanceDataType: resource {hit['_id']} already exists in ResourceXResource (nodeid: {nodeid}, from_resourceid: {from_resourceid})"
-                            )
+                            exists_error_msg = f"ResourceInstanceDataType: resource {hit['_id']} already exists in ResourceXResource (nodeid: {nodeid}, from_resourceid: {from_resourceid})"
+                            if validate:
+                                errors.append(exists_error_msg)
+                            else:
+                                logger.error(exists_error_msg)
                     else:
-                        transformed_value.append(build_resource_instance_object(hit))
+                        transformed_value.append(
+                            self.build_resource_instance_object(
+                                hit, default_values_lookup
+                            )
+                        )
 
             case "dict":  # assume data correctly parsed via ast.literal
                 for val in converted_value:
@@ -2522,9 +2562,11 @@ class ResourceInstanceDataType(BaseDataType):
                         if not resource_x_resource_exists:
                             transformed_value.append(val)
                         else:
-                            logger.error(
-                                f"ResourceInstanceDataType: resource {val['resourceId']} already exists in ResourceXResource (nodeid: {nodeid}, from_resourceid: {from_resourceid})"
-                            )
+                            exists_error_msg = f"ResourceInstanceDataType: resource {val['resourceId']} already exists in ResourceXResource (nodeid: {nodeid}, from_resourceid: {from_resourceid})"
+                            if validate:
+                                errors.append(exists_error_msg)
+                            else:
+                                logger.error(exists_error_msg)
                     else:
                         transformed_value.append(val)
             case _:  # default case (handles str/legacyid and any other types)
@@ -2536,9 +2578,11 @@ class ResourceInstanceDataType(BaseDataType):
                 query.add_query(boolquery)
                 results = query.search(index=RESOURCES_INDEX)
                 if not len(results["hits"]["hits"]):
-                    logger.warning(
-                        f"ResourceInstanceDataType: [default case] no hits in Terms query for {converted_value} (datatype: {value_type})"
-                    )
+                    default_hits_error_msg = f"ResourceInstanceDataType: [default case] no hits in Terms query for {converted_value} (datatype: {value_type})"
+                    if validate:
+                        errors.append(default_hits_error_msg)
+                    else:
+                        logger.warning(default_hits_error_msg)
                 # print(f"{len(results['hits']['hits'])} hits")
                 for hit in results["hits"]["hits"]:
                     if from_resourceid:
@@ -2558,20 +2602,30 @@ class ResourceInstanceDataType(BaseDataType):
                         )
                         if not resource_x_resource_exists:
                             transformed_value.append(
-                                build_resource_instance_object(hit)
+                                self.build_resource_instance_object(
+                                    hit, default_values_lookup
+                                )
                             )
                         else:
-                            logger.error(
-                                f"ResourceInstanceDataType: resource {hit['_id']} already exists in ResourceXResource (nodeid: {nodeid}, from_resourceid: {from_resourceid})"
-                            )
+                            exists_error_msg = f"ResourceInstanceDataType: resource {hit['_id']} already exists in ResourceXResource (nodeid: {nodeid}, from_resourceid: {from_resourceid})"
+                            if validate:
+                                errors.append(exists_error_msg)
+                            else:
+                                logger.error(exists_error_msg)
                     else:
-                        transformed_value.append(build_resource_instance_object(hit))
+                        transformed_value.append(
+                            self.build_resource_instance_object(
+                                hit, default_values_lookup
+                            )
+                        )
 
         if len(transformed_value) == 0:
             logger.error(
                 f"ResourceInstanceDataType: no resources found for {converted_value}"
             )
 
+        if validate:
+            return errors
         return transformed_value
 
     def transform_export_values(self, value, *args, **kwargs):
