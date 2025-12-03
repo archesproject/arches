@@ -31,7 +31,14 @@ RESOURCES_INDEX = "resources"
 ANALYZER = {
     "analyzer": {
         "folding": {"tokenizer": "whitespace", "filter": ["lowercase", "asciifolding"]}
-    }
+    },
+    "normalizer": {
+        "folding_normalizer": {
+            "type": "custom",
+            "char_filter": [],
+            "filter": ["lowercase", "asciifolding"],
+        }
+    },
 }
 
 
@@ -154,7 +161,10 @@ def prepare_search_index(create=False):
                 "displayname": {
                     "type": "nested",
                     "properties": {
-                        "value": {"type": "keyword"},
+                        "value": {
+                            "type": "keyword",
+                            "normalizer": "folding_normalizer",
+                        },
                         "language": {"type": "keyword"},
                     },
                 },
