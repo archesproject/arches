@@ -23,7 +23,7 @@ const {
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: DateValue | string): void;
+    (event: "update:value", updatedValue: DateValue | string | number): void;
 }>();
 
 const shouldShowTime = ref(false);
@@ -42,30 +42,39 @@ watchEffect(() => {
 function onUpdateModelValue(updatedValue: string) {
     const date = new Date(updatedValue);
 
-    let formValue;
-    let formattedDate;
-
-    try {
-        formattedDate = formatDate(
-            date,
-            cardXNodeXWidgetData.node.config.dateFormat,
-        );
-
-        formValue = {
-            display_value: formattedDate,
-            node_value: formattedDate,
-            details: [],
-        };
-    } catch (_error) {
-        formValue = {
-            display_value: updatedValue,
-            node_value: updatedValue,
-            details: [],
-        };
-    }
     if (shouldEmitSimplifiedValue) {
-        emit("update:value", formattedDate || updatedValue);
+        let simplifiedDate;
+        try {
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Add 1 to month and pad
+            const day = date.getDate().toString().padStart(2, "0");
+            simplifiedDate = Number(`${year}${month}${day}`);
+        } catch (_error) {
+            simplifiedDate = updatedValue;
+        }
+        emit("update:value", simplifiedDate);
     } else {
+        let formValue;
+        let formattedDate;
+
+        try {
+            formattedDate = formatDate(
+                date,
+                cardXNodeXWidgetData.node.config.dateFormat,
+            );
+
+            formValue = {
+                display_value: formattedDate,
+                node_value: formattedDate,
+                details: [],
+            };
+        } catch (_error) {
+            formValue = {
+                display_value: updatedValue,
+                node_value: updatedValue,
+                details: [],
+            };
+        }
         emit("update:value", formValue);
     }
 }
