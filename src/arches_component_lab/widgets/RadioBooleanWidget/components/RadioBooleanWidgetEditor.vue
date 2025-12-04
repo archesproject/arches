@@ -36,12 +36,19 @@ function getDisplayValue(value: boolean | null | undefined): string {
 }
 
 function onUpdateModelValue(updatedValue: string | null) {
-    const booleanValue =
-        updatedValue === "true"
-            ? true
-            : updatedValue === "false"
-              ? false
-              : null;
+    let booleanValue;
+    switch (updatedValue) {
+        case "true":
+            booleanValue = true;
+            break;
+        case "false":
+            booleanValue = false;
+            break;
+        default:
+            booleanValue = null;
+            break;
+    }
+
     if (shouldEmitSimplifiedValue) {
         emit("update:value", booleanValue);
     } else {
