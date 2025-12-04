@@ -57,7 +57,7 @@ function onUpdateModelValue(updatedValue: string | null) {
 <template>
     <RadioButtonGroup
         fluid="true"
-        :class="['button-group', flexDirection]"
+        class="button-group"
         :model-value="aliasedNodeData?.node_value?.toString() || ''"
         @update:model-value="onUpdateModelValue($event)"
     >
@@ -97,5 +97,9 @@ function onUpdateModelValue(updatedValue: string | null) {
     display: flex;
     gap: 0.25rem;
     align-items: center;
+}
+
+label {
+    all: unset;
 }
 </style>

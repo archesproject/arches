@@ -1,9 +1,11 @@
 <script setup lang="ts">
-const props = defineProps<{
-    value: string | null | undefined;
+import type { BooleanValue } from "@/arches_component_lab/datatypes/boolean/types";
+
+defineProps<{
+    aliasedNodeData: BooleanValue | null;
 }>();
 </script>
 
 <template>
-    <div>{{ props.value.display_value }}</div>
+    <div>{{ aliasedNodeData?.display_value }}</div>
 </template>

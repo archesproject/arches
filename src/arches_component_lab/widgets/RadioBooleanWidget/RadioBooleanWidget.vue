@@ -4,7 +4,7 @@ import RadioBooleanWidgetViewer from "@/arches_component_lab/widgets/RadioBoolea
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type { BooleanCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { BooleanValue } from "@/arches_component_lab/datatypes/boolean/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
@@ -12,7 +12,7 @@ defineProps<{
     mode: WidgetMode;
     nodeAlias: string;
     graphSlug: string;
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
+    cardXNodeXWidgetData: BooleanCardXNodeXWidgetData;
     aliasedNodeData: BooleanValue | null;
     shouldEmitSimplifiedValue?: boolean;
 }>();
@@ -30,8 +30,8 @@ const emit = defineEmits(["update:value"]);
     />
     <RadioBooleanWidgetViewer
         v-if="mode === VIEW"
-        :card-x-node-x-widget-data="slotProps.cardXNodeXWidgetData"
-        :value="props.value"
+        :card-x-node-x-widget-data="cardXNodeXWidgetData"
+        :aliased-node-data="aliasedNodeData"
     />
 </template>
 
