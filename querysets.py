@@ -414,7 +414,7 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         alias_expressions = generate_node_alias_expressions(self.model, nodes)
 
         if resource_ids:
-            qs = self.filter(pk__in=resource_ids)
+            qs = self.filter(graph__slug=graph_slug, pk__in=resource_ids)
         else:
             filters = models.Q(graph__slug=graph_slug)
             # arches_version==9.0.0
