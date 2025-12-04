@@ -50,6 +50,7 @@ function onUpdateModelValue(updatedValue: boolean | null) {
 <template>
     <ToggleSwitch
         :fluid="true"
+        :input-id="cardXNodeXWidgetData.node.alias"
         :model-value="aliasedNodeData?.node_value || ''"
         @update:model-value="onUpdateModelValue($event)"
     />
