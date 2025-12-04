@@ -35,6 +35,9 @@ export interface CardXNodeXWidgetData {
         isrequired: boolean;
         nodeid: string;
         datatype: string;
+        config: {
+            [key: string]: unknown;
+        };
     };
     sortorder: number;
     visible: boolean;
@@ -54,6 +57,18 @@ export interface StringCardXNodeXWidgetData extends CardXNodeXWidgetData {
 export interface ConceptRadioCardXNodeXWidgetData extends CardXNodeXWidgetData {
     config: CardXNodeXWidgetData["config"] & {
         groupDirection: string | null;
+    };
+}
+
+export interface BooleanCardXNodeXWidgetData extends CardXNodeXWidgetData {
+    config: CardXNodeXWidgetData["config"] & {
+        subtitle: string;
+    };
+    node: CardXNodeXWidgetData["node"] & {
+        config: {
+            trueLabel: string;
+            falseLabel: string;
+        };
     };
 }
 
