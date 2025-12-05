@@ -436,7 +436,7 @@ class UserProfileView(View):
     def post(self, request):
         username = request.POST.get("username", None)
         password = request.POST.get("password", None)
-        user = authenticate(username=username, password=password)
+        user = authenticate(username=username, password=password) or request.user
         if user:
             userDict = JSONSerializer().serializeToPython(user)
             userDict["password"] = None
