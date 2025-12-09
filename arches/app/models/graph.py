@@ -1638,13 +1638,13 @@ class Graph(models.GraphModel):
             valid_stagings = {
                 obj for obj in staging_objs if obj.nodegroup_id in all_nodegroup_ids
             }
-            models.LoadErrors.objects.bulk_update(valid_errors, fields=["nodegroup"])
-            models.LoadStaging.objects.bulk_update(valid_stagings, fields=["nodegroup"])
+            models.LoadErrors.objects.bulk_update(valid_errors, fields=["nodegroup"], batch_size=500)
+            models.LoadStaging.objects.bulk_update(valid_stagings, fields=["nodegroup"], batch_size=500)
 
             # Restore the node references that still exist.
             all_node_ids = models.Node.objects.values_list("pk", flat=True)
             valid_errors = {obj for obj in error_objs if obj.node_id in all_node_ids}
-            models.LoadErrors.objects.bulk_update(valid_errors, fields=["node"])
+            models.LoadErrors.objects.bulk_update(valid_errors, fields=["node"], batch_size=500)
 
     def update_permissions_from_serialized_graph(self, serialized_graph):
         if (
