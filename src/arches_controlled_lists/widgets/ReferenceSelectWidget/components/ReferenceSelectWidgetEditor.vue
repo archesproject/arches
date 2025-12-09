@@ -26,7 +26,7 @@ const {
     cardXNodeXWidgetData: ReferenceSelectDatatypeCardXNodeXWidgetData;
     graphSlug: string;
     nodeAlias: string;
-    shouldEmitSimplifiedValue: boolean;
+    shouldEmitSimplifiedValue?: boolean;
 }>();
 
 const emit = defineEmits<{
