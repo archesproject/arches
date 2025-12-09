@@ -220,7 +220,11 @@ class GraphTestCase(TestCase):
             "url": {"url": "http://arthurdent.com", "url_label": ""},
             "boolean": False,
             "number": 7,
-            "date": "1979-10-12T00:00:00.000-05:00",
+            "date": (
+                "1979-10-12"
+                if arches_version > (8, 0)
+                else "1979-10-12T00:00:00.000-05:00"
+            ),
             # "resource-instance": None,
             # "resource-instance-list": [],
             # "concept": None,
