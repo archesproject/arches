@@ -10,7 +10,7 @@ const { cardXNodeXWidgetData, aliasedNodeData, shouldEmitSimplifiedValue } =
     defineProps<{
         cardXNodeXWidgetData: NumberCardXNodeXWidgetData;
         aliasedNodeData: NumberValue | null;
-        shouldEmitSimplifiedValue: boolean;
+        shouldEmitSimplifiedValue?: boolean;
     }>();
 
 const emit = defineEmits<{

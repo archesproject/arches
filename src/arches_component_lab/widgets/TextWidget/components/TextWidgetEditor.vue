@@ -19,7 +19,7 @@ const { cardXNodeXWidgetData, aliasedNodeData, shouldEmitSimplifiedValue } =
     defineProps<{
         cardXNodeXWidgetData: StringCardXNodeXWidgetData;
         aliasedNodeData: StringValue | null;
-        shouldEmitSimplifiedValue: boolean;
+        shouldEmitSimplifiedValue?: boolean;
     }>();
 
 const emit = defineEmits<{

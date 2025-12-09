@@ -21,7 +21,7 @@ const {
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
     aliasedNodeData: ResourceInstanceValue | null;
-    shouldEmitSimplifiedValue: boolean;
+    shouldEmitSimplifiedValue?: boolean;
 }>();
 
 const emit = defineEmits(["update:value"]);

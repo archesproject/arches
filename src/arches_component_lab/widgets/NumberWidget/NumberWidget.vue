@@ -14,7 +14,7 @@ defineProps<{
     graphSlug: string;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
     aliasedNodeData: NumberValue | null;
-    shouldEmitSimplifiedValue: boolean;
+    shouldEmitSimplifiedValue?: boolean;
 }>();
 
 const emit = defineEmits(["update:isDirty", "update:value"]);

@@ -30,7 +30,7 @@ const {
     nodeAlias: string;
     graphSlug: string;
     aliasedNodeData: ResourceInstanceValue | null;
-    shouldEmitSimplifiedValue: boolean;
+    shouldEmitSimplifiedValue?: boolean;
 }>();
 
 const emit = defineEmits<{
