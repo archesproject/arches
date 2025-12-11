@@ -15,6 +15,7 @@ const {
     cardXNodeXWidgetData,
     aliasedNodeData,
     shouldEmitSimplifiedValue = false,
+    defaultTerm,
 } = defineProps<{
     mode: WidgetMode;
     nodeAlias: string;
@@ -22,6 +23,7 @@ const {
     cardXNodeXWidgetData: CardXNodeXWidgetData;
     aliasedNodeData: ResourceInstanceValue | null;
     shouldEmitSimplifiedValue?: boolean;
+    defaultTerm?: string;
 }>();
 
 const emit = defineEmits(["update:value"]);
@@ -35,6 +37,7 @@ const emit = defineEmits(["update:value"]);
         :node-alias="nodeAlias"
         :aliased-node-data="aliasedNodeData"
         :should-emit-simplified-value="shouldEmitSimplifiedValue"
+        :default-term="defaultTerm"
         @update:value="emit('update:value', $event)"
     />
     <ResourceInstanceSelectWidgetViewer

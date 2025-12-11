@@ -25,12 +25,14 @@ const {
     graphSlug,
     aliasedNodeData,
     shouldEmitSimplifiedValue,
+    defaultTerm,
 } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
     nodeAlias: string;
     graphSlug: string;
     aliasedNodeData: ResourceInstanceValue | null;
     shouldEmitSimplifiedValue?: boolean;
+    defaultTerm?: string;
 }>();
 
 const emit = defineEmits<{
@@ -67,7 +69,9 @@ async function getOptions(page: number, filterTerm?: string) {
     try {
         isLoading.value = true;
         emptyFilterMessage.value = $gettext("Searching...");
-
+        if (defaultTerm) {
+            filterTerm = [defaultTerm, filterTerm].join(",");
+        }
         const resourceData = await fetchRelatableResources(
             graphSlug,
             nodeAlias,

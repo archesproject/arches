@@ -57,9 +57,12 @@ class RelatableResourcesView(View):
                 uuid.UUID(str(filter_term))
                 resources = resources.filter(Q(resourceinstanceid=str(filter_term)))
             except ValueError:
-                resources = resources.filter(
-                    Q(**{"display_value__icontains": filter_term})
-                )
+                query_filter = Q()
+                for term in filter_term.split(","):
+                    query_filter = query_filter & Q(
+                        **{"display_value__icontains": term}
+                    )
+                    resources = resources.filter(query_filter)
 
         resources.count = lambda self=None: 1_000_000_000
         paginator = Paginator(resources, items_per_page)
