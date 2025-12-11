@@ -1355,7 +1355,7 @@ class Command(BaseCommand):
         languages: str = None,
     ):
         graphids = []
-        if graphid is False and file_format == "json":
+        if graphid is False and file_format in ["json", "tilexl"]:
             graphids = [
                 str(graph.graphid)
                 for graph in (
@@ -1364,7 +1364,7 @@ class Command(BaseCommand):
                     .exclude(source_identifier__isnull=False)
                 )
             ]
-        if graphid is False and file_format != "json":
+        if graphid is False and file_format not in ["json", "tilexl"]:
             utils.print_message(
                 "Exporting data for all graphs is currently only supported for the json format. Please specify a graphid with the -g flag."
             )
