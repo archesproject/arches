@@ -1621,7 +1621,9 @@ class Graph(models.GraphModel):
         error_query = models.LoadErrors.objects.filter(
             Q(nodegroup__in=nodegroups) | Q(node__in=self.nodes.values())
         ).only("node", "nodegroup")
-        staging_query = models.LoadStaging.objects.filter(nodegroup__in=nodegroups).only("nodegroup")
+        staging_query = models.LoadStaging.objects.filter(
+            nodegroup__in=nodegroups
+        ).only("nodegroup")
         error_objs = set(error_query)
         staging_objs = set(staging_query)
         error_query.update(nodegroup=None, node=None)
