@@ -372,6 +372,22 @@ var IIIFViewerViewmodel = function(params) {
         }
     });
 
+    var createThumbnailUrl = function(imageUrl, maxSize) {
+        if (!imageUrl) return imageUrl;
+        
+        try {
+            // IIIF format: {scheme}://{server}/{prefix}/{identifier}/{region}/{size}/{rotation}/{quality}.{format}
+            var iiifPattern = /^(https?:\/\/.+\/)([^\/]+)\/(full|square|\d+,\d+,\d+,\d+)\/([^\/]+)\/(\d+)\/([^\/]+)\.(jpg|jpeg|png|webp|tif|tiff|gif|pdf)$/i;   
+            if (iiifPattern.test(imageUrl)) {
+                return imageUrl.replace(iiifPattern, '$1$2/$3/!' + maxSize + ',' + maxSize + '/$5/$6.$7');
+            }
+            // If not a recognized IIIF URL, return original
+            return imageUrl;
+        } catch(e) {
+            return imageUrl;
+        }
+    };
+
     this.canvases = ko.pureComputed(function() {
         var manifestData = self.manifestData();
         var sequences = manifestData ? manifestData.sequences : [];
@@ -381,10 +397,12 @@ var IIIFViewerViewmodel = function(params) {
                 sequence.label = self.getManifestDataValue(sequence, 'label', true);
                 sequence.canvases.forEach(function(canvas) {
                     canvas.label = self.getManifestDataValue(canvas, 'label', true);
-                    if (typeof canvas.thumbnail === 'object')
+                    if (typeof canvas.thumbnail === 'object') {
                         canvas.thumbnail = canvas.thumbnail["@id"];
-                    else if (canvas.images && canvas.images[0] && canvas.images[0].resource)
-                        canvas.thumbnail = canvas.images[0].resource["@id"];
+                    } else if (canvas.images && canvas.images[0] && canvas.images[0].resource) {
+                        var fullImageUrl = canvas.images[0].resource["@id"];
+                        canvas.thumbnail = createThumbnailUrl(fullImageUrl, 200);
+                    }
                     canvas.id = self.getCanvasService(canvas);
                     canvas.text = canvas.label;
                     canvases.push(canvas);
