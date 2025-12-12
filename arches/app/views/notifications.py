@@ -1,81 +1,125 @@
-from django.views.generic import View
-from arches.app.utils.response import JSONResponse
-from arches.app.models import models
-import copy
 import json
-import logging
+from django.views.generic import View
+from django.core.paginator import Paginator
+
+from arches.app.models import models
+from arches.app.utils.pagination import get_paginator
+from arches.app.utils.response import JSONResponse
 
 
 class NotificationView(View):
     action = ""
 
     def get(self, request):
-        if request.user.is_authenticated:
-            if self.action == "get_types":
-                default_types = list(models.NotificationType.objects.all())
-                user_types = models.UserXNotificationType.objects.filter(
-                    user=request.user, notiftype__in=default_types
-                )
-                for user_type in user_types:
-                    if (
-                        user_type.notiftype in default_types
-                    ):  # find an overridden default_type and copy notify settings from user_type
-                        i = default_types.index(user_type.notiftype)
-                        default_type = default_types[i]
-                        default_type.webnotify = user_type.webnotify
-                        default_type.emailnotify = user_type.emailnotify
+        if not request.user.is_authenticated:
+            return JSONResponse(
+                {"error": "User not authenticated. Access denied."}, status=401
+            )
 
-                notiftype_dict_list = [_type.__dict__ for _type in default_types]
-                return JSONResponse(
-                    {"success": True, "types": notiftype_dict_list}, status=200
-                )
+        if self.action == "get_types":
+            default_types = list(models.NotificationType.objects.all())
+            user_types = models.UserXNotificationType.objects.filter(
+                user=request.user, notiftype__in=default_types
+            )
+            for user_type in user_types:
+                if (
+                    user_type.notiftype in default_types
+                ):  # find an overridden default_type and copy notify settings from user_type
+                    i = default_types.index(user_type.notiftype)
+                    default_type = default_types[i]
+                    default_type.webnotify = user_type.webnotify
+                    default_type.emailnotify = user_type.emailnotify
 
+            notiftype_dict_list = [_type.__dict__ for _type in default_types]
+            return JSONResponse(
+                {"success": True, "types": notiftype_dict_list}, status=200
+            )
+
+        else:
+            response = {}
+            if request.GET.get("unread_only"):
+                user_notifications = (
+                    models.UserXNotification.objects.filter(
+                        recipient=request.user, isread=False
+                    )
+                    .select_related("notif")
+                    .order_by("notif__created")
+                    .reverse()
+                )
             else:
-                if request.GET.get("unread_only"):
-                    userxnotifs = (
-                        models.UserXNotification.objects.filter(
-                            recipient=request.user, isread=False
-                        )
-                        .order_by("notif__created")
-                        .reverse()
-                    )
-                else:
-                    userxnotifs = (
-                        models.UserXNotification.objects.filter(recipient=request.user)
-                        .order_by("notif__created")
-                        .reverse()
-                    )
-                notif_dict_list = []
-                for userxnotif in userxnotifs:
-                    if (
-                        models.UserXNotificationType.objects.filter(
-                            user=request.user,
-                            notiftype=userxnotif.notif.notiftype,
-                            webnotify=False,
-                        ).exists()
-                        is False
-                    ):
-                        notif = userxnotif.__dict__
-                        notif["message"] = userxnotif.notif.message
-                        notif["created"] = userxnotif.notif.created
-
-                        if userxnotif.notif.context:
-                            notif["loaded_resources"] = userxnotif.notif.context.get(
-                                "loaded_resources", []
-                            )
-                            notif["link"] = userxnotif.notif.context.get("link")
-                            if userxnotif.notif.context.get("files"):
-                                notif["files"] = userxnotif.notif.context.get("files")
-
-                        notif_dict_list.append(notif)
-
-                return JSONResponse(
-                    {"success": True, "notifications": notif_dict_list}, status=200
+                user_notifications = (
+                    models.UserXNotification.objects.filter(recipient=request.user)
+                    .select_related("notif")
+                    .order_by("notif__created")
+                    .reverse()
                 )
 
-        return JSONResponse(
-            {"error": "User not authenticated. Access denied."}, status=401
-        )
+            page = request.GET.get("page")
+            if page:
+                page = int(page)
+                count_per_page = 5
+                paginated_notifications = (
+                    Paginator(user_notifications, count_per_page).page(page).object_list
+                )
+                total_count = len(user_notifications)
+                paginator, pages = get_paginator(
+                    request,
+                    user_notifications,
+                    total_count,
+                    page,
+                    count_per_page,
+                )
+                page = paginator.page(page)
+                paginator_details = {
+                    "current_page": page,
+                    "has_next": page.has_next(),
+                    "has_previous": page.has_previous(),
+                    "has_other_pages": page.has_other_pages(),
+                    "next_page_number": (
+                        page.next_page_number() if page.has_next() else None
+                    ),
+                    "previous_page_number": (
+                        page.previous_page_number() if page.has_previous() else None
+                    ),
+                    "start_index": page.start_index(),
+                    "end_index": page.end_index(),
+                    "pages": pages,
+                }
+                response["paginator"] = paginator_details
+                user_notifications = paginated_notifications
+
+            # prefetch UserXNotificationType objects to avoid N+1 queries
+            user_notification_type_overrides = (
+                models.UserXNotificationType.objects.filter(
+                    user=request.user, webnotify=False
+                ).values_list("notiftype", flat=True)
+            )
+
+            notif_dict_list = []
+            for user_notification in user_notifications:
+                if (
+                    user_notification.notif.notiftype
+                    not in user_notification_type_overrides
+                ):
+                    notif = user_notification.__dict__
+                    notif["message"] = user_notification.notif.message
+                    notif["created"] = user_notification.notif.created
+
+                    if user_notification.notif.context:
+                        notif["loaded_resources"] = user_notification.notif.context.get(
+                            "loaded_resources", []
+                        )
+                        notif["link"] = user_notification.notif.context.get("link")
+                        if user_notification.notif.context.get("files"):
+                            notif["files"] = user_notification.notif.context.get(
+                                "files"
+                            )
+
+                    notif_dict_list.append(notif)
+
+            response["success"] = True
+            response["notifications"] = notif_dict_list
+            return JSONResponse(response, status=200)
 
     def post(self, request):
         if request.user.is_authenticated:
