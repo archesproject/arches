@@ -37,22 +37,20 @@ class NotificationView(View):
 
         else:
             response = {}
-            if request.GET.get("unread_only"):
-                user_notifications = (
-                    models.UserXNotification.objects.filter(
-                        recipient=request.user, isread=False
-                    )
-                    .select_related("notif")
-                    .order_by("notif__created")
-                    .reverse()
-                )
+            all_user_notifications = (
+                models.UserXNotification.objects.filter(recipient=request.user)
+                .select_related("notif")
+                .order_by("notif__created")
+                .reverse()
+            )
+            unread_notifications = all_user_notifications.filter(isread=False)
+            unread_only = request.GET.get("unread_only", False)
+
+            # To maintain back-compat, funnel filtered notifs through common variable
+            if unread_only:
+                user_notifications = unread_notifications
             else:
-                user_notifications = (
-                    models.UserXNotification.objects.filter(recipient=request.user)
-                    .select_related("notif")
-                    .order_by("notif__created")
-                    .reverse()
-                )
+                user_notifications = all_user_notifications
 
             page = request.GET.get("page")
             if page:
@@ -61,7 +59,7 @@ class NotificationView(View):
                 paginated_notifications = (
                     Paginator(user_notifications, count_per_page).page(page).object_list
                 )
-                total_count = len(user_notifications)
+                total_count = user_notifications.count()
                 paginator, pages = get_paginator(
                     request,
                     user_notifications,
@@ -85,6 +83,20 @@ class NotificationView(View):
                     "end_index": page.end_index(),
                     "pages": pages,
                 }
+                if unread_only:
+                    paginator_details.update(
+                        {
+                            "total_notifications": all_user_notifications.count(),
+                            "unread_notifications": total_count,
+                        }
+                    )
+                else:
+                    paginator_details.update(
+                        {
+                            "total_notifications": total_count,
+                            "unread_notifications": unread_notifications.count(),
+                        }
+                    )
                 response["paginator"] = paginator_details
                 user_notifications = paginated_notifications
 
