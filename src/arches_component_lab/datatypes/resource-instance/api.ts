@@ -4,7 +4,7 @@ export const fetchRelatableResources = async (
     graphSlug: string,
     nodeAlias: string,
     page: number,
-    filterTerm?: string,
+    filterTerm?: string[] | string,
     initialValue?: string | null | undefined,
 ) => {
     const params = new URLSearchParams();
@@ -12,7 +12,12 @@ export const fetchRelatableResources = async (
     params.append("page", page.toString());
 
     if (filterTerm) {
-        params.append("filter_term", filterTerm);
+        if (!Array.isArray(filterTerm)) {
+            filterTerm = [filterTerm];
+        }
+        filterTerm.forEach(term => {
+            params.append("filter_term", term);
+        });
     }
 
     if (initialValue) {

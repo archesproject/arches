@@ -69,14 +69,18 @@ async function getOptions(page: number, filterTerm?: string) {
     try {
         isLoading.value = true;
         emptyFilterMessage.value = $gettext("Searching...");
+        const filterTerms = [];
         if (defaultTerm) {
-            filterTerm = [defaultTerm, filterTerm].join(",");
+            filterTerms.push(defaultTerm);
+        }
+        if (filterTerm) {
+            filterTerms.push(filterTerm);
         }
         const resourceData = await fetchRelatableResources(
             graphSlug,
             nodeAlias,
             page,
-            filterTerm,
+            filterTerms,
             aliasedNodeData?.details?.[0]?.resource_id,
         );
 
