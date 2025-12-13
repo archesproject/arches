@@ -22,7 +22,7 @@ class RelatableResourcesView(View):
         node = Node.objects.get(node_filter)
 
         page_number = request.GET.get("page", 1)
-        filter_term = request.GET.getlist('filter_term', [])
+        filter_term = request.GET.getlist("filter_term", [])
         items_per_page = request.GET.get("items", 25)
         language = get_language()
         initial_values = request.GET.getlist("initialValue", "")
@@ -53,16 +53,16 @@ class RelatableResourcesView(View):
         )
 
         if filter_term:
-            try:
-                uuid.UUID(str(filter_term[0]))
-                resources = resources.filter(Q(resourceinstanceid=str(filter_term[0])))
-            except ValueError:
-                query_filter = Q()
-                for term in filter_term:
+            query_filter = Q()
+            for term in filter_term:
+                try:
+                    uuid.UUID(str(term))
+                    query_filter = query_filter & Q(resourceinstanceid=str(term))
+                except ValueError:
                     query_filter = query_filter & Q(
                         **{"display_value__icontains": term}
                     )
-                    resources = resources.filter(query_filter)
+            resources = resources.filter(query_filter)
 
         resources.count = lambda self=None: 1_000_000_000
         paginator = Paginator(resources, items_per_page)
