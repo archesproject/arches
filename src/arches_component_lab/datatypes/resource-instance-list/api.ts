@@ -15,7 +15,7 @@ export const fetchRelatableResources = async (
         if (!Array.isArray(filterTerm)) {
             filterTerm = [filterTerm];
         }
-        filterTerm.forEach(term => {
+        filterTerm.forEach((term) => {
             params.append("filter_term", term);
         });
     }
