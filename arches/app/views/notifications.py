@@ -3,7 +3,6 @@ from django.views.generic import View
 from django.core.paginator import Paginator
 
 from arches.app.models import models
-from arches.app.utils.pagination import get_paginator
 from arches.app.utils.response import JSONResponse
 
 
@@ -52,53 +51,33 @@ class NotificationView(View):
             else:
                 user_notifications = all_user_notifications
 
-            page = request.GET.get("page")
-            if page:
-                page = int(page)
+            page_number = request.GET.get("page")
+            if page_number:
+                page_number = int(page_number)
                 count_per_page = request.GET.get("items", 10)
-                paginated_notifications = (
-                    Paginator(user_notifications, count_per_page).page(page).object_list
-                )
-                total_count = user_notifications.count()
-                paginator, pages = get_paginator(
-                    request,
-                    user_notifications,
-                    total_count,
-                    page,
-                    count_per_page,
-                )
-                page = paginator.page(page)
+                paginator = Paginator(user_notifications, count_per_page)
                 paginator_details = {
-                    "current_page": page,
-                    "has_next": page.has_next(),
-                    "has_previous": page.has_previous(),
-                    "has_other_pages": page.has_other_pages(),
-                    "next_page_number": (
-                        page.next_page_number() if page.has_next() else None
-                    ),
-                    "previous_page_number": (
-                        page.previous_page_number() if page.has_previous() else None
-                    ),
-                    "start_index": page.start_index(),
-                    "end_index": page.end_index(),
-                    "pages": pages,
+                    "current_page": page_number,
+                    "total_pages": paginator.num_pages,
+                    "results_per_page": paginator.per_page,
+                    "has_next": paginator.num_pages > page_number,
                 }
                 if unread_only:
                     paginator_details.update(
                         {
                             "total_notifications": all_user_notifications.count(),
-                            "unread_notifications": total_count,
+                            "unread_notifications": paginator.count,
                         }
                     )
                 else:
                     paginator_details.update(
                         {
-                            "total_notifications": total_count,
+                            "total_notifications": paginator.count,
                             "unread_notifications": unread_notifications.count(),
                         }
                     )
                 response["paginator"] = paginator_details
-                user_notifications = paginated_notifications
+                user_notifications = paginator.page(page_number).object_list
 
             # prefetch UserXNotificationType objects to avoid N+1 queries
             user_notification_type_overrides = (
