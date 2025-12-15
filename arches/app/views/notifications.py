@@ -55,7 +55,7 @@ class NotificationView(View):
             page = request.GET.get("page")
             if page:
                 page = int(page)
-                count_per_page = 5
+                count_per_page = request.GET.get("items", 10)
                 paginated_notifications = (
                     Paginator(user_notifications, count_per_page).page(page).object_list
                 )
