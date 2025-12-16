@@ -65,23 +65,23 @@
             <span style="font-weight:bold;" data-bind="text: ': ' + graphTree.getNodeIdentifier(node)"></span>
             <!-- /ko -->
             <span class="spacer"></span>
+            <i 
+                class="jstree-node-action-icon ion-ios-copy-outline" 
+                role="presentation" 
+                data-bind="
+                    visible: graphTree.showIds(), 
+                    clipboard: {
+                        value: graphTree.getNodeIdentifier(node),
+                        tooltip: true, 
+                        beforeCopiedText: graphTree.translations.copyNodeIdToClipboard, 
+                        afterCopiedText: graphTree.translations.copiedNodeIdToClipboard
+                    }
+                " 
+                data-toggle="tooltip" 
+                data-placement="auto" 
+                data-container="body"
+            ></i>
             <!-- ko ifnot: graph.attributes.isresource && ( node.is_immutable || !graph.attributes.source_identifier_id ) -->
-                <i 
-                    class="jstree-node-action-icon ion-ios-copy-outline" 
-                    role="presentation" 
-                    data-bind="
-                        visible: graphTree.showIds(), 
-                        clipboard: {
-                            value: graphTree.getNodeIdentifier(node),
-                            tooltip: true, 
-                            beforeCopiedText: graphTree.translations.copyNodeIdToClipboard, 
-                            afterCopiedText: graphTree.translations.copiedNodeIdToClipboard
-                        }
-                    " 
-                    data-toggle="tooltip" 
-                    data-placement="auto" 
-                    data-container="body"
-                ></i>
                 <i 
                     class="jstree-node-action-icon fa fa-plus-circle" 
                     role="presentation" 
