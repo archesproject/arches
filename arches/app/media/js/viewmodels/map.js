@@ -138,6 +138,7 @@ const viewModel = function (params) {
 
     var mapLayers = params.mapLayers || arches.mapLayers;
     mapLayers.forEach(function (layer) {
+        if (!layer.activated) { return; }
         if (!layer.isoverlay) {
             if (!params.basemaps) self.basemaps.push(layer);
         }
