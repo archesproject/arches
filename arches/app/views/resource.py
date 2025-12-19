@@ -616,6 +616,8 @@ class ResourceEditLogView(BaseManagerView):
                 "tile edit": _("Tile Updated"),
                 "delete edit": _("Edit Deleted"),
                 "bulk_create": _("Resource Created"),
+                "resourcexresource edit": _("Resource Relationship Updated"),
+                "resourcexresource delete": _("Resource Relationship Deleted"),
             }
             deleted_instances = [
                 e.resourceinstanceid for e in recent_edits if e.edittype == "delete"
