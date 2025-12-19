@@ -616,8 +616,6 @@ class ResourceEditLogView(BaseManagerView):
                 "tile edit": _("Tile Updated"),
                 "delete edit": _("Edit Deleted"),
                 "bulk_create": _("Resource Created"),
-                "resourcexresource edit": _("Resource Relationship Updated"),
-                "resourcexresource delete": _("Resource Relationship Deleted"),
             }
             deleted_instances = [
                 e.resourceinstanceid for e in recent_edits if e.edittype == "delete"
@@ -626,7 +624,7 @@ class ResourceEditLogView(BaseManagerView):
                 str(r.resourceinstanceid): r.graph.name for r in resources
             }
             for edit in recent_edits:
-                edit.friendly_edittype = edit_type_lookup[edit.edittype]
+                edit.friendly_edittype = edit_type_lookup.get(edit.edittype, edit.edittype)
                 edit.resource_model_name = None
                 edit.deleted = edit.resourceinstanceid in deleted_instances
                 if edit.resourceinstanceid in graph_name_lookup:
