@@ -1,6 +1,7 @@
 import json
 from django.views.generic import View
 from django.core.paginator import Paginator
+from django.utils.translation import gettext as _
 
 from arches.app.models import models
 from arches.app.utils.response import JSONResponse
@@ -12,7 +13,7 @@ class NotificationView(View):
     def get(self, request):
         if not request.user.is_authenticated:
             return JSONResponse(
-                {"error": "User not authenticated. Access denied."}, status=401
+                {"error": _("User not authenticated. Access denied.")}, status=401
             )
 
         if self.action == "get_types":
@@ -79,18 +80,18 @@ class NotificationView(View):
                 response["paginator"] = paginator_details
                 user_notifications = paginator.page(page_number).object_list
 
-            # prefetch UserXNotificationType objects to avoid N+1 queries
-            user_notification_type_overrides = (
+            disabled_notification_type_ids = set(
                 models.UserXNotificationType.objects.filter(
-                    user=request.user, webnotify=False
-                ).values_list("notiftype", flat=True)
+                    user=request.user,
+                    webnotify=False,
+                ).values_list("notiftype_id", flat=True)
             )
 
             notif_dict_list = []
             for user_notification in user_notifications:
                 if (
                     user_notification.notif.notiftype
-                    not in user_notification_type_overrides
+                    not in disabled_notification_type_ids
                 ):
                     notif = user_notification.__dict__
                     notif["message"] = user_notification.notif.message

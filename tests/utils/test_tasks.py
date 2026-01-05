@@ -27,16 +27,16 @@ class NotificationViewTests(TestCase):
         cls.user = models.User.objects.get(username="admin")
         notifs = []
         user_x_notifs = []
-        for i in range(100):
+        for idx in range(100):
             notif = models.Notification(
-                message=f"Test notification {i+1}",
-                context={"index": i + 1},
+                message=f"Test notification {idx+1}",
+                context={"index": idx + 1},
             )
             notifs.append(notif)
             user_x_notif = models.UserXNotification(
                 recipient=cls.user,
                 notif=notif,
-                isread=(i % 2 == 0),  # Mark even indexed notifications as read
+                isread=(idx % 2 == 0),  # Mark even indexed notifications as read
             )
             user_x_notifs.append(user_x_notif)
         models.Notification.objects.bulk_create(notifs)
