@@ -1142,7 +1142,7 @@ class FileListDataType(BaseDataType):
 
         try:
             config = node.config
-            limit = config["maxFiles"]
+            limit = config["maxFiles"] if "maxFiles" in config.keys() else None
             max_size = config["maxFileSize"] if "maxFileSize" in config.keys() else None
 
             images_only = config.get("imagesOnly", False)
@@ -1174,11 +1174,7 @@ class FileListDataType(BaseDataType):
                             }
                         )
 
-            if (
-                value is not None
-                and config["activateMax"] is True
-                and len(value) > limit
-            ):
+            if value is not None and limit is not None and len(value) > limit:
                 message = _(
                     "This node has a limit of {0} files. Please reduce files.".format(
                         limit
