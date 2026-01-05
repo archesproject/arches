@@ -2316,7 +2316,6 @@
                 {
                     "alias": "image",
                     "config": {
-                        "activateMax": false,
                         "imagesOnly": false,
                         "maxFileSize": null,
                         "maxFiles": 1
