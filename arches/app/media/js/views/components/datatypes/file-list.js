@@ -25,16 +25,34 @@ const viewModel = function(params) {
             params.filterValue(val);
         });
     } else {
-        this.maxFiles = ko.observable(params.config.maxFiles());
+        this.maxFiles = ko.observable(
+            params.config.maxFiles() == null ? "" : 
+            params.config.maxFiles().toString()
+        );
         this.maxFiles.subscribe(function(val) {
+            if (val === "" || val === null) {
+                params.config.maxFiles(null);
+                return;
+            }
+
             var int = parseInt(val);
-            if(int > 0) { params.config.maxFiles(int); }
-            else { self.maxFiles(1); }
+            if(!isNaN(int) && int > 0) { 
+                params.config.maxFiles(int);
+            } else {
+                self.maxFiles(
+                    params.config.maxFiles() == null ? "" :
+                    params.config.maxFiles().toString()
+                );
+            }
+        });
+        params.config.maxFiles.subscribe(function(val) {
+            var stringified_val = (val === null ? "" : val.toString());
+            if (self.maxFiles() !== stringified_val) {
+                self.maxFiles(stringified_val);
+            }
         });
 
         this.imagesOnly = params.config.imagesOnly;
-        params.config.maxFiles.subscribe((val) => self.maxFiles(val));
-        this.activated = params.config.activateMax;
     }
 };
 

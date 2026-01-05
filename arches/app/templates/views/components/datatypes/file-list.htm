@@ -35,7 +35,10 @@
             <p class="control-label node-widget-label">
                 <span data-bind="text: $root.translations.maximumNumberOfFiles"></span>
             </p>
-            <input class="form-control input-md widget-input widget-file" placeholder="1" type="number" data-bind="textInput: maxFiles"></input>
+            <input type="number"
+                class="form-control input-md widget-input widget-file"
+                data-bind="textInput: $data.maxFiles"
+            ></input>
         </label>
     </div>
     <div class="node-config-item">
@@ -45,7 +48,7 @@
                     component: {
                         name: 'views/components/simple-switch',
                         params: {
-                            value: imagesOnly,
+                            value: $data.imagesOnly,
                             config: {
                                 label: $root.translations.imagesOnly,
                             }
