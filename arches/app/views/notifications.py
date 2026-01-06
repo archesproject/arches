@@ -90,7 +90,7 @@ class NotificationView(View):
             notif_dict_list = []
             for user_notification in user_notifications:
                 if (
-                    user_notification.notif.notiftype
+                    user_notification.notif.notiftype_id
                     not in disabled_notification_type_ids
                 ):
                     notif = user_notification.__dict__
