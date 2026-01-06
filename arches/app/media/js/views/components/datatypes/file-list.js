@@ -3,14 +3,14 @@ import _ from "underscore";
 import fileListDatatypeTemplate from "templates/views/components/datatypes/file-list.htm";
 
 
-var name = 'file-list-datatype-config';
+const name = 'file-list-datatype-config';
 const viewModel = function(params) {
     const self = this;
     this.config = params.config;
     this.search = params.search;
 
     if (this.search) {
-        var filter = params.filterValue();
+        const filter = params.filterValue();
         this.op = ko.observable(filter.op || '~');
         this.node = params.node;
         this.searchValue = ko.observable(filter.val || '');
@@ -25,30 +25,31 @@ const viewModel = function(params) {
             params.filterValue(val);
         });
     } else {
-        this.maxFiles = ko.observable(
-            params.config.maxFiles() == null ? "" : 
-            params.config.maxFiles().toString()
-        );
+        function stringify(val) {
+            if (val == null) {
+                return "";
+            } else {
+                return val.toString();
+            }
+        }
+        this.maxFiles = ko.observable(stringify(params.config.maxFiles()));
         this.maxFiles.subscribe(function(val) {
             if (val === "" || val === null) {
                 params.config.maxFiles(null);
                 return;
             }
 
-            var int = parseInt(val);
+            const int = parseInt(val);
             if(!isNaN(int) && int > 0) { 
                 params.config.maxFiles(int);
             } else {
-                self.maxFiles(
-                    params.config.maxFiles() == null ? "" :
-                    params.config.maxFiles().toString()
-                );
+                self.maxFiles(stringify(params.config.maxFiles()));
             }
         });
         params.config.maxFiles.subscribe(function(val) {
-            var stringified_val = (val === null ? "" : val.toString());
-            if (self.maxFiles() !== stringified_val) {
-                self.maxFiles(stringified_val);
+            const stringifiedVal = stringify(val);
+            if (self.maxFiles() !== stringifiedVal) {
+                self.maxFiles(stringifiedVal);
             }
         });
 
