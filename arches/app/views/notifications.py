@@ -30,7 +30,7 @@ class NotificationView(View):
                     default_type.webnotify = user_type.webnotify
                     default_type.emailnotify = user_type.emailnotify
 
-            notiftype_dict_list = [_type.__dict__ for _type in default_types]
+            notiftype_dict_list = [_type.serialize() for _type in default_types]
             return JSONResponse(
                 {"success": True, "types": notiftype_dict_list}, status=200
             )
@@ -93,7 +93,7 @@ class NotificationView(View):
                     user_notification.notif.notiftype_id
                     not in disabled_notification_type_ids
                 ):
-                    notif = user_notification.__dict__
+                    notif = user_notification.serialize()
                     notif["message"] = user_notification.notif.message
                     notif["created"] = user_notification.notif.created
 

@@ -2248,6 +2248,11 @@ class NotificationType(SaveSupportsBlindOverwriteMixin, models.Model):
     emailnotify = models.BooleanField(default=False)
     webnotify = models.BooleanField(default=False)
 
+    def serialize(self, fields=None, exclude=None, **kwargs):
+        return JSONSerializer().handle_model(
+            self, fields=fields, exclude=exclude, **kwargs
+        )
+
     class Meta:
         managed = True
         db_table = "notification_types"
@@ -2289,6 +2294,11 @@ class UserXNotification(SaveSupportsBlindOverwriteMixin, models.Model):
     notif = models.ForeignKey(Notification, on_delete=models.CASCADE)
     isread = models.BooleanField(default=False)
     recipient = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def serialize(self, fields=None, exclude=None, **kwargs):
+        return JSONSerializer().handle_model(
+            self, fields=fields, exclude=exclude, **kwargs
+        )
 
     class Meta:
         managed = True
