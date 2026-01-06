@@ -45,6 +45,7 @@ class NotificationView(View):
             )
             unread_notifications = all_user_notifications.filter(isread=False)
             unread_only = request.GET.get("unread_only", False)
+            unread_only = True if str(unread_only).lower() == "true" else False
 
             # To maintain back-compat, funnel filtered notifs through common variable
             if unread_only:
@@ -55,7 +56,7 @@ class NotificationView(View):
             page_number = request.GET.get("page")
             if page_number:
                 page_number = int(page_number)
-                count_per_page = request.GET.get("items", 10)
+                count_per_page = int(request.GET.get("items", 10))
                 paginator = Paginator(user_notifications, count_per_page)
                 paginator_details = {
                     "current_page": page_number,
