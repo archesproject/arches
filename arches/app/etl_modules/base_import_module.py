@@ -375,8 +375,8 @@ class BaseImportModule:
                     workbook = load_workbook(filename=opened_file, read_only=True)
                     self.validate_uploaded_file(workbook)
                     has_valid_excel_file = True
-                except:
-                    pass
+                except Exception as e:
+                    logger.error(e, exc_info=True)
                 else:
                     opened_file.close()
         if not has_valid_excel_file:

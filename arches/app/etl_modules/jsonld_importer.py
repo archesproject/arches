@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import zipfile
 from datetime import datetime
 from functools import lru_cache
@@ -270,7 +271,12 @@ class JSONLDImporter(BaseImportModule):
             datatype = nodegroup_info[nodeid]["datatype"]
             datatype_instance = self.datatype_factory.get_instance(datatype)
             config = nodegroup_info[nodeid]["config"]
-            config["path"] = self.temp_dir
+
+            if source_value and os.sep in source_value:
+                config["path"] = Path(source_value).parent
+            else:
+                config["path"] = self.temp_dir
+
             config["loadid"] = self.loadid
             value, validation_errors = self.prepare_data_for_loading(
                 datatype_instance,

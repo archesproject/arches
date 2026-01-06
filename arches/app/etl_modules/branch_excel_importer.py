@@ -1,6 +1,7 @@
 from datetime import datetime
 import json
 import os
+from pathlib import Path
 import uuid
 from tempfile import NamedTemporaryFile
 
@@ -93,9 +94,14 @@ class BranchExcelImporter(BaseImportModule):
                 datatype_instance = self.datatype_factory.get_instance(datatype)
                 source_value = row_details[key]
                 config = node_details["config"]
-                config["path"] = os.path.join(
-                    settings.UPLOADED_FILES_DIR, "tmp", self.loadid
-                )
+
+                if source_value and os.sep in source_value:
+                    config["path"] = Path(source_value).parent
+                else:
+                    config["path"] = (
+                        Path(settings.UPLOADED_FILES_DIR) / "tmp" / self.loadid
+                    )
+
                 config["loadid"] = self.loadid
                 try:
                     config["nodeid"] = nodeid

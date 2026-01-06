@@ -108,7 +108,7 @@ class BranchExcelTests(TransactionTestCase):
     def test_write(self):
         load_id = "d481d116-7c1e-4b36-b7ef-85963d482db0"
         edits = EditLog.objects.filter(transactionid=load_id)
-        self.assertTrue(len(edits) == 9)
+        self.assertTrue(len(edits) == 11)
 
     def test_export(self):
         load_id = "2d288e76-ebd3-11ee-85b8-0242ac120005"

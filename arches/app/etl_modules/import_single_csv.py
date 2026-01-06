@@ -3,6 +3,7 @@ from datetime import datetime
 import io
 import json
 import os
+from pathlib import Path
 import uuid
 import zipfile
 from django.contrib.auth.models import User
@@ -426,7 +427,11 @@ class ImportSingleCsv(BaseImportModule):
                             source_value = row[i]
                             config = current_node.config
                             config["nodeid"] = node
-                            config["path"] = temp_dir
+
+                            if source_value and os.sep in source_value:
+                                config["path"] = Path(source_value).parent
+                            else:
+                                config["path"] = temp_dir
 
                             if source_value:
                                 if datatype == "string":

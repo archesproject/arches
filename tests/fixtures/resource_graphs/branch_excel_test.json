@@ -5,6 +5,33 @@
             "cards": [
                 {
                     "active": true,
+                    "cardid": "2f45da7a-fb7b-4305-9f8c-f15def6fdc09",
+                    "component_id": "f05e4d3a-53c1-11e8-b0ea-784f435179ea",
+                    "config": null,
+                    "constraints": [],
+                    "cssclass": null,
+                    "description": null,
+                    "graph_id": "a5c3946a-a9c0-4472-9191-ffc0f35a5901",
+                    "helpenabled": false,
+                    "helptext": {
+                        "en": ""
+                    },
+                    "helptitle": {
+                        "en": ""
+                    },
+                    "instructions": {
+                        "en": ""
+                    },
+                    "name": {
+                        "en": "file-list"
+                    },
+                    "nodegroup_id": "c152e45b-8272-4149-83fb-34185c292391",
+                    "sortorder": null,
+                    "source_identifier_id": null,
+                    "visible": true
+                },
+                {
+                    "active": true,
                     "cardid": "ea297049-8bf2-42d5-80b2-9ea730f70fc9",
                     "component_id": "f05e4d3a-53c1-11e8-b0ea-784f435179ea",
                     "config": null,
@@ -22,12 +49,12 @@
                     "instructions": {
                         "en": ""
                     },
-                    "is_editable": true,
                     "name": {
                         "en": "geometry"
                     },
                     "nodegroup_id": "1d6afbca-4f62-11ef-be0d-323af0a1fd6a",
                     "sortorder": null,
+                    "source_identifier_id": null,
                     "visible": true
                 },
                 {
@@ -49,12 +76,12 @@
                     "instructions": {
                         "en": ""
                     },
-                    "is_editable": true,
                     "name": {
                         "en": "string"
                     },
                     "nodegroup_id": "1dd75892-4f62-11ef-be0d-323af0a1fd6a",
                     "sortorder": null,
+                    "source_identifier_id": null,
                     "visible": true
                 }
             ],
@@ -85,6 +112,7 @@
                     },
                     "node_id": "1dd75892-4f62-11ef-be0d-323af0a1fd6a",
                     "sortorder": 0,
+                    "source_identifier_id": null,
                     "visible": true,
                     "widget_id": "10000000-0000-0000-0000-000000000001"
                 },
@@ -132,8 +160,28 @@
                     },
                     "node_id": "1d6afbca-4f62-11ef-be0d-323af0a1fd6a",
                     "sortorder": 0,
+                    "source_identifier_id": null,
                     "visible": true,
                     "widget_id": "10000000-0000-0000-0000-000000000007"
+                },
+                {
+                    "card_id": "2f45da7a-fb7b-4305-9f8c-f15def6fdc09",
+                    "config": {
+                        "acceptedFiles": "",
+                        "defaultValue": [],
+                        "label": "file-list",
+                        "maxFilesize": "200",
+                        "rerender": true
+                    },
+                    "id": "e91b74ed-b40d-4d02-b2f0-5d97b8b8f5a0",
+                    "label": {
+                        "en": "file-list"
+                    },
+                    "node_id": "c152e45b-8272-4149-83fb-34185c292391",
+                    "sortorder": 0,
+                    "source_identifier_id": null,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000019"
                 }
             ],
             "color": null,
@@ -151,7 +199,8 @@
                     "graph_id": "a5c3946a-a9c0-4472-9191-ffc0f35a5901",
                     "name": null,
                     "ontologyproperty": null,
-                    "rangenode_id": "1d6afbca-4f62-11ef-be0d-323af0a1fd6a"
+                    "rangenode_id": "1d6afbca-4f62-11ef-be0d-323af0a1fd6a",
+                    "source_identifier_id": null
                 },
                 {
                     "description": null,
@@ -160,14 +209,27 @@
                     "graph_id": "a5c3946a-a9c0-4472-9191-ffc0f35a5901",
                     "name": null,
                     "ontologyproperty": null,
-                    "rangenode_id": "1dd75892-4f62-11ef-be0d-323af0a1fd6a"
+                    "rangenode_id": "1dd75892-4f62-11ef-be0d-323af0a1fd6a",
+                    "source_identifier_id": null
+                },
+                {
+                    "description": null,
+                    "domainnode_id": "c31eb25c-4f5b-11ef-be0d-323af0a1fd6a",
+                    "edgeid": "6ee84eef-0c85-402f-a84c-af7d00b542fb",
+                    "graph_id": "a5c3946a-a9c0-4472-9191-ffc0f35a5901",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "c152e45b-8272-4149-83fb-34185c292391",
+                    "source_identifier_id": null
                 }
             ],
             "functions_x_graphs": [],
             "graphid": "a5c3946a-a9c0-4472-9191-ffc0f35a5901",
+            "group_permissions": {},
+            "has_unpublished_changes": true,
             "iconclass": "",
             "is_active": true,
-            "is_editable": true,
+            "is_copy_immutable": false,
             "isresource": true,
             "jsonldcontext": null,
             "name": {
@@ -176,14 +238,23 @@
             "nodegroups": [
                 {
                     "cardinality": "1",
+                    "grouping_node_id": "1d6afbca-4f62-11ef-be0d-323af0a1fd6a",
                     "legacygroupid": null,
                     "nodegroupid": "1d6afbca-4f62-11ef-be0d-323af0a1fd6a",
                     "parentnodegroup_id": null
                 },
                 {
                     "cardinality": "1",
+                    "grouping_node_id": "1dd75892-4f62-11ef-be0d-323af0a1fd6a",
                     "legacygroupid": null,
                     "nodegroupid": "1dd75892-4f62-11ef-be0d-323af0a1fd6a",
+                    "parentnodegroup_id": null
+                },
+                {
+                    "cardinality": "1",
+                    "grouping_node_id": "c152e45b-8272-4149-83fb-34185c292391",
+                    "legacygroupid": null,
+                    "nodegroupid": "c152e45b-8272-4149-83fb-34185c292391",
                     "parentnodegroup_id": null
                 }
             ],
@@ -221,6 +292,7 @@
                     "graph_id": "a5c3946a-a9c0-4472-9191-ffc0f35a5901",
                     "hascustomalias": false,
                     "is_collector": true,
+                    "is_immutable": false,
                     "isrequired": false,
                     "issearchable": true,
                     "istopnode": false,
@@ -230,6 +302,7 @@
                     "ontologyclass": null,
                     "parentproperty": null,
                     "sortorder": 0,
+                    "source_identifier_id": null,
                     "sourcebranchpublication_id": null
                 },
                 {
@@ -244,6 +317,7 @@
                     "graph_id": "a5c3946a-a9c0-4472-9191-ffc0f35a5901",
                     "hascustomalias": false,
                     "is_collector": true,
+                    "is_immutable": false,
                     "isrequired": false,
                     "issearchable": true,
                     "istopnode": false,
@@ -253,10 +327,39 @@
                     "ontologyclass": null,
                     "parentproperty": null,
                     "sortorder": 0,
+                    "source_identifier_id": null,
                     "sourcebranchpublication_id": null
                 },
                 {
-                    "alias": null,
+                    "alias": "file_list",
+                    "config": {
+                        "activateMax": false,
+                        "imagesOnly": false,
+                        "maxFileSize": null,
+                        "maxFiles": 1
+                    },
+                    "datatype": "file-list",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "a5c3946a-a9c0-4472-9191-ffc0f35a5901",
+                    "hascustomalias": true,
+                    "is_collector": true,
+                    "is_immutable": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "file-list",
+                    "nodegroup_id": "c152e45b-8272-4149-83fb-34185c292391",
+                    "nodeid": "c152e45b-8272-4149-83fb-34185c292391",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 0,
+                    "source_identifier_id": null,
+                    "sourcebranchpublication_id": null
+                },
+                {
+                    "alias": "branch_excel_test",
                     "config": {
                         "en": ""
                     },
@@ -267,6 +370,7 @@
                     "graph_id": "a5c3946a-a9c0-4472-9191-ffc0f35a5901",
                     "hascustomalias": false,
                     "is_collector": false,
+                    "is_immutable": false,
                     "isrequired": false,
                     "issearchable": true,
                     "istopnode": true,
@@ -276,15 +380,83 @@
                     "ontologyclass": null,
                     "parentproperty": "",
                     "sortorder": 0,
+                    "source_identifier_id": null,
                     "sourcebranchpublication_id": null
                 }
             ],
             "ontology_id": null,
-            "publication": null,
+            "publication": {
+                "graph_id": "a5c3946a-a9c0-4472-9191-ffc0f35a5901",
+                "most_recent_edit_id": null,
+                "notes": null,
+                "publicationid": "c4ace3ee-6ad3-49cc-bce2-1af1b999e2d2",
+                "published_time": "2026-01-07T11:24:20.531"
+            },
             "relatable_resource_model_ids": [],
             "resource_2_resource_constraints": [],
+            "resource_instance_lifecycle": {
+                "id": "7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75",
+                "name": {
+                    "en": "Standard"
+                },
+                "resource_instance_lifecycle_states": [
+                    {
+                        "action_label": {
+                            "en": "Revert to Draft"
+                        },
+                        "can_delete_resource_instances": true,
+                        "can_edit_resource_instances": true,
+                        "id": "9375c9a7-dad2-4f14-a5c1-d7e329fdde4f",
+                        "is_initial_state": true,
+                        "name": {
+                            "en": "Draft"
+                        },
+                        "next_resource_instance_lifecycle_states": [
+                            "f75bb034-36e3-4ab4-8167-f520cf0b4c58"
+                        ],
+                        "previous_resource_instance_lifecycle_states": [],
+                        "resource_instance_lifecycle_id": "7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"
+                    },
+                    {
+                        "action_label": {
+                            "en": "Make Active"
+                        },
+                        "can_delete_resource_instances": false,
+                        "can_edit_resource_instances": true,
+                        "id": "f75bb034-36e3-4ab4-8167-f520cf0b4c58",
+                        "is_initial_state": false,
+                        "name": {
+                            "en": "Active"
+                        },
+                        "next_resource_instance_lifecycle_states": [
+                            "d95d9c0e-0e2c-4450-93a3-d788b91abcc8"
+                        ],
+                        "previous_resource_instance_lifecycle_states": [
+                            "9375c9a7-dad2-4f14-a5c1-d7e329fdde4f"
+                        ],
+                        "resource_instance_lifecycle_id": "7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"
+                    },
+                    {
+                        "action_label": {
+                            "en": "Retire"
+                        },
+                        "can_delete_resource_instances": false,
+                        "can_edit_resource_instances": false,
+                        "id": "d95d9c0e-0e2c-4450-93a3-d788b91abcc8",
+                        "is_initial_state": false,
+                        "name": {
+                            "en": "Retired"
+                        },
+                        "next_resource_instance_lifecycle_states": [],
+                        "previous_resource_instance_lifecycle_states": [
+                            "f75bb034-36e3-4ab4-8167-f520cf0b4c58"
+                        ],
+                        "resource_instance_lifecycle_id": "7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"
+                    }
+                ]
+            },
             "root": {
-                "alias": null,
+                "alias": "branch_excel_test",
                 "config": {
                     "en": ""
                 },
@@ -295,6 +467,7 @@
                 "graph_id": "a5c3946a-a9c0-4472-9191-ffc0f35a5901",
                 "hascustomalias": false,
                 "is_collector": false,
+                "is_immutable": false,
                 "isrequired": false,
                 "issearchable": true,
                 "istopnode": true,
@@ -303,20 +476,24 @@
                 "nodeid": "c31eb25c-4f5b-11ef-be0d-323af0a1fd6a",
                 "ontologyclass": null,
                 "sortorder": 0,
+                "source_identifier_id": null,
                 "sourcebranchpublication_id": null
             },
             "slug": "branch_excel_test",
+            "source_identifier_id": null,
+            "spatial_views": [],
             "subtitle": {
                 "en": ""
             },
             "template_id": "50000000-0000-0000-0000-000000000001",
+            "user_permissions": {},
             "version": ""
         }
     ],
     "metadata": {
-        "db": "PostgreSQL 16.2 (Postgres.app) on aarch64-apple-darwin21.6.0, compiled by Apple clang version 14.0.0 (clang-1400.0.29.102), 64-bit",
-        "git hash": "7a23de45b 2024-07-31 01:51:10 -0700",
-        "os": "Darwin",
-        "os version": "23.5.0"
+        "db": "PostgreSQL 16.4 (Debian 16.4-1.pgdg110+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 10.2.1-6) 10.2.1 20210110, 64-bit",
+        "git hash": "d77535b88d 2026-01-07 09:20:12 -0700",
+        "os": "Linux",
+        "os version": "6.10.14-linuxkit"
     }
 }
