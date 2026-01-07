@@ -20,6 +20,7 @@ import json
 import time
 import uuid
 
+from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.models.models import NodeGroup
@@ -34,6 +35,7 @@ from arches.app.views.search import search_terms, search_results
 from django.http import HttpRequest
 from django.contrib.auth.models import User
 from django.test.utils import captured_stdout
+from django.test import RequestFactory
 from tests.base_test import ArchesTestCase
 
 # these tests can be run from the command line via
@@ -488,3 +490,31 @@ class SearchTests(ArchesTestCase):
         results = search_results(request=request)
         results = JSONDeserializer().deserialize(results.content)["results"]["hits"]
         self.assertEqual(1, len(results["hits"]))
+
+    def test_no_resources_from_unpublished_graphs(self):
+
+        test_graph = Graph.objects.get(name="Resource Test Model")
+
+        Resource.objects.create(
+            graph=test_graph,
+            name="Resource from unpublished graph",
+            resourceinstanceid="53c2246a-dd01-4ee1-9e45-8b339197824e",
+        )
+
+        # add delay to allow for indexes to be updated
+        time.sleep(1)
+
+        test_graph.unpublish()
+
+        user = User.objects.get(username="admin")
+
+        factory = RequestFactory()
+        request = factory.get("/search")
+        request.user = user
+
+        response = search_results(request)
+        response_data = json.loads(response.content.decode("utf-8"))
+        hits_data = response_data["results"]["hits"]["hits"]
+        hit_ids = [hit["_id"] for hit in hits_data]
+
+        self.assertNotIn("53c2246a-dd01-4ee1-9e45-8b339197824e", hit_ids)

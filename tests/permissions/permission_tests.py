@@ -23,6 +23,7 @@ from arches.app.utils.permission_backend import user_can_read_resource
 from arches.app.utils.permission_backend import user_has_resource_model_permissions
 from arches.app.utils.permission_backend import get_restricted_users
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
+
 from tests.base_test import ArchesTestCase
 
 # these tests can be run from the command line via
@@ -200,3 +201,63 @@ class PermissionTests(ArchesTestCase):
         graphids = get_permitted_graphids(permitted_nodegroups)
         with self.subTest(graphids):
             self.assertTrue(self.data_type_graphid not in graphids)
+
+    def test_nodegroups_by_perm(self):
+        # In this first case, user 'ben' has implicit read access to all nodegroups
+        nodegroup_set = get_nodegroups_by_perm(self.user, "models.read_nodegroup")
+        self.assertTrue(nodegroup_set)
+
+        # For the case of edit and delete, access should succeed because implicitly users have all read, write, and delete
+        nodegroup_set = get_nodegroups_by_perm(self.user, "models.delete_nodegroup")
+        self.assertTrue(nodegroup_set)
+        nodegroup_set = get_nodegroups_by_perm(self.user, "models.write_nodegroup")
+        self.assertTrue(nodegroup_set)
+
+        # If multiple perms, if any_perm is true, user should have access to node
+        nodegroup_set = get_nodegroups_by_perm(
+            self.user, ["models.read_nodegroup", "models.delete_nodegroup"]
+        )
+        self.assertTrue(nodegroup_set)
+        nodegroup_set = get_nodegroups_by_perm(
+            self.user, ["models.read_nodegroup", "models.delete_nodegroup"], False
+        )
+        self.assertTrue(nodegroup_set)
+
+        nodegroups = NodeGroup.objects.filter(
+            node__graph_id=self.data_type_graphid
+        ).distinct()
+
+        # Give user 'ben' explicit delete permission on one nodegroup - verify that group is returned
+        first_nodegroup = nodegroups.first()
+        assign_perm("models.delete_nodegroup", self.user, first_nodegroup)
+        nodegroup_set = get_nodegroups_by_perm(
+            self.user, ["models.read_nodegroup", "models.delete_nodegroup"], True
+        )
+        self.assertTrue(nodegroup_set)
+
+        # If all permissions are required, this is OK as long as the user is logged in
+        nodegroup_set = get_nodegroups_by_perm(
+            self.user, ["models.read_nodegroup", "models.delete_nodegroup"], False
+        )
+        self.assertTrue(nodegroup_set)
+
+        anonymous_user = User.objects.get(username="anonymous")
+        # Anonymous user should be able to read by default, but not delete or edit
+        nodegroup_set = get_nodegroups_by_perm(
+            anonymous_user,
+            [
+                "models.read_nodegroup",
+            ],
+        )
+
+        self.assertTrue(nodegroup_set)
+
+        nodegroup_set = get_nodegroups_by_perm(
+            anonymous_user, ["models.read_nodegroup", "models.delete_nodegroup"], False
+        )
+        self.assertFalse(nodegroup_set)
+
+        nodegroup_set = get_nodegroups_by_perm(
+            anonymous_user, ["models.read_nodegroup", "models.write_nodegroup"], False
+        )
+        self.assertFalse(nodegroup_set)

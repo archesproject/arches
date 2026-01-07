@@ -397,6 +397,7 @@ class StringDataType(BaseDataType):
                     return raw_value[current_language]["value"]
                 except KeyError:
                     pass
+        return ""
 
     def default_es_mapping(self):
         """
@@ -483,6 +484,7 @@ class NumberDataType(BaseDataType):
             display_value = data.get(str(node.nodeid))
             if display_value is not None:
                 return str(display_value)
+        return ""
 
     def transform_value_for_tile(self, value, **kwargs):
         try:
@@ -596,6 +598,7 @@ class BooleanDataType(BaseDataType):
             raw_value = data.get(str(node.nodeid))
             if raw_value is not None:
                 return str(raw_value)
+        return ""
 
         # TODO: When APIv1 is retired, replace the body of get_display_value with the following
         # data = self.get_tile_data(tile)
@@ -879,7 +882,7 @@ class DateDataType(BaseDataType):
                 new_date_format
             )
         except TypeError:
-            value = data[str(node.nodeid)]
+            value = data[str(node.nodeid)] or ""
         return value
 
 
@@ -921,7 +924,7 @@ class EDTFDataType(BaseDataType):
         try:
             value = data[str(node.nodeid)]["value"]
         except TypeError:
-            value = data[str(node.nodeid)]
+            value = data[str(node.nodeid)] or ""
         return value
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
@@ -2129,6 +2132,7 @@ class ResourceInstanceDataType(BaseDataType):
                 except:
                     logger.info(f'Resource with id "{resourceid}" not in the system.')
             return ", ".join(items)
+        return ""
 
     def get_relationship_display_value(self, relationship_valueid):
         preflabel = get_preflabel_from_valueid(relationship_valueid, get_language())

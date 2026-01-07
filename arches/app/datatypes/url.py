@@ -117,6 +117,7 @@ class URLDataType(BaseDataType):
 
             if display_value:
                 return json.dumps(display_value)
+        return ""
 
     def to_json(self, tile, node):
         data = self.get_tile_data(tile)

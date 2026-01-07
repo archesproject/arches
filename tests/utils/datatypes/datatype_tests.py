@@ -51,9 +51,9 @@ class AllDataTypeTests(ArchesTestCase):
         for datatype in self.datatypes:
             instance = self.factory.get_instance(datatype)
             with self.subTest(datatype=datatype):
-                self.assertIn(
+                self.assertEqual(
                     instance.to_json(mock_tile, self.mock_node)["@display_value"],
-                    ["", None],
+                    "",
                 )
 
 

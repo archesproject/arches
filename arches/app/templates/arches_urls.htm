@@ -31,6 +31,7 @@
     buffer="{% url 'buffer'%}"
     config="{% url 'config' %}"
     node="{% url 'node' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
+    thumbnail='(resourceid) => {return "{% url "thumbnail" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", resourceid)}'
     graph_nodes='(graphid)=>{return "{% url "graph_nodes" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
     nodegroup="{% url 'nodegroup' %}"
     node_layer="{% url 'node_layer' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"

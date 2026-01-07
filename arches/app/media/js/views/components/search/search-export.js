@@ -21,6 +21,7 @@ define([
         this.precision = ko.observable(6);
         this.result = ko.observable();
         this.emailInput = ko.observable(arches.userEmail);
+        this.userName = ko.observable(arches.userName);
         this.exportName = ko.observable();
         this.celeryRunning = ko.observable(arches.celeryRunning);
         this.hasExportHtmlTemplates = ko.observable(arches.exportHtmlTemplates.length > 0);
