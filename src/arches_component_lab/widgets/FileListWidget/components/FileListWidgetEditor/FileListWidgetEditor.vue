@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watchEffect } from "vue";
+import { computed, ref, watchEffect } from "vue";
 
 import FileUpload from "primevue/fileupload";
 
@@ -37,6 +37,12 @@ const fileUploadRef = ref<InstanceType<typeof FileUpload> | null>(null);
 
 const savedFiles = ref<FileReference[]>([]);
 const pendingFiles = ref<FileData[]>([]);
+const maxFiles = ref(cardXNodeXWidgetData.node.config.maxFiles as number);
+
+const isDisabled = computed(() => {
+    const totalFiles = savedFiles.value.length + pendingFiles.value.length;
+    return maxFiles.value ? maxFiles.value <= totalFiles : false;
+});
 
 const allowedFileTypes = ref();
 const currentValues = ref();
@@ -129,6 +135,7 @@ function openFileChooser(): void {
             <FileDropZone
                 :card-x-node-x-widget-data="cardXNodeXWidgetData"
                 :open-file-chooser="openFileChooser"
+                :is-disabled="isDisabled"
             />
 
             <FileList

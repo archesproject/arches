@@ -5,31 +5,53 @@ import type { CardXNodeXWidgetData } from "@/arches_component_lab/types";
 
 const { $gettext } = useGettext();
 
-const { openFileChooser, cardXNodeXWidgetData } = defineProps<{
+const { openFileChooser, cardXNodeXWidgetData, isDisabled } = defineProps<{
     openFileChooser: () => void;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
+    isDisabled: boolean;
 }>();
 </script>
 
 <template>
     <div
-        :id="cardXNodeXWidgetData.node.alias"
-        class="upload-container"
-        role="button"
-        tabindex="0"
-        @click="openFileChooser"
-        @keydown.enter.prevent="openFileChooser"
-        @keydown.space.prevent="openFileChooser"
+        v-tooltip="{
+            value: isDisabled
+                ? $gettext('Maximum number of files reached.')
+                : null,
+            pt: {
+                arrow: {
+                    style: { display: 'none' },
+                },
+                text: {
+                    style: {
+                        fontSize: '1rem',
+                        paddingBottom: '0.75rem',
+                        paddingInlineStart: '0.25rem',
+                    },
+                },
+            },
+        }"
     >
-        <i
-            class="pi pi-cloud-upload upload-icon"
-            aria-hidden="true"
-        />
-        <div class="upload-title">
-            {{ $gettext("Upload Files") }}
-        </div>
-        <div class="upload-subtitle">
-            {{ $gettext("Drag & drop files here or click to browse") }}
+        <div
+            :id="cardXNodeXWidgetData.node.alias"
+            class="upload-container"
+            role="button"
+            tabindex="0"
+            :class="{ 'p-disabled': isDisabled }"
+            @click="openFileChooser"
+            @keydown.enter.prevent="openFileChooser"
+            @keydown.space.prevent="openFileChooser"
+        >
+            <i
+                class="pi pi-cloud-upload upload-icon"
+                aria-hidden="true"
+            />
+            <div class="upload-title">
+                {{ $gettext("Upload Files") }}
+            </div>
+            <div class="upload-subtitle">
+                {{ $gettext("Drag & drop files here or click to browse") }}
+            </div>
         </div>
     </div>
 </template>
