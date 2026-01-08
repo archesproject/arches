@@ -100,10 +100,6 @@ function onUpdateModelValue(updatedValue: string | undefined) {
             :options="languages"
             :option-label="(lang: Language) => `${lang.name} (${lang.code})`"
             :placeholder="$gettext('Language')"
-            :pt="{
-                label: { style: { fontSize: '1rem' } },
-                optionLabel: { style: { fontSize: '1rem' } },
-            }"
         />
         <InputText
             type="text"
@@ -117,3 +113,11 @@ function onUpdateModelValue(updatedValue: string | undefined) {
         />
     </div>
 </template>
+
+<style>
+.p-select-options,
+.p-select-label,
+.p-select-overlay {
+    font-size: 1rem;
+}
+</style>
