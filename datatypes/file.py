@@ -65,8 +65,11 @@ class FileListDataType(datatypes.FileListDataType):
         # Remove file object created in transform_value_for_tile
         # after discussion with chiatt, this behavior is only really needed
         # for the bulk loader (and causes integrity problems/duplicity) -
-        # file will be recreated later in post_tile_save
-        if not kwargs["is_existing_tile"]:
+        # file will be recreated later in post_tile_save.  Skip this deletion
+        # if a path is provided (indicating the bulk uploader is running)
+        if "path" not in kwargs and (
+            "is_existing_tile" not in kwargs or not kwargs["is_existing_tile"]
+        ):
             File.objects.filter(
                 fileid__in=[file["file_id"] for file in new_value]
             ).delete()
