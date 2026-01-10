@@ -159,6 +159,7 @@ def check_tile_permissions(func):
     @functools.wraps(func)
     def wrapper(request, *args, **kwargs):
         resourceid = request.POST.get("resourceinstanceid", None)
+        permitted = False
         if not resourceid:
             tileid = request.POST.get("tileid", None) or kwargs.get("tileid")
             resourceid = models.TileModel.objects.get(pk=tileid).resourceinstance_id
