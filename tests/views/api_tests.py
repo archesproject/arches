@@ -591,7 +591,9 @@ class ResourceAPITests(ArchesTestCase):
     def test_node_value_endpoint(self):
         user = User.objects.get(username="ben")
         self.client.force_login(user)
-        tile = models.TileModel.objects.filter(resourceinstance_id=self.non_legacy_resource_instanceid).first()
+        tile = models.TileModel.objects.filter(
+            resourceinstance_id=self.non_legacy_resource_instanceid
+        ).first()
         nodeid = "f08a3057-95c4-11e8-9761-acde48001122"
         payload = {
             "tileid": (None, str(tile.tileid)),
@@ -600,15 +602,17 @@ class ResourceAPITests(ArchesTestCase):
             "operation": (None, "create"),
         }
         response = self.client.post(
-                reverse("api_node_value"),
-                payload,
-            )
+            reverse("api_node_value"),
+            payload,
+        )
         self.assertEqual(response.status_code, 200)
 
     def test_node_tiles(self):
         user = User.objects.get(username="ben")
         self.client.force_login(user)
-        tile = models.TileModel.objects.filter(resourceinstance_id=self.non_legacy_resource_instanceid).first()
+        tile = models.TileModel.objects.filter(
+            resourceinstance_id=self.non_legacy_resource_instanceid
+        ).first()
         response = self.client.get(
             reverse("api_tiles", kwargs={"tileid": str(tile.tileid)})
         )

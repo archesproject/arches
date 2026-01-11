@@ -155,6 +155,7 @@ def user_created_transaction_match(function):
 
     return wrapper
 
+
 def check_tile_permissions(func):
     @functools.wraps(func)
     def wrapper(request, *args, **kwargs):
@@ -171,4 +172,5 @@ def check_tile_permissions(func):
             return func(request, *args, **kwargs)
         else:
             return JSONResponse(status=403)
+
     return wrapper
