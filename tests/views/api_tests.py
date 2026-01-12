@@ -607,7 +607,7 @@ class ResourceAPITests(ArchesTestCase):
         )
         self.assertEqual(response.status_code, 200)
 
-    def test_node_tiles(self):
+    def test_tiles_endpoint(self):
         user = User.objects.get(username="ben")
         self.client.force_login(user)
         tile = models.TileModel.objects.filter(
