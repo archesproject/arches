@@ -50,7 +50,7 @@ AS $BODY$
             when 'url' then
                 display_value := ((in_tiledata -> in_nodeid::text)::jsonb ->> 'url');
             when 'node-value' then
-                display_value := __arches_get_nodevalue_label(in_tiledata -> in_nodeid::text, in_nodeid);
+                display_value := __arches_get_nodevalue_label((in_tiledata -> in_nodeid::text)::uuid, in_nodeid, language_id);
             when 'resource-instance' then
                 display_value := __arches_get_resourceinstance_label(in_tiledata -> in_nodeid::text, 'name', language_id);
             when 'resource-instance-list' then
