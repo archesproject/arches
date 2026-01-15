@@ -153,7 +153,7 @@ def search_terms(request):
     i = 0
     ret = {"terms": [], "concepts": []}
     if len(permitted_nodegroups) == 0:
-        return JSONResponse(ret)    
+        return JSONResponse(ret)
     nodegroup_ids = set()
     queries = {}
     for index in list(ret.keys()):
@@ -228,12 +228,12 @@ def search_terms(request):
                     for nodegroup in result["nodegroupid"]["buckets"]:
                         nodegroup_ids.add(nodegroup["key"])
 
-    nodes = Node.objects.filter(nodeid__in=nodegroup_ids).select_related('graph')
+    nodes = Node.objects.filter(nodeid__in=nodegroup_ids).select_related("graph")
     node_lookup = {str(node.nodeid): (node.graph.name, node.name) for node in nodes}
 
     i = 0
     for index in list(ret.keys()):
-        results = results_dict[index]        
+        results = results_dict[index]
         if results is not None:
             for result in results["aggregations"]["value_agg"]["buckets"]:
                 if len(result["top_concept"]["buckets"]) > 0:
@@ -257,7 +257,9 @@ def search_terms(request):
                 else:
                     for nodegroup in result["nodegroupid"]["buckets"]:
                         nodegroup_id = nodegroup["key"]
-                        graph_name, node_name = node_lookup.get(str(nodegroup_id), ("", ""))										  
+                        graph_name, node_name = node_lookup.get(
+                            str(nodegroup_id), ("", "")
+                        )
                         context_label = "{0} - {1}".format(graph_name, node_name)
                         ret[index].append(
                             {
