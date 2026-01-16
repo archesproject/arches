@@ -262,6 +262,8 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         self.refresh_from_db(
             using=kwargs.get("using"), fields=kwargs.get("update_fields")
         )
+        if request.GET.get("fill_blanks", "f").lower().startswith("t"):
+            self.fill_blanks()
 
 
 class TileTree(TileModel, AliasedDataMixin):
