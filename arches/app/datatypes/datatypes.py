@@ -2602,3 +2602,36 @@ class AnnotationDataType(BaseDataType):
             }
         }
         return mapping
+
+
+class LanguageDataType(BaseDataType):
+    def validate(
+        self,
+        value,
+        row_number=None,
+        source="",
+        node=None,
+        nodeid=None,
+        strict=False,
+        **kwargs,
+    ):
+        errors = []
+        return errors
+
+    def transform_value_for_tile(self, value, **kwargs):
+        return super().transform_value_for_tile(value, **kwargs)
+
+    def transform_export_values(self, value, *args, **kwargs):
+        return super().transform_export_values(value, *args, **kwargs)
+
+    def get_display_value(self, tile, node, **kwargs):
+        data = self.get_tile_data(tile)
+        if data:
+            # TODO: cache languages to avoid querying db each time
+            language = models.Language.objects.get(code=data[str(node.nodeid)])
+            if language:
+                return language.name
+        return ""
+
+    # def serialize(self, tile, node):
+    #     return super().serialize(tile, node)
