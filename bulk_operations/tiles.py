@@ -131,7 +131,11 @@ class TileTreeOperation:
             return ret
 
     def validate_and_save_tiles(self):
-        self.validate()
+        delete_missing_tiles = (
+            self.request.GET.get("delete_missing_tiles", str(not self.partial)).lower()
+            == "true"
+        )
+        self.validate(delete_missing_tiles=delete_missing_tiles)
         try:
             self._save()
         except ProgrammingError as e:
@@ -144,21 +148,23 @@ class TileTreeOperation:
             raise
         self.after_update_all()
 
-    def validate(self, delete_absent_children=False):
+    def validate(self, delete_missing_tiles=False):
         """Move values from resource or tile to prefetched tiles, and validate.
         Raises ValidationError if new data fails datatype validation.
 
-        HTTP PUT should request delete_absent_children=True to delete child tiles
+        HTTP PUT should request delete_missing_tiles=True to delete child tiles
         not in the payload.
-        HTTP PATCH should request delete_absent_children=False (default).
+        HTTP PATCH should request delete_missing_tiles=False (default).
         """
         original_tile_data_by_tile_id = {}
+        incoming_tiles = set()
         if isinstance(self.entry, TileModel):
             self._update_tile(
                 self.grouping_nodes_by_nodegroup_id[self.entry.nodegroup_id],
                 None,
                 original_tile_data_by_tile_id,
-                delete_siblings=False,
+                incoming_tiles=incoming_tiles,
+                delete_missing_tiles=delete_missing_tiles,
             )
         else:
             for grouping_node in self.grouping_nodes_by_nodegroup_id.values():
@@ -168,7 +174,8 @@ class TileTreeOperation:
                     grouping_node,
                     self.entry,
                     original_tile_data_by_tile_id,
-                    delete_siblings=delete_absent_children,
+                    incoming_tiles=incoming_tiles,
+                    delete_missing_tiles=delete_missing_tiles,
                 )
 
         if self.errors_by_node_alias:
@@ -184,7 +191,8 @@ class TileTreeOperation:
         grouping_node,
         container,
         original_tile_data_by_tile_id,
-        delete_siblings=False,
+        incoming_tiles,
+        delete_missing_tiles=False,
     ):
         if str(grouping_node.nodegroup_id) not in self.editable_nodegroups:
             # Currently also prevents deletes.
@@ -192,8 +200,16 @@ class TileTreeOperation:
 
         try:
             new_tiles = self._extract_incoming_tiles(container, grouping_node)
+            incoming_tiles.update(new_tiles)
         except KeyError:
+            if delete_missing_tiles:
+                for existing_tile in self.existing_tiles_by_nodegroup_alias[
+                    grouping_node.alias
+                ]:
+                    if str(existing_tile.nodegroup_id) in self.deletable_nodegroups:
+                        self.to_delete.add(existing_tile)
             return
+
         existing_tiles = self.existing_tiles_by_nodegroup_alias[grouping_node.alias]
         if not existing_tiles:
             next_sort_order = 0
@@ -210,14 +226,16 @@ class TileTreeOperation:
         to_insert = set()
         to_update = set()
         to_delete = set()
+
         for existing_tile, new_tile in self._pair_tiles(existing_tiles, new_tiles):
             if new_tile is NOT_PROVIDED:
                 if (
-                    delete_siblings
+                    delete_missing_tiles
                     and str(existing_tile.nodegroup_id) in self.deletable_nodegroups
                 ):
                     to_delete.add(existing_tile)
                 continue
+
             if existing_tile is NOT_PROVIDED:
                 new_tile.nodegroup_id = grouping_node.nodegroup_id
                 new_tile.resourceinstance_id = self.resourceid
@@ -252,12 +270,14 @@ class TileTreeOperation:
                     ],
                     container=tile._incoming_tile,
                     original_tile_data_by_tile_id=original_tile_data_by_tile_id,
-                    delete_siblings=delete_siblings,
+                    incoming_tiles=incoming_tiles,
+                    delete_missing_tiles=delete_missing_tiles,
                 )
             self._validate_and_patch_incoming_values(tile, nodes=nodes)
+
             tile.set_missing_keys_to_none()
 
-        for tile in to_insert | to_update:
+        for tile in list(to_update):
             # Remove no-op upserts.
             if (
                 original_data := original_tile_data_by_tile_id.pop(tile.pk, None)
@@ -267,6 +287,13 @@ class TileTreeOperation:
         self.to_insert |= to_insert
         self.to_update |= to_update
         self.to_delete |= to_delete
+
+        for tile in incoming_tiles:
+            # Need to remove tiles flagged for deletion if they are
+            # being updated.  This can happen becuase of the way cardinality n tiles
+            # are processed within separate _update_tile() calls.
+            # print("DEBUG: Removing tile from delete set because it is being upserted, tile id", str(tile.pk))
+            self.to_delete.discard(tile)
 
     def _extract_incoming_tiles(self, container, grouping_node):
         from arches_querysets.models import TileTree
@@ -292,14 +319,18 @@ class TileTreeOperation:
                 new_tiles = []
             elif not isinstance(new_tiles, list):
                 new_tiles = [new_tiles]
+
         if all(isinstance(tile, TileTree) for tile in new_tiles):
-            new_tiles.sort(key=attrgetter("sortorder"))
+            new_tiles.sort(
+                key=lambda tile_tree: (tile_tree.sortorder is None, tile_tree.sortorder)
+            )
         else:
             parent_tile = container if isinstance(container, TileTree) else None
             new_tiles = [
                 TileTree.deserialize(tile_dict, parent_tile=parent_tile)
                 for tile_dict in new_tiles
             ]
+
         return new_tiles
 
     def _pair_tiles(self, existing_tiles, new_tiles):
@@ -307,7 +338,7 @@ class TileTreeOperation:
         matched_new_tiles = []
         for existing_tile in existing_tiles:
             for tile in new_tiles:
-                if existing_tile.pk == tile.pk:
+                if str(existing_tile.pk) == str(tile.pk):
                     pairs.append((existing_tile, tile))
                     matched_new_tiles.append(tile)
                     break

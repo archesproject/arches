@@ -139,11 +139,15 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         self._sealed = value
 
     def save(
-        self, *, request=None, index=True, partial=True, force_admin=False, **kwargs
+        self, *, request=None, index=True, partial=None, force_admin=False, **kwargs
     ):
         """
-        partial=True (HTTP PATCH): absent nodes ignored, absent child tiles ignored.
-        partial=False (HTTP PUT): absent nodes reset to default, absent child tiles deleted.
+        If `partial` is not explicitly provided, infer it from the HTTP method:
+
+        - PATCH -> partial=True  (diff-only)
+        - PUT   -> partial=False (full replace; delete/reset missing)
+        - POST  -> partial=False (new resource; full source of truth)
+        - anything else with no request -> partial=True as a safe default
         """
         # arches_version==9.0.0
         if (
@@ -153,7 +157,19 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         ):
             raise ValidationError(_("Graph Has Different Publication"))
 
-        request = request or self._request
+        request = ensure_request(request or self._request, force_admin)
+
+        if partial is None:
+            request_method_value = getattr(request, "method", "") if request else ""
+            http_method = str(request_method_value or "").upper()
+
+            if http_method == "PATCH":
+                partial = True
+            elif http_method in {"PUT", "POST"}:
+                partial = False
+            else:
+                partial = True
+
         self._save_aliased_data(
             request=request,
             index=index,

@@ -55,6 +55,11 @@ class ArchesResourceBlankView(ArchesModelAPIMixin, RetrieveAPIView):
             return ArchesResourceTopNodegroupsSerializer
         return self.serializer_class
 
+    def get_serializer_context(self):
+        serializer_context = super().get_serializer_context()
+        serializer_context["fill_blanks"] = True
+        return serializer_context
+
     def get_object(self, *args, **kwargs):
         return None
 
@@ -67,6 +72,11 @@ class ArchesTileBlankView(ArchesModelAPIMixin, RetrieveAPIView):
         if self.request.GET.get("exclude_children", "").lower() == "true":
             return ArchesSingleNodegroupSerializer
         return self.serializer_class
+
+    def get_serializer_context(self):
+        serializer_context = super().get_serializer_context()
+        serializer_context["fill_blanks"] = True
+        return serializer_context
 
     def get_object(self, *args, **kwargs):
         return None
