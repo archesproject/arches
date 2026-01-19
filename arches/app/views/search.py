@@ -232,7 +232,7 @@ def search_terms(request):
     node_lookup = {str(node.nodeid): (node.graph.name, node.name) for node in nodes}
 
     i = 0
-    for index in list(ret.keys()):
+    for index in ret.keys():
         results = results_dict[index]
         if results is not None:
             for result in results["aggregations"]["value_agg"]["buckets"]:
