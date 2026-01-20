@@ -7,8 +7,6 @@
             select2Config:{
                 value: op,
                 data:[
-                    { text: $root.translations.like, id: '~' },
-                    { text: $root.translations.notLike, id: '!~' },
                     { text: $root.translations.equals, id: 'eq' },
                     { text: $root.translations.not, id: '!eq' },
                     { text: $root.translations.hasNoValue, id: 'null' },
@@ -24,7 +22,7 @@
             attr: {'data-label': node.label},
             select2Query: {
                 select2Config:{
-                    data: languages,
+                    data: options,
                     value: searchValue,
                     allowClear: true,
                     placeholder: $root.translations.selectAnOption,

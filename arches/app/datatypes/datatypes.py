@@ -2633,5 +2633,18 @@ class LanguageDataType(BaseDataType):
                 return language.name
         return ""
 
-    # def serialize(self, tile, node):
-    #     return super().serialize(tile, node)
+    def append_search_filters(self, value, node, query, request):
+        try:
+            operation = value["op"]
+            if operation == "null" or operation == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif value["val"] != "":
+                field = f"tiles.data.{str(node.pk)}"
+                match_query = Term(field=field, term=value["val"])
+                (
+                    query.must(match_query)
+                    if "!" not in operation
+                    else query.must_not(match_query)
+                )
+        except KeyError:
+            pass
