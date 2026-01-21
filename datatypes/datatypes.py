@@ -6,6 +6,7 @@ from arches.app.datatypes.datatypes import (
     DomainListDataType,
     NonLocalizedStringDataType,
     NumberDataType,
+    GeojsonFeatureCollectionDataType,
 )
 
 from arches_querysets.datatypes import *
@@ -61,6 +62,8 @@ class DataTypeFactory(datatypes.DataTypeFactory):
             case DomainListDataType():
                 return DomainListField(null=True)
             case FileListDataType():
+                return django.db.models.JSONField(default=list, null=True)
+            case GeojsonFeatureCollectionDataType():
                 return django.db.models.JSONField(default=list, null=True)
             case _:
                 return django.db.models.TextField(null=True)

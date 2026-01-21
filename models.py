@@ -3,6 +3,7 @@ import uuid
 from types import SimpleNamespace
 from typing import Mapping
 
+from django.conf import settings
 from django.core.exceptions import (
     MultipleObjectsReturned,
     ObjectDoesNotExist,
@@ -32,7 +33,8 @@ from arches_querysets.utils.models import (
     ensure_request,
     pop_arches_model_kwargs,
 )
-
+from arches_querysets.tasks import index_resource
+import arches.app.utils.task_management as task_management
 
 logger = logging.getLogger(__name__)
 
@@ -265,7 +267,13 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         )
         proxy_resource.save_descriptors()
         if index:
-            proxy_resource.index()
+            if (
+                getattr(settings, "EVENTUALLY_CONSISTENT_ES_INDEXING", False)
+                and task_management.check_if_celery_available()
+            ):
+                index_resource.apply_async((self.resourceinstanceid,))
+            else:
+                proxy_resource.index()
 
         # arches_version==9.0.0
         if arches_version < (8, 0) and request and for_new_resource:
@@ -695,8 +703,15 @@ class TileTree(TileModel, AliasedDataMixin):
             .get()
         )
         proxy_resource.save_descriptors()
+
         if index:
-            proxy_resource.index()
+            if (
+                getattr(settings, "EVENTUALLY_CONSISTENT_ES_INDEXING", False)
+                and task_management.check_if_celery_available()
+            ):
+                index_resource.apply_async((self.resourceinstanceid,))
+            else:
+                proxy_resource.index()
 
         self.refresh_from_db(
             using=kwargs.get("using", None),
