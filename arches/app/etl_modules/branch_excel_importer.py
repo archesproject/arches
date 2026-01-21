@@ -17,6 +17,7 @@ from arches.app.models.models import ETLModule, TileModel
 from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.utils.string_utils import deserialize_json_like_string
 from arches.management.commands.etl_template import create_workbook
 from arches.app.etl_modules.base_import_module import (
     BaseImportModule,
@@ -95,8 +96,18 @@ class BranchExcelImporter(BaseImportModule):
                 source_value = row_details[key]
                 config = node_details["config"]
 
-                if source_value and os.sep in source_value:
-                    config["path"] = Path(source_value).parent
+                if (
+                    source_value
+                    and type(source_value) is str
+                    and os.sep in source_value
+                ):
+                    path_value = source_value
+                    try:
+                        path_value = deserialize_json_like_string(source_value)
+                        path_value = path_value["name"]
+                    except json.decoder.JSONDecodeError:
+                        pass
+                    config["path"] = Path(path_value).parent
                 else:
                     config["path"] = (
                         Path(settings.UPLOADED_FILES_DIR) / "tmp" / self.loadid
@@ -196,7 +207,7 @@ class BranchExcelImporter(BaseImportModule):
                                 "update"  # db will "insert" if tileid does not exist
                             )
                         elif nodegroup_cardinality == "1":
-                            if TileModel.objects.filter(pk=cell_values[1]).exists():
+                            if TileModel.objects.filter(pk=user_tileid).exists():
                                 operation = "update"
 
                     nodegroup_depth = nodegroup_lookup[row_details["nodegroup_id"]][
