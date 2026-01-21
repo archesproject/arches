@@ -16,6 +16,7 @@ from django.core.files import File
 from django.core.files.images import get_image_dimensions
 from django.core.files.storage import default_storage
 from django.db import connection
+from django.db.models import Q
 from django.utils.translation import get_language
 from django.utils.translation import gettext as _
 
@@ -2605,6 +2606,10 @@ class AnnotationDataType(BaseDataType):
 
 
 class LanguageDataType(BaseDataType):
+    def __init__(self, model=None):
+        super().__init__()
+        self.language_lookup = {}  # {code or name: Language model}
+
     def validate(
         self,
         value,
@@ -2616,19 +2621,47 @@ class LanguageDataType(BaseDataType):
         **kwargs,
     ):
         errors = []
+        if value is not None:
+            found_language = self.lookup_language(value)
+            if not found_language:
+                message = _(
+                    "The language '{0}' is not a valid language code or name.".format(
+                        value
+                    )
+                )
+                title = _("Invalid Language Datatype")
+                error_message = self.create_error_message(
+                    value, source, row_number, message, title
+                )
+                errors.append(error_message)
         return errors
 
     def transform_value_for_tile(self, value, **kwargs):
-        return super().transform_value_for_tile(value, **kwargs)
+        if value is not None:
+            found_language = self.lookup_language(value)
+            if found_language:
+                return found_language.code
+        return None
 
-    def transform_export_values(self, value, *args, **kwargs):
-        return super().transform_export_values(value, *args, **kwargs)
+    # TODO: add RDF export method that uses this value as language tag for literals
+    # likely a tile method
+    # def transform_export_values(self, value, *args, **kwargs):
+    #     return super().transform_export_values(value, *args, **kwargs)
+
+    def lookup_language(self, value) -> models.Language | None:
+        if value in self.language_lookup:
+            return self.language_lookup[value]
+        language = models.Language.objects.filter(Q(code=value) | Q(name=value)).first()
+        if language:
+            self.language_lookup[language.code] = language
+            self.language_lookup[language.name] = language
+            return language
+        return None
 
     def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
         if data:
-            # TODO: cache languages to avoid querying db each time
-            language = models.Language.objects.get(code=data[str(node.nodeid)])
+            language = self.lookup_language(data[str(node.nodeid)])
             if language:
                 return language.name
         return ""
