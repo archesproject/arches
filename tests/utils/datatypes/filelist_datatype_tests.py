@@ -12,16 +12,14 @@ class FileListDataTypeTests(TestCase):
     def test_bulk_import_path(self):
         datatype = DataTypeFactory().get_instance("file-list")
         resultingPath = datatype._get_bulk_import_file_path("filename.xls", "12345")
-        expectedPath = (
-            Path(settings.UPLOADED_FILES_DIR) / "tmp" / "12345" / "filename.xls"
-        )
+        expectedPath = Path(settings.UPLOADED_FILES_DIR) / "tmp" / "12345"
 
         self.assertEqual(resultingPath, expectedPath)
 
         resultingPath = datatype._get_bulk_import_file_path(
             "/test/path/filename.xls", "12345"
         )
-        expectedPath = Path("/test/path/filename.xls")
+        expectedPath = Path("/test/path")
 
         self.assertEqual(resultingPath, expectedPath)
 
