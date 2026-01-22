@@ -96,22 +96,7 @@ class BranchExcelImporter(BaseImportModule):
                 source_value = row_details[key]
                 config = node_details["config"]
 
-                if (
-                    source_value
-                    and type(source_value) is str
-                    and os.sep in source_value
-                ):
-                    path_value = source_value
-                    try:
-                        path_value = deserialize_json_like_string(source_value)
-                        path_value = path_value["name"]
-                    except json.decoder.JSONDecodeError:
-                        pass
-                    config["path"] = Path(path_value).parent
-                else:
-                    config["path"] = (
-                        Path(settings.UPLOADED_FILES_DIR) / "tmp" / self.loadid
-                    )
+                config["bulk_import"] = True
 
                 config["loadid"] = self.loadid
                 try:

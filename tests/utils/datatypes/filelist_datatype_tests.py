@@ -1,12 +1,29 @@
+from pathlib import Path
 from django.utils.translation import get_language
 from arches.app.datatypes.datatypes import DataTypeFactory
 from django.test import TestCase
+from arches.app.models.system_settings import settings
 
 # these tests can be run from the command line via
 # python manage.py test tests.utils.datatypes.filelist_datatype_tests --settings="tests.test_settings"
 
 
 class FileListDataTypeTests(TestCase):
+    def test_bulk_import_path(self):
+        datatype = DataTypeFactory().get_instance("file-list")
+        resultingPath = datatype._get_bulk_import_file_path("filename.xls", "12345")
+        expectedPath = (
+            Path(settings.UPLOADED_FILES_DIR) / "tmp" / "12345" / "filename.xls"
+        )
+
+        self.assertEqual(resultingPath, expectedPath)
+
+        resultingPath = datatype._get_bulk_import_file_path(
+            "/test/path/filename.xls", "12345"
+        )
+        expectedPath = Path("/test/path/filename.xls")
+
+        self.assertEqual(resultingPath, expectedPath)
 
     def test_tile_transform(self):
         value1 = "testfile1.png,testfile2.png"

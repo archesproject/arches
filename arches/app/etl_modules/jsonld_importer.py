@@ -272,10 +272,7 @@ class JSONLDImporter(BaseImportModule):
             datatype_instance = self.datatype_factory.get_instance(datatype)
             config = nodegroup_info[nodeid]["config"]
 
-            if source_value and os.sep in source_value:
-                config["path"] = Path(source_value).parent
-            else:
-                config["path"] = self.temp_dir
+            config["bulk_import"] = True
 
             config["loadid"] = self.loadid
             value, validation_errors = self.prepare_data_for_loading(

@@ -1385,6 +1385,12 @@ class FileListDataType(BaseDataType):
                                 compatible_renderers.append(renderer["id"])
         return compatible_renderers
 
+    def _get_bulk_import_file_path(self, file_path, loadid=None):
+        if file_path and os.sep in file_path:
+            return Path(file_path).parent
+        else:
+            return Path(settings.UPLOADED_FILES_DIR) / "tmp" / loadid
+
     def transform_value_for_tile(self, value, **kwargs):
         """
         The 'value' argument can be a comma delimited string of file paths,
@@ -1407,7 +1413,7 @@ class FileListDataType(BaseDataType):
 
         mime = MimeTypes()
         tile_data = []
-        source_path = kwargs.get("path")
+        bulk_import = kwargs.get("bulk_import", False)
 
         # check if value is a string (csv) or a dictionay (a list of dictionaries)
         try:
@@ -1431,6 +1437,7 @@ class FileListDataType(BaseDataType):
             file_path = (
                 file_info if isinstance(file_info, str) else file_info.get("name")
             )
+            original_file_path = file_path
             tile_file = {}
             try:
                 file_stats = os.stat(file_path)
@@ -1444,7 +1451,11 @@ class FileListDataType(BaseDataType):
             tile_file["type"] = "" if tile_file["type"] is None else tile_file["type"]
             file_path = "%s/%s" % (settings.UPLOADED_FILES_DIR, str(tile_file["name"]))
             tile_file["file_id"] = str(uuid.uuid4())
-            if source_path:
+            if bulk_import:
+                source_path = self._get_bulk_import_file_path(
+                    original_file_path, kwargs.get("loadid")
+                )
+
                 source_file = os.path.join(source_path, tile_file["name"])
                 fs = default_storage
                 try:
@@ -1478,7 +1489,6 @@ class FileListDataType(BaseDataType):
             # if files include metadata, add metadata to the tile_file
             localized_metadata_keys = {"altText", "attribution", "description", "title"}
             languages = models.Language.objects.all()
-            language = get_language()
 
             if isinstance(file_info, dict):
                 for key in localized_metadata_keys:
