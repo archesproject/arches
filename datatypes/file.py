@@ -66,8 +66,7 @@ class FileListDataType(datatypes.FileListDataType):
         # after discussion with chiatt, this behavior is only really needed
         # for the bulk loader (and causes integrity problems/duplicity) -
         # file will be recreated later in post_tile_save.  Skip this deletion
-        # if a path is provided (indicating the bulk uploader is running)
-        if "path" not in kwargs and (
+        if "bulk_import" not in kwargs and (
             "is_existing_tile" not in kwargs or not kwargs["is_existing_tile"]
         ):
             File.objects.filter(
