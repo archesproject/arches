@@ -1180,7 +1180,7 @@ class FileListDataType(BaseDataType):
                         limit
                     )
                 )
-                title = _("Exceed Maximun Number of Files")
+                title = _("Exceeded Maximum Number of Files")
                 errors.append({"type": "ERROR", "message": message, "title": title})
 
             if max_size is not None:

@@ -3,7 +3,6 @@ from datetime import datetime
 import io
 import json
 import os
-from pathlib import Path
 import uuid
 import zipfile
 from django.contrib.auth.models import User
@@ -429,6 +428,7 @@ class ImportSingleCsv(BaseImportModule):
                             config["nodeid"] = node
 
                             config["bulk_import"] = True
+                            config["loadid"] = self.loadid
 
                             if source_value:
                                 if datatype == "string":
