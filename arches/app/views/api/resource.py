@@ -476,6 +476,88 @@ class Resources(APIBase):
         return JSONResponse(status=200)
 
 
+@method_decorator(csrf_exempt, name="dispatch")
+class ResourceIdentifiers(APIBase):
+    def get(self, request, resourceid):
+        try:
+            resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+        except models.ResourceInstance.DoesNotExist as error:
+            return JSONErrorResponse(message=error.args[0], status=HTTPStatus.NOT_FOUND)
+
+        if not user_can_read_resource(user=request.user, resource=resource_instance):
+            return JSONResponse(status=HTTPStatus.FORBIDDEN)
+
+        return JSONResponse(
+            list(
+                models.ResourceIdentifier.objects.filter(resourceid=resource_instance)
+                .order_by("id")
+                .values("id", "identifier", "source", "identifier_type")
+            )
+        )
+
+    def post(self, request, resourceid):
+        try:
+            resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+        except models.ResourceInstance.DoesNotExist as error:
+            return JSONErrorResponse(message=error.args[0], status=HTTPStatus.NOT_FOUND)
+
+        if not user_can_edit_resource(user=request.user, resource=resource_instance):
+            return JSONResponse(status=HTTPStatus.FORBIDDEN)
+
+        try:
+            payload = json.loads(request.body)
+        except Exception as error:
+            return JSONErrorResponse(str(error), status=HTTPStatus.BAD_REQUEST)
+
+        if not payload.get("identifier"):
+            return JSONErrorResponse(
+                _("identifier is required"), status=HTTPStatus.BAD_REQUEST
+            )
+
+        if not payload.get("source"):
+            return JSONErrorResponse(
+                _("source is required"), status=HTTPStatus.BAD_REQUEST
+            )
+
+        if payload.get("id"):
+            try:
+                resource_identifier = models.ResourceIdentifier.objects.get(
+                    pk=payload["id"],
+                    resourceid=resource_instance,
+                )
+            except models.ResourceIdentifier.DoesNotExist:
+                return JSONErrorResponse(
+                    message=_("Not found"), status=HTTPStatus.NOT_FOUND
+                )
+
+            resource_identifier.identifier = payload["identifier"]
+            resource_identifier.source = payload["source"]
+            resource_identifier.identifier_type = (
+                payload.get("identifier_type", "") or ""
+            )
+            resource_identifier.save()
+            status = HTTPStatus.OK
+        else:
+            resource_identifier = models.ResourceIdentifier(
+                resourceid=resource_instance,
+                identifier=payload["identifier"],
+                source=payload["source"],
+                identifier_type=payload.get("identifier_type", "") or "",
+            )
+            resource_identifier.save()
+            status = HTTPStatus.CREATED
+
+        return JSONResponse(
+            {
+                "id": resource_identifier.id,
+                "identifier": resource_identifier.identifier,
+                "source": resource_identifier.source,
+                "identifier_type": resource_identifier.identifier_type,
+            },
+            status=status,
+        )
+
+
 class ResourceInstanceLifecycleStates(APIBase):
     def get(self, request):
         def replace_resource_instance_lifecycle_id_with_resource_instance_lifecycle(
