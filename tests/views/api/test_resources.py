@@ -618,6 +618,169 @@ class ResourceAPITests(ArchesTestCase):
         )
 
 
+class ResourceIdentifiersAPITests(ArchesTestCase):
+    graph_fixtures = ["Data_Type_Model"]
+    data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
+    non_legacy_resource_instanceid = "eb817333-2010-4cf5-a6e9-88003bfa8b64"
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.add_users()
+
+        cls.data_type_graph = Graph.objects.get(pk=cls.data_type_graphid)
+
+        cls.resource_instance_id = uuid.UUID(cls.non_legacy_resource_instanceid)
+        cls.resource_instance = models.ResourceInstance.objects.create(
+            resourceinstanceid=cls.resource_instance_id,
+            graph=cls.data_type_graph,
+        )
+
+    def test_get_resource_identifiers_not_found(self):
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(
+            reverse("api-resource-identifiers", args=[str(uuid.uuid4())])
+        )
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+
+    @patch("arches.app.views.api.resource.user_can_read_resource")
+    def test_get_resource_identifiers_permission_denied(self, mock_user_can_read):
+        self.client.login(username="admin", password="admin")
+        mock_user_can_read.return_value = False
+
+        response = self.client.get(
+            reverse("api-resource-identifiers", args=[str(self.resource_instance_id)])
+        )
+        self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
+
+    @patch("arches.app.views.api.resource.user_can_read_resource")
+    def test_get_resource_identifiers_returns_identifiers(self, mock_user_can_read):
+        self.client.login(username="admin", password="admin")
+        mock_user_can_read.return_value = True
+
+        models.ResourceIdentifier.objects.create(
+            resourceid=self.resource_instance,
+            identifier="ID-1",
+            source="Unit Test",
+            identifier_type="test",
+        )
+        models.ResourceIdentifier.objects.create(
+            resourceid=self.resource_instance,
+            identifier="ID-2",
+            source="Unit Test",
+            identifier_type="test",
+        )
+
+        response = self.client.get(
+            reverse("api-resource-identifiers", args=[str(self.resource_instance_id)])
+        )
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+        response_payload = json.loads(response.content)
+        self.assertEqual(len(response_payload), 2)
+        self.assertEqual(response_payload[0]["identifier"], "ID-1")
+        self.assertEqual(response_payload[1]["identifier"], "ID-2")
+
+    @patch("arches.app.views.api.resource.user_can_edit_resource")
+    def test_post_resource_identifiers_permission_denied(self, mock_user_can_edit):
+        self.client.login(username="admin", password="admin")
+        mock_user_can_edit.return_value = False
+
+        response = self.client.post(
+            reverse("api-resource-identifiers", args=[str(self.resource_instance_id)]),
+            data=json.dumps(
+                {"identifier": "ID-1", "source": "Unit Test", "identifier_type": "test"}
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
+
+    @patch("arches.app.views.api.resource.user_can_edit_resource")
+    def test_post_resource_identifiers_invalid_payload(self, mock_user_can_edit):
+        self.client.login(username="admin", password="admin")
+        mock_user_can_edit.return_value = True
+
+        with patch(
+            "arches.app.views.api.resource.JSONDeserializer.deserialize"
+        ) as mock_deserialize:
+            mock_deserialize.side_effect = Exception("bad json")
+
+            response = self.client.post(
+                reverse(
+                    "api-resource-identifiers", args=[str(self.resource_instance_id)]
+                ),
+                data=b"{not-json",
+                content_type="application/json",
+            )
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+
+    @patch("arches.app.views.api.resource.user_can_edit_resource")
+    def test_post_resource_identifiers_creates_identifier(self, mock_user_can_edit):
+        self.client.login(username="admin", password="admin")
+        mock_user_can_edit.return_value = True
+
+        self.assertEqual(
+            models.ResourceIdentifier.objects.filter(
+                resourceid=self.resource_instance
+            ).count(),
+            0,
+        )
+
+        response = self.client.post(
+            reverse("api-resource-identifiers", args=[str(self.resource_instance_id)]),
+            data=json.dumps(
+                {"identifier": "ID-1", "source": "Unit Test", "identifier_type": "test"}
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+        self.assertEqual(
+            models.ResourceIdentifier.objects.filter(
+                resourceid=self.resource_instance
+            ).count(),
+            1,
+        )
+
+        created_identifier = models.ResourceIdentifier.objects.get(
+            resourceid=self.resource_instance
+        )
+        self.assertEqual(created_identifier.identifier, "ID-1")
+        self.assertEqual(created_identifier.source, "Unit Test")
+        self.assertEqual(created_identifier.identifier_type, "test")
+
+    @patch("arches.app.views.api.resource.user_can_edit_resource")
+    def test_post_resource_identifiers_updates_identifier(self, mock_user_can_edit):
+        self.client.login(username="admin", password="admin")
+        mock_user_can_edit.return_value = True
+
+        existing_identifier = models.ResourceIdentifier.objects.create(
+            resourceid=self.resource_instance,
+            identifier="ID-1",
+            source="Unit Test",
+            identifier_type="test",
+        )
+
+        response = self.client.post(
+            reverse("api-resource-identifiers", args=[str(self.resource_instance_id)]),
+            data=json.dumps(
+                {
+                    "id": existing_identifier.pk,
+                    "identifier": "ID-2",
+                    "source": "Unit Test Updated",
+                    "identifier_type": "updated",
+                }
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+        existing_identifier.refresh_from_db()
+        self.assertEqual(existing_identifier.identifier, "ID-2")
+        self.assertEqual(existing_identifier.source, "Unit Test Updated")
+        self.assertEqual(existing_identifier.identifier_type, "updated")
+
+
 class ResourceInstanceLifecycleStatesTest(ArchesTestCase):
     @patch("arches.app.models.models.ResourceInstanceLifecycle.objects.all")
     @patch("arches.app.models.models.ResourceInstanceLifecycleState.objects.all")

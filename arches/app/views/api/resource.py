@@ -481,43 +481,35 @@ class ResourceIdentifiers(APIBase):
     def get(self, request, resourceid):
         try:
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
-        except models.ResourceInstance.DoesNotExist as error:
-            return JSONErrorResponse(message=error.args[0], status=HTTPStatus.NOT_FOUND)
+        except Exception as e:
+            return JSONErrorResponse(str(e), status=404)
 
         if not user_can_read_resource(user=request.user, resource=resource_instance):
-            return JSONResponse(status=HTTPStatus.FORBIDDEN)
-
-        return JSONResponse(
-            list(
-                models.ResourceIdentifier.objects.filter(resourceid=resource_instance)
-                .order_by("id")
-                .values("id", "identifier", "source", "identifier_type")
+            return JSONErrorResponse(
+                _("Request Failed"), _("Permission Denied"), status=403
             )
-        )
+
+        resource_identifiers = models.ResourceIdentifier.objects.filter(
+            resourceid=resource_instance
+        ).order_by("id")
+
+        return JSONResponse(resource_identifiers)
 
     def post(self, request, resourceid):
         try:
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
-        except models.ResourceInstance.DoesNotExist as error:
-            return JSONErrorResponse(message=error.args[0], status=HTTPStatus.NOT_FOUND)
+        except Exception as e:
+            return JSONErrorResponse(str(e), status=404)
 
         if not user_can_edit_resource(user=request.user, resource=resource_instance):
-            return JSONResponse(status=HTTPStatus.FORBIDDEN)
+            return JSONErrorResponse(
+                _("Request Failed"), _("Permission Denied"), status=403
+            )
 
         try:
-            payload = json.loads(request.body)
-        except Exception as error:
-            return JSONErrorResponse(str(error), status=HTTPStatus.BAD_REQUEST)
-
-        if not payload.get("identifier"):
-            return JSONErrorResponse(
-                _("identifier is required"), status=HTTPStatus.BAD_REQUEST
-            )
-
-        if not payload.get("source"):
-            return JSONErrorResponse(
-                _("source is required"), status=HTTPStatus.BAD_REQUEST
-            )
+            payload = JSONDeserializer().deserialize(request.body)
+        except Exception as e:
+            return JSONErrorResponse(str(e), status=400)
 
         if payload.get("id"):
             try:
@@ -525,37 +517,22 @@ class ResourceIdentifiers(APIBase):
                     pk=payload["id"],
                     resourceid=resource_instance,
                 )
-            except models.ResourceIdentifier.DoesNotExist:
-                return JSONErrorResponse(
-                    message=_("Not found"), status=HTTPStatus.NOT_FOUND
-                )
-
-            resource_identifier.identifier = payload["identifier"]
-            resource_identifier.source = payload["source"]
-            resource_identifier.identifier_type = (
-                payload.get("identifier_type", "") or ""
-            )
-            resource_identifier.save()
-            status = HTTPStatus.OK
+            except Exception as e:
+                return JSONErrorResponse(str(e), status=404)
         else:
             resource_identifier = models.ResourceIdentifier(
-                resourceid=resource_instance,
-                identifier=payload["identifier"],
-                source=payload["source"],
-                identifier_type=payload.get("identifier_type", "") or "",
+                resourceid=resource_instance
             )
-            resource_identifier.save()
-            status = HTTPStatus.CREATED
 
-        return JSONResponse(
-            {
-                "id": resource_identifier.id,
-                "identifier": resource_identifier.identifier,
-                "source": resource_identifier.source,
-                "identifier_type": resource_identifier.identifier_type,
-            },
-            status=status,
-        )
+        resource_identifier.identifier = payload["identifier"]
+        resource_identifier.source = payload["source"]
+
+        if "identifier_type" in payload:
+            resource_identifier.identifier_type = payload["identifier_type"]
+
+        resource_identifier.save()
+
+        return JSONResponse(resource_identifier)
 
 
 class ResourceInstanceLifecycleStates(APIBase):
