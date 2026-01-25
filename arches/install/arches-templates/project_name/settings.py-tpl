@@ -297,6 +297,15 @@ CACHE_BY_USER = {
     "anonymous": 3600 * 24 #24hrs
     }
 
+# Changing PERMISSION_FRAMEWORK requires reindexing.
+PERMISSION_FRAMEWORK = "arches_default_deny.ArchesDefaultDenyPermissionFramework"
+
+# Changing PERMISSION_DEFAULTS requires reindexing.
+PERMISSION_DEFAULTS = {}
+# PERMISSION_DEFAULTS = {
+#     "graphid": [{"id": "1", "type": "user", "permissions": ["no_access_to_resourceinstance"]}]
+# }
+
 TILE_CACHE_TIMEOUT = 600 #seconds
 CLUSTER_DISTANCE_MAX = 5000 #meters
 GRAPH_MODEL_CACHE_TIMEOUT = None
