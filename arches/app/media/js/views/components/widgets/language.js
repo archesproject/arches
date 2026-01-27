@@ -8,7 +8,7 @@ const viewModel = function(params) {
     LanguageSelectViewModel.apply(this, [params]);
     const self = this;
 
-    self.multiple = false; // TODO: allow multiselect?
+    self.multiple = false;
 };
 
 export default ko.components.register("language-widget", {

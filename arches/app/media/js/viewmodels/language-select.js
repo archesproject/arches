@@ -19,9 +19,14 @@ const LanguageSelectViewModel = function(params) {
     });
 
     async function fetchLanguages() {
-        const languages = await fetch(arches.urls.languages)
-            .then((response) => response.json())
-            .then((data) => data.languages);
+        let languages = [];
+        try {
+            const response = await fetch(arches.urls.languages);
+            const data = await response.json();
+            languages = data.languages;
+        } catch(error) {
+            console.error('Error fetching languages:', error);
+        }
         return languages;
     }
 
