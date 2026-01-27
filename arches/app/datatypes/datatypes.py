@@ -2607,7 +2607,7 @@ class AnnotationDataType(BaseDataType):
 
 class LanguageDataType(BaseDataType):
     def __init__(self, model=None):
-        super().__init__()
+        super(LanguageDataType, self).__init__(model=model)
         self.language_lookup = {}  # {code or name: Language model}
 
     def validate(
@@ -2674,10 +2674,9 @@ class LanguageDataType(BaseDataType):
             elif value["val"] != "":
                 field = f"tiles.data.{str(node.pk)}"
                 match_query = Term(field=field, term=value["val"])
-                (
+                if "!" not in operation:
                     query.must(match_query)
-                    if "!" not in operation
-                    else query.must_not(match_query)
-                )
+                else:
+                    query.must_not(match_query)
         except KeyError:
             pass
