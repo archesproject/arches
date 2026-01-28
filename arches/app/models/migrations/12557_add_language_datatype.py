@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "12542_update_file_list_default_config"),
+        ("models", "12547_fix_db_nodevalue_display_value"),
     ]
 
     def forward(apps, schema_editor):
