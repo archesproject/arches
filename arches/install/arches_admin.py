@@ -131,6 +131,7 @@ class ArchesProjectCommand(TemplateCommand):
                     "If this is not desired, use the --directory option to create "
                     "a directory with the name you want. Consider using a name "
                     "distinct from your project name."
+                    "For more information, see https://github.com/archesproject/arches/issues/12028"
                 )
             )
 
