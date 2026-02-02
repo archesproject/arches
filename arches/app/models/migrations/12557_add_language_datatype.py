@@ -20,9 +20,9 @@ class Migration(migrations.Migration):
             helptext=None,
             datatype="language",
             defaultconfig={
-                "defaultValue": "",
+                "defaultValue": None,
                 "i18n_properties": ["placeholder"],
-                "placeholder": "Select language",
+                "placeholder": "Select a language",
                 "width": "100%",
                 "uneditable": False,
             },
