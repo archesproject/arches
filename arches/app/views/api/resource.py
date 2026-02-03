@@ -706,11 +706,11 @@ class ResourceReport(APIBase):
             permitted_card_ids = [card.pk for card in permitted_cards]
             cardwidgets = sorted(
                 [
-                    widget
-                    for widget in graph.widgets
-                    if widget["card_id"] in permitted_card_ids
+                    card_node_widget
+                    for card_node_widget in graph.cards_x_nodes_x_widgets
+                    if uuid.UUID(card_node_widget["card_id"]) in permitted_card_ids
                 ],
-                key=lambda widget: widget["sortorder"] or 0,
+                key=lambda card_node_widget: card_node_widget["sortorder"] or 0,
             )
 
             resp["cards"] = permitted_cards
