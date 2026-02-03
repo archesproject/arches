@@ -8,7 +8,7 @@ const viewModel = function(params) {
     LanguageSelectViewModel.apply(this, [params]);
     const self = this;
 
-    self.multiple = ko.observable(false);
+    self.multiple = false;
     self.defaultValue = ko.observable(params.config.defaultValue || null);
 };
 
