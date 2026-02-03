@@ -2638,41 +2638,48 @@ class ResourceInstanceDataType(BaseDataType):
         return json.dumps(value)
 
     def append_in_list_search_filters(self, value, node, query):
+        mutated_query = False
         values_list = value.get("val", [])
         if isinstance(values_list, str):
             values_list = [values_list]
         if len(values_list):
-            field_name = f"tiles.data.{node.pk}"
+            field_name = f"tiles.data.{str(node.pk)}"
             for val in values_list:
                 match_q = Term(
-                    field=f"tiles.data.{node.pk}.resourceId.keyword",
+                    field=f"tiles.data.{str(node.pk)}.resourceId.keyword",
                     term=val,
                 )
 
                 match value["op"]:
-                    case "" | "in_list_any":
+                    case "in_list_any":
                         query.should(match_q)
+                        mutated_query = True
                     case "in_list_all":
                         query.must(match_q)
+                        mutated_query = True
                     case "!" | "in_list_none":
                         query.must_not(match_q)
+                        mutated_query = True
                     case "~":
                         query.must(
                             Wildcard(
-                                field=f"tiles.data.{node.pk}.resourceName.keyword",
+                                field=f"tiles.data.{str(node.pk)}.resourceName.keyword",
                                 query=f"*{val}*",
                                 case_insensitive=True,
                             )
                         )
+                        mutated_query = True
                     case "!~":
                         query.must_not(
                             Wildcard(
-                                field=f"tiles.data.{node.pk}.resourceName.keyword",
+                                field=f"tiles.data.{str(node.pk)}.resourceName.keyword",
                                 query=f"*{val}*",
                                 case_insensitive=True,
                             )
                         )
-            query.filter(Exists(field=field_name))
+                        mutated_query = True
+            if mutated_query:
+                query.filter(Exists(field=field_name))
 
     def append_search_filters(self, value, node, query, request):
         try:
