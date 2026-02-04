@@ -1,13 +1,11 @@
-import type { AliasedTileData } from "@/arches_component_lab/types.ts";
+import type { AliasedData } from "@/arches_component_lab/types.ts";
 
-export function extractFileEntriesFromPayload(
-    payload: AliasedTileData,
+export function extractFileEntriesFromAliasedData(
+    payload: AliasedData,
 ): { file: File; nodeId: string }[] {
     const collectedEntries: { file: File; nodeId: string }[] = [];
 
-    function traverseObject(
-        currentObject: AliasedTileData["aliased_data"],
-    ): void {
+    function traverseObject(currentObject: AliasedData): void {
         for (const [_key, value] of Object.entries(currentObject)) {
             if (value instanceof File) {
                 const nodeId = currentObject.node_id;
@@ -21,19 +19,15 @@ export function extractFileEntriesFromPayload(
             } else if (Array.isArray(value)) {
                 for (const arrayItem of value) {
                     if (arrayItem && typeof arrayItem === "object") {
-                        traverseObject(
-                            arrayItem as unknown as AliasedTileData["aliased_data"],
-                        );
+                        traverseObject(arrayItem as unknown as AliasedData);
                     }
                 }
             } else if (value && typeof value === "object") {
-                traverseObject(
-                    value as unknown as AliasedTileData["aliased_data"],
-                );
+                traverseObject(value as unknown as AliasedData);
             }
         }
     }
 
-    traverseObject(payload.aliased_data);
+    traverseObject(payload);
     return collectedEntries;
 }

@@ -1,7 +1,7 @@
 import arches from "arches";
 import Cookies from "js-cookie";
 
-import { extractFileEntriesFromPayload } from "@/arches_component_lab/generics/GenericCard/utils.ts";
+import { extractFileEntriesFromAliasedData } from "@/arches_component_lab/generics/GenericCard/utils.ts";
 
 import type {
     AliasedTileData,
@@ -65,7 +65,7 @@ export async function upsertTile(
     tileId?: string,
     resourceInstanceId?: string | null | undefined,
 ): Promise<AliasedTileData> {
-    const fileEntries = extractFileEntriesFromPayload(payload);
+    const fileEntries = extractFileEntriesFromAliasedData(payload.aliased_data);
 
     if (fileEntries.length > 0) {
         return upsertTileWithFiles(
