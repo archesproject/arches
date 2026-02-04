@@ -88,6 +88,14 @@ parser_startproject.add_argument(
     ),
 )
 
+parser_startproject.add_argument(
+    "-y",
+    "--yes",
+    action="store_true",
+    dest="yes",
+    help='used to force a yes answer to any user input "continue? y/n" prompt',
+)
+
 
 class ArchesProjectCommand(TemplateCommand):
     help = (
@@ -122,18 +130,6 @@ class ArchesProjectCommand(TemplateCommand):
             [str(arches.VERSION[0]), str(arches.VERSION[1] + 1), "0"]
         )
         options["project_name_title_case"] = project_name.title().replace("_", "")
-        options["project_name_kebab_case"] = project_name.replace("_", "-")
-
-        if options["project_name_kebab_case"] != project_name:
-            self.stdout.write(
-                self.style.NOTICE(
-                    f"Renamed the directory from {project_name} to {options['project_name_kebab_case']}. "
-                    "If this is not desired, use the --directory option to create "
-                    "a directory with the name you want. Consider using a name "
-                    "distinct from your project name."
-                    "For more information, see https://github.com/archesproject/arches/issues/12028"
-                )
-            )
 
         super(ArchesProjectCommand, self).handle(
             "project", project_name, target, **options
@@ -182,13 +178,27 @@ def command_startproject(args):
     options = vars(args)
     name = options["name"]
     make_directory = False
-    if not options["directory"] and "_" in name:
-        # The user is supposed to create the --directory themselves. But we
-        # should do it for them if the command is the one that invented the
-        # --directory argument.
-        # RemovedInArches81Warning (Django 6 creates target dir automatically)
+
+    options["project_name_kebab_case"] = name.replace("_", "-")
+    directory_name_will_be_changed = name != options["project_name_kebab_case"]
+
+    if not options["directory"] and directory_name_will_be_changed:
+        if not options.get("yes"):
+            response = input(
+                f"The project directory will be renamed from {name} to {options['project_name_kebab_case']}.\n"
+                "If this is not desired, use the --directory option to create "
+                "a directory with the name you want.\n"
+                "Consider using a name distinct from your project name.\n"
+                "For more information, see https://github.com/archesproject/arches/issues/12028\n"
+                "Continue? (y/N):"
+            )
+            if response.lower() not in ["y", "yes"]:
+                print("Operation cancelled.")
+                sys.exit(0)
+
         make_directory = True
-        options["directory"] = name.replace("_", "-")
+        options["directory"] = options["project_name_kebab_case"]
+
     directory = options["directory"]
 
     project_path = os.path.join(os.getcwd(), directory if directory else name)
