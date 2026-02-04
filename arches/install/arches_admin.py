@@ -203,6 +203,8 @@ def command_startproject(args):
 
     project_path = os.path.join(os.getcwd(), directory if directory else name)
 
+    # TODO: remove manual directory creation when upgrading to Django 6+
+    # re. https://github.com/django/django/pull/18387
     if make_directory and not os.path.exists(project_path):
         os.mkdir(project_path)
 
