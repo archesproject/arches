@@ -95,11 +95,9 @@ class CardXNodeXWidgetListFromNodegroupView(View):
         if arches_version >= (8, 0):
             card_x_node_x_widgets_query &= Q(node__source_identifier_id__isnull=True)
 
-        saved_widget_queryset = (
-            models.CardXNodeXWidget.objects.filter(card_x_node_x_widgets_query)
-            .select_related()
-            .order_by("sortorder")
-        )
+        saved_widget_queryset = models.CardXNodeXWidget.objects.filter(
+            card_x_node_x_widgets_query
+        ).select_related()
 
         datatype_factory = DataTypeFactory()
 
@@ -150,4 +148,6 @@ class CardXNodeXWidgetListFromNodegroupView(View):
 
             serialized_widgets.append(serialized_widget)
 
-        return JSONResponse(serialized_widgets)
+        return JSONResponse(
+            sorted(serialized_widgets, key=lambda item: item["sortorder"] or 0)
+        )
