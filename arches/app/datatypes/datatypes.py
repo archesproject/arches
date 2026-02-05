@@ -1332,9 +1332,23 @@ class FileListDataType(BaseDataType):
                             except models.File.DoesNotExist:
                                 logger.exception(_("File does not exist"))
 
+            file_list_key = (
+                tile.aliased_data.site_images[0]["file_id"]
+                if hasattr(tile, "aliased_data")
+                and tile.aliased_data.site_images
+                and tile.aliased_data.site_images[0]["file_id"]
+                else "file-list_" + nodeid
+            )
             files = request.FILES.getlist(
-                "file-list_" + nodeid + "_preloaded", []
-            ) + request.FILES.getlist("file-list_" + nodeid, [])
+                file_list_key + "_preloaded", []
+            ) + request.FILES.getlist(
+                file_list_key,
+                [],
+            )
+
+            # files = request.FILES.getlist(
+            #     "file-list_" + nodeid + "_preloaded", []
+            # ) + request.FILES.getlist("file-list_" + nodeid, [])
             tile_exists = models.TileModel.objects.filter(pk=tile.tileid).exists()
 
             for file_data in files:
