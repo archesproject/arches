@@ -1,10 +1,11 @@
+import uuid
 from django.db import models
 
 from arches.app.models.models import Widget
 
 
 class WidgetMapping(models.Model):
-    id = models.UUIDField(primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     widget = models.OneToOneField(
         Widget,
         on_delete=models.CASCADE,
