@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunSQL(
-            r"""
+            """
             create extension if not exists "unaccent";
 
             create or replace function __arches_slugify(
@@ -31,12 +31,12 @@ class Migration(migrations.Migration):
                 ),
                 -- replaces anything that's not a letter, number, hyphen('-'), or underscore('_') with an underscore('_')
                 "separated" as (
-                    select regexp_replace("value", '[^a-z0-9\\\\-_]+', '_', 'gi') as "value"
+                    select regexp_replace("value", '[^a-z0-9_-]+', '_', 'gi') as "value"
                     from "removed_quotes"
                 ),
                 -- trims hyphens('-') if they exist on the head or tail of the string
                 "trimmed" as (
-                    select regexp_replace(regexp_replace("value", '\-+$', ''), '^\-', '') as "value"
+                    select regexp_replace(regexp_replace("value", '-+$', ''), '^-', '') as "value"
                     from "separated"
                 )
             select "value"
