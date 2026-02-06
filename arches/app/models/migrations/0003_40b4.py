@@ -188,7 +188,7 @@ class Migration(migrations.Migration):
                     configname = NULL
                 WHERE datatype = 'domain-value-list';
             UPDATE d_data_types
-                SET configcomponent = 'views/graph/datatypes/geojson-feature-collection',
+                SET configcomponent = 'views/graph/datatypes/geojson-feature-collection'
                 WHERE datatype = 'geojson-feature-collection';
         """,
         ),
