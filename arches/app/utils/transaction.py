@@ -43,7 +43,11 @@ def reverse_edit_log_entries(transaction_id, user=None, chunk_size=2000):
             "resourceinstanceid_uuid", flat=True
         )
     )
-
+    logger.info(
+        "Reversing transaction %s: Deleting %s created resources",
+        transaction_id,
+        created_resources_query_set.count(),
+    )
     for resource in optimize_resource_iteration(
         created_resources_query_set, chunk_size=chunk_size
     ):
@@ -58,6 +62,11 @@ def reverse_edit_log_entries(transaction_id, user=None, chunk_size=2000):
         tileinstanceid_uuid=Func(F("tileinstanceid"), function="UUID")
     )
 
+    logger.info(
+        "Reversing transaction %s: Deleting %s created tiles",
+        transaction_id,
+        tile_create_changes.count(),
+    )
     for tile in Tile.objects.filter(
         tileid__in=tile_create_changes.values_list("tileinstanceid_uuid", flat=True)
     ).iterator(chunk_size=chunk_size):
@@ -67,12 +76,22 @@ def reverse_edit_log_entries(transaction_id, user=None, chunk_size=2000):
             transaction_id=revserse_operation_transactionid,
             user=user,
         )
+    logger.info(
+        "Reversing transaction %s: Restoring %s edited tiles",
+        transaction_id,
+        tile_edit_changes.count(),
+    )
     index_tile_deletion_by_transaction(transaction_id)
 
     with transaction.atomic():
         # cast tileinstanceid to UUID
         tile_edit_changes = tile_edit_changes.annotate(
             tileinstanceid_uuid=Func(F("tileinstanceid"), function="UUID")
+        )
+        logger.info(
+            "Reversing transaction %s: Restoring %s edited tiles",
+            transaction_id,
+            tile_edit_changes.count(),
         )
 
         for tile in Tile.objects.filter(
@@ -86,6 +105,7 @@ def reverse_edit_log_entries(transaction_id, user=None, chunk_size=2000):
                 user=user,
             )
     if tile_edit_changes.count() > 0:
+        logger.info("Re-indexing resources affected by transaction %s", transaction_id)
         index_resources_by_transaction(
             transaction_id,
             recalculate_descriptors=True,
