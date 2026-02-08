@@ -53,6 +53,8 @@ dependencies = [
     "pyjwt[crypto]",
     "PyLD[requests]==1.0.5",
     "pyotp>=2.6.0",
+    # Upper bound on pyparsing to avoid noisy deprecation warnings on our edtf version.
+    "pyparsing<3.3.0",
     "pyprind==2.11.3",
     "pyshp==2.1.2",
     "python-memcached==1.62",
