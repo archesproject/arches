@@ -72,9 +72,9 @@ dependencies = [
 dev = [
     "black==24.4.2",
     "coverage",
-    "django-silk==5.3.2",
+    "django-silk==5.4.3",
     "livereload",
-    "pre-commit==4.1.0",
+    "pre-commit==4.5.1",
     "sst",
 ]
 
