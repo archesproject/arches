@@ -2,6 +2,7 @@ from importlib.metadata import PackageNotFoundError
 
 from django.contrib.auth.models import User
 from django.core.management import call_command
+from django.test.utils import captured_stdout
 
 from tests.base_test import ArchesTestCase
 
@@ -17,7 +18,10 @@ def raise_package_not_found_error(name):
 class AddUserTests(ArchesTestCase):
     def test_add_test_users(self):
         """Test adding users via the management command."""
-        call_command("add_users", operation="test_users", user_count=4, power_user=True)
+        with captured_stdout():
+            call_command(
+                "add_users", operation="test_users", user_count=4, power_user=True
+            )
 
         self.assertEqual(User.objects.filter(username__startswith="tester").count(), 4)
         self.assertTrue(User.objects.filter(username="dev").exists())
