@@ -1,4 +1,3 @@
-import codecs
 import os
 import uuid
 
@@ -11,7 +10,7 @@ from arches.db.migration_operations.extras import CreateExtension, CreateFunctio
 
 def get_sql_string_from_file(pathtofile):
     ret = []
-    with codecs.open(pathtofile, encoding="utf-8") as f:
+    with open(pathtofile, encoding="utf-8") as f:
         ret = f.read()
         # print sqlparse.split(sqlparse.format(ret,strip_comments=True))
         # for stmt in sqlparse.split(sqlparse.format(f.read(),strip_comments=True)):
