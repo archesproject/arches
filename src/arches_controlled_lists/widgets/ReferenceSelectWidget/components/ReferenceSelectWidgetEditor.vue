@@ -13,6 +13,7 @@ import type {
     ReferenceSelectDetails,
     ReferenceSelectTreeNode,
     ReferenceSelectValue,
+    ReferenceSelectNodeValue,
 } from "@/arches_controlled_lists/datatypes/reference-select/types.ts";
 
 const {
@@ -42,16 +43,32 @@ const optionsError = ref<string | null>(null);
 const expandedKeys: Ref<TreeExpandedKeys> = ref({});
 
 const initialValueFromTileData = computed(() => {
-    if (aliasedNodeData?.details) {
+    if (aliasedNodeData?.details?.length) {
         return aliasedNodeData.details.reduce<Record<string, boolean>>(
-            (acc, option) => {
-                acc[option.list_item_id] = true;
-                return acc;
+            (accumulator, selectedOption) => {
+                accumulator[selectedOption.list_item_id] = true;
+                return accumulator;
             },
             {},
         );
     }
-    return {};
+
+    const defaultValueFromWidgetConfig = cardXNodeXWidgetData?.config
+        ?.defaultValue as ReferenceSelectNodeValue[] | undefined;
+
+    return defaultValueFromWidgetConfig?.reduce<Record<string, boolean>>(
+        (accumulator, defaultValueItem) => {
+            const listItemIdentifier =
+                defaultValueItem?.labels?.[0]?.list_item_id;
+
+            if (listItemIdentifier) {
+                accumulator[listItemIdentifier] = true;
+            }
+
+            return accumulator;
+        },
+        {},
+    );
 });
 
 watchEffect(() => {
