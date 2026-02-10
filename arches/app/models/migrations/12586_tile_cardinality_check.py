@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "12547_fix_db_nodevalue_display_value"),
+        ("models", "12557_add_language_datatype"),
     ]
 
     sql = """
