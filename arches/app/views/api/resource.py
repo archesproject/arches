@@ -481,8 +481,8 @@ class ResourceIdentifiers(APIBase):
     def get(self, request, resourceid):
         try:
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
-        except Exception as e:
-            return JSONErrorResponse(str(e), status=404)
+        except Exception:
+            return JSONErrorResponse(_("Resource instance not found"), status=404)
 
         if not user_can_read_resource(user=request.user, resource=resource_instance):
             return JSONErrorResponse(
@@ -498,8 +498,8 @@ class ResourceIdentifiers(APIBase):
     def post(self, request, resourceid):
         try:
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
-        except Exception as e:
-            return JSONErrorResponse(str(e), status=404)
+        except Exception:
+            return JSONErrorResponse(_("Resource instance not found"), status=404)
 
         if not user_can_edit_resource(user=request.user, resource=resource_instance):
             return JSONErrorResponse(
@@ -508,8 +508,8 @@ class ResourceIdentifiers(APIBase):
 
         try:
             payload = JSONDeserializer().deserialize(request.body)
-        except Exception as e:
-            return JSONErrorResponse(str(e), status=400)
+        except Exception:
+            return JSONErrorResponse(_("Invalid JSON payload"), status=400)
 
         if payload.get("id"):
             try:
@@ -517,8 +517,8 @@ class ResourceIdentifiers(APIBase):
                     pk=payload["id"],
                     resourceid=resource_instance,
                 )
-            except Exception as e:
-                return JSONErrorResponse(str(e), status=404)
+            except Exception:
+                return JSONErrorResponse(_("Resource identifier not found"), status=404)
         else:
             resource_identifier = models.ResourceIdentifier(
                 resourceid=resource_instance
