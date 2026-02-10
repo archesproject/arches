@@ -1,10 +1,12 @@
 from django.db import migrations
-from arches.app.models.models import DDataType, Node
 
 
 class Migration(migrations.Migration):
 
     def forward(apps, schema_editor):
+        DDataType = apps.get_model("models", "DDataType")
+        Node = apps.get_model("models", "Node")
+
         DDataType.objects.filter(
             defaultwidget="10000000-0000-0000-0000-000000000019"
         ).update(
@@ -23,6 +25,9 @@ class Migration(migrations.Migration):
         Node.objects.bulk_update(nodes_to_update, ["config"])
 
     def reverse(apps, schema_editor):
+        DDataType = apps.get_model("models", "DDataType")
+        Node = apps.get_model("models", "Node")
+
         DDataType.objects.filter(
             defaultwidget="10000000-0000-0000-0000-000000000019"
         ).update(
