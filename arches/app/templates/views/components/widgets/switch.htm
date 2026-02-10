@@ -3,11 +3,11 @@
 
 {% block form %}
 <div class="toggle-container" data-bind="let: {uid: Math.random().toString()}, class: nodeCssClasses">
-    <span class="switch switch-small switch-widget" data-bind="css: {'on': getvalue() === true, 'null': getvalue() === null, 'disabled': disabled },
+    <span class="switch switch-small switch-widget" data-bind="css: {'on': getvalue() === true, 'null': getvalue() === null, 'disabled': disable },
           onEnterkeyClick, onSpaceClick, click: setvalue, attr: {'aria-checked': getariavalue(), 'aria-label': label() + ', ' + localizedSubtitle()}" tabindex="0" role="checkbox"
     ><small></small></span>
             <div style="display:flex; flex-direction:row;">
-            <div class="arches-toggle-sm" data-bind="text:label, css: {'disabled': disabled}"></div>
+            <div class="arches-toggle-sm" data-bind="text:label, css: {'disabled': disable}"></div>
                 <div style="margin-top: -17px;">
                 <!-- ko if: node -->
                 <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
@@ -38,4 +38,5 @@
             </div>
     <span class="arches-toggle-subtitle" data-bind="text: localizedSubtitle, attr: {id: uid}"></span>
 </div>
+{{ block.super }}
 {% endblock config_form %}

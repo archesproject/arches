@@ -13,7 +13,7 @@
                 <label class="form-radio form-normal form-text" role="radio"
                     data-bind="css: {
                         'active': $parent.isOptionSelected($data),
-                        'disabled': $parent.disabled
+                        'disabled': $parent.disable
                     },
                     onEnterkeyClick,
                     onSpaceClick,
@@ -67,5 +67,5 @@
         </div>
     </div>
 </div>
-
+{{ block.super }}
 {% endblock config_form %}

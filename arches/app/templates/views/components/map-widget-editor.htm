@@ -32,7 +32,7 @@
     </div>
     <div class="workbench-card-sidepanel-border"></div>
         <div class="new-provisional-edit-card-container" style="height: 100%">
-            <!-- ko if: geoJSONString() !== undefined -->
+            <!-- ko if: !disable() && geoJSONString() !== undefined -->
             <div class="card">
                 <div class="geojson-editor" data-bind="codemirror: {
                     value: geoJSONString,
@@ -64,68 +64,73 @@
             </div>
             <!-- /ko-->
 
+            <!-- ko ifnot: disable -->
             {% include 'views/components/coordinate-editor.htm' %}
 
             {% include 'views/components/buffer-editor.htm' %}
+            <!-- /ko -->
 
             <div class="card" data-bind="visible: geoJSONString() === undefined && !coordinateEditing() && !bufferNodeId()">
                 <div class="row widget-wrapper">
                     <div class="form-group">
                         <div class="col-xs-12">
                             <div class="map-card-feature-list">
-                                <div class="add-new-feature">
-                                    <select
-                                        data-bind="
-                                            placeholder: $root.translations.addANewFeature + '...',
-                                            value: self.featureLookup[widget.node_id()].selectedTool,
-                                            valueAllowUnset: true,
-                                            options: widget.drawTools,
-                                            optionsText: 'text',
-                                            optionsValue: 'value',
-                                            chosen: {
-                                                'width': '100%',
-                                                'disable_search_threshold': 10,
-                                                'allow_single_deselect': true
-                                            },
-                                            attr: {'aria-label': $root.translations.addANewFeature}
-                                        "
-                                    ></select>
-                                </div>
-                                <div>
-                                    <div class="map-data-drop-area" tabindex="0" role="button"
-                                        data-bind="event: {
-                                            dragover: dropZoneOverHandler,
-                                            drop: dropZoneHandler,
-                                            click: dropZoneClickHandler,
-                                            dragenter: dropZoneEnterHandler,
-                                            dragleave: dropZoneLeaveHandler,
-                                            dragend: dropZoneLeaveHandler
-                                        }, attr: {'aria-label': $root.translations.dragGeoJsonKml},
-                                        onEnterkeyClick, onSpaceClick
-                                        ">
-                                        <span data-bind="text: $root.translations.dragGeoJsonKml"></span>
+                                <div data-bind="css: {'state-disabled': disable()}">
+                                    <div class="add-new-feature">
+                                        <select
+                                            data-bind="
+                                                placeholder: $root.translations.addANewFeature + '...',
+                                                value: self.featureLookup[widget.node_id()].selectedTool,
+                                                valueAllowUnset: true,
+                                                options: widget.drawTools,
+                                                optionsText: 'text',
+                                                optionsValue: 'value',
+                                                disable: disable,
+                                                chosen: {
+                                                    'width': '100%',
+                                                    'disable_search_threshold': 10,
+                                                    'allow_single_deselect': true
+                                                },
+                                                attr: {'aria-label': $root.translations.addANewFeature}
+                                            "
+                                        ></select>
                                     </div>
-                                    <div class="hidden-file-input">
-                                        <input type="file" accept=".json,.geojson,.kml,.shp,.zip" data-bind="event: {
-                                            change: self.dropZoneFileSelected
-                                        }"/>
+                                    <div>
+                                        <div class="map-data-drop-area" tabindex="0" role="button"
+                                            data-bind="event: {
+                                                dragover: dropZoneOverHandler,
+                                                drop: dropZoneHandler,
+                                                click: dropZoneClickHandler,
+                                                dragenter: dropZoneEnterHandler,
+                                                dragleave: dropZoneLeaveHandler,
+                                                dragend: dropZoneLeaveHandler
+                                            }, attr: {'aria-label': $root.translations.dragGeoJsonKml},
+                                            onEnterkeyClick, onSpaceClick
+                                            ">
+                                            <span data-bind="text: $root.translations.dragGeoJsonKml"></span>
+                                        </div>
+                                        <div class="hidden-file-input">
+                                            <input type="file" accept=".json,.geojson,.kml,.shp,.zip" data-bind="event: {
+                                                change: self.dropZoneFileSelected
+                                            }"/>
+                                        </div>
                                     </div>
+                                    <!-- ko if: self.featureLookup[widget.node_id()].dropErrors().length !== 0 -->
+                                    <div class="geojson-error-list">
+                                        <a href="javascript: void(0);" data-bind="click:function () {
+                                            self.featureLookup[widget.node_id()].dropErrors([]);
+                                        }">
+                                            <i class="fa fa-close"></i>
+                                        </a>
+                                        <span data-bind="text: $root.translations.followingErrorsOccurred"></span>
+                                        <ul>
+                                            <!-- ko foreach: self.featureLookup[widget.node_id()].dropErrors() -->
+                                            <li data-bind="text: message"></li>
+                                            <!-- /ko-->
+                                        </ul>
+                                    </div>
+                                    <!-- /ko-->
                                 </div>
-                                <!-- ko if: self.featureLookup[widget.node_id()].dropErrors().length !== 0 -->
-                                <div class="geojson-error-list">
-                                    <a href="javascript: void(0);" data-bind="click:function () {
-                                        self.featureLookup[widget.node_id()].dropErrors([]);
-                                    }">
-                                        <i class="fa fa-close"></i>
-                                    </a>
-                                    <span data-bind="text: $root.translations.followingErrorsOccurred"></span>
-                                    <ul>
-                                        <!-- ko foreach: self.featureLookup[widget.node_id()].dropErrors() -->
-                                        <li data-bind="text: message"></li>
-                                        <!-- /ko-->
-                                    </ul>
-                                </div>
-                                <!-- /ko-->
                                 <table class="table">
                                     <tbody>
                                         <!-- ko foreach: {data: self.featureLookup[widget.node_id()].features, as: 'feature'} -->
@@ -133,7 +138,7 @@
                                             <td>
                                                 <span class="map-card-feature-name" data-bind="text: feature.geometry.type"></span>
                                             </td>
-                                            <td class="map-card-feature-tool">
+                                            <td class="map-card-feature-tool" data-bind="css: {'state-disabled': self.disable()}">
                                                 <a href="javascript:void(0);" role="button" data-bind="click: function() { self.editFeature(feature) }, clickBubble: false,
                                                     attr: {'aria-label': $root.translations.editFeature}
                                                 ">
@@ -141,7 +146,7 @@
                                                     <span data-bind="text: $root.translations.edit"></span>
                                                 </a>
                                             </td>
-                                            <td class="map-card-feature-tool">
+                                            <td class="map-card-feature-tool" data-bind="css: {'state-disabled': self.disable()}">
                                                 <a href="javascript:void(0);" role="button" data-bind="click: function() { self.deleteFeature(feature) }, clickBubble: false,
                                                     attr: {'aria-label': $root.translations.deleteFeature}
                                                 ">
@@ -153,7 +158,7 @@
                                         <!-- /ko -->
                                     </tbody>
                                 </table>
-                                <div class="map-card-zoom-tool">
+                                <div class="map-card-zoom-tool" data-bind="css: {'state-disabled': disable()}">
                                     <button data-bind="click: function() {
                                         self.editGeoJSON(self.featureLookup[widget.node_id()].features(), widget.node_id());
                                     }">

@@ -25,11 +25,11 @@ import 'bindings/key-events-click';
 
 const viewModel = function(params) {
     params.configKeys = ['trueLabel', 'falseLabel', 'defaultValue'];
-        
+
     WidgetViewModel.apply(this, [params]);
     var self = this;
     this.setValue = function(val) {
-        if (ko.unwrap(self.disabled) === false) {
+        if (ko.unwrap(self.disable) === false) {
             if (val === self.value()) {
                 self.value(null);
             } else {

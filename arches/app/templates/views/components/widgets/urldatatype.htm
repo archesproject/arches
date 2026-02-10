@@ -13,7 +13,7 @@
             </label>
         </div>
         <div class="col-xs-12">
-            <input type="string" data-bind="textInput: url_label, attr: {placeholder: url_label_placeholder}" class="form-control input-lg widget-input" style="margin-bottom: 5px">
+            <input type="string" data-bind="disable: disable, textInput: url_label, attr: {placeholder: url_label_placeholder}" class="form-control input-lg widget-input" style="margin-bottom: 5px">
         </div>
         <div class="control-label">
             <label class="control-label widget-input-label" for="">
@@ -21,7 +21,7 @@
             </label>
         </div>
         <div class="col-xs-12">
-            <input type="string" data-bind="textInput: url, attr: {placeholder: url_placeholder}" class="form-control
+            <input type="string" data-bind="disable: disable, textInput: url, attr: {placeholder: url_placeholder}" class="form-control
             input-lg widget-input" style="margin-bottom: 5px">
         </div>
         <div class="col-xs-12">
@@ -37,7 +37,6 @@
     </div>
 </div>
 {% endblock form %}
-
 
 {% block config_form %}
 <div class="control-label">
@@ -61,8 +60,8 @@
     <input type="" id="" class="form-control input-md widget-input"
     data-bind="textInput: link_color">
 </div>
+{{ block.super }}
 {% endblock config_form %}
-
 
 {% block report %}
 <dt data-bind="text: label, class: nodeCssClasses"></dt>

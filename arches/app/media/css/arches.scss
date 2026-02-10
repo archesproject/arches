@@ -7056,6 +7056,11 @@ div.hide-file-list>div>div>div>div>form>div>div:nth-child(3) {
     background: rgba(214, 214, 214, 0.3);
 }
 
+.state-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
 .wizard-card-tools {
     float: right;
     padding-left: 10px;

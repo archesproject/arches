@@ -24,5 +24,24 @@
 
 <!-- ko if: configForm -->
 {% block config_form %}
+<div class="node-config-item">
+    <div class="control-label">
+        <span>Disable Editing</span>
+    </div>
+    <div class="pad-no">
+        <div data-bind="
+            component: {
+                name: 'views/components/simple-switch',
+                params: {
+                    value: uneditable,
+                    config:{
+                        label: 'Uneditable',
+                        subtitle: 'Prevent users from editing this value'
+                    }
+                }
+            }">
+        </div>
+    </div>
+</div>
 {% endblock config_form %}
 <!-- /ko -->

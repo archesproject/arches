@@ -67,7 +67,7 @@
                         entities_greek: false
                     },
                     valueUpdate: 'afterkeydown',
-                    attr: {disabled: disabled}
+                    attr: {disabled: disable}
                 "></textarea>
         </div>
     </div>
@@ -94,6 +94,7 @@
         attr: {disabled: disabled}
     "
 ></textarea>
+{{ block.super }}
 {% endblock config_form %}
 
 {% block report %}
