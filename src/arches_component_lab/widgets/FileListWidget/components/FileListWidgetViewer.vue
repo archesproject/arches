@@ -1,18 +1,34 @@
 <script setup lang="ts">
+import arches from "arches";
 import { computed } from "vue";
 import { Image, Galleria } from "primevue";
 
-import type { FileListValue } from "@/arches_component_lab/datatypes/file-list/types";
+import type {
+    FileListValue,
+    FileReference,
+} from "@/arches_component_lab/datatypes/file-list/types";
 
 const props = defineProps<{
     value: FileListValue | null;
 }>();
 
+const getFileUrl = (originalUrl: string) => {
+    if (
+        !originalUrl ||
+        originalUrl.toLowerCase().startsWith("http://") ||
+        originalUrl.toLowerCase().startsWith("https://") ||
+        originalUrl.startsWith(arches.urls.url_subpath)
+    ) {
+        return originalUrl;
+    }
+    return (arches.urls.url_subpath + originalUrl).replace("//", "/");
+};
+
 const imageData = computed(() => {
-    return props.value?.node_value?.map((fileReference) => {
+    return props.value?.node_value?.map((fileReference: FileReference) => {
         return {
-            thumbnailImageSrc: `${fileReference.url}`,
-            itemImageSrc: `${fileReference.url}`,
+            thumbnailImageSrc: getFileUrl(fileReference.url),
+            itemImageSrc: getFileUrl(fileReference.url),
             alt: fileReference.altText,
             title: fileReference.title,
         };
