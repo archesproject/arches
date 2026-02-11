@@ -10,12 +10,20 @@ class Migration(migrations.Migration):
         ("models", "12557_add_language_datatype"),
     ]
 
-    migrations.operations.special.SeparateDatabaseAndState(
-        state_operations=[
-            django_migrate_sql.operations.CreateSQL(
-                name="__arches_check_tile_cardinality_violation_for_load",
-                sql="\nCREATE OR REPLACE PROCEDURE public.__arches_check_tile_cardinality_violation_for_load(load_id uuid)\nAS $$\n    UPDATE load_staging\n        SET error_message = 'excess tile error', passes_validation = false\n        WHERE loadid = load_id\n        AND operation = 'insert'\n        AND (resourceid, nodegroupid, COALESCE(parenttileid::text, '')) IN (\n            SELECT t.resourceinstanceid, t.nodegroupid, COALESCE(t.parenttileid::text, '')\n                FROM tiles t, node_groups ng\n                WHERE t.nodegroupid = ng.nodegroupid\n                AND ng.cardinality = '1'\n            UNION\n            SELECT ls.resourceid, ls.nodegroupid, COALESCE(ls.parenttileid::text, '')\n                FROM load_staging ls, node_groups ng\n                WHERE ls.nodegroupid = ng.nodegroupid\n                AND ng.cardinality = '1'\n                GROUP BY ls.resourceid, ls.nodegroupid, COALESCE(ls.parenttileid::text, ''), ls.loadid\n                HAVING count(*) > 1\n                AND ls.loadid = load_id\n        );\n$$ LANGUAGE SQL;",
-                reverse_sql="drop procedure __arches_check_tile_cardinality_violation_for_load;",
-            ),
-        ]
-    )
+    operations = [
+        migrations.operations.special.SeparateDatabaseAndState(
+            state_operations=[
+                django_migrate_sql.operations.CreateSQL(
+                    name="__arches_check_tile_cardinality_violation_for_load",
+                    sql="\nCREATE OR REPLACE PROCEDURE public.__arches_check_tile_cardinality_violation_for_load(load_id uuid)\nAS $$\n    UPDATE load_staging\n        SET error_message = 'excess tile error', passes_validation = false\n        WHERE loadid = load_id\n        AND operation = 'insert'\n        AND (resourceid, nodegroupid, COALESCE(parenttileid::text, '')) IN (\n            SELECT t.resourceinstanceid, t.nodegroupid, COALESCE(t.parenttileid::text, '')\n                FROM tiles t, node_groups ng\n                WHERE t.nodegroupid = ng.nodegroupid\n                AND ng.cardinality = '1'\n            UNION\n            SELECT ls.resourceid, ls.nodegroupid, COALESCE(ls.parenttileid::text, '')\n                FROM load_staging ls, node_groups ng\n                WHERE ls.nodegroupid = ng.nodegroupid\n                AND ng.cardinality = '1'\n                GROUP BY ls.resourceid, ls.nodegroupid, COALESCE(ls.parenttileid::text, ''), ls.loadid\n                HAVING count(*) > 1\n                AND ls.loadid = load_id\n        );\n$$ LANGUAGE SQL;",
+                    reverse_sql="drop procedure __arches_check_tile_cardinality_violation_for_load;",
+                ),
+            ]
+        ),
+        django_migrate_sql.operations.AlterSQL(
+            name="__arches_check_tile_cardinality_violation_for_load",
+            sql="\nCREATE OR REPLACE PROCEDURE public.__arches_check_tile_cardinality_violation_for_load(load_id uuid)\nAS $$\n    UPDATE load_staging ls\n    SET error_message = 'excess tile error',\n        passes_validation = false\n    FROM node_groups ng\n    WHERE ls.loadid = load_id\n    AND ls.operation = 'insert'\n    AND ng.nodegroupid = ls.nodegroupid\n    AND ng.cardinality = '1'\n    AND (\n            EXISTS (\n                SELECT 1\n                FROM tiles t\n                WHERE t.resourceinstanceid = ls.resourceid\n                AND t.nodegroupid = ls.nodegroupid\n                AND COALESCE(t.parenttileid, '00000000-0000-0000-0000-000000000000'::uuid)\n                    =\n                    COALESCE(ls.parenttileid, '00000000-0000-0000-0000-000000000000'::uuid)\n            )\n            OR\n            EXISTS (\n                SELECT 1\n                FROM load_staging ls2\n                WHERE ls2.loadid = load_id\n                AND ls2.operation = 'insert'\n                AND ls2.resourceid = ls.resourceid\n                AND ls2.nodegroupid = ls.nodegroupid\n                AND COALESCE(ls2.parenttileid, '00000000-0000-0000-0000-000000000000'::uuid)\n                    =\n                    COALESCE(ls.parenttileid, '00000000-0000-0000-0000-000000000000'::uuid)\n                GROUP BY ls2.resourceid, ls2.nodegroupid, ls2.parenttileid\n                HAVING COUNT(*) > 1\n            )\n    );\n$$ LANGUAGE SQL;",
+            reverse_sql="\nCREATE OR REPLACE PROCEDURE public.__arches_check_tile_cardinality_violation_for_load(load_id uuid)\nAS $$\n    UPDATE load_staging\n        SET error_message = 'excess tile error', passes_validation = false\n        WHERE loadid = load_id\n        AND operation = 'insert'\n        AND (resourceid, nodegroupid, COALESCE(parenttileid::text, '')) IN (\n            SELECT t.resourceinstanceid, t.nodegroupid, COALESCE(t.parenttileid::text, '')\n                FROM tiles t, node_groups ng\n                WHERE t.nodegroupid = ng.nodegroupid\n                AND ng.cardinality = '1'\n            UNION\n            SELECT ls.resourceid, ls.nodegroupid, COALESCE(ls.parenttileid::text, '')\n                FROM load_staging ls, node_groups ng\n                WHERE ls.nodegroupid = ng.nodegroupid\n                AND ng.cardinality = '1'\n                GROUP BY ls.resourceid, ls.nodegroupid, COALESCE(ls.parenttileid::text, ''), ls.loadid\n                HAVING count(*) > 1\n                AND ls.loadid = load_id\n        );\n$$ LANGUAGE SQL;",
+            state_reverse_sql="drop procedure __arches_check_tile_cardinality_violation_for_load;",
+        ),
+    ]
