@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, watchEffect } from "vue";
 
-import { convertISO8601DatetimeFormatToPrimevueDatetimeFormat } from "@/arches_component_lab/widgets/DatePickerWidget/utils.ts";
+import {
+    convertISO8601DatetimeFormatToPrimevueDatetimeFormat,
+    convertViewMode,
+} from "@/arches_component_lab/widgets/DatePickerWidget/utils.ts";
 
 import DatePicker from "primevue/datepicker";
 
@@ -28,6 +31,9 @@ const emit = defineEmits<{
 
 const shouldShowTime = ref(false);
 const dateFormat = ref();
+const viewMode = computed(() => {
+    return convertViewMode(cardXNodeXWidgetData?.config?.viewMode ?? "days");
+});
 
 watchEffect(() => {
     const convertedDateFormat =
@@ -106,6 +112,7 @@ const modelDate = computed(() => {
         :show-time="shouldShowTime"
         :show-seconds="shouldShowTime"
         :show-icon="true"
+        :view="viewMode"
         @update:model-value="onUpdateModelValue($event as unknown as string)"
     />
 </template>

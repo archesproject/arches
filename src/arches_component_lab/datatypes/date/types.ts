@@ -7,6 +7,11 @@ export interface DateDatatypeCardXNodeXWidgetData extends CardXNodeXWidgetData {
             dateFormat: string;
         };
     };
+    config: CardXNodeXWidgetData["config"] & {
+        viewMode: string;
+        minDate: boolean;
+        maxDate: boolean;
+    };
 }
 
 export interface DateValue extends AliasedNodeData {
