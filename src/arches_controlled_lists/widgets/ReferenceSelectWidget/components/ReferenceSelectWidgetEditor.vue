@@ -56,6 +56,13 @@ const initialValueFromTileData = computed(() => {
     const defaultValueFromWidgetConfig = cardXNodeXWidgetData?.config
         ?.defaultValue as ReferenceSelectNodeValue[] | undefined;
 
+    if (
+        !defaultValueFromWidgetConfig ||
+        defaultValueFromWidgetConfig.length === 0
+    ) {
+        return undefined;
+    }
+
     return defaultValueFromWidgetConfig?.reduce<Record<string, boolean>>(
         (accumulator, defaultValueItem) => {
             const listItemIdentifier =
