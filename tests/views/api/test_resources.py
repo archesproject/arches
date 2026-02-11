@@ -561,6 +561,10 @@ class ResourceAPITests(ArchesTestCase):
         self.assertIsNone(result["cards"][0]["sortorder"])
 
     def test_resource_report_api(self):
+        """
+        Ensure api_resource_report returns proper response
+
+        """
         self.client.login(username="admin", password="admin")
         response = self.client.get(
             reverse(
@@ -568,7 +572,12 @@ class ResourceAPITests(ArchesTestCase):
                 args=(str(self.test_prj_user.pk),),
             ),
         )
-        self.assertEqual(response.status_code, 200)
+
+        with self.subTest(response):
+            self.assertEqual(response.status_code, 200)
+
+        with self.subTest(response):
+            self.assertTrue(len(response.json()["cardwidgets"]) > 0)
 
     def test_related_resources_in_resource_report_api(self):
         self.client.login(username="admin", password="admin")
