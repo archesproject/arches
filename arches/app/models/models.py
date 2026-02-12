@@ -1090,6 +1090,8 @@ class ResourceXResource(models.Model):
             elif self.resourceinstanceidto_id == deletedResourceId:
                 newTileData = []
                 data = self.tileid.data[str(self.nodeid_id)]
+                if data is None:
+                    data = []
                 if type(data) != list:
                     data = [data]
                 newTileData = list(
