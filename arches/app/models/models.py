@@ -1100,7 +1100,9 @@ class ResourceXResource(models.Model):
                 if len(newTileData):
                     self.tileid.data[str(self.nodeid_id)] = newTileData
                     self.tileid.save()
-                else:
+                elif not any(
+                    [value for value in self.tileid.data.values() if value is not None]
+                ):
                     self.tileid.delete()
 
         super(ResourceXResource, self).delete()
