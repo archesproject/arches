@@ -13,10 +13,10 @@ const props = defineProps<{
 }>();
 
 const getFileUrl = (originalUrl: string) => {
+    const httpRegex = /^(blob|https?):\/\//;
     if (
         !originalUrl ||
-        originalUrl.toLowerCase().startsWith("http://") ||
-        originalUrl.toLowerCase().startsWith("https://") ||
+        httpRegex.test(originalUrl) ||
         originalUrl.startsWith(arches.urls.url_subpath)
     ) {
         return originalUrl;
