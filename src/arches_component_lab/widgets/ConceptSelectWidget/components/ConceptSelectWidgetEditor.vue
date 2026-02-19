@@ -88,7 +88,7 @@ function onUpdateModelValue(selectedOption: Record<string, boolean> | null) {
 
 <template>
     <TreeSelect
-        :id="nodeAlias"
+        :input-id="cardXNodeXWidgetData.node.alias"
         data-key="key"
         selection-mode="single"
         filter

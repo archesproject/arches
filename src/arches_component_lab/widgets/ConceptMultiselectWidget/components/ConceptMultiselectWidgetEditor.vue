@@ -92,7 +92,7 @@ function onUpdateModelValue(selectedConcepts: string[]) {
 
 <template>
     <TreeSelect
-        :id="nodeAlias"
+        :input-id="cardXNodeXWidgetData.node.alias"
         selection-mode="multiple"
         :fluid="true"
         filter
