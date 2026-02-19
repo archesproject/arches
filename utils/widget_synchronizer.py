@@ -15,13 +15,12 @@ class WidgetSynchronizer:
             mappings.values_list("widget_id", flat=True)
         )
 
-        if len(missing_mappings) > 1 and widget_name and component_name:
+        if len(missing_mappings) > 1 and not widget_name:
             raise ValueError(
                 _(
-                    "Multiple widgets are missing mappings."
-                    "Please specify a widget_name and component_name to create "
-                    "a mapping for a specific widget, or accept default (widget name) "
-                    "to create mappings for all missing widgets."
+                    "Multiple widgets are missing mappings. "
+                    "Please specify a widget_name and optional component_name to create "
+                    "a mapping for a specific widget."
                 )
             )
 
@@ -36,21 +35,20 @@ class WidgetSynchronizer:
                     .replace("_", "")
                 )
 
-            if widget_name:
+            if widget.name == widget_name:
                 WidgetMapping.objects.create(
                     widget=widget,
                     component=f"arches_component_lab/widgets/{component_name}/{component_name}.vue",
                 )
                 return
 
-            else:
+            elif not widget_name:
                 WidgetMapping.objects.create(
                     widget=widget,
                     component=f"arches_component_lab/widgets/{component_name}/{component_name}.vue",
                 )
             sys.stdout.write(
                 _(
-                    f"Created mapping for widget '{widget.name}' with \
-                component '{component_name}.vue'\n"
+                    f"Created mapping for widget '{widget.name}' with component '{component_name}.vue'\n"
                 )
             )
