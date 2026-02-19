@@ -1332,13 +1332,8 @@ class FileListDataType(BaseDataType):
                             except models.File.DoesNotExist:
                                 logger.exception(_("File does not exist"))
 
-            file_list_key = (
-                tile.aliased_data.site_images[0]["file_id"]
-                if hasattr(tile, "aliased_data")
-                and tile.aliased_data.site_images
-                and tile.aliased_data.site_images[0]["file_id"]
-                else "file-list_" + nodeid
-            )
+            # Try to get the files with the nodeid only. NB - this doesn't support saving multiple tiles in one POST
+            file_list_key = "file-list_" + nodeid
             files = request.FILES.getlist(
                 file_list_key + "_preloaded", []
             ) + request.FILES.getlist(
@@ -1346,9 +1341,18 @@ class FileListDataType(BaseDataType):
                 [],
             )
 
-            # files = request.FILES.getlist(
-            #     "file-list_" + nodeid + "_preloaded", []
-            # ) + request.FILES.getlist("file-list_" + nodeid, [])
+            # If they weren't available in the POST with the nodeid, try the tile-scoped file names.
+            # This adds support for saving multiple tiles in one POST
+            if len(files) == 0:
+                # First check to see if the files have been set using the tile ID
+                file_list_key = f"file-list_{tile.tileid}-{nodeid}"
+                files = request.FILES.getlist(
+                    file_list_key + "_preloaded", []
+                ) + request.FILES.getlist(
+                    file_list_key,
+                    [],
+                )
+
             tile_exists = models.TileModel.objects.filter(pk=tile.tileid).exists()
 
             for file_data in files:
