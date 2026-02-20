@@ -93,7 +93,6 @@ def can_edit_resource_instance(function):
             return function(request, *args, **kwargs)
         else:
             raise PermissionDenied
-        return function(request, *args, **kwargs)
 
     return wrapper
 
