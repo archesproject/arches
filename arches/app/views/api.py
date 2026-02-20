@@ -44,7 +44,7 @@ from arches.app.utils.resource_relationship_utils import (
 )
 from arches.app.utils.skos import SKOSWriter
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
-from arches.app.utils.decorators import group_required
+from arches.app.utils.decorators import group_required, check_tile_permissions
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
@@ -1567,6 +1567,7 @@ class BulkDisambiguatedResourceInstance(APIBase):
 
 
 @method_decorator(csrf_exempt, name="dispatch")
+@method_decorator(check_tile_permissions, name="dispatch")
 class Tile(APIBase):
     def get(self, request, tileid):
         try:
@@ -1699,6 +1700,7 @@ class InstancePermission(APIBase):
 
 
 @method_decorator(csrf_exempt, name="dispatch")
+@method_decorator(check_tile_permissions, name="dispatch")
 class NodeValue(APIBase):
     def post(self, request):
         datatype_factory = DataTypeFactory()

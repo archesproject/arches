@@ -624,7 +624,9 @@ class ResourceEditLogView(BaseManagerView):
                 str(r.resourceinstanceid): r.graph.name for r in resources
             }
             for edit in recent_edits:
-                edit.friendly_edittype = edit_type_lookup[edit.edittype]
+                edit.friendly_edittype = edit_type_lookup.get(
+                    edit.edittype, edit.edittype
+                )
                 edit.resource_model_name = None
                 edit.deleted = edit.resourceinstanceid in deleted_instances
                 if edit.resourceinstanceid in graph_name_lookup:

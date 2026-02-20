@@ -154,6 +154,8 @@ def search_terms(request):
     ret = {"terms": [], "concepts": []}
     if len(permitted_nodegroups) == 0:
         return JSONResponse(ret)
+    nodegroup_ids = set()
+    queries = {}
     for index in list(ret.keys()):
         query = Query(se, start=0, limit=0)
         boolquery = Bool()
@@ -214,7 +216,24 @@ def search_terms(request):
         base_agg.add_aggregation(nodegroupid_agg)
         query.add_aggregation(base_agg)
 
+        queries[index] = query
+
+    results_dict = {}
+    for index, query in queries.items():
         results = query.search(index=index)
+        results_dict[index] = results
+        if results is not None:
+            for result in results["aggregations"]["value_agg"]["buckets"]:
+                if len(result["top_concept"]["buckets"]) == 0:
+                    for nodegroup in result["nodegroupid"]["buckets"]:
+                        nodegroup_ids.add(nodegroup["key"])
+
+    nodes = Node.objects.filter(nodeid__in=nodegroup_ids).select_related("graph")
+    node_lookup = {str(node.nodeid): (node.graph.name, node.name) for node in nodes}
+
+    i = 0
+    for index in ret.keys():
+        results = results_dict[index]
         if results is not None:
             for result in results["aggregations"]["value_agg"]["buckets"]:
                 if len(result["top_concept"]["buckets"]) > 0:
@@ -236,31 +255,26 @@ def search_terms(request):
                             )
                         i = i + 1
                 else:
-                    ret[index].append(
-                        {
-                            "type": "term",
-                            "context": "",
-                            "context_label": get_resource_model_label(result),
-                            "id": i,
-                            "text": result["key"],
-                            "value": result["key"],
-                            "nodegroupid": result["nodegroupid"]["buckets"][0]["key"],
-                        }
-                    )
-                    i = i + 1
+                    for nodegroup in result["nodegroupid"]["buckets"]:
+                        nodegroup_id = nodegroup["key"]
+                        graph_name, node_name = node_lookup.get(
+                            str(nodegroup_id), ("", "")
+                        )
+                        context_label = "{0} - {1}".format(graph_name, node_name)
+                        ret[index].append(
+                            {
+                                "type": "term",
+                                "context": "",
+                                "context_label": context_label,
+                                "id": i,
+                                "text": result["key"],
+                                "value": result["key"],
+                                "nodegroupid": nodegroup_id,
+                            }
+                        )
+                        i = i + 1
 
     return JSONResponse(ret)
-
-
-def get_resource_model_label(result):
-    if len(result["nodegroupid"]["buckets"]) > 0:
-        for nodegroup in result["nodegroupid"]["buckets"]:
-            nodegroup_id = nodegroup["key"]
-            node = Node.objects.get(nodeid=nodegroup_id)
-            graph = node.graph
-        return "{0} - {1}".format(graph.name, node.name)
-    else:
-        return ""
 
 
 @group_required("Resource Exporter")
