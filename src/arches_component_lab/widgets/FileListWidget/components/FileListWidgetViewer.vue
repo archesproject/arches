@@ -13,7 +13,7 @@ const props = defineProps<{
 }>();
 
 const getFileUrl = (originalUrl: string) => {
-    const httpRegex = /^(blob|https?):\/\//;
+    const httpRegex = /^(blob:|https?:\/\/)/;
     if (
         !originalUrl ||
         httpRegex.test(originalUrl) ||
