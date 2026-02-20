@@ -1701,6 +1701,7 @@ class InstancePermission(APIBase):
 
 @method_decorator(csrf_exempt, name="dispatch")
 @method_decorator(check_tile_permissions, name="dispatch")
+@method_decorator(group_required("Resource Editor", raise_exception=True), name="dispatch")
 class NodeValue(APIBase):
     def post(self, request):
         datatype_factory = DataTypeFactory()
