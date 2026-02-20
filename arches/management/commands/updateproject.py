@@ -18,7 +18,7 @@ class Command(BaseCommand):  # pragma: no cover
 
     def handle(self, *args, **options):
         answer = input(
-            "This operation will upgrade your project to version 8.0\n"
+            "This operation will upgrade your project to version 8.2\n"
             "This will replace the following files in your project:\n"
             "  - <project>/apps.py\n"
             "  - .github/actions/build-and-test-branch/action.yml\n"
@@ -37,6 +37,7 @@ class Command(BaseCommand):  # pragma: no cover
         if answer.lower() in ["y", "yes"]:
             self.update_to_v8()
             self.update_to_v8_1()
+            self.update_to_v8_2()
         else:
             self.stdout.write("Operation aborted.")
 
@@ -58,6 +59,7 @@ class Command(BaseCommand):  # pragma: no cover
         )
 
         self.stdout.write("Done!")
+
         self.stdout.write("Project successfully updated to version 8.2")
 
     def update_to_v8_1(self):
