@@ -56,6 +56,21 @@ class Command(BaseCommand):  # pragma: no cover
             os.path.join(settings.APP_ROOT, "..", "eslint.config.mjs"),
         )
         self.stdout.write("Done!")
+
+        # Adds .github/dependabot.yml
+        self.stdout.write("Copying .github/dependabot.yml to project...")
+        shutil.copy(
+            os.path.join(
+                settings.ROOT_DIR,
+                "install",
+                "arches-templates",
+                ".github",
+                "dependabot.yml",
+            ),
+            os.path.join(settings.APP_ROOT, "..", ".github", "dependabot.yml"),
+        )
+        self.stdout.write("Done!")
+
         self.stdout.write("Project successfully updated to version 8.1")
 
     def update_to_v8(self):
@@ -273,18 +288,3 @@ from arches.settings_utils import generate_frontend_configuration"""
         )  # ensure graphs are v8 serialized
         self.stdout.write("Done!")
         self.stdout.write("Project successfully updated to version 8.0")
-
-    def update_to_v8_1(self):
-        # Adds .github/dependabot.yml
-        self.stdout.write("Copying .github/dependabot.yml to project...")
-        shutil.copy(
-            os.path.join(
-                settings.ROOT_DIR,
-                "install",
-                "arches-templates",
-                ".github",
-                "dependabot.yml",
-            ),
-            os.path.join(settings.APP_ROOT, "..", ".github", "dependabot.yml"),
-        )
-        self.stdout.write("Done!")
