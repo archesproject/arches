@@ -93,7 +93,9 @@ class TileData(View):
             _(title), _(str(message)), {"message": message, "title": title}
         )
 
-    @method_decorator(group_required("Resource Editor", raise_exception=True), name="dispatch")
+    @method_decorator(
+        group_required("Resource Editor", raise_exception=True), name="dispatch"
+    )
     def post(self, request):
         original_transaction_id = request.POST.get("transaction_id", None)
         transaction_id = request.POST.get("transaction_id", uuid.uuid1())
@@ -303,7 +305,9 @@ class TileData(View):
 
         return HttpResponseNotFound()
 
-    @method_decorator(group_required("Resource Editor", raise_exception=True), name="dispatch")
+    @method_decorator(
+        group_required("Resource Editor", raise_exception=True), name="dispatch"
+    )
     def delete(self, request):
         json = request.body
         if json is not None:

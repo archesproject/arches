@@ -170,7 +170,9 @@ def check_tile_permissions(func):
             else:
                 permitted = user_can_edit_resource(user, resourceid)
         if request.method == "GET":
-            resourceid = request.GET.get("resourceinstanceid", None) or kwargs.get("tileid")
+            resourceid = request.GET.get("resourceinstanceid", None) or kwargs.get(
+                "tileid"
+            )
             permitted = user_can_read_resource(user, resourceid)
         if permitted:
             return func(request, *args, **kwargs)
