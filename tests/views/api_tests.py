@@ -607,7 +607,7 @@ class ResourceAPITests(ArchesTestCase):
         )
         self.assertEqual(response.status_code, 200)
 
-    def test_tiles_endpoint(self):
+    def test_tiles_endpoint_get(self):
         user = User.objects.get(username="ben")
         self.client.force_login(user)
         tile = models.TileModel.objects.filter(
@@ -617,3 +617,36 @@ class ResourceAPITests(ArchesTestCase):
             reverse("api_tiles", kwargs={"tileid": str(tile.tileid)})
         )
         self.assertEqual(response.status_code, 200)
+
+    def test_tiles_endpoint_post(self):
+        user = User.objects.get(username="ben")
+        self.client.force_login(user)
+        nodegroupid = "e7364d1e-95c4-11e8-9e7c-acde48001122"
+        nodeid = "f08a3057-95c4-11e8-9761-acde48001122"
+        tileid = "97310030-0eba-11f1-87e3-469c1cc4c080"
+        values = json.dumps(
+            {
+                "tileid": "",
+                "data": {nodeid: 55},
+                "nodegroup_id": nodegroupid,
+                "parenttile_id": None,
+                "resourceinstance_id": "a6421f96-0eba-11f1-87e3-469c1cc4c080",
+                "sortorder": 0,
+                "transaction_id": None,
+            }
+        )
+        payload = {
+            "data": values,
+        }
+
+        self.client.post(
+            reverse("api_tiles", kwargs={"tileid": tileid}),
+            payload,
+        )
+
+        self.assertEqual(
+            models.ResourceInstance.objects.get(
+                pk="a6421f96-0eba-11f1-87e3-469c1cc4c080"
+            ).tilemodel_set.count(),
+            1,
+        )
