@@ -163,7 +163,7 @@ def check_tile_permissions(func):
         if request.method == "POST":
             resourceid = request.POST.get("resourceinstanceid", None)
             tileid = request.POST.get("tileid", None) or kwargs.get("tileid")
-            if tileid and not resourceid:
+            if not resourceid and models.TileModel.objects.filter(pk=tileid).exists():
                 resourceid = models.TileModel.objects.get(pk=tileid).resourceinstance_id
             if not models.ResourceInstance.objects.filter(pk=resourceid).exists():
                 return func(request, *args, **kwargs)
