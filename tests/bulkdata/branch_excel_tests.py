@@ -167,9 +167,11 @@ class BranchExcelTests(TransactionTestCase):
             "tests/fixtures/data/archestemp", file_name + ".zip"
         )
         self.addCleanup(
-            lambda: os.remove(exported_file_path)
-            if os.path.exists(exported_file_path)
-            else None
+            lambda: (
+                os.remove(exported_file_path)
+                if os.path.exists(exported_file_path)
+                else None
+            )
         )
 
         exporter = BranchExcelExporter(loadid=load_id)
