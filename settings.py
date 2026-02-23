@@ -134,6 +134,8 @@ INSTALLED_APPS = (
     "django.contrib.staticfiles",
     "django.contrib.gis",
     "django_hosts",
+    "arches_component_lab",
+    "arches_querysets",
     "arches",
     "arches.app.models",
     "arches.management",
@@ -145,8 +147,6 @@ INSTALLED_APPS = (
     "django_celery_results",
     # "silk",
     "pgtrigger",
-    "arches_component_lab",  # Ensure the project is listed before any other arches applications
-    "arches_querysets",
 )
 
 # Placing this last ensures any templates provided by Arches Applications
