@@ -16,12 +16,12 @@ class Command(WidgetCommand):
         )
 
         parser.add_argument(
-            "-cn",
-            "--component_name",
+            "-p",
+            "--component_path",
             action="store",
-            dest="component_name",
+            dest="component_path",
             default="",
-            help="The name of the Vue component to be used in the mapping",
+            help="The path of the Vue component to be used in the mapping",
         )
 
     def handle(self, *args, **options):
@@ -40,9 +40,9 @@ class Command(WidgetCommand):
 
         elif options["operation"] == "add_mapping":
             widget_name = options["widget_name"]
-            component_name = options["component_name"] or None
+            component_path = options["component_path"] or None
             mapping = WidgetSynchronizer().add_mapping(
-                widget_name, component_name=component_name
+                widget_name, component_path=component_path
             )
             if mapping:
                 self.stdout.write(

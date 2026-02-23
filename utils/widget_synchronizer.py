@@ -20,8 +20,8 @@ class WidgetSynchronizer:
         return set(widgets_without_mapping.values_list("widgetid", flat=True))
 
     def add_mapping(
-        self, widget_name: str, component_path: str = None, component_name: str = None
-    ) -> None:
+        self, widget_name: str, component_path: str = None
+    ) -> WidgetMapping | None:
         widget = Widget.objects.filter(name=widget_name).first()
         if not widget:
             sys.stdout.write(_(f"No widget found with the name '{widget_name}'.\n"))
@@ -34,14 +34,10 @@ class WidgetSynchronizer:
         if component_path:
             component = component_path
         else:
-            if not component_name:
-                # Provide a reasonable default mapping based on widget name
-                component_name = (
-                    widget.name.title()
-                    .replace(" ", "")
-                    .replace("-", "")
-                    .replace("_", "")
-                )
+            # Provide a reasonable default mapping based on widget name
+            component_name = (
+                widget.name.title().replace(" ", "").replace("-", "").replace("_", "")
+            )
             component = (
                 f"arches_component_lab/widgets/{component_name}/{component_name}.vue"
             )
