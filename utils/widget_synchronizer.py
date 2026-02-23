@@ -1,5 +1,7 @@
 import sys
+import uuid
 
+from django.db.models import QuerySet
 from django.utils.translation import gettext as _
 
 from arches.app.models.models import Widget
@@ -7,25 +9,31 @@ from arches_component_lab.models import WidgetMapping
 
 
 class WidgetSynchronizer:
-    def synchronize_widgets(self, widget_name: str = None, component_name: str = None):
-        """Ensure that all widgets in the Arches database have a corresponding WidgetMapping."""
-        widgets = Widget.objects.all()
-        mappings = WidgetMapping.objects.all()
-        missing_mappings = set(widgets.values_list("widgetid", flat=True)) - set(
-            mappings.values_list("widget_id", flat=True)
+    def check_for_missing_mappings(
+        self, return_as_queryset=False
+    ) -> set[uuid.UUID] | QuerySet:
+        widgets_without_mapping = Widget.objects.exclude(
+            widgetid__in=WidgetMapping.objects.values_list("widget_id", flat=True)
         )
+        if return_as_queryset:
+            return widgets_without_mapping
+        return set(widgets_without_mapping.values_list("widgetid", flat=True))
 
-        if len(missing_mappings) > 1 and not widget_name:
-            raise ValueError(
-                _(
-                    "Multiple widgets are missing mappings. "
-                    "Please specify a widget_name and optional component_name to create "
-                    "a mapping for a specific widget."
-                )
-            )
+    def add_mapping(
+        self, widget_name: str, component_path: str = None, component_name: str = None
+    ) -> None:
+        widget = Widget.objects.filter(name=widget_name).first()
+        if not widget:
+            sys.stdout.write(_(f"No widget found with the name '{widget_name}'.\n"))
+            return
 
-        for widget_pk in missing_mappings:
-            widget = Widget.objects.get(widgetid=widget_pk)
+        if widget_name == "language-widget" and not component_path:
+            component_path = "arches_component_lab/widgets/LanguageSelectWidget/LanguageSelectWidget.vue"
+
+        component = None
+        if component_path:
+            component = component_path
+        else:
             if not component_name:
                 # Provide a reasonable default mapping based on widget name
                 component_name = (
@@ -34,21 +42,12 @@ class WidgetSynchronizer:
                     .replace("-", "")
                     .replace("_", "")
                 )
-
-            if widget.name == widget_name:
-                WidgetMapping.objects.create(
-                    widget=widget,
-                    component=f"arches_component_lab/widgets/{component_name}/{component_name}.vue",
-                )
-                return
-
-            elif not widget_name:
-                WidgetMapping.objects.create(
-                    widget=widget,
-                    component=f"arches_component_lab/widgets/{component_name}/{component_name}.vue",
-                )
-            sys.stdout.write(
-                _(
-                    f"Created mapping for widget '{widget.name}' with component '{component_name}.vue'\n"
-                )
+            component = (
+                f"arches_component_lab/widgets/{component_name}/{component_name}.vue"
             )
+
+        mapping = WidgetMapping.objects.create(
+            widget=widget,
+            component=component,
+        )
+        return mapping
