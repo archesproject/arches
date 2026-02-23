@@ -27,13 +27,26 @@ class Command(WidgetCommand):
     def handle(self, *args, **options):
         super().handle(*args, **options)
 
-        if options["operation"] == "sync_mappings":
-            self.synchronize_mapping(
-                widget_name=options["widget_name"],
-                component_name=options["component_name"],
-            )
+        if options["operation"] == "check_mappings":
+            missing_mappings = WidgetSynchronizer().check_for_missing_mappings()
+            if missing_mappings:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"Widgets without mappings: {', '.join(str(id) for id in missing_mappings)}"
+                    )
+                )
+            else:
+                self.stdout.write(self.style.SUCCESS("All widgets have mappings."))
 
-    def synchronize_mapping(self, widget_name, component_name):
-        WidgetSynchronizer().synchronize_widgets(
-            widget_name=widget_name, component_name=component_name
-        )
+        elif options["operation"] == "add_mapping":
+            widget_name = options["widget_name"]
+            component_name = options["component_name"] or None
+            mapping = WidgetSynchronizer().add_mapping(
+                widget_name, component_name=component_name
+            )
+            if mapping:
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        f"Created mapping for widget '{mapping.widget.name}' with component: '{mapping.component}'"
+                    )
+                )
