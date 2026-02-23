@@ -133,6 +133,56 @@ class BranchExcelTests(TransactionTestCase):
 
         self.assertTrue(exported)
 
+    def test_export_with_missing_tile_node(self):
+        """Export should not raise KeyError when a tile's tiledata is missing a node
+        that exists in the graph (simulating a node added after tiles were created)."""
+        string_nodeid = "1dd75892-4f62-11ef-be0d-323af0a1fd6a"
+        string_nodegroup_id = "1dd75892-4f62-11ef-be0d-323af0a1fd6a"
+
+        # Remove the node UUID from a tile's tiledata, simulating a tile
+        # that was created before the node was added to the graph.
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                UPDATE tiles
+                SET tiledata = tiledata - %s
+                WHERE tileid = (
+                    SELECT tileid FROM tiles WHERE nodegroupid = %s LIMIT 1
+                )
+                """,
+                [string_nodeid, string_nodegroup_id],
+            )
+            self.assertEqual(
+                cursor.rowcount,
+                1,
+                "Expected at least one tile in the string nodegroup from setUp import",
+            )
+
+        load_id = "3d288e76-ebd3-11ee-85b8-0242ac120005"
+        graph_id = "a5c3946a-a9c0-4472-9191-ffc0f35a5901"
+        graph_name = "branch_excel_test"
+        file_name = "branch_exporter_missing_node_test"
+
+        exported_file_path = os.path.join(
+            "tests/fixtures/data/archestemp", file_name + ".zip"
+        )
+        self.addCleanup(
+            lambda: os.remove(exported_file_path)
+            if os.path.exists(exported_file_path)
+            else None
+        )
+
+        exporter = BranchExcelExporter(loadid=load_id)
+        exporter.run_export_task(
+            load_id=load_id,
+            graph_id=graph_id,
+            graph_name=graph_name,
+            resource_ids=None,
+            filename=file_name,
+        )
+
+        self.assertTrue(os.path.exists(exported_file_path))
+
     def test_cli(self):
         out = StringIO()
         excel_file_path = "tests/fixtures/data/uploadedfiles/branch_excel_test.xlsx"
