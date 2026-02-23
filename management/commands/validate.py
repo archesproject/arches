@@ -124,9 +124,9 @@ class Command(BaseValidateCommand):
             if self.options["verbosity"] > 1:
                 self.stdout.write("\t" + "-" * 36)
                 if queryset:
-                    for i, n in enumerate(queryset):
-                        if i < limit:
-                            self.stdout.write(f"\t{n}")
+                    for idx, instance in enumerate(queryset):
+                        if idx < limit:
+                            self.stdout.write(f"\t{instance}")
                         else:
                             self.stdout.write("\t\t(truncated...)")
                             break
