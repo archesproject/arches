@@ -171,11 +171,11 @@ def create_workbook(graphid, tiledata=None) -> Workbook:
                         .values("alias")
                     )
                     for i, node in enumerate(nodes):
-                        if tile[node["alias"]] is not None:
+                        if tile.get(node["alias"]) is not None:
                             sheet.cell(
                                 column=i + 4,
                                 row=row_number,
-                                value=f"{tile[node['alias']]}",
+                                value=f"{tile.get(node['alias'])}",
                             )
 
         write_metadata(wb, metadata)
@@ -228,11 +228,11 @@ def create_tile_excel_workbook(graphid, tiledata=None):
                         .values("alias")
                     )
                     for i, node in enumerate(nodes):
-                        if tile[node["alias"]] is not None:
+                        if tile.get(node["alias"]) is not None:
                             sheet.cell(
                                 column=i + 4,
                                 row=row_number,
-                                value=f"{tile[node['alias']]}",
+                                value=f"{tile.get(node['alias'])}",
                             )
                         sheet.cell(
                             column=i + 5, row=row_number, value=tile["sortorder"]
