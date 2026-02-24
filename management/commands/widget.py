@@ -16,7 +16,7 @@ class Command(WidgetCommand):
         )
 
         parser.add_argument(
-            "-p",
+            "-cp",
             "--component_path",
             action="store",
             dest="component_path",
