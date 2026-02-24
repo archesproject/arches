@@ -1587,8 +1587,13 @@ class Tile(APIBase):
 
     def post(self, request, tileid):
         resourceid = json.loads(request.POST.get("data"))["resourceinstance_id"]
+        # Important! the resource instance permission decorator on the TileView 
+        # will not be called by the instantiated view below. 
+        # Resource edit perms must be checked here.
         if not user_can_edit_resource(request.user, resourceid):
-            return JSONResponse(_("User is not permitted to edit this resource"), status=403)
+            return JSONResponse(
+                _("User is not permitted to edit this resource"), status=403
+            )
         tileview = TileView()
         tileview.action = "update_tile"
         # check that no data is on POST or FILES before assigning body to POST (otherwise request fails)
