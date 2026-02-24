@@ -24,26 +24,15 @@ class WidgetSynchronizer:
     ) -> WidgetMapping | None:
         widget = Widget.objects.filter(name=widget_name).first()
         if not widget:
-            sys.stdout.write(_(f"No widget found with the name '{widget_name}'.\n"))
-            return
+            raise ValueError(_(f"No widget found with the name '{widget_name}'."))
 
-        if widget_name == "language-widget" and not component_path:
-            component_path = "arches_component_lab/widgets/LanguageSelectWidget/LanguageSelectWidget.vue"
-
-        component = None
-        if component_path:
-            component = component_path
-        else:
-            # Provide a reasonable default mapping based on widget name
-            component_name = (
-                widget.name.title().replace(" ", "").replace("-", "").replace("_", "")
-            )
-            component = (
-                f"arches_component_lab/widgets/{component_name}/{component_name}.vue"
+        if not component_path:
+            raise ValueError(
+                _("A component path must be provided to create a widget mapping.")
             )
 
         mapping = WidgetMapping.objects.create(
             widget=widget,
-            component=component,
+            component=component_path,
         )
         return mapping
