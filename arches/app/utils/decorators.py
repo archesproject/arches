@@ -153,34 +153,3 @@ def user_created_transaction_match(function):
             raise PermissionDenied
 
     return wrapper
-
-
-def check_tile_permissions(func):
-    @functools.wraps(func)
-    def wrapper(request, *args, **kwargs):
-        permitted = False
-        user = request.user
-        if request.method == "POST":
-            resourceid = request.POST.get("resourceinstanceid", None)
-            tileid = request.POST.get("tileid", None) or kwargs.get("tileid")
-            if (
-                not resourceid
-                and tileid
-                and models.TileModel.objects.filter(pk=tileid).exists()
-            ):
-                resourceid = models.TileModel.objects.get(pk=tileid).resourceinstance_id
-            if not models.ResourceInstance.objects.filter(pk=resourceid).exists():
-                return func(request, *args, **kwargs)
-            else:
-                permitted = user_can_edit_resource(user, resourceid)
-        if request.method == "GET":
-            resourceid = request.GET.get("resourceinstanceid", None) or kwargs.get(
-                "tileid"
-            )
-            permitted = user_can_read_resource(user, resourceid)
-        if permitted:
-            return func(request, *args, **kwargs)
-        else:
-            return JSONResponse(status=403)
-
-    return wrapper

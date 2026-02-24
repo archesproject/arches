@@ -44,7 +44,7 @@ from arches.app.utils.resource_relationship_utils import (
 )
 from arches.app.utils.skos import SKOSWriter
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
-from arches.app.utils.decorators import group_required, check_tile_permissions
+from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
@@ -1567,7 +1567,6 @@ class BulkDisambiguatedResourceInstance(APIBase):
 
 
 @method_decorator(csrf_exempt, name="dispatch")
-@method_decorator(check_tile_permissions, name="dispatch")
 class Tile(APIBase):
     def get(self, request, tileid):
         try:
@@ -1579,12 +1578,17 @@ class Tile(APIBase):
         permitted_nodegroups = get_nodegroups_by_perm(
             request.user, "models.read_nodegroup"
         )
+        if not user_can_read_resource(request.user, tile.resourceinstance_id):
+            return JSONResponse(_("User not permitted to read resource"), status=403)
         if tile.nodegroup_id in permitted_nodegroups:
             return JSONResponse(tile, status=200)
         else:
             return JSONResponse(_("Tile not found."), status=404)
 
     def post(self, request, tileid):
+        resourceid = json.loads(request.POST.get("data"))["resourceinstance_id"]
+        if not user_can_edit_resource(request.user, resourceid):
+            return JSONResponse(_("User is not permitted to edit this resource"), status=403)
         tileview = TileView()
         tileview.action = "update_tile"
         # check that no data is on POST or FILES before assigning body to POST (otherwise request fails)
@@ -1722,7 +1726,7 @@ class NodeValue(APIBase):
         if resourceid and models.ResourceInstance.filter(pk=resourceid).exists():
             if not user_can_edit_resource(request.user, resourceid):
                 return JSONResponse(
-                    _("User is not permitted to edit this resource."), status=403
+                    _("User is not permitted to edit this resource"), status=403
                 )
 
         user_has_perms = request.user.has_perm("write_nodegroup", node.nodegroup)
