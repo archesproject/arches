@@ -624,16 +624,37 @@ class ResourceAPITests(ArchesTestCase):
     def test_tiles_endpoint_post(self):
         user = User.objects.get(username="ben")
         self.client.force_login(user)
+        response = self.client.get(
+            reverse("api_bulk_disambiguated_resource_instance"),
+            QUERY_STRING=f"resource_ids={self.non_legacy_resource_instanceid}",
+        )
+        self.assertTrue(
+            response.json()[str(self.non_legacy_resource_instanceid)] is not None
+        )
+
+    def test_tiles_endpoint_post(self):
+        user = User.objects.get(username="admin")
+        self.client.force_login(user)
         nodegroupid = "e7364d1e-95c4-11e8-9e7c-acde48001122"
         nodeid = "f08a3057-95c4-11e8-9761-acde48001122"
+        resourceid = "a6421f96-0eba-11f1-87e3-469c1cc4c080"
+
+        with self.subTest("resource does not exist before post"):
+            self.assertFalse(
+                models.ResourceInstance.objects.filter(pk=resourceid).exists()
+            )
+
         tileid = "97310030-0eba-11f1-87e3-469c1cc4c080"
         values = json.dumps(
             {
                 "tileid": "",
-                "data": {nodeid: 55},
+                "data": {
+                    nodegroupid: None,
+                    nodeid: 55.1,
+                },
                 "nodegroup_id": nodegroupid,
                 "parenttile_id": None,
-                "resourceinstance_id": "a6421f96-0eba-11f1-87e3-469c1cc4c080",
+                "resourceinstance_id": resourceid,
                 "sortorder": 0,
                 "transaction_id": None,
             }
@@ -647,9 +668,41 @@ class ResourceAPITests(ArchesTestCase):
             payload,
         )
 
-        self.assertEqual(
-            models.ResourceInstance.objects.get(
-                pk="a6421f96-0eba-11f1-87e3-469c1cc4c080"
-            ).tilemodel_set.count(),
-            1,
+        with self.subTest("resource is created after first post"):
+            self.assertTrue(
+                models.ResourceInstance.objects.filter(pk=resourceid).exists()
+            )
+
+        new_tileid = str(
+            models.ResourceInstance.objects.get(pk=resourceid).tilemodel_set.first().pk
         )
+        values = json.dumps(
+            {
+                "tileid": new_tileid,
+                "data": {
+                    "e7364d1e-95c4-11e8-9e7c-acde48001122": None,
+                    "f08a3057-95c4-11e8-9761-acde48001122": 75,
+                },
+                "nodegroup_id": nodegroupid,
+                "parenttile_id": None,
+                "resourceinstance_id": resourceid,
+                "sortorder": 0,
+                "transaction_id": None,
+            }
+        )
+        payload = {
+            "data": values,
+        }
+
+        self.client.post(
+            reverse("api_tiles", kwargs={"tileid": new_tileid}),
+            payload,
+        )
+
+        with self.subTest("first related tile has expected nodeid value"):
+            self.assertEqual(
+                models.ResourceInstance.objects.get(pk=resourceid)
+                .tilemodel_set.first()
+                .data[nodeid],
+                75,
+            )
