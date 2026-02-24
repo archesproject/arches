@@ -55,7 +55,10 @@ class ResourceAPITests(ArchesTestCase):
         )
         models.TileModel.objects.create(
             nodegroup_id=uuid.UUID("e7364d1e-95c4-11e8-9e7c-acde48001122"),
-            data={"f08a3057-95c4-11e8-9761-acde48001122": 55},
+            data={
+                "e7364d1e-95c4-11e8-9e7c-acde48001122": None,
+                "f08a3057-95c4-11e8-9761-acde48001122": 55,
+            },
             resourceinstance=cls.non_legacy_resource,
         )
 
