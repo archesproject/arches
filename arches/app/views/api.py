@@ -1590,10 +1590,11 @@ class Tile(APIBase):
         # Important! The resource instance permission decorator on the TileView
         # will not be called by the instance of TileView below.
         # Resource edit perms must be checked here.
-        if not user_can_edit_resource(request.user, resourceid):
-            return JSONResponse(
-                _("User is not permitted to edit this resource"), status=403
-            )
+        if resourceid and models.ResourceInstance.objects.filter(pk=resourceid):
+            if not user_can_edit_resource(request.user, resourceid):
+                return JSONResponse(
+                    _("User is not permitted to edit this resource"), status=403
+                )
         tileview = TileView()
         tileview.action = "update_tile"
         # check that no data is on POST or FILES before assigning body to POST (otherwise request fails)
