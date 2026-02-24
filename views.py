@@ -1,3 +1,4 @@
+from collections import defaultdict
 from http import HTTPStatus
 from uuid import UUID
 import filetype
@@ -199,6 +200,86 @@ class ListView(APIBase):
             )
         list_to_delete.delete()
         return JSONResponse(status=HTTPStatus.NO_CONTENT)
+
+
+class FilteredListView(APIBase):
+    def _get_parent_path(self, item, item_map, lang):
+        parts = []
+        current_id = item.get("parent_id")
+        while current_id and current_id in item_map:
+            parent = item_map[current_id]
+            parent_labels = [
+                v for v in parent.get("values", [])
+                if v.get("valuetype_id") == "prefLabel"
+            ]
+            label = next(
+                (lbl["value"] for lbl in parent_labels
+                 if lbl.get("language_id", lbl.get("languageid")) == lang),
+                next((lbl["value"] for lbl in parent_labels), ""),
+            )
+            parts.append(label)
+            current_id = parent.get("parent_id")
+        return " > ".join(reversed(parts))
+
+    def _walk(self, children_map, parent_id, depth, item_map, lang):
+        for child in children_map[parent_id]:
+            child["depth"] = depth
+            child["parent_path"] = self._get_parent_path(child, item_map, lang)
+            yield child
+            yield from self._walk(children_map, child["id"], depth + 1, item_map, lang)
+
+    def get(self, request, list_id):
+        """Returns a flat, hierarchically-ordered list with parent paths."""
+        term = request.GET.get("term", "")
+
+        try:
+            lst = List.objects.prefetch_related(*_prefetch_terms(request)).get(
+                pk=list_id
+            )
+        except List.DoesNotExist:
+            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
+
+        flat = str_to_bool(request.GET.get("flat", "false"))
+        permitted = get_nodegroups_by_perm(request.user, "read_nodegroup")
+        serialized = lst.serialize(flat=flat, permitted_nodegroups=permitted)
+
+        if "items" not in serialized:
+            return JSONResponse(serialized)
+
+        items = serialized["items"]
+
+        item_map = {item["id"]: item for item in items}
+        children_map = defaultdict(list)
+        roots = []
+        for item in items:
+            pid = item.get("parent_id")
+            if pid and pid in item_map:
+                children_map[pid].append(item)
+            else:
+                roots.append(item)
+
+        lang = request.LANGUAGE_CODE
+        ordered = []
+
+        for root in roots:
+            root["depth"] = 0
+            root["parent_path"] = ""
+            ordered.append(root)
+            ordered.extend(self._walk(children_map, root["id"], 1, item_map, lang))
+
+        if term:
+            term_lower = term.lower()
+            ordered = [
+                item for item in ordered
+                if not item.get("guide") and any(
+                    v.get("valuetype_id") == "prefLabel"
+                    and term_lower in v.get("value", "").lower()
+                    for v in item.get("values", [])
+                )
+            ]
+
+        serialized["items"] = ordered
+        return JSONResponse(serialized)
 
 
 @method_decorator(
