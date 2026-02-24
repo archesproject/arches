@@ -1700,7 +1700,6 @@ class InstancePermission(APIBase):
 
 
 @method_decorator(csrf_exempt, name="dispatch")
-@method_decorator(check_tile_permissions, name="dispatch")
 @method_decorator(
     group_required("Resource Editor", raise_exception=True), name="dispatch"
 )
@@ -1715,13 +1714,17 @@ class NodeValue(APIBase):
         operation = request.POST.get("operation")
         transaction_id = request.POST.get("transaction_id")
 
-        # get node model return error if not found
         try:
             node = models.Node.objects.get(nodeid=nodeid)
         except Exception as e:
             return JSONResponse(e, status=404)
 
-        # check if user has permissions to write to node
+        if resourceid and models.ResourceInstance.filter(pk=resourceid).exists():
+            if not user_can_edit_resource(request.user, resourceid):
+                return JSONResponse(
+                    _("User is not permitted to edit this resource."), status=403
+                )
+
         user_has_perms = request.user.has_perm("write_nodegroup", node.nodegroup)
         if user_has_perms:
             # get datatype of node
