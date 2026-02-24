@@ -124,7 +124,7 @@ function openFileChooser(): void {
         ref="fileUploadRef"
         :accept="allowedFileTypes"
         :model-value="aliasedNodeData?.node_value"
-        :multiple="true"
+        :multiple="maxFiles && maxFiles > 1 ? true : false"
         :show-cancel-button="false"
         :show-upload-button="false"
         :with-credentials="true"
