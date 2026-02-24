@@ -1727,15 +1727,15 @@ class NodeValue(APIBase):
             node = models.Node.objects.get(nodeid=nodeid)
         except Exception as e:
             return JSONResponse(_("Node not found"), status=404)
-        
+
         if not request.user.has_perm("write_nodegroup", node.nodegroup):
             return JSONResponse(
                 _("User does not have permission to edit this node."), status=403
             )
-        
+
         datatype = datatype_factory.get_instance(node.datatype)
         data = datatype.transform_value_for_tile(data, format=format)
-        
+
         try:
             tile = models.TileModel.objects.get(tileid=tileid)
             if not user_can_edit_resource(request.user, tile.resourceinstance_id):
@@ -1745,7 +1745,10 @@ class NodeValue(APIBase):
             if operation == "append":
                 data = datatype.update(tile, data, nodeid, action=operation)
         except ObjectDoesNotExist:
-            if resourceid and models.ResourceInstance.objects.filter(pk=resourceid).exists():
+            if (
+                resourceid
+                and models.ResourceInstance.objects.filter(pk=resourceid).exists()
+            ):
                 if not user_can_edit_resource(request.user, resourceid):
                     return JSONResponse(
                         _("User is not permitted to edit this resource"), status=403
