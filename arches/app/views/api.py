@@ -1726,47 +1726,41 @@ class NodeValue(APIBase):
         try:
             node = models.Node.objects.get(nodeid=nodeid)
         except Exception as e:
-            return JSONResponse(e, status=404)
-
-        if resourceid and models.ResourceInstance.filter(pk=resourceid).exists():
-            if not user_can_edit_resource(request.user, resourceid):
+            return JSONResponse(_("Node not found"), status=404)
+        
+        if not request.user.has_perm("write_nodegroup", node.nodegroup):
+            return JSONResponse(
+                _("User does not have permission to edit this node."), status=403
+            )
+        
+        datatype = datatype_factory.get_instance(node.datatype)
+        data = datatype.transform_value_for_tile(data, format=format)
+        
+        try:
+            tile = models.TileModel.objects.get(tileid=tileid)
+            if not user_can_edit_resource(request.user, tile.resourceinstance_id):
                 return JSONResponse(
                     _("User is not permitted to edit this resource"), status=403
                 )
-
-        user_has_perms = request.user.has_perm("write_nodegroup", node.nodegroup)
-        if user_has_perms:
-            # get datatype of node
-            try:
-                datatype = datatype_factory.get_instance(node.datatype)
-            except Exception as e:
-                return JSONResponse(e, status=404)
-
-            # transform data to format expected by tile
-            data = datatype.transform_value_for_tile(data, format=format)
-
-            # get existing data and append new data if operation='append'
             if operation == "append":
-                tile = models.TileModel.objects.get(tileid=tileid)
                 data = datatype.update(tile, data, nodeid, action=operation)
+        except ObjectDoesNotExist:
+            if resourceid and models.ResourceInstance.objects.filter(pk=resourceid).exists():
+                if not user_can_edit_resource(request.user, resourceid):
+                    return JSONResponse(
+                        _("User is not permitted to edit this resource"), status=403
+                    )
 
-            # update/create tile
-            new_tile = TileProxyModel.update_node_value(
-                nodeid,
-                data,
-                tileid,
-                request=request,
-                resourceinstanceid=resourceid,
-                transaction_id=transaction_id,
-            )
+        new_tile = TileProxyModel.update_node_value(
+            nodeid,
+            data,
+            tileid,
+            request=request,
+            resourceinstanceid=resourceid,
+            transaction_id=transaction_id,
+        )
 
-            response = JSONResponse(new_tile, status=200)
-        else:
-            response = JSONResponse(
-                _("User does not have permission to edit this node."), status=403
-            )
-
-        return response
+        return JSONResponse(new_tile, status=200)
 
 
 class UserIncompleteWorkflows(APIBase):
