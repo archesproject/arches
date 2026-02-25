@@ -59,6 +59,7 @@ function onUpdateModelValue(updatedValue: string[] | null) {
         :options="options"
         :placeholder="cardXNodeXWidgetData.config.placeholder"
         :fluid="true"
+        :show-clear="true"
         :model-value="aliasedNodeData?.node_value || []"
         @update:model-value="onUpdateModelValue($event)"
     />

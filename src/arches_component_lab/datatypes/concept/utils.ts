@@ -33,7 +33,8 @@ export function convertConceptOptionToFormValue(
     let conceptOptionId: string | null = null;
     if (
         typeof conceptOption === "string" ||
-        typeof conceptOption === "undefined"
+        typeof conceptOption === "undefined" ||
+        conceptOption === null
     ) {
         conceptOptionId = conceptOption;
     } else {

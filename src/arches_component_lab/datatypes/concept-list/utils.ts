@@ -13,7 +13,8 @@ export function convertSelectionToModelValue(
     conceptOptionIds: string[],
     options: CollectionItem[],
 ): ConceptListValue {
-    if (conceptOptionIds.length == 0) return blankConceptListValue();
+    if (!conceptOptionIds || conceptOptionIds.length == 0)
+        return blankConceptListValue();
     const allSelectedOptions: CollectionItem[] = Object.keys(
         conceptOptionIds,
     ).map((key) => getOption(key, options) as CollectionItem);
@@ -32,7 +33,7 @@ export function convertSelectionToModelValue(
 export function blankConceptListValue(): ConceptListValue {
     return {
         display_value: "",
-        node_value: [],
+        node_value: null,
         details: [],
     };
 }

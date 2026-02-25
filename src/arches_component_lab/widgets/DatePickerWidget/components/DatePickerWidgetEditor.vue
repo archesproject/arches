@@ -46,6 +46,19 @@ watchEffect(() => {
 });
 
 function onUpdateModelValue(updatedValue: string) {
+    if (!updatedValue) {
+        if (shouldEmitSimplifiedValue) {
+            emit("update:value", "");
+        } else {
+            emit("update:value", {
+                display_value: "",
+                node_value: null,
+                details: [],
+            });
+        }
+        return;
+    }
+
     const date = new Date(updatedValue);
 
     if (shouldEmitSimplifiedValue) {
@@ -108,6 +121,7 @@ const modelDate = computed(() => {
         :fluid="true"
         :input-id="cardXNodeXWidgetData.node.alias"
         :manual-input="false"
+        :show-clear="true"
         :model-value="modelDate"
         :show-time="shouldShowTime"
         :show-seconds="shouldShowTime"

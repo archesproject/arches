@@ -8,6 +8,6 @@ export type { ConceptFetchResult, CollectionItem };
 
 export interface ConceptListValue extends AliasedNodeData {
     display_value: string;
-    node_value: string[];
+    node_value: string[] | null;
     details: CollectionItem[];
 }
