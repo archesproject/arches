@@ -209,12 +209,16 @@ class FilteredListView(APIBase):
         while current_id and current_id in item_map:
             parent = item_map[current_id]
             parent_labels = [
-                v for v in parent.get("values", [])
+                v
+                for v in parent.get("values", [])
                 if v.get("valuetype_id") == "prefLabel"
             ]
             label = next(
-                (lbl["value"] for lbl in parent_labels
-                 if lbl.get("language_id", lbl.get("languageid")) == lang),
+                (
+                    lbl["value"]
+                    for lbl in parent_labels
+                    if lbl.get("language_id", lbl.get("languageid")) == lang
+                ),
                 next((lbl["value"] for lbl in parent_labels), ""),
             )
             parts.append(label)
@@ -270,8 +274,10 @@ class FilteredListView(APIBase):
         if term:
             term_lower = term.lower()
             ordered = [
-                item for item in ordered
-                if not item.get("guide") and any(
+                item
+                for item in ordered
+                if not item.get("guide")
+                and any(
                     v.get("valuetype_id") == "prefLabel"
                     and term_lower in v.get("value", "").lower()
                     for v in item.get("values", [])
