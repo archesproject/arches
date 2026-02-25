@@ -1099,7 +1099,7 @@ class FileListDataType(BaseDataType):
     def validate_file_types(self, request=None, nodeid=None):
         errors = []
         validator = FileValidator()
-        files = request.FILES.getlist("file-list_" + nodeid, [])
+        files = self._get_files_from_request(request, nodeid)
         for file in files:
             errors = errors + validator.validate_file_type(
                 file.file, file.name.split(".")[-1]
@@ -1173,7 +1173,7 @@ class FileListDataType(BaseDataType):
                                 ).format(metadata["name"]),
                             }
                         )
-                files = request.FILES.getlist(f"file-list_{node.nodeid}", [])
+                files = self._get_files_from_request(request, node.nodeid)
                 for file in files:
                     width, height = get_image_dimensions(file.file)
                     if not width or not height:
@@ -1332,26 +1332,7 @@ class FileListDataType(BaseDataType):
                             except models.File.DoesNotExist:
                                 logger.exception(_("File does not exist"))
 
-            # Try to get the files with the nodeid only. NB - this doesn't support saving multiple tiles in one POST
-            file_list_key = "file-list_" + nodeid
-            files = request.FILES.getlist(
-                file_list_key + "_preloaded", []
-            ) + request.FILES.getlist(
-                file_list_key,
-                [],
-            )
-
-            # If they weren't available in the POST with the nodeid, try the tile-scoped file names.
-            # This adds support for saving multiple tiles in one POST
-            if len(files) == 0:
-                # First check to see if the files have been set using the tile ID
-                file_list_key = f"file-list_{tile.tileid}-{nodeid}"
-                files = request.FILES.getlist(
-                    file_list_key + "_preloaded", []
-                ) + request.FILES.getlist(
-                    file_list_key,
-                    [],
-                )
+            files = self._get_files_from_request(request, nodeid, tile)
 
             tile_exists = models.TileModel.objects.filter(pk=tile.tileid).exists()
 
@@ -1389,6 +1370,29 @@ class FileListDataType(BaseDataType):
                                     nodeid
                                 ] = updated_file_records
                             tile_to_update.save()
+
+    def _get_files_from_request(self, request, nodeid, tile=None):
+        # Try to get the files with the nodeid only. NB - this doesn't support saving multiple tiles in one POST
+        file_list_key = "file-list_" + nodeid
+        files = request.FILES.getlist(
+            file_list_key + "_preloaded", []
+        ) + request.FILES.getlist(
+            file_list_key,
+            [],
+        )
+
+        # If they weren't available in the POST with the nodeid, try the tile-scoped file names.
+        # This adds support for saving multiple tiles in one POST
+        if len(files) == 0 and tile:
+            # First check to see if the files have been set using the tile ID
+            file_list_key = f"file-list_{tile.tileid}-{nodeid}"
+            files = request.FILES.getlist(
+                file_list_key + "_preloaded", []
+            ) + request.FILES.getlist(
+                file_list_key,
+                [],
+            )
+        return files
 
     def get_compatible_renderers(self, file_data):
         extension = Path(file_data["name"]).suffix.strip(".")
