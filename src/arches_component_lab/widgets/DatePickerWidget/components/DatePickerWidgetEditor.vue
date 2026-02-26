@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { debounce } from "es-toolkit/function";
+
 import { computed, ref, watchEffect } from "vue";
 
 import {
@@ -45,7 +47,7 @@ watchEffect(() => {
     shouldShowTime.value = convertedDateFormat.shouldShowTime;
 });
 
-function onUpdateModelValue(updatedValue: string) {
+const onUpdateModelValue = debounce((updatedValue: string) => {
     if (!updatedValue) {
         if (shouldEmitSimplifiedValue) {
             emit("update:value", "");
@@ -96,7 +98,8 @@ function onUpdateModelValue(updatedValue: string) {
         }
         emit("update:value", formValue);
     }
-}
+}, 900);
+
 const modelDate = computed(() => {
     if (!aliasedNodeData?.node_value) {
         return null;
@@ -120,7 +123,7 @@ const modelDate = computed(() => {
         :date-format="dateFormat"
         :fluid="true"
         :input-id="cardXNodeXWidgetData.node.alias"
-        :manual-input="false"
+        :manual-input="true"
         :show-clear="true"
         :model-value="modelDate"
         :show-time="shouldShowTime"
