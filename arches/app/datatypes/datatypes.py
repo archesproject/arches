@@ -717,6 +717,17 @@ class DateDataType(BaseDataType):
                 errors.append(error_message)
         return errors
 
+    def clean(self, tile, nodeid):
+        super().clean(tile, nodeid)
+        if tile.data[nodeid] == "Date of Data Entry":
+            cnw = models.CardXNodeXWidget.objects.get(node__nodeid=nodeid)
+            if cnw.config.get("dateFormat", None):
+                tile.data[nodeid] = datetime.now().strftime(
+                    self.date_format_lookup[cnw.config.get("dateFormat")]
+                )
+            else:
+                tile.data[nodeid] = ""
+
     def get_valid_date_format(self, value):
         valid = False
         valid_date_format = ""
