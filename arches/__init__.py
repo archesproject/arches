@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from arches.version import get_version
+import importlib.metadata
 
 try:
     # This will make sure the app is always imported when
@@ -10,7 +10,4 @@ try:
 except Exception as e:
     pass
 
-# VERSION[3] options = "alpha", "beta", "rc", or "final"
-VERSION = (8, 0, 9, "beta", 0)
-
-__version__ = get_version(VERSION)
+__version__ = importlib.metadata.version(__package__)

@@ -3,12 +3,12 @@ requires = ["setuptools>=77", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-dynamic = ["version"]
 name = "arches"
 readme = "README.md"
 authors = [
     {name = "Arches Project"}
 ]
+version = "8.0.10"
 license = "AGPL-3.0-or-later"
 requires-python = ">=3.11"
 description = "Arches is an open-source, web-based, geospatial information system for cultural heritage inventory and management."
@@ -86,9 +86,6 @@ Homepage = "https://archesproject.org/"
 Documentation = "https://arches.readthedocs.io"
 Repository = "https://github.com/archesproject/arches.git"
 Issues = "https://github.com/archesproject/arches/issues"
-
-[tool.setuptools.dynamic]
-version = {attr = "arches.__version__"}
 
 [tool.setuptools.packages.find]
 exclude = ["*.tests", "*.tests.*", "tests.*", "tests"]
