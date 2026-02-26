@@ -2,8 +2,11 @@ import datetime
 from tests.base_test import ArchesTestCase
 from zoneinfo import ZoneInfo
 from django.test import override_settings
-from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.datatypes.datatypes import DataTypeFactory, DateDataType
 from arches.app.models.system_settings import settings
+from datetime import datetime
+from unittest.mock import patch, MagicMock
+
 
 # these tests can be run from the command line via
 # python manage.py test tests.utils.datatypes.date_datatype_tests --settings="tests.test_settings"
@@ -97,6 +100,57 @@ class DateDataTypeTests(ArchesTestCase):
         chicago_date_tz = datatype.set_timezone(chicago_date)
 
         self.assertEqual(los_angeles_date_tz, chicago_date_tz)
+
+    def test_clean(self):
+
+        date_datatype = DateDataType()
+
+        # Create a mock tile
+        class MockTile:
+            def __init__(self, data):
+                self.data = data
+
+        nodeid = "test_node"
+
+        # Test normal case (not "Date of Data Entry")
+        tile = MockTile({nodeid: "2022-01-01"})
+        date_datatype.clean(tile, nodeid)
+        self.assertEqual(tile.data[nodeid], "2022-01-01")
+
+        # Test "Date of Data Entry" with date format config
+        with patch("arches.app.models.models.CardXNodeXWidget.objects.get") as mock_get:
+            # Setup mock with config
+            mock_widget = MagicMock()
+            mock_widget.config = {"dateFormat": "YYYY-MM-DD"}
+            mock_get.return_value = mock_widget
+
+            tile = MockTile({nodeid: "Date of Data Entry"})
+            date_datatype.clean(tile, nodeid)
+
+            # The date format YYYY-MM-DD corresponds to '%Y-%m-%d' in strftime
+            expected_format = "%Y-%m-%d"
+            # Try to parse the result to verify it's a valid date in expected format
+            try:
+                datetime.strptime(tile.data[nodeid], expected_format)
+                is_valid_date = True
+            except ValueError:
+                is_valid_date = False
+
+            self.assertTrue(
+                is_valid_date,
+                f"Date {tile.data[nodeid]} should be in format YYYY-MM-DD",
+            )
+
+        # Test "Date of Data Entry" without date format config
+        with patch("arches.app.models.models.CardXNodeXWidget.objects.get") as mock_get:
+            # Setup mock without dateFormat in config
+            mock_widget = MagicMock()
+            mock_widget.config = {}
+            mock_get.return_value = mock_widget
+
+            tile = MockTile({nodeid: "Date of Data Entry"})
+            date_datatype.clean(tile, nodeid)
+            self.assertEqual(tile.data[nodeid], "")
 
     @override_settings(DATE_IMPORT_EXPORT_FORMAT="%Y-%m-%d %H:%M:%S")
     def test_set_timezone_no_z(self, **kwarg):
