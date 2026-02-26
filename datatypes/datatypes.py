@@ -5,6 +5,8 @@ from typing import Iterable, Mapping
 
 from django.db.models import F, JSONField
 from django.utils.translation import gettext as _
+from rdflib import Graph, Literal, Namespace, URIRef
+from rdflib.namespace import RDF, RDFS
 
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models.models import Node
@@ -434,3 +436,61 @@ class ReferenceDataType(BaseDataType):
 
         except KeyError:
             pass
+
+    def get_rdf_uri(self, node, data, which="r"):
+        if not data:
+            return None
+        return [URIRef(ref["uri"]) for ref in data]
+
+    def to_rdf(self, edge_info, edge):
+        g = Graph()
+
+        if not edge_info["range_tile_data"]:
+            return g
+
+        for ref in edge_info["range_tile_data"]:
+            ref_uri = URIRef(ref["uri"])
+            g.add((ref_uri, RDF.type, URIRef(edge.rangenode.ontologyclass)))
+            g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), ref_uri))
+
+            labels = ref.get("labels", [])
+            for label in labels:
+                if label.get("valuetype_id") == "prefLabel":
+                    g.add(
+                        (
+                            ref_uri,
+                            URIRef(RDFS.label),
+                            Literal(label["value"], lang=label.get("language_id")),
+                        )
+                    )
+
+        return g
+
+    def from_rdf(self, json_ld_node):
+        if isinstance(json_ld_node, list):
+            return [
+                item
+                for node in json_ld_node
+                if (item := self._single_from_rdf(node)) is not None
+            ]
+        return self._single_from_rdf(json_ld_node)
+
+    def _single_from_rdf(self, json_ld_node):
+        uri = json_ld_node.get("@id")
+        if not uri:
+            return None
+
+        try:
+            list_item = ListItem.objects.get(uri=uri)
+        except ListItem.DoesNotExist:
+            return None
+
+        return list_item.build_tile_value()
+
+    def accepts_rdf_uri(self, uri):
+        return ListItem.objects.filter(uri=str(uri)).exists()
+
+    def ignore_keys(self):
+        return [
+            f"{RDFS.label} {RDFS.Literal}",
+        ]
