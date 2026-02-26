@@ -4,7 +4,6 @@ from zoneinfo import ZoneInfo
 from django.test import override_settings
 from arches.app.datatypes.datatypes import DataTypeFactory, DateDataType
 from arches.app.models.system_settings import settings
-from datetime import datetime
 from unittest.mock import patch, MagicMock
 
 
@@ -131,7 +130,7 @@ class DateDataTypeTests(ArchesTestCase):
             expected_format = "%Y-%m-%d"
             # Try to parse the result to verify it's a valid date in expected format
             try:
-                datetime.strptime(tile.data[nodeid], expected_format)
+                datetime.datetime.strptime(tile.data[nodeid], expected_format)
                 is_valid_date = True
             except ValueError:
                 is_valid_date = False
