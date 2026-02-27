@@ -11,7 +11,10 @@ from rest_framework import renderers
 from rest_framework import serializers
 from rest_framework.fields import empty
 
-from arches import VERSION as arches_version
+from arches import __version__ as _arches_version_str
+from packaging.version import Version
+
+arches_version = Version(_arches_version_str)
 from arches.app.models.fields.i18n import I18n_JSON, I18n_String
 from arches.app.models.models import GraphModel, Node, NodeGroup
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -175,7 +178,7 @@ class NodeFetcherMixin:
         node_filters = models.Q(graph__slug=self.graph_slug, nodegroup__isnull=False)
         children = "nodegroup_set"
         # arches_version==9.0.0
-        if arches_version >= (8, 0):
+        if arches_version >= Version("8.0"):
             node_filters &= models.Q(source_identifier=None)
             children = "children"
 
@@ -384,7 +387,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             child_query = (
                 self._root_node.nodegroup.children
                 # arches_version==9.0.0
-                if arches_version >= (8, 0)
+                if arches_version >= Version("8.0")
                 else self._root_node.nodegroup.nodegroup_set
             )
             flat_node_lookup = {node.pk: node for node in self.context["graph_nodes"]}
@@ -618,7 +621,7 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         if ret.get("tileid", object()) is None:
             ret["tileid"] = uuid.uuid4()
         # arches_version==9.0.0
-        if arches_version < (8, 0):
+        if arches_version < Version("8.0"):
             # Simulate field default provided by Arches 8+.
             ret["data"] = {}
         return ret
@@ -637,7 +640,7 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         validated_data["__as_representation"] = True
         graph_filters = models.Q(slug=self.graph_slug)
         # arches_version==9.0.0
-        if arches_version >= (8, 0):
+        if arches_version >= Version("8.0"):
             graph_filters &= models.Q(source_identifier=None)
         graph = (
             GraphModel.objects.filter(graph_filters)
@@ -724,7 +727,7 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         ret = super().build_relational_field(field_name, relation_info)
         # arches_version==9.0.0
         if field_name == "graph":
-            if arches_version >= (8, 0):
+            if arches_version >= Version("8.0"):
                 ret[1]["queryset"] = ret[1]["queryset"].filter(
                     slug=self.graph_slug, source_identifier=None
                 )
@@ -765,7 +768,7 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
 
     def get_graph_has_different_publication(self, obj):
         # arches_version==9.0.0
-        if arches_version < (8, 0):
+        if arches_version < Version("8.0"):
             return False
         return obj.graph_publication_id and (
             obj.graph_publication_id != obj.graph.publication_id

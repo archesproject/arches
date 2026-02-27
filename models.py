@@ -12,7 +12,10 @@ from django.core.exceptions import (
 from django.db import models
 from django.utils.translation import gettext as _
 
-from arches import VERSION as arches_version
+from arches import __version__ as _arches_version_str
+from packaging.version import Version
+
+arches_version = Version(_arches_version_str)
 from arches.app.models.models import GraphModel, ResourceInstance, TileModel
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
@@ -81,7 +84,7 @@ class AliasedDataMixin:
         # so we can retrieve aliased data from the queryset cache.
         from_queryset = from_queryset.filter(pk=self.pk)
         # arches_version==9.0.0
-        if arches_version >= (8, 0):
+        if arches_version >= Version("8.0"):
             # Patch out filter(pk=...) so that when refresh_from_db() calls get(),
             # it populates the cache. TODO: ask on forum about happier path.
             from_queryset.filter = lambda pk=None: from_queryset
@@ -153,7 +156,7 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         """
         # arches_version==9.0.0
         if (
-            arches_version >= (8, 0)
+            arches_version >= Version("8.0")
             and self.graph_publication_id
             and (self.graph_publication_id != self.graph.publication_id)
         ):
@@ -276,7 +279,7 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
                 proxy_resource.index()
 
         # arches_version==9.0.0
-        if arches_version < (8, 0) and request and for_new_resource:
+        if arches_version < Version("8.0") and request and for_new_resource:
             self.save_edit(
                 user=request.user,
                 transaction_id=operation.transaction_id,
@@ -355,7 +358,7 @@ class TileTree(TileModel, AliasedDataMixin):
         """
         # arches_version==9.0.0
         if (
-            arches_version >= (8, 0)
+            arches_version >= Version("8.0")
             and self.resourceinstance_id
             and self.resourceinstance.graph_publication_id
             and (
@@ -369,7 +372,7 @@ class TileTree(TileModel, AliasedDataMixin):
         # Mimic some computations trapped on TileModel.save().
         # arches_version==9.0.0
         if (
-            arches_version >= (8, 0)
+            arches_version >= Version("8.0")
             and self.sortorder is None
             or self.is_fully_provisional()
         ):
@@ -429,7 +432,7 @@ class TileTree(TileModel, AliasedDataMixin):
 
     def find_nodegroup_alias(self, grouping_node_lookup=None):
         # arches_version==9.0.0
-        if arches_version >= (8, 0):
+        if arches_version >= Version("8.0"):
             if grouping_node_lookup:
                 self.nodegroup.grouping_node = grouping_node_lookup[self.nodegroup_id]
             return super().find_nodegroup_alias()
@@ -480,7 +483,7 @@ class TileTree(TileModel, AliasedDataMixin):
                     pass
 
         # arches_version==9.0.0
-        if arches_version < (8, 0):
+        if arches_version < Version("8.0"):
             # Simulate the default supplied by v8.
             tile.data = {}
 
@@ -595,7 +598,7 @@ class TileTree(TileModel, AliasedDataMixin):
             children = (
                 nodegroup.children.all()
                 # arches_version==9.0.0
-                if arches_version >= (8, 0)
+                if arches_version >= Version("8.0")
                 else nodegroup.nodegroup_set.all()
             )
             for child_nodegroup in children:

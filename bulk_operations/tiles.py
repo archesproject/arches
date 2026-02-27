@@ -8,7 +8,10 @@ from django.db import ProgrammingError, transaction
 from django.db.models import F, Q, OuterRef, Exists
 from django.utils.translation import get_language, gettext as _
 
-from arches import VERSION as arches_version
+from arches import __version__ as _arches_version_str
+from packaging.version import Version
+
+arches_version = Version(_arches_version_str)
 from arches.app.models.models import (
     CardXNodeXWidget,
     EditLog,
@@ -74,7 +77,7 @@ class TileTreeOperation:
                 .order_by("sortorder")
             )
             # arches_version==9.0.0
-            if arches_version < (8, 0):
+            if arches_version < Version("8.0"):
                 # Cannot supply this too early, as nodegroup might be included
                 # with the request and already instantiated to a fresh object.
                 grouping_node = [
@@ -111,7 +114,7 @@ class TileTreeOperation:
     def _get_grouping_node_lookup(self):
         filters = Q(pk=F("nodegroup_id"), graph__slug=self.graph.slug)
         # arches_version==9.0.0
-        if arches_version >= (8, 0):
+        if arches_version >= Version("8.0"):
             filters &= Q(source_identifier=None)
             return {
                 node.pk: node
@@ -259,7 +262,7 @@ class TileTreeOperation:
         nodes = grouping_node.nodegroup.node_set.all()
         for tile in to_insert | to_update:
             # arches_version==9.0.0
-            if arches_version >= (8, 0):
+            if arches_version >= Version("8.0"):
                 children = tile.nodegroup.children.all()
             else:
                 children = tile.nodegroup.nodegroup_set.all()

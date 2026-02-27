@@ -8,7 +8,10 @@ import semantic_version
 from datetime import datetime, timedelta
 from django.utils.translation import gettext_lazy as _
 
-from arches import VERSION as arches_version
+from arches import __version__ as _arches_version_str
+from packaging.version import Version
+
+arches_version = Version(_arches_version_str)
 
 try:
     from arches.settings import *
@@ -151,7 +154,7 @@ INSTALLED_APPS = (
 )
 
 # arches_version==9.0.0
-if arches_version >= (8, 0):
+if arches_version >= Version("8.0"):
     INSTALLED_APPS += (
         "django_recaptcha",
         "pgtrigger",

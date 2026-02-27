@@ -19,7 +19,10 @@ from django.db.models.fields.json import KT
 from django.http import HttpRequest
 from django.utils.functional import cached_property
 
-from arches import VERSION as arches_version
+from arches import __version__ as _arches_version_str
+from packaging.version import Version
+
+arches_version = Version(_arches_version_str)
 from arches.app.models.models import ResourceInstance, TileModel
 
 from arches_querysets.datatypes.datatypes import DataTypeFactory
@@ -181,7 +184,7 @@ def get_nodegroups_here_and_below(start_nodegroup):
         nonlocal accumulator
         accumulator.append(nodegroup)
         # arches_version==9.0.0
-        if arches_version >= (8, 0):
+        if arches_version >= Version("8.0"):
             children_attr = nodegroup.children
         else:
             children_attr = nodegroup.nodegroup_set

@@ -8,7 +8,10 @@ from django.db.models.query import ModelIterable
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 
-from arches import VERSION as arches_version
+from arches import __version__ as _arches_version_str
+from packaging.version import Version
+
+arches_version = Version(_arches_version_str)
 from arches.app.models.models import Node
 
 from arches_querysets.datatypes.datatypes import DataTypeFactory
@@ -71,7 +74,7 @@ class TileTreeManager(models.Manager):
     def get_queryset(self):
         qs = super().get_queryset().select_related("resourceinstance")
         # arches_version==9.0.0
-        if arches_version >= (8, 0):
+        if arches_version >= Version("8.0"):
             # TODO: could get this once?
             qs = qs.prefetch_related("resourceinstance__from_resxres__to_resource")
             qs = qs.select_related("nodegroup__grouping_node")
@@ -138,7 +141,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
             # by providing a `nodes` argument doing the same query.
             filters = models.Q(graph__slug=graph_slug)
             # arches_version==9.0.0
-            if arches_version >= (8, 0):
+            if arches_version >= Version("8.0"):
                 filters &= models.Q(source_identifier=None)
             nodes = (
                 Node.objects.filter(filters)
@@ -152,7 +155,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         alias_expressions = generate_node_alias_expressions(self.model, nodes)
 
         # arches_version==9.0.0
-        if arches_version < (8, 0):
+        if arches_version < Version("8.0"):
             msg = "arches-querysets requires all nodes to have an alias."
             assert None not in alias_expressions, msg
 
@@ -184,7 +187,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
             qs = qs.prefetch_related(
                 models.Prefetch(
                     # arches_version==9.0.0
-                    "children" if arches_version >= (8, 0) else "tilemodel_set",
+                    "children" if arches_version >= Version("8.0") else "tilemodel_set",
                     queryset=child_tile_query,
                     # Using to_attr ensures the query results materialize into
                     # TileTree objects rather than TileModel objects. This isn't
@@ -289,7 +292,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         child_nodegroups = (
             getattr(tile.nodegroup, "children")
             # arches_version==9.0.0
-            if arches_version >= (8, 0)
+            if arches_version >= Version("8.0")
             else getattr(tile.nodegroup, "nodegroup_set")
         )
         for child_nodegroup in child_nodegroups.all():
@@ -399,7 +402,7 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
             # by providing a `nodes` argument doing the same query.
             filters = models.Q(graph__slug=graph_slug)
             # arches_version==9.0.0
-            if arches_version >= (8, 0):
+            if arches_version >= Version("8.0"):
                 filters &= models.Q(source_identifier=None)
             nodes = (
                 Node.objects.filter(filters)
@@ -418,7 +421,7 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         else:
             filters = models.Q(graph__slug=graph_slug)
             # arches_version==9.0.0
-            if arches_version >= (8, 0):
+            if arches_version >= Version("8.0"):
                 filters &= models.Q(graph__source_identifier=None)
             qs = self.filter(filters)
 
@@ -623,7 +626,7 @@ class GraphWithPrefetchingQuerySet(models.QuerySet):  # pragma: no cover
             user=user,
             notes=_("Graph created."),
         )
-        if arches_version >= (8, 0):
+        if arches_version >= Version("8.0"):
             graph.create_draft_graph()
 
         # ensures entity returned matches database entity
@@ -636,7 +639,7 @@ class GraphWithPrefetchingQuerySet(models.QuerySet):  # pragma: no cover
             qs = qs.filter(resourceinstance__in=resource_ids)
         elif graph_slug:
             # arches_version==9.0.0
-            if arches_version >= (8, 0):
+            if arches_version >= Version("8.0"):
                 qs = qs.filter(slug=graph_slug, source_identifier=None)
             else:
                 qs = qs.filter(slug=graph_slug)
@@ -644,7 +647,7 @@ class GraphWithPrefetchingQuerySet(models.QuerySet):  # pragma: no cover
             raise ValueError("graph_slug or resource_ids must be provided")
 
         # arches_version==9.0.0
-        if arches_version >= (8, 0):
+        if arches_version >= Version("8.0"):
             children = "children"
         else:
             children = "nodegroup_set"

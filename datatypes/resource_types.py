@@ -2,7 +2,10 @@ import logging
 import uuid
 from itertools import chain
 
-from arches import VERSION as arches_version
+from arches import __version__ as _arches_version_str
+from packaging.version import Version
+
+arches_version = Version(_arches_version_str)
 from arches.app.datatypes import datatypes
 from arches.app.models import models
 from django.utils.translation import get_language
@@ -74,7 +77,7 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
         related_resources = []
 
         # arches_version==9.0.0
-        if arches_version >= (8, 0):
+        if arches_version >= Version("8.0"):
             relations = resource.from_resxres.all()
         else:
             relations = resource.resxres_resource_instance_ids_from.all()
@@ -89,7 +92,7 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
             target_resource_id = uuid.UUID(inner_val["resourceId"])
             if not relations:
                 # arches_version==9.0.0
-                if arches_version >= (8, 0):
+                if arches_version >= Version("8.0"):
                     relations = models.ResourceXResource.objects.filter(
                         to_resource_id=target_resource_id
                     ).select_related("to_resource")
@@ -102,7 +105,7 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
                 to_resource_id = (
                     relation.resourceinstanceidto_id
                     # arches_version==9.0.0
-                    if arches_version < (8, 0)
+                    if arches_version < Version("8.0")
                     else relation.to_resource_id
                 )
                 if to_resource_id == target_resource_id:
@@ -110,7 +113,7 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
                         to_resource = (
                             relation.resourceinstanceidto
                             # arches_version==9.0.0
-                            if arches_version < (8, 0)
+                            if arches_version < Version("8.0")
                             else relation.to_resource
                         )
                         if to_resource is None:

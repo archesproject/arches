@@ -4,7 +4,10 @@ import uuid
 from django.db.models import F, OuterRef, prefetch_related_objects
 from django.test import TestCase
 
-from arches import VERSION as arches_version
+from arches import __version__ as _arches_version_str
+from packaging.version import Version
+
+arches_version = Version(_arches_version_str)
 from arches.app.models.graph import Graph
 from arches.app.models.models import (
     CardModel,
@@ -43,7 +46,7 @@ class GraphTestCase(TestCase):
 
         graph_proxy = Graph.objects.get(pk=cls.graph.pk)
         # arches_version==9.0.0
-        if arches_version < (8, 0):
+        if arches_version < Version("8.0"):
             graph_proxy.refresh_from_database()
             # Repair parent nodegroup link broken by get_nodegroups()!
             for node in graph_proxy.nodes.values():
@@ -69,7 +72,7 @@ class GraphTestCase(TestCase):
             name="Datatype Lookups", is_resource=True
         )
         # arches_version==9.0.0
-        if arches_version >= (8, 0):
+        if arches_version >= Version("8.0"):
             cls.graph.is_active = True
             cls.graph.save()
         cls.root_node = cls.graph.node_set.get(istopnode=True)
@@ -85,7 +88,7 @@ class GraphTestCase(TestCase):
             parentnodegroup=parent_nodegroup,
         )
         # arches_version==9.0.0
-        if arches_version >= (8, 0):
+        if arches_version >= Version("8.0"):
             nodegroup.grouping_node = grouping_node
             nodegroup.save()
         grouping_node.nodegroup = nodegroup
@@ -222,7 +225,7 @@ class GraphTestCase(TestCase):
             "number": 7,
             "date": (
                 "1979-10-12"
-                if arches_version > (8, 0)
+                if arches_version > Version("8.0")
                 else "1979-10-12T00:00:00.000-05:00"
             ),
             # "resource-instance": None,
@@ -248,15 +251,15 @@ class GraphTestCase(TestCase):
                 else:
                     raise RuntimeError("Missing datatype")
             # arches_version==9.0.0
-            if arches_version < (8, 0):
+            if arches_version < Version("8.0"):
                 widget.save()
         # arches_version==9.0.0
-        if arches_version >= (8, 0):
+        if arches_version >= Version("8.0"):
             CardXNodeXWidget.objects.bulk_update(node_widgets, ["config"])
 
     @classmethod
     def create_resources(cls):
-        if arches_version >= (8, 0):
+        if arches_version >= Version("8.0"):
             from arches.app.models.models import ResourceInstanceLifecycleState
 
             state = ResourceInstanceLifecycleState.objects.first()
@@ -275,7 +278,7 @@ class GraphTestCase(TestCase):
         }
 
         # arches_version==9.0.0
-        if arches_version >= (8, 0):
+        if arches_version >= Version("8.0"):
             resource_with_data_kwargs["resource_instance_lifecycle_state"] = state
             resource_without_data_kwargs["resource_instance_lifecycle_state"] = state
 
@@ -405,7 +408,7 @@ class GraphTestCase(TestCase):
     @classmethod
     def create_relations(cls):
         # arches_version==9.0.0
-        if arches_version < (8, 0):
+        if arches_version < Version("8.0"):
             from_resource_attr = "resourceinstanceidto"
             to_resource_attr = "resourceinstanceidfrom"
             from_graph_attr = "resourceinstancefrom_graphid"

@@ -1,6 +1,9 @@
 from django.utils.translation import get_language
 
-from arches import VERSION as arches_version
+from arches import __version__ as _arches_version_str
+from packaging.version import Version
+
+arches_version = Version(_arches_version_str)
 from arches.app.datatypes import datatypes
 from arches.app.models import models
 from arches.app.models.models import File
@@ -27,7 +30,7 @@ class FileListDataType(datatypes.FileListDataType):
             languages = models.Language.objects.all()
         language = get_language()
         # arches == 9.0.0 - remove the stringifieid_list in favor of the 8.1.0 logic
-        if arches_version < (8, 1):
+        if arches_version < Version("8.1"):
             original_value = value
             if isinstance(value, str):
                 stringified_list = value
