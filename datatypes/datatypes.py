@@ -443,20 +443,20 @@ class ReferenceDataType(BaseDataType):
         return [URIRef(ref["uri"]) for ref in data]
 
     def to_rdf(self, edge_info, edge):
-        g = Graph()
+        graph = Graph()
 
         if not edge_info["range_tile_data"]:
-            return g
+            return graph
 
         for ref in edge_info["range_tile_data"]:
             ref_uri = URIRef(ref["uri"])
-            g.add((ref_uri, RDF.type, URIRef(edge.rangenode.ontologyclass)))
-            g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), ref_uri))
+            graph.add((ref_uri, RDF.type, URIRef(edge.rangenode.ontologyclass)))
+            graph.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), ref_uri))
 
             labels = ref.get("labels", [])
             for label in labels:
                 if label.get("valuetype_id") == "prefLabel":
-                    g.add(
+                    graph.add(
                         (
                             ref_uri,
                             URIRef(RDFS.label),
@@ -464,7 +464,7 @@ class ReferenceDataType(BaseDataType):
                         )
                     )
 
-        return g
+        return graph
 
     def from_rdf(self, json_ld_node):
         if isinstance(json_ld_node, list):
