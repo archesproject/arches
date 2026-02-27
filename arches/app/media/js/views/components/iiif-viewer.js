@@ -488,6 +488,7 @@ var IIIFViewerViewmodel = function(params) {
         allowClear: false,
         dataAdapter: CustomDataAdapter,
         dropdownCssClass: "split-controls-drop",
+        minimumResultsForSearch: 0,
         templateResult: function(item) {
             if(item.loading){
                 return "";
