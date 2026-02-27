@@ -179,13 +179,14 @@ def command_startproject(args):
     name = options["name"]
     make_directory = False
 
-    options["project_name_kebab_case"] = name.replace("_", "-")
-    directory_name_will_be_changed = name != options["project_name_kebab_case"]
+    project_name_kebab_case = name.replace("_", "-")
+    options["project_name_kebab_case"] = project_name_kebab_case
+    directory_name_will_be_changed = name != project_name_kebab_case
 
     if not options["directory"] and directory_name_will_be_changed:
         if not options.get("yes"):
             response = input(
-                f"The project directory will be renamed from {name} to {options['project_name_kebab_case']}.\n"
+                f"The project directory will be renamed from {name} to {project_name_kebab_case}.\n"
                 "If this is not desired, use the --directory option to create "
                 "a directory with the name you want.\n"
                 "Consider using a name distinct from your project name.\n"
@@ -197,7 +198,7 @@ def command_startproject(args):
                 sys.exit(0)
 
         make_directory = True
-        options["directory"] = options["project_name_kebab_case"]
+        options["directory"] = project_name_kebab_case
 
     directory = options["directory"]
 
