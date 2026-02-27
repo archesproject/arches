@@ -1,5 +1,8 @@
 from django.db.models import Q
-from arches import VERSION as arches_version
+from arches import __version__ as _arches_version_str
+from packaging.version import Version
+
+arches_version = Version(_arches_version_str)
 from arches.app.models import models
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
@@ -14,7 +17,7 @@ class CardNodeWidgetConfigMixin:
             node__graph__slug=graph_slug,
             node__alias=node_alias,
         )
-        if arches_version >= (8, 0):
+        if arches_version >= Version("8.0"):
             query_filter = query_filter & Q(
                 node__source_identifier_id__isnull=True,
             )
@@ -28,7 +31,7 @@ class CardNodeWidgetConfigMixin:
         if not card_x_node_x_widget:
             # Supply default widget configuration.
             nodes = models.Node.objects.filter(graph__slug=graph_slug, alias=node_alias)
-            if arches_version >= (8, 0):
+            if arches_version >= Version("8.0"):
                 nodes = nodes.filter(source_identifier=None)
             node = nodes.get()
             datatype_factory = DataTypeFactory()
