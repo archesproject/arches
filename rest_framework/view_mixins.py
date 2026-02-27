@@ -265,6 +265,9 @@ class ArchesModelAPIMixin:
     def perform_update(self, serializer):
         self.validate_tile_data_and_save(serializer)
 
+    def perform_destroy(self, instance):
+        instance.delete(request=self.request)
+
     @staticmethod
     def flatten_validation_errors(error):
         """DRF's ValidationError doesn't really handle nesting, so unpack

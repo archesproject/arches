@@ -339,6 +339,13 @@ class TileTree(TileModel, AliasedDataMixin):
     def sealed(self, value):
         self._sealed = value
 
+    def delete(self, *args, request=None, **kwargs):
+        """Delegate to Tile.delete() so that function hooks (__preDelete),
+        edit logging, search index cleanup, and datatype post-delete
+        side effects all run."""
+        tile = Tile.objects.get(pk=self.pk)
+        return tile.delete(*args, request=request, **kwargs)
+
     def save(
         self, *, request=None, index=True, partial=True, force_admin=False, **kwargs
     ):
