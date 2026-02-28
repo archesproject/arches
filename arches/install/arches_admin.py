@@ -124,10 +124,14 @@ class ArchesProjectCommand(TemplateCommand):
                 f"dev/{complete_version[0]}.{complete_version[1]}.x"
             )
         options["arches_semantic_version"] = ".".join(
-            [str(arches.VERSION[0]), str(arches.VERSION[1]), str(arches.VERSION[2])]
+            [
+                str(complete_version[0]),
+                str(complete_version[1]),
+                str(complete_version[2]),
+            ]
         )
         options["arches_next_minor_version"] = ".".join(
-            [str(arches.VERSION[0]), str(arches.VERSION[1] + 1), "0"]
+            [str(complete_version[0]), str(complete_version[1] + 1), "0"]
         )
         options["project_name_title_case"] = project_name.title().replace("_", "")
 
