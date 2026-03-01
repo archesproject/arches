@@ -107,6 +107,8 @@ class BranchExcelExporter(BaseExcelExporter):
                         tile["resourceinstanceid"] = resource_id
                         tile_data = json.loads(tile["tiledata"])
                         for key, value in tile_data.items():
+                            if key not in node_lookup_by_id:
+                                continue
                             alias = node_lookup_by_id[key]["alias"]
                             if node_lookup_by_id[key]["datatype"] == "file-list":
                                 file_names_to_export = []

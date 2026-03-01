@@ -16,11 +16,14 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import json
+import os
 from io import StringIO
 from pathlib import Path
 
 from django.conf import settings
 from django.core.management import call_command
+from django.db import connection
 from django.http import HttpRequest
 from django.test import TransactionTestCase
 
@@ -32,6 +35,7 @@ from arches.app.utils.data_management.resource_graphs.importer import (
 from arches.app.utils.i18n import LanguageSynchronizer
 from django.contrib.auth.models import User
 
+from arches.app.etl_modules.tile_excel_exporter import TileExcelExporter
 from arches.app.etl_modules.tile_excel_importer import TileExcelImporter
 
 from arches.app.etl_modules.base_import_module import FileValidationError
@@ -87,3 +91,60 @@ class TileExcelTests(TransactionTestCase):
         new_tiles = TileModel.objects.all()
         self.assertEqual(new_tiles.count(), 6)
         self.assertEqual(new_tiles.filter(sortorder=1).count(), 2)
+
+    def test_export_with_orphaned_tile_node(self):
+        """Export should not raise KeyError when tile tiledata contains a node
+        UUID that is not in the graph (simulating a deleted node)."""
+        excel_file_path = str(
+            Path("tests", "fixtures", "data", "uploadedfiles", "tile_excel_test.xlsx")
+        )
+        call_command("etl", "tile-excel-importer", source=excel_file_path)
+
+        fake_node_id = "00000000-0000-0000-0000-000000000000"
+        name_nodegroup_id = "c9b37b7c-17b3-11eb-a708-acde48001122"
+
+        # Add a fake node UUID to a tile's tiledata, simulating an orphaned
+        # node reference after the node was deleted from the graph.
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                UPDATE tiles
+                SET tiledata = tiledata || %s::jsonb
+                WHERE tileid = (
+                    SELECT tileid FROM tiles WHERE nodegroupid = %s LIMIT 1
+                )
+                """,
+                [json.dumps({fake_node_id: "orphaned value"}), name_nodegroup_id],
+            )
+            self.assertEqual(
+                cursor.rowcount,
+                1,
+                "Expected at least one tile in the name nodegroup from importer",
+            )
+
+        load_id = "5d288e76-ebd3-11ee-85b8-0242ac120005"
+        graph_id = "c9b37a14-17b3-11eb-a708-acde48001122"
+        graph_name = "Resource Test Model"
+        file_name = "tile_exporter_orphaned_node_test"
+
+        exported_file_path = os.path.join(
+            "tests/fixtures/data/archestemp", file_name + ".zip"
+        )
+        self.addCleanup(
+            lambda: (
+                os.remove(exported_file_path)
+                if os.path.exists(exported_file_path)
+                else None
+            )
+        )
+
+        exporter = TileExcelExporter(loadid=load_id)
+        exporter.run_export_task(
+            load_id=load_id,
+            graph_id=graph_id,
+            graph_name=graph_name,
+            resource_ids=None,
+            filename=file_name,
+        )
+
+        self.assertTrue(os.path.exists(exported_file_path))

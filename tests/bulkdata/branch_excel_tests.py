@@ -185,6 +185,58 @@ class BranchExcelTests(TransactionTestCase):
 
         self.assertTrue(os.path.exists(exported_file_path))
 
+    def test_export_with_orphaned_tile_node(self):
+        """Export should not raise KeyError when tile tiledata contains a node
+        UUID that is not in the graph (simulating a deleted node)."""
+        fake_node_id = "00000000-0000-0000-0000-000000000000"
+        string_nodegroup_id = "1dd75892-4f62-11ef-be0d-323af0a1fd6a"
+
+        # Add a fake node UUID to a tile's tiledata, simulating an orphaned
+        # node reference after the node was deleted from the graph.
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                UPDATE tiles
+                SET tiledata = tiledata || %s::jsonb
+                WHERE tileid = (
+                    SELECT tileid FROM tiles WHERE nodegroupid = %s LIMIT 1
+                )
+                """,
+                [json.dumps({fake_node_id: "orphaned value"}), string_nodegroup_id],
+            )
+            self.assertEqual(
+                cursor.rowcount,
+                1,
+                "Expected at least one tile in the string nodegroup from setUp import",
+            )
+
+        load_id = "4d288e76-ebd3-11ee-85b8-0242ac120005"
+        graph_id = "a5c3946a-a9c0-4472-9191-ffc0f35a5901"
+        graph_name = "branch_excel_test"
+        file_name = "branch_exporter_orphaned_node_test"
+
+        exported_file_path = os.path.join(
+            "tests/fixtures/data/archestemp", file_name + ".zip"
+        )
+        self.addCleanup(
+            lambda: (
+                os.remove(exported_file_path)
+                if os.path.exists(exported_file_path)
+                else None
+            )
+        )
+
+        exporter = BranchExcelExporter(loadid=load_id)
+        exporter.run_export_task(
+            load_id=load_id,
+            graph_id=graph_id,
+            graph_name=graph_name,
+            resource_ids=None,
+            filename=file_name,
+        )
+
+        self.assertTrue(os.path.exists(exported_file_path))
+
     def test_cli(self):
         out = StringIO()
         excel_file_path = "tests/fixtures/data/uploadedfiles/branch_excel_test.xlsx"

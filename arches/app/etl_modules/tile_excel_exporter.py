@@ -65,6 +65,8 @@ class TileExcelExporter(BaseExcelExporter):
                 for tile in tiles:
                     tile_data = json.loads(tile["tiledata"])
                     for key, value in tile_data.items():
+                        if key not in node_lookup_by_id:
+                            continue
                         alias = node_lookup_by_id[key]["alias"]
                         datatype = node_lookup_by_id[key]["datatype"]
                         if datatype == "file-list":
