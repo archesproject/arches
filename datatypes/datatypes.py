@@ -9,7 +9,7 @@ from django.utils.translation import gettext as _
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models.models import Node
 from arches.app.models.graph import GraphValidationError
-from arches.app.search.elasticsearch_dsl_builder import Exists, Term
+from arches.app.search.elasticsearch_dsl_builder import Bool, Exists, Term
 
 from arches_controlled_lists.models import ListItem
 
@@ -407,6 +407,43 @@ class ReferenceDataType(BaseDataType):
             values_list = value.get("val", [])
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
+            elif value["op"] in ["like", "startswith", "like_uri", "startswith_uri"]:
+                search_string = values_list if isinstance(values_list, str) else ""
+                if search_string:
+                    controlled_list_id = node.config.get("controlledList")
+                    if value["op"] == "like":
+                        item_filter = {
+                            "list_item_values__value__icontains": search_string,
+                        }
+                    elif value["op"] == "startswith":
+                        item_filter = {
+                            "list_item_values__value__istartswith": search_string,
+                        }
+                    elif value["op"] == "like_uri":
+                        item_filter = {
+                            "uri__icontains": search_string,
+                        }
+                    elif value["op"] == "startswith_uri":
+                        item_filter = {
+                            "uri__istartswith": search_string,
+                        }
+                    if controlled_list_id:
+                        item_filter["list_id"] = controlled_list_id
+
+                    matching_items = ListItem.objects.filter(**item_filter)
+                    child_uris = []
+                    for item in matching_items:
+                        item.get_child_uris(uris=child_uris)
+
+                    if child_uris:
+                        uri_field = f"tiles.data.{str(node.pk)}.uri"
+                        sub_query = Bool()
+                        for uri in set(child_uris):
+                            sub_query.should(Term(field=uri_field, term=uri))
+                        sub_query.dsl["bool"]["minimum_should_match"] = 1
+                        query.must(sub_query)
+                    else:
+                        query.must(Term(field="resourceinstanceid", term="_no_match_"))
             elif values_list:
                 child_uris = []
                 for val in values_list:
