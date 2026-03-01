@@ -59,7 +59,6 @@ dependencies = [
     "pyshp==2.1.2",
     "python-memcached==1.62",
     "python-slugify==8.0.4",
-    "pytz==2023.3",
     "qrcode>=7.3.1",
     "rdflib==4.2.2",
     "requests-oauthlib==2.0.0",

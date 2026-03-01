@@ -20,7 +20,6 @@ import uuid
 import importlib
 import datetime
 import json
-import pytz
 import logging
 from types import SimpleNamespace
 from django.db import IntegrityError
@@ -29,7 +28,6 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Q
 from django.contrib.auth.models import User
-from django.utils import timezone
 from django.utils.translation import gettext as _
 from arches.app.models import models
 from arches.app.models.resource import Resource
@@ -203,7 +201,7 @@ class Tile(models.TileModel):
 
             utc_date_format = "%Y-%m-%dT%H:%M:%S.%fZ"
             timestamp_utc = str(
-                datetime.datetime.now(pytz.utc).strftime(utc_date_format)
+                datetime.datetime.now(datetime.UTC).strftime(utc_date_format)
             )
 
             provisionaledit = {
