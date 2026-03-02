@@ -66,15 +66,15 @@ class ArchesAdminCommandTests(ArchesAdminTestCase):
         project_name = "my_project"
         expected_top_level_dir = "my-project"
 
-        tmp_dir = tempfile.mkdtemp()
-        self.addCleanup(shutil.rmtree, tmp_dir, ignore_errors=True)
+        temp_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, temp_dir, ignore_errors=True)
 
         self.run_arches_admin(
             ["startproject", project_name, "--yes"],
-            cwd=tmp_dir,
+            cwd=temp_dir,
         )
 
-        top_level = os.path.join(tmp_dir, expected_top_level_dir)
+        top_level = os.path.join(temp_dir, expected_top_level_dir)
         self.assertTrue(
             os.path.isdir(top_level),
             msg=f"Expected top-level project directory '{expected_top_level_dir}' was not created.",
@@ -82,7 +82,7 @@ class ArchesAdminCommandTests(ArchesAdminTestCase):
 
         # The original snake_case name should NOT appear as a top-level directory.
         self.assertFalse(
-            os.path.isdir(os.path.join(tmp_dir, project_name)),
+            os.path.isdir(os.path.join(temp_dir, project_name)),
             msg=f"Top-level directory should be '{expected_top_level_dir}', not '{project_name}'.",
         )
 
