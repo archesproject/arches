@@ -12,7 +12,7 @@ from django.core.management.base import CommandError
 from django.utils.crypto import get_random_string
 
 from arches import __version__
-from arches.version import get_complete_version
+from packaging.version import Version
 
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arches.settings")
@@ -115,23 +115,22 @@ class ArchesProjectCommand(TemplateCommand):
         # this is used in the package.json file generated when "arches-admin startproject" is called
         # if this is not a final released version of arches (for developers) then arches_version will be blank
         # and the arches dependency defined in the generated package.json file will point to "master"
-        complete_version = get_complete_version()
-        options["arches_version"] = "master"
-        if complete_version[3] == "final":
-            options["arches_version"] = f"stable/{__version__}"
-        elif complete_version[3] in ["alpha", "beta", "rc"]:
+        complete_version = Version(__version__)
+        if complete_version.is_prerelease:
             options["arches_version"] = (
-                f"dev/{complete_version[0]}.{complete_version[1]}.x"
+                f"dev/{complete_version.major}.{complete_version.minor}.x"
             )
+        else:
+            options["arches_version"] = f"stable/{__version__}"
         options["arches_semantic_version"] = ".".join(
             [
-                str(complete_version[0]),
-                str(complete_version[1]),
-                str(complete_version[2]),
+                str(complete_version.major),
+                str(complete_version.minor),
+                str(complete_version.micro),
             ]
         )
         options["arches_next_minor_version"] = ".".join(
-            [str(complete_version[0]), str(complete_version[1] + 1), "0"]
+            [str(complete_version.major), str(complete_version.minor + 1), "0"]
         )
         options["project_name_title_case"] = project_name.title().replace("_", "")
 
