@@ -1586,7 +1586,8 @@ class Tile(APIBase):
             return JSONResponse(_("Tile not found."), status=404)
 
     def post(self, request, tileid):
-        resourceid = json.loads(request.POST.get("data"))["resourceinstance_id"]
+        data = request.POST.get("data") or request.body
+        resourceid = json.loads(data).get("resourceinstance_id")
         # Important! The resource instance permission decorator on the TileView
         # will not be called by the instance of TileView below.
         # Resource edit perms must be checked here.
