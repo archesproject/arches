@@ -72,7 +72,7 @@ class RelatableResourcesView(View):
 
         data = list(selected_resources) + sorted(
             paginator.get_page(page_number).object_list,
-            key=lambda r: r.get("display_value", "").lower(),
+            key=lambda resource: (resource.get("display_value") or "").lower(),
         )
 
         return JSONResponse(
