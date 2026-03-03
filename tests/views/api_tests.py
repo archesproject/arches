@@ -622,17 +622,6 @@ class ResourceAPITests(ArchesTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_tiles_endpoint_post(self):
-        user = User.objects.get(username="ben")
-        self.client.force_login(user)
-        response = self.client.get(
-            reverse("api_bulk_disambiguated_resource_instance"),
-            QUERY_STRING=f"resource_ids={self.non_legacy_resource_instanceid}",
-        )
-        self.assertTrue(
-            response.json()[str(self.non_legacy_resource_instanceid)] is not None
-        )
-
-    def test_tiles_endpoint_post(self):
         user = User.objects.get(username="admin")
         self.client.force_login(user)
         nodegroupid = "e7364d1e-95c4-11e8-9e7c-acde48001122"
