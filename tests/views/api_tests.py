@@ -627,12 +627,6 @@ class ResourceAPITests(ArchesTestCase):
         nodegroupid = "e7364d1e-95c4-11e8-9e7c-acde48001122"
         nodeid = "f08a3057-95c4-11e8-9761-acde48001122"
         resourceid = "a6421f96-0eba-11f1-87e3-469c1cc4c080"
-
-        with self.subTest("resource does not exist before post"):
-            self.assertFalse(
-                models.ResourceInstance.objects.filter(pk=resourceid).exists()
-            )
-
         tileid = "97310030-0eba-11f1-87e3-469c1cc4c080"
         values = json.dumps(
             {
@@ -652,6 +646,11 @@ class ResourceAPITests(ArchesTestCase):
             "data": values,
         }
 
+        with self.subTest("resource does not exist before post"):
+            self.assertFalse(
+                models.ResourceInstance.objects.filter(pk=resourceid).exists()
+            )
+
         self.client.post(
             reverse("api_tiles", kwargs={"tileid": tileid}),
             payload,
@@ -665,6 +664,7 @@ class ResourceAPITests(ArchesTestCase):
         new_tileid = str(
             models.ResourceInstance.objects.get(pk=resourceid).tilemodel_set.first().pk
         )
+
         values = json.dumps(
             {
                 "tileid": new_tileid,
