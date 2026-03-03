@@ -13,30 +13,27 @@ export async function fetchTileData(
     nodegroupAlias: string,
     tileId?: string | null | undefined,
 ): Promise<AliasedTileData> {
-    let response;
+    let tileUrl;
 
     if (tileId) {
-        response = await fetch(
-            arches.urls.api_tile(graphSlug, nodegroupAlias, tileId),
-        );
+        tileUrl = arches.urls.api_tile(graphSlug, nodegroupAlias, tileId);
     } else {
-        response = await fetch(
-            arches.urls.api_tile_blank(graphSlug, nodegroupAlias),
-        );
+        tileUrl = arches.urls.api_tile_blank(graphSlug, nodegroupAlias);
     }
 
-    try {
-        const parsed = await response.json();
-        if (response.ok) {
-            return parsed;
-        }
-        throw new Error(parsed.message);
-    } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+    const response = await fetch(tileUrl);
+    const parsed = await response.json();
+
+    if (!response.ok) {
+        throw new Error(parsed.message ?? response.statusText);
     }
+    return parsed;
 }
 
-export async function fetchCardXNodeXWidgetDataFromNodeGroup(
+// Promise-based cache: graph config is static for the lifetime of the SPA.
+const nodegroupConfigCache = new Map<string, Promise<CardXNodeXWidgetData[]>>();
+
+async function fetchCardXNodeXWidgetDataFromNodeGroupFromServer(
     graphSlug: string,
     nodegroupAlias: string,
 ): Promise<CardXNodeXWidgetData[]> {
@@ -46,16 +43,31 @@ export async function fetchCardXNodeXWidgetDataFromNodeGroup(
             nodegroupAlias,
         ),
     );
-
-    try {
-        const parsed = await response.json();
-        if (response.ok) {
-            return parsed;
-        }
-        throw new Error(parsed.message);
-    } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+    const parsed = await response.json();
+    if (!response.ok) {
+        throw new Error(parsed.message ?? response.statusText);
     }
+    return parsed;
+}
+
+export function fetchCardXNodeXWidgetDataFromNodeGroup(
+    graphSlug: string,
+    nodegroupAlias: string,
+): Promise<CardXNodeXWidgetData[]> {
+    const cacheKey = `${graphSlug}:${nodegroupAlias}`;
+
+    if (!nodegroupConfigCache.has(cacheKey)) {
+        const fetchRequest = fetchCardXNodeXWidgetDataFromNodeGroupFromServer(
+            graphSlug,
+            nodegroupAlias,
+        );
+
+        // On failure, evict so a retry can re-fetch.
+        fetchRequest.catch(() => nodegroupConfigCache.delete(cacheKey));
+        nodegroupConfigCache.set(cacheKey, fetchRequest);
+    }
+
+    return nodegroupConfigCache.get(cacheKey)!;
 }
 
 export async function upsertTile(
