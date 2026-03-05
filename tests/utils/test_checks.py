@@ -49,3 +49,31 @@ class SystemCheckTests(SimpleTestCase):
         ):
             with self.assertRaisesMessage(SystemCheckError, "arches==1.0.1"):
                 call_command("check", tag=[Tags.compatibility])
+
+    @override_settings(DEBUG=False)
+    def test_prerelease_version_compatibility(self):
+        """Pre-release arches versions should satisfy pre-release lower-bound
+        requirements, but not stable requirements.
+
+        Regression test for https://github.com/archesproject/arches/pull/12633.
+        Previously, Version.coerce("8.1.0a10") silently dropped the pre-release
+        suffix and compared as the stable "8.1.0", causing a false positive when
+        checking against a stable lower bound like ">=8.1.0".
+        """
+        core_arches_appconfig = apps.get_app_config("arches")
+        core_arches_appconfig.is_arches_application = True
+        self.addCleanup(setattr, core_arches_appconfig, "is_arches_application", False)
+
+        with mock.patch("arches.apps.__version__", "8.1.0a10"):
+            # 8.1.0a10 satisfies >=8.1.0a6 and >=8.1.0a9 — no error expected.
+            with mock.patch("arches.apps.requires", lambda _: ["arches>=8.1.0a6"]):
+                call_command("check", tag=[Tags.compatibility])
+
+            with mock.patch("arches.apps.requires", lambda _: ["arches>=8.1.0a9"]):
+                call_command("check", tag=[Tags.compatibility])
+
+            # 8.1.0a10 does NOT satisfy >=8.1.0 (stable) — error expected.
+            # With the old semantic_version + coerce approach this incorrectly passed.
+            with mock.patch("arches.apps.requires", lambda _: ["arches>=8.1.0"]):
+                with self.assertRaisesMessage(SystemCheckError, "arches>=8.1.0"):
+                    call_command("check", tag=[Tags.compatibility])
