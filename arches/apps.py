@@ -1,5 +1,4 @@
 import os
-import re
 import tomllib
 from importlib.metadata import PackageNotFoundError, requires
 from pathlib import Path
@@ -8,7 +7,8 @@ from django.apps import AppConfig, apps
 from django.conf import settings
 from django.core.checks import register, CheckMessage, Error, Tags, Warning
 from django.core.checks.messages import ERROR, WARNING
-from semantic_version import SimpleSpec, Version
+from packaging.specifiers import InvalidSpecifier, SpecifierSet
+from packaging.version import Version
 
 from arches import __version__
 from arches.app.utils.frontend_configuration_utils.generate_frontend_configuration import (
@@ -83,10 +83,7 @@ def check_arches_compatibility(app_configs, **kwargs):
             raise ValueError from None
         return project_requirements
 
-    try:
-        arches_version = Version(__version__)
-    except ValueError:
-        arches_version = Version.coerce(__version__)
+    arches_version = Version(__version__)
 
     if app_configs is None:
         app_configs = apps.get_app_configs()
@@ -114,11 +111,9 @@ def check_arches_compatibility(app_configs, **kwargs):
                 to_parse = requirement.lower().replace("arches", "").lstrip()
             else:
                 continue
-            # Some arches tags didn't use hyphens, so provide them.
-            to_parse = re.sub(r"0(a|b|rc)", r"0-\1", to_parse)
             try:
-                parsed_arches_requirement = SimpleSpec(to_parse)
-            except ValueError:
+                parsed_arches_requirement = SpecifierSet(to_parse)
+            except InvalidSpecifier:
                 # might have been arches-for-x==3 -> for-x==3, not valid; keep searching.
                 continue
             break
