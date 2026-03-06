@@ -159,13 +159,13 @@ class TileTreeOperation:
         not in the payload.
         HTTP PATCH should request delete_missing_tiles=False (default).
         """
-        original_tile_data_by_tile_id = {}
+        original_tile_by_tile_id = {}
         incoming_tiles = set()
         if isinstance(self.entry, TileModel):
             self._update_tile(
                 self.grouping_nodes_by_nodegroup_id[self.entry.nodegroup_id],
                 None,
-                original_tile_data_by_tile_id,
+                original_tile_by_tile_id,
                 incoming_tiles=incoming_tiles,
                 delete_missing_tiles=delete_missing_tiles,
             )
@@ -176,7 +176,7 @@ class TileTreeOperation:
                 self._update_tile(
                     grouping_node,
                     self.entry,
-                    original_tile_data_by_tile_id,
+                    original_tile_by_tile_id,
                     incoming_tiles=incoming_tiles,
                     delete_missing_tiles=delete_missing_tiles,
                 )
@@ -193,7 +193,7 @@ class TileTreeOperation:
         self,
         grouping_node,
         container,
-        original_tile_data_by_tile_id,
+        original_tile_by_tile_id,
         incoming_tiles,
         delete_missing_tiles=False,
     ):
@@ -255,8 +255,22 @@ class TileTreeOperation:
                     new_tile.pk = uuid.uuid4()
                 to_insert.add(new_tile)
             else:
-                original_tile_data_by_tile_id[existing_tile.pk] = {**existing_tile.data}
+                original_tile_by_tile_id[existing_tile.pk] = {
+                    "data": {**existing_tile.data},
+                    "sortorder": existing_tile.sortorder,
+                    "resourceinstance_id": existing_tile.resourceinstance_id,
+                    "nodegroup_id": existing_tile.nodegroup_id,
+                    "tileid": existing_tile.pk,
+                    "provisionaledits": (
+                        {**existing_tile.provisionaledits}
+                        if existing_tile.provisionaledits
+                        else None
+                    ),
+                    "parenttile_id": existing_tile.parenttile_id,
+                }
                 existing_tile._incoming_tile = new_tile
+                if new_tile.sortorder is not None:
+                    existing_tile.sortorder = new_tile.sortorder
                 to_update.add(existing_tile)
 
         nodes = grouping_node.nodegroup.node_set.all()
@@ -272,7 +286,7 @@ class TileTreeOperation:
                         child_nodegroup.pk
                     ],
                     container=tile._incoming_tile,
-                    original_tile_data_by_tile_id=original_tile_data_by_tile_id,
+                    original_tile_by_tile_id=original_tile_by_tile_id,
                     incoming_tiles=incoming_tiles,
                     delete_missing_tiles=delete_missing_tiles,
                 )
@@ -283,8 +297,8 @@ class TileTreeOperation:
         for tile in list(to_update):
             # Remove no-op upserts.
             if (
-                original_data := original_tile_data_by_tile_id.pop(tile.pk, None)
-            ) and tile._tile_update_is_noop(original_data):
+                original_tile := original_tile_by_tile_id.pop(tile.pk, None)
+            ) and tile._tile_update_is_noop(original_tile):
                 to_update.remove(tile)
 
         self.to_insert |= to_insert

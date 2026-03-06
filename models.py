@@ -749,16 +749,19 @@ class TileTree(TileModel, AliasedDataMixin):
             return self.parenttile.backfill_parent_tiles()
         return self
 
-    def _tile_update_is_noop(self, original_data):
+    def _tile_update_is_noop(self, original_tile):
         """Skipping no-op tile saves avoids regenerating RxR rows, at least
         given the current implementation that doesn't serialize them."""
 
         datatype_factory = DataTypeFactory()
+        if self.sortorder != original_tile["sortorder"]:
+            return False
+
         for node in self.nodegroup.node_set.all():
             if node.datatype == "semantic":
                 continue
             node_id_str = str(node.nodeid)
-            old = original_data.get(node_id_str)
+            old = original_tile["data"].get(node_id_str)
             datatype_instance = datatype_factory.get_instance(node.datatype)
             new = self.data[node_id_str]
             if not datatype_instance.values_match(old, new):
