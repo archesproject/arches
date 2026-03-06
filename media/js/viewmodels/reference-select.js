@@ -1,16 +1,16 @@
-import $ from "jquery";
-import ko from "knockout";
-import koMapping from "knockout-mapping";
-import arches from "arches";
-import WidgetViewModel from "viewmodels/widget";
+import $ from 'jquery';
+import ko from 'knockout';
+import koMapping from 'knockout-mapping';
+import arches from 'arches';
+import WidgetViewModel from 'viewmodels/widget';
 
 export default function (params) {
     const NAME_LOOKUP = {};
     var self = this;
 
-    params.configKeys = ["placeholder", "defaultValue"];
+    params.configKeys = ['placeholder', 'defaultValue'];
     this.multiple = !!ko.unwrap(params.node.config.multiValue);
-    this.displayName = ko.observable("");
+    this.displayName = ko.observable('');
     this.selectionValue = ko.observable([]); // formatted version of this.value that select2 can use
     this.activeLanguage = arches.activeLanguage;
 
@@ -23,20 +23,20 @@ export default function (params) {
                 ?.find(
                     (label) =>
                         label.language_id === arches.activeLanguage &&
-                        label.valuetype_id === "prefLabel",
+                        label.valuetype_id === 'prefLabel',
                 )?.value || arches.translations.unlabeledItem
         );
     };
 
     this.isLabel = function (value) {
-        return ["prefLabel", "altLabel"].includes(value.valuetype_id);
+        return ['prefLabel', 'altLabel'].includes(value.valuetype_id);
     };
 
     this.displayValue = ko.computed(function () {
         const val = self.value();
         let name = null;
         if (val) {
-            name = val.map((item) => self.getPrefLabel(item.labels)).join(", ");
+            name = val.map((item) => self.getPrefLabel(item.labels)).join(', ');
         }
         return name;
     });
@@ -61,8 +61,8 @@ export default function (params) {
                 const newItem = selection.map((id) => {
                     return {
                         labels: NAME_LOOKUP[id].labels,
-                        list_id: NAME_LOOKUP[id]["list_id"],
-                        uri: NAME_LOOKUP[id]["uri"],
+                        list_id: NAME_LOOKUP[id]['list_id'],
+                        uri: NAME_LOOKUP[id]['uri'],
                     };
                 });
                 self.value(newItem);
@@ -97,19 +97,19 @@ export default function (params) {
             url: arches.urls.controlled_list_filtered(
                 ko.unwrap(params.node.config.controlledList),
             ),
-            dataType: "json",
+            dataType: 'json',
             quietMillis: 250,
             data: function (requestParams) {
                 return {
-                    term: requestParams.term || "",
+                    term: requestParams.term || '',
                     flat: true,
                 };
             },
             processResults: function (data, requestParams) {
                 const items = data.items;
-                const term = (requestParams?.term || "").toLowerCase();
+                const term = (requestParams?.term || '').toLowerCase();
                 items.forEach((item) => {
-                    item["list_id"] = item.list_id;
+                    item['list_id'] = item.list_id;
                     item.uri = item.uri;
                     item.disabled = item.guide;
                     item.labels = item.values.filter((val) =>
@@ -129,7 +129,7 @@ export default function (params) {
             if (item.uri) {
                 const text =
                     self.getPrefLabel(item.labels) ||
-                    arches.translations.searching + "...";
+                    arches.translations.searching + '...';
                 NAME_LOOKUP[item.labels[0].list_item_id] = {
                     prefLabel: text,
                     labels: item.labels,
@@ -141,22 +141,21 @@ export default function (params) {
                         text +
                         '<span style="display:block;font-size:0.85em;opacity:0.6;">(' +
                         item.parent_path +
-                        ")</span>"
+                        ')</span>'
                     );
                 }
-                let indentation = "";
+                let indentation = '';
                 for (let i = 0; i < item.depth; i++) {
-                    indentation += "&nbsp;&nbsp;&nbsp;&nbsp;";
+                    indentation += '&nbsp;&nbsp;&nbsp;&nbsp;';
                 }
                 return indentation + text;
             }
         },
         templateSelection: function (item) {
-            if (!item.uri) {
-                // option has a different shape when coming from initSelection vs templateResult
+            if (!item.uri) { // option has a different shape when coming from initSelection vs templateResult
                 return item.text;
             } else {
-                return NAME_LOOKUP[item.labels[0].list_item_id]["prefLabel"];
+                return NAME_LOOKUP[item.labels[0].list_item_id]['prefLabel'];
             }
         },
         escapeMarkup: function (markup) {
