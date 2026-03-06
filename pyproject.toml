@@ -8,7 +8,7 @@ readme = "README.md"
 authors = [
     {name = "Arches Project"}
 ]
-version = "8.1.0a10"
+version = "8.1.0a11"
 license = "AGPL-3.0-or-later"
 requires-python = ">=3.11"
 description = "Arches is an open-source, web-based, geospatial information system for cultural heritage inventory and management."
