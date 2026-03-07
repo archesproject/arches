@@ -1,12 +1,11 @@
 import arches from "arches";
-import type { ResourceInstanceListOption } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
 
 export const fetchRelatableResources = async (
     graphSlug: string,
     nodeAlias: string,
     page: number,
     filterTerm?: string[] | string,
-    initialValues?: ResourceInstanceListOption[] | null | undefined,
+    initialValues?: string[] | null | undefined,
 ) => {
     const params = new URLSearchParams();
 
@@ -20,14 +19,19 @@ export const fetchRelatableResources = async (
         });
     }
     initialValues?.forEach((initialValue) => {
-        params.append("initialValue", initialValue.resource_id);
+        params.append("initialValue", initialValue);
     });
     const response = await fetch(
-        `${arches.urls.api_relatable_resources(
-            graphSlug,
-            nodeAlias,
-        )}?${params}`,
+        `${arches.urls.api_relatable_resources(graphSlug, nodeAlias)}?${params}`,
     );
+
+    const parsed = await response.json();
+    if (!response.ok) throw new Error(parsed.message || response.statusText);
+    return parsed;
+};
+
+export const fetchGraph = async (graphId: string) => {
+    const response = await fetch(`${arches.urls.graphs_api}${graphId}`);
 
     const parsed = await response.json();
     if (!response.ok) throw new Error(parsed.message || response.statusText);

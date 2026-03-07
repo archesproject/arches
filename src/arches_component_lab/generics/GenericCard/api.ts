@@ -115,6 +115,8 @@ export async function upsertTileAsJson(
     } else if (resourceInstanceId) {
         urlSegments.push(resourceInstanceId);
         endpointUrl = arches.urls.api_tile_list_create(...urlSegments);
+    } else {
+        endpointUrl = arches.urls.api_tile_new_resource(...urlSegments);
     }
 
     const httpMethod = tileId ? "PATCH" : "POST";

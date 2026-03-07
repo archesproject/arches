@@ -20,25 +20,33 @@ export interface AliasedTileData {
     tileid: string | null;
 }
 
-export interface CardXNodeXWidgetData {
-    card: {
-        name: string;
+export interface Node {
+    alias: string;
+    isrequired: boolean;
+    nodeid: string;
+    datatype: string;
+    config: {
+        [key: string]: unknown;
     };
+}
+
+export interface Card {
+    name: string;
+    sortorder: number;
+    cardid: string;
+    nodegroup_id: string;
+    nodes: Node[];
+}
+
+export interface CardXNodeXWidgetData {
+    card: Card;
     config: {
         defaultValue: unknown | null;
         placeholder?: string;
     };
     id: string;
     label: string;
-    node: {
-        alias: string;
-        isrequired: boolean;
-        nodeid: string;
-        datatype: string;
-        config: {
-            [key: string]: unknown;
-        };
-    };
+    node: Node;
     sortorder: number;
     visible: boolean;
     widget: {

@@ -7,6 +7,8 @@ import { useGettext } from "vue3-gettext";
 import Button from "primevue/button";
 import MultiSelect from "primevue/multiselect";
 
+import ResourceInstanceCreation from "@/arches_component_lab/widgets/components/ResourceInstanceCreation.vue";
+
 import { fetchRelatableResources } from "@/arches_component_lab/datatypes/resource-instance-list/api.ts";
 import { debounce } from "@/arches_component_lab/utils.ts";
 
@@ -20,8 +22,9 @@ import type {
 import type {
     ResourceInstanceDataItem,
     ResourceInstanceListOption,
+    ResourceInstanceListCardXNodeXWidgetData,
 } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type { AliasedTileData } from "@/arches_component_lab/types.ts";
 
 const {
     cardXNodeXWidgetData,
@@ -30,7 +33,7 @@ const {
     aliasedNodeData,
     shouldEmitSimplifiedValue,
 } = defineProps<{
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
+    cardXNodeXWidgetData: ResourceInstanceListCardXNodeXWidgetData;
     nodeAlias: string;
     graphSlug: string;
     aliasedNodeData: ResourceInstanceListValue | null;
@@ -46,10 +49,11 @@ const emit = defineEmits<{
 
 const { $gettext } = useGettext();
 
-const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidgetData config
+// in future iteration these may be declared in the CardXNodeXWidgetData config
+const itemSize = 36;
 
-const options = ref<{ display_value: string; resource_id: string }[]>(
-    aliasedNodeData?.details || [],
+const options = ref<ResourceInstanceListOption[]>(
+    aliasedNodeData?.details ?? [],
 );
 const isLoading = ref(false);
 const resourceResultsPage = ref(0);
@@ -57,15 +61,14 @@ const resourceResultsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 const emptyFilterMessage = ref($gettext("Search returned no results"));
 
+const selectedGraphId = ref<string>("");
+const showResourceCreation = ref(false);
+const resourceCreationDialogKey = ref(0);
+
 const resourceResultsCurrentCount = computed(() => options.value.length);
-const initialValueFromTileData = computed(() => {
-    if (aliasedNodeData?.details) {
-        return aliasedNodeData.details.map((option) => {
-            return option.resource_id;
-        });
-    }
-    return [];
-});
+const selectedValues = ref<string[]>(
+    aliasedNodeData?.details?.map((option) => option.resource_id) || [],
+);
 
 watchEffect(() => {
     getOptions(1);
@@ -85,7 +88,7 @@ async function getOptions(page: number, filterTerm?: string) {
             nodeAlias,
             page,
             filterTerm,
-            aliasedNodeData?.details,
+            selectedValues.value,
         );
 
         const references = resourceData.data.map(
@@ -154,6 +157,12 @@ function getOption(value: string): ResourceInstanceListOption | undefined {
     return options.value.find((option) => option.resource_id == value);
 }
 
+function onCreateNewResource(graphId: string) {
+    selectedGraphId.value = graphId;
+    resourceCreationDialogKey.value++;
+    showResourceCreation.value = true;
+}
+
 function onUpdateModelValue(updatedValue: string[]) {
     const options = updatedValue.map((resourceId: string) => {
         return getOption(resourceId);
@@ -170,6 +179,8 @@ function onUpdateModelValue(updatedValue: string[]) {
         },
     );
 
+    selectedValues.value = updatedValue;
+
     if (shouldEmitSimplifiedValue) {
         emit("update:value", updatedValue as string[]);
     } else {
@@ -183,6 +194,16 @@ function onUpdateModelValue(updatedValue: string[]) {
 
         emit("update:value", formattedValue);
     }
+}
+
+async function onResourceCreated(createdTile: AliasedTileData) {
+    selectedValues.value = [
+        ...selectedValues.value,
+        createdTile.resourceinstance,
+    ];
+    getOptions(1);
+    onUpdateModelValue(selectedValues.value);
+    showResourceCreation.value = false;
 }
 </script>
 
@@ -198,7 +219,7 @@ function onUpdateModelValue(updatedValue: string[]) {
         :fluid="true"
         :input-id="cardXNodeXWidgetData.node.alias"
         :loading="isLoading"
-        :model-value="initialValueFromTileData"
+        :model-value="selectedValues"
         :options="options"
         :placeholder="cardXNodeXWidgetData.config.placeholder"
         :reset-filter-on-hide="true"
@@ -208,10 +229,33 @@ function onUpdateModelValue(updatedValue: string[]) {
             loading: isLoading,
             onLazyLoad: onLazyLoadResources,
         }"
+        :overlay-visible="showResourceCreation ? false : undefined"
         @filter="onFilter"
         @before-show="getOptions(1)"
         @update:model-value="onUpdateModelValue($event)"
     >
+        <template
+            v-if="cardXNodeXWidgetData.node.config.graphs?.length"
+            #header
+        >
+            <div class="create-new-options-header">
+                <div
+                    v-for="graph in cardXNodeXWidgetData.node.config.graphs"
+                    :key="graph.graphid"
+                    class="create-new-option"
+                    @click="onCreateNewResource(graph.graphid)"
+                >
+                    {{
+                        $gettext("Create a new %{graphName}", {
+                            graphName: graph.name,
+                        })
+                    }}
+                </div>
+            </div>
+        </template>
+        <template #option="slotProps">
+            <div>{{ slotProps.option.display_value }}</div>
+        </template>
         <template #chip="slotProps">
             <div style="width: 100%">
                 <div class="chip-text">
@@ -250,6 +294,13 @@ function onUpdateModelValue(updatedValue: string[]) {
             </div>
         </template>
     </MultiSelect>
+
+    <ResourceInstanceCreation
+        v-if="showResourceCreation"
+        :key="resourceCreationDialogKey"
+        :graph-id="selectedGraphId!"
+        @resource-created="onResourceCreated"
+    />
 </template>
 
 <style scoped>
@@ -284,5 +335,35 @@ function onUpdateModelValue(updatedValue: string[]) {
 :deep(.p-multiselect-label-container) {
     white-space: break-spaces;
     width: inherit;
+}
+</style>
+
+<style>
+.p-multiselect-overlay {
+    display: flex;
+    flex-direction: column;
+}
+
+.p-multiselect-header {
+    order: 0;
+}
+
+.create-new-options-header {
+    order: 1;
+}
+
+.p-multiselect-list-container,
+.p-virtualscroller {
+    order: 2;
+}
+
+.create-new-option {
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+}
+
+.create-new-option:hover {
+    background: var(--p-multiselect-option-focus-background);
 }
 </style>

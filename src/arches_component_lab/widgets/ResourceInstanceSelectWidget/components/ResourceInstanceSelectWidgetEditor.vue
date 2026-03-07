@@ -5,6 +5,8 @@ import { useGettext } from "vue3-gettext";
 
 import Select from "primevue/select";
 
+import ResourceInstanceCreation from "@/arches_component_lab/widgets/components/ResourceInstanceCreation.vue";
+
 import { fetchRelatableResources } from "@/arches_component_lab/datatypes/resource-instance/api.ts";
 import { debounce } from "@/arches_component_lab/utils.ts";
 
@@ -15,9 +17,10 @@ import type {
     ResourceInstanceValue,
     ResourceInstanceDataItem,
     ResourceInstanceSelectOption,
+    ResourceInstanceCardXNodeXWidgetData,
 } from "@/arches_component_lab/datatypes/resource-instance/types.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types";
+import type { AliasedTileData } from "@/arches_component_lab/types";
 
 const {
     cardXNodeXWidgetData,
@@ -27,7 +30,7 @@ const {
     shouldEmitSimplifiedValue,
     defaultTerm,
 } = defineProps<{
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
+    cardXNodeXWidgetData: ResourceInstanceCardXNodeXWidgetData;
     nodeAlias: string;
     graphSlug: string;
     aliasedNodeData: ResourceInstanceValue | null;
@@ -44,10 +47,11 @@ const emit = defineEmits<{
 
 const { $gettext } = useGettext();
 
-const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidgetData config
+// in future iteration these may be declared in the CardXNodeXWidgetData config
+const itemSize = 36;
 
-const options = ref<{ display_value: string; resource_id: string }[]>(
-    aliasedNodeData?.details || [],
+const options = ref<ResourceInstanceSelectOption[]>(
+    aliasedNodeData?.details ?? [],
 );
 const isLoading = ref(false);
 const resourceResultsPage = ref(0);
@@ -55,7 +59,14 @@ const resourceResultsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 const emptyFilterMessage = ref($gettext("Search returned no results"));
 
+const selectedGraphId = ref<string>("");
+const showResourceCreation = ref(false);
+const resourceCreationDialogKey = ref(0);
+
 const resourceResultsCurrentCount = computed(() => options.value.length);
+const selectedValue = ref<string | null>(
+    aliasedNodeData?.details?.[0]?.resource_id ?? null,
+);
 
 watchEffect(() => {
     getOptions(1);
@@ -81,7 +92,7 @@ async function getOptions(page: number, filterTerm?: string) {
             nodeAlias,
             page,
             filterTerms,
-            aliasedNodeData?.details?.[0]?.resource_id,
+            selectedValue.value || aliasedNodeData?.details?.[0]?.resource_id,
         );
 
         const references = resourceData.data.map(
@@ -147,21 +158,22 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
 }
 
 function getOption(value: string): ResourceInstanceSelectOption | undefined {
-    return options.value.find((option) => option.resource_id == value);
+    return options.value.find((option) => option.resource_id === value);
+}
+
+function onCreateNewResource(graphId: string) {
+    selectedGraphId.value = graphId;
+    resourceCreationDialogKey.value++;
+    showResourceCreation.value = true;
 }
 
 function onUpdateModelValue(updatedValue: string | null) {
-    const selectedValue = updatedValue ?? "";
+    selectedValue.value = updatedValue;
 
-    const option = getOption(selectedValue);
+    const option = updatedValue ? getOption(updatedValue) : undefined;
 
     if (shouldEmitSimplifiedValue) {
-        if (updatedValue === null) {
-            emit("update:value", []);
-        } else {
-            emit("update:value", [selectedValue]);
-        }
-        return;
+        emit("update:value", updatedValue ? [updatedValue] : []);
     } else {
         emit("update:value", {
             display_value: option ? option.display_value : "",
@@ -169,13 +181,20 @@ function onUpdateModelValue(updatedValue: string | null) {
                 ? {
                       inverseOntologyProperty: "",
                       ontologyProperty: "",
-                      resourceId: selectedValue,
+                      resourceId: updatedValue,
                       resourceXresourceId: "",
                   }
                 : null,
             details: option ? [option] : [],
         } as ResourceInstanceValue);
     }
+}
+
+async function onResourceCreated(createdTile: AliasedTileData) {
+    selectedValue.value = createdTile.resourceinstance;
+    getOptions(1);
+    onUpdateModelValue(selectedValue.value);
+    showResourceCreation.value = false;
 }
 </script>
 
@@ -191,7 +210,7 @@ function onUpdateModelValue(updatedValue: string | null) {
         :fluid="true"
         :label-id="cardXNodeXWidgetData.node.alias"
         :loading="isLoading"
-        :model-value="aliasedNodeData?.details?.[0]?.resource_id"
+        :model-value="selectedValue"
         :options="options"
         :placeholder="cardXNodeXWidgetData.config.placeholder"
         :reset-filter-on-hide="true"
@@ -202,8 +221,65 @@ function onUpdateModelValue(updatedValue: string | null) {
             loading: isLoading,
             onLazyLoad: onLazyLoadResources,
         }"
+        :overlay-visible="showResourceCreation ? false : undefined"
         @filter="onFilter"
         @before-show="getOptions(1)"
         @update:model-value="onUpdateModelValue($event)"
+    >
+        <template
+            v-if="cardXNodeXWidgetData.node.config.graphs?.length"
+            #header
+        >
+            <div class="create-new-options-header">
+                <div
+                    v-for="graph in cardXNodeXWidgetData.node.config.graphs"
+                    :key="graph.graphid"
+                    class="create-new-option"
+                    @click="onCreateNewResource(graph.graphid)"
+                >
+                    {{
+                        $gettext("Create a new %{graphName}", {
+                            graphName: graph.name,
+                        })
+                    }}
+                </div>
+            </div>
+        </template>
+    </Select>
+    <ResourceInstanceCreation
+        v-if="showResourceCreation"
+        :key="resourceCreationDialogKey"
+        :graph-id="selectedGraphId!"
+        @resource-created="onResourceCreated"
     />
 </template>
+
+<style>
+.p-select-overlay {
+    display: flex;
+    flex-direction: column;
+}
+
+.p-select-header {
+    order: 0;
+}
+
+.create-new-options-header {
+    order: 1;
+}
+
+.p-select-list-container,
+.p-virtualscroller {
+    order: 2;
+}
+
+.create-new-option {
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+}
+
+.create-new-option:hover {
+    background: var(--p-select-option-focus-background);
+}
+</style>
