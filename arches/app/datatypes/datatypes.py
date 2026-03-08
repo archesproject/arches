@@ -2662,6 +2662,8 @@ class LanguageDataType(BaseDataType):
     def lookup_language(self, value) -> models.Language | None:
         if type(value) == list and len(value) > 0:
             value = value[0]  # Arches with i18n may send list of values
+        if not value:
+            return None
         if value in self.language_lookup:
             return self.language_lookup[value]
         language = models.Language.objects.filter(Q(code=value) | Q(name=value)).first()

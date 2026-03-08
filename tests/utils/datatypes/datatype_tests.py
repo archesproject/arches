@@ -324,6 +324,13 @@ class LanguageDataTypeTests(ArchesTestCase):
         some_errors = language.validate("jc")
         self.assertEqual(len(some_errors), 1)
 
+    def test_get_display_value_none_no_query(self):
+        language = DataTypeFactory().get_instance("language")
+        node = Node()
+        tile = TileModel(data={str(node.pk): None})
+        with self.assertNumQueries(0):
+            self.assertEqual(language.get_display_value(tile, node), "")
+
     def test_tile_transform(self):
         language = DataTypeFactory().get_instance("language")
 
