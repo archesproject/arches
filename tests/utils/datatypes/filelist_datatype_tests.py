@@ -1,5 +1,11 @@
+import uuid
 from pathlib import Path
+from unittest.mock import Mock
+
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.utils.datastructures import MultiValueDict
 from django.utils.translation import get_language
+
 from arches.app.datatypes.datatypes import DataTypeFactory
 from django.test import TestCase
 from arches.app.models.system_settings import settings
@@ -76,3 +82,60 @@ class FileListDataTypeTests(TestCase):
                 tile_value[1]["description"][language]["value"], "A File for Testing"
             )
             self.assertEqual(tile_value[1]["title"][language]["value"], "Test File 4")
+
+    def test_get_files_from_request(self):
+        datatype = DataTypeFactory().get_instance("file-list")
+        nodeid = str(uuid.uuid4())
+        tile_id = str(uuid.uuid4())
+
+        file1 = SimpleUploadedFile("file1.png", b"content1", content_type="image/png")
+        file2 = SimpleUploadedFile("file2.png", b"content2", content_type="image/png")
+        preloaded = SimpleUploadedFile(
+            "preloaded.png", b"preloaded", content_type="image/png"
+        )
+
+        node_key = f"file-list_{nodeid}"
+        tile_key = f"file-list_{tile_id}-{nodeid}"
+
+        mock_tile = Mock()
+        mock_tile.tileid = tile_id
+        request = Mock()
+
+        with self.subTest("files found via nodeid key"):
+            request.FILES = MultiValueDict({node_key: [file1, file2]})
+            result = datatype._get_files_from_request(request, nodeid)
+            self.assertEqual(result, [file1, file2])
+
+        with self.subTest("preloaded and regular files are concatenated"):
+            request.FILES = MultiValueDict(
+                {f"{node_key}_preloaded": [preloaded], node_key: [file1]}
+            )
+            result = datatype._get_files_from_request(request, nodeid)
+            self.assertEqual(result, [preloaded, file1])
+
+        with self.subTest("falls back to tile-scoped key when nodeid key is empty"):
+            request.FILES = MultiValueDict({tile_key: [file1, file2]})
+            result = datatype._get_files_from_request(request, nodeid, tile=mock_tile)
+            self.assertEqual(result, [file1, file2])
+
+        with self.subTest("tile-scoped preloaded and regular files are concatenated"):
+            request.FILES = MultiValueDict(
+                {f"{tile_key}_preloaded": [preloaded], tile_key: [file1]}
+            )
+            result = datatype._get_files_from_request(request, nodeid, tile=mock_tile)
+            self.assertEqual(result, [preloaded, file1])
+
+        with self.subTest("nodeid key takes priority over tile-scoped key"):
+            request.FILES = MultiValueDict({node_key: [file1], tile_key: [file2]})
+            result = datatype._get_files_from_request(request, nodeid, tile=mock_tile)
+            self.assertEqual(result, [file1])
+
+        with self.subTest("no files, no tile → empty list"):
+            request.FILES = MultiValueDict({})
+            result = datatype._get_files_from_request(request, nodeid)
+            self.assertEqual(result, [])
+
+        with self.subTest("no files anywhere, tile provided → empty list"):
+            request.FILES = MultiValueDict({})
+            result = datatype._get_files_from_request(request, nodeid, tile=mock_tile)
+            self.assertEqual(result, [])
