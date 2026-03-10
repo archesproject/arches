@@ -119,7 +119,9 @@ async function focusWidgetInputForNodeAlias(nodeAlias: string) {
             }
 
             const inputElementToFocus =
-                widgetRootElement.querySelector<HTMLElement>(`#${nodeAlias}`);
+                widgetRootElement.querySelector<HTMLElement>(
+                    `[id="${nodeAlias}"]`,
+                );
 
             if (inputElementToFocus) {
                 inputElementToFocus.focus();
