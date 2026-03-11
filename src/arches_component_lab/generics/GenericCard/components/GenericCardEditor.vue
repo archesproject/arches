@@ -326,7 +326,7 @@ defineExpose({ save });
 .form {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 1.4rem;
 }
 
 .form-action-buttons {

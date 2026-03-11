@@ -105,7 +105,9 @@ defineExpose({
             {{ configurationError.message }}
         </Message>
         <template v-else>
-            <span>{{ cardXNodeXWidgetData[0].card.name }}</span>
+            <span class="card-name">{{
+                cardXNodeXWidgetData[0].card.name
+            }}</span>
 
             <GenericCardEditor
                 v-if="mode === EDIT"
@@ -146,5 +148,10 @@ defineExpose({
     flex-direction: column;
     gap: 0.5rem;
     width: 100%;
+}
+.card-name {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
 }
 </style>
