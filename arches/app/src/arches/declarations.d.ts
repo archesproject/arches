@@ -15,6 +15,7 @@ declare module "lt-themify-icons";
 declare module "requirejs-plugins";
 declare module "requirejs-text";
 declare module "select-woo";
+declare module "numeral";
 
 // declare filetypes used in `./src/` folder
 declare module "*.ts";
