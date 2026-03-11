@@ -11,6 +11,7 @@ defineProps<{
     <div :key="aliasedNodeData?.details?.[0]?.resource_id">
         <a
             :href="`${arches.urls.resource_editor}${aliasedNodeData?.details?.[0]?.resource_id}`"
+            class="resource-instance-link"
         >
             {{ aliasedNodeData?.details?.[0]?.display_value }}
         </a>

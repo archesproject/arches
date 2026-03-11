@@ -14,6 +14,7 @@ defineProps<{
     >
         <a
             :href="`${arches.urls.resource_editor}${resourceInstanceDetail.resource_id}`"
+            class="resource-instance-link"
         >
             {{ resourceInstanceDetail.display_value }}
         </a>
