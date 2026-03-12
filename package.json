@@ -91,7 +91,7 @@
         "webpack-bundle-tracker": "^3.1.0"
     },
     "devDependencies": {
-        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/7.6.x"
+        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#cbyrd/remove-copy-webpack-plugin"
     },
     "nodeModulesPaths": {
         "nifty": "plugins/nifty",
