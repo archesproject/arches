@@ -7,17 +7,17 @@
         <span data-bind="text: $root.translations.controlledList"></span>
     </div>
     <!-- ko if: $data.controlledLists() -->
-        <select 
+        <select
             data-bind="
-                options: $data.controlledLists, 
-                optionsText: 'name', 
-                optionsValue: 'id', 
+                options: $data.controlledLists,
+                optionsText: 'name',
+                optionsValue: 'id',
                 select2Query: {
                     select2Config:{
                         disable: false,
                         value: $data.controlledList,
                         allowClear: true,
-                        placeholder: $root.translations.selectAControlledList, 
+                        placeholder: $root.translations.selectAControlledList,
                 }},
                 attr: {'data-label': $root.translations.controlledList}
             "
@@ -49,6 +49,10 @@
                 data: [
                     { text: $root.translations.equals, id: 'eq' },
                     { text: $root.translations.not, id: '!eq' },
+                    { text: $root.translations.like, id: 'like' },
+                    { text: $root.translations.startsWith, id: 'startswith' },
+                    { text: $root.translations.uriLike, id: 'like_uri' },
+                    { text: $root.translations.uriStartsWith, id: 'startswith_uri' },
                     { text: $root.translations.hasNoValue, id: 'null' },
                     { text: $root.translations.hasAnyValue, id: 'not_null' },
                     { text: $root.translations.hasAnyListValue, id: 'in_list_any' },
@@ -60,6 +64,23 @@
     </select>
 </div>
 
+<!-- ko if: isStringOp() -->
+<div class="col-md-8 col-lg-9">
+    <input
+        type="text"
+        class="form-control input-lg"
+        style="height: 36px;"
+        data-bind="
+            attr: {
+                placeholder: 'Enter a search pattern...',
+                'aria-label': node.label
+            },
+            textInput: searchString
+        "
+    >
+</div>
+<!-- /ko -->
+<!-- ko ifnot: isStringOp() -->
 <div class="col-md-8 col-lg-9" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
     <!-- ko if: !ko.unwrap(op).includes('in_list') -->
     <select style="display:inline-block;"
@@ -82,4 +103,5 @@
     </select>
     <!-- /ko -->
 </div>
+<!-- /ko -->
 <!-- /ko -->

@@ -5,11 +5,13 @@ from typing import Iterable, Mapping
 
 from django.db.models import F, JSONField
 from django.utils.translation import gettext as _
+from rdflib import Graph, Literal, Namespace, URIRef
+from rdflib.namespace import RDF, RDFS
 
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models.models import Node
 from arches.app.models.graph import GraphValidationError
-from arches.app.search.elasticsearch_dsl_builder import Exists, Term
+from arches.app.search.elasticsearch_dsl_builder import Bool, Exists, Term
 
 from arches_controlled_lists.models import ListItem
 
@@ -407,6 +409,43 @@ class ReferenceDataType(BaseDataType):
             values_list = value.get("val", [])
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
+            elif value["op"] in ["like", "startswith", "like_uri", "startswith_uri"]:
+                search_string = values_list if isinstance(values_list, str) else ""
+                if search_string:
+                    controlled_list_id = node.config.get("controlledList")
+                    if value["op"] == "like":
+                        item_filter = {
+                            "list_item_values__value__icontains": search_string,
+                        }
+                    elif value["op"] == "startswith":
+                        item_filter = {
+                            "list_item_values__value__istartswith": search_string,
+                        }
+                    elif value["op"] == "like_uri":
+                        item_filter = {
+                            "uri__icontains": search_string,
+                        }
+                    elif value["op"] == "startswith_uri":
+                        item_filter = {
+                            "uri__istartswith": search_string,
+                        }
+                    if controlled_list_id:
+                        item_filter["list_id"] = controlled_list_id
+
+                    matching_items = ListItem.objects.filter(**item_filter)
+                    child_uris = []
+                    for item in matching_items:
+                        item.get_child_uris(uris=child_uris)
+
+                    if child_uris:
+                        uri_field = f"tiles.data.{str(node.pk)}.uri"
+                        sub_query = Bool()
+                        for uri in set(child_uris):
+                            sub_query.should(Term(field=uri_field, term=uri))
+                        sub_query.dsl["bool"]["minimum_should_match"] = 1
+                        query.must(sub_query)
+                    else:
+                        query.must(Term(field="resourceinstanceid", term="_no_match_"))
             elif values_list:
                 child_uris = []
                 for val in values_list:
@@ -434,3 +473,61 @@ class ReferenceDataType(BaseDataType):
 
         except KeyError:
             pass
+
+    def get_rdf_uri(self, node, data, which="r"):
+        if not data:
+            return None
+        return [URIRef(ref["uri"]) for ref in data]
+
+    def to_rdf(self, edge_info, edge):
+        graph = Graph()
+
+        if not edge_info["range_tile_data"]:
+            return graph
+
+        for ref in edge_info["range_tile_data"]:
+            ref_uri = URIRef(ref["uri"])
+            graph.add((ref_uri, RDF.type, URIRef(edge.rangenode.ontologyclass)))
+            graph.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), ref_uri))
+
+            labels = ref.get("labels", [])
+            for label in labels:
+                if label.get("valuetype_id") == "prefLabel":
+                    graph.add(
+                        (
+                            ref_uri,
+                            URIRef(RDFS.label),
+                            Literal(label["value"], lang=label.get("language_id")),
+                        )
+                    )
+
+        return graph
+
+    def from_rdf(self, json_ld_node):
+        if isinstance(json_ld_node, list):
+            return [
+                item
+                for node in json_ld_node
+                if (item := self._single_from_rdf(node)) is not None
+            ]
+        return self._single_from_rdf(json_ld_node)
+
+    def _single_from_rdf(self, json_ld_node):
+        uri = json_ld_node.get("@id")
+        if not uri:
+            return None
+
+        try:
+            list_item = ListItem.objects.get(uri=uri)
+        except ListItem.DoesNotExist:
+            return None
+
+        return list_item.build_tile_value()
+
+    def accepts_rdf_uri(self, uri):
+        return ListItem.objects.filter(uri=str(uri)).exists()
+
+    def ignore_keys(self):
+        return [
+            f"{RDFS.label} {RDFS.Literal}",
+        ]

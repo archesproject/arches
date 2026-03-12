@@ -36,7 +36,14 @@ export default function (params) {
         const val = self.value();
         let name = null;
         if (val) {
-            name = val.map((item) => self.getPrefLabel(item.labels)).join(", ");
+            if (typeof val === "string") {
+                // This is only when using the "like" function of advanced search
+                name = val;
+            } else {
+                name = val
+                    .map((item) => self.getPrefLabel(item.labels))
+                    .join(", ");
+            }
         }
         return name;
     });
