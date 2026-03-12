@@ -183,6 +183,13 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
             **kwargs,
         )
 
+    def delete(self, *args, request=None, **kwargs):
+        """Delegate to Resource.delete() so that edit logging, search index
+        cleanup, and related resource side effects all run."""
+        resource = Resource.objects.get(pk=self.pk)
+        user = getattr(request, "user", None)
+        return resource.delete(user=user if user is not None else {})
+
     @classmethod
     def get_tiles(
         cls,
