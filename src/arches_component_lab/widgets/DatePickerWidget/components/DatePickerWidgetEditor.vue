@@ -107,7 +107,7 @@ const modelDate = computed(() => {
     if (shouldShowTime.value) {
         return new Date(aliasedNodeData?.node_value as string);
     }
-    const incommingDate = new Date(aliasedNodeData?.node_value as string);
+    const incommingDate = new Date(aliasedNodeData?.display_value as string);
     const day = new Date(incommingDate).getUTCDate();
     const month = new Date(incommingDate).getUTCMonth();
     const year = new Date(incommingDate).getUTCFullYear();
