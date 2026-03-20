@@ -94,25 +94,27 @@ export default function (params) {
 
     this.select2Config = {
         value: self.selectionValue,
-        minimumResultsForSearch: -1,
+        minimumInputLength: 0,
         clickBubble: true,
         multiple: this.multiple,
         closeOnSelect: true,
         placeholder: self.placeholder,
         allowClear: true,
         ajax: {
-            url: arches.urls.controlled_list(
+            url: arches.urls.controlled_list_filtered(
                 ko.unwrap(params.node.config.controlledList),
             ),
             dataType: "json",
             quietMillis: 250,
             data: function (requestParams) {
                 return {
+                    term: requestParams.term || "",
                     flat: true,
                 };
             },
-            processResults: function (data) {
+            processResults: function (data, requestParams) {
                 const items = data.items;
+                const term = (requestParams?.term || "").toLowerCase();
                 items.forEach((item) => {
                     item["list_id"] = item.list_id;
                     item.uri = item.uri;
@@ -120,21 +122,17 @@ export default function (params) {
                     item.labels = item.values.filter((val) =>
                         self.isLabel(val),
                     );
+                    if (term) {
+                        item._filtered = true;
+                    }
                 });
                 return {
                     results: items,
-                    pagination: {
-                        more: false,
-                    },
+                    pagination: { more: false },
                 };
             },
         },
         templateResult: function (item) {
-            let indentation = "";
-            for (let i = 0; i < item.depth; i++) {
-                indentation += "&nbsp;&nbsp;&nbsp;&nbsp;";
-            }
-
             if (item.uri) {
                 const text =
                     self.getPrefLabel(item.labels) ||
@@ -145,6 +143,18 @@ export default function (params) {
                     list_id: item.list_id,
                     uri: item.uri,
                 };
+                if (item._filtered && item.parent_path) {
+                    return (
+                        text +
+                        '<span style="display:block;font-size:0.85em;opacity:0.6;">(' +
+                        item.parent_path +
+                        ")</span>"
+                    );
+                }
+                let indentation = "";
+                for (let i = 0; i < item.depth; i++) {
+                    indentation += "&nbsp;&nbsp;&nbsp;&nbsp;";
+                }
                 return indentation + text;
             }
         },

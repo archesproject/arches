@@ -4,6 +4,7 @@ from django.conf.urls.i18n import i18n_patterns
 from django.urls import include, path
 
 from arches_controlled_lists.views import (
+    FilteredListView,
     ListsView,
     ListView,
     ListExportView,
@@ -21,6 +22,11 @@ urlpatterns = [
         "api/controlled_list/<uuid:list_id>",
         ListView.as_view(),
         name="controlled_list",
+    ),
+    path(
+        "api/filtered_controlled_list/<uuid:list_id>",
+        FilteredListView.as_view(),
+        name="filtered_controlled_list",
     ),
     path("api/controlled_list", ListView.as_view(), name="controlled_list_add"),
     path(
