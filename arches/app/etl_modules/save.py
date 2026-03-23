@@ -1,13 +1,13 @@
 from datetime import datetime
 import json
 from urllib.parse import urlsplit, parse_qs
-from django.db.utils import IntegrityError, ProgrammingError
 from django.contrib.auth.models import User
 from django.core.validators import URLValidator
 from django.db import connection
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
 from django.urls import reverse, resolve, get_script_prefix
+from arches.app.etl_modules.staging_to_tile import staging_to_tile
 from arches.app.models.system_settings import settings
 from arches.app.utils.index_database import index_resources_by_transaction
 import logging
@@ -18,11 +18,28 @@ logger = logging.getLogger(__name__)
 def save_to_tiles(userid, loadid, multiprocessing=False):
     with connection.cursor() as cursor:
         disable_tile_triggers(cursor, loadid)
-        error_saving_tiles = _save_to_tiles(cursor, loadid)
-        reenable_tile_triggers(cursor, loadid)
-        if error_saving_tiles:
-            return error_saving_tiles
+        error = None
+        try:
+            log_event_details(cursor, loadid, "done|Saving the tiles...")
+            staging_to_tile(loadid)
+            _update_load_details(cursor, loadid)
+        except Exception as e:
+            logger.error(e)
+            cursor.execute(
+                """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                ("failed", datetime.now(), loadid),
+            )
+            error = {
+                "status": 400,
+                "success": False,
+                "title": _("Failed to complete load"),
+                "message": _("Unable to insert record into staging table"),
+            }
+        finally:
+            reenable_tile_triggers(cursor, loadid)
 
+        if error:
+            return error
         return _post_save_edit_log(cursor, userid, loadid, multiprocessing)
 
 
@@ -58,75 +75,51 @@ def reenable_tile_triggers(cursor, loadid):
     )
 
 
-def _save_to_tiles(cursor, loadid):
-    try:
-        log_event_details(cursor, loadid, "done|Saving the tiles...")
-        cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [loadid])
-        saved = cursor.fetchone()[0]
-        if not saved:
-            cursor.execute(
-                """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                ("failed", datetime.now(), loadid),
-            )
-            return {"success": False, "data": "failed"}
-        else:
-            log_event_details(cursor, loadid, "done|Getting the statistics...")
-            cursor.execute(
-                """SELECT g.name graph, COUNT(DISTINCT l.resourceid)
-                    FROM load_staging l, resource_instances r, graphs g
-                    WHERE l.loadid = %s
-                    AND r.resourceinstanceid = l.resourceid
-                    AND g.graphid = r.graphid
-                    GROUP BY g.name
-                """,
-                [loadid],
-            )
-            resources = cursor.fetchall()
-            number_of_resources = {}
-            for resource in resources:
-                graph = json.loads(resource[0])[settings.LANGUAGE_CODE]
-                number_of_resources.update({graph: {"total": resource[1]}})
-            cursor.execute(
-                """SELECT g.name graph, n.name, COUNT(*)
-                    FROM load_staging l, nodes n, graphs g
-                    WHERE l.loadid = %s
-                    AND n.nodeid = l.nodegroupid
-                    AND n.graphid = g.graphid
-                    GROUP BY n.name, g.name;
-                """,
-                [loadid],
-            )
-            tiles = cursor.fetchall()
-            for tile in tiles:
-                graph = json.loads(tile[0])[settings.LANGUAGE_CODE]
-                number_of_resources[graph].setdefault("tiles", []).append(
-                    {"tile": tile[1], "count": tile[2]}
-                )
-
-            number_of_import = json.dumps(
-                {
-                    "number_of_import": [
-                        {"name": k, "total": v["total"], "tiles": v["tiles"]}
-                        for k, v in number_of_resources.items()
-                    ]
-                }
-            )
-            cursor.execute(
-                """UPDATE load_event SET (status, load_end_time, load_details) = (%s, %s, load_details || %s::JSONB) WHERE loadid = %s""",
-                ("completed", datetime.now(), number_of_import, loadid),
-            )
-    except (IntegrityError, ProgrammingError) as e:
-        logger.error(e)
-        cursor.execute(
-            """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-            ("failed", datetime.now(), loadid),
+def _update_load_details(cursor, loadid):
+    log_event_details(cursor, loadid, "done|Getting the statistics...")
+    cursor.execute(
+        """SELECT g.name graph, COUNT(DISTINCT l.resourceid)
+            FROM load_staging l, resource_instances r, graphs g
+            WHERE l.loadid = %s
+            AND r.resourceinstanceid = l.resourceid
+            AND g.graphid = r.graphid
+            GROUP BY g.name
+        """,
+        [loadid],
+    )
+    resources = cursor.fetchall()
+    number_of_resources = {}
+    for resource in resources:
+        graph = json.loads(resource[0])[settings.LANGUAGE_CODE]
+        number_of_resources.update({graph: {"total": resource[1]}})
+    cursor.execute(
+        """SELECT g.name graph, n.name, COUNT(*)
+            FROM load_staging l, nodes n, graphs g
+            WHERE l.loadid = %s
+            AND n.nodeid = l.nodegroupid
+            AND n.graphid = g.graphid
+            GROUP BY n.name, g.name;
+        """,
+        [loadid],
+    )
+    tiles = cursor.fetchall()
+    for tile in tiles:
+        graph = json.loads(tile[0])[settings.LANGUAGE_CODE]
+        number_of_resources[graph].setdefault("tiles", []).append(
+            {"tile": tile[1], "count": tile[2]}
         )
-        return {
-            "status": 400,
-            "success": False,
-            "title": _("Failed to complete load"),
-            "message": _("Unable to insert record into staging table"),
+    number_of_import = json.dumps(
+        {
+            "number_of_import": [
+                {"name": k, "total": v["total"], "tiles": v["tiles"]}
+                for k, v in number_of_resources.items()
+            ]
         }
+    )
+    cursor.execute(
+        """UPDATE load_event SET (status, load_end_time, load_details) = (%s, %s, load_details || %s::JSONB) WHERE loadid = %s""",
+        ("completed", datetime.now(), number_of_import, loadid),
+    )
 
 
 def _post_save_edit_log(cursor, userid, loadid, multiprocessing=False):
