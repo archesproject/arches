@@ -1,11 +1,8 @@
-# save.py (or a new staging_to_tile.py)
-
 import uuid
-from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from itertools import groupby
 
-from django.db import connection, transaction
+from django.db import connection
 from django.db.models import OuterRef, Subquery
 from django.utils import timezone
 
@@ -235,11 +232,11 @@ def _build_tile_data(staged_value):
 
 
 def _post_process_staging(staging_records, max_workers=4):
-    """File associations + resource relationship refreshes.
-
+    """
+    File associations + resource relationship refreshes.
     These are independent per-tile, so they parallelise well.
     """
-    resource_refresh_tile_ids = []
+    resource_refresh_tile_ids = set()
 
     for record in staging_records:
         if not record.value:
@@ -256,7 +253,7 @@ def _post_process_staging(staging_records, max_workers=4):
                             tile_id=record.tileid
                         )
             elif datatype in ("resource-instance-list", "resource-instance"):
-                resource_refresh_tile_ids.append(record.tileid)
+                resource_refresh_tile_ids.add(record.tileid)
 
     if resource_refresh_tile_ids:
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
