@@ -5,9 +5,11 @@ import { useGettext } from "vue3-gettext";
 import { useToast } from "primevue/usetoast";
 import Button from "primevue/button";
 import Dialog from "primevue/dialog";
+import InputText from "primevue/inputtext";
 import MultiSelect from "primevue/multiselect";
 import ProgressSpinner from "primevue/progressspinner";
 
+import { sanitizeFilename } from "@/arches_controlled_lists/utils.ts";
 import { exportList } from "@/arches_controlled_lists/api.ts";
 import {
     DEFAULT_ERROR_TOAST_LIFE,
@@ -31,9 +33,10 @@ const visible = ref(true);
 const loading = ref(false);
 const listOptions = ref();
 const selectedListIds = ref<string[]>([]);
+const filename = ref();
 
 function extractLists() {
-    return (listOptions.value = props.lists.map((node) => ({
+    return (listOptions.value = props.lists.map((node: TreeNode) => ({
         id: node.data.id,
         name: node.data.name,
     })));
@@ -55,11 +58,15 @@ async function exportToSKOS() {
     if (file) {
         loading.value = false;
         const url = window.URL.createObjectURL(
-            new Blob([file], { type: "application/xml" }),
+            new Blob([file.blob], { type: "application/xml" }),
         );
         const download = document.createElement("a");
         download.href = url;
-        download.setAttribute("download", `${"PLACEHOLDER"}.xml`);
+        const inputFileName = sanitizeFilename(filename.value) + ".xml";
+        download.setAttribute(
+            "download",
+            `${filename.value ? inputFileName : file.filename}`,
+        );
         document.body.appendChild(download);
         download.click();
         document.body.removeChild(download);
@@ -122,6 +129,19 @@ onMounted(() => {
                     display="chip"
                     aria-labelledby="export-list-select"
                 />
+                <label
+                    id="export-list-filename"
+                    style="margin-top: 1rem"
+                    >{{ $gettext("Filename (optional)") }}</label
+                >
+                <InputText
+                    id="export-list-filename"
+                    v-model="filename"
+                    type="text"
+                    fluid
+                    placeholder="app name_controlled_lists"
+                    size="large"
+                />
             </div>
         </template>
         <template #footer>
@@ -143,5 +163,6 @@ onMounted(() => {
 <style scoped>
 .select-container {
     padding: 2rem 0;
+    font-size: 1.3rem;
 }
 </style>

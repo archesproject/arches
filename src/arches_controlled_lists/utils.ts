@@ -299,3 +299,8 @@ export const shouldUseContrast = () => {
         el.href.endsWith("accessibility.css"),
     );
 };
+
+export const sanitizeFilename = (filename: string) => {
+    // Simple filename sanitizer to remove problematic characters.
+    return filename.replace(/[^a-z0-9_\-.]/gi, "_");
+};

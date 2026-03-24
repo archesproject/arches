@@ -87,7 +87,11 @@ export const exportList = async (listIds: string[]) => {
     try {
         if (response.ok) {
             const blob = await response.blob();
-            return blob;
+            const disposition = response.headers.get("Content-Disposition");
+            const filename = disposition
+                ? disposition.split("filename=")[1].replace(/"/g, "")
+                : "controlled_lists.xml";
+            return { blob, filename };
         }
     } catch (error) {
         throw new Error((error as Error).message || response.statusText);
