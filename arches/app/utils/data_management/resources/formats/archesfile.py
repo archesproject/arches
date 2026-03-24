@@ -162,108 +162,339 @@ class ArchesFileReader(Reader):
         return tiles
 
     def import_business_data_without_mapping(
-        self, business_data, reporter, overwrite="append", prevent_indexing=False
+        self, business_data, reporter, overwrite="append", prevent_indexing=False,
+        bulk_size=100,
     ):
-        errors = []
         graph_uuids = GraphModel.objects.values_list("pk", flat=True)
-        last_resource = None  # only set if prevent_indexing=False
-        for resource in business_data["resources"]:
-            if resource["resourceinstance"] is not None:
-                graph_uuid = uuid.UUID(str(resource["resourceinstance"]["graph_id"]))
-                if graph_uuid in graph_uuids:
-                    resourceinstanceid = uuid.UUID(
-                        str(resource["resourceinstance"]["resourceinstanceid"])
+        batch = []
+        failed_resources = []  # list of {"resourceinstanceid", "graph_id", "reason"}
+
+        # Cache per-graph defaults to avoid repeated queries
+        graph_defaults_cache = {}
+
+        def get_graph_defaults(graph_uuid):
+            if graph_uuid not in graph_defaults_cache:
+                graph = GraphModel.objects.select_related(
+                    "publication", "resource_instance_lifecycle"
+                ).get(pk=graph_uuid)
+                lifecycle_state = None
+                try:
+                    lifecycle = graph.resource_instance_lifecycle
+                    lifecycle_state = lifecycle.resource_instance_lifecycle_states.get(
+                        is_initial_state=True
                     )
-                    defaults = {
-                        "graph_id": graph_uuid,
-                        "legacyid": resource["resourceinstance"]["legacyid"],
-                    }
-                    new_values = {
-                        "resourceinstanceid": resourceinstanceid,
-                        "createdtime": datetime.datetime.now(),
-                    }
-                    new_values.update(defaults)
-                    if overwrite == "overwrite":
-                        resourceinstance = Resource(**new_values)
+                except Exception:
+                    pass
+                graph_defaults_cache[graph_uuid] = {
+                    "graph_publication": graph.publication,
+                    "lifecycle_state": lifecycle_state,
+                }
+            return graph_defaults_cache[graph_uuid]
+
+        def build_resource(resource):
+            """Build a Resource with tiles from a business data resource dict."""
+            ri = resource["resourceinstance"]
+            if not ri.get("graph_id"):
+                failed_resources.append({
+                    "resourceinstanceid": ri.get("resourceinstanceid", "unknown"),
+                    "graph_id": None,
+                    "reason": "Missing graph_id",
+                })
+                return None
+            if not ri.get("resourceinstanceid"):
+                failed_resources.append({
+                    "resourceinstanceid": "unknown",
+                    "graph_id": ri.get("graph_id"),
+                    "reason": "Missing resourceinstanceid",
+                })
+                return None
+
+            graph_uuid = uuid.UUID(str(ri["graph_id"]))
+            if graph_uuid not in graph_uuids:
+                failed_resources.append({
+                    "resourceinstanceid": ri.get("resourceinstanceid"),
+                    "graph_id": str(graph_uuid),
+                    "reason": f"Graph {graph_uuid} not found in database",
+                })
+                return None
+
+            resourceinstanceid = uuid.UUID(str(ri["resourceinstanceid"]))
+            defaults = get_graph_defaults(graph_uuid)
+            resourceinstance = Resource(
+                resourceinstanceid=resourceinstanceid,
+                graph_id=graph_uuid,
+                legacyid=ri.get("legacyid"),
+                createdtime=datetime.datetime.now(),
+                graph_publication=defaults["graph_publication"],
+                resource_instance_lifecycle_state=defaults["lifecycle_state"],
+            )
+
+            if resource["tiles"]:
+                reporter.update_tiles(len(resource["tiles"]))
+
+                for src_tile in resource["tiles"]:
+                    tile = Tile(
+                        tileid=uuid.UUID(str(src_tile["tileid"])),
+                        resourceinstance=resourceinstance,
+                        parenttile_id=(
+                            uuid.UUID(str(src_tile["parenttile_id"]))
+                            if src_tile.get("parenttile_id")
+                            else None
+                        ),
+                        nodegroup_id=(
+                            str(src_tile["nodegroup_id"])
+                            if src_tile.get("nodegroup_id")
+                            else None
+                        ),
+                        sortorder=(
+                            int(src_tile["sortorder"])
+                            if src_tile.get("sortorder")
+                            else 0
+                        ),
+                        data=src_tile["data"],
+                    )
+                    resourceinstance.tiles.append(tile)
+                    reporter.update_tiles_saved()
+
+            return resourceinstance
+
+        # Preload constraints: {nodegroup_id: [(constraint, [node_ids], uniquetoall)]}
+        from arches.app.models.models import CardModel, ConstraintModel
+        constraint_map = {}
+        for constraint in ConstraintModel.objects.select_related("card").prefetch_related("nodes").all():
+            ng_id = str(constraint.card.nodegroup_id)
+            node_ids = [str(n.nodeid) for n in constraint.nodes.all()]
+            if node_ids:
+                constraint_map.setdefault(ng_id, []).append({
+                    "node_ids": node_ids,
+                    "uniquetoall": constraint.uniquetoallinstances,
+                })
+
+        # In-memory constraint tracking:
+        # global_seen: {(nodegroup_id, constraint_idx, value_key)} for uniquetoallinstances
+        # per_resource_seen: reset per resource for within-resource constraints
+        global_constraint_seen = set()
+
+        # Pre-seed global constraints from existing DB data (append mode only)
+        # In overwrite mode, existing records will be deleted before insert,
+        # so pre-seeding would cause false positives.
+        if overwrite != "overwrite":
+            for ng_id, constraints in constraint_map.items():
+                for ci, constraint in enumerate(constraints):
+                    if not constraint["uniquetoall"]:
+                        continue
+                    existing_tiles = Tile.objects.filter(
+                        nodegroup_id=ng_id
+                    ).values_list("data", flat=True)
+                    for tile_data in existing_tiles:
+                        if tile_data:
+                            values = []
+                            skip = False
+                            for nid in sorted(constraint["node_ids"]):
+                                val = tile_data.get(nid)
+                                if val is None:
+                                    skip = True
+                                    break
+                                values.append(json.dumps(val, sort_keys=True))
+                            if not skip:
+                                global_constraint_seen.add(
+                                    (ng_id, ci, tuple(values))
+                                )
+            if global_constraint_seen:
+                print(
+                    f"  Pre-seeded {len(global_constraint_seen)} existing "
+                    f"constraint values from database"
+                )
+
+        def make_constraint_key(tile_data, node_ids):
+            """Create a hashable key from tile data for constraint nodes."""
+            values = []
+            for nid in sorted(node_ids):
+                val = tile_data.get(nid)
+                if val is None:
+                    return None  # Skip constraint check if value is null
+                values.append(json.dumps(val, sort_keys=True))
+            return tuple(values)
+
+        def check_constraints(resource):
+            """Check unique constraints using in-memory tracking.
+            Returns error string or None."""
+            per_resource_seen = set()
+            for tile in resource.tiles:
+                ng_id = str(tile.nodegroup_id)
+                if ng_id not in constraint_map:
+                    continue
+                for ci, constraint in enumerate(constraint_map[ng_id]):
+                    key = make_constraint_key(tile.data, constraint["node_ids"])
+                    if key is None:
+                        continue
+                    lookup = (ng_id, ci, key)
+                    if constraint["uniquetoall"]:
+                        if lookup in global_constraint_seen:
+                            return (
+                                f"Unique constraint violation (global) on "
+                                f"nodegroup {ng_id}: duplicate value"
+                            )
                     else:
+                        if lookup in per_resource_seen:
+                            return (
+                                f"Unique constraint violation (per-resource) on "
+                                f"nodegroup {ng_id}: duplicate value"
+                            )
+                    if constraint["uniquetoall"]:
+                        global_constraint_seen.add(lookup)
+                    per_resource_seen.add(lookup)
+            return None
+
+        def flush_batch(batch, prevent_indexing, overwrite):
+            """Validate and save a batch of resources using bulk operations."""
+            if not batch:
+                return
+            if overwrite == "overwrite":
+                existing_ids = [r.resourceinstanceid for r in batch]
+                Resource.objects.filter(
+                    resourceinstanceid__in=existing_ids
+                ).delete()
+
+            # Validate tiles using arches' built-in validation + constraint checks
+            print(f"  Validating {len(batch)} resources...")
+            valid_resources = []
+
+            # Cache serialized graph per graph_id
+            serialized_graph_cache = {}
+            for resource in batch:
+                gid = str(resource.graph_id)
+                if gid not in serialized_graph_cache:
+                    published = resource.graph.get_published_graph()
+                    serialized_graph_cache[gid] = (
+                        published.serialized_graph if published else None
+                    )
+
+            for ri, resource in enumerate(batch):
+                if ri > 0 and ri % 25 == 0:
+                    print(f"    validated {ri}/{len(batch)}...")
+                resource_valid = True
+
+                # Check unique constraints in-memory
+                constraint_error = check_constraints(resource)
+                if constraint_error:
+                    failed_resources.append({
+                        "resourceinstanceid": str(resource.resourceinstanceid),
+                        "graph_id": str(resource.graph_id),
+                        "reason": constraint_error,
+                    })
+                    resource_valid = False
+
+                if resource_valid:
+                    sg = serialized_graph_cache.get(str(resource.graph_id))
+                    for tile in resource.tiles:
                         try:
-                            resourceinstance = Resource.objects.get(
-                                resourceinstanceid=resourceinstanceid
-                            )
-                            for key, value in defaults.items():
-                                setattr(resourceinstance, key, value)
-                        except Resource.DoesNotExist:
-                            resourceinstance = Resource(**new_values)
-
-                    if resource["tiles"] != []:
-                        reporter.update_tiles(len(resource["tiles"]))
-
-                        def update_or_create_tile(src_tile):
-                            tile = None
-                            src_tile["parenttile_id"] = (
-                                uuid.UUID(str(src_tile["parenttile_id"]))
-                                if src_tile["parenttile_id"]
-                                else None
-                            )
-                            defaults = {
-                                "resourceinstance": resourceinstance,
-                                "parenttile_id": (
-                                    str(src_tile["parenttile_id"])
-                                    if src_tile["parenttile_id"]
-                                    else None
-                                ),
-                                "nodegroup_id": (
-                                    str(src_tile["nodegroup_id"])
-                                    if src_tile["nodegroup_id"]
-                                    else None
-                                ),
-                                "sortorder": (
-                                    int(src_tile["sortorder"])
-                                    if src_tile["sortorder"]
-                                    else 0
-                                ),
-                                "data": src_tile["data"],
-                            }
-                            new_values = {"tileid": uuid.UUID(str(src_tile["tileid"]))}
-                            new_values.update(defaults)
-                            if overwrite == "overwrite":
-                                tile = Tile(**new_values)
-                            else:
-                                try:
-                                    tile = Tile.objects.get(
-                                        tileid=uuid.UUID(str(src_tile["tileid"]))
+                            tile.serialized_graph = sg
+                            # Run datatype pre-save hooks (data normalisation)
+                            for nodeid in tile.data.keys():
+                                node = next(
+                                    (item for item in tile.serialized_graph["nodes"]
+                                     if item["nodeid"] == nodeid),
+                                    None,
+                                )
+                                if node:
+                                    datatype = tile.datatype_factory.get_instance(
+                                        node["datatype"]
                                     )
-                                    for key, value in defaults.items():
-                                        setattr(tile, key, value)
-                                except Tile.DoesNotExist:
-                                    tile = Tile(**new_values)
-                            if tile is not None:
-                                resourceinstance.tiles.append(tile)
-                                reporter.update_tiles_saved()
+                                    datatype.pre_tile_save(tile, nodeid)
+                            tile.check_for_missing_nodes()
+                            tile.populate_missing_nodes()
+                            tile.validate(raise_early=False)
+                        except TileValidationError as e:
+                            reason = f"Tile {tile.tileid}: {e}"
+                            if len(failed_resources) < 3:
+                                print(f"    FAIL: {resource.resourceinstanceid}: {reason}")
+                            failed_resources.append({
+                                "resourceinstanceid": str(resource.resourceinstanceid),
+                                "graph_id": str(resource.graph_id),
+                                "reason": reason,
+                            })
+                            resource_valid = False
+                            break
+                        except Exception as e:
+                            reason = f"Tile {tile.tileid}: {type(e).__name__}: {e}"
+                            if len(failed_resources) < 3:
+                                print(f"    FAIL: {resource.resourceinstanceid}: {reason}")
+                            failed_resources.append({
+                                "resourceinstanceid": str(resource.resourceinstanceid),
+                                "graph_id": str(resource.graph_id),
+                                "reason": reason,
+                            })
+                            resource_valid = False
+                            break
 
-                            for child in src_tile["tiles"]:
-                                update_or_create_tile(child)
+                if resource_valid:
+                    valid_resources.append(resource)
 
-                        for tile in resource["tiles"]:
-                            tile["tiles"] = [
-                                child
-                                for child in resource["tiles"]
-                                if child["parenttile_id"] == tile["tileid"]
-                            ]
+            print(f"  {len(valid_resources)}/{len(batch)} passed validation, {len(batch) - len(valid_resources)} failed")
+            if not valid_resources:
+                return
 
-                        for tile in [
-                            k for k in resource["tiles"] if k["parenttile_id"] is None
-                        ]:
-                            update_or_create_tile(tile)
+            # Bulk create resources and tiles
+            tiles = []
+            for resource in valid_resources:
+                tiles.extend(resource.tiles)
+            print(f"  Bulk creating {len(valid_resources)} resources, {len(tiles)} tiles...")
+            Resource.objects.bulk_create(valid_resources)
+            Tile.objects.bulk_create(tiles)
+            print(f"  DB save complete. Computing descriptors...")
 
-                    resourceinstance.save(index=False)
+            for resource in valid_resources:
+                try:
+                    resource.save_descriptors()
+                except Exception as e:
+                    failed_resources.append({
+                        "resourceinstanceid": str(resource.resourceinstanceid),
+                        "graph_id": str(resource.graph_id),
+                        "reason": f"Descriptor error: {e}",
+                    })
 
-                    if not prevent_indexing:
-                        last_resource = self.save_descriptors_and_index(
-                            resourceinstance, last_resource=last_resource
-                        )
+            reporter.update_resources_saved(count=len(valid_resources))
 
-                    reporter.update_resources_saved()
+        for resource in business_data["resources"]:
+            if resource["resourceinstance"] is None:
+                continue
+
+            resourceinstance = build_resource(resource)
+            if resourceinstance is None:
+                continue
+
+            batch.append(resourceinstance)
+
+            if len(batch) >= bulk_size:
+                flush_batch(batch, prevent_indexing, overwrite)
+                batch = []
+
+        flush_batch(batch, prevent_indexing, overwrite)
+
+        # Print failure summary
+        if failed_resources:
+            print("\n" + "=" * 80)
+            print(f"IMPORT ERRORS: {len(failed_resources)} resource(s) failed")
+            print("=" * 80)
+
+            # Group by reason for readability
+            from collections import defaultdict
+            by_reason = defaultdict(list)
+            for failure in failed_resources:
+                by_reason[failure["reason"]].append(failure)
+
+            for reason, failures in by_reason.items():
+                print(f"\n  {reason}")
+                print(f"  Affected resources ({len(failures)}):")
+                for f in failures[:20]:
+                    print(f"    - {f['resourceinstanceid']} (graph: {f['graph_id']})")
+                if len(failures) > 20:
+                    print(f"    ... and {len(failures) - 20} more")
+
+            print("\n" + "=" * 80)
+        else:
+            print("\nAll resources imported successfully.")
 
     def get_blank_tile(
         self, sourcetilegroup, blanktilecache, tiles, resourceinstanceid
@@ -570,7 +801,8 @@ class ArchesFileReader(Reader):
                     reporter.update_resources_saved()
 
         except (KeyError, TypeError) as e:
-            print(e)
+            import traceback
+            traceback.print_exc()
 
         finally:
             reporter.report_results()
