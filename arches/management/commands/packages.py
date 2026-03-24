@@ -272,6 +272,14 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
+            "-sv",
+            "--skip_validation",
+            action="store_true",
+            dest="skip_validation",
+            help="Skips tile validation during import. Use for trusted data that has already been validated or migrated.",
+        )
+
+        parser.add_argument(
             "-create_concepts",
             "--create_concepts",
             action="store",
@@ -393,6 +401,7 @@ class Command(BaseCommand):
                 use_multiprocessing=options["use_multiprocessing"],
                 force=options["yes"],
                 prevent_indexing=prevent_indexing,
+                skip_validation=options.get("skip_validation", False),
             )
 
             if defer_indexing and not prevent_indexing:
@@ -1439,6 +1448,7 @@ class Command(BaseCommand):
         use_multiprocessing=False,
         force=False,
         prevent_indexing=False,
+        skip_validation=False,
     ):
         """
         Imports business data from all formats. A config file (mapping file) is required for .csv format.
@@ -1543,6 +1553,7 @@ class Command(BaseCommand):
                         use_multiprocessing=use_multiprocessing,
                         prevent_indexing=prevent_indexing,
                         transaction_id=transaction_id,
+                        skip_validation=skip_validation,
                     )
                 else:
                     utils.print_message(

@@ -163,7 +163,7 @@ class ArchesFileReader(Reader):
 
     def import_business_data_without_mapping(
         self, business_data, reporter, overwrite="append", prevent_indexing=False,
-        bulk_size=100,
+        bulk_size=100, skip_validation=False,
     ):
         graph_uuids = GraphModel.objects.values_list("pk", flat=True)
         batch = []
@@ -357,81 +357,86 @@ class ArchesFileReader(Reader):
                 ).delete()
 
             # Validate tiles using arches' built-in validation + constraint checks
-            print(f"  Validating {len(batch)} resources...")
             valid_resources = []
 
-            # Cache serialized graph per graph_id
-            serialized_graph_cache = {}
-            for resource in batch:
-                gid = str(resource.graph_id)
-                if gid not in serialized_graph_cache:
-                    published = resource.graph.get_published_graph()
-                    serialized_graph_cache[gid] = (
-                        published.serialized_graph if published else None
-                    )
+            if skip_validation:
+                print(f"  Skipping validation for {len(batch)} resources...")
+                valid_resources = batch
+            else:
+                print(f"  Validating {len(batch)} resources...")
 
-            for ri, resource in enumerate(batch):
-                if ri > 0 and ri % 25 == 0:
-                    print(f"    validated {ri}/{len(batch)}...")
-                resource_valid = True
+                # Cache serialized graph per graph_id
+                serialized_graph_cache = {}
+                for resource in batch:
+                    gid = str(resource.graph_id)
+                    if gid not in serialized_graph_cache:
+                        published = resource.graph.get_published_graph()
+                        serialized_graph_cache[gid] = (
+                            published.serialized_graph if published else None
+                        )
 
-                # Check unique constraints in-memory
-                constraint_error = check_constraints(resource)
-                if constraint_error:
-                    failed_resources.append({
-                        "resourceinstanceid": str(resource.resourceinstanceid),
-                        "graph_id": str(resource.graph_id),
-                        "reason": constraint_error,
-                    })
-                    resource_valid = False
+                for ri, resource in enumerate(batch):
+                    if ri > 0 and ri % 25 == 0:
+                        print(f"    validated {ri}/{len(batch)}...")
+                    resource_valid = True
 
-                if resource_valid:
-                    sg = serialized_graph_cache.get(str(resource.graph_id))
-                    for tile in resource.tiles:
-                        try:
-                            tile.serialized_graph = sg
-                            # Run datatype pre-save hooks (data normalisation)
-                            for nodeid in tile.data.keys():
-                                node = next(
-                                    (item for item in tile.serialized_graph["nodes"]
-                                     if item["nodeid"] == nodeid),
-                                    None,
-                                )
-                                if node:
-                                    datatype = tile.datatype_factory.get_instance(
-                                        node["datatype"]
+                    # Check unique constraints in-memory
+                    constraint_error = check_constraints(resource)
+                    if constraint_error:
+                        failed_resources.append({
+                            "resourceinstanceid": str(resource.resourceinstanceid),
+                            "graph_id": str(resource.graph_id),
+                            "reason": constraint_error,
+                        })
+                        resource_valid = False
+
+                    if resource_valid:
+                        sg = serialized_graph_cache.get(str(resource.graph_id))
+                        for tile in resource.tiles:
+                            try:
+                                tile.serialized_graph = sg
+                                # Run datatype pre-save hooks (data normalisation)
+                                for nodeid in tile.data.keys():
+                                    node = next(
+                                        (item for item in tile.serialized_graph["nodes"]
+                                         if item["nodeid"] == nodeid),
+                                        None,
                                     )
-                                    datatype.pre_tile_save(tile, nodeid)
-                            tile.check_for_missing_nodes()
-                            tile.populate_missing_nodes()
-                            tile.validate(raise_early=False)
-                        except TileValidationError as e:
-                            reason = f"Tile {tile.tileid}: {e}"
-                            if len(failed_resources) < 3:
-                                print(f"    FAIL: {resource.resourceinstanceid}: {reason}")
-                            failed_resources.append({
-                                "resourceinstanceid": str(resource.resourceinstanceid),
-                                "graph_id": str(resource.graph_id),
-                                "reason": reason,
-                            })
-                            resource_valid = False
-                            break
-                        except Exception as e:
-                            reason = f"Tile {tile.tileid}: {type(e).__name__}: {e}"
-                            if len(failed_resources) < 3:
-                                print(f"    FAIL: {resource.resourceinstanceid}: {reason}")
-                            failed_resources.append({
-                                "resourceinstanceid": str(resource.resourceinstanceid),
-                                "graph_id": str(resource.graph_id),
-                                "reason": reason,
-                            })
-                            resource_valid = False
-                            break
+                                    if node:
+                                        datatype = tile.datatype_factory.get_instance(
+                                            node["datatype"]
+                                        )
+                                        datatype.pre_tile_save(tile, nodeid)
+                                tile.check_for_missing_nodes()
+                                tile.populate_missing_nodes()
+                                tile.validate(raise_early=False)
+                            except TileValidationError as e:
+                                reason = f"Tile {tile.tileid}: {e}"
+                                if len(failed_resources) < 3:
+                                    print(f"    FAIL: {resource.resourceinstanceid}: {reason}")
+                                failed_resources.append({
+                                    "resourceinstanceid": str(resource.resourceinstanceid),
+                                    "graph_id": str(resource.graph_id),
+                                    "reason": reason,
+                                })
+                                resource_valid = False
+                                break
+                            except Exception as e:
+                                reason = f"Tile {tile.tileid}: {type(e).__name__}: {e}"
+                                if len(failed_resources) < 3:
+                                    print(f"    FAIL: {resource.resourceinstanceid}: {reason}")
+                                failed_resources.append({
+                                    "resourceinstanceid": str(resource.resourceinstanceid),
+                                    "graph_id": str(resource.graph_id),
+                                    "reason": reason,
+                                })
+                                resource_valid = False
+                                break
 
-                if resource_valid:
-                    valid_resources.append(resource)
+                    if resource_valid:
+                        valid_resources.append(resource)
 
-            print(f"  {len(valid_resources)}/{len(batch)} passed validation, {len(batch) - len(valid_resources)} failed")
+                print(f"  {len(valid_resources)}/{len(batch)} passed validation, {len(batch) - len(valid_resources)} failed")
             if not valid_resources:
                 return
 
@@ -526,6 +531,7 @@ class ArchesFileReader(Reader):
         overwrite="append",
         prevent_indexing=False,
         transaction_id=None,
+        skip_validation=False,
     ):
         reporter = ResourceImportReporter(business_data)
         try:
@@ -535,6 +541,7 @@ class ArchesFileReader(Reader):
                     reporter,
                     overwrite=overwrite,
                     prevent_indexing=prevent_indexing,
+                    skip_validation=skip_validation,
                 )
             else:
                 blanktilecache = {}

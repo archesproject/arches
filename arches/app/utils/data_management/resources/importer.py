@@ -201,6 +201,7 @@ class BusinessDataImporter(object):
         use_multiprocessing=False,
         prevent_indexing=False,
         transaction_id=None,
+        skip_validation=False,
     ):
         start = time()
         cursor = connection.cursor()
@@ -221,6 +222,7 @@ class BusinessDataImporter(object):
                     overwrite=overwrite,
                     prevent_indexing=prevent_indexing,
                     transaction_id=transaction_id,
+                    skip_validation=skip_validation,
                 )
             elif file_format == "jsonl":
                 with open(self.file[0], "r") as openf:
