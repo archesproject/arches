@@ -128,6 +128,9 @@ function memoizeLastActiveInput(event: FocusEvent) {
     </div>
     <Toast
         :pt="{
+            root: {
+                style: { minWidth: '50rem' },
+            },
             messageIcon: {
                 style: { marginTop: 'var(--p-toast-text-gap)' },
             },
