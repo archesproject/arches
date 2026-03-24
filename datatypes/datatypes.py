@@ -115,14 +115,14 @@ class ReferenceDataType(BaseDataType):
         if not references:
             return
         for reference in references:
-            pref_label_languages = [
-                label.language_id
-                for label in reference.labels
-                if label.valuetype_id == "prefLabel"
-            ]
-            if len(set(pref_label_languages)) < len(pref_label_languages):
-                msg = _("A reference can have only one prefLabel per language")
-                raise ValueError(msg)
+            pref_label_languages = set()
+            for label in reference.labels:
+                if label.valuetype_id == "prefLabel":
+                    if label.language_id in pref_label_languages:
+                        raise ValueError(
+                            _("A reference can have only one prefLabel per language")
+                        )
+                    pref_label_languages.add(label.language_id)
 
     def validate_list_item_consistency(self, references: list[Reference] | None):
         if not references:
