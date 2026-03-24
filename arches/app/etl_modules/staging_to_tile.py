@@ -22,22 +22,18 @@ from arches.app.models.models import (
 def staging_to_tile(load_id, max_workers=4):
     now = timezone.now()
 
-    # ── Phase 1: bulk pre-fetch ──────────────────────────────────────────
     all_staging = list(
         LoadStaging.objects.filter(load_event_id=load_id).order_by("nodegroup_depth")
     )
-    valid = [r for r in all_staging if r.passes_validation]
+    valid_staged_tiles = [r for r in all_staging if r.passes_validation]
+    nodegroup_ids = {r.nodegroup_id for r in valid_staged_tiles if r.nodegroup_id}
 
-    nodegroup_ids = {r.nodegroup_id for r in valid if r.nodegroup_id}
-
-    # One query: nodegroup → graph
     nodegroup_to_graph = dict(
         Node.objects.filter(nodegroup_id__in=nodegroup_ids)
         .values_list("nodegroup_id", "graph_id")
         .distinct()
     )
 
-    # One query: graph → initial lifecycle state
     graph_ids = set(nodegroup_to_graph.values())
     graph_to_lifecycle_state = dict(
         GraphModel.objects.filter(graphid__in=graph_ids)
@@ -54,17 +50,15 @@ def staging_to_tile(load_id, max_workers=4):
         .values_list("graphid", "initial_state_id")
     )
 
-    # ── Phase 2: bulk resource instance creation ─────────────────────────
-    all_resource_ids = {r.resourceid for r in valid if r.resourceid}
+    all_resource_ids = {r.resourceid for r in valid_staged_tiles if r.resourceid}
     existing_ids = set(
         ResourceInstance.objects.filter(
             resourceinstanceid__in=all_resource_ids
         ).values_list("resourceinstanceid", flat=True)
     )
 
-    # Build resource metadata (first record wins for each resource)
     resource_meta = {}
-    for r in valid:
+    for r in valid_staged_tiles:
         if r.resourceid and r.resourceid not in resource_meta:
             resource_meta[r.resourceid] = {
                 "graph_id": nodegroup_to_graph.get(r.nodegroup_id),
@@ -101,16 +95,14 @@ def staging_to_tile(load_id, max_workers=4):
         ]
     )
 
-    # ── Phase 3: tiles, level by level ───────────────────────────────────
     edit_logs = []
 
-    for depth, group in groupby(valid, key=lambda r: r.nodegroup_depth):
+    for depth, group in groupby(valid_staged_tiles, key=lambda r: r.nodegroup_depth):
         records = list(group)
         inserts, updates = [], []
         for r in records:
             (inserts if r.operation == "insert" else updates).append(r)
 
-        # For 'update' ops, check which tiles actually exist
         if updates:
             update_tile_ids = {r.tileid for r in updates}
             existing_tile_ids = set(
@@ -123,7 +115,6 @@ def staging_to_tile(load_id, max_workers=4):
         else:
             real_updates = []
 
-        # Bulk insert
         if inserts:
             tile_data_map = {r.tileid: _build_tile_data(r.value) for r in inserts}
             TileModel.objects.bulk_create(
@@ -154,7 +145,6 @@ def staging_to_tile(load_id, max_workers=4):
                 for r in inserts
             ]
 
-        # Bulk update
         if real_updates:
             existing_tiles = {
                 t.tileid: t
@@ -189,7 +179,6 @@ def staging_to_tile(load_id, max_workers=4):
 
     EditLog.objects.bulk_create(edit_logs)
 
-    # ── Phase 4: post-processing (parallelisable) ─────────────────────────
     _post_process_staging(all_staging, max_workers=max_workers)
 
     LoadEvent.objects.filter(loadid=load_id).update(
@@ -203,12 +192,8 @@ def staging_to_tile(load_id, max_workers=4):
 
 
 def _build_tile_data(staged_value):
-    """Convert staged value JSON → tile data dict.
-
-    The SQL loop extracts `staged_value[key]['value']` for each node,
-    and for resource-instance types assigns a new resourceXresourceId.
-    Note: the SQL had `tile_data_value <> null` which is always unknown
-    in SQL — the correct intent is IS NOT NULL, fixed here.
+    """
+    Convert staged value JSON → tile data dict.
     """
     if not staged_value:
         return {}
