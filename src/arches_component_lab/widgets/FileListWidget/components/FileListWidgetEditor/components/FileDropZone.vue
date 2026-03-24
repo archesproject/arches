@@ -1,15 +1,30 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types";
 
 const { $gettext } = useGettext();
 
-const { openFileChooser, cardXNodeXWidgetData, isDisabled } = defineProps<{
-    openFileChooser: () => void;
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
-    isDisabled: boolean;
-}>();
+const { openFileChooser, cardXNodeXWidgetData, isDisabled, acceptedFileTypes } =
+    defineProps<{
+        openFileChooser: () => void;
+        cardXNodeXWidgetData: CardXNodeXWidgetData;
+        isDisabled: boolean;
+        acceptedFileTypes: string[];
+    }>();
+
+const displayFileTypes = computed(() => {
+    if (!acceptedFileTypes.length) {
+        return undefined;
+    }
+    const mimeWildcardLabels: Record<string, string> = {
+        "image/*": $gettext("Images"),
+    };
+    return acceptedFileTypes
+        .map((fileType) => mimeWildcardLabels[fileType] ?? fileType)
+        .join(", ");
+});
 </script>
 
 <template>
@@ -52,6 +67,16 @@ const { openFileChooser, cardXNodeXWidgetData, isDisabled } = defineProps<{
             <div class="upload-subtitle">
                 {{ $gettext("Drag & drop files here or click to browse") }}
             </div>
+            <div
+                v-if="displayFileTypes"
+                class="accepted-types"
+            >
+                {{
+                    $gettext("Accepted file types: %{acceptedFileTypeLabels}", {
+                        acceptedFileTypeLabels: displayFileTypes,
+                    })
+                }}
+            </div>
         </div>
     </div>
 </template>
@@ -84,6 +109,12 @@ const { openFileChooser, cardXNodeXWidgetData, isDisabled } = defineProps<{
 .upload-subtitle {
     font-size: 1rem;
     color: var(--p-text-muted-color);
+}
+
+.accepted-types {
+    font-size: 0.875rem;
+    color: var(--p-text-muted-color);
+    margin-top: 0.25rem;
 }
 
 .upload-container {

@@ -44,13 +44,24 @@ const isDisabled = computed(() => {
     return maxFiles.value ? maxFiles.value <= totalFiles : false;
 });
 
-const allowedFileTypes = ref();
+const acceptedFileTypes = computed(() => {
+    const fileTypes: string[] = [];
+    const acceptedFiles = cardXNodeXWidgetData.config.acceptedFiles;
+    const imagesOnly = cardXNodeXWidgetData.node.config?.imagesOnly;
+
+    if (acceptedFiles) {
+        fileTypes.push(...acceptedFiles.split(","));
+    }
+    if (imagesOnly) {
+        fileTypes.push("image/*");
+    }
+
+    return fileTypes;
+});
+
 const currentValues = ref();
 
 watchEffect(() => {
-    const acceptedFiles = cardXNodeXWidgetData.config.acceptedFiles;
-    allowedFileTypes.value = acceptedFiles != "" ? acceptedFiles : null;
-
     if (aliasedNodeData) {
         currentValues.value = aliasedNodeData.node_value;
 
@@ -122,7 +133,9 @@ function openFileChooser(): void {
 <template>
     <FileUpload
         ref="fileUploadRef"
-        :accept="allowedFileTypes"
+        :accept="
+            acceptedFileTypes.length ? acceptedFileTypes.join(',') : undefined
+        "
         :model-value="aliasedNodeData?.node_value"
         :multiple="maxFiles && maxFiles > 1 ? true : false"
         :show-cancel-button="false"
@@ -136,6 +149,7 @@ function openFileChooser(): void {
                 :card-x-node-x-widget-data="cardXNodeXWidgetData"
                 :open-file-chooser="openFileChooser"
                 :is-disabled="isDisabled"
+                :accepted-file-types="acceptedFileTypes"
             />
 
             <FileList
