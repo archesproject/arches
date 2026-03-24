@@ -738,6 +738,7 @@ class DateDataType(BaseDataType):
                     datetime.strptime(value, date_format)
                     valid = True
                     valid_date_format = date_format
+                    break
                 except ValueError:
                     pass
         return valid_date_format, valid
