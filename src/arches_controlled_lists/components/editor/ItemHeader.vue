@@ -31,8 +31,9 @@ const iconLabel = (item: ControlledListItem) => {
     <div class="item-header-container">
         <div class="item-header">
             <i
+                :class="item.guide ? 'pi pi-bookmark' : 'pi pi-tag'"
                 class="pi pi-tag item-header-icon"
-                :aria-label="$gettext('Item')"
+                :aria-label="iconLabel(item)"
             ></i>
             <h3 class="item-label">
                 {{

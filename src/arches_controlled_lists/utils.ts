@@ -150,7 +150,7 @@ export const itemAsNode = (
             itemAsNode(child, selectedLanguage, iconLabels),
         ),
         data: item,
-        icon: "pi pi-tag",
+        icon: item.guide ? "pi pi-bookmark" : "pi pi-tag",
         iconLabel: iconLabels.item,
     };
 };
