@@ -5,7 +5,7 @@ from typing import Iterable, Mapping
 
 from django.db.models import F, JSONField
 from django.utils.translation import gettext as _
-from rdflib import Graph, Literal, Namespace, URIRef
+from rdflib import Graph, Literal, URIRef
 from rdflib.namespace import RDF, RDFS
 
 from arches.app.datatypes.base import BaseDataType
