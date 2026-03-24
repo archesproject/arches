@@ -89,14 +89,27 @@ class ReferenceDataType(BaseDataType):
         strict=False,
         **kwargs,
     ):
+        errors = []
         try:
             parsed = self.to_python(value)
-            self.validate_pref_labels(parsed)
-            self.validate_list_item_consistency(parsed)
-            self.validate_multivalue(parsed, node, nodeid)
+            try:
+                self.validate_pref_labels(parsed)
+            except Exception as e:
+                errors.append(self.transform_exception(e))
+
+            try:
+                self.validate_list_item_consistency(parsed)
+            except Exception as e:
+                errors.append(self.transform_exception(e))
+
+            try:
+                self.validate_multivalue(parsed, node, nodeid)
+            except Exception as e:
+                return [self.transform_exception(e)]
+
         except Exception as e:
             return [self.transform_exception(e)]
-        return []
+        return errors
 
     def validate_pref_labels(self, references: list[Reference] | None):
         if not references:
