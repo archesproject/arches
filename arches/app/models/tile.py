@@ -389,7 +389,7 @@ class Tile(models.TileModel):
                         )
             if errors is not None:
                 errors += error
-        if not raise_early:
+        if not raise_early and tile_errors:
             raise TileValidationError(tile_errors)
         return errors
 
