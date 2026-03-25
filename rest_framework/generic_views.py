@@ -57,7 +57,8 @@ class ArchesResourceBlankView(ArchesModelAPIMixin, RetrieveAPIView):
 
     def get_serializer_context(self):
         serializer_context = super().get_serializer_context()
-        serializer_context["fill_blanks"] = True
+        fill_blanks = self.request.GET.get("fill_blanks", "true").lower() == "true"
+        serializer_context["fill_blanks"] = fill_blanks
         return serializer_context
 
     def get_object(self, *args, **kwargs):
@@ -75,7 +76,8 @@ class ArchesTileBlankView(ArchesModelAPIMixin, RetrieveAPIView):
 
     def get_serializer_context(self):
         serializer_context = super().get_serializer_context()
-        serializer_context["fill_blanks"] = True
+        fill_blanks = self.request.GET.get("fill_blanks", "true").lower() == "true"
+        serializer_context["fill_blanks"] = fill_blanks
         return serializer_context
 
     def get_object(self, *args, **kwargs):
