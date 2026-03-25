@@ -44,6 +44,7 @@ runs:
     - name: Clean node_modules and lockfile
       run: |
         rm -rf node_modules package-lock.json
+      shell: bash
 
     - name: Install frontend dependencies
       run: |
