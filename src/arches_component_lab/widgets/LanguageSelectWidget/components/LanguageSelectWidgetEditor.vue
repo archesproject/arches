@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watchEffect } from "vue";
+import { ref, watch, watchEffect } from "vue";
 
 import Select from "primevue/select";
 
@@ -24,17 +24,28 @@ const {
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: LanguageValue | string | null): void;
+    (event: "update:isLoading", isLoading: boolean): void;
 }>();
 
 const languages: Ref<Language[] | null> = ref<Language[] | null>(null);
+const isLoading = ref(false);
+
+watch(isLoading, (newValue) => {
+    emit("update:isLoading", newValue);
+});
 
 watchEffect(async () => {
-    const response = (await fetchLanguages()) as {
-        languages: Language[];
-        request_language: string;
-    };
+    isLoading.value = true;
+    try {
+        const response = (await fetchLanguages()) as {
+            languages: Language[];
+            request_language: string;
+        };
 
-    languages.value = response.languages;
+        languages.value = response.languages;
+    } finally {
+        isLoading.value = false;
+    }
 });
 
 function onUpdateModelValue(updatedValue: string | null) {
@@ -59,6 +70,7 @@ function onUpdateModelValue(updatedValue: string | null) {
     <Select
         option-value="code"
         option-label="name"
+        :loading="isLoading"
         :options="languages as Language[]"
         :placeholder="cardXNodeXWidgetData.config.placeholder"
         :fluid="true"

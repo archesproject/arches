@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watchEffect } from "vue";
+import { computed, ref, watch, watchEffect } from "vue";
 import type { Ref } from "vue";
 
 import TreeSelect from "primevue/treeselect";
@@ -34,6 +34,7 @@ const emit = defineEmits<{
         event: "update:value",
         updatedValue: ConceptListValue | string[] | null,
     ): void;
+    (event: "update:isLoading", isLoading: boolean): void;
 }>();
 
 const options: Ref<CollectionItem[] | null> = ref<CollectionItem[] | null>(
@@ -53,6 +54,10 @@ const initialValue = computed<Record<string, boolean> | null>(() => {
             {} as Record<string, boolean>,
         ) || null
     );
+});
+
+watch(isLoading, (newValue) => {
+    emit("update:isLoading", newValue);
 });
 
 watchEffect(() => {

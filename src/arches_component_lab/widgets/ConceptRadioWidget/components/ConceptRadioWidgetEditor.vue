@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watchEffect } from "vue";
+import { ref, computed, watch, watchEffect } from "vue";
 
 import RadioButton from "primevue/radiobutton";
 import RadioButtonGroup from "primevue/radiobuttongroup";
@@ -33,6 +33,7 @@ const {
 
 const emit = defineEmits<{
     (event: "update:value", updatedValue: ConceptValue | string | null): void;
+    (event: "update:isLoading", isLoading: boolean): void;
 }>();
 
 const flexDirection = computed(() =>
@@ -48,6 +49,10 @@ const isLoading = ref(false);
 const optionsLoaded = ref(false);
 const optionsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
+
+watch(isLoading, (newValue) => {
+    emit("update:isLoading", newValue);
+});
 
 watchEffect(() => {
     getOptions();

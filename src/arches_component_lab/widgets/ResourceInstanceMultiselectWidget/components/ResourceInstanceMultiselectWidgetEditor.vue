@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watchEffect } from "vue";
+import { computed, ref, watch, watchEffect } from "vue";
 
 import arches from "arches";
 import { useGettext } from "vue3-gettext";
@@ -45,6 +45,7 @@ const emit = defineEmits<{
         event: "update:value",
         updatedValue: ResourceInstanceListValue | string[],
     ): void;
+    (event: "update:isLoading", isLoading: boolean): void;
 }>();
 
 const { $gettext } = useGettext();
@@ -69,6 +70,10 @@ const resourceResultsCurrentCount = computed(() => options.value.length);
 const selectedValues = ref<string[]>(
     aliasedNodeData?.details?.map((option) => option.resource_id) || [],
 );
+
+watch(isLoading, (newValue) => {
+    emit("update:isLoading", newValue);
+});
 
 watchEffect(() => {
     getOptions(1);

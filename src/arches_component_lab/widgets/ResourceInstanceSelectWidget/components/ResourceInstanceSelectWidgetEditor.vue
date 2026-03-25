@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watchEffect } from "vue";
+import { computed, ref, watch, watchEffect } from "vue";
 
 import { useGettext } from "vue3-gettext";
 
@@ -43,6 +43,7 @@ const emit = defineEmits<{
         event: "update:value",
         updatedValue: ResourceInstanceValue | string[],
     ): void;
+    (event: "update:isLoading", isLoading: boolean): void;
 }>();
 
 const { $gettext } = useGettext();
@@ -67,6 +68,10 @@ const resourceResultsCurrentCount = computed(() => options.value.length);
 const selectedValue = ref<string | null>(
     aliasedNodeData?.details?.[0]?.resource_id ?? null,
 );
+
+watch(isLoading, (newValue) => {
+    emit("update:isLoading", newValue);
+});
 
 watchEffect(() => {
     getOptions(1);
