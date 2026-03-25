@@ -1,5 +1,6 @@
 from urllib.parse import urlparse, urlunparse, urlsplit, urlunsplit
 from django.core.management.base import BaseCommand, CommandError
+from django.core import management
 from django.db import connection, models, transaction
 from django.db.models.expressions import CombinedExpression
 from django.db.models.fields.json import KT
@@ -54,7 +55,8 @@ class Command(BaseCommand):
             action="store",
             dest="collections_to_migrate",
             nargs="*",
-            help="One or more collections to migrate to controlled lists",
+            help="One or more collections to migrate to controlled lists. "
+            "To migrate all collections, provide an empty string ('') as the only argument.",
         )
 
         parser.add_argument(
@@ -104,14 +106,11 @@ class Command(BaseCommand):
                     )
                 )
 
-            if options["collections_to_migrate"] is None:
-                raise CommandError("No collections provided to migrate.")
-
             if not options["overwrite"]:
                 for collection_name in options["collections_to_migrate"]:
                     if List.objects.filter(name=collection_name).exists():
                         raise CommandError(
-                            f"The collection '{collection_name}' already exists."
+                            f"The controlled list '{collection_name}' already exists."
                         )
 
             self.migrate_collections_to_controlled_lists(
@@ -144,7 +143,11 @@ class Command(BaseCommand):
         preferred_sort_language,
     ):
         """
-        Uses a postgres function to migrate collections to controlled lists
+        Wrapper around __arches_migrate_collections_to_clm Postgres function to migrate
+        concept collections to controlled lists for use in the controlled list manager plugin.
+        Takes in a list of collection names to migrate, a host URL for URI generation,
+        a language code to use for develop sort order of list items based on prefLabel in that language,
+        and an overwrite boolean to determine whether to overwrite existing controlled lists or not.
 
         Example usage:
             python manage.py controlled_lists
@@ -172,6 +175,16 @@ class Command(BaseCommand):
                     valuetype__in=["prefLabel", "identifier"],
                     concept__nodetype="Collection",
                 ).values_list("value", flat=True)
+            )
+
+            if len(collections_in_db) == 0:
+                self.stderr.write(
+                    "No collections were found in the database to migrate to controlled lists."
+                )
+
+        if len(collections_in_db) == 0:
+            self.stderr.write(
+                "No collections were found in the database for the provided collection names."
             )
 
         failed_collections = [

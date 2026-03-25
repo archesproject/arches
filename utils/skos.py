@@ -240,7 +240,7 @@ class SKOSReader(SKOSReader):
             return uuid.uuid5(baseuuid, str(subject))
 
 
-class SKOSWriter(SKOSReader):
+class SKOSWriter(SKOSWriter):
     def write_controlled_lists(self, lists, list_items, format):
         # get empty RDF graph
         rdf_graph = Graph()

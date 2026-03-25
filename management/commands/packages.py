@@ -2,10 +2,12 @@ import os
 import sys
 import glob
 import pyprind
+import uuid
 
 import openpyxl
 from django.db import transaction
 from django.db.models import Q
+from django.core.management.base import CommandError
 
 from arches.management.commands.packages import Command as PackagesCommand
 from arches.app.models import models
@@ -28,8 +30,7 @@ class Command(PackagesCommand):
             "--file_name",
             type=str,
             dest="file_name",
-            default="export_controlled_lists",
-            help="The name of the file to export to. Default is export_controlled_lists",
+            help="The name of the file to export to. Default is the first (or only) controlled list that is being exported",
         )
 
         parser.add_argument(
@@ -37,7 +38,9 @@ class Command(PackagesCommand):
             "--controlled_lists",
             type=str,
             dest="controlled_lists",
-            help="A comma-separated list of controlled list names to export. If not provided, all controlled lists will be exported.",
+            help="A comma-separated list of controlled list names to export. "
+            "If not provided, all controlled lists will be exported. "
+            "For SKOS/RDF-XML, use the -single_file flag to export all controlled lists to a single file.",
         )
 
     def handle(self, *args, **options):
@@ -47,11 +50,30 @@ class Command(PackagesCommand):
             self.import_controlled_lists(options["source"], options["overwrite"])
 
         if options["operation"] == "export_controlled_lists":
+            file_name = options.get("file_name", None)
+            single_file = options.get("single_file", False)
+            parsed_lists = (
+                [lst.strip() for lst in options["controlled_lists"].split(",")]
+                if options["controlled_lists"]
+                else []
+            )
+
+            if (
+                options["file_name"]
+                and not options["single_file"]
+                and len(parsed_lists) > 1
+            ):
+                raise CommandError(
+                    "The file_name argument cannot be used when the single_file flag is set to false. \
+                    Please provide a file_name only when batch exporting controlled lists or a single list."
+                )
+
             self.export_controlled_lists(
                 options["dest_dir"],
-                options["file_name"],
-                options["controlled_lists"],
+                file_name,
+                parsed_lists,
                 options["format"],
+                single_file,
             )
 
     def load_package(
@@ -81,40 +103,46 @@ class Command(PackagesCommand):
 
     def load_concepts(self, package_dir, overwrite, stage, defer_indexing):
         super().load_concepts(package_dir, overwrite, stage, defer_indexing)
-
-        def load_controlled_lists(package_dir, overwrite_options):
-            file_types = ["*.xml", "*.xlsx"]
-            controlled_list_files = []
-            for file_type in file_types:
-                controlled_list_files.extend(
-                    glob.glob(
-                        os.path.join(
-                            package_dir, "reference_data", "controlled_lists", file_type
-                        )
-                    )
-                )
-
-            bar = (
-                pyprind.ProgBar(
-                    len(controlled_list_files), bar_char="█", stream=self.stdout
-                )
-                if len(controlled_list_files) > 1
-                else None
-            )
-
-            for path in controlled_list_files:
-                if bar is None:
-                    print(path)
-                self.import_controlled_lists(path, overwrite_options)
-                if bar is not None:
-                    head, tail = os.path.split(path)
-                    bar.update(item_id=tail + (" " * 10))
-
         print("Importing controlled lists...")
-        load_controlled_lists(package_dir, overwrite or "overwrite")
+        self._import_controlled_lists_from_dir(package_dir, overwrite or "overwrite")
 
     def import_controlled_lists(self, source, overwrite_options):
+        if os.path.isdir(source):
+            self._import_controlled_lists_from_dir(source, overwrite_options)
+        elif os.path.isfile(source):
+            self._import_controlled_list_from_file(source, overwrite_options)
+            print('Successfully imported "{0}"'.format(source))
+        else:
+            self.stdout.write(
+                "The source file or directory does not exist. Please rerun this command with a valid source file or directory."
+            )
+            sys.exit()
 
+    def _import_controlled_lists_from_dir(self, dir, overwrite_options):
+        file_types = ["*.xml", "*.xlsx"]
+        reference_data_dir = os.path.join(dir, "reference_data", "controlled_lists")
+        search_dir = reference_data_dir if os.path.isdir(reference_data_dir) else dir
+        controlled_list_files = []
+        for file_type in file_types:
+            controlled_list_files.extend(glob.glob(os.path.join(search_dir, file_type)))
+
+        bar = (
+            pyprind.ProgBar(
+                len(controlled_list_files), bar_char="█", stream=self.stdout
+            )
+            if len(controlled_list_files) > 1
+            else None
+        )
+
+        for path in controlled_list_files:
+            if bar is None:
+                self.stdout.write(path)
+            self._import_controlled_list_from_file(path, overwrite_options)
+            if bar is not None:
+                head, tail = os.path.split(path)
+                bar.update(item_id=tail + (" " * 10))
+
+    def _import_controlled_list_from_file(self, source, overwrite_options):
         if source.lower().endswith(".xml"):
             skos = SKOSReader()
             rdf = skos.read_file(source)
@@ -230,8 +258,30 @@ class Command(PackagesCommand):
 
         return instance_pks
 
-    def export_controlled_lists(self, data_dest, file_name, controlled_lists, format):
+    def _validate_controlled_lists(self, controlled_lists):
+        not_found = []
+        resolved_lists = []
+        for list_identifier in controlled_lists:
+            try:
+                list_uuid = uuid.UUID(list_identifier)
+                resolved_list = List.objects.filter(id=list_uuid).first()
+            except ValueError:
+                resolved_list = List.objects.filter(name=list_identifier).first()
+            if resolved_list is None:
+                not_found.append(list_identifier)
+            else:
+                resolved_lists.append(resolved_list)
 
+        if not_found:
+            raise CommandError(
+                "The following controlled lists were not found: " + ", ".join(not_found)
+            )
+
+        return resolved_lists
+
+    def export_controlled_lists(
+        self, data_dest, file_name, controlled_lists, format, single_file
+    ):
         if format == "xlsx":
             wb = openpyxl.Workbook()
             ws = wb.active
@@ -249,33 +299,56 @@ class Command(PackagesCommand):
                 )
 
         elif format == "skos-rdf":
-            parsed_lists = [lst.strip() for lst in controlled_lists.split(",")]
-            if parsed_lists != [""]:
-                export_lists = List.objects.filter(
-                    Q(name__in=parsed_lists) | Q(id__in=parsed_lists)
-                )
+            if controlled_lists and controlled_lists != [""]:
+                export_lists = self._validate_controlled_lists(controlled_lists)
+            else:
+                export_lists = list(List.objects.all())
+
+            if single_file:
                 export_list_items = ListItem.objects.filter(
                     list__in=export_lists
                 ).prefetch_related("list_item_values", "parent", "children")
-            else:
-                export_lists = List.objects.all()
-                export_list_items = ListItem.objects.all().prefetch_related(
-                    "list_item_values", "parent", "children"
-                )
-            skos = SKOSWriter()
-            skos_file = skos.write_controlled_lists(
-                export_lists, export_list_items, format="pretty-xml"
-            )
 
-            if data_dest != "" and data_dest != ".":
-                with open(os.path.join(data_dest, f"{file_name}.xml"), "wb") as file:
-                    file.write(skos_file)
-                self.stdout.write(f"Data exported successfully to {file_name}.xml")
+                self._write_to_skos_file(
+                    export_lists,
+                    export_list_items,
+                    data_dest,
+                    file_name or self._slugify(export_lists[0].name),
+                )
+
+            elif not single_file:
+                for controlled_list in export_lists:
+                    export_list_items = ListItem.objects.filter(
+                        list=controlled_list
+                    ).prefetch_related("list_item_values", "parent", "children")
+
+                    self._write_to_skos_file(
+                        [controlled_list],
+                        export_list_items,
+                        data_dest,
+                        self._slugify(controlled_list.name),
+                    )
 
         else:
             self.stdout.write(
                 f"The specified format {format} is not supported. Please rerun this command with a supported format."
             )
+
+    def _write_to_skos_file(
+        self, export_lists, export_list_items, data_dest, file_name
+    ):
+        skos = SKOSWriter()
+        skos_file = skos.write_controlled_lists(
+            export_lists, export_list_items, format="pretty-xml"
+        )
+
+        if data_dest != "" and data_dest != ".":
+            with open(os.path.join(data_dest, f"{file_name}.xml"), "wb") as file:
+                file.write(skos_file)
+            self.stdout.write(f"Data exported successfully to {file_name}.xml")
+
+    def _slugify(self, value):
+        return value.lower().replace(" ", "_").replace("/", "_")
 
     def export_model_to_sheet(self, wb, model):
         # For the first sheet (List), use blank sheet that is initiallized with workbook
