@@ -1173,7 +1173,7 @@ class FileListDataType(BaseDataType):
                                 ).format(metadata["name"]),
                             }
                         )
-                files = self._get_files_from_request(request, node.nodeid)
+                files = self._get_files_from_request(request, str(node.nodeid))
                 for file in files:
                     width, height = get_image_dimensions(file.file)
                     if not width or not height:
