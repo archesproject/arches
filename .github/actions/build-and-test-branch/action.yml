@@ -41,6 +41,10 @@ runs:
       with:
         secrets: ${{ inputs.secrets }}
 
+    - name: Clean node_modules and lockfile
+      run: |
+        rm -rf node_modules package-lock.json
+
     - name: Install frontend dependencies
       run: |
           npm install
