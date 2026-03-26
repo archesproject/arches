@@ -2,7 +2,6 @@
 import {
     computed,
     defineAsyncComponent,
-    onUnmounted,
     ref,
     shallowRef,
     watch,
@@ -56,16 +55,12 @@ const emit = defineEmits([
 
 const isLoading = ref(false);
 const isChildLoading = ref(false);
-const showLoadingIndicator = ref(false);
-let loadingIndicatorTimeout: ReturnType<typeof setTimeout> | undefined;
 const resolvedCardXNodeXWidgetData = shallowRef(cardXNodeXWidgetData);
 const configurationError = ref<Error>();
 
 const isCombinedLoading = computed(
     () => isLoading.value || isChildLoading.value,
 );
-
-onUnmounted(() => clearTimeout(loadingIndicatorTimeout));
 
 watch(isCombinedLoading, (newValue) => {
     emit("update:isLoading", newValue);
@@ -104,11 +99,6 @@ watchEffect(async () => {
     }
 
     isLoading.value = true;
-    loadingIndicatorTimeout = setTimeout(() => {
-        if (isLoading.value) {
-            showLoadingIndicator.value = true;
-        }
-    }, 200);
 
     try {
         resolvedCardXNodeXWidgetData.value = await fetchCardXNodeXWidgetData(
@@ -127,9 +117,7 @@ watchEffect(async () => {
     } catch (error) {
         configurationError.value = error as Error;
     } finally {
-        clearTimeout(loadingIndicatorTimeout);
         isLoading.value = false;
-        showLoadingIndicator.value = false;
     }
 });
 </script>
@@ -143,7 +131,7 @@ watchEffect(async () => {
         @focusout="() => emit('update:isFocused', false)"
     >
         <Skeleton
-            v-if="showLoadingIndicator"
+            v-if="isLoading"
             style="height: 2rem"
         />
         <Message
