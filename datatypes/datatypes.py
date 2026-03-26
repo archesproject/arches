@@ -47,7 +47,6 @@ class Reference:
 
 class ReferenceDataType(BaseDataType):
     model_field = ReferenceField(null=True)
-    _node_cache: dict[str, Node] = {}
 
     def to_python(
         self, value: Iterable[Mapping] | None, **kwargs
@@ -140,13 +139,10 @@ class ReferenceDataType(BaseDataType):
         if not node:
             if not nodeid:
                 raise ValueError
-            nodeid_str = str(nodeid)
-            if nodeid_str not in self._node_cache:
-                try:
-                    self._node_cache[nodeid_str] = Node.objects.get(nodeid=nodeid)
-                except Node.DoesNotExist:
-                    return
-            node = self._node_cache[nodeid_str]
+            try:
+                node = Node.objects.get(nodeid=nodeid)
+            except Node.DoesNotExist:
+                return
         if not node.config.get("multiValue"):
             raise ValueError(_("This node does not allow multiple references."))
 
