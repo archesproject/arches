@@ -139,11 +139,13 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
             if related := related_resources_by_id.get(
                 uuid.UUID(inner_val["resourceId"]), None
             ):
+                descriptor = related.descriptors.get(lang) or next(
+                    iter(related.descriptors.values()), None
+                )
                 ret.append(
                     {
                         "resource_id": str(related.pk),
-                        # TODO: gracefully handle missing language.
-                        "display_value": related.descriptors[lang]["name"],
+                        "display_value": descriptor["name"] if descriptor else "",
                     }
                 )
             else:
