@@ -26,7 +26,7 @@ const {
     defaultTerm?: string;
 }>();
 
-const emit = defineEmits(["update:value"]);
+const emit = defineEmits(["update:isLoading", "update:value"]);
 </script>
 
 <template>
@@ -38,6 +38,7 @@ const emit = defineEmits(["update:value"]);
         :aliased-node-data="aliasedNodeData"
         :should-emit-simplified-value="shouldEmitSimplifiedValue"
         :default-term="defaultTerm"
+        @update:is-loading="emit('update:isLoading', $event)"
         @update:value="emit('update:value', $event)"
     />
     <ResourceInstanceSelectWidgetViewer

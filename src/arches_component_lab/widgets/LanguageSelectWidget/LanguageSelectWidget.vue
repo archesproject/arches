@@ -19,7 +19,7 @@ defineProps<{
     shouldEmitSimplifiedValue?: boolean;
 }>();
 
-const emit = defineEmits(["update:value"]);
+const emit = defineEmits(["update:isLoading", "update:value"]);
 </script>
 
 <template>
@@ -29,6 +29,7 @@ const emit = defineEmits(["update:value"]);
         :graph-slug="graphSlug"
         :aliased-node-data="aliasedNodeData"
         :should-emit-simplified-value="shouldEmitSimplifiedValue"
+        @update:is-loading="emit('update:isLoading', $event)"
         @update:value="emit('update:value', $event)"
     />
     <LanguageSelectWidgetViewer
