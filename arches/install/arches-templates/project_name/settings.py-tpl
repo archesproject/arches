@@ -134,7 +134,6 @@ INSTALLED_APPS = (
     "django.contrib.staticfiles",
     "django.contrib.gis",
     "django_hosts",
-    "arches",
     "arches.app.models",
     "arches.management",
     "guardian",
@@ -149,9 +148,11 @@ INSTALLED_APPS = (
     "{{ project_name }}",  # Ensure the project is listed before any other arches applications
 )
 
-# Placing this last ensures any templates provided by Arches Applications
-# take precedence over core arches templates in arches/app/templates.
+# Placing this last ensures any templates and modules provided by
+# Arches Applications take precedence over core arches templates
+# in arches/app/templates.
 INSTALLED_APPS += (
+    "arches",
     "arches.app",
     "django.contrib.admin",
 )
