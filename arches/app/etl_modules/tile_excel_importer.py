@@ -13,9 +13,15 @@ from django.core.files.storage import default_storage
 from django.contrib.auth.models import User
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.decorators import load_data_async
-from arches.app.models.models import Node, TileModel, ETLModule
+from arches.app.models.models import (
+    Node,
+    TileModel,
+    ETLModule,
+    LoadEvent,
+    LoadErrors,
+    LoadStaging,
+)
 from arches.app.models.system_settings import settings
-from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.etl_modules.base_import_module import (
     BaseImportModule,
     FileValidationError,
@@ -73,11 +79,7 @@ class TileExcelImporter(BaseImportModule):
         load_task = tasks.load_tile_excel.apply_async(
             (self.userid, files, summary, result, self.temp_dir, self.loadid),
         )
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """UPDATE load_event SET taskid = %s WHERE loadid = %s""",
-                (load_task.task_id, self.loadid),
-            )
+        LoadEvent.objects.filter(loadid=self.loadid).update(taskid=load_task.task_id)
 
     def create_tile_value(
         self,
@@ -85,7 +87,6 @@ class TileExcelImporter(BaseImportModule):
         node_lookup,
         nodegroup_alias,
         row_details,
-        cursor,
     ):
         node_value_keys = data_node_lookup[nodegroup_alias]
         tile_value = {}
@@ -120,20 +121,15 @@ class TileExcelImporter(BaseImportModule):
                         if error_message != ""
                         else error["message"]
                     )
-                    cursor.execute(
-                        """
-                        INSERT INTO load_errors (type, value, source, error, message, datatype, loadid, nodeid)
-                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
-                        (
-                            "node",
-                            source_value,
-                            "",
-                            error["title"],
-                            error["message"],
-                            datatype,
-                            self.loadid,
-                            nodeid,
-                        ),
+                    LoadErrors.objects.create(
+                        type="node",
+                        value=str(source_value),
+                        source="",
+                        error=error["title"],
+                        message=error["message"],
+                        datatype=datatype,
+                        load_event_id=self.loadid,
+                        node_id=nodeid,
                     )
 
                 if value is not None:
@@ -149,8 +145,7 @@ class TileExcelImporter(BaseImportModule):
             except KeyError:
                 pass
 
-        tile_value_json = JSONSerializer().serialize(tile_value)
-        return tile_value_json, tile_valid
+        return tile_value, tile_valid
 
     def get_nodegroup_id_column(self, worksheet):
         """
@@ -185,9 +180,8 @@ class TileExcelImporter(BaseImportModule):
                 continue
             resourceid = cell_values[2]
             if resourceid is None:
-                cursor.execute(
-                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("failed", datetime.now(), self.loadid),
+                LoadEvent.objects.filter(loadid=self.loadid).update(
+                    status="failed", load_end_time=datetime.now()
                 )
                 raise ValueError(_("All rows must have a valid resource id"))
 
@@ -210,12 +204,11 @@ class TileExcelImporter(BaseImportModule):
                     else None
                 )
                 legacyid, resourceid = self.set_legacy_id(resourceid)
-                tile_value_json, passes_validation = self.create_tile_value(
+                tile_value, passes_validation = self.create_tile_value(
                     data_node_lookup,
                     node_lookup,
                     nodegroup_alias,
                     row_details,
-                    cursor,
                 )
                 nodegroup_cardinality = nodegroup_lookup[row_details["nodegroup_id"]][
                     "cardinality"
@@ -229,24 +222,21 @@ class TileExcelImporter(BaseImportModule):
                     elif nodegroup_cardinality == "1":
                         if TileModel.objects.filter(pk=tileid).exists():
                             operation = "update"
-                cursor.execute(
-                    """INSERT INTO load_staging (nodegroupid, legacyid, resourceid, tileid, parenttileid, value, loadid, nodegroup_depth, source_description, passes_validation, operation, sortorder) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
-                    (
-                        row_details["nodegroup_id"],
-                        legacyid,
-                        resourceid,
-                        tileid,
-                        parenttileid,
-                        tile_value_json,
-                        self.loadid,
-                        nodegroup_depth,
-                        "worksheet:{0}, row:{1}".format(
-                            worksheet.title, row[0].row
-                        ),  # source_description
-                        passes_validation,
-                        operation,
-                        sortorder,
+                LoadStaging.objects.create(
+                    nodegroup_id=row_details["nodegroup_id"],
+                    legacyid=legacyid,
+                    resourceid=resourceid,
+                    tileid=tileid,
+                    parenttileid=parenttileid,
+                    value=tile_value,
+                    load_event_id=self.loadid,
+                    nodegroup_depth=nodegroup_depth,
+                    source_description="worksheet:{0}, row:{1}".format(
+                        worksheet.title, row[0].row
                     ),
+                    passes_validation=passes_validation,
+                    operation=operation,
+                    sortorder=sortorder,
                 )
             except KeyError:
                 pass
@@ -320,10 +310,7 @@ class TileExcelImporter(BaseImportModule):
                 summary["files"][file]["worksheets"].append(details)
             opened_file.close()
 
-            cursor.execute(
-                """UPDATE load_event SET load_details = %s WHERE loadid = %s""",
-                (json.dumps(summary), self.loadid),
-            )
+            LoadEvent.objects.filter(loadid=self.loadid).update(load_details=summary)
 
     def download(self, request):
         format = request.POST.get("format")
