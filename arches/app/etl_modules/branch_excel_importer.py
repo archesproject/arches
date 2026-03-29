@@ -232,10 +232,6 @@ class BranchExcelImporter(BaseImportModule):
                 except KeyError:
                     pass
         cursor.execute(
-            """CALL __arches_check_tile_cardinality_violation_for_load(%s)""",
-            [self.loadid],
-        )
-        cursor.execute(
             """
             INSERT INTO load_errors (type, source, error, loadid, nodegroupid)
             SELECT 'tile', source_description, error_message, loadid, nodegroupid
@@ -280,7 +276,10 @@ class BranchExcelImporter(BaseImportModule):
                     )
                     summary["files"][file]["worksheets"].append(details)
             opened_file.close()
-
+            cursor.execute(
+                """CALL __arches_check_tile_cardinality_violation_for_load(%s)""",
+                [self.loadid],
+            )
             cursor.execute(
                 """UPDATE load_event SET load_details = %s WHERE loadid = %s""",
                 (json.dumps(summary), self.loadid),
