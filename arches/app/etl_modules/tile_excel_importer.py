@@ -92,6 +92,7 @@ class TileExcelImporter(BaseImportModule):
         node_value_keys = data_node_lookup[nodegroup_alias]
         tile_value = {}
         tile_valid = True
+        error_instances = []
         for key in node_value_keys:
             try:
                 nodeid = node_lookup[key]["nodeid"]
@@ -122,15 +123,17 @@ class TileExcelImporter(BaseImportModule):
                         if error_message != ""
                         else error["message"]
                     )
-                    LoadErrors.objects.create(
-                        type="node",
-                        value=str(source_value),
-                        source="",
-                        error=error["title"],
-                        message=error["message"],
-                        datatype=datatype,
-                        load_event_id=self.loadid,
-                        node_id=nodeid,
+                    error_instances.append(
+                        LoadErrors(
+                            type="node",
+                            value=str(source_value),
+                            source="",
+                            error=error["title"],
+                            message=error["message"],
+                            datatype=datatype,
+                            load_event_id=self.loadid,
+                            node_id=nodeid,
+                        )
                     )
 
                 if value is not None:
@@ -146,7 +149,7 @@ class TileExcelImporter(BaseImportModule):
             except KeyError:
                 pass
 
-        return tile_value, tile_valid
+        return tile_value, tile_valid, error_instances
 
     def get_nodegroup_id_column(self, worksheet):
         """
@@ -165,7 +168,6 @@ class TileExcelImporter(BaseImportModule):
     def process_worksheet(self, worksheet, cursor, node_lookup, nodegroup_lookup):
         data_node_lookup = {}
         row_count = 0
-
         nodegroupid_column = self.get_nodegroup_id_column(worksheet)
         maybe_nodegroup = worksheet.cell(row=2, column=nodegroupid_column).value
         if maybe_nodegroup:
@@ -174,6 +176,14 @@ class TileExcelImporter(BaseImportModule):
                 val.value for val in worksheet[1][3:-3]
             ]
         # else: empty worksheet (no tiles)
+
+        # Accumulate objects for bulk insert
+        staging_instances = []
+        all_error_instances = []
+
+        # Staging rows that need a cardinality-1 existence check deferred until
+        # we can batch the TileModel query.
+        tiles_to_update = []  # list of (index_in_staging_instances, tileid)
 
         for row in worksheet.iter_rows(min_row=2):
             cell_values = [cell.value for cell in row]
@@ -205,12 +215,13 @@ class TileExcelImporter(BaseImportModule):
                     else None
                 )
                 legacyid, resourceid = self.set_legacy_id(resourceid)
-                tile_value, passes_validation = self.create_tile_value(
+                tile_value, passes_validation, error_instances = self.create_tile_value(
                     data_node_lookup,
                     node_lookup,
                     nodegroup_alias,
                     row_details,
                 )
+                all_error_instances.extend(error_instances)
                 nodegroup_cardinality = nodegroup_lookup[row_details["nodegroup_id"]][
                     "cardinality"
                 ]
@@ -221,30 +232,45 @@ class TileExcelImporter(BaseImportModule):
                             "update"  # db will "insert" if tileid does not exist
                         )
                     elif nodegroup_cardinality == "1":
-                        if TileModel.objects.filter(pk=tileid).exists():
-                            operation = "update"
-                LoadStaging.objects.create(
-                    nodegroup_id=row_details["nodegroup_id"],
-                    legacyid=legacyid,
-                    resourceid=resourceid,
-                    tileid=tileid,
-                    parenttileid=parenttileid,
-                    value=tile_value,
-                    load_event_id=self.loadid,
-                    nodegroup_depth=nodegroup_depth,
-                    source_description="worksheet:{0}, row:{1}".format(
-                        worksheet.title, row[0].row
-                    ),
-                    passes_validation=passes_validation,
-                    operation=operation,
-                    sortorder=sortorder,
+                        operation = "insert"
+                        tiles_to_update.append((len(staging_instances), tileid))
+                staging_instances.append(
+                    LoadStaging(
+                        nodegroup_id=row_details["nodegroup_id"],
+                        legacyid=legacyid,
+                        resourceid=resourceid,
+                        tileid=tileid,
+                        parenttileid=parenttileid,
+                        value=tile_value,
+                        load_event_id=self.loadid,
+                        nodegroup_depth=nodegroup_depth,
+                        source_description="worksheet:{0}, row:{1}".format(
+                            worksheet.title, row[0].row
+                        ),
+                        passes_validation=passes_validation,
+                        operation=operation,
+                        sortorder=sortorder,
+                    )
                 )
             except KeyError:
                 pass
-        cursor.execute(
-            """CALL __arches_check_tile_cardinality_violation_for_load(%s)""",
-            [self.loadid],
-        )
+
+        # Resolve deferred cardinality-1 existence checks in a single query
+        if tiles_to_update:
+            pending_tileids = [t for _, t in tiles_to_update]
+            existing_tileids = set(
+                TileModel.objects.filter(pk__in=pending_tileids).values_list(
+                    "pk", flat=True
+                )
+            )
+            for staging_instances_idx, tileid in tiles_to_update:
+                if tileid in existing_tileids:
+                    staging_instances[staging_instances_idx].operation = "update"
+
+        # Bulk insert accumulated objects
+        batch_size = settings.BULK_IMPORT_BATCH_SIZE
+        LoadErrors.objects.bulk_create(all_error_instances, batch_size=batch_size)
+        LoadStaging.objects.bulk_create(staging_instances, batch_size=batch_size)
         cursor.execute(
             """
             INSERT INTO load_errors (type, source, error, loadid, nodegroupid)
@@ -310,7 +336,6 @@ class TileExcelImporter(BaseImportModule):
                 )
                 summary["files"][file]["worksheets"].append(details)
             opened_file.close()
-
             LoadEvent.objects.filter(loadid=self.loadid).update(load_details=summary)
 
     def download(self, request):
