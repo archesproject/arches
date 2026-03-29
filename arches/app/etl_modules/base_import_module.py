@@ -40,6 +40,7 @@ class BaseImportModule:
         self.loadid = loadid
         self.legacyid_lookup = {}
         self.datatype_factory = DataTypeFactory()
+        self.validated_data = {}
         self.config = (
             ETLModule.objects.get(pk=self.moduleid).config if self.moduleid else {}
         )
@@ -111,6 +112,12 @@ class BaseImportModule:
 
     def prepare_data_for_loading(self, datatype_instance, source_value, config):
         try:
+            value, error = self.validated_data[config["nodeid"]][source_value]
+            return value, error
+        except Exception:
+            pass
+
+        try:
             value = (
                 datatype_instance.transform_value_for_tile(source_value, **config)
                 if source_value
@@ -128,6 +135,12 @@ class BaseImportModule:
             errors = [
                 datatype_instance.create_error_message(value, "", "", message, title)
             ]
+
+        if config["nodeid"] not in self.validated_data:
+            self.validated_data[config["nodeid"]] = {source_value: (value, errors)}
+        else:
+            if source_value not in self.validated_data["nodeid"]:
+                self.validated_data["nodeid"][source_value] = (value, errors)
 
         return value, errors
 

@@ -53,6 +53,7 @@ class BranchExcelImporter(BaseImportModule):
         self.datatype_factory = DataTypeFactory()
         self.legacyid_lookup = {}
         self.temp_path = ""
+        self.validated_data = {}
         self.temp_dir = temp_dir if temp_dir else None
         self.config = (
             ETLModule.objects.get(pk=self.moduleid).config if self.moduleid else {}

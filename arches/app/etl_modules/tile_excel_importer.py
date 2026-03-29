@@ -59,6 +59,7 @@ class TileExcelImporter(BaseImportModule):
         self.moduleid = request.POST.get("module") if request else None
         self.datatype_factory = DataTypeFactory()
         self.legacyid_lookup = {}
+        self.validated_data = {}
         self.temp_path = ""
         self.temp_dir = temp_dir if temp_dir else None
         self.config = (
