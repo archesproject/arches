@@ -273,10 +273,6 @@ class BranchExcelImporter(BaseImportModule):
                     )
                     summary["files"][file]["worksheets"].append(details)
             opened_file.close()
-            cursor.execute(
-                """CALL __arches_check_tile_cardinality_violation_for_load(%s)""",
-                [self.loadid],
-            )
             LoadEvent.objects.filter(loadid=self.loadid).update(load_details=summary)
 
     def download(self, request):
