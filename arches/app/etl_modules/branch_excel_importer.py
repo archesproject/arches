@@ -147,6 +147,9 @@ class BranchExcelImporter(BaseImportModule):
         nodegroup_tile_lookup = {}
         previous_tile = {}
         row_count = 0
+        staging_instances = []
+        tiles_to_update = []
+
         for row in worksheet.rows:
             cell_values = [cell.value for cell in row]
             if len(cell_values) == 0 or any(cell_values) is False:
@@ -184,8 +187,8 @@ class BranchExcelImporter(BaseImportModule):
                                 "update"  # db will "insert" if tileid does not exist
                             )
                         elif nodegroup_cardinality == "1":
-                            if TileModel.objects.filter(pk=user_tileid).exists():
-                                operation = "update"
+                            operation = "insert"
+                            tiles_to_update.append((len(staging_instances), tileid))
 
                     nodegroup_depth = nodegroup_lookup[row_details["nodegroup_id"]][
                         "depth"
@@ -202,24 +205,41 @@ class BranchExcelImporter(BaseImportModule):
                     tile_value, passes_validation = self.create_tile_value(
                         cell_values, data_node_lookup, node_lookup, row_details
                     )
-                    LoadStaging.objects.create(
-                        nodegroup_id=row_details["nodegroup_id"],
-                        legacyid=legacyid,
-                        resourceid=resourceid,
-                        tileid=tileid,
-                        parenttileid=parenttileid,
-                        value=tile_value,
-                        load_event_id=self.loadid,
-                        nodegroup_depth=nodegroup_depth,
-                        source_description="worksheet:{0}, row:{1}".format(
-                            worksheet.title, row[0].row
-                        ),
-                        passes_validation=passes_validation,
-                        operation=operation,
-                        sortorder=0,
+                    staging_instances.append(
+                        LoadStaging(
+                            nodegroup_id=row_details["nodegroup_id"],
+                            legacyid=legacyid,
+                            resourceid=resourceid,
+                            tileid=tileid,
+                            parenttileid=parenttileid,
+                            value=tile_value,
+                            load_event_id=self.loadid,
+                            nodegroup_depth=nodegroup_depth,
+                            source_description="worksheet:{0}, row:{1}".format(
+                                worksheet.title, row[0].row
+                            ),
+                            passes_validation=passes_validation,
+                            operation=operation,
+                            sortorder=0,
+                        )
                     )
                 except KeyError:
                     pass
+
+        if tiles_to_update:
+            pending_tileids = [t for _, t in tiles_to_update]
+            existing_tileids = set(
+                TileModel.objects.filter(pk__in=pending_tileids).values_list(
+                    "pk", flat=True
+                )
+            )
+            for staging_instances_idx, tileid in tiles_to_update:
+                if tileid in existing_tileids:
+                    staging_instances[staging_instances_idx].operation = "update"
+
+        batch_size = settings.BULK_IMPORT_BATCH_SIZE
+        LoadStaging.objects.bulk_create(staging_instances, batch_size=batch_size)
+
         failed_stagings = LoadStaging.objects.filter(
             load_event_id=self.loadid,
             passes_validation=False,
