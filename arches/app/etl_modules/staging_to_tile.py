@@ -50,22 +50,21 @@ def staging_to_tile(load_id, max_workers=4):
         .values_list("graphid", "initial_state_id")
     )
 
-    all_resource_ids = {r.resourceid for r in valid_staged_tiles if r.resourceid}
+    resource_meta = {
+        r.resourceid: {
+            "graph_id": nodegroup_to_graph.get(r.nodegroup_id),
+            "legacyid": r.legacyid,
+        }
+        for r in valid_staged_tiles
+        if r.resourceid
+    }
+
     existing_ids = set(
         ResourceInstance.objects.filter(
-            resourceinstanceid__in=all_resource_ids
+            resourceinstanceid__in=resource_meta
         ).values_list("resourceinstanceid", flat=True)
     )
-
-    resource_meta = {}
-    for r in valid_staged_tiles:
-        if r.resourceid and r.resourceid not in resource_meta:
-            resource_meta[r.resourceid] = {
-                "graph_id": nodegroup_to_graph.get(r.nodegroup_id),
-                "legacyid": r.legacyid,
-            }
-
-    new_ids = all_resource_ids - existing_ids
+    new_ids = resource_meta.keys() - existing_ids
     ResourceInstance.objects.bulk_create(
         [
             ResourceInstance(
@@ -97,11 +96,10 @@ def staging_to_tile(load_id, max_workers=4):
 
     edit_logs = []
 
-    for depth, group in groupby(valid_staged_tiles, key=lambda r: r.nodegroup_depth):
+    for _, group in groupby(valid_staged_tiles, key=lambda r: r.nodegroup_depth):
         records = list(group)
-        inserts, updates = [], []
-        for r in records:
-            (inserts if r.operation == "insert" else updates).append(r)
+        inserts = [r for r in records if r.operation == "insert"]
+        updates = [r for r in records if r.operation != "insert"]
 
         if updates:
             update_tile_ids = {r.tileid for r in updates}
@@ -219,7 +217,7 @@ def _build_tile_data(staged_value):
 def _post_process_staging(staging_records, max_workers=4):
     """
     File associations + resource relationship refreshes.
-    These are independent per-tile, so they parallelise well.
+    These are independent per-tile, so they parallize well.
     """
     resource_refresh_tile_ids = set()
 
