@@ -175,15 +175,11 @@ class TileExcelImporter(BaseImportModule):
             data_node_lookup[nodegroup_alias] = [
                 val.value for val in worksheet[1][3:-3]
             ]
-        # else: empty worksheet (no tiles)
 
-        # Accumulate objects for bulk insert
         staging_instances = []
         all_error_instances = []
 
-        # Staging rows that need a cardinality-1 existence check deferred until
-        # we can batch the TileModel query.
-        tiles_to_update = []  # list of (index_in_staging_instances, tileid)
+        tiles_to_update = []
 
         for row in worksheet.iter_rows(min_row=2):
             cell_values = [cell.value for cell in row]
@@ -255,7 +251,6 @@ class TileExcelImporter(BaseImportModule):
             except KeyError:
                 pass
 
-        # Resolve deferred cardinality-1 existence checks in a single query
         if tiles_to_update:
             pending_tileids = [t for _, t in tiles_to_update]
             existing_tileids = set(
@@ -267,7 +262,6 @@ class TileExcelImporter(BaseImportModule):
                 if tileid in existing_tileids:
                     staging_instances[staging_instances_idx].operation = "update"
 
-        # Bulk insert accumulated objects
         batch_size = settings.BULK_IMPORT_BATCH_SIZE
         LoadErrors.objects.bulk_create(all_error_instances, batch_size=batch_size)
         LoadStaging.objects.bulk_create(staging_instances, batch_size=batch_size)
