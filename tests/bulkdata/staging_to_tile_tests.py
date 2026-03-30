@@ -85,8 +85,8 @@ class BuildTileDataTests(TestCase):
 
 
 class StagingToTileTests(ArchesTestCase):
-    """Integration tests for staging_to_tile().
-
+    """
+    Integration tests for staging_to_tile().
     Uses ArchesTestCase (TestCase) so each test is wrapped in a rolled-back
     savepoint. Raw cursor calls to stored procedures are mocked out.
     """
