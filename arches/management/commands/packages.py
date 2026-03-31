@@ -280,6 +280,16 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
+            "-ff",
+            "--fire_functions",
+            action="store_true",
+            dest="fire_functions",
+            help="Fire post-save function triggers during bulk import. Only applies when the import "
+            "uses the bulk path (large datasets). Has no effect on small imports which always "
+            "run the full save pipeline.",
+        )
+
+        parser.add_argument(
             "-create_concepts",
             "--create_concepts",
             action="store",
@@ -402,6 +412,7 @@ class Command(BaseCommand):
                 force=options["yes"],
                 prevent_indexing=prevent_indexing,
                 skip_validation=options.get("skip_validation", False),
+                fire_functions=options.get("fire_functions", False),
             )
 
             if defer_indexing and not prevent_indexing:
@@ -1449,6 +1460,7 @@ class Command(BaseCommand):
         force=False,
         prevent_indexing=False,
         skip_validation=False,
+        fire_functions=False,
     ):
         """
         Imports business data from all formats. A config file (mapping file) is required for .csv format.
@@ -1554,6 +1566,7 @@ class Command(BaseCommand):
                         prevent_indexing=prevent_indexing,
                         transaction_id=transaction_id,
                         skip_validation=skip_validation,
+                        fire_functions=fire_functions,
                     )
                 else:
                     utils.print_message(
