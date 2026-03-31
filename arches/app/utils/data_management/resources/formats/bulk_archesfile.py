@@ -470,8 +470,7 @@ class BulkArchesFileImporter:
         self.reporter.update_resources_saved(count=len(valid_resources))
 
     # Post-save function triggers
-    @staticmethod
-    def _run_post_save_functions(valid_resources):
+    def _run_post_save_functions(self, valid_resources):
         """Run FunctionXGraph post_save triggers for bulk-created resources."""
         print(
             f"  Running post-save functions for "
@@ -506,9 +505,11 @@ class BulkArchesFileImporter:
                     except NotImplementedError:
                         pass
                     except Exception as e:
-                        print(
-                            f"    Warning: post-save function failed "
-                            f"for tile {tile.tileid}: {e}"
+                        self._fail(
+                            str(resource.resourceinstanceid),
+                            str(resource.graph_id),
+                            f"Post-save function failed for "
+                            f"tile {tile.tileid}: {e}",
                         )
 
     # Failure tracking / reporting
