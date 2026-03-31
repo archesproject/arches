@@ -111,10 +111,13 @@ class BaseImportModule:
         return rows
 
     def prepare_data_for_loading(self, datatype_instance, source_value, config):
+        if source_value is None:
+            return source_value, []
+
         try:
             value, error = self.validated_data[config["nodeid"]][source_value]
             return value, error
-        except Exception:
+        except KeyError:
             pass
 
         try:
@@ -135,12 +138,17 @@ class BaseImportModule:
             errors = [
                 datatype_instance.create_error_message(value, "", "", message, title)
             ]
-
-        if config["nodeid"] not in self.validated_data:
-            self.validated_data[config["nodeid"]] = {source_value: (value, errors)}
-        else:
-            if source_value not in self.validated_data["nodeid"]:
-                self.validated_data["nodeid"][source_value] = (value, errors)
+        try:
+            if config["nodeid"] not in self.validated_data:
+                self.validated_data[config["nodeid"]] = {source_value: (value, errors)}
+            else:
+                if source_value not in self.validated_data[config["nodeid"]]:
+                    self.validated_data[config["nodeid"]][source_value] = (
+                        value,
+                        errors,
+                    )
+        except Exception as e:
+            logger.error(e)
 
         return value, errors
 
