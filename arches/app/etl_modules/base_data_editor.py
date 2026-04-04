@@ -10,7 +10,7 @@ from django.http import HttpRequest
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
-from django.db.models import F, Value
+from django.db.models import F, TextField, Value
 from django.db.models.functions import Concat, Coalesce
 from arches.app.models.models import GraphModel, Node, ETLModule, LoadEvent, LoadStaging
 from arches.app.models.system_settings import settings
@@ -214,7 +214,9 @@ class BaseBulkEditor:
     def log_event_details(self, details):
         LoadEvent.objects.filter(loadid=self.loadid).update(
             load_description=Concat(
-                Coalesce(F("load_description"), Value("")), Value(details)
+                Coalesce(F("load_description"), Value("", output_field=TextField())),
+                Value(details, output_field=TextField()),
+                output_field=TextField(),
             )
         )
 

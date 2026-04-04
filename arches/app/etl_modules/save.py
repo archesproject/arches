@@ -7,7 +7,7 @@ from django.db import connection
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
 from django.urls import reverse, resolve, get_script_prefix
-from django.db.models import F, Value
+from django.db.models import F, TextField, Value
 from django.db.models.functions import Concat, Coalesce
 from arches.app.etl_modules.staging_to_tile import staging_to_tile
 from arches.app.models.models import LoadEvent
@@ -48,7 +48,9 @@ def save_to_tiles(userid, loadid, multiprocessing=False):
 def log_event_details(loadid, details):
     LoadEvent.objects.filter(loadid=loadid).update(
         load_description=Concat(
-            Coalesce(F("load_description"), Value("")), Value(details)
+            Coalesce(F("load_description"), Value("", output_field=TextField())),
+            Value(details, output_field=TextField()),
+            output_field=TextField(),
         )
     )
 
