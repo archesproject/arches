@@ -102,16 +102,17 @@ def staging_to_tile(load_id, max_workers=4):
         updates = [r for r in records if r.operation != "insert"]
 
         if updates:
-            update_tile_ids = {r.tileid for r in updates}
-            existing_tile_ids = set(
-                TileModel.objects.filter(tileid__in=update_tile_ids).values_list(
-                    "tileid", flat=True
-                )
-            )
-            inserts += [r for r in updates if r.tileid not in existing_tile_ids]
-            real_updates = [r for r in updates if r.tileid in existing_tile_ids]
+            update_tile_ids = {staged_tile.tileid for staged_tile in updates}
+            existing_tiles = {
+                tile.tileid: tile
+                for tile in TileModel.objects.filter(tileid__in=update_tile_ids)
+            }
+            existing_tile_ids = existing_tiles.keys()
+            inserts += [t for t in updates if t.tileid not in existing_tile_ids]
+            real_updates = [t for t in updates if t.tileid in existing_tile_ids]
         else:
             real_updates = []
+            existing_tiles = {}
 
         if inserts:
             tile_data_map = {r.tileid: _build_tile_data(r.value) for r in inserts}
@@ -144,12 +145,6 @@ def staging_to_tile(load_id, max_workers=4):
             ]
 
         if real_updates:
-            existing_tiles = {
-                t.tileid: t
-                for t in TileModel.objects.filter(
-                    tileid__in={r.tileid for r in real_updates}
-                )
-            }
             tiles_to_update = []
             for r in real_updates:
                 tile = existing_tiles.get(r.tileid)
