@@ -14,7 +14,7 @@ from django.db.models.functions import Lower
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import ETLModule, GraphModel, Node, NodeGroup
+from arches.app.models.models import ETLModule, GraphModel, LoadEvent, Node, NodeGroup
 from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -201,14 +201,10 @@ class ImportSingleCsv(BaseImportModule):
             text_wrapper = io.TextIOWrapper(csvfile, encoding="utf-8")
             reader = csv.reader(text_wrapper)
             data = {"csv": [line for line in reader], "csv_file": csv_file_name}
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """SELECT load_details FROM load_event WHERE loadid = %s""",
-                    [self.loadid],
-                )
-                row = cursor.fetchall()
-            if len(row) > 0:
-                data["config"] = row[0][0]
+            try:
+                data["config"] = LoadEvent.objects.get(loadid=self.loadid).load_details
+            except LoadEvent.DoesNotExist:
+                pass
         return {"success": True, "data": data}
 
     def validate(self, loadid):
@@ -241,11 +237,9 @@ class ImportSingleCsv(BaseImportModule):
         if column_names.count(id_label) > 1:
             error_message = _("Only one column should be selected for id")
         if error_message:
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("failed", datetime.now(), self.loadid),
-                )
+            LoadEvent.objects.filter(loadid=self.loadid).update(
+                status="failed", load_end_time=datetime.now()
+            )
             return {"success": False, "data": error_message}
 
         temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
@@ -293,11 +287,7 @@ class ImportSingleCsv(BaseImportModule):
 
         validation = self.validate(loadid)
         if len(validation["data"]) == 0:
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
-                    ("validated", loadid),
-                )
+            LoadEvent.objects.filter(loadid=loadid).update(status="validated")
             self.loadid = loadid  # currently redundant, but be certain
             response = save_to_tiles(userid, loadid)
             with connection.cursor() as cursor:
@@ -310,11 +300,9 @@ class ImportSingleCsv(BaseImportModule):
                 raise Exception("Unable to refresh spatial views")
             return response
         else:
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("failed", datetime.now(), loadid),
-                )
+            LoadEvent.objects.filter(loadid=loadid).update(
+                status="failed", load_end_time=datetime.now()
+            )
             return {"success": False, "data": "failed"}
 
     @load_data_async
@@ -340,11 +328,7 @@ class ImportSingleCsv(BaseImportModule):
                 id_label,
             ),
         )
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """UPDATE load_event SET taskid = %s WHERE loadid = %s""",
-                (load_task.task_id, self.loadid),
-            )
+        LoadEvent.objects.filter(loadid=self.loadid).update(taskid=load_task.task_id)
 
     def start(self, request):
         graphid = request.POST.get("graphid")
@@ -357,19 +341,15 @@ class ImportSingleCsv(BaseImportModule):
             "graph": graphid,
             "file_name": csv_file_name,
         }
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """INSERT INTO load_event (loadid, complete, status, etl_module_id, load_details, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-                (
-                    self.loadid,
-                    False,
-                    "running",
-                    self.moduleid,
-                    json.dumps(mapping_details),
-                    datetime.now(),
-                    self.userid,
-                ),
-            )
+        LoadEvent.objects.create(
+            loadid=self.loadid,
+            complete=False,
+            status="running",
+            etl_module_id=self.moduleid,
+            load_details=mapping_details,
+            load_start_time=datetime.now(),
+            user_id=self.userid,
+        )
         message = "load event created"
         return {"success": True, "data": message}
 

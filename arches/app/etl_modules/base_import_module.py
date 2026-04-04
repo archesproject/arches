@@ -63,16 +63,15 @@ class BaseImportModule:
         )
 
     def reverse_load(self, loadid):
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """UPDATE load_event SET status = %s WHERE loadid = %s""",
-                ("reversing", loadid),
-            )
-            resources_changed_count = reverse_edit_log_entries(loadid)
-            cursor.execute(
-                """UPDATE load_event SET status = %s, load_details = load_details::jsonb || ('{"resources_removed":' || %s || '}')::jsonb WHERE loadid = %s""",
-                ("unloaded", resources_changed_count, loadid),
-            )
+        LoadEvent.objects.filter(loadid=loadid).update(status="reversing")
+        resources_changed_count = reverse_edit_log_entries(loadid)
+        event = LoadEvent.objects.get(loadid=loadid)
+        event.status = "unloaded"
+        event.load_details = {
+            **(event.load_details or {}),
+            "resources_removed": resources_changed_count,
+        }
+        event.save(update_fields=["status", "load_details"])
 
     @method_decorator(user_created_transaction_match, name="dispatch")
     def reverse(self, request, **kwargs):
@@ -256,11 +255,9 @@ class BaseImportModule:
                     if not refresh_successful:
                         raise Exception("Unable to refresh spatial views")
                 else:
-                    with connection.cursor() as cursor:
-                        cursor.execute(
-                            """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                            ("failed", datetime.now(), loadid),
-                        )
+                    LoadEvent.objects.filter(loadid=loadid).update(
+                        status="failed", load_end_time=datetime.now()
+                    )
         finally:
             self.delete_from_default_storage(temp_dir)
         result["summary"] = summary
@@ -412,22 +409,18 @@ class BaseImportModule:
     def start(self, request):
         self.temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         result = {"started": False, "message": ""}
-        with connection.cursor() as cursor:
-            try:
-                cursor.execute(
-                    """INSERT INTO load_event (loadid, etl_module_id, complete, status, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s)""",
-                    (
-                        self.loadid,
-                        self.moduleid,
-                        False,
-                        "running",
-                        datetime.now(),
-                        self.userid,
-                    ),
-                )
-                result["started"] = True
-            except Exception:
-                result["message"] = _("Unable to initialize load")
+        try:
+            LoadEvent.objects.create(
+                loadid=self.loadid,
+                etl_module_id=self.moduleid,
+                complete=False,
+                status="running",
+                load_start_time=datetime.now(),
+                user_id=self.userid,
+            )
+            result["started"] = True
+        except Exception:
+            result["message"] = _("Unable to initialize load")
         return {"success": result["started"], "data": result}
 
     def write(self, request):

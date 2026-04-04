@@ -2,9 +2,9 @@ from datetime import datetime
 import functools
 import logging
 
-from django.db import connection
 from django.utils.translation import gettext as _
 
+from arches.app.models.models import LoadEvent
 import arches.app.utils.task_management as task_management
 
 logger = logging.getLogger(__name__)
@@ -22,11 +22,9 @@ def load_data_async(func):
             err = _(
                 "Unable to perform this operation because Celery does not appear to be running. Please contact your administrator."
             )
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("failed", datetime.now(), loadid),
-                )
+            LoadEvent.objects.filter(loadid=loadid).update(
+                status="failed", load_end_time=datetime.now()
+            )
             return {"success": False, "data": {"title": _("Error"), "message": err}}
 
     return wrapper

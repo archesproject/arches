@@ -126,7 +126,7 @@ class ETLManagerView(View):
         with connection.cursor() as cursor:
             cursor.execute("""DELETE FROM load_errors WHERE loadid = %s""", [loadid])
             cursor.execute("""DELETE FROM load_staging WHERE loadid = %s""", [loadid])
-            cursor.execute("""DELETE FROM load_event WHERE loadid = %s""", [loadid])
+        LoadEvent.objects.filter(loadid=loadid).delete()
         return {"success": True, "data": ""}
 
     def stop_loading(self, loadid):
@@ -139,11 +139,9 @@ class ETLManagerView(View):
             remote_control.revoke(task_id=taskid, terminate=True)
             # app.control.Control.revoke(task_id=taskid, terminate=True)
             result = _("Cancel Request sent to Celery")
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("cancelled", datetime.now(), loadid),
-                )
+            LoadEvent.objects.filter(loadid=loadid).update(
+                status="cancelled", load_end_time=datetime.now()
+            )
             return {"success": True, "data": result}
         else:
             err = _(

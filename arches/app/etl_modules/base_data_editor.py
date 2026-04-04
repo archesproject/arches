@@ -10,7 +10,9 @@ from django.http import HttpRequest
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import GraphModel, Node, ETLModule, LoadStaging
+from django.db.models import F, Value
+from django.db.models.functions import Concat, Coalesce
+from arches.app.models.models import GraphModel, Node, ETLModule, LoadEvent, LoadStaging
 from arches.app.models.system_settings import settings
 from arches.app.search.elasticsearch_dsl_builder import (
     Bool,
@@ -51,16 +53,15 @@ class BaseBulkEditor:
         self.node_lookup = {}
 
     def reverse_load(self, loadid):
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """UPDATE load_event SET status = %s WHERE loadid = %s""",
-                ("reversing", loadid),
-            )
-            resources_changed_count = reverse_edit_log_entries(loadid)
-            cursor.execute(
-                """UPDATE load_event SET status = %s, load_details = load_details::jsonb || ('{"resources_removed":' || %s || '}')::jsonb WHERE loadid = %s""",
-                ("unloaded", resources_changed_count, loadid),
-            )
+        LoadEvent.objects.filter(loadid=loadid).update(status="reversing")
+        resources_changed_count = reverse_edit_log_entries(loadid)
+        event = LoadEvent.objects.get(loadid=loadid)
+        event.status = "unloaded"
+        event.load_details = {
+            **(event.load_details or {}),
+            "resources_removed": resources_changed_count,
+        }
+        event.save(update_fields=["status", "load_details"])
 
     @method_decorator(user_created_transaction_match, name="dispatch")
     def reverse(self, request, **kwargs):
@@ -142,23 +143,18 @@ class BaseBulkEditor:
             nodegroups = dictfetchall(cursor)
         return {"success": True, "data": nodegroups}
 
-    def create_load_event(self, cursor, load_details):
+    def create_load_event(self, load_details):
         result = {"success": False}
-        load_details_json = json.dumps(load_details)
         try:
-            load_description = "Preparing the load..."
-            cursor.execute(
-                """INSERT INTO load_event (loadid, etl_module_id, load_details, complete, status, load_description, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
-                (
-                    self.loadid,
-                    self.moduleid,
-                    load_details_json,
-                    False,
-                    "running",
-                    load_description,
-                    datetime.now(),
-                    self.userid,
-                ),
+            LoadEvent.objects.create(
+                loadid=self.loadid,
+                etl_module_id=self.moduleid,
+                load_details=load_details,
+                complete=False,
+                status="running",
+                load_description="Preparing the load...",
+                load_start_time=datetime.now(),
+                user_id=self.userid,
             )
             result["success"] = True
         except Exception as e:
@@ -202,9 +198,7 @@ class BaseBulkEditor:
             count_of_tiles_staged = LoadStaging.objects.filter(
                 load_event=self.loadid
             ).count()
-            self.log_event_details(
-                cursor, f"done|{count_of_tiles_staged} tiles staged..."
-            )
+            self.log_event_details(f"done|{count_of_tiles_staged} tiles staged...")
             result["success"] = True
         except Exception as e:
             logger.error(e)
@@ -212,16 +206,16 @@ class BaseBulkEditor:
 
         return result
 
-    def log_event(self, cursor, status):
-        cursor.execute(
-            """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-            (status, datetime.now(), self.loadid),
+    def log_event(self, status):
+        LoadEvent.objects.filter(loadid=self.loadid).update(
+            status=status, load_end_time=datetime.now()
         )
 
-    def log_event_details(self, cursor, details):
-        cursor.execute(
-            """UPDATE load_event SET load_description = concat(load_description, %s) WHERE loadid = %s""",
-            (details, self.loadid),
+    def log_event_details(self, details):
+        LoadEvent.objects.filter(loadid=self.loadid).update(
+            load_description=Concat(
+                Coalesce(F("load_description"), Value("")), Value(details)
+            )
         )
 
     def validate(self, request):
@@ -548,11 +542,10 @@ class BulkStringEditor(BaseBulkEditor):
             "language_code": language_code,
         }
 
-        with connection.cursor() as cursor:
-            event_created = self.create_load_event(cursor, load_details)
-            if not event_created["success"]:
-                self.log_event(cursor, "failed")
-                return {"success": False, "data": event_created["message"]}
+        event_created = self.create_load_event(load_details)
+        if not event_created["success"]:
+            self.log_event("failed")
+            return {"success": False, "data": event_created["message"]}
 
         use_celery_bulk_edit = True
 
@@ -562,10 +555,7 @@ class BulkStringEditor(BaseBulkEditor):
             if resourceids:
                 resourceids = json.loads(resourceids)
             if search_url:
-                with connection.cursor() as cursor:
-                    self.log_event_details(
-                        cursor, "done|Getting resources from search url..."
-                    )
+                self.log_event_details("done|Getting resources from search url...")
                 resourceids = get_resourceids_from_search_url(
                     search_url, self.request.user
                 )
@@ -603,10 +593,7 @@ class BulkStringEditor(BaseBulkEditor):
         if resourceids:
             resourceids = json.loads(resourceids)
         if search_url:
-            with connection.cursor() as cursor:
-                self.log_event_details(
-                    cursor, "done|Getting resources from search url..."
-                )
+            self.log_event_details("done|Getting resources from search url...")
             resourceids = get_resourceids_from_search_url(search_url, self.request.user)
 
         pattern = old_text
@@ -633,11 +620,7 @@ class BulkStringEditor(BaseBulkEditor):
                 resourceids,
             ),
         )
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """UPDATE load_event SET taskid = %s WHERE loadid = %s""",
-                (edit_task.task_id, self.loadid),
-            )
+        LoadEvent.objects.filter(loadid=self.loadid).update(taskid=edit_task.task_id)
 
     def run_load_task(
         self,
@@ -659,7 +642,7 @@ class BulkStringEditor(BaseBulkEditor):
             case_insensitive = True
 
         with connection.cursor() as cursor:
-            self.log_event_details(cursor, "done|Staging the data for edit...")
+            self.log_event_details("done|Staging the data for edit...")
             data_staged = self.stage_data(
                 cursor,
                 module_id,
@@ -674,7 +657,7 @@ class BulkStringEditor(BaseBulkEditor):
             )
 
             if data_staged["success"]:
-                self.log_event_details(cursor, "done|Editing the data...")
+                self.log_event_details("done|Editing the data...")
                 data_updated = self.edit_staged_data(
                     cursor,
                     graph_id,
@@ -685,7 +668,7 @@ class BulkStringEditor(BaseBulkEditor):
                     new_text,
                 )
             else:
-                self.log_event(cursor, "failed")
+                self.log_event("failed")
                 return {
                     "success": False,
                     "data": {"title": _("Error"), "message": data_staged["message"]},
@@ -696,7 +679,7 @@ class BulkStringEditor(BaseBulkEditor):
                 save_to_tiles(userid, loadid)
                 return {"success": True, "data": "done"}
             else:
-                self.log_event(cursor, "failed")
+                self.log_event("failed")
                 return {
                     "success": False,
                     "data": {"title": _("Error"), "message": data_updated["message"]},
