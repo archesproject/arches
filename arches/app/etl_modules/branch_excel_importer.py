@@ -249,12 +249,12 @@ class BranchExcelImporter(BaseImportModule):
             [
                 LoadErrors(
                     type="tile",
-                    source=s.source_description,
-                    error=s.error_message,
-                    load_event_id=str(s.load_event_id),
-                    nodegroup_id=str(s.nodegroup_id),
+                    source=tile.source_description,
+                    error=tile.error_message,
+                    load_event_id=str(tile.load_event_id),
+                    nodegroup_id=str(tile.nodegroup_id),
                 )
-                for s in failed_stagings
+                for tile in failed_stagings
             ]
         )
         return {"name": worksheet.title, "rows": row_count}
