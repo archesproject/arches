@@ -217,7 +217,7 @@ def _build_tile_data(staged_value):
 def _post_process_staging(staging_records, max_workers=4):
     """
     File associations + resource relationship refreshes.
-    These are independent per-tile, so they parallize well.
+    These are independent per-tile, so they parallelize well.
     """
     resource_refresh_tile_ids = set()
 
