@@ -17,6 +17,7 @@ from arches.app.models.models import (
     ResourceInstanceLifecycleState,
     TileModel,
 )
+from arches.app.models.system_settings import settings
 
 
 def staging_to_tile(load_id, max_workers=4):
@@ -91,7 +92,8 @@ def staging_to_tile(load_id, max_workers=4):
             )
             for rid in new_ids
             if resource_meta.get(rid, {}).get("graph_id")
-        ]
+        ],
+        settings.BULK_IMPORT_BATCH_SIZE,
     )
 
     edit_logs = []
@@ -175,7 +177,7 @@ def staging_to_tile(load_id, max_workers=4):
                 tiles_to_update.append(tile)
             TileModel.objects.bulk_update(tiles_to_update, ["data", "sortorder"])
 
-    EditLog.objects.bulk_create(edit_logs)
+    EditLog.objects.bulk_create(edit_logs, settings.BULK_IMPORT_BATCH_SIZE)
 
     _post_process_staging(all_staging, max_workers=max_workers)
 
