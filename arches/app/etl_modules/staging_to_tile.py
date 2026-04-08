@@ -220,7 +220,7 @@ def _build_tile_data(staged_value):
         ):
             items = tile_data_value if isinstance(tile_data_value, list) else []
             tile_data_value = [
-                {**item, "resourceXresourceId": str(uuid.uuid1())} for item in items
+                {**item, "resourceXresourceId": str(uuid.uuid4())} for item in items
             ]
         tile_data[key] = tile_data_value
     return tile_data
