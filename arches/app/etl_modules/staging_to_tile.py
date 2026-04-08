@@ -206,8 +206,7 @@ def _build_tile_data(staged_value):
     """
     Convert staged value JSON → tile data dict.
     """
-    if not staged_value:
-        return {}
+
     tile_data = {}
     for key, value_dict in staged_value.items():
         if not isinstance(value_dict, dict):

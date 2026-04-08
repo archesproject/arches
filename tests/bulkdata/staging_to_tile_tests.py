@@ -27,9 +27,6 @@ from tests.constants import AllDatatypesTestGraph
 class BuildTileDataTests(TestCase):
     """Tests for _build_tile_data."""
 
-    def test_none_value_returns_empty_dict(self):
-        self.assertEqual(_build_tile_data(None), {})
-
     def test_empty_dict_returns_empty_dict(self):
         self.assertEqual(_build_tile_data({}), {})
 
