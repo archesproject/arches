@@ -265,15 +265,6 @@ class TileExcelImporter(BaseImportModule):
         batch_size = settings.BULK_IMPORT_BATCH_SIZE
         LoadErrors.objects.bulk_create(all_error_instances, batch_size=batch_size)
         LoadStaging.objects.bulk_create(staging_instances, batch_size=batch_size)
-        cursor.execute(
-            """
-            INSERT INTO load_errors (type, source, error, loadid, nodegroupid)
-            SELECT 'tile', source_description, error_message, loadid, nodegroupid
-            FROM load_staging
-            WHERE loadid = %s AND passes_validation = false AND error_message IS NOT null
-            """,
-            [self.loadid],
-        )
         return {"name": worksheet.title, "rows": row_count}
 
     def validate_uploaded_file(self, workbook):
