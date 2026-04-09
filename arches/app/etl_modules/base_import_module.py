@@ -114,8 +114,18 @@ class BaseImportModule:
         if source_value is None:
             return source_value, []
 
+        cache_key = source_value
         try:
-            value, error = self.validated_data[config["nodeid"]][source_value]
+            hash(cache_key)
+        except TypeError:
+            # Some importers provide dict/list values; normalize so cache lookups stay hashable.
+            try:
+                cache_key = json.dumps(source_value, sort_keys=True, default=str)
+            except (TypeError, ValueError):
+                cache_key = repr(source_value)
+
+        try:
+            value, error = self.validated_data[config["nodeid"]][cache_key]
             return value, error
         except KeyError:
             pass
@@ -140,15 +150,15 @@ class BaseImportModule:
             ]
         try:
             if config["nodeid"] not in self.validated_data:
-                self.validated_data[config["nodeid"]] = {source_value: (value, errors)}
+                self.validated_data[config["nodeid"]] = {cache_key: (value, errors)}
             else:
-                if source_value not in self.validated_data[config["nodeid"]]:
-                    self.validated_data[config["nodeid"]][source_value] = (
+                if cache_key not in self.validated_data[config["nodeid"]]:
+                    self.validated_data[config["nodeid"]][cache_key] = (
                         value,
                         errors,
                     )
         except Exception as e:
-            logger.error(e)
+            logger.exception(e)
 
         return value, errors
 
