@@ -2,7 +2,7 @@ import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from itertools import groupby
 
-from django.db import connection
+from django.db import connection, transaction
 from django.db.models import OuterRef, Subquery
 from django.utils import timezone
 
@@ -20,6 +20,7 @@ from arches.app.models.models import (
 from arches.app.models.system_settings import settings
 
 
+@transaction.atomic
 def staging_to_tile(load_id, max_workers=4):
     now = timezone.now()
 
@@ -78,7 +79,8 @@ def staging_to_tile(load_id, max_workers=4):
             )
             for rid in new_ids
             if resource_meta.get(rid, {}).get("graph_id")
-        ]
+        ],
+        settings.BULK_IMPORT_BATCH_SIZE,
     )
     EditLog.objects.bulk_create(
         [
@@ -145,7 +147,8 @@ def staging_to_tile(load_id, max_workers=4):
                         sortorder=r.sortorder,
                     )
                     for r in inserts
-                ]
+                ],
+                settings.BULK_IMPORT_BATCH_SIZE,
             )
             edit_logs += [
                 EditLog(
