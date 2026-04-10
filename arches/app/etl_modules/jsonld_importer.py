@@ -1,6 +1,5 @@
 import json
 import logging
-import os
 import zipfile
 from datetime import datetime
 from functools import lru_cache
