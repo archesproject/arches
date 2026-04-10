@@ -12,11 +12,11 @@ from django.db import transaction
 from django.utils.translation import gettext as _
 
 from arches.app.etl_modules.save import (
-    _save_to_tiles,
     disable_tile_triggers,
     reenable_tile_triggers,
     _post_save_edit_log,
 )
+from arches.app.etl_modules.staging_to_tile import staging_to_tile
 from arches.app.tasks import load_json_ld
 from arches.app.utils.data_management.resources.formats.rdffile import (
     ValueErrorWithNodeInfo,
@@ -274,6 +274,7 @@ class JSONLDImporter(BaseImportModule):
             config["bulk_import"] = True
 
             config["loadid"] = self.loadid
+            config["nodeid"] = nodeid
             value, validation_errors = self.prepare_data_for_loading(
                 datatype_instance,
                 source_value,
@@ -333,6 +334,12 @@ class JSONLDImporter(BaseImportModule):
 
     def save_to_tiles(self, cursor, userid, loadid, multiprocessing=False):
         error_saving_tiles = None
+        error_response = {
+            "status": 400,
+            "success": False,
+            "title": _("Failed to complete load"),
+            "message": _("Unable to insert record into staging table"),
+        }
 
         # Disable the tile triggers early, because below we wrap resource
         # deletion in a transaction. Avoids "pending trigger events..." error.
@@ -349,11 +356,14 @@ class JSONLDImporter(BaseImportModule):
 
                 # Now we can check tile cardinality.
                 super().check_tile_cardinality(cursor)
-
-                error_saving_tiles = _save_to_tiles(cursor, loadid)
-                if error_saving_tiles:
-                    # Revert transaction.
-                    raise RuntimeError
+            try:
+                # staging_to_tile is in its own transaction
+                if not staging_to_tile(loadid):
+                    error_saving_tiles = error_response
+            except:
+                # Revert transaction.
+                error_saving_tiles = error_response
+                raise RuntimeError
         except:
             return error_saving_tiles
         finally:
