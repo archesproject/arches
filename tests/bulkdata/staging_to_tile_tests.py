@@ -118,7 +118,7 @@ class StagingToTileTests(ArchesTestCase):
             passes_validation=True,
             nodegroup_depth=1,
             operation="insert",
-            value=None,
+            value={},
             sortorder=0,
         )
         defaults.update(kwargs)
