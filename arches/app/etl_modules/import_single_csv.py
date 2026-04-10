@@ -33,6 +33,7 @@ class ImportSingleCsv(BaseImportModule):
             else settings.DEFAULT_RESOURCE_IMPORT_USER["userid"]
         )
         self.mode = "cli" if not request and params else "ui"
+        self.validated_data = {}
         try:
             self.user = User.objects.get(pk=self.userid)
         except User.DoesNotExist:
