@@ -109,6 +109,16 @@ class Resource(models.ResourceInstance):
     def set_node_datatypes(self, node_datatypes):
         self.node_datatypes = node_datatypes
 
+    @staticmethod
+    def _ensure_context_dict(context: None | dict) -> dict:
+        if context is None:
+            return {}
+        if isinstance(context, dict):
+            return context
+        raise TypeError(
+            f"Resource context must be a dict or None, got {type(context).__name__}."
+        )
+
     def get_root_ontology(self):
         """
         Finds and returns the ontology class of the instance's root node
@@ -143,10 +153,8 @@ class Resource(models.ResourceInstance):
         if self.name is None:
             self.name = {}
 
-        requested_language = None
-
-        if context and "language" in context:
-            requested_language = context["language"]
+        context = self._ensure_context_dict(context)
+        requested_language = context.get("language")
         language = requested_language or get_language()
 
         if language not in self.descriptors:
@@ -177,8 +185,9 @@ class Resource(models.ResourceInstance):
     ):
         """
         descriptors -- iterator with descriptors to be calculated
-        context -- Dictionary with any key:value pairs needed to control the behavior of a custom descriptor function
-
+        context -- Dictionary which may have:
+            language -- Language code in which the descriptor should be returned (e.g. 'en').
+            any key:value pairs needed to control the behavior of a custom descriptor function
         """
 
         if self.descriptor_function is None:  # might be empty queryset
@@ -186,12 +195,11 @@ class Resource(models.ResourceInstance):
                 graph_id=self.graph_id, function__functiontype="primarydescriptors"
             ).select_related("function")
 
+        context = self._ensure_context_dict(context)
+
         for lang in settings.LANGUAGES:
             language = self.get_descriptor_language({"language": lang[0]})
-            if context:
-                context["language"] = language
-            else:
-                context = {"language": language}
+            context["language"] = language
 
             for descriptor in descriptors:
                 if len(self.descriptor_function) == 1:
@@ -397,7 +405,7 @@ class Resource(models.ResourceInstance):
         Indexes all the necessary items values of a resource to support search
 
         Keyword Arguments:
-        context -- a string such as "copy" to indicate conditions under which a document is indexed
+        context -- Dictionary with descriptor and indexing options
         """
 
         if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
@@ -466,7 +474,7 @@ class Resource(models.ResourceInstance):
         fetchTiles -- instead of fetching the tiles from the database get them off the model itself
         datatype_factory -- refernce to the DataTypeFactory instance
         node_datatypes -- a dictionary of datatypes keyed to node ids
-        context -- a string such as "copy" to indicate conditions under which a document is indexed
+        context -- Dictionary with descriptor and indexing options
         all_users -- an iterable of User objects, e.g. User.objects.prefetch_related("groups")
 
         """
@@ -497,9 +505,9 @@ class Resource(models.ResourceInstance):
             )
         except ObjectDoesNotExist:
             document["date_last_edited"] = None
+
+        context = self._ensure_context_dict(context)
         for lang in settings.LANGUAGES:
-            if context is None:
-                context = {}
             context["language"] = lang[0]
             displayname = self.displayname(context)
             if displayname is not None and displayname != "Undefined":
@@ -1049,7 +1057,7 @@ class Resource(models.ResourceInstance):
                 tile.parenttile = id_map[tile.parenttile_id]
 
         with transaction.atomic():
-            new_resource.save(context="copy")
+            new_resource.save(context={"mode": "copy"})
 
         return new_resource
 

@@ -19,7 +19,9 @@ class AbstractPrimaryDescriptorsFunction(BaseFunction):
         config -- the descriptor config which indicates how and what will define the descriptor
 
         Keyword Arguments:
-        context -- string such as "copy" to indicate conditions under which a resource participates in a function.
+        context -- Dictionary which may have:
+            language -- Language code in which the descriptor should be returned (e.g. 'en').
+            any key:value pairs needed to control the behavior of a custom descriptor function
         descriptor -- type of descriptor, e.g. "name", "map_popup", or "description"
         """
 
@@ -36,16 +38,22 @@ class PrimaryDescriptorsFunction(AbstractPrimaryDescriptorsFunction):
         config -- the descriptor config which indicates how and what will define the descriptor
 
         Keyword Arguments:
-        context -- string such as "copy" to indicate conditions under which a resource participates in a function.
+        context -- Dictionary which may have:
+            language -- Language code in which the descriptor should be returned (e.g. 'en').
+            any key:value pairs needed to control the behavior of a custom descriptor function
         descriptor -- type of descriptor, e.g. "name", "map_popup", or "description"
         """
 
+        if context is None:
+            context = {}
+        elif not isinstance(context, dict):
+            raise TypeError(
+                "Primary descriptor context must be a dict or None, "
+                f"got {type(context).__name__}."
+            )
+
         datatype_factory = None
-        language = (
-            context["language"]
-            if (context is not None and "language" in context)
-            else None
-        )
+        language = context.get("language", None)
         result = config["string_template"]
         updated = False
 
