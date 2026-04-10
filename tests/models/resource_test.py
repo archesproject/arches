@@ -28,6 +28,7 @@ from django.test.client import Client
 from django.test.utils import CaptureQueriesContext
 from guardian.shortcuts import assign_perm, get_perms
 from arches.app.models import models
+from arches.app.functions.primary_descriptors import PrimaryDescriptorsFunction
 from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
@@ -48,7 +49,7 @@ from arches.app.utils.permission_backend import (
 from arches.test.utils import sync_overridden_test_settings_to_arches
 from tests.base_test import ArchesTestCase
 
-from django.test import override_settings
+from django.test import override_settings, SimpleTestCase
 
 # these tests can be run from the command line via
 # python manage.py test tests.models.resource_test --settings="tests.test_settings"
@@ -778,3 +779,34 @@ class ResourceTests(ArchesTestCase):
         mock_has_perm.assert_any_call(
             "read_nodegroup", self.test_resource.tiles[0].nodegroup
         )
+
+
+class ContextDictContractTests(SimpleTestCase):
+    def test_resource_context_helper_returns_same_dict_instance(self):
+        provided_context = {"mode": "copy", "language": "en"}
+        normalized_context = Resource._ensure_context_dict(provided_context)
+        self.assertIs(normalized_context, provided_context)
+
+    def test_resource_context_helper_raises_for_non_dict(self):
+        with self.assertRaises(TypeError):
+            Resource._ensure_context_dict("copy")
+
+    def test_tile_context_helper_returns_same_dict_instance(self):
+        provided_context = {"mode": "copy"}
+        normalized_context = Tile._ensure_context_dict(provided_context)
+        self.assertIs(normalized_context, provided_context)
+
+    def test_tile_context_helper_raises_for_non_dict(self):
+        with self.assertRaises(TypeError):
+            Tile._ensure_context_dict(["invalid", "context"])
+
+    def test_primary_descriptor_raises_for_non_dict_context(self):
+        descriptor_function = PrimaryDescriptorsFunction()
+
+        with self.assertRaises(TypeError):
+            descriptor_function.get_primary_descriptor_from_nodes(
+                resource=object(),
+                config={"string_template": "<name>", "nodegroup_id": None},
+                context="copy",
+                descriptor="name",
+            )
