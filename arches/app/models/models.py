@@ -12,7 +12,7 @@ from django.contrib.gis.db import models
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import RegexValidator, validate_slug
-from django.db import ProgrammingError, connection
+from django.db import ProgrammingError, connection, transaction
 from django.db.models import Case, F, JSONField, Max, Q, Value, When
 from django.db.models.constraints import UniqueConstraint
 from django.db.models.expressions import CombinedExpression
@@ -1618,6 +1618,40 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
             edit.transactionid = transaction_id
         edit.edittype = edit_type
         edit.save()
+
+    @transaction.atomic
+    def copy(self):
+        """
+        Returns a copy of this resource instance including a copy of all associated tiles
+        This is the same implementation as the copy() method on the Resource proxy model,
+        but does NOT run side effects like indexing or creating edit log entries
+        """
+
+        id_map = {}
+        resourceid = self.resourceinstanceid
+        new_resource = self
+        new_resource.pk = None
+        new_resource._state.adding = True
+        new_resource.save()
+
+        new_tiles = []
+        for tile in TileModel.objects.filter(
+            resourceinstance_id=resourceid
+        ).prefetch_related("parenttile"):
+            new_tile = tile
+            new_tile.pk = None
+            new_tile.resourceinstance = new_resource
+            new_tile._state.adding = True
+            new_tiles.append(new_tile)
+            id_map[tile.pk] = new_tile
+
+        for tile in new_tiles:
+            if tile.parenttile:
+                tile.parenttile = id_map[tile.parenttile_id]
+
+        TileModel.objects.bulk_create(new_tiles)
+
+        return new_resource
 
 
 class ResourceIdentifier(models.Model):
