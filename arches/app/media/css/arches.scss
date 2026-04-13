@@ -3635,14 +3635,14 @@ div.dropdown-menu.open {
 
 .modal-content-container {
   position: fixed;
-  top: 15%;                   
+  top: 15%;
   left: 50%;
   transform: translateX(-50%);
-  max-height: 80vh;          
+  max-height: 80vh;
   padding: 1.5rem 2rem;
-  background-color: #ffffff;  
-  border-radius: 0.5rem;  
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); 
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -3929,7 +3929,7 @@ div.dropdown-menu.open {
     height: 50px;
     background: #fafafa;
     border-bottom: 1px solid #ddd;
-    font-size: 1.2rem;  
+    font-size: 1.2rem;
 }
 
 .ep-edits-title {
@@ -4374,24 +4374,24 @@ div.dropdown-menu.open {
     z-index: 10;
 }
 
-.publication {
+fieldset.model-history-list .publication {
     cursor: pointer;
     justify-content: left;
-    min-height: 60px; 
+    min-height: 60px;
     display: grid;
     grid-auto-flow: column;
     align-items: center;
     border-bottom: 1px solid #ddd;
-    padding: 0 8px; 
+    padding: 0 8px;
 }
 
-.publication:hover {
+fieldset.model-history-list .publication:hover {
     background-color: #fff;
     border-left: 1px solid #ddd;
     border-right: 1px solid #ddd;
 }
 
-.active-publication {
+fieldset.model-history-list .active-publication {
     justify-content: left;
     background-color: #fff;
     border-left: 1px solid #ddd;
@@ -9374,12 +9374,12 @@ a.search-query-link-captions:focus {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease-in-out;
-    pointer-events: none;    
+    pointer-events: none;
 }
 
 .search-inline-filters-btns.open {
     max-height: 50px;
-    overflow: visible;   
+    overflow: visible;
     pointer-events: auto;
 }
 
@@ -9485,7 +9485,7 @@ a.search-query-link-captions:focus {
 }
 
 .search-thumbnail-container {
-    display: flex; 
+    display: flex;
     position: relative;
 }
 
@@ -9498,28 +9498,28 @@ a.search-query-link-captions:focus {
 }
 
 .search-hover-image {
-    position: absolute; 
-    left: 90px; 
-    right: 90px; 
-    bottom: 10px; 
-    height:260px; 
-    padding: 5px; 
-    background: #f4f4f4; 
-    border: 1px solid #ddd; 
-    border-radius: 2px; 
+    position: absolute;
+    left: 90px;
+    right: 90px;
+    bottom: 10px;
+    height:260px;
+    padding: 5px;
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 2px;
     display: none;
 }
 
 .search-listing:first-child .search-hover-image {
-    position: absolute; 
-    left: 90px; 
-    right: 90px; 
-    top: 10px; 
-    height: 260px; 
-    padding: 5px; 
-    background: #f4f4f4; 
-    border: 1px solid #ddd; 
-    border-radius: 2px; 
+    position: absolute;
+    left: 90px;
+    right: 90px;
+    top: 10px;
+    height: 260px;
+    padding: 5px;
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 2px;
     z-index: 10;
     display: none;
 }
@@ -12967,7 +12967,7 @@ section .etl-preview table {
 }
 
 .csv-import-options .toggle-container{
-    padding-bottom: 0px;    
+    padding-bottom: 0px;
 }
 
 .csv-mapping-table-container {
