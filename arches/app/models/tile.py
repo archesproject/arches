@@ -459,6 +459,7 @@ class Tile(models.TileModel):
             user = None
 
         with transaction.atomic():
+            mode = context.get("mode")
             for nodeid in self.data.keys():
                 node = next(
                     item
@@ -467,6 +468,8 @@ class Tile(models.TileModel):
                 )
                 datatype = self.datatype_factory.get_instance(node["datatype"])
                 datatype.pre_tile_save(self, nodeid)
+                if mode == "copy":
+                    self.data[nodeid] = datatype.copy(self.data[nodeid])
             self.__preSave(request, context=context)
             self.check_for_missing_nodes()
             self.check_for_constraint_violation()
@@ -545,6 +548,7 @@ class Tile(models.TileModel):
                     request=request,
                     resource_creation=resource_creation,
                     index=False,
+                    context=context,
                     **kwargs,
                 )
 
