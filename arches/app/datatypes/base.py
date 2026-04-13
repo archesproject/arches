@@ -89,6 +89,15 @@ class BaseDataType(object):
         """
         return value
 
+    def copy(self, value, **kwargs):
+        """
+        Allows for transformation of a value when copying a resource.
+        By default, the value is returned unchanged, but this can be overridden to allow
+        for transformations during copy operations
+        (eg: updating resource to resource records or duplicating files during copy)
+        """
+        return value
+
     def get_bounds(self, tile, node):
         """
         Gets the bounds of a geometry if the datatype is spatial
