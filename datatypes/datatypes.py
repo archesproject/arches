@@ -258,7 +258,7 @@ class ReferenceDataType(BaseDataType):
     def get_display_value(self, tile, node, **kwargs):
         requested_language = kwargs.pop("language", None)
         node_data = self.get_tile_data(tile)
-        value = node_data.get(str(node.pk), None)
+        value = node_data.get(str(node.nodeid), None)
         references = self.to_python(value)
         if not references:
             return ""
