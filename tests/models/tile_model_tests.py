@@ -683,7 +683,8 @@ class TileTests(ArchesTestCase):
                     "tile_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce"),
                 }
                 self.assertTrue(
-                    all(item in ri_dict.items() for item in expected.items())
+                    all(item in ri_dict.items() for item in expected.items()),
+                    f"Expected {expected} but actual value was {ri_dict}",
                 )
             else:
                 expected = {
