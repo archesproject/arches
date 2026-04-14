@@ -7,24 +7,37 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9525_add_published_graph_edits'),
+        ("models", "12586_tile_cardinality_check"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='DataMigration',
+            name="DataMigration",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('app', models.TextField()),
-                ('name', models.TextField()),
-                ('operation', models.TextField()),
-                ('metadata', models.JSONField(null=True)),
-                ('resource_instance_ids', django.contrib.postgres.fields.ArrayField(base_field=models.UUIDField(blank=True), size=None, default=list)),
-                ('applied', models.DateTimeField(auto_now_add=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("app", models.TextField()),
+                ("name", models.TextField()),
+                ("operation", models.TextField()),
+                ("metadata", models.JSONField(null=True)),
+                (
+                    "resource_instance_ids",
+                    django.contrib.postgres.fields.ArrayField(
+                        base_field=models.UUIDField(blank=True), size=None, default=list
+                    ),
+                ),
+                ("applied", models.DateTimeField(auto_now_add=True)),
             ],
             options={
-                'db_table': 'data_migrations',
-                'managed': True,
+                "db_table": "data_migrations",
+                "managed": True,
             },
         )
     ]
