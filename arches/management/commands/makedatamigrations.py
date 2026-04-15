@@ -144,10 +144,6 @@ class Command(BaseCommand):
             output_path.write_text(writer.as_string())
             self.stdout.write(self.style.SUCCESS(f"Migration written to {output_path}"))
 
-    # ------------------------------------------------------------------
-    # Helpers
-    # ------------------------------------------------------------------
-
     def _get_two_most_recent_publications(self, slug):
         pubs = GraphXPublishedGraph.objects.filter(graph__slug=slug).order_by(
             "-published_time"
@@ -170,11 +166,6 @@ class Command(BaseCommand):
                 f"and language={language!r}."
             )
         return pub.serialized_graph
-
-
-# ---------------------------------------------------------------------------
-# Comparator
-# ---------------------------------------------------------------------------
 
 
 class GraphPublicationComparator:
@@ -346,45 +337,40 @@ class GraphPublicationComparator:
 
 
 def _format_op_for_display(op: dict) -> str:
-    kind = op["op"]
-    if kind == "CreateNode":
-        return f"CREATED  node {op['nodeid']!r}  alias={op['alias']!r}  datatype={op['datatype']!r}"
-    if kind == "DeleteNode":
-        return f"DELETED  node {op['nodeid']!r}  alias={op['alias']!r}  datatype={op['datatype']!r}"
-    if kind == "CreateNodeGroup":
-        return f"CREATED  nodegroup {op['nodegroupid']!r}  parent={op['parent_nodegroup_id']!r}"
-    if kind == "DeleteNodeGroup":
-        return f"DELETED  nodegroup {op['nodegroupid']!r}  parent={op['parent_nodegroup_id']!r}"
-    if kind == "AlterNodeGroupParent":
-        return (
-            f"nodegroup {op['nodegroupid']!r}  "
-            f"parentnodegroup_id: {op['old_parent_nodegroup_id']!r} → {op['new_parent_nodegroup_id']!r}"
-        )
-    if kind == "AlterNodeNodeGroup":
-        return (
-            f"node {op['nodeid']!r}  alias={op['alias']!r}  "
-            f"nodegroup_id: {op['old_nodegroup_id']!r} → {op['new_nodegroup_id']!r}"
-        )
-    if kind == "AlterNodeAlias":
-        return (
-            f"node {op['nodeid']!r}  alias: {op['old_alias']!r} → {op['new_alias']!r}"
-        )
-    if kind == "AlterNodeDatatype":
-        return (
-            f"node {op['nodeid']!r}  alias={op['alias']!r}  "
-            f"datatype: {op['old_datatype']!r} → {op['new_datatype']!r}"
-        )
-    if kind == "AlterNodeConfig":
-        return (
-            f"node {op['nodeid']!r}  alias={op['alias']!r}  "
-            f"config: {op['old_config']!r} → {op['new_config']!r}"
-        )
-    return repr(op)
+    match op["op"]:
+        case "CreateNode":
+            return f"CREATED  node {op['nodeid']!r}  alias={op['alias']!r}  datatype={op['datatype']!r}"
+        case "DeleteNode":
+            return f"DELETED  node {op['nodeid']!r}  alias={op['alias']!r}  datatype={op['datatype']!r}"
+        case "CreateNodeGroup":
+            return f"CREATED  nodegroup {op['nodegroupid']!r}  parent={op['parent_nodegroup_id']!r}"
+        case "DeleteNodeGroup":
+            return f"DELETED  nodegroup {op['nodegroupid']!r}  parent={op['parent_nodegroup_id']!r}"
+        case "AlterNodeGroupParent":
+            return (
+                f"nodegroup {op['nodegroupid']!r}  "
+                f"parentnodegroup_id: {op['old_parent_nodegroup_id']!r} → {op['new_parent_nodegroup_id']!r}"
+            )
+        case "AlterNodeNodeGroup":
+            return (
+                f"node {op['nodeid']!r}  alias={op['alias']!r}  "
+                f"nodegroup_id: {op['old_nodegroup_id']!r} → {op['new_nodegroup_id']!r}"
+            )
+        case "AlterNodeAlias":
+            return f"node {op['nodeid']!r}  alias: {op['old_alias']!r} → {op['new_alias']!r}"
+        case "AlterNodeDatatype":
+            return (
+                f"node {op['nodeid']!r}  alias={op['alias']!r}  "
+                f"datatype: {op['old_datatype']!r} → {op['new_datatype']!r}"
+            )
+        case "AlterNodeConfig":
+            return (
+                f"node {op['nodeid']!r}  alias={op['alias']!r}  "
+                f"config: {op['old_config']!r} → {op['new_config']!r}"
+            )
+        case _:
+            return repr(op)
 
-
-# ---------------------------------------------------------------------------
-# Migration writer
-# ---------------------------------------------------------------------------
 
 # Maps each operation type to the ordered parameter names that should appear
 # as keyword arguments in the rendered call.
