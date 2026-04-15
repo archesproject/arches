@@ -204,7 +204,6 @@ class GraphPublicationComparator:
             ng["nodegroupid"]: ng for ng in graph_b.get("nodegroups", [])
         }
 
-    # 1. New nodes created or deleted
     def check_nodes_created_or_deleted(self) -> list[dict]:
         ops = []
         ids_a, ids_b = set(self.nodes_a), set(self.nodes_b)
@@ -234,7 +233,6 @@ class GraphPublicationComparator:
 
         return ops
 
-    # 2. Nodegroups created or deleted
     def check_nodegroups_created_or_deleted(self) -> list[dict]:
         ops = []
         ids_a, ids_b = set(self.nodegroups_a), set(self.nodegroups_b)
@@ -261,7 +259,6 @@ class GraphPublicationComparator:
 
         return ops
 
-    # 3. Parent nodegroup of a nodegroup changed
     def check_nodegroup_parent_changed(self) -> list[dict]:
         ops = []
         for ngid in sorted(set(self.nodegroups_a) & set(self.nodegroups_b)):
@@ -278,7 +275,6 @@ class GraphPublicationComparator:
                 )
         return ops
 
-    # 4. The nodegroupid assigned to a node changed
     def check_node_nodegroup_changed(self) -> list[dict]:
         ops = []
         for nodeid in sorted(set(self.nodes_a) & set(self.nodes_b)):
@@ -287,7 +283,7 @@ class GraphPublicationComparator:
             if old != new:
                 ops.append(
                     {
-                        "op": "AlterNodeNodeGroup",
+                        "op": "AlterNodeGroup",
                         "nodeid": nodeid,
                         "alias": self.nodes_b[nodeid].get("alias"),
                         "old_nodegroup_id": old,
@@ -296,7 +292,6 @@ class GraphPublicationComparator:
                 )
         return ops
 
-    # 5. Node alias changed
     def check_node_alias_changed(self) -> list[dict]:
         ops = []
         for nodeid in sorted(set(self.nodes_a) & set(self.nodes_b)):
@@ -348,11 +343,6 @@ class GraphPublicationComparator:
                     }
                 )
         return ops
-
-
-# ---------------------------------------------------------------------------
-# Display helper
-# ---------------------------------------------------------------------------
 
 
 def _format_op_for_display(op: dict) -> str:
@@ -408,7 +398,7 @@ _OP_PARAMS: dict[str, list[str]] = {
         "old_parent_nodegroup_id",
         "new_parent_nodegroup_id",
     ],
-    "AlterNodeNodeGroup": ["nodeid", "alias", "old_nodegroup_id", "new_nodegroup_id"],
+    "AlterNodeGroup": ["nodeid", "alias", "old_nodegroup_id", "new_nodegroup_id"],
     "AlterNodeAlias": ["nodeid", "old_alias", "new_alias"],
     "AlterNodeDatatype": ["nodeid", "alias", "old_datatype", "new_datatype"],
     "AlterNodeConfig": ["nodeid", "alias", "old_config", "new_config"],
