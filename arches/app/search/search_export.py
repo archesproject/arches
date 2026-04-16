@@ -24,15 +24,17 @@ import uuid
 from io import BytesIO, StringIO
 
 from django.contrib.gis.geos import GeometryCollection, GEOSGeometry
+from django.contrib.contenttypes.models import ContentType
 from django.core.files import File
 from django.urls import get_script_prefix, resolve, reverse
 from django.utils.translation import gettext as _
+
+from guardian.models import GroupObjectPermission, UserObjectPermission
 
 import arches.app.utils.zip as zip_utils
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.models.system_settings import settings
-from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.flatten_dict import flatten_dict
@@ -78,11 +80,28 @@ class SearchResultsExporter(object):
             main_card_list[index_number:index_number] = sub_cards_to_add
         return subcards_added
 
+    def get_restricted_nodegroups(self):
+
+        ct = ContentType.objects.get_for_model(models.NodeGroup)
+
+        return set(
+            GroupObjectPermission.objects.filter(
+                content_type=ct,
+                permission__codename="no_access_to_nodegroup",
+                group__in=self.search_request.user.groups.all(),
+            ).values_list("object_pk", flat=True)
+        ) | set(
+            UserObjectPermission.objects.filter(
+                content_type=ct,
+                permission__codename="no_access_to_nodegroup",
+                user=self.search_request.user,
+            ).values_list("object_pk", flat=True)
+        )
+
     def get_headers(self, graph, export_type, fields):
 
-        restricted_ids = set(
-            get_nodegroups_by_perm(self.search_request.user, "no_access_to_nodegroup")
-        )
+        restricted_ids = self.get_restricted_nodegroups()
+
         if not settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER or export_type == "tilexl":
             fields_to_export = fields if type(fields) is list else [fields]
             if len(fields_to_export) == 1:
