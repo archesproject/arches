@@ -28,7 +28,6 @@ from django.test.client import Client
 from django.test.utils import CaptureQueriesContext
 from guardian.shortcuts import assign_perm, get_perms
 from arches.app.models import models
-from arches.app.functions.primary_descriptors import PrimaryDescriptorsFunction
 from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
@@ -49,7 +48,7 @@ from arches.app.utils.permission_backend import (
 from arches.test.utils import sync_overridden_test_settings_to_arches
 from tests.base_test import ArchesTestCase
 
-from django.test import override_settings, SimpleTestCase
+from django.test import override_settings
 
 # these tests can be run from the command line via
 # python manage.py test tests.models.resource_test --settings="tests.test_settings"
