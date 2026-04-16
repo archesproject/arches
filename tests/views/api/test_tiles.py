@@ -60,23 +60,62 @@ class ResourceAPITests(ArchesTestCase):
         )
 
     def test_node_value_endpoint(self):
-        user = User.objects.get(username="ben")
+        user = User.objects.get(username="admin")
         self.client.force_login(user)
         tile = models.TileModel.objects.filter(
             resourceinstance_id=self.non_legacy_resource_instanceid
         ).first()
         nodeid = "f08a3057-95c4-11e8-9761-acde48001122"
+        value = 42
         payload = {
-            "tileid": (None, str(tile.tileid)),
-            "nodeid": (None, nodeid),
-            "data": (None, 42),
-            "operation": (None, "create"),
+            "tileid": str(tile.tileid),
+            "nodeid": nodeid,
+            "data": value,
+            "operation": "create",
         }
         response = self.client.post(
             reverse("api_node_value"),
             payload,
         )
         self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data["data"][nodeid], value)
+
+    def test_node_value_endpoint_without_tileid(self):
+        user = User.objects.get(username="admin")
+        self.client.force_login(user)
+        nodeid = "f08a3057-95c4-11e8-9761-acde48001122"
+        new_value = 99
+        payload = {
+            "resourceinstanceid": self.non_legacy_resource_instanceid,
+            "nodeid": nodeid,
+            "data": new_value,
+            "operation": "create",
+        }
+        response = self.client.post(
+            reverse("api_node_value"),
+            payload,
+        )
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data["data"][nodeid], new_value)
+
+    def test_node_value_endpoint_without_permission(self):
+        user = User.objects.get(username="anonymous")
+        self.client.force_login(user)
+        nodeid = "f08a3057-95c4-11e8-9761-acde48001122"
+        new_value = 99
+        payload = {
+            "resourceinstanceid": self.non_legacy_resource_instanceid,
+            "nodeid": nodeid,
+            "data": new_value,
+            "operation": "create",
+        }
+        response = self.client.post(
+            reverse("api_node_value"),
+            payload,
+        )
+        self.assertEqual(response.status_code, 403)
 
     def test_tiles_endpoint(self):
         user = User.objects.get(username="ben")

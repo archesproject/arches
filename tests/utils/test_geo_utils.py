@@ -7,6 +7,33 @@ import json
 # python manage.py test tests.utils.test_geo_utils --settings="tests.test_settings"
 
 
+class ArcgisJsonToGeojsonTests(TestCase):
+    def setUp(self):
+        self.geo_utils = GeoUtils()
+
+    def test_points(self):
+        geom = (
+            '{"x": -0.115, "y": 51.534, "spatialReference": {"wkid": 4326}},'
+            '{"x": -0.113, "y": 51.536, "spatialReference": {"wkid": 4326}}'
+        )
+        result = self.geo_utils.arcgisjson_to_geojson(geom)
+
+        self.assertEqual(result["type"], "FeatureCollection")
+        self.assertEqual(len(result["features"]), 2)
+        for feature in result["features"]:
+            self.assertEqual(feature["type"], "Feature")
+            self.assertEqual(feature["geometry"]["type"], "Point")
+            self.assertIsInstance(feature["properties"], dict)
+
+    def test_result_is_valid_geojson(self):
+        geom = '{"x": -118.243, "y": 34.052, "spatialReference": {"wkid": 4326}}'
+        result = self.geo_utils.arcgisjson_to_geojson(geom)
+
+        self.assertTrue(
+            GEOSGeometry(json.dumps(result["features"][0]["geometry"])).valid
+        )
+
+
 class GeoUtilsTests(TestCase):
 
     def test_convert_multipoint_to_single(self):
