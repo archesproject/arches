@@ -440,7 +440,9 @@ class Tile(models.TileModel):
         new_resource_created = kwargs.pop("new_resource_created", False)
         resource_creation = kwargs.pop("resource_creation", False)
         note = "resource creation" if resource_creation else None
-        context = kwargs.pop("context", {})
+        context = kwargs.pop("context", None)
+        if context is None:
+            context = {}
         resource = kwargs.pop("resource", None)
         transaction_id = kwargs.pop("transaction_id", None)
         provisional_edit_log_details = kwargs.pop("provisional_edit_log_details", None)
