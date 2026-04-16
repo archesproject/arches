@@ -540,7 +540,6 @@ class TileTreeOperation:
                 upsert_proxy._provisional_edit_log_details = (
                     provisional_edit_log_details
                 )
-                upsert_proxy._existing_data = vanilla_instance.data
 
             for delete_proxy in delete_proxies:
                 delete_proxy._Tile__preDelete(request=self.request)
