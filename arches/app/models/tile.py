@@ -433,16 +433,6 @@ class Tile(models.TileModel):
             datatype = self.datatype_factory.get_instance(node.datatype)
             datatype.post_tile_save(self, nodeid, request)
 
-    @staticmethod
-    def _ensure_context_dict(context: None | dict) -> dict:
-        if context is None:
-            return {}
-        if isinstance(context, dict):
-            return context
-        raise TypeError(
-            f"Tile context must be a dict or None, got {type(context).__name__}."
-        )
-
     def save(self, **kwargs):
         request = kwargs.pop("request", None)
         index = kwargs.pop("index", True)
@@ -450,7 +440,7 @@ class Tile(models.TileModel):
         new_resource_created = kwargs.pop("new_resource_created", False)
         resource_creation = kwargs.pop("resource_creation", False)
         note = "resource creation" if resource_creation else None
-        context = self._ensure_context_dict(kwargs.pop("context", None))
+        context = kwargs.pop("context", {})
         resource = kwargs.pop("resource", None)
         transaction_id = kwargs.pop("transaction_id", None)
         provisional_edit_log_details = kwargs.pop("provisional_edit_log_details", None)

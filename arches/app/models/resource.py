@@ -109,16 +109,6 @@ class Resource(models.ResourceInstance):
     def set_node_datatypes(self, node_datatypes):
         self.node_datatypes = node_datatypes
 
-    @staticmethod
-    def _ensure_context_dict(context: None | dict) -> dict:
-        if context is None:
-            return {}
-        if isinstance(context, dict):
-            return context
-        raise TypeError(
-            f"Resource context must be a dict or None, got {type(context).__name__}."
-        )
-
     def get_root_ontology(self):
         """
         Finds and returns the ontology class of the instance's root node
@@ -153,7 +143,9 @@ class Resource(models.ResourceInstance):
         if self.name is None:
             self.name = {}
 
-        context = self._ensure_context_dict(context)
+        if context is None:
+            context = {}
+
         requested_language = context.get("language")
         language = requested_language or get_language()
 
@@ -195,11 +187,12 @@ class Resource(models.ResourceInstance):
                 graph_id=self.graph_id, function__functiontype="primarydescriptors"
             ).select_related("function")
 
-        context = self._ensure_context_dict(context)
-
         for lang in settings.LANGUAGES:
             language = self.get_descriptor_language({"language": lang[0]})
-            context["language"] = language
+            if context:
+                context["language"] = language
+            else:
+                context = {"language": language}
 
             for descriptor in descriptors:
                 if len(self.descriptor_function) == 1:
@@ -506,8 +499,9 @@ class Resource(models.ResourceInstance):
         except ObjectDoesNotExist:
             document["date_last_edited"] = None
 
-        context = self._ensure_context_dict(context)
         for lang in settings.LANGUAGES:
+            if context is None:
+                context = {}
             context["language"] = lang[0]
             displayname = self.displayname(context)
             if displayname is not None and displayname != "Undefined":

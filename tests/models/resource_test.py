@@ -780,33 +780,16 @@ class ResourceTests(ArchesTestCase):
             "read_nodegroup", self.test_resource.tiles[0].nodegroup
         )
 
-
-class ContextDictContractTests(SimpleTestCase):
-    def test_resource_context_helper_returns_same_dict_instance(self):
-        provided_context = {"mode": "copy", "language": "en"}
-        normalized_context = Resource._ensure_context_dict(provided_context)
-        self.assertIs(normalized_context, provided_context)
-
-    def test_resource_context_helper_raises_for_non_dict(self):
-        with self.assertRaises(TypeError):
-            Resource._ensure_context_dict("copy")
-
-    def test_tile_context_helper_returns_same_dict_instance(self):
-        provided_context = {"mode": "copy"}
-        normalized_context = Tile._ensure_context_dict(provided_context)
-        self.assertIs(normalized_context, provided_context)
-
-    def test_tile_context_helper_raises_for_non_dict(self):
-        with self.assertRaises(TypeError):
-            Tile._ensure_context_dict(["invalid", "context"])
-
-    def test_primary_descriptor_raises_for_non_dict_context(self):
-        descriptor_function = PrimaryDescriptorsFunction()
-
-        with self.assertRaises(TypeError):
-            descriptor_function.get_primary_descriptor_from_nodes(
-                resource=object(),
-                config={"string_template": "<name>", "nodegroup_id": None},
-                context="copy",
-                descriptor="name",
+    def test_resource_copy(self):
+        copied_resource = self.test_resource.copy()
+        self.assertNotEqual(self.test_resource.pk, copied_resource.pk)
+        self.assertEqual(self.test_resource.graph_id, copied_resource.graph_id)
+        self.assertEqual(len(self.test_resource.tiles), len(copied_resource.tiles))
+        for original_tile, copied_tile in zip(
+            self.test_resource.tiles, copied_resource.tiles
+        ):
+            self.assertEqual(
+                str(original_tile.nodegroup_id), str(copied_tile.nodegroup_id)
             )
+            self.assertEqual(original_tile.data, copied_tile.data)
+            self.assertEqual(original_tile.sortorder, copied_tile.sortorder)
