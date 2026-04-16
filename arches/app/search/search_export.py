@@ -32,6 +32,7 @@ import arches.app.utils.zip as zip_utils
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.models.system_settings import settings
+from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.flatten_dict import flatten_dict
@@ -77,10 +78,31 @@ class SearchResultsExporter(object):
             main_card_list[index_number:index_number] = sub_cards_to_add
         return subcards_added
 
-    def return_ordered_header(self, graphid, export_type):
+    def get_headers(self, graph, export_type, fields):
+
+        restricted_ids = set(
+            get_nodegroups_by_perm(self.search_request.user, "no_access_to_nodegroup")
+        )
+        if not settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER or export_type == "tilexl":
+            fields_to_export = fields if type(fields) is list else [fields]
+            if len(fields_to_export) == 1:
+                return list(
+                    graph.node_set.filter(exportable=True)
+                    .exclude(nodegroup_id__in=restricted_ids)
+                    .values_list(*fields, flat=True)
+                )
+            else:
+                return list(
+                    graph.node_set.filter(exportable=True)
+                    .exclude(nodegroup_id__in=restricted_ids)
+                    .values(*fields)
+                )
+
         subcard_list_with_sort = []
-        all_cards = models.CardModel.objects.filter(graph=graphid).select_related(
-            "nodegroup"
+        all_cards = (
+            models.CardModel.objects.filter(graph=graph)
+            .exclude(nodegroup_id__in=restricted_ids)
+            .select_related("nodegroup")
         )
         all_card_list_with_sort = all_cards.exclude(sortorder=None).order_by(
             "sortorder"
@@ -211,14 +233,7 @@ class SearchResultsExporter(object):
                     resource["Link"] = f"{export_namespace}{report_url}"
 
             if format == "geojson":
-                if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER is True:
-                    headers = self.return_ordered_header(graph_id, "csv")
-                else:
-                    headers = list(
-                        graph.node_set.filter(exportable=True).values_list(
-                            "name", flat=True
-                        )
-                    )
+                headers = self.get_headers(graph, "csv", ["name"])
 
                 if (report_link == "true") and ("Link" not in headers):
                     headers.append("Link")
@@ -228,15 +243,7 @@ class SearchResultsExporter(object):
                 return ret, ""
 
             if format == "tilecsv":
-                if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER is True:
-                    headers = self.return_ordered_header(graph_id, "csv")
-                else:
-                    headers = list(
-                        graph.node_set.filter(exportable=True).values_list(
-                            "name", flat=True
-                        )
-                    )
-
+                headers = self.get_headers(graph, "csv", ["name"])
                 headers.append("resourceid")
                 if (report_link == "true") and ("Link" not in headers):
                     headers.append("Link")
@@ -245,13 +252,9 @@ class SearchResultsExporter(object):
                 )
 
             if format == "shp":
-                if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER is True:
-                    headers = self.return_ordered_header(graph_id, "shp")
-                else:
-                    headers = graph.node_set.filter(exportable=True).values(
-                        "fieldname", "datatype", "name"
-                    )[::1]
-
+                headers = self.get_headers(
+                    graph, "shp", ["fieldname", "datatype", "name"]
+                )
                 headers.append({"fieldname": "resourceid", "datatype": "str"})
 
                 missing_field_names = []
@@ -279,12 +282,10 @@ class SearchResultsExporter(object):
                 )
 
             if format == "tilexl":
-                headers = graph.node_set.filter(exportable=True).values(
-                    "fieldname", "datatype", "name"
-                )[::1]
-                headers = graph.node_set.filter(exportable=True).values(
-                    "fieldname", "datatype"
-                )[::1]
+                headers = self.get_headers(graph, "tilexl", ["fieldname", "datatype"])
+
+                headers.append({"fieldname": "resourceid", "datatype": "str"})
+                ret += self.to_tilexl(resources["output"])
                 headers.append({"fieldname": "resourceid", "datatype": "str"})
                 ret += self.to_tilexl(resources["output"])
 
