@@ -106,7 +106,7 @@
 <div id="infoTabId" role="tabpanel" data-bind="attr: {'aria-label': $root.translations.resourceInformation}">
 <div class="workbench-card-sidepanel-header-container">
     <div class="h4 workbench-card-sidepanel-header" tabindex="0" role="button"
-        data-bind="click: function(){hideSidePanel('#infoTabButton');}, onEnterkeyClick, onSpaceClick, attr: {'aria-label': $root.translations.closeResourceInformation, 'aria-description': $root.translations.resourceInformationDescription}">
+        data-bind="click: function(){hideSidePanel('#infoTabButton');}, onEnterkeyClick, onSpaceClick, attr: {'aria-label': $root.translations.closeResourceInformation, 'aria-describedby': $root.translations.resourceInformationDescription}">
         <span data-bind="text: $root.translations.resourceInformation"></span>
     </div>
 </div>
@@ -269,7 +269,7 @@
 <div id="searchTabId" role="tabpanel" data-bind="attr: {'aria-label': $root.translations.searchNetwork}">
 <div class="workbench-card-sidepanel-header-container">
     <div class="h4 workbench-card-sidepanel-header" tabindex="0" role="button" data-bind="onEnterkeyClick, onSpaceClick, click: function(){hideSidePanel('#searchTabButton');}, 
-        attr: {'aria-label': $root.translations.closeSearchNetwork, 'aria-description': $root.translations.resourceSearchDescription}">
+        attr: {'aria-label': $root.translations.closeSearchNetwork, 'aria-describedby': $root.translations.resourceSearchDescription}">
         <span data-bind="text: $root.translations.searchNetwork"></span>
     </div>
 <div class="list-filter related-reasources-search-container">
@@ -338,7 +338,7 @@
 <div id="legendTabId" role="tabpanel" data-bind="attr: {'aria-label': $root.translations.legend}">
 <div class="workbench-card-sidepanel-header-container">
     <div class="h4 workbench-card-sidepanel-header" tabindex="0" role="button" data-bind="onEnterkeyClick, onSpaceClick, click: function(){hideSidePanel('#legendTabButton');}, 
-            attr: {'aria-label': $root.translations.closeLegend, 'aria-description': $root.translations.resourceLegendDescription}">
+            attr: {'aria-label': $root.translations.closeLegend, 'aria-describedby': $root.translations.resourceLegendDescription}">
         <span data-bind="text: $root.translations.legend"></span>
     </div>
 </div>
