@@ -47,6 +47,7 @@ from arches.app.utils.permission_backend import (
 )
 from arches.test.utils import sync_overridden_test_settings_to_arches
 from tests.base_test import ArchesTestCase
+from tests.constants import AllDatatypesTestGraph
 
 from django.test import override_settings
 
@@ -55,7 +56,7 @@ from django.test import override_settings
 
 
 class ResourceTests(ArchesTestCase):
-    graph_fixtures = ["Resource Test Model"]
+    graph_fixtures = ["Resource Test Model", "All_Datatypes"]
 
     @classmethod
     def setUpTestData(cls):
@@ -235,6 +236,115 @@ class ResourceTests(ArchesTestCase):
         cls.test_resource.save()
         # add delay to allow for indexes to be updated
         time.sleep(1)
+
+    def _create_tile_node_value_for_all_datatypes_resource(
+        self,
+        datatype_name,
+        node,
+        related_resource_id,
+    ):
+        if datatype_name == "number":
+            return 3.14
+        if datatype_name == "boolean":
+            return True
+        if datatype_name in ["domain-value", "domain-value-list"]:
+            node_options = node.config.get("options", []) if node.config else []
+            first_option_id = str(node_options[0]["id"]) if node_options else None
+            if datatype_name == "domain-value":
+                return first_option_id
+            else:
+                return [first_option_id]
+
+        if datatype_name in ["concept", "concept-list"]:
+            concept_value = models.Value.objects.order_by("pk").first()
+            if datatype_name == "concept":
+                return concept_value.valueid
+            else:
+                return [concept_value.valueid]
+
+        if datatype_name == "file-list":
+            return []
+        if datatype_name == "annotation":
+            return {
+                "type": "FeatureCollection",
+                "features": [],
+            }
+        if datatype_name == "resource-instance":
+            return [
+                {
+                    "resourceId": str(related_resource_id),
+                    "ontologyProperty": "",
+                    "inverseOntologyProperty": "",
+                }
+            ]
+
+        if datatype_name == "resource-instance-list":
+            return [
+                {
+                    "resourceId": str(related_resource_id),
+                    "ontologyProperty": "",
+                    "inverseOntologyProperty": "",
+                }
+            ]
+
+        if datatype_name == "date":
+            return "2020-01-01"
+        if datatype_name == "edtf":
+            return "2020"
+        if datatype_name == "geojson-feature-collection":
+            return {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                        "geometry": {"type": "Point", "coordinates": [0, 0]},
+                        "type": "Feature",
+                        "properties": {},
+                    }
+                ],
+            }
+        if datatype_name == "string":
+            return {"en": {"value": "copy string", "direction": "ltr"}}
+        if datatype_name == "non-localized-string":
+            return "copy non localized"
+        if datatype_name == "node-value":
+            return None
+
+        return None
+
+    def _create_all_datatypes_resource(self):
+        all_datatypes_graph = Graph.objects.get(pk=AllDatatypesTestGraph.GRAPH_ID.value)
+        all_datatypes_resource = Resource(graph=all_datatypes_graph)
+        related_resource = Resource(graph=all_datatypes_graph)
+        related_resource.save(index=False)
+
+        nodes = (
+            models.Node.objects.filter(graph_id=all_datatypes_graph.pk, istopnode=False)
+            .exclude(datatype="semantic")
+            .order_by("nodegroup_id", "name")
+        )
+
+        nodes_by_nodegroup = {}
+        for node in nodes:
+            nodes_by_nodegroup.setdefault(node.nodegroup_id, []).append(node)
+
+        for sortorder, nodegroup_id in enumerate(nodes_by_nodegroup):
+            tile_data = {}
+            for node in nodes_by_nodegroup[nodegroup_id]:
+                node_value = self._create_tile_node_value_for_all_datatypes_resource(
+                    datatype_name=node.datatype,
+                    node=node,
+                    related_resource_id=related_resource.pk,
+                )
+                tile_data[str(node.pk)] = node_value
+
+            tile_for_nodegroup = Tile(
+                data=tile_data,
+                nodegroup_id=nodegroup_id,
+                sortorder=sortorder,
+            )
+            all_datatypes_resource.tiles.append(tile_for_nodegroup)
+        all_datatypes_resource.save(index=False)
+        return all_datatypes_resource
 
     def test_update_resource_instance_lifecycle_state_success(self):
         self.test_resource.graph.resource_instance_lifecycle = self.lifecycle
@@ -780,12 +890,25 @@ class ResourceTests(ArchesTestCase):
         )
 
     def test_resource_copy(self):
-        copied_resource = self.test_resource.copy()
-        self.assertNotEqual(self.test_resource.pk, copied_resource.pk)
-        self.assertEqual(self.test_resource.graph_id, copied_resource.graph_id)
-        self.assertEqual(len(self.test_resource.tiles), len(copied_resource.tiles))
+        all_datatypes_resource = self._create_all_datatypes_resource()
+        copied_resource = all_datatypes_resource.copy()
+
+        self.assertNotEqual(all_datatypes_resource.pk, copied_resource.pk)
+        self.assertEqual(all_datatypes_resource.graph_id, copied_resource.graph_id)
+        self.assertEqual(len(all_datatypes_resource.tiles), len(copied_resource.tiles))
+
+        all_datatypes_original_tiles = sorted(
+            all_datatypes_resource.tiles,
+            key=lambda tile_instance: tile_instance.sortorder,
+        )
+        all_datatypes_copied_tiles = sorted(
+            copied_resource.tiles,
+            key=lambda tile_instance: tile_instance.sortorder,
+        )
+
         for original_tile, copied_tile in zip(
-            self.test_resource.tiles, copied_resource.tiles
+            all_datatypes_original_tiles,
+            all_datatypes_copied_tiles,
         ):
             self.assertEqual(
                 str(original_tile.nodegroup_id), str(copied_tile.nodegroup_id)
