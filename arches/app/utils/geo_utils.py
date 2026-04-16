@@ -92,20 +92,16 @@ class GeoUtils(object):
     def _strip_z_m(self, geometry):
         if geometry is None:
             return
-        geom_type = geometry.get("type")
-        if geom_type == "Point":
-            geometry["coordinates"] = geometry["coordinates"][:2]
-        elif geom_type in ("LineString", "MultiPoint"):
-            geometry["coordinates"] = [c[:2] for c in geometry["coordinates"]]
-        elif geom_type in ("Polygon", "MultiLineString"):
-            geometry["coordinates"] = [
-                [c[:2] for c in ring] for ring in geometry["coordinates"]
-            ]
-        elif geom_type == "MultiPolygon":
-            geometry["coordinates"] = [
-                [[c[:2] for c in ring] for ring in polygon]
-                for polygon in geometry["coordinates"]
-            ]
+        elif isinstance(geometry, dict):
+            if geometry.get("type") == "GeometryCollection":
+                for geom in geometry.get("geometries", []):
+                    self._strip_z_m(geom)
+            elif coords := geometry.get("coordinates"):
+                geometry["coordinates"] = self._strip_z_m(coords)
+        elif isinstance(geometry[0], (int, float)):
+            return geometry[:2]
+        else:
+            return [self._strip_z_m(c) for c in geometry]
 
     def convert_geos_geom_collection_to_feature_collection(self, geometry):
         arches_geojson = {}
