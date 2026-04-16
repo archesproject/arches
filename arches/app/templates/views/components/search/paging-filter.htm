@@ -7,7 +7,7 @@
                 <!-- ko if: page -->
                 <li class="page" data-bind="click: $parents[1].newPage.bind($parents[1]), css: {'current active': (page == $parent.current_page())}">
                     <a href="#" data-bind="text: page, attr:{'data-page':page, 'aria-label': $root.translations.page + ' ' + page, 
-                    'role': 'menuitem', 'aria-posinet': page}"
+                    'role': 'menuitem', 'aria-posinet': page, 'aria-setsize': '-1'}"
                 ></a></li>
                 <!-- /ko -->
                 <!-- ko ifnot: page -->
