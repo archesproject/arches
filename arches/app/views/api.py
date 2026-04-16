@@ -1746,7 +1746,7 @@ class NodeValue(APIBase):
                 )
             if operation == "append":
                 data = datatype.update(tile, data, nodeid, action=operation)
-        except ObjectDoesNotExist:
+        except (ObjectDoesNotExist, ValidationError):
             if (
                 resourceid
                 and models.ResourceInstance.objects.filter(pk=resourceid).exists()
