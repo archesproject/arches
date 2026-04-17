@@ -256,11 +256,11 @@ class ResourceTests(ArchesTestCase):
                 return [first_option_id]
 
         if datatype_name in ["concept", "concept-list"]:
-            concept_value = models.Value.objects.order_by("pk").first()
+            concept_value = str(models.Value.objects.order_by("pk").first().valueid)
             if datatype_name == "concept":
-                return concept_value.valueid
+                return concept_value
             else:
-                return [concept_value.valueid]
+                return [concept_value]
 
         if datatype_name == "file-list":
             return []
