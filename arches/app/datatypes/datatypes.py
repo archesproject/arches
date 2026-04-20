@@ -2507,7 +2507,7 @@ class ResourceInstanceDataType(BaseDataType):
                 }
 
         converted_value, value_type = self.test_for_subtype(value)
-        if converted_value is False or not len(converted_value):
+        if not converted_value:
             convert_error_msg = (
                 f"ResourceInstanceDataType: value could not be converted: {value}"
             )
