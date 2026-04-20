@@ -126,20 +126,17 @@ class ResourceAPITests(ArchesTestCase):
 
         request = factory.get(reverse("api_node_value", kwargs={}), {"ver": "2.0"})
         request.user = None
-        with self.assertLogs("django.request", level="WARNING"):
-            response = view(request)
+        response = view(request)
         self.assertEqual(request.GET.get("ver"), "2.0")
 
         request = factory.get(reverse("api_node_value"), kwargs={})
         request.user = None
-        with self.assertLogs("django.request", level="WARNING"):
-            response = view(request)
+        response = view(request)
         self.assertEqual(request.GET.get("ver"), "2.1")
 
     @override_settings(DEBUG=False)
     def test_api_404_returns_json(self):
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.get("/api/doesnotexist")
+        response = self.client.get("/api/doesnotexist")
         self.assertContains(
             response,
             "Not Found",
@@ -375,10 +372,7 @@ class ResourceAPITests(ArchesTestCase):
         # ==PUT=============================================================================================
 
         # ==Act : GET confirmation that resource does not exist in database=================================
-        with (
-            self.assertLogs("django.request", level="WARNING"),
-            self.assertLogs("arches.app.views.api", level="ERROR"),
-        ):
+        with self.assertLogs("arches.app.views.api", level="ERROR"):
             resp_get = self.client.get(
                 reverse(
                     "resources",
@@ -440,16 +434,15 @@ class ResourceAPITests(ArchesTestCase):
         # ==================================================================================================
 
         # ==Act : PUT resource changes to database, with invalid URI========================================
-        with self.assertLogs("django.request", level="WARNING"):
-            resp_put_uri_diff = self.client.put(
-                reverse(
-                    "resources",
-                    kwargs={"resourceid": "001fe587-ad3d-4d0d-a3c9-814028766434"},
-                )
-                + "?format=arches-json",
-                payload_modified,
-                content_type,
+        resp_put_uri_diff = self.client.put(
+            reverse(
+                "resources",
+                kwargs={"resourceid": "001fe587-ad3d-4d0d-a3c9-814028766434"},
             )
+            + "?format=arches-json",
+            payload_modified,
+            content_type,
+        )
         # ==Assert==========================================================================================
         self.assertEqual(resp_put_uri_diff.status_code, 400)  # Bad Request.
         # ==================================================================================================
@@ -511,10 +504,7 @@ class ResourceAPITests(ArchesTestCase):
         # ==================================================================================================
 
         # ==Act : GET confirmation that resource does not exist in database=================================
-        with (
-            self.assertLogs("django.request", level="WARNING"),
-            self.assertLogs("arches.app.views.api", level="ERROR"),
-        ):
+        with self.assertLogs("arches.app.views.api", level="ERROR"):
             resp_get_deleted = self.client.get(
                 reverse(
                     "resources",
@@ -534,11 +524,10 @@ class ResourceAPITests(ArchesTestCase):
         # Bypass validation in .save()
         Graph.objects.filter(pk=self.data_type_graph.pk).update(ontology=None)
 
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.get(
-                reverse("resources", kwargs={"resourceid": str(self.test_prj_user.pk)})
-                + "?format=json-ld"
-            )
+        response = self.client.get(
+            reverse("resources", kwargs={"resourceid": str(self.test_prj_user.pk)})
+            + "?format=json-ld"
+        )
 
         self.assertEqual(response.status_code, 400)
 

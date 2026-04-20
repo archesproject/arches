@@ -128,10 +128,7 @@ class JSONLDImportTests(TransactionTestCase):
         self.basic_resource_1.delete()
         self.basic_graph.delete()
 
-        with (
-            open(self.uploaded_zip_location, "rb") as f,
-            self.assertLogs("django.request", level="WARNING"),
-        ):
+        with open(self.uploaded_zip_location, "rb") as f:
             response = self.client.post(
                 reverse("etl_manager"),
                 data={

@@ -76,13 +76,12 @@ class WorkflowHistoryTests(ArchesTestCase):
 
     def test_get_workflow_history(self):
         self.client.force_login(self.anonymous)
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.get(
-                reverse(
-                    "workflow_history",
-                    kwargs={"workflowid": str(self.history.workflowid)},
-                )
+        response = self.client.get(
+            reverse(
+                "workflow_history",
+                kwargs={"workflowid": str(self.history.workflowid)},
             )
+        )
 
         self.assertContains(
             response, "Permission Denied", status_code=HTTPStatus.FORBIDDEN
@@ -139,15 +138,14 @@ class WorkflowHistoryTests(ArchesTestCase):
 
         # Non-superuser cannot update someone else's workflow.
         self.client.force_login(self.editor)
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.post(
-                reverse(
-                    "workflow_history",
-                    kwargs={"workflowid": str(self.history.workflowid)},
-                ),
-                post_data,
-                content_type="application/json",
-            )
+        response = self.client.post(
+            reverse(
+                "workflow_history",
+                kwargs={"workflowid": str(self.history.workflowid)},
+            ),
+            post_data,
+            content_type="application/json",
+        )
 
         self.assertContains(
             response, "Permission Denied", status_code=HTTPStatus.FORBIDDEN
@@ -194,18 +192,17 @@ class WorkflowHistoryTests(ArchesTestCase):
         self.history.save()
         self.client.force_login(self.admin)
 
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.post(
-                reverse(
-                    "workflow_history",
-                    kwargs={"workflowid": str(self.history.workflowid)},
-                ),
-                {
-                    "workflowid": str(self.history.workflowid),
-                    "workflowname": "test-name",
-                    "completed": False,
-                },
-                content_type="application/json",
-            )
+        response = self.client.post(
+            reverse(
+                "workflow_history",
+                kwargs={"workflowid": str(self.history.workflowid)},
+            ),
+            {
+                "workflowid": str(self.history.workflowid),
+                "workflowname": "test-name",
+                "completed": False,
+            },
+            content_type="application/json",
+        )
 
         self.assertEqual(response.status_code, 400)

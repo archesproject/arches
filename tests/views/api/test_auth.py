@@ -38,10 +38,7 @@ class AuthAPITests(ArchesTestCase):
 
     @override_settings(FORCE_TWO_FACTOR_AUTHENTICATION=True)
     def test_login_rejected_two_factor_enabled(self):
-        with (
-            sync_overridden_test_settings_to_arches(),
-            self.assertLogs("django.request", level="WARNING"),
-        ):
+        with sync_overridden_test_settings_to_arches():
             response = self.client.post(
                 reverse("api_login"),
                 {"username": "visitor", "password": "jazz"},
@@ -54,10 +51,9 @@ class AuthAPITests(ArchesTestCase):
         )
 
     def test_login_failure_missing_credentials(self):
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.post(
-                reverse("api_login"), {}, content_type="application/json"
-            )
+        response = self.client.post(
+            reverse("api_login"), {}, content_type="application/json"
+        )
         self.assertContains(
             response,
             "Invalid username and/or password.",
@@ -65,12 +61,11 @@ class AuthAPITests(ArchesTestCase):
         )
 
     def test_login_failure_wrong_credentials(self):
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.post(
-                reverse("api_login"),
-                {"username": "visitor", "password": "garbage"},
-                content_type="application/json",
-            )
+        response = self.client.post(
+            reverse("api_login"),
+            {"username": "visitor", "password": "garbage"},
+            content_type="application/json",
+        )
         self.assertContains(
             response,
             "Invalid username and/or password.",
@@ -80,13 +75,10 @@ class AuthAPITests(ArchesTestCase):
     def test_login_failure_inactive_user(self):
         self.visitor.is_active = False
         self.visitor.save()
-        with (
-            self.modify_settings(
-                AUTHENTICATION_BACKENDS={
-                    "prepend": "django.contrib.auth.backends.AllowAllUsersModelBackend"
-                }
-            ),
-            self.assertLogs("django.request", level="WARNING"),
+        with self.modify_settings(
+            AUTHENTICATION_BACKENDS={
+                "prepend": "django.contrib.auth.backends.AllowAllUsersModelBackend"
+            }
         ):
             response = self.client.post(
                 reverse("api_login"),
@@ -100,10 +92,7 @@ class AuthAPITests(ArchesTestCase):
         )
 
     def test_login_get_not_allowed(self):
-        with self.assertLogs("django.request", level="WARNING"):
-            self.client.get(
-                reverse("api_login"), status_code=HTTPStatus.METHOD_NOT_ALLOWED
-            )
+        self.client.get(reverse("api_login"), status_code=HTTPStatus.METHOD_NOT_ALLOWED)
 
     def test_logout(self):
         self.client.force_login(self.visitor)

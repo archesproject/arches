@@ -43,8 +43,7 @@ class UserAPITests(TestCase):
         self.visitor.save()
 
         self.client.force_login(self.visitor)
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.get(reverse("api_user"))
+        response = self.client.get(reverse("api_user"))
         self.assertContains(
             response,
             "This account is no longer active.",

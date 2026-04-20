@@ -857,15 +857,13 @@ class SearchTests(ArchesTestCase):
 
         """
         query = {"search-view": "unavailable-search-view"}
-        with self.assertLogs("django.request", level="WARNING"):
-            response_json = get_response_json(self.client, query=query)
+        response_json = get_response_json(self.client, query=query)
         self.assertFalse(response_json["success"])
 
         # Also test search_home route, not just search_results
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.get(
-                reverse("search_home"), QUERY_STRING="search-view=nonexistent"
-            )
+        response = self.client.get(
+            reverse("search_home"), QUERY_STRING="search-view=nonexistent"
+        )
         self.assertContains(
             response,
             "Search view instance not found",

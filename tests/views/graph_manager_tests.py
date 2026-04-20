@@ -314,7 +314,7 @@ class GraphManagerViewTests(ArchesTestCase):
         data = JSONSerializer().serializeToPython(node)
         data["parentproperty"] = "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as"
 
-        with self.assertLogs("django.request", level="WARNING"):
+        with self.assertLogs("django.request", level="ERROR"):
             response = self.client.post(url, data, content_type="application/json")
         self.assertContains(
             response,

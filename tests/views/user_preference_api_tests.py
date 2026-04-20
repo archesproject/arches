@@ -64,24 +64,22 @@ class UserPrefApiTest(ArchesTestCase):
         self.assertFalse(isinstance(response_json, list))
 
     def test_detail_get_identifier_no_permission(self):
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.get(
-                reverse(
-                    "api_user_preference_detail_view",
-                    kwargs={"identifier": self.admin_preference_id},
-                ),
-            )
-            self.assertEqual(response.status_code, 403)
+        response = self.client.get(
+            reverse(
+                "api_user_preference_detail_view",
+                kwargs={"identifier": self.admin_preference_id},
+            ),
+        )
+        self.assertEqual(response.status_code, 403)
 
     def test_detail_get_invalid_identifier(self):
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.get(
-                reverse(
-                    "api_user_preference_detail_view",
-                    kwargs={"identifier": str(uuid.uuid4())},
-                ),
-            )
-            self.assertEqual(response.status_code, 404)
+        response = self.client.get(
+            reverse(
+                "api_user_preference_detail_view",
+                kwargs={"identifier": str(uuid.uuid4())},
+            ),
+        )
+        self.assertEqual(response.status_code, 404)
 
     def test_detail_get_no_identifier(self):
         # Show that providing no identifier returns the listView
@@ -133,33 +131,30 @@ class UserPrefApiTest(ArchesTestCase):
         self.assertEqual(response.status_code, 204)
 
     def test_delete_unauthorised_user(self):
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.delete(
-                reverse(
-                    "api_user_preference_detail_view",
-                    kwargs={"identifier": self.admin_preference_id},
-                ),
-            )
-            self.assertEqual(response.status_code, 403)
+        response = self.client.delete(
+            reverse(
+                "api_user_preference_detail_view",
+                kwargs={"identifier": self.admin_preference_id},
+            ),
+        )
+        self.assertEqual(response.status_code, 403)
 
     def test_delete_with_no_identifier(self):
         self.client.login(username="admin", password="admin")
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.delete(
-                reverse("api_user_preference_detail_view", kwargs={"identifier": ""}),
-            )
-            self.assertEqual(response.status_code, 405)
+        response = self.client.delete(
+            reverse("api_user_preference_detail_view", kwargs={"identifier": ""}),
+        )
+        self.assertEqual(response.status_code, 405)
 
     def test_delete_invalid_identifier(self):
         self.client.login(username="admin", password="admin")
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.delete(
-                reverse(
-                    "api_user_preference_detail_view",
-                    kwargs={"identifier": str(uuid.uuid4())},
-                ),
-            )
-            self.assertEqual(response.status_code, 404)
+        response = self.client.delete(
+            reverse(
+                "api_user_preference_detail_view",
+                kwargs={"identifier": str(uuid.uuid4())},
+            ),
+        )
+        self.assertEqual(response.status_code, 404)
 
     def test_post_valid(self):
         self.client.login(username="admin", password="admin")
@@ -179,44 +174,40 @@ class UserPrefApiTest(ArchesTestCase):
         user_pref = self.user_preference_json_data("admin")
         del user_pref["username"]
         del user_pref["config"]
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.post(
-                reverse("api_user_preference_list_view"),
-                data=user_pref,
-                content_type="application/json",
-            )
-            response_json = json.loads(response.content)
+        response = self.client.post(
+            reverse("api_user_preference_list_view"),
+            data=user_pref,
+            content_type="application/json",
+        )
+        response_json = json.loads(response.content)
         self.assertEqual(response.status_code, 400)
 
     def test_post_unauthorised_user(self):
         user_pref = self.user_preference_json_data("anonymous")
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.post(
-                reverse("api_user_preference_list_view"),
-                data=user_pref,
-                content_type="application/json",
-            )
-            self.assertEqual(response.status_code, 403)
+        response = self.client.post(
+            reverse("api_user_preference_list_view"),
+            data=user_pref,
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 403)
 
     def test_post_invalid_user(self):
         self.client.login(username="admin", password="admin")
         user_pref = self.user_preference_json_data("fakeuser")
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.post(
-                reverse("api_user_preference_list_view"),
-                data=user_pref,
-                content_type="application/json",
-            )
+        response = self.client.post(
+            reverse("api_user_preference_list_view"),
+            data=user_pref,
+            content_type="application/json",
+        )
         self.assertEqual(response.status_code, 400)
 
     def test_post_with_userpreferenceid(self):
         self.client.login(username="admin", password="admin")
         user_pref = self.user_preference_json_data("admin")
         user_pref["userpreferenceid"] = str(uuid.uuid4())
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.post(
-                reverse("api_user_preference_list_view"),
-                data=user_pref,
-                content_type="application/json",
-            )
+        response = self.client.post(
+            reverse("api_user_preference_list_view"),
+            data=user_pref,
+            content_type="application/json",
+        )
         self.assertEqual(response.status_code, 400)

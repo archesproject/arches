@@ -75,14 +75,12 @@ class ETLManagerTests(ArchesTestCase):
 
     def test_no_loadid(self):
         self.client.force_login(self.admin)
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.get(
-                reverse("etl_manager"), QUERY_STRING="action=nodeError"
-            )
+        response = self.client.get(
+            reverse("etl_manager"), QUERY_STRING="action=nodeError"
+        )
         self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
 
     def test_insufficent_permissions(self):
         self.client.force_login(self.anonymous)
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.get(reverse("etl_manager"))
+        response = self.client.get(reverse("etl_manager"))
         self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)

@@ -191,16 +191,15 @@ class AuthTests(ArchesTestCase):
         """
         settings.ENABLE_TWO_FACTOR_AUTHENTICATION = True
 
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.post(
-                reverse("two-factor-authentication-login"),
-                {
-                    "username": "test",
-                    "password": "password",
-                    "user-has-enabled-two-factor-authentication": True,
-                    "two-factor-authentication": 123456,
-                },
-            )
+        response = self.client.post(
+            reverse("two-factor-authentication-login"),
+            {
+                "username": "test",
+                "password": "password",
+                "user-has-enabled-two-factor-authentication": True,
+                "two-factor-authentication": 123456,
+            },
+        )
 
         self.assertTemplateUsed(response, "two_factor_authentication_login.htm")
         self.assertTrue(response.status_code == 401)

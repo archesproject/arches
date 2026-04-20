@@ -153,8 +153,7 @@ class ResourceViewTests(ArchesTestCase):
         )
         group = Group.objects.get(pk=2)
         assign_perm("change_resourceinstance", group, self.resource)
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.get(url)
+        response = self.client.get(url)
         self.assertTrue(response.status_code == 403)
 
     def test_user_cannot_edit_without_permission(self):
@@ -242,8 +241,7 @@ class ResourceViewTests(ArchesTestCase):
         assign_perm("change_resourceinstance", group, self.resource)
         assign_perm("delete_resourceinstance", group, self.resource)
         assign_perm("no_access_to_resourceinstance", user, self.resource)
-        with self.assertLogs("django.request", level="WARNING"):
-            view = self.client.get(view_url)
+        view = self.client.get(view_url)
 
         edit = self.client.get(edit_url)
 
@@ -359,8 +357,7 @@ class ResourceViewTests(ArchesTestCase):
 
     def test_resource_report_missing_resource(self):
         self.client.login(username="sam", password="Test12345!")
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.get(
-                reverse("resource_report", kwargs={"resourceid": str(uuid.uuid4())})
-            )
+        response = self.client.get(
+            reverse("resource_report", kwargs={"resourceid": str(uuid.uuid4())})
+        )
         self.assertEqual(response.status_code, 404)

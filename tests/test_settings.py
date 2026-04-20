@@ -73,6 +73,7 @@ CACHES = {
     },
 }
 
+LOGGING["loggers"]["django.request"]["level"] = "ERROR"
 LOGGING["loggers"]["arches"]["level"] = "ERROR"
 
 ELASTICSEARCH_PREFIX = "test"
