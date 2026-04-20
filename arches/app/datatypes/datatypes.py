@@ -2513,9 +2513,10 @@ class ResourceInstanceDataType(BaseDataType):
             )
             if validate:
                 errors.append(convert_error_msg)
+                return errors
             else:
                 logger.error(convert_error_msg)
-                return []
+                return
 
         se = SearchEngineFactory().create()
         query = Query(se)
@@ -2654,6 +2655,7 @@ class ResourceInstanceDataType(BaseDataType):
             logger.error(
                 f"ResourceInstanceDataType: no resources found for {converted_value}"
             )
+            transformed_value = None
 
         if validate:
             return errors
