@@ -2454,6 +2454,7 @@ class ResourceInstanceDataType(BaseDataType):
                         value_subtype_class(val) for val in converted_value
                     ]
                     value_type = value_subtype_label
+                    break
                 except ValueError:
                     continue
                 except AttributeError:
