@@ -2417,12 +2417,17 @@ class ResourceInstanceDataType(BaseDataType):
             # "int": int,
             # "float": float,
         }
+        test_dict = {"uuid": uuid.UUID, "json": json.loads, "ast": ast.literal_eval}
         converted_value = None
 
         if isinstance(value, str):
-            for test_method in [uuid.UUID, json.loads, ast.literal_eval]:
+            for label, test_method in test_dict.items():
                 try:
                     converted_value = test_method(value)
+                    if label == "uuid":
+                        return [
+                            converted_value,
+                        ], label
                     break
                 except:
                     pass
@@ -2446,7 +2451,9 @@ class ResourceInstanceDataType(BaseDataType):
         if not converted_value:
             return converted_value, value_type
         if not isinstance(converted_value, list):
-            converted_value = [converted_value]
+            converted_value = [
+                converted_value,
+            ]
         for value_subtype_label, value_subtype_class in list(subtypes_dict.items()):
             if value_subtype_label == "uuid":
                 try:
