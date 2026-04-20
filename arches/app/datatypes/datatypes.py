@@ -2493,6 +2493,14 @@ class ResourceInstanceDataType(BaseDataType):
         }
         return mapping
 
+    def copy(self, value, **kwargs):
+        # pre_tile_save creates a new resourceXresourceId, post_tile_save creates
+        # the record during __arches_create_resource_x_resource_relationships
+        if value:
+            for val in value:
+                val["resourceXresourceId"] = ""
+        return value
+
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):
     def to_json(self, tile, node):
