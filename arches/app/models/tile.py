@@ -469,9 +469,11 @@ class Tile(models.TileModel):
                     if item["nodeid"] == nodeid
                 )
                 datatype = self.datatype_factory.get_instance(node["datatype"])
-                datatype.pre_tile_save(self, nodeid)
                 if mode == "copy":
-                    self.data[nodeid] = datatype.copy(self.data[nodeid])
+                    self.data[nodeid] = datatype.copy(
+                        self.data[nodeid], resource=resource
+                    )
+                datatype.pre_tile_save(self, nodeid)
             self.__preSave(request, context=context)
             self.check_for_missing_nodes()
             self.check_for_constraint_violation()
