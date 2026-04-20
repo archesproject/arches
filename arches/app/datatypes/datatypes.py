@@ -2115,7 +2115,7 @@ class ResourceInstanceDataType(BaseDataType):
         errors = []
         if value is not None:
             from_resourceid = kwargs.get("resourceid", None)
-            if value is not None and not len(value):
+            if not len(value):
                 # message = _("No related resources were provided in the value.")
                 # title = _("Invalid Resource Instance Datatype")
                 # error_message = self.create_error_message(
@@ -2136,11 +2136,25 @@ class ResourceInstanceDataType(BaseDataType):
                     ]
                 )
 
-            relations = self.get_nodevalues(value)
+            relations, value_type = self.test_for_subtype(value)
+            if relations is None:
+                message = _(
+                    "Invalid Value: Check that the value actually exists if it was a legacyid or uuid."
+                )
+                title = _("Invalid Resource Instance Datatype Value")
+                error_message = self.create_error_message(
+                    value, source, row_number, message, title
+                )
+                errors.append(error_message)
+                return errors
             for rel in relations:
                 try:
-                    resourceid = rel["resourceId"]
-                    uuid.UUID(resourceid)
+                    if value_type == "uuid":
+                        resourceid = str(rel)
+                    elif value_type == "str":
+                        resourceid = rel
+                    elif value_type == "dict":
+                        resourceid = rel["resourceId"]
                     if strict:
                         try:
                             if not node:
@@ -2152,8 +2166,17 @@ class ResourceInstanceDataType(BaseDataType):
                                     bool_query = Bool()
                                     ri_query = Dsl(dsl)
                                     bool_query.must(ri_query)
-                                    ids_query = Dsl({"ids": {"values": [resourceid]}})
-                                    bool_query.must(ids_query)
+                                    if value_type in ("uuid", "dict"):
+                                        ids_query = Dsl(
+                                            {"ids": {"values": [resourceid]}}
+                                        )
+                                        bool_query.must(ids_query)
+                                    elif value_type == "str":
+                                        legacy_terms_query = Terms(
+                                            field="legacyid.keyword",
+                                            values=[resourceid],
+                                        )
+                                        bool_query.must(legacy_terms_query)
                                     query.add_query(bool_query)
                                     try:
                                         results = query.search(index=RESOURCES_INDEX)
