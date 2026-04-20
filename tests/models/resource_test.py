@@ -890,6 +890,7 @@ class ResourceTests(ArchesTestCase):
         )
 
     def test_resource_copy(self):
+        self.maxDiff = None
         all_datatypes_resource = self._create_all_datatypes_resource()
         copied_resource = all_datatypes_resource.copy()
 
@@ -897,21 +898,41 @@ class ResourceTests(ArchesTestCase):
         self.assertEqual(all_datatypes_resource.graph_id, copied_resource.graph_id)
         self.assertEqual(len(all_datatypes_resource.tiles), len(copied_resource.tiles))
 
-        all_datatypes_original_tiles = sorted(
-            all_datatypes_resource.tiles,
-            key=lambda tile_instance: tile_instance.sortorder,
-        )
-        all_datatypes_copied_tiles = sorted(
-            copied_resource.tiles,
-            key=lambda tile_instance: tile_instance.sortorder,
-        )
+        original_tiles = models.TileModel.objects.filter(
+            resourceinstance=all_datatypes_resource.pk
+        ).order_by("sortorder")
+        copied_tiles = models.TileModel.objects.filter(
+            resourceinstance=copied_resource.pk
+        ).order_by("sortorder")
 
         for original_tile, copied_tile in zip(
-            all_datatypes_original_tiles,
-            all_datatypes_copied_tiles,
+            original_tiles,
+            copied_tiles,
         ):
             self.assertEqual(
                 str(original_tile.nodegroup_id), str(copied_tile.nodegroup_id)
             )
-            self.assertEqual(original_tile.data, copied_tile.data)
             self.assertEqual(original_tile.sortorder, copied_tile.sortorder)
+            if original_tile.find_nodegroup_alias() == "resource_instance":
+                nodeids = list(original_tile.data.keys())
+                for nodeid in nodeids:
+                    original_value = original_tile.data[nodeid][0]
+                    copied_value = copied_tile.data[nodeid][0]
+                    self.assertEqual(
+                        original_value["resourceId"],
+                        copied_value["resourceId"],
+                    )
+                    self.assertEqual(
+                        original_value["ontologyProperty"],
+                        copied_value["ontologyProperty"],
+                    )
+                    self.assertEqual(
+                        original_value["inverseOntologyProperty"],
+                        copied_value["inverseOntologyProperty"],
+                    )
+                    self.assertNotEqual(
+                        original_value["resourceXresourceId"],
+                        copied_value["resourceXresourceId"],
+                    )
+            else:
+                self.assertEqual(original_tile.data, copied_tile.data)
