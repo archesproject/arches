@@ -2434,7 +2434,9 @@ class ResourceInstanceDataType(BaseDataType):
                     converted_value = [uuid.UUID(val) for val in converted_value]
                 except:
                     pass
-            elif not converted_value or not len(converted_value):
+            elif converted_value:
+                pass
+            else:
                 logger.warning("ResourceInstanceDataType: value is empty")
                 # return []
         else:
