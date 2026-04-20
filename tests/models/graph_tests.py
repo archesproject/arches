@@ -153,18 +153,17 @@ class GraphTests(ArchesTestCase):
             },
         ]
 
-        # default_widgets_by_datatype = {
-        #     datatype.pk: datatype.defaultwidget
-        #     for datatype in models.DDataType.objects.select_related("defaultwidget")
-        # }
+        default_widgets_by_datatype = {
+            datatype.pk: datatype.defaultwidget
+            for datatype in models.DDataType.objects.select_related("defaultwidget")
+        }
         for node_data in nodes_data:
             node = models.Node.objects.create(**node_data)
-            # This should be uncommented when it will no longer cause failures.
-            # models.CardXNodeXWidget.objects.create(
-            #     card=node.nodegroup.cardmodel_set.all()[0],
-            #     node=node,
-            #     widget=default_widgets_by_datatype[node.datatype],
-            # )
+            models.CardXNodeXWidget.objects.create(
+                card=node.nodegroup.cardmodel_set.all()[0],
+                node=node,
+                widget=default_widgets_by_datatype[node.datatype],
+            )
 
         models.NodeGroup.objects.filter(
             pk="20000000-0000-0000-0000-100000000001"
@@ -1425,21 +1424,6 @@ class GraphTests(ArchesTestCase):
             graph.save()
 
     def test_graph_validation_of_widget_count(self):
-        # Add missing CardXNodeXWidget instances to the graph
-        # See commented out code in setUpTestData() where this should be done.
-        default_widgets_by_datatype = {
-            datatype.pk: datatype.defaultwidget
-            for datatype in models.DDataType.objects.select_related("defaultwidget")
-        }
-        for node in self.node_node_type_graph.nodes.values():
-            models.CardXNodeXWidget.objects.create(
-                card=node.nodegroup.cardmodel_set.first(),
-                node=node,
-                widget=default_widgets_by_datatype[node.datatype],
-            )
-
-        self.node_node_type_graph.refresh_from_database()
-        self.node_node_type_graph.has_unpublished_changes = True
         superfluous_widgets = {
             uid: models.CardXNodeXWidget(node=node)
             for uid, node in [

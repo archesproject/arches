@@ -1228,11 +1228,16 @@ class Graph(models.GraphModel):
             else:
                 self._nodegroups_to_delete = [old_node.nodegroup]
                 # remove a card
-                self.cards = {
-                    card_id: card
-                    for card_id, card in self.cards.items()
-                    if card.nodegroup_id != old_node.nodegroup_id
-                }
+                for card in self.cards.values():
+                    if card.nodegroup_id == old_node.nodegroup_id:
+                        removed_card = self.cards.pop(card.pk)
+                        # Check for stale card references on widgets.
+                        self.widgets = {
+                            widget.pk: widget
+                            for widget in self.widgets.values()
+                            if widget.card_id != removed_card.pk
+                        }
+                        break
 
         try:
             new_card = models.CardModel.objects.get(
