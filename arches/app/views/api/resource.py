@@ -757,7 +757,7 @@ class ResourceReport(APIBase):
                     card
                     for card in graph.cards.values()
                     if card.nodegroup_id in readable_nodegroup_ids
-                    and card.nodegroup_id in writable_nodegroup_ids
+                    or card.nodegroup_id in writable_nodegroup_ids
                 ],
                 key=lambda card: card.sortorder or 0,
             )
