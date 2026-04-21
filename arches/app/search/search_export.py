@@ -83,20 +83,17 @@ class SearchResultsExporter(object):
     def get_restricted_nodegroups(self):
 
         ct = ContentType.objects.get_for_model(models.NodeGroup)
-
-        return set(
-            GroupObjectPermission.objects.filter(
-                content_type=ct,
-                permission__codename="no_access_to_nodegroup",
-                group__in=self.search_request.user.groups.all(),
-            ).values_list("object_pk", flat=True)
-        ) | set(
-            UserObjectPermission.objects.filter(
-                content_type=ct,
-                permission__codename="no_access_to_nodegroup",
-                user=self.search_request.user,
-            ).values_list("object_pk", flat=True)
-        )
+        group_restrictions = GroupObjectPermission.objects.filter(
+            content_type=ct,
+            permission__codename="no_access_to_nodegroup",
+            group__in=self.search_request.user.groups.all(),
+        ).values_list("object_pk", flat=True)
+        user_restrictions = UserObjectPermission.objects.filter(
+            content_type=ct,
+            permission__codename="no_access_to_nodegroup",
+            user=self.search_request.user,
+        ).values_list("object_pk", flat=True)
+        return set(group_restrictions).union(user_restrictions)
 
     def get_headers(self, graph, export_type, fields):
 
