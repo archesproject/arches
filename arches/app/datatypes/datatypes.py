@@ -865,7 +865,7 @@ class DateDataType(BaseDataType):
                 (
                     edge_info["d_uri"],
                     URIRef(edge.ontologyproperty),
-                    Literal(edge_info["range_tile_data"], datatype=XSD.dateTime),
+                    Literal(edge_info["range_tile_data"]),
                 )
             )
         return g
