@@ -98,14 +98,16 @@ class Command(BaseCommand):
         if self.verbosity >= 1:
             self.stdout.write(self.style.MIGRATE_HEADING("Operations to perform:"))
             if plan:
-                self.stdout.write(
-                    self.style.MIGRATE_LABEL("  Apply all data migrations: ")
-                    + ", ".join(
-                        f"{app}.{name}"
-                        for (app, name, _), backwards in plan
-                        if not backwards
+                forwards = [f"{app}.{name}" for (app, name, _), bw in plan if not bw]
+                backwards = [f"{app}.{name}" for (app, name, _), bw in plan if bw]
+                if forwards:
+                    self.stdout.write(
+                        self.style.MIGRATE_LABEL("  Apply: ") + ", ".join(forwards)
                     )
-                )
+                if backwards:
+                    self.stdout.write(
+                        self.style.MIGRATE_LABEL("  Unapply: ") + ", ".join(backwards)
+                    )
             else:
                 self.stdout.write("  (none)")
 
@@ -132,22 +134,67 @@ class Command(BaseCommand):
     def _build_plan(self, all_migrations, applied, options):
         """
         Return a list of ((app_label, name, migration_obj), backwards) tuples
-        representing the migrations that need to be applied, in execution order.
+        representing the migrations to run, in execution order.
+
+        Supports:
+          - No target: apply all unapplied migrations.
+          - Named target (unapplied): apply forward up to and including it.
+          - Named target (already applied): unapply back to just after it.
+          - "zero": unapply all applied migrations in reverse order.
         """
         app_label = options.get("app_label")
         migration_name = options.get("migration_name")
 
-        plan = []
-        for app, name, migration in all_migrations:
-            if app_label and app != app_label:
-                continue
-            if (app, name) not in applied:
-                plan.append(((app, name, migration), False))
-            # Stop after the target migration if one was specified.
-            if migration_name and name.startswith(migration_name):
-                break
+        scoped = [
+            (app, name, mig)
+            for app, name, mig in all_migrations
+            if not app_label or app == app_label
+        ]
 
-        return plan
+        if migration_name == "zero":
+            return [
+                ((app, name, mig), True)
+                for app, name, mig in reversed(scoped)
+                if (app, name) in applied
+            ]
+
+        if migration_name:
+            target_idx = next(
+                (
+                    i
+                    for i, (_, name, __) in enumerate(scoped)
+                    if name.startswith(migration_name)
+                ),
+                None,
+            )
+            if target_idx is None:
+                raise CommandError(
+                    f"Data migration {migration_name!r} not found"
+                    + (f" for app {app_label!r}" if app_label else "")
+                    + "."
+                )
+            target_app, target_name, _ = scoped[target_idx]
+            if (target_app, target_name) in applied:
+                # Target is already applied — unapply everything after it.
+                return [
+                    ((app, name, mig), True)
+                    for app, name, mig in reversed(scoped[target_idx + 1 :])
+                    if (app, name) in applied
+                ]
+            else:
+                # Target not yet applied — apply forward up to and including it.
+                return [
+                    ((app, name, mig), False)
+                    for app, name, mig in scoped[: target_idx + 1]
+                    if (app, name) not in applied
+                ]
+
+        # Default: apply all unapplied in order.
+        return [
+            ((app, name, mig), False)
+            for app, name, mig in scoped
+            if (app, name) not in applied
+        ]
 
     def _apply(self, migration, state, schema_editor, recorder, fake):
         if self.verbosity >= 1:
