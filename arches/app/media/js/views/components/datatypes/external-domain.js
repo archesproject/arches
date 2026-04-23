@@ -3,7 +3,7 @@ import externalDomainTemplate from 'templates/views/components/datatypes/externa
 
 const name = 'external-domain-datatype-config';
 
-const viewModel = function (params) {
+export const ExternalDomainConfigViewModel = function (params) {
     const self = this;
     self.search = params.search;
     self.options = ko.observableArray();
@@ -20,7 +20,7 @@ const viewModel = function (params) {
         params.filterValue(self.filterValue());
         self.filterValue.subscribe((val) => params.filterValue(val));
 
-        const datatype = params.node.datatype;
+        const datatype = ko.unwrap(params.node.datatype);
         fetch(`/api/datatypes/${datatype}/options`)
             .then((r) => r.json())
             .then((data) => self.options(data.options))
@@ -28,5 +28,5 @@ const viewModel = function (params) {
     }
 };
 
-ko.components.register(name, { viewModel, template: externalDomainTemplate });
+ko.components.register(name, { viewModel: ExternalDomainConfigViewModel, template: externalDomainTemplate });
 export default name;

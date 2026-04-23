@@ -1,18 +1,14 @@
 import ko from "knockout";
-import LanguageSelectViewModel from "viewmodels/language-select";
+import ExternalDomainSelectViewModel from "viewmodels/external-domain-select";
 import selectTemplate from "templates/views/components/widgets/select.htm";
 
 const viewModel = function(params) {
-    params.configKeys = ["defaultValue"];
-    
-    LanguageSelectViewModel.apply(this, [params]);
-    const self = this;
-
-    self.multiple = false;
-    self.defaultValue = ko.observable(params.config.defaultValue || null);
+    params.configKeys = ["placeholder", "width", "uneditable", "defaultValue"];
+    ExternalDomainSelectViewModel.apply(this, [params]);
+    this.multiple = false;
 };
 
 export default ko.components.register("language-widget", {
-    viewModel: viewModel,
+    viewModel,
     template: selectTemplate,
 });
