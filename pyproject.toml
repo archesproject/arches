@@ -67,6 +67,11 @@ dependencies = [
     "SPARQLWrapper==1.8.5",
 ]
 
+[project.optional-dependencies]
+mcp = [
+    "mcp>=1.2.0",
+]
+
 [dependency-groups]
 dev = [
     "black==24.4.2",
