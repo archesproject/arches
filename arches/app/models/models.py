@@ -2747,12 +2747,11 @@ class UserPreference(models.Model):
 
 
 class DataMigration(models.Model):
-    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")
+    id = models.BigAutoField(
+        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+    )
     app = models.TextField()
     name = models.TextField()
-    operation = models.TextField()
-    metadata = JSONField(null=True)
-    resource_instance_ids = ArrayField(models.UUIDField(blank=True), default=list)
     applied = models.DateTimeField(auto_now_add=True, blank=True)
 
     class Meta:
