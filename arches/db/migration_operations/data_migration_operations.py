@@ -150,9 +150,6 @@ class AddNodeToTileData(ArchesDataMigration):
         # wants to make to the database.
         migration_name = self.get_migration_name_for_forwards_migration()
         operation_name = self.__class__.__name__
-        import pdb
-
-        pdb.set_trace()
         data_migration = models.DataMigration.objects.create(
             name=migration_name,
             app=app_label,
