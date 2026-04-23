@@ -50,21 +50,13 @@ class DataMigrationRecorder:
         """Return a set of (app, name) tuples for applied data migrations."""
         if not self.has_table():
             return set()
-        return set(
-            DataMigrationRecord.objects.filter(operation=APPLIED_SENTINEL).values_list(
-                "app", "name"
-            )
-        )
+        return set(DataMigrationRecord.objects.filter().values_list("app", "name"))
 
     def record_applied(self, app, name):
-        DataMigrationRecord.objects.create(
-            app=app, name=name, operation=APPLIED_SENTINEL
-        )
+        DataMigrationRecord.objects.create(app=app, name=name)
 
     def record_unapplied(self, app, name):
-        DataMigrationRecord.objects.filter(
-            app=app, name=name, operation=APPLIED_SENTINEL
-        ).delete()
+        DataMigrationRecord.objects.filter(app=app, name=name).delete()
 
 
 def discover_data_migrations():
