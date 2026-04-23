@@ -17,8 +17,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import datetime
+import re
 from pathlib import Path
 
+from django.apps import apps
+from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from arches.app.models.models import GraphXPublishedGraph, PublishedGraph
 
@@ -59,13 +62,6 @@ class Command(BaseCommand):
             default="en",
             dest="language",
             help="Language code to use when fetching serialized_graph (default: en).",
-        )
-        parser.add_argument(
-            "--output",
-            dest="output",
-            default=None,
-            metavar="FILE",
-            help="Write a graph migration file to FILE describing the detected changes.",
         )
 
     def handle(self, *args, **options):
@@ -132,17 +128,57 @@ class Command(BaseCommand):
         if not any_changes:
             self.stdout.write(self.style.SUCCESS("No differences found."))
 
-        if options["output"]:
-            writer = MigrationWriter(
-                graph_name=graph_a.get("name", ""),
-                graph_slug=graph_b.get("slug", ""),
-                pub_a=pub_a,
-                pub_b=pub_b,
-                operations=all_operations,
-            )
-            output_path = Path(options["output"])
-            output_path.write_text(writer.as_string())
-            self.stdout.write(self.style.SUCCESS(f"Migration written to {output_path}"))
+        graph_slug = graph_b.get("slug", "")
+        writer = MigrationWriter(
+            graph_name=graph_a.get("name", ""),
+            graph_slug=graph_slug,
+            pub_a=pub_a,
+            pub_b=pub_b,
+            operations=all_operations,
+        )
+        app_label = settings.APP_NAME
+        base_dir = Path(apps.get_app_config(app_label).path)
+        migrations_dir = base_dir / "migrations" / "data_migrations"
+        output_path = self._next_migration_path(
+            migrations_dir, graph_slug, all_operations
+        )
+        migrations_dir.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(writer.as_string())
+        self.stdout.write(self.style.SUCCESS(f"Migration written to {output_path}"))
+
+    def _next_migration_path(
+        self, directory: Path, graph_slug: str, operations: list
+    ) -> Path:
+        nums = []
+        if directory.exists():
+            for f in directory.iterdir():
+                m = re.match(r"^(\d+)", f.name)
+                if m:
+                    nums.append(int(m.group(1)))
+        next_num = (max(nums) + 1) if nums else 1
+        summary = self._build_migration_summary(graph_slug, operations)
+        return directory / f"{next_num:04d}_{summary}.py"
+
+    def _build_migration_summary(self, graph_slug: str, operations: list) -> str:
+        op_types = {op["op"] for op in operations}
+        parts = []
+        if graph_slug:
+            parts.append(re.sub(r"[^a-z0-9]+", "_", graph_slug.lower()).strip("_"))
+        if "CreateNode" in op_types or "CreateNodeGroup" in op_types:
+            parts.append("add_nodes")
+        if "DeleteNode" in op_types or "DeleteNodeGroup" in op_types:
+            parts.append("delete_nodes")
+        if "AlterNodeDatatype" in op_types:
+            parts.append("alter_datatype")
+        if "AlterNodeAlias" in op_types:
+            parts.append("alter_alias")
+        if "AlterNodeConfig" in op_types:
+            parts.append("alter_config")
+        if "AlterNodeGroupParent" in op_types or "AlterNodeGroup" in op_types:
+            parts.append("alter_nodegroup")
+        if len(parts) <= (1 if graph_slug else 0):
+            parts.append("update_publication")
+        return "_".join(parts)[:80]
 
     def _get_two_most_recent_publications(self, slug):
         pubs = GraphXPublishedGraph.objects.filter(graph__slug=slug).order_by(
