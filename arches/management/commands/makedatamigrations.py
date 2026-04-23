@@ -126,12 +126,27 @@ class Command(BaseCommand):
                 self.stdout.write("")
 
         if not any_changes:
-            self.stdout.write(self.style.SUCCESS("No differences found."))
+            self.stdout.write(
+                self.style.SUCCESS("No differences found. No migration created.")
+            )
+            return
 
         graph_slug = graph_b.get("slug", "")
         app_label = settings.APP_NAME
         base_dir = Path(apps.get_app_config(app_label).path)
         migrations_dir = base_dir / "migrations" / "data_migrations"
+
+        pub_b_id = str(pub_b.publicationid)
+        if migrations_dir.exists():
+            for existing_file in migrations_dir.glob("*.py"):
+                if pub_b_id in existing_file.read_text():
+                    self.stdout.write(
+                        self.style.WARNING(
+                            f"Migration for publication {pub_b_id} already exists in {existing_file.name}. Skipping."
+                        )
+                    )
+                    return
+
         dependencies = self._compute_dependencies(app_label, migrations_dir)
         writer = MigrationWriter(
             graph_name=graph_a.get("name", ""),
