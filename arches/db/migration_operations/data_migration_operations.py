@@ -2,7 +2,8 @@ import json
 import copy
 
 from django.db.migrations.operations.base import Operation
-
+from django.db.models import JSONField
+from django.db.models.expressions import RawSQL
 from arches.app.models import models
 from arches.app.models.graph import Graph
 from arches.app.models.system_settings import settings
@@ -146,8 +147,6 @@ class AddNodeToTileData(ArchesDataMigration):
         self.value = value
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        # The Operation should use schema_editor to apply any changes it
-        # wants to make to the database.
         migration_name = self.get_migration_name_for_forwards_migration()
         operation_name = self.__class__.__name__
         data_migration = models.DataMigration.objects.create(
@@ -155,21 +154,21 @@ class AddNodeToTileData(ArchesDataMigration):
             app=app_label,
             operation=operation_name,
         )
-        data_migration.save()
 
-        # schema_editor.execute(
-        #     """
-        #     UPDATE tiles
-        #     SET tiledata = jsonb_set(tiledata, '{%s}', '%s'::jsonb)
-        #     WHERE nodegroupid = '%s'
-        #     AND resourceinstanceid = ANY(
-        #         SELECT resourceinstanceid
-        #         FROM resource_instances
-        #         WHERE graphpublicationid = '%s'
-        #     )
-        #     AND NOT tiledata @> jsonb_build_array('%s')
-        #     """ % (self.node_id, self.value, self.nodegroup_id, self.publication_id, self.node_id)
-        # )
+        models.TileModel.objects.filter(
+            nodegroup_id=self.nodegroup_id,
+            resourceinstance__graph_publication_id=self.publication_id,
+        ).exclude(
+            data__has_key=self.node_id,
+        ).update(
+            data=RawSQL(
+                "jsonb_set(tiledata, ARRAY[%s], %s::jsonb)",
+                [self.node_id, json.dumps(self.value)],
+                output_field=JSONField(),
+            )
+        )
+
+        data_migration.save()
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         # If reversible is True, this is called when the operation is reversed.
