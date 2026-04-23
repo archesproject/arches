@@ -129,22 +129,40 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS("No differences found."))
 
         graph_slug = graph_b.get("slug", "")
+        app_label = settings.APP_NAME
+        base_dir = Path(apps.get_app_config(app_label).path)
+        migrations_dir = base_dir / "migrations" / "data_migrations"
+        dependencies = self._compute_dependencies(app_label, migrations_dir)
         writer = MigrationWriter(
             graph_name=graph_a.get("name", ""),
             graph_slug=graph_slug,
             pub_a=pub_a,
             pub_b=pub_b,
             operations=all_operations,
+            dependencies=dependencies,
         )
-        app_label = settings.APP_NAME
-        base_dir = Path(apps.get_app_config(app_label).path)
-        migrations_dir = base_dir / "migrations" / "data_migrations"
         output_path = self._next_migration_path(
             migrations_dir, graph_slug, all_operations
         )
         migrations_dir.mkdir(parents=True, exist_ok=True)
         output_path.write_text(writer.as_string())
         self.stdout.write(self.style.SUCCESS(f"Migration written to {output_path}"))
+
+    def _compute_dependencies(
+        self,
+        app_label: str,
+        data_migrations_dir: Path,
+    ) -> list[tuple[str, str]]:
+        if not data_migrations_dir.exists():
+            return []
+        data = sorted(
+            f
+            for f in data_migrations_dir.glob("[0-9][0-9][0-9][0-9]_*.py")
+            if f.is_file()
+        )
+        if not data:
+            return []
+        return [(app_label, f"data_migrations.{data[-1].stem}")]
 
     def _next_migration_path(
         self, directory: Path, graph_slug: str, operations: list
@@ -418,12 +436,14 @@ class MigrationWriter:
         pub_a: GraphXPublishedGraph,
         pub_b: GraphXPublishedGraph,
         operations: list[dict],
+        dependencies: list[tuple[str, str]] | None = None,
     ):
         self.graph_name = graph_name
         self.graph_slug = graph_slug
         self.pub_a = pub_a
         self.pub_b = pub_b
         self.operations = operations
+        self.dependencies = dependencies or []
 
     def as_string(self) -> str:
         now = datetime.datetime.now(tz=datetime.timezone.utc).strftime(
@@ -447,7 +467,7 @@ class MigrationWriter:
             "class Migration(migrations.Migration):",
             f"    # graph_slug = {self.graph_slug!r}",
             "",
-            "    dependencies = []",
+            *self._render_dependencies(),
             "",
             "    operations = [",
             ops_block,
@@ -455,6 +475,15 @@ class MigrationWriter:
             "",
         ]
         return "\n".join(lines)
+
+    def _render_dependencies(self) -> list[str]:
+        if not self.dependencies:
+            return ["    initial = True", "    dependencies = []"]
+        dep_lines = ["    dependencies = ["]
+        for app, name in self.dependencies:
+            dep_lines.append(f"        ({app!r}, {name!r}),")
+        dep_lines.append("    ]")
+        return dep_lines
 
     def _collect_imports(self) -> list[str]:
         needed = {"UpdateResourceInstancesPublicationId"}
