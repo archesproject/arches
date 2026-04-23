@@ -1,198 +1,153 @@
-"""MCP server exposing read-only Arches data tools.
+"""MCP server exposing Arches data tools.
 
-Tools are intentionally read-only: the server reads from the active Django
-database connection and returns plain JSON-serialisable dicts. Mutating
-operations (create/update/delete) are deliberately omitted so the server
-is safe to point at a production database.
+Core read-only tools cover graphs, resource instances, tiles, relationships,
+and concepts.  A write tool (``set_tile_geojson``) is also provided for
+updating ``geojson-feature-collection`` node values on existing tiles.
+
+Extension packages (e.g. ``arches-controlled-lists``) add their own tools
+by implementing one of the two hooks documented in :func:`register_extensions`.
 """
 
 from __future__ import annotations
 
-import functools
-import uuid
+import logging
 from typing import Any, Optional
 
-from asgiref.sync import sync_to_async
 from django.db.models import Q
 
 from arches.app.models import models as arches_models
 from arches.app.models.resource import Resource
 
+from arches.mcp.helpers import (
+    async_orm_tool,
+    build_list_envelope,
+    clamp_limit,
+    coerce_uuid,
+    i18n_to_str,
+    DEFAULT_LIMIT,
+)
+from arches.mcp.serializers import (
+    node_alias_map_for_graph,
+    serialize_edge,
+    serialize_graph,
+    serialize_node,
+    serialize_nodegroup,
+    serialize_resource_instance,
+    serialize_tile,
+)
 
-def _async_orm_tool(func):
-    """Wrap a sync ORM function so FastMCP can call it from its event loop.
+logger = logging.getLogger(__name__)
 
-    FastMCP runs tool callables on the asyncio loop; Django's ORM refuses to
-    run from an async context. ``sync_to_async`` with ``thread_sensitive=True``
-    routes the call through the shared sync thread so DB connections remain
-    consistent.
+
+def register_extensions(mcp) -> None:
+    """Discover and load MCP tools from installed Arches application packages.
+
+    Called by :func:`build_server` after all core tools have been registered.
+    Two hook styles are supported (tried in order):
+
+    **1. AppConfig method hook** (preferred)::
+
+        # mypackage/apps.py
+        class MyPackageConfig(AppConfig):
+            name = "mypackage"
+            is_arches_application = True
+
+            def register_mcp_tools(self, server) -> None:
+                from mypackage.mcp import register
+                register(server)
+
+    **2. Module-level ``register`` function** (zero-config fallback)::
+
+        # mypackage/mcp.py
+        def register(server) -> None:
+            from arches.mcp.helpers import async_orm_tool
+
+            @server.tool()
+            @async_orm_tool
+            def my_tool(...) -> dict:
+                ...
+
+    Any exception raised by an extension is logged as an error and skipped so
+    that a broken add-on never prevents the server from starting.
     """
+    import importlib
 
-    @functools.wraps(func)
-    async def wrapper(*args, **kwargs):
-        return await sync_to_async(func, thread_sensitive=True)(*args, **kwargs)
+    from django.apps import apps
 
-    return wrapper
+    arches_apps = [
+        ac
+        for ac in apps.get_app_configs()
+        if getattr(ac, "is_arches_application", False)
+    ]
+    logger.warning(
+        "MCP register_extensions: found %d Arches application(s): %s",
+        len(arches_apps),
+        [ac.name for ac in arches_apps],
+    )
 
+    for app_config in arches_apps:
+        # --- Hook 1: explicit AppConfig method ---
+        if hasattr(app_config, "register_mcp_tools"):
+            logger.warning("MCP: calling register_mcp_tools on %s", app_config.name)
+            try:
+                app_config.register_mcp_tools(mcp)
+                logger.warning(
+                    "MCP: registered tools from %s (AppConfig hook)",
+                    app_config.name,
+                )
+            except Exception:
+                logger.exception(
+                    "MCP: FAILED to register tools from %s (AppConfig hook)",
+                    app_config.name,
+                )
+            continue  # don't also try the module hook for the same app
 
-# A defensive ceiling so the server cannot return unbounded result sets.
-MAX_LIMIT = 200
-DEFAULT_LIMIT = 25
-
-
-def _i18n_to_str(value: Any) -> Any:
-    """Render an I18n_String / I18n_JSON / dict to a JSON-safe value.
-
-    Falls back to ``str(value)`` for I18n field values, and returns the value
-    unchanged for primitives. Returns ``None`` for ``None``.
-    """
-    if value is None:
-        return None
-    if isinstance(value, dict):
-        return value
-    try:
-        return str(value)
-    except Exception:
-        return None
-
-
-def _coerce_uuid(value: str, field: str) -> uuid.UUID:
-    try:
-        return uuid.UUID(str(value))
-    except (ValueError, AttributeError, TypeError) as exc:
-        raise ValueError(f"{field} must be a valid UUID, got: {value!r}") from exc
-
-
-def _clamp_limit(limit: Optional[int]) -> int:
-    if not limit or limit <= 0:
-        return DEFAULT_LIMIT
-    return min(int(limit), MAX_LIMIT)
-
-
-def _serialize_graph(graph: arches_models.GraphModel) -> dict[str, Any]:
-    return {
-        "graphid": str(graph.graphid),
-        "name": _i18n_to_str(graph.name),
-        "slug": graph.slug,
-        "description": _i18n_to_str(graph.description),
-        "subtitle": _i18n_to_str(graph.subtitle),
-        "isresource": graph.isresource,
-        "is_active": graph.is_active,
-        "author": graph.author,
-        "version": graph.version,
-        "iconclass": graph.iconclass,
-        "color": graph.color,
-        "ontology_id": str(graph.ontology_id) if graph.ontology_id else None,
-        "publication_id": (str(graph.publication_id) if graph.publication_id else None),
-    }
-
-
-def _serialize_node(node: arches_models.Node) -> dict[str, Any]:
-    return {
-        "nodeid": str(node.nodeid),
-        "name": node.name,
-        "alias": node.alias,
-        "datatype": node.datatype,
-        "description": node.description,
-        "istopnode": node.istopnode,
-        "issearchable": node.issearchable,
-        "isrequired": node.isrequired,
-        "nodegroupid": str(node.nodegroup_id) if node.nodegroup_id else None,
-        "graphid": str(node.graph_id),
-        "ontologyclass": node.ontologyclass,
-    }
-
-
-def _serialize_nodegroup(ng: arches_models.NodeGroup) -> dict[str, Any]:
-    return {
-        "nodegroupid": str(ng.nodegroupid),
-        "cardinality": ng.cardinality,
-        "parentnodegroupid": (
-            str(ng.parentnodegroup_id) if ng.parentnodegroup_id else None
-        ),
-        "alias": (
-            ng.grouping_node.alias
-            if getattr(ng, "grouping_node", None) is not None
-            else None
-        ),
-    }
-
-
-def _serialize_edge(edge: arches_models.Edge) -> dict[str, Any]:
-    return {
-        "edgeid": str(edge.edgeid),
-        "domainnodeid": str(edge.domainnode_id),
-        "rangenodeid": str(edge.rangenode_id),
-        "ontologyproperty": edge.ontologyproperty,
-        "name": edge.name,
-    }
-
-
-def _serialize_resource_instance(
-    resource: arches_models.ResourceInstance,
-) -> dict[str, Any]:
-    descriptors = resource.descriptors or {}
-    name = _i18n_to_str(resource.name)
-    return {
-        "resourceinstanceid": str(resource.resourceinstanceid),
-        "graphid": str(resource.graph_id),
-        "graph_name": _i18n_to_str(resource.graph.name) if resource.graph_id else None,
-        "name": name,
-        "descriptors": descriptors,
-        "createdtime": (
-            resource.createdtime.isoformat() if resource.createdtime else None
-        ),
-        "legacyid": resource.legacyid,
-        "lifecycle_state_id": (
-            str(resource.resource_instance_lifecycle_state_id)
-            if resource.resource_instance_lifecycle_state_id
-            else None
-        ),
-    }
-
-
-def _serialize_tile(
-    tile: arches_models.TileModel,
-    *,
-    node_alias_map: Optional[dict[str, str]] = None,
-) -> dict[str, Any]:
-    """Serialize a tile. If a node_alias_map is provided, also annotate
-    each value with the alias of the node it belongs to so consumers do
-    not have to fetch the graph separately.
-    """
-    raw_data = tile.data or {}
-    data_with_aliases: dict[str, Any] = {}
-    for nodeid_str, value in raw_data.items():
-        entry: dict[str, Any] = {"value": value}
-        if node_alias_map and nodeid_str in node_alias_map:
-            entry["alias"] = node_alias_map[nodeid_str]
-        data_with_aliases[nodeid_str] = entry
-
-    return {
-        "tileid": str(tile.tileid),
-        "resourceinstanceid": str(tile.resourceinstance_id),
-        "nodegroupid": str(tile.nodegroup_id) if tile.nodegroup_id else None,
-        "nodegroup_alias": tile.find_nodegroup_alias(),
-        "parenttileid": str(tile.parenttile_id) if tile.parenttile_id else None,
-        "sortorder": tile.sortorder,
-        "data": data_with_aliases,
-    }
-
-
-def _node_alias_map_for_graph(graph_id) -> dict[str, str]:
-    return {
-        str(nodeid): alias or ""
-        for nodeid, alias in arches_models.Node.objects.filter(
-            graph_id=graph_id
-        ).values_list("nodeid", "alias")
-    }
+        # --- Hook 2: <app_module>.mcp.register(server) ---
+        mcp_module_path = f"{app_config.name}.mcp"
+        logger.warning(
+            "MCP: no register_mcp_tools on %s, trying module %s",
+            app_config.name,
+            mcp_module_path,
+        )
+        try:
+            mod = importlib.import_module(mcp_module_path)
+            if callable(getattr(mod, "register", None)):
+                mod.register(mcp)
+                logger.warning(
+                    "MCP: registered tools from %s (module hook)",
+                    mcp_module_path,
+                )
+            else:
+                logger.warning(
+                    "MCP: module %s has no callable register()", mcp_module_path
+                )
+        except ModuleNotFoundError as exc:
+            # Only suppress if the missing module IS the top-level mcp module
+            # itself.  A deeper ImportError (e.g. a missing dep inside mcp.py)
+            # must be reported so it is not mistaken for "no mcp module".
+            if exc.name == mcp_module_path:
+                logger.warning("MCP: no module %s found, skipping", mcp_module_path)
+            else:
+                logger.exception(
+                    "MCP: FAILED loading %s — ImportError inside the module "
+                    "(missing dependency: %s)",
+                    mcp_module_path,
+                    exc.name,
+                )
+        except Exception:
+            logger.exception(
+                "MCP: FAILED to register tools from %s (module hook)",
+                mcp_module_path,
+            )
 
 
 def build_server():
-    """Build and return a configured FastMCP server.
+    """Build and return a configured FastMCP server with all tools registered.
 
     Imported lazily so the rest of the package does not require the optional
-    ``mcp`` dependency at import time.
+    ``mcp`` dependency at import time. After the core tools are registered,
+    :func:`register_extensions` is called to load tools from installed Arches
+    application packages.
     """
     try:
         from mcp.server.fastmcp import FastMCP
@@ -205,15 +160,21 @@ def build_server():
     mcp = FastMCP(
         name="arches",
         instructions=(
-            "Read-only tools for browsing an Arches cultural-heritage database. "
+            "Tools for browsing and editing an Arches cultural-heritage database. "
             "Use list_graphs to discover resource models, describe_graph to see "
             "the node/nodegroup schema for a graph, and search_resources or "
-            "get_resource to inspect resource instances and their tiles."
+            "get_resource to inspect resource instances and their tiles. "
+            "Use set_tile_geojson to update the geometry (geojson-feature-collection) "
+            "on an existing tile — supply a valid GeoJSON FeatureCollection."
         ),
     )
 
+    # ------------------------------------------------------------------ #
+    #  Core tools                                                          #
+    # ------------------------------------------------------------------ #
+
     @mcp.tool()
-    @_async_orm_tool
+    @async_orm_tool
     def list_graphs(
         resource_models_only: bool = True,
         active_only: bool = True,
@@ -234,23 +195,21 @@ def build_server():
         qs = qs.filter(source_identifier__isnull=True)
 
         total = qs.count()
-        qs = qs.order_by("name")[offset : offset + _clamp_limit(limit)]
-        return {
-            "total": total,
-            "offset": offset,
-            "limit": _clamp_limit(limit),
-            "graphs": [_serialize_graph(g) for g in qs],
-        }
+        _limit = clamp_limit(limit)
+        qs = qs.order_by("name")[offset : offset + _limit]
+        return build_list_envelope(
+            total, offset, _limit, "graphs", [serialize_graph(g) for g in qs]
+        )
 
     @mcp.tool()
-    @_async_orm_tool
+    @async_orm_tool
     def describe_graph(graph_id: str) -> dict[str, Any]:
         """Return the full schema for a graph: nodes, nodegroups, and edges.
 
         ``graph_id`` is a UUID string. Use ``list_graphs`` first if you do
         not know the id.
         """
-        gid = _coerce_uuid(graph_id, "graph_id")
+        gid = coerce_uuid(graph_id, "graph_id")
         graph = arches_models.GraphModel.objects.get(pk=gid)
 
         nodes = list(arches_models.Node.objects.filter(graph_id=gid))
@@ -263,14 +222,14 @@ def build_server():
         edges = list(arches_models.Edge.objects.filter(graph_id=gid))
 
         return {
-            "graph": _serialize_graph(graph),
-            "nodes": [_serialize_node(n) for n in nodes],
-            "nodegroups": [_serialize_nodegroup(ng) for ng in nodegroups],
-            "edges": [_serialize_edge(e) for e in edges],
+            "graph": serialize_graph(graph),
+            "nodes": [serialize_node(n) for n in nodes],
+            "nodegroups": [serialize_nodegroup(ng) for ng in nodegroups],
+            "edges": [serialize_edge(e) for e in edges],
         }
 
     @mcp.tool()
-    @_async_orm_tool
+    @async_orm_tool
     def count_resources_by_graph() -> list[dict[str, Any]]:
         """Return the resource instance count per graph (resource models only)."""
         from django.db.models import Count
@@ -284,14 +243,14 @@ def build_server():
         return [
             {
                 "graphid": str(r["graph_id"]),
-                "graph_name": _i18n_to_str(r["graph__name"]),
+                "graph_name": i18n_to_str(r["graph__name"]),
                 "count": r["count"],
             }
             for r in rows
         ]
 
     @mcp.tool()
-    @_async_orm_tool
+    @async_orm_tool
     def search_resources(
         graph_id: Optional[str] = None,
         name_contains: Optional[str] = None,
@@ -307,37 +266,39 @@ def build_server():
         """
         qs = arches_models.ResourceInstance.objects.select_related("graph")
         if graph_id:
-            qs = qs.filter(graph_id=_coerce_uuid(graph_id, "graph_id"))
+            qs = qs.filter(graph_id=coerce_uuid(graph_id, "graph_id"))
         if legacyid:
             qs = qs.filter(legacyid=legacyid)
         if name_contains:
-            # ``name`` is an I18n_TextField stored as JSON. icontains over the
+            # ``name`` is an I18n_TextField stored as JSON; icontains over the
             # JSON text covers all languages without needing a per-language key.
             qs = qs.filter(name__icontains=name_contains)
 
         total = qs.count()
-        qs = qs.order_by("-createdtime")[offset : offset + _clamp_limit(limit)]
-        return {
-            "total": total,
-            "offset": offset,
-            "limit": _clamp_limit(limit),
-            "resources": [_serialize_resource_instance(r) for r in qs],
-        }
+        _limit = clamp_limit(limit)
+        qs = qs.order_by("-createdtime")[offset : offset + _limit]
+        return build_list_envelope(
+            total,
+            offset,
+            _limit,
+            "resources",
+            [serialize_resource_instance(r) for r in qs],
+        )
 
     @mcp.tool()
-    @_async_orm_tool
+    @async_orm_tool
     def get_resource(resource_id: str, include_tiles: bool = True) -> dict[str, Any]:
         """Fetch a resource instance and (optionally) all its tiles.
 
         Tiles are returned grouped by ``nodegroup_alias`` so consumers can
         navigate the resource by semantic field name rather than by UUID.
         """
-        rid = _coerce_uuid(resource_id, "resource_id")
+        rid = coerce_uuid(resource_id, "resource_id")
         resource = arches_models.ResourceInstance.objects.select_related("graph").get(
             pk=rid
         )
         out: dict[str, Any] = {
-            "resource": _serialize_resource_instance(resource),
+            "resource": serialize_resource_instance(resource),
         }
         # Best-effort display name via the Resource proxy; it may return None
         # if no descriptor function is configured for the graph.
@@ -347,7 +308,7 @@ def build_server():
             out["display_name"] = None
 
         if include_tiles:
-            alias_map = _node_alias_map_for_graph(resource.graph_id)
+            alias_map = node_alias_map_for_graph(resource.graph_id)
             tiles = arches_models.TileModel.objects.filter(
                 resourceinstance_id=rid
             ).order_by("nodegroup_id", "sortorder")
@@ -355,7 +316,7 @@ def build_server():
             grouped: dict[str, list[dict[str, Any]]] = {}
             ungrouped: list[dict[str, Any]] = []
             for tile in tiles:
-                serialized = _serialize_tile(tile, node_alias_map=alias_map)
+                serialized = serialize_tile(tile, node_alias_map=alias_map)
                 key = serialized["nodegroup_alias"]
                 if key:
                     grouped.setdefault(key, []).append(serialized)
@@ -368,7 +329,7 @@ def build_server():
         return out
 
     @mcp.tool()
-    @_async_orm_tool
+    @async_orm_tool
     def list_resource_tiles(
         resource_id: str,
         nodegroup_alias: Optional[str] = None,
@@ -377,7 +338,7 @@ def build_server():
     ) -> dict[str, Any]:
         """List tiles for a resource, optionally filtered to one nodegroup
         (by its grouping-node alias)."""
-        rid = _coerce_uuid(resource_id, "resource_id")
+        rid = coerce_uuid(resource_id, "resource_id")
         qs = arches_models.TileModel.objects.filter(resourceinstance_id=rid)
 
         if nodegroup_alias:
@@ -387,32 +348,32 @@ def build_server():
         graph_id = arches_models.ResourceInstance.objects.values_list(
             "graph_id", flat=True
         ).get(pk=rid)
-        alias_map = _node_alias_map_for_graph(graph_id)
+        alias_map = node_alias_map_for_graph(graph_id)
 
         total = qs.count()
-        qs = qs.order_by("nodegroup_id", "sortorder")[
-            offset : offset + _clamp_limit(limit)
-        ]
-        return {
-            "total": total,
-            "offset": offset,
-            "limit": _clamp_limit(limit),
-            "tiles": [_serialize_tile(t, node_alias_map=alias_map) for t in qs],
-        }
+        _limit = clamp_limit(limit)
+        qs = qs.order_by("nodegroup_id", "sortorder")[offset : offset + _limit]
+        return build_list_envelope(
+            total,
+            offset,
+            _limit,
+            "tiles",
+            [serialize_tile(t, node_alias_map=alias_map) for t in qs],
+        )
 
     @mcp.tool()
-    @_async_orm_tool
+    @async_orm_tool
     def get_tile(tile_id: str) -> dict[str, Any]:
         """Fetch a single tile by id, with node aliases annotated."""
-        tid = _coerce_uuid(tile_id, "tile_id")
+        tid = coerce_uuid(tile_id, "tile_id")
         tile = arches_models.TileModel.objects.select_related(
             "nodegroup__grouping_node", "resourceinstance"
         ).get(pk=tid)
-        alias_map = _node_alias_map_for_graph(tile.resourceinstance.graph_id)
-        return _serialize_tile(tile, node_alias_map=alias_map)
+        alias_map = node_alias_map_for_graph(tile.resourceinstance.graph_id)
+        return serialize_tile(tile, node_alias_map=alias_map)
 
     @mcp.tool()
-    @_async_orm_tool
+    @async_orm_tool
     def list_resource_relationships(
         resource_id: str,
         direction: str = "both",
@@ -425,7 +386,7 @@ def build_server():
         Each row includes the related resource id, its graph, and the
         relationship type.
         """
-        rid = _coerce_uuid(resource_id, "resource_id")
+        rid = coerce_uuid(resource_id, "resource_id")
         if direction not in {"from", "to", "both"}:
             raise ValueError("direction must be one of: from, to, both")
 
@@ -440,7 +401,8 @@ def build_server():
             "from_resource_graph", "to_resource_graph"
         )
         total = qs.count()
-        qs = qs.order_by("-modified")[offset : offset + _clamp_limit(limit)]
+        _limit = clamp_limit(limit)
+        qs = qs.order_by("-modified")[offset : offset + _limit]
 
         rows = []
         for rel in qs:
@@ -454,12 +416,12 @@ def build_server():
                         str(rel.to_resource_id) if rel.to_resource_id else None
                     ),
                     "from_graph_name": (
-                        _i18n_to_str(rel.from_resource_graph.name)
+                        i18n_to_str(rel.from_resource_graph.name)
                         if rel.from_resource_graph_id
                         else None
                     ),
                     "to_graph_name": (
-                        _i18n_to_str(rel.to_resource_graph.name)
+                        i18n_to_str(rel.to_resource_graph.name)
                         if rel.to_resource_graph_id
                         else None
                     ),
@@ -471,15 +433,10 @@ def build_server():
                     "modified": rel.modified.isoformat() if rel.modified else None,
                 }
             )
-        return {
-            "total": total,
-            "offset": offset,
-            "limit": _clamp_limit(limit),
-            "relationships": rows,
-        }
+        return build_list_envelope(total, offset, _limit, "relationships", rows)
 
     @mcp.tool()
-    @_async_orm_tool
+    @async_orm_tool
     def get_concept_values(
         concept_id: str,
         language: Optional[str] = None,
@@ -488,7 +445,7 @@ def build_server():
 
         Optionally filter to a single ``language`` code (e.g. ``"en"``).
         """
-        cid = _coerce_uuid(concept_id, "concept_id")
+        cid = coerce_uuid(concept_id, "concept_id")
         qs = arches_models.Value.objects.filter(concept_id=cid).select_related(
             "valuetype", "language"
         )
@@ -510,7 +467,7 @@ def build_server():
         }
 
     @mcp.tool()
-    @_async_orm_tool
+    @async_orm_tool
     def search_concepts(
         text: str,
         language: Optional[str] = None,
@@ -521,15 +478,16 @@ def build_server():
         qs = arches_models.Value.objects.filter(value__icontains=text)
         if language:
             qs = qs.filter(language_id=language)
-        # Prefer prefLabel-type values when present.
         qs = qs.select_related("concept", "valuetype").order_by("value")
         total = qs.count()
-        qs = qs[offset : offset + _clamp_limit(limit)]
-        return {
-            "total": total,
-            "offset": offset,
-            "limit": _clamp_limit(limit),
-            "matches": [
+        _limit = clamp_limit(limit)
+        qs = qs[offset : offset + _limit]
+        return build_list_envelope(
+            total,
+            offset,
+            _limit,
+            "matches",
+            [
                 {
                     "conceptid": str(v.concept_id),
                     "value": v.value,
@@ -538,6 +496,187 @@ def build_server():
                 }
                 for v in qs
             ],
+        )
+
+    # ------------------------------------------------------------------ #
+    #  Write tools                                                         #
+    # ------------------------------------------------------------------ #
+
+    @mcp.tool()
+    @async_orm_tool
+    def set_tile_geojson(
+        tile_id: str,
+        geojson: dict,
+        node_alias: Optional[str] = None,
+        node_id: Optional[str] = None,
+        username: Optional[str] = None,
+    ) -> dict[str, Any]:
+        """Set the geojson-feature-collection value on a tile.
+
+        **This tool writes to the database.** The GeoJSON is validated
+        (geometry bbox, feature structure) before saving.
+
+        Parameters
+        ----------
+        tile_id : str
+            UUID of the tile to edit.
+        geojson : dict
+            A valid GeoJSON ``FeatureCollection`` object, e.g.::
+
+                {
+                    "type": "FeatureCollection",
+                    "features": [
+                        {
+                            "type": "Feature",
+                            "geometry": {"type": "Point", "coordinates": [-118.2, 34.0]},
+                            "properties": {}
+                        }
+                    ]
+                }
+
+            Pass ``{"type": "FeatureCollection", "features": []}`` to clear
+            the geometry.
+        node_alias : str, optional
+            Alias of the ``geojson-feature-collection`` node to update.
+            Either ``node_alias`` or ``node_id`` must be supplied when the
+            tile contains more than one geojson node.
+        node_id : str, optional
+            UUID of the ``geojson-feature-collection`` node to update.
+            Alternative to ``node_alias``; ignored if ``node_alias`` is given.
+        username : str, optional
+            Django username to record in the edit log and use for permission
+            checking.  If the user is not a resource reviewer the edit is
+            stored as a *provisional edit* rather than committed directly.
+            Omit to save without a user context (bypasses provisional-edit
+            logic and saves directly — appropriate for system-level imports).
+
+        Returns
+        -------
+        dict
+            The serialised tile after saving, plus a ``"saved_node_id"`` key
+            indicating which node was updated.
+        """
+        from django.contrib.auth.models import User
+
+        from arches.app.datatypes.datatypes import DataTypeFactory
+        from arches.app.models.tile import Tile
+
+        # --- Validate geojson structure (surface-level) ---
+        if not isinstance(geojson, dict) or geojson.get("type") != "FeatureCollection":
+            raise ValueError(
+                "geojson must be a GeoJSON FeatureCollection object "
+                "(i.e. {'type': 'FeatureCollection', 'features': [...]})"
+            )
+        if "features" not in geojson or not isinstance(geojson["features"], list):
+            raise ValueError("geojson must have a 'features' list")
+
+        tid = coerce_uuid(tile_id, "tile_id")
+
+        # --- Load the tile (proxy class, not the raw model) ---
+        tile = Tile.objects.select_related("resourceinstance__graph", "nodegroup").get(
+            pk=tid
+        )
+
+        # --- Resolve which node to update ---
+        # Build a map of nodeid → alias for geojson nodes in this tile.
+        geojson_nodes = {
+            str(nodeid): alias or ""
+            for nodeid, alias, datatype in arches_models.Node.objects.filter(
+                graph_id=tile.resourceinstance.graph_id
+            ).values_list("nodeid", "alias", "datatype")
+            if datatype == "geojson-feature-collection"
         }
+
+        # Only keep nodes whose data key is already present in the tile
+        # (or any geojson node for the graph if the tile data is empty/new).
+        tile_geojson_nodeids = {
+            nid: alias
+            for nid, alias in geojson_nodes.items()
+            if nid in (tile.data or {})
+        }
+
+        if node_alias:
+            # Find by alias.
+            matched = [nid for nid, al in geojson_nodes.items() if al == node_alias]
+            if not matched:
+                raise ValueError(
+                    f"No geojson-feature-collection node with alias {node_alias!r} "
+                    f"found in graph for tile {tile_id}. "
+                    f"Available geojson nodes: {list(geojson_nodes.values())}"
+                )
+            target_nodeid = matched[0]
+        elif node_id:
+            nid_str = str(coerce_uuid(node_id, "node_id"))
+            if nid_str not in geojson_nodes:
+                raise ValueError(
+                    f"Node {node_id!r} is not a geojson-feature-collection node "
+                    f"in graph for tile {tile_id}. "
+                    f"Available geojson node ids: {list(geojson_nodes.keys())}"
+                )
+            target_nodeid = nid_str
+        else:
+            # Auto-detect: exactly one geojson node must exist in the tile data.
+            if len(tile_geojson_nodeids) == 1:
+                target_nodeid = next(iter(tile_geojson_nodeids))
+            elif len(tile_geojson_nodeids) == 0:
+                # Tile data has no geojson keys yet — look at all graph geojson nodes.
+                if len(geojson_nodes) == 1:
+                    target_nodeid = next(iter(geojson_nodes))
+                elif len(geojson_nodes) == 0:
+                    raise ValueError(
+                        f"Tile {tile_id} belongs to a graph with no "
+                        "geojson-feature-collection nodes."
+                    )
+                else:
+                    raise ValueError(
+                        "Multiple geojson-feature-collection nodes found. "
+                        "Specify node_alias or node_id. "
+                        f"Available: {list(geojson_nodes.values())}"
+                    )
+            else:
+                raise ValueError(
+                    "Multiple geojson-feature-collection nodes found in tile data. "
+                    "Specify node_alias or node_id. "
+                    f"Available aliases: {list(tile_geojson_nodeids.values())}"
+                )
+
+        # --- Run datatype validation (bbox, geometry structure) ---
+        factory = DataTypeFactory()
+        datatype = factory.get_instance("geojson-feature-collection")
+        # check_geojson_value normalises multi-part geometries and assigns feature ids.
+        normalised = datatype.check_geojson_value(geojson)
+        errors = datatype.validate(normalised)
+        if errors:
+            messages = "; ".join(e.get("message", str(e)) for e in errors)
+            raise ValueError(f"GeoJSON validation failed: {messages}")
+
+        # --- Apply the new value ---
+        if tile.data is None:
+            tile.data = {}
+        tile.data[target_nodeid] = normalised
+
+        # --- Resolve user (optional) ---
+        user = None
+        if username:
+            try:
+                user = User.objects.get(username=username)
+            except User.DoesNotExist:
+                raise ValueError(f"No Django user found with username {username!r}")
+
+        # --- Save via the Tile proxy (triggers pre/post hooks and edit log) ---
+        tile.save(user=user)
+
+        # --- Return the updated tile ---
+        alias_map = node_alias_map_for_graph(tile.resourceinstance.graph_id)
+        return {
+            "saved_node_id": target_nodeid,
+            "saved_node_alias": alias_map.get(target_nodeid, ""),
+            "tile": serialize_tile(tile, node_alias_map=alias_map),
+        }
+
+    # ------------------------------------------------------------------ #
+    #  Extension tools from installed Arches application packages         #
+    # ------------------------------------------------------------------ #
+    register_extensions(mcp)
 
     return mcp
