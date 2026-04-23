@@ -8,13 +8,31 @@ is safe to point at a production database.
 
 from __future__ import annotations
 
+import functools
 import uuid
 from typing import Any, Optional
 
+from asgiref.sync import sync_to_async
 from django.db.models import Q
 
 from arches.app.models import models as arches_models
 from arches.app.models.resource import Resource
+
+
+def _async_orm_tool(func):
+    """Wrap a sync ORM function so FastMCP can call it from its event loop.
+
+    FastMCP runs tool callables on the asyncio loop; Django's ORM refuses to
+    run from an async context. ``sync_to_async`` with ``thread_sensitive=True``
+    routes the call through the shared sync thread so DB connections remain
+    consistent.
+    """
+
+    @functools.wraps(func)
+    async def wrapper(*args, **kwargs):
+        return await sync_to_async(func, thread_sensitive=True)(*args, **kwargs)
+
+    return wrapper
 
 
 # A defensive ceiling so the server cannot return unbounded result sets.
@@ -195,6 +213,7 @@ def build_server():
     )
 
     @mcp.tool()
+    @_async_orm_tool
     def list_graphs(
         resource_models_only: bool = True,
         active_only: bool = True,
@@ -224,6 +243,7 @@ def build_server():
         }
 
     @mcp.tool()
+    @_async_orm_tool
     def describe_graph(graph_id: str) -> dict[str, Any]:
         """Return the full schema for a graph: nodes, nodegroups, and edges.
 
@@ -250,6 +270,7 @@ def build_server():
         }
 
     @mcp.tool()
+    @_async_orm_tool
     def count_resources_by_graph() -> list[dict[str, Any]]:
         """Return the resource instance count per graph (resource models only)."""
         from django.db.models import Count
@@ -270,6 +291,7 @@ def build_server():
         ]
 
     @mcp.tool()
+    @_async_orm_tool
     def search_resources(
         graph_id: Optional[str] = None,
         name_contains: Optional[str] = None,
@@ -303,6 +325,7 @@ def build_server():
         }
 
     @mcp.tool()
+    @_async_orm_tool
     def get_resource(resource_id: str, include_tiles: bool = True) -> dict[str, Any]:
         """Fetch a resource instance and (optionally) all its tiles.
 
@@ -345,6 +368,7 @@ def build_server():
         return out
 
     @mcp.tool()
+    @_async_orm_tool
     def list_resource_tiles(
         resource_id: str,
         nodegroup_alias: Optional[str] = None,
@@ -377,6 +401,7 @@ def build_server():
         }
 
     @mcp.tool()
+    @_async_orm_tool
     def get_tile(tile_id: str) -> dict[str, Any]:
         """Fetch a single tile by id, with node aliases annotated."""
         tid = _coerce_uuid(tile_id, "tile_id")
@@ -387,6 +412,7 @@ def build_server():
         return _serialize_tile(tile, node_alias_map=alias_map)
 
     @mcp.tool()
+    @_async_orm_tool
     def list_resource_relationships(
         resource_id: str,
         direction: str = "both",
@@ -453,6 +479,7 @@ def build_server():
         }
 
     @mcp.tool()
+    @_async_orm_tool
     def get_concept_values(
         concept_id: str,
         language: Optional[str] = None,
@@ -483,6 +510,7 @@ def build_server():
         }
 
     @mcp.tool()
+    @_async_orm_tool
     def search_concepts(
         text: str,
         language: Optional[str] = None,
