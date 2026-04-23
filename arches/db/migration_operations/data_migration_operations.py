@@ -7,7 +7,6 @@ from django.db.models.expressions import RawSQL
 from arches.app.models import models
 from arches.app.models.graph import Graph
 from arches.app.models.system_settings import settings
-from arches.db.data_migration_registry import get_next_unapplied_data_migration_name
 
 
 class ArchesDataMigration(Operation):
@@ -30,10 +29,6 @@ class ArchesDataMigration(Operation):
             for item in input:
                 ArchesDataMigration.localize_json(item, language_code)
         return input
-
-    @staticmethod
-    def get_migration_name_for_forwards_migration():
-        return get_next_unapplied_data_migration_name()
 
     def __init__(self, arg1, arg2):
         # Operations are usually instantiated with arguments in migration
@@ -79,50 +74,16 @@ class UpdateResourceInstancesPublicationId(ArchesDataMigration):
         self.updated_publication_id = updated_publication_id
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        # The Operation should use schema_editor to apply any changes it
-        # wants to make to the database.
-        migration_name = self.get_migration_name_for_forwards_migration()
-        operation_name = self.__class__.__name__
-
-        data_migration = models.DataMigration.objects.create(
-            name=migration_name,
-            app=app_label,
-            operation=operation_name,
-            resource_instance_ids=[
-                resource_instance_id
-                for resource_instance_id in models.ResourceInstance.objects.filter(
-                    graph_publication_id=self.current_publication_id
-                ).values_list("resourceinstanceid", flat=True)
-            ],
-        )
-        data_migration.save()
-
         schema_editor.execute(
             "UPDATE resource_instances SET graphpublicationid = '%s' WHERE graphpublicationid = '%s'"
             % (self.updated_publication_id, self.current_publication_id)
         )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        # If reversible is True, this is called when the operation is reversed.
-        data_migration = models.DataMigration.objects.filter(
-            app=app_label,
-        ).last()
-
         schema_editor.execute(
-            """
-            UPDATE resource_instances 
-            SET graphpublicationid = '%s' 
-            WHERE graphpublicationid = '%s'
-            AND resourceinstanceid = ANY(ARRAY%s::uuid[])
-            """
-            % (
-                self.current_publication_id,
-                self.updated_publication_id,
-                data_migration.resource_instance_ids,
-            )
+            "UPDATE resource_instances SET graphpublicationid = '%s' WHERE graphpublicationid = '%s'"
+            % (self.current_publication_id, self.updated_publication_id)
         )
-
-        data_migration.delete()
 
     def describe(self):
         # This is used to describe what the operation does in console output.
@@ -147,14 +108,6 @@ class AddNodeToTileData(ArchesDataMigration):
         self.value = value
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        migration_name = self.get_migration_name_for_forwards_migration()
-        operation_name = self.__class__.__name__
-        data_migration = models.DataMigration.objects.create(
-            name=migration_name,
-            app=app_label,
-            operation=operation_name,
-        )
-
         models.TileModel.objects.filter(
             nodegroup_id=self.nodegroup_id,
             resourceinstance__graph_publication_id=self.publication_id,
@@ -168,30 +121,18 @@ class AddNodeToTileData(ArchesDataMigration):
             )
         )
 
-        data_migration.save()
-
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        # If reversible is True, this is called when the operation is reversed.
-        data_migration = models.DataMigration.objects.filter(
-            app=app_label,
-        ).last()
-
-        schema_editor.execute(
-            """
-            UPDATE tiles
-            SET tiledata = tiledata - '%s'
-            WHERE nodegroupid = '%s'
-            AND resourceinstanceid = ANY(                
-                SELECT resourceinstanceid 
-                FROM resource_instances 
-                WHERE graphpublicationid = '%s'
+        models.TileModel.objects.filter(
+            nodegroup_id=self.nodegroup_id,
+            resourceinstance__graph_publication_id=self.publication_id,
+            data__has_key=self.node_id,
+        ).update(
+            data=RawSQL(
+                "tiledata - %s",
+                [self.node_id],
+                output_field=JSONField(),
             )
-            AND NOT tiledata @> jsonb_build_array('%s')
-            """
-            % (self.node_id, self.nodegroup_id, self.publication_id, self.node_id)
         )
-
-        data_migration.delete()
 
     def describe(self):
         # This is used to describe what the operation does in console output.
@@ -210,17 +151,11 @@ class UpdateGraphFromJSON(ArchesDataMigration):
         self.json_path = json_path
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        # The Operation should use schema_editor to apply any changes it
-        # wants to make to the database.
-        migration_name = self.get_migration_name_for_forwards_migration()
-        operation_name = self.__class__.__name__
-
         with open(self.json_path, "r") as f:
             data = json.load(f)
 
         graph_data = data["graph"][0]
         previous_graph = Graph.objects.get(pk=graph_data["graphid"])
-        previous_graph_publication_id = previous_graph.publication_id
 
         # first, update the json structure to the system default language
         # and create a GraphXPublishedGraph entry
@@ -241,7 +176,7 @@ class UpdateGraphFromJSON(ArchesDataMigration):
         )
         publication.save()
 
-        updated_graph = previous_graph.restore_state_from_serialized_graph(
+        previous_graph.restore_state_from_serialized_graph(
             system_default_language_localized_graph_data
         )
 
@@ -256,29 +191,23 @@ class UpdateGraphFromJSON(ArchesDataMigration):
             )
             published_graph.save()
 
-        data_migration = models.DataMigration.objects.create(
-            name=migration_name,
-            app=app_label,
-            operation=operation_name,
-            metadata=json.dumps(
-                {
-                    "previous_publication_id": str(previous_graph_publication_id),
-                    "current_publication_id": str(updated_graph.publication_id),
-                }
-            ),
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        with open(self.json_path, "r") as f:
+            data = json.load(f)
+
+        graph_data = data["graph"][0]
+        current_publication_id = graph_data["publication"]["publicationid"]
+        current_graph = Graph.objects.get(pk=graph_data["graphid"])
+
+        previous_publication = (
+            models.GraphXPublishedGraph.objects.filter(graph=current_graph)
+            .exclude(publicationid=current_publication_id)
+            .order_by("-published_time")
+            .first()
         )
 
-        data_migration.save()
-
-    def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        # If reversible is True, this is called when the operation is reversed.
-        data_migration = models.DataMigration.objects.filter(
-            app=app_label,
-        ).last()
-
-        metadata = json.loads(data_migration.metadata)
         published_graph = models.PublishedGraph.objects.get(
-            publication_id=metadata["previous_publication_id"],
+            publication=previous_publication,
             language=settings.LANGUAGE_CODE,
         )
 
@@ -289,12 +218,9 @@ class UpdateGraphFromJSON(ArchesDataMigration):
             published_graph.serialized_graph
         )
 
-        out_of_date_publication = models.GraphXPublishedGraph.objects.get(
-            publicationid=metadata["current_publication_id"]
-        )
-        out_of_date_publication.delete()
-
-        data_migration.delete()
+        models.GraphXPublishedGraph.objects.get(
+            publicationid=current_publication_id
+        ).delete()
 
     def describe(self):
         # This is used to describe what the operation does in console output.
