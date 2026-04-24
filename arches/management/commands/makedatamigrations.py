@@ -519,7 +519,7 @@ class MigrationWriter:
             return "\n".join(
                 [
                     "        AddNodeToTileData(",
-                    f"            publication_id={str(self.pub_b.publicationid)!r},",
+                    f"            publication_id={str(self.pub_a.publicationid)!r},",
                     f"            nodegroup_id={op['nodegroup_id']!r},",
                     f"            node_id={op['nodeid']!r},",
                     f"            value=None,  # TODO: set default value for {op['alias']!r} ({op['datatype']!r})",
