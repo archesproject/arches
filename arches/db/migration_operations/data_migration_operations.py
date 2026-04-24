@@ -139,6 +139,56 @@ class AddNodeToTileData(ArchesDataMigration):
         return "Updates resources' publication_id from"
 
 
+class DeleteNodeFromTileData(ArchesDataMigration):
+    # If this is False, it means that this operation will be ignored by
+    # sqlmigrate; if true, it will be run and the SQL collected for its output.
+    reduces_to_sql = False
+
+    # If this is False, Django will refuse to reverse past this operation.
+    reversible = True
+
+    def __init__(self, publication_id, nodegroup_id, node_id, value):
+        self.publication_id = publication_id
+        self.nodegroup_id = nodegroup_id
+        self.node_id = node_id
+        self.value = value
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        models.TileModel.objects.filter(
+            nodegroup_id=self.nodegroup_id,
+            resourceinstance__graph_publication_id=self.publication_id,
+        ).filter(
+            data__has_key=self.node_id,
+        ).update(
+            data=RawSQL(
+                "tiledata - %s",
+                [self.node_id],
+                output_field=JSONField(),
+            )
+        )
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        models.TileModel.objects.filter(
+            nodegroup_id=self.nodegroup_id,
+            resourceinstance__graph_publication_id=self.publication_id,
+        ).exclude(
+            data__has_key=self.node_id,
+        ).update(
+            data=RawSQL(
+                "jsonb_set(tiledata, ARRAY[%s], %s::jsonb)",
+                [self.node_id, json.dumps(self.value)],
+                output_field=JSONField(),
+            )
+        )
+
+    def describe(self):
+        # This is used to describe what the operation does in console output.
+        return "Deletes node %s from tile data for nodegroup %s" % (
+            self.node_id,
+            self.nodegroup_id,
+        )
+
+
 class UpdateGraphFromJSON(ArchesDataMigration):
     # If this is False, it means that this operation will be ignored by
     # sqlmigrate; if true, it will be run and the SQL collected for its output.
