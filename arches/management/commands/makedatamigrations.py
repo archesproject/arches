@@ -97,6 +97,7 @@ class Command(BaseCommand):
         self.stdout.write("")
 
         checks = [
+            ("Graph created (no prior publications)", comparator.check_is_new_graph),
             ("Nodes created / deleted", comparator.check_nodes_created_or_deleted),
             (
                 "Nodegroups created / deleted",
@@ -263,6 +264,28 @@ class GraphPublicationComparator:
         self.nodegroups_b: dict[str, dict] = {
             ng["nodegroupid"]: ng for ng in graph_b.get("nodegroups", [])
         }
+
+    def check_is_new_graph(self) -> bool:
+        ops = []
+        graph_a_pub_time = GraphXPublishedGraph.objects.get(
+            publicationid=self.graph_a.get("publication_id"),
+        ).published_time
+        is_new_graph = not GraphXPublishedGraph.objects.filter(
+            graph_id=self.graph_a.get("graphid"),
+            published_time__lt=graph_a_pub_time,
+        ).exists()
+
+        if is_new_graph:
+            ops.append(
+                {
+                    "op": "CreateGraph",
+                    "graph_id": self.graph_a.get("graphid"),
+                    "graph_slug": self.graph_a.get("slug"),
+                    "name": self.graph_a.get("name"),
+                    "is_resource": self.graph_a.get("isresource", False),
+                }
+            )
+        return ops
 
     def check_nodes_created_or_deleted(self) -> list[dict]:
         ops = []
@@ -508,6 +531,8 @@ class MigrationWriter:
     def _collect_imports(self) -> list[str]:
         needed = {"UpdateResourceInstancesPublicationId"}
         for op in self.operations:
+            if op["op"] == "CreateGraph":
+                needed.add("CreateGraph")
             if op["op"] == "CreateNode" and op.get("nodegroup_is_existing"):
                 needed.add("AddNodeToTileData")
             if op["op"] == "DeleteNode" and op.get("nodegroup_id"):
@@ -522,6 +547,16 @@ class MigrationWriter:
         return "\n".join(rendered)
 
     def _render_op(self, op: dict) -> str:
+        if op["op"] == "CreateGraph":
+            return "\n".join(
+                [
+                    "        CreateGraph(",
+                    f"            graph_id={op['graph_id']!r},",
+                    f"            graph_slug={op['graph_slug']!r},",
+                    f"            name={op['name']!r},",
+                    "        ),",
+                ]
+            )
         if op["op"] == "CreateNode" and op.get("nodegroup_is_existing"):
             return "\n".join(
                 [
