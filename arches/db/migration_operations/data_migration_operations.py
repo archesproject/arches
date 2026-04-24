@@ -61,6 +61,42 @@ class ArchesDataMigration(Operation):
         return "custom_operation_%s_%s" % (self.arg1, self.arg2)
 
 
+class CreateGraph(ArchesDataMigration):
+    # If this is False, it means that this operation will be ignored by
+    # sqlmigrate; if true, it will be run and the SQL collected for its output.
+    reduces_to_sql = False
+
+    # If this is False, Django will refuse to reverse past this operation.
+    reversible = True
+
+    def __init__(
+        self,
+        graphid,
+        graph_slug,
+        name="",
+        is_resource=False,
+    ):
+        self.graphid = graphid
+        self.graph_slug = graph_slug
+        self.name = name
+        self.is_resource = is_resource
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        Graph.objects.create_graph(
+            graphid=self.graphid,
+            slug=self.graph_slug,
+            name=self.name,
+            is_resource=self.is_resource,
+        )
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        Graph.objects.filter(graphid=self.graphid).delete()
+
+    def describe(self):
+        # This is used to describe what the operation does in console output.
+        return "Creates a graph with id %s" % self.graphid
+
+
 class UpdateResourceInstancesPublicationId(ArchesDataMigration):
     # If this is False, it means that this operation will be ignored by
     # sqlmigrate; if true, it will be run and the SQL collected for its output.
