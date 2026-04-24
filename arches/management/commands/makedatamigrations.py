@@ -284,12 +284,15 @@ class GraphPublicationComparator:
 
         for nodeid in sorted(ids_a - ids_b):
             n = self.nodes_a[nodeid]
+            nodegroup_id = n.get("nodegroup_id")
             ops.append(
                 {
                     "op": "DeleteNode",
                     "nodeid": nodeid,
                     "alias": n.get("alias"),
                     "datatype": n.get("datatype"),
+                    "nodegroup_id": nodegroup_id,
+                    "nodegroup_is_existing": nodegroup_id in self.nodegroups_a,
                 }
             )
 
@@ -505,6 +508,8 @@ class MigrationWriter:
         for op in self.operations:
             if op["op"] == "CreateNode" and op.get("nodegroup_is_existing"):
                 needed.add("AddNodeToTileData")
+            if op["op"] == "DeleteNode" and op.get("nodegroup_id"):
+                needed.add("DeleteNodeFromTileData")
         return sorted(needed)
 
     def _render_operations(self) -> str:
@@ -519,6 +524,17 @@ class MigrationWriter:
             return "\n".join(
                 [
                     "        AddNodeToTileData(",
+                    f"            publication_id={str(self.pub_a.publicationid)!r},",
+                    f"            nodegroup_id={op['nodegroup_id']!r},",
+                    f"            node_id={op['nodeid']!r},",
+                    f"            value=None,  # TODO: set default value for {op['alias']!r} ({op['datatype']!r})",
+                    "        ),",
+                ]
+            )
+        if op["op"] == "DeleteNode" and op.get("nodegroup_id"):
+            return "\n".join(
+                [
+                    "        DeleteNodeFromTileData(",
                     f"            publication_id={str(self.pub_a.publicationid)!r},",
                     f"            nodegroup_id={op['nodegroup_id']!r},",
                     f"            node_id={op['nodeid']!r},",
