@@ -9,6 +9,7 @@ import Tooltip from 'primevue/tooltip';
 
 import { createApp } from 'vue';
 import { createGettext } from "vue3-gettext";
+import { createPinia } from 'pinia';
 
 import { DEFAULT_THEME } from "@/arches/themes/default.ts";
 import { generateArchesURL } from '@/arches/utils/generate-arches-url.ts';
@@ -58,6 +59,7 @@ export default async function createVueApplication(
             document.documentElement.classList.add(darkModeClass);
         }
 
+        app.use(createPinia());
         app.use(PrimeVue, themeConfiguration);
         app.use(gettext);
         app.use(ConfirmationService);
