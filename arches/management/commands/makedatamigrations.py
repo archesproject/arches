@@ -271,6 +271,7 @@ class GraphPublicationComparator:
         for nodeid in sorted(ids_b - ids_a):
             n = self.nodes_b[nodeid]
             nodegroup_id = n.get("nodegroup_id")
+            node_config = n.get("config") or {}
             ops.append(
                 {
                     "op": "CreateNode",
@@ -279,6 +280,7 @@ class GraphPublicationComparator:
                     "datatype": n.get("datatype"),
                     "nodegroup_id": nodegroup_id,
                     "nodegroup_is_existing": nodegroup_id in self.nodegroups_a,
+                    "default_value": node_config.get("defaultValue"),
                 }
             )
 
@@ -527,7 +529,7 @@ class MigrationWriter:
                     f"            publication_id={str(self.pub_a.publicationid)!r},",
                     f"            nodegroup_id={op['nodegroup_id']!r},",
                     f"            node_id={op['nodeid']!r},",
-                    f"            value=None,  # TODO: set default value for {op['alias']!r} ({op['datatype']!r})",
+                    f"            value={op.get('default_value')!r},",
                     "        ),",
                 ]
             )
