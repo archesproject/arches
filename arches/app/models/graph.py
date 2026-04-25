@@ -2276,8 +2276,7 @@ class Graph(models.GraphModel):
             self._validate_widget_count(node)
             datatype = datatype_factory.get_instance(node.datatype)
             datatype.validate_node(node)
-            config = node.config or {}
-            if "defaultValue" in config:
+            if "defaultValue" in (config := node.config or {}):
                 errors = datatype.validate(config["defaultValue"], node=node)
                 if errors:
                     raise GraphValidationError(errors)
