@@ -4,7 +4,6 @@ from django.db import migrations
 def _move_default_value_from_widgets_to_nodes(serialized_graph):
     nodes = serialized_graph.get("nodes", [])
     widgets = serialized_graph.get("cards_x_nodes_x_widgets", [])
-
     node_by_id = {node["nodeid"]: node for node in nodes}
     changed = False
 
