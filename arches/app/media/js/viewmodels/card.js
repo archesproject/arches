@@ -466,7 +466,7 @@ var CardViewModel = function(params) {
             if(tile.dirty()) {
                 var res = {};
                 self.widgets().forEach(function(w){
-                    res[w.node.nodeid] = ko.unwrap(w.config.defaultValue);
+                    res[w.node.nodeid] = ko.unwrap(w.node?.config?.defaultValue);
                 });
                 for (var k in tile.data) {
                     if (Object.keys(res).indexOf(k) > -1) {

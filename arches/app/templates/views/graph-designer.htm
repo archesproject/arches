@@ -242,7 +242,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- ko if: ko.unwrap(cardTree.selection) && ko.unwrap(cardTree.selection) !=='root' -->
             <span class="graph-settings" data-bind="visible: cardTree.selection() && activeTab() === 'card'" style="display: none;">
                 <!-- ko with: ko.unwrap(cardTree.selection).model ? ko.unwrap(cardTree.selection).model : ko.unwrap(cardTree.selection).card -->
-                <!-- ko if: $data.dirty() -->
+                <!-- ko if: $data.dirty() || $parent.hasDirtyWidget() -->
                     <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: function(){$parent.hasDirtyWidget(false); $data.reset();}"><span>{% trans "Discard Card Edits" %}</span></button>
                     <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: function(){$parent.hasDirtyWidget(false); $parent.saveCardEdits($data);}"><span>{% trans "Save Card Edits" %}</span></button>
                 <!-- /ko -->

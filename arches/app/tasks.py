@@ -671,17 +671,15 @@ def update_resource_instance_data_based_on_graph_diff(
         )
         resource_instance_count = resource_instances.count()
 
-        initial_node_ids_to_default_values = {}
-        for initial_widget in initial_graph["cards_x_nodes_x_widgets"]:
-            initial_node_ids_to_default_values[initial_widget["node_id"]] = (
-                initial_widget.get("config", {}).get("defaultValue")
-            )
+        initial_node_ids_to_default_values = {
+            node["nodeid"]: (node.get("config") or {}).get("defaultValue")
+            for node in initial_graph["nodes"]
+        }
 
-        updated_node_ids_to_default_values = {}
-        for updated_widget in updated_graph["cards_x_nodes_x_widgets"]:
-            updated_node_ids_to_default_values[updated_widget["node_id"]] = (
-                updated_widget.get("config", {}).get("defaultValue")
-            )
+        updated_node_ids_to_default_values = {
+            node["nodeid"]: (node.get("config") or {}).get("defaultValue")
+            for node in updated_graph["nodes"]
+        }
 
         for tile in models.TileModel.objects.filter(
             resourceinstance__in=resource_instances

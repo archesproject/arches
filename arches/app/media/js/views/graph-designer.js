@@ -542,7 +542,18 @@ var GraphDesignerView = BaseManagerView.extend({
         };
 
         viewModel.saveCardEdits = function(card) {
-            card.save();
+            card.save(function(request, status) {
+                if (status === 'success') {
+                    var savedNodeIds = [];
+                    ko.unwrap(card.get('widgets')).forEach(function(widget) {
+                        var node = widget.node;
+                        if (node && !savedNodeIds.includes(node.nodeid) && ko.unwrap(node.dirty)) {
+                            savedNodeIds.push(node.nodeid);
+                            node.save();
+                        }
+                    });
+                }
+            });
         };
 
         viewModel.cardTree = new CardTreeViewModel({

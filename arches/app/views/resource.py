@@ -135,38 +135,7 @@ class ResourceEditorView(MapBaseManagerView):
                 datatype.pre_structure_tile_data(tile, nodeid, languages=languages)
 
         def add_i18n_to_cardwidget_defaults(cardwidgets):
-            serialized_cardwidgets = JSONSerializer().serializeToPython(cardwidgets)
-
-            for cardwidget in serialized_cardwidgets:
-                if cardwidget["widget_id"] in [
-                    "10000000-0000-0000-0000-000000000005",
-                    "10000000-0000-0000-0000-000000000001",
-                ]:
-                    try:
-                        default_value = cardwidget["config"]["defaultValue"]
-                    except KeyError:
-                        default_value = None
-                    if default_value is None:
-                        existing_languages = []
-                        cardwidget["config"]["defaultValue"] = {}
-                    elif type(default_value) is str:
-                        default_language = languages.get(code=settings.LANGUAGE_CODE)
-                        cardwidget["config"]["defaultValue"] = {
-                            settings.LANGUAGE_CODE: {
-                                "value": default_value,
-                                "direction": default_language.default_direction,
-                            }
-                        }
-                        existing_languages = [settings.LANGUAGE_CODE]
-                    else:
-                        existing_languages = list(default_value.keys())
-                    for language in languages:
-                        if language.code not in existing_languages:
-                            cardwidget["config"]["defaultValue"][language.code] = {
-                                "value": "",
-                                "direction": language.default_direction,
-                            }
-            return serialized_cardwidgets
+            return JSONSerializer().serializeToPython(cardwidgets)
 
         def add_i18n_to_widget_defaults(widgets):
             for widget in widgets:

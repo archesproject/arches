@@ -285,7 +285,7 @@ var TileViewModel = function(params) {
         widgets.forEach(function(widget) {
             Object.keys(self.data).forEach(function(nodeId) {
                 if (nodeId === widget.node_id()) {
-                    var defaultValue = ko.unwrap(widget.config.defaultValue);
+                    var defaultValue = ko.unwrap(widget.node?.config?.defaultValue);
                     if (defaultValue) {
                         if(typeof self.data[nodeId] === 'function') {
                             self.data[nodeId](defaultValue);

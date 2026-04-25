@@ -50,7 +50,9 @@ var WidgetViewModel = function(params) {
     this.configForm = params.configForm || false;
     this.config = params.config || ko.observable({});
     this.configObservables = params.configObservables || {};
-    this.configKeys = params.configKeys || [];
+    this.configKeys = (params.configKeys || []).filter(function(key) {
+        return key !== 'defaultValue';
+    });
     this.configKeys.push('label');
     this.configKeys.push('required');
     this.valueProperties = params.valueProperties || [];
@@ -98,6 +100,25 @@ var WidgetViewModel = function(params) {
         var obs = ko.observable(self.config()[key]);
         subscribeConfigObservable(obs, key);
     });
+
+    if (this.node && this.node.config) {
+        if (!ko.isObservable(this.node.config.defaultValue)) {
+            this.node.config.defaultValue = ko.observable(
+                this.node.config.defaultValue != null ? this.node.config.defaultValue : null
+            );
+        }
+        this.defaultValue = this.node.config.defaultValue;
+        this.defaultValue.subscribe(function(val) {
+            if (val != null && ko.isObservable(self.node.configKeys) && !self.node.configKeys().includes('defaultValue')) {
+                self.node.configKeys.push('defaultValue');
+            }
+            if (params.hasOwnProperty('graphDesignerHasDirtyWidget')) {
+                params.graphDesignerHasDirtyWidget(true);
+            }
+        });
+    } else {
+        this.defaultValue = ko.observable(null);
+    }
 
     if (ko.isObservable(this.value) && ko.isObservable(this.defaultValue)) {
         var defaultValue = this.defaultValue();
