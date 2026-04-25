@@ -134,9 +134,6 @@ class ResourceEditorView(MapBaseManagerView):
                 datatype = datatype_lookup[nodeid]
                 datatype.pre_structure_tile_data(tile, nodeid, languages=languages)
 
-        def add_i18n_to_cardwidget_defaults(cardwidgets):
-            return JSONSerializer().serializeToPython(cardwidgets)
-
         def add_i18n_to_widget_defaults(widgets):
             for widget in widgets:
                 if widget.datatype == "string":
@@ -281,7 +278,7 @@ class ResourceEditorView(MapBaseManagerView):
             for card in cards:
                 cardwidgets += card.cardxnodexwidget_set.all()
 
-        updated_cardwidgets = add_i18n_to_cardwidget_defaults(cardwidgets)
+        updated_cardwidgets = JSONSerializer().serializeToPython(cardwidgets)
 
         widgets = list(models.Widget.objects.all())
         updated_widgets = add_i18n_to_widget_defaults(widgets)
