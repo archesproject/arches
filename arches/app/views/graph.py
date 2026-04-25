@@ -18,7 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import zipfile
 import json
-from slugify import slugify
 import uuid
 import logging
 from dateutil import tz

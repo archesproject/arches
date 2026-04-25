@@ -2276,6 +2276,11 @@ class Graph(models.GraphModel):
             self._validate_widget_count(node)
             datatype = datatype_factory.get_instance(node.datatype)
             datatype.validate_node(node)
+            config = node.config or {}
+            if "defaultValue" in config:
+                errors = datatype.validate(config["defaultValue"], node=node)
+                if errors:
+                    raise GraphValidationError(errors)
             if node.exportable is True:
                 if node.fieldname is not None:
                     validated_fieldname = validate_fieldname(node.fieldname, fieldnames)
