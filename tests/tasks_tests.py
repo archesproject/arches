@@ -365,20 +365,6 @@ class UpdateResourceInstanceDataTaskTests(ArchesTestCase):
         )
         draft_graph.add_node(node_to_add)
 
-        card = models.CardModel.objects.get(pk=draft_graph.get_cards()[0]["cardid"])
-
-        models.CardXNodeXWidget.objects.create(
-            config={
-                "defaultValue": {
-                    "en": {"value": "Overridden Default Value", "direction": "ltr"},
-                }
-            },
-            card=card,
-            node_id=node_to_add.nodeid,
-            widget=models.Widget.objects.first(),
-            label="Widget name",
-        )
-
         self.test_graph.promote_draft_graph_to_active_graph()
         self.test_graph.publish()
 
@@ -400,16 +386,9 @@ class UpdateResourceInstanceDataTaskTests(ArchesTestCase):
             {"en": {"value": "test value", "direction": "ltr"}},
         )
 
-        widget_defaults = {
-            widget["node_id"]: widget["config"]["defaultValue"]
-            for widget in updated_published_graph.serialized_graph[
-                "cards_x_nodes_x_widgets"
-            ]
-        }
-
         self.assertEqual(
             tile.data[new_node_id],
-            widget_defaults[new_node_id],
+            {"en": {"value": "Default Value", "direction": "ltr"}},
         )
 
     @patch("arches.app.tasks.notify_completion")
@@ -425,6 +404,14 @@ class UpdateResourceInstanceDataTaskTests(ArchesTestCase):
             widget=models.Widget.objects.first(),
             label="Widget name",
         )
+
+        node = models.Node.objects.get(pk=self.string_node_id)
+        node.config = {
+            "defaultValue": {
+                "en": {"value": "Default Value", "direction": "ltr"},
+            },
+        }
+        node.save()
 
         self.test_graph.refresh_from_database()
         self.test_graph.save(validate=False)
@@ -455,12 +442,7 @@ class UpdateResourceInstanceDataTaskTests(ArchesTestCase):
         )
 
         draft_graph = self.test_graph.create_draft_graph()
-
-        models.CardXNodeXWidget.objects.filter(
-            node_id=models.Node.objects.get(
-                source_identifier_id=self.string_node_id
-            ).nodeid,
-        ).update(
+        models.Node.objects.filter(source_identifier_id=self.string_node_id).update(
             config={
                 "defaultValue": {
                     "en": {"value": "Overridden Default Value", "direction": "ltr"},
