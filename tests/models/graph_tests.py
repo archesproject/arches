@@ -1438,6 +1438,19 @@ class GraphTests(ArchesTestCase):
             self.node_node_type_graph.validate()
         self.assertEqual(cm.exception.code, IntegrityCheck.TOO_MANY_WIDGETS.value)
 
+    def test_graph_validation_of_invalid_default_value(self):
+        graph = Graph.objects.get(pk=self.node_node_type_graph.pk)
+        target_node = next(
+            node for node in graph.nodes.values() if node.datatype == "string"
+        )
+        target_node.config = {"defaultValue": 42}
+
+        with self.assertRaises(GraphValidationError) as raised:
+            graph.validate()
+
+        errors = raised.exception.message
+        self.assertTrue(errors)
+
     def test_graph_validation_of_slug_changes(self):
         """
         Test that changing the slug of a graph raises a validation error for current graph publication.
