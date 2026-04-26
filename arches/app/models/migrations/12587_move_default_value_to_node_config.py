@@ -77,7 +77,7 @@ class Migration(migrations.Migration):
         schema_editor.execute(
             """
             UPDATE nodes
-            SET config = COALESCE(config, '{}'::jsonb)
+                        SET config = COALESCE(nodes.config, '{}'::jsonb)
                          || jsonb_build_object('defaultValue', w.config->'defaultValue')
             FROM cards_x_nodes_x_widgets w
             WHERE w.nodeid = nodes.nodeid
@@ -101,7 +101,7 @@ class Migration(migrations.Migration):
         schema_editor.execute(
             """
             UPDATE cards_x_nodes_x_widgets
-            SET config = COALESCE(config, '{}'::jsonb)
+                        SET config = COALESCE(cards_x_nodes_x_widgets.config, '{}'::jsonb)
                          || jsonb_build_object('defaultValue', n.config->'defaultValue')
             FROM nodes n
             WHERE cards_x_nodes_x_widgets.nodeid = n.nodeid
