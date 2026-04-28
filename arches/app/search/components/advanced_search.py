@@ -31,14 +31,11 @@ class AdvancedSearch(BaseSearchFilter):
         datatype_factory = DataTypeFactory()
         search_query = Bool()
         advanced_query = Bool()
-        grouped_queries = [{"tile_query": Bool(), "null_query": Bool()}]
-
+        grouped_query = Bool()
+        grouped_queries = [grouped_query]
         for index, advanced_filter in enumerate(advanced_filters):
-            if advanced_filter.get("op") == "or" and index != 0:
-                grouped_queries.append({"tile_query": Bool(), "null_query": Bool()})
-
-            current_group = grouped_queries[-1]
-
+            tile_query = Bool()
+            null_query = Bool()
             for key, val in advanced_filter.items():
                 if key != "op":
                     node = Node.objects.get(pk=key)
@@ -58,30 +55,22 @@ class AdvancedSearch(BaseSearchFilter):
                         ):
                             # don't use a nested query with the null/not null search
                             datatype.append_search_filters(
-                                val, node, current_group["null_query"], self.request
+                                val, node, null_query, self.request
                             )
                         else:
                             datatype.append_search_filters(
-                                val, node, current_group["tile_query"], self.request
+                                val, node, tile_query, self.request
                             )
-
-        for grouped_filters in grouped_queries:
-            grouped_query = Bool()
-
-            if not grouped_filters["tile_query"].empty:
-                grouped_query.must(
-                    Nested(path="tiles", query=grouped_filters["tile_query"])
-                )
-
-            if not grouped_filters["null_query"].empty:
-                grouped_query.must(grouped_filters["null_query"])
-
-            if not grouped_query.empty:
-                advanced_query.should(grouped_query)
-
-        if not advanced_query.empty:
-            search_query.must(advanced_query)
-            search_query_object["query"].add_query(search_query)
+            nested_query = Nested(path="tiles", query=tile_query)
+            if advanced_filter["op"] == "or" and index != 0:
+                grouped_query = Bool()
+                grouped_queries.append(grouped_query)
+            grouped_query.must(nested_query)
+            grouped_query.must(null_query)
+        for grouped_query in grouped_queries:
+            advanced_query.should(grouped_query)
+        search_query.must(advanced_query)
+        search_query_object["query"].add_query(search_query)
 
     def view_data(self):
         ret = {}
