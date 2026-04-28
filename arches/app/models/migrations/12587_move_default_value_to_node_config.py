@@ -54,14 +54,19 @@ def _move_default_value_from_nodes_to_widgets(serialized_graph):
 
 def _update_published_graphs(apps, graph_transformer):
     PublishedGraph = apps.get_model("models", "PublishedGraph")
+    batch_size = 25
     graphs_to_update = []
 
-    for published_graph in PublishedGraph.objects.exclude(
-        serialized_graph__isnull=True
-    ):
+    queryset = PublishedGraph.objects.exclude(serialized_graph__isnull=True)
+    for published_graph in queryset.iterator(chunk_size=batch_size):
         serialized_graph = published_graph.serialized_graph
         if graph_transformer(serialized_graph):
             graphs_to_update.append(published_graph)
+            if len(graphs_to_update) == batch_size:
+                PublishedGraph.objects.bulk_update(
+                    graphs_to_update, ["serialized_graph"]
+                )
+                graphs_to_update = []
 
     if graphs_to_update:
         PublishedGraph.objects.bulk_update(graphs_to_update, ["serialized_graph"])
