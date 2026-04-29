@@ -10,6 +10,7 @@ IntegrityCheckDescriptions = {
     1015: "Graphs missing slugs",
     1016: "Nodes with excess widgets",
     1017: "Nodes missing widgets",
+    1020: "Nodes with invalid default values",
 }
 
 
@@ -24,6 +25,7 @@ class IntegrityCheck(Enum):
     # NO_WIDGETS isn't currently an error condition,
     # but it might be in the future.
     NO_WIDGETS = 1017
+    INVALID_DEFAULT_VALUE = 1020
 
     def __str__(self):
         return IntegrityCheckDescriptions[self.value]

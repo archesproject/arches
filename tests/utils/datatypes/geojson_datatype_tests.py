@@ -23,6 +23,11 @@ class GeoJsonDataTypeTest(ArchesTestCase):
         errors = geom_datatype.validate(geom)
         self.assertEqual(len(errors), 0)
 
+    def test_validate_non_subscriptable_value_returns_none(self):
+        geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
+        errors = geom_datatype.validate(1, row_number=3, source="test-source")
+        self.assertEqual(len(errors), 1)
+
     @override_settings(
         DATA_VALIDATION_BBOX=[
             (12.948801570473677, 52.666192057898854),

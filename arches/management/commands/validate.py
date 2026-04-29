@@ -28,6 +28,7 @@ from django.db.models import Count, Exists, OuterRef, Q, Subquery
 
 from arches import __version__
 from arches.app.const import IntegrityCheck
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 
 
@@ -46,6 +47,20 @@ class FixActions(StrEnum):
     DELETE_QUERYSET = auto()
     DEDUPLICATE_WIDGETS = auto()
     UPDATE_GRAPH_PUBLICATIONS = auto()
+
+
+class ValidationResultList(list):
+    def exists(self):
+        return bool(self)
+
+
+class InvalidNodeDefaultValue:
+    def __init__(self, node, errors):
+        self.node = node
+        self.errors = errors
+
+    def __str__(self):
+        return f"{self.node} ({self.node.pk}): {self.errors}"
 
 
 class Command(BaseCommand):
@@ -190,6 +205,11 @@ class Command(BaseCommand):
             ).filter(Q(source_widget_count__gt=1) | Q(draft_widget_count__gt=1)),
             fix_action=FixActions.DEDUPLICATE_WIDGETS,
         )
+        self.check_integrity(
+            check=IntegrityCheck.INVALID_DEFAULT_VALUE,  # 1020
+            queryset=self.get_invalid_default_values(),
+            fix_action=None,
+        )
         # This is not currently an error condition, so don't show it.
         # self.check_integrity(
         #     check=IntegrityCheck.NO_WIDGETS,  # 1017
@@ -198,6 +218,24 @@ class Command(BaseCommand):
         #     .filter(widget_count__lt=1),
         #     fix_action=None,
         # )
+
+    def get_invalid_default_values(self):
+        invalid_defaults = ValidationResultList()
+        datatype_factory = DataTypeFactory()
+        nodes = (
+            models.Node.objects.filter(config__has_key="defaultValue")
+            .select_related("graph")
+            .only("nodeid", "datatype", "config", "graph")
+        )
+
+        for node in nodes.iterator(chunk_size=500):
+            default_value = node.config.get("defaultValue")
+            datatype = datatype_factory.get_instance(node.datatype)
+            errors = datatype.validate(default_value, node=node)
+            if errors:
+                invalid_defaults.append(InvalidNodeDefaultValue(node, errors))
+
+        return invalid_defaults
 
     def check_integrity(self, check, queryset, fix_action):
         # 500 not set as a default earlier:

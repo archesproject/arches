@@ -76,6 +76,16 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 )
 
         if value is not None:
+            message = _("Unable to serialize some geometry features.")
+            title = _("Unable to Serialize Geometry")
+            try:
+                value["features"]
+            except TypeError:
+                errors.append(
+                    self.create_error_message(value, source, row_number, message, title)
+                )
+                return errors
+
             for feature in value["features"]:
                 try:
                     geom = GEOSGeometry(JSONSerializer().serialize(feature["geometry"]))
@@ -84,8 +94,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     else:
                         raise Exception
                 except Exception:
-                    message = _("Unable to serialize some geometry features.")
-                    title = _("Unable to Serialize Geometry")
                     error_message = self.create_error_message(
                         value, source, row_number, message, title
                     )
