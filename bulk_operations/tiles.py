@@ -22,6 +22,7 @@ from arches.app.models.models import (
 )
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile, TileValidationError
+from arches.app.utils.permission_backend import user_is_resource_reviewer
 
 from arches_querysets.datatypes.datatypes import DataTypeFactory
 from arches_querysets.utils.models import (
@@ -472,6 +473,19 @@ class TileTreeOperation:
             raise
 
     def _perform_transaction(self):
+        """
+        Interact with the database in bulk as much as possible.
+        Since some side effects are only exposed on (Proxy)Tile.save(), but
+        we wish to operate on TileTrees, which only inherit from (vanilla)
+        TileModel, we will need to pair off Tile and TileTree instances.
+
+        Below,
+        vanilla_instance: the TileTree instance to save
+        insert/update_proxy: the Tile instance to run side effects on.
+
+        This situation is a snapshot of an "arrested" refactor that was slowed
+        down by the need to support multiple arches versions.
+        """
         from arches_querysets.models import ResourceTileTree
 
         # Instantiate proxy models for now, but TODO: expose this
@@ -499,9 +513,6 @@ class TileTreeOperation:
                     super(ResourceTileTree, self.entry).save(**self.save_kwargs)
                 elif isinstance(self.entry, ResourceInstance):
                     self.entry.save(**self.save_kwargs)
-            # Interact with the database in bulk as much as possible, but
-            # run certain side effects from Tile.save() one-at-a-time until
-            # proxy model methods can be refactored. Then run in bulk.
             for upsert_proxy, vanilla_instance in zip(
                 sorted(upsert_proxies, key=attrgetter("pk")),
                 sorted(upserts, key=attrgetter("pk")),
@@ -534,6 +545,14 @@ class TileTreeOperation:
                     upsert_proxy._existing_provisionaledits,
                     user=self.request.user,
                 )
+
+                if not user_is_resource_reviewer(self.request.user):
+                    if upsert_proxy._state.adding:
+                        vanilla_instance.data = {}
+                        vanilla_instance.set_missing_keys_to_none()
+                    else:
+                        vanilla_instance.data = upsert_proxy._existing_data
+
                 # Remember the values needed for the edit log updates later.
                 upsert_proxy._oldprovisionalvalue = oldprovisionalvalue
                 upsert_proxy._newprovisionalvalue = newprovisionalvalue
