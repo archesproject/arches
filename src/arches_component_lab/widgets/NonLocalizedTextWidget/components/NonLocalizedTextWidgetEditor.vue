@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import InputText from "primevue/inputtext";
+import Textarea from "primevue/textarea";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { NonLocalizedTextValue } from "@/arches_component_lab/datatypes/non-localized-text/types.ts";
@@ -36,7 +37,18 @@ function onUpdateModelValue(updatedValue: string | undefined) {
 </script>
 
 <template>
+    <Textarea
+        v-if="cardXNodeXWidgetData.config.multiline"
+        :auto-resize="true"
+        :fluid="true"
+        :model-value="aliasedNodeData?.node_value || ''"
+        :placeholder="cardXNodeXWidgetData.config.placeholder"
+        :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
+        rows="4"
+        @update:model-value="onUpdateModelValue($event)"
+    />
     <InputText
+        v-else
         type="text"
         :fluid="true"
         :model-value="aliasedNodeData?.node_value || ''"

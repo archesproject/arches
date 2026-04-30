@@ -111,9 +111,15 @@ watchEffect(async () => {
             cardXNodeXWidgetDataOverrides &&
             resolvedCardXNodeXWidgetData.value
         ) {
+            const { config: configOverrides, ...topLevelOverrides } =
+                cardXNodeXWidgetDataOverrides;
             resolvedCardXNodeXWidgetData.value = {
                 ...resolvedCardXNodeXWidgetData.value,
-                ...cardXNodeXWidgetDataOverrides,
+                ...topLevelOverrides,
+                config: {
+                    ...resolvedCardXNodeXWidgetData.value.config,
+                    ...configOverrides,
+                },
             };
         }
     } catch (error) {

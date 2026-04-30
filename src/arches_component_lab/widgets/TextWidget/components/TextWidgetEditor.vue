@@ -4,6 +4,7 @@ import { useGettext } from "vue3-gettext";
 
 import InputText from "primevue/inputtext";
 import Select from "primevue/select";
+import Textarea from "primevue/textarea";
 
 import { fetchLanguages } from "@/arches_component_lab/widgets/api.ts";
 
@@ -101,7 +102,20 @@ function onUpdateModelValue(updatedValue: string | undefined) {
             :option-label="(lang: Language) => `${lang.name} (${lang.code})`"
             :placeholder="$gettext('Language')"
         />
+        <Textarea
+            v-if="cardXNodeXWidgetData.config.multiline"
+            :auto-resize="true"
+            :fluid="true"
+            :maxlength="cardXNodeXWidgetData.config.maxLength ?? undefined"
+            :model-value="singleInputValue"
+            :placeholder="cardXNodeXWidgetData.config.placeholder"
+            :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
+            :required="cardXNodeXWidgetData.node.isrequired"
+            rows="4"
+            @update:model-value="onUpdateModelValue($event)"
+        />
         <InputText
+            v-else
             type="text"
             :fluid="true"
             :maxlength="cardXNodeXWidgetData.config.maxLength ?? undefined"
