@@ -1020,36 +1020,16 @@ class Resource(models.ResourceInstance):
 
     def copy(self):
         """
-        Returns a copy of this resource instance including a copy of all tiles associated with this resource instance
-
+        Returns a copy of this resource instance including a copy of all
+        tiles. Delegates to ResourceInstance.copy() for the base copy, then
+        adds edit logging and indexing.
         """
-        # need this here to prevent a circular import error
-        from arches.app.models.tile import Tile
-
-        id_map = {}
-        new_resource = Resource()
-        new_resource.graph = self.graph
-
-        if len(self.tiles) == 0:
-            self.tiles = Tile.objects.filter(resourceinstance=self)
-
-        for tile in self.tiles:
-            new_tile = Tile()
-            new_tile.data = tile.data
-            new_tile.nodegroup = tile.nodegroup
-            new_tile.parenttile = tile.parenttile
-            new_tile.resourceinstance = new_resource
-            new_tile.sortorder = tile.sortorder
-
-            new_resource.tiles.append(new_tile)
-            id_map[tile.pk] = new_tile
-
-        for tile in new_resource.tiles:
-            if tile.parenttile:
-                tile.parenttile = id_map[tile.parenttile_id]
-
-        with transaction.atomic():
-            new_resource.save(context={"mode": "copy"})
+        new_resource = super().copy()
+        new_resource.tiles = list(
+            models.TileModel.objects.filter(resourceinstance=new_resource)
+        )
+        new_resource.save_edit(edit_type="create")
+        new_resource.index()
 
         return new_resource
 
