@@ -898,17 +898,63 @@ class ResourceTests(ArchesTestCase):
         self.assertEqual(all_datatypes_resource.graph_id, copied_resource.graph_id)
         self.assertEqual(len(all_datatypes_resource.tiles), len(copied_resource.tiles))
 
-        original_tiles = models.TileModel.objects.filter(
-            resourceinstance=all_datatypes_resource.pk
-        ).order_by("sortorder")
-        copied_tiles = models.TileModel.objects.filter(
-            resourceinstance=copied_resource.pk
-        ).order_by("sortorder")
+        original_tiles = all_datatypes_resource.tiles
+        copied_tiles = copied_resource.tiles
 
         for original_tile, copied_tile in zip(
             original_tiles,
             copied_tiles,
         ):
+            self.assertEqual(
+                str(original_tile.nodegroup_id), str(copied_tile.nodegroup_id)
+            )
+            self.assertEqual(original_tile.sortorder, copied_tile.sortorder)
+            if original_tile.find_nodegroup_alias() == "resource_instance":
+                nodeids = list(original_tile.data.keys())
+                for nodeid in nodeids:
+                    original_value = original_tile.data[nodeid][0]
+                    copied_value = copied_tile.data[nodeid][0]
+                    self.assertEqual(
+                        original_value["resourceId"],
+                        copied_value["resourceId"],
+                    )
+                    self.assertEqual(
+                        original_value["ontologyProperty"],
+                        copied_value["ontologyProperty"],
+                    )
+                    self.assertEqual(
+                        original_value["inverseOntologyProperty"],
+                        copied_value["inverseOntologyProperty"],
+                    )
+                    self.assertNotEqual(
+                        original_value["resourceXresourceId"],
+                        copied_value["resourceXresourceId"],
+                    )
+            else:
+                self.assertEqual(original_tile.data, copied_tile.data)
+
+    def test_resource_instance_copy(self):
+        self.maxDiff = None
+        all_datatypes_resource = self._create_all_datatypes_resource()
+        original_pk = all_datatypes_resource.pk
+        resource_instance = models.ResourceInstance.objects.get(pk=original_pk)
+        copied_instance = resource_instance.copy()
+
+        self.assertEqual(all_datatypes_resource.pk, original_pk)
+        self.assertNotEqual(original_pk, copied_instance.pk)
+        self.assertEqual(all_datatypes_resource.graph_id, copied_instance.graph_id)
+
+        original_tiles = models.TileModel.objects.filter(
+            resourceinstance=original_pk
+        ).order_by("sortorder")
+        copied_tiles = models.TileModel.objects.filter(
+            resourceinstance=copied_instance.pk
+        ).order_by("sortorder")
+
+        self.assertEqual(original_tiles.count(), copied_tiles.count())
+
+        for original_tile, copied_tile in zip(original_tiles, copied_tiles):
+            self.assertNotEqual(original_tile.tileid, copied_tile.tileid)
             self.assertEqual(
                 str(original_tile.nodegroup_id), str(copied_tile.nodegroup_id)
             )
