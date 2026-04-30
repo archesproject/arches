@@ -53,7 +53,7 @@ def remove_concept_config_key(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "12586_tile_cardinality_check"),
+        ("models", "12587_move_default_value_to_node_config"),
     ]
 
     operations = [
