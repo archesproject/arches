@@ -14,7 +14,6 @@ import MapComponentViewModel from "views/components/map";
 import selectFeatureLayersFactory from "views/components/cards/select-feature-layers";
 import geojsonFeatureCollection from "views/components/datatypes/geojson-feature-collection";
 
-
 var viewModel = function (params) {
     var self = this;
     var padding = 40;
@@ -50,7 +49,7 @@ var viewModel = function (params) {
     var selectFeatureLayers = selectFeatureLayersFactory(
         resourceId,
         selectSource,
-        selectSourceLayer
+        selectSourceLayer,
     );
 
     this.setSelectLayersVisibility = function (visibility) {
@@ -60,7 +59,7 @@ var viewModel = function (params) {
                 map.setLayoutProperty(
                     layer.id,
                     "visibility",
-                    visibility ? "visible" : "none"
+                    visibility ? "visible" : "none",
                 );
             });
         }
@@ -69,10 +68,7 @@ var viewModel = function (params) {
     var sources = [];
     for (var sourceName in arches.mapSources) {
         if (
-            Object.prototype.hasOwnProperty.call(
-                arches.mapSources,
-                sourceName
-            )
+            Object.prototype.hasOwnProperty.call(arches.mapSources, sourceName)
         ) {
             sources.push(sourceName);
         }
@@ -82,14 +78,10 @@ var viewModel = function (params) {
         var sourceLayer = self.selectSourceLayer();
         selectFeatureLayers =
             sources.indexOf(source) > 0
-                ? selectFeatureLayersFactory(
-                        resourceId,
-                        source,
-                        sourceLayer
-                    )
+                ? selectFeatureLayersFactory(resourceId, source, sourceLayer)
                 : [];
         self.additionalLayers(
-            extendedLayers.concat(selectFeatureLayers, geojsonLayers)
+            extendedLayers.concat(selectFeatureLayers, geojsonLayers),
         );
     };
     this.selectSource.subscribe(updateSelectLayers);
@@ -120,6 +112,19 @@ var viewModel = function (params) {
             selectedTool: ko.observable(),
             dropErrors: ko.observableArray(),
         };
+        // If the geometries change without editing, then zoom to them this
+        // fixes the apply provisional edits issue
+        self.tile.data[id].subscribe(function () {
+            if (
+                (ko.unwrap(self.featureLookup[id].features).length ?? 0 > 0) &&
+                (self.draw?.getMode() ?? "") === "simple_select"
+            ) {
+                self.fitFeatures(
+                    ko.unwrap(self.featureLookup[id].features),
+                    true,
+                );
+            }
+        });
         self.featureLookup[id].selectedTool.subscribe(function (tool) {
             if (self.draw) {
                 if (tool === "") {
@@ -156,8 +161,7 @@ var viewModel = function (params) {
             var id = ko.unwrap(widget.node_id);
             var features = [];
             featureCollection.features.forEach(function (feature) {
-                if (feature.properties.nodeId === id)
-                    features.push(feature);
+                if (feature.properties.nodeId === id) features.push(feature);
             });
             if (ko.isObservable(self.tile.data[id])) {
                 self.tile.data[id]({
@@ -184,9 +188,7 @@ var viewModel = function (params) {
                     }
                     feature.properties.nodeId = id;
                 });
-                drawFeatures = drawFeatures.concat(
-                    featureCollection.features
-                );
+                drawFeatures = drawFeatures.concat(featureCollection.features);
             }
         });
         return drawFeatures;
@@ -220,7 +222,7 @@ var viewModel = function (params) {
                 },
             },
         },
-        params.sources
+        params.sources,
     );
     var extendedLayers = [];
     if (params.layers) {
@@ -304,7 +306,7 @@ var viewModel = function (params) {
     ];
 
     params.layers = ko.observable(
-        extendedLayers.concat(selectFeatureLayers, geojsonLayers)
+        extendedLayers.concat(selectFeatureLayers, geojsonLayers),
     );
 
     MapComponentViewModel.apply(this, [params]);
@@ -315,7 +317,7 @@ var viewModel = function (params) {
             self.selectedFeatureIds(
                 self.selectedFeatureIds().filter(function (id) {
                     return id !== feature.id;
-                })
+                }),
             );
             self.updateTiles();
         }
@@ -361,7 +363,7 @@ var viewModel = function (params) {
                 features: features,
             },
             null,
-            "   "
+            "   ",
         );
         this.geoJSONString(geoJSONString);
         self.newNodeId = nodeId;
@@ -394,8 +396,7 @@ var viewModel = function (params) {
         .pureComputed(function () {
             var geoJSONString = self.geoJSONString();
             var geoJSONErrors = self.geoJSONErrors();
-            if (geoJSONErrors.length === 0)
-                return JSON.parse(geoJSONString);
+            if (geoJSONErrors.length === 0) return JSON.parse(geoJSONString);
             var fc = {
                 type: "FeatureCollection",
                 features: [],
@@ -415,9 +416,7 @@ var viewModel = function (params) {
             self.drawAvailable(false);
             var geoJSON = JSON.parse(this.geoJSONString());
             const subscription = self.drawAvailable.subscribe(() => {
-                geoJSON.features = geoJSON.features.filter(function (
-                    feature
-                ) {
+                geoJSON.features = geoJSON.features.filter(function (feature) {
                     return feature.geometry;
                 });
                 if (geoJSON.features.length > 0) {
@@ -476,7 +475,7 @@ var viewModel = function (params) {
                 self.draw.setFeatureProperty(
                     feature.id,
                     "nodeId",
-                    self.newNodeId
+                    self.newNodeId,
                 );
             });
             self.updateTiles();
@@ -484,8 +483,7 @@ var viewModel = function (params) {
         map.on("draw.update", function () {
             self.updateTiles();
             if (self.coordinateEditing()) {
-                var editingFeature =
-                    self.draw.getSelected().features[0];
+                var editingFeature = self.draw.getSelected().features[0];
                 if (editingFeature)
                     updateCoordinatesFromFeature(editingFeature);
             }
@@ -501,7 +499,7 @@ var viewModel = function (params) {
             self.selectedFeatureIds(
                 e.features.map(function (feature) {
                     return feature.id;
-                })
+                }),
             );
             if (e.features.length > 0) {
                 _.each(self.featureLookup, function (value) {
@@ -527,7 +525,6 @@ var viewModel = function (params) {
         if (self.draw) {
             self.drawAvailable(true);
         }
-
     };
 
     if (this.provisionalTileViewModel) {
@@ -542,9 +539,14 @@ var viewModel = function (params) {
                                 try {
                                     featureCollection = self.draw.getAll();
                                     featureCollection.features = ko.unwrap(
-                                        self.featureLookup[k].features
+                                        self.featureLookup[k].features,
                                     );
                                     self.draw.set(featureCollection);
+                                    if (featureCollection.features.length > 0) {
+                                        self.fitFeatures(
+                                            featureCollection.features,
+                                        );
+                                    }
                                 } catch (e) {
                                     //pass: TypeError in draw seems inconsequential.
                                 }
@@ -553,7 +555,7 @@ var viewModel = function (params) {
                     };
                     setTimeout(displayAll, 100);
                 }
-            }
+            },
         );
     }
 
@@ -582,29 +584,24 @@ var viewModel = function (params) {
                     },
                 ];
                 options = options.concat(
-                    ko
-                        .unwrap(widget.config.geometryTypes)
-                        .map(function (type) {
-                            var option = {};
-                            switch (ko.unwrap(type.id)) {
-                                case "Point":
-                                    option.value = "draw_point";
-                                    option.text =
-                                        arches.translations.mapAddPoint;
-                                    break;
-                                case "Line":
-                                    option.value = "draw_line_string";
-                                    option.text =
-                                        arches.translations.mapAddLine;
-                                    break;
-                                case "Polygon":
-                                    option.value = "draw_polygon";
-                                    option.text =
-                                        arches.translations.mapAddPolygon;
-                                    break;
-                            }
-                            return option;
-                        })
+                    ko.unwrap(widget.config.geometryTypes).map(function (type) {
+                        var option = {};
+                        switch (ko.unwrap(type.id)) {
+                            case "Point":
+                                option.value = "draw_point";
+                                option.text = arches.translations.mapAddPoint;
+                                break;
+                            case "Line":
+                                option.value = "draw_line_string";
+                                option.text = arches.translations.mapAddLine;
+                                break;
+                            case "Polygon":
+                                option.value = "draw_polygon";
+                                option.text = arches.translations.mapAddPolygon;
+                                break;
+                        }
+                        return option;
+                    }),
                 );
                 if (self.selectSource()) {
                     options.push({
@@ -624,8 +621,7 @@ var viewModel = function (params) {
         var tool = self.selectedTool();
         if (tool && tool !== "select_feature") return false;
         return (
-            feature.properties.resourceinstanceid ||
-            self.isSelectable(feature)
+            feature.properties.resourceinstanceid || self.isSelectable(feature)
         );
     };
 
@@ -713,20 +709,21 @@ var viewModel = function (params) {
                 });
             } else {
                 promises.push(
-                    new Promise (function(resolve) {
-                    var file = files[i];
-                    var extension = file.name.split(".").pop();
-                    var reader = new window.FileReader();
-                    reader.onload = function(e) {
-                        var geoJSON;
-                        if (["json", "geojson"].includes(extension))
-                            geoJSON = JSON.parse(e.target.result);
-                        else if (extension === "kml")
-                            geoJSON = kml(
-                                new window.DOMParser().parseFromString(
-                                    e.target.result,
-                                    "text/xml")
-                            );
+                    new Promise(function (resolve) {
+                        var file = files[i];
+                        var extension = file.name.split(".").pop();
+                        var reader = new window.FileReader();
+                        reader.onload = function (e) {
+                            var geoJSON;
+                            if (["json", "geojson"].includes(extension))
+                                geoJSON = JSON.parse(e.target.result);
+                            else if (extension === "kml")
+                                geoJSON = kml(
+                                    new window.DOMParser().parseFromString(
+                                        e.target.result,
+                                        "text/xml",
+                                    ),
+                                );
                             else if (extension === "shp")
                                 shp({ shp: e.target.result }).then(
                                     (parsedShp) => {
@@ -739,12 +736,12 @@ var viewModel = function (params) {
                                 });
                             if (!["shp", "zip"].includes(extension))
                                 resolve(geoJSON);
-                    };
-                    if (["shp", "zip"].includes(extension))
-                        reader.readAsArrayBuffer(file);
-                    else
-                        reader.readAsText(file);
-                }));
+                        };
+                        if (["shp", "zip"].includes(extension))
+                            reader.readAsArrayBuffer(file);
+                        else reader.readAsText(file);
+                    }),
+                );
             }
         }
         Promise.all(promises).then(function (results) {
@@ -756,7 +753,7 @@ var viewModel = function (params) {
                 }, []),
             };
             errors = errors.concat(
-                addFromGeoJSON(JSON.stringify(geoJSON), nodeId)
+                addFromGeoJSON(JSON.stringify(geoJSON), nodeId),
             );
             self.featureLookup[nodeId].dropErrors(errors);
         });
@@ -779,7 +776,7 @@ var viewModel = function (params) {
 
     self.dropZoneClickHandler = function (data, e) {
         var fileInput = e.target.parentNode.parentNode.querySelector(
-            ".hidden-file-input input"
+            ".hidden-file-input input",
         );
         var event = window.document.createEvent("MouseEvents");
         event.initEvent("click", true, false);
@@ -799,7 +796,7 @@ var viewModel = function (params) {
     };
     self.coordinateReferences = arches.preferredCoordinateSystems;
     self.selectedCoordinateReference = ko.observable(
-        self.coordinateReferences[0].proj4
+        self.coordinateReferences[0].proj4,
     );
     self.coordinates = ko.observableArray();
     var geographic = '+proj=longlat +datum=WGS84 +no_defs", "default';
@@ -823,11 +820,9 @@ var viewModel = function (params) {
                     if (feature.id === selectedFeatureId) {
                         if (feature.geometry.type === "Polygon") {
                             rawCoordinates.push(rawCoordinates[0]);
-                            feature.geometry.coordinates[0] =
-                                rawCoordinates;
+                            feature.geometry.coordinates[0] = rawCoordinates;
                         } else if (feature.geometry.type === "Point")
-                            feature.geometry.coordinates =
-                                rawCoordinates[0];
+                            feature.geometry.coordinates = rawCoordinates[0];
                         else feature.geometry.coordinates = rawCoordinates;
                     }
                 });
@@ -882,10 +877,7 @@ var viewModel = function (params) {
     });
     self.focusLatestY = ko.observable(true);
     var getNewCoordinatePair = function (coords) {
-        var newCoords = [
-            ko.observable(coords[0]),
-            ko.observable(coords[1]),
-        ];
+        var newCoords = [ko.observable(coords[0]), ko.observable(coords[1])];
         newCoords.forEach(function (value) {
             value.subscribe(function (newValue) {
                 if ([undefined, null, ""].includes(newValue)) value(0);
@@ -921,7 +913,7 @@ var viewModel = function (params) {
                 var newCoords = getNewCoordinatePair(coords);
                 transformCoordinatePair(newCoords, geographic);
                 return newCoords;
-            })
+            }),
         );
     };
     var transformCoordinatePair = function (coords, sourceCRS) {
@@ -1023,15 +1015,13 @@ var viewModel = function (params) {
         if (featureId) {
             var feature = self.draw.get(featureId);
             return ["Point", "LineString", "Polygon"].includes(
-                feature.geometry.type
+                feature.geometry.type,
             );
         } else {
             var selectedTool = self.selectedTool();
-            return [
-                "draw_point",
-                "draw_line_string",
-                "draw_polygon",
-            ].includes(selectedTool);
+            return ["draw_point", "draw_line_string", "draw_polygon"].includes(
+                selectedTool,
+            );
         }
     });
 
@@ -1076,7 +1066,7 @@ var viewModel = function (params) {
                 .fetch(
                     arches.urls.buffer +
                         "?filter=" +
-                        JSON.stringify(bufferParams)
+                        JSON.stringify(bufferParams),
                 )
                 .then(function (response) {
                     if (response.ok) {
@@ -1108,22 +1098,20 @@ var viewModel = function (params) {
             var dirty = ko.unwrap(self.tile.dirty);
             var nodeId = self.bufferNodeId();
             var addBufferResultAsNew = function () {
-                var updateNewTile = self.card.selected.subscribe(
-                    function () {
-                        var fc = {
-                            type: "FeatureCollection",
-                            features: [bufferResult],
-                        };
-                        self.card.getNewTile().data[nodeId](fc);
-                        self.card.map.subscribe(function (map) {
-                            map.fitBounds(geojsonExtent(fc), {
-                                duration: 0,
-                                padding: padding,
-                            });
+                var updateNewTile = self.card.selected.subscribe(function () {
+                    var fc = {
+                        type: "FeatureCollection",
+                        features: [bufferResult],
+                    };
+                    self.card.getNewTile().data[nodeId](fc);
+                    self.card.map.subscribe(function (map) {
+                        map.fitBounds(geojsonExtent(fc), {
+                            duration: 0,
+                            padding: padding,
                         });
-                        updateNewTile.dispose();
-                    }
-                );
+                    });
+                    updateNewTile.dispose();
+                });
                 self.card.selected(true);
             };
             if (dirty) self.saveTile(addBufferResultAsNew);
