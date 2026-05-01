@@ -1625,6 +1625,9 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
         Returns a copy of this resource instance including a copy of all
         associated tiles. Runs datatype.copy() transforms but does NOT run
         side effects like indexing or creating edit log entries.
+
+        Implementor is responsible for saving the new resource instance and tiles,
+        and for any additional side effects.
         """
         from arches.app.datatypes.datatypes import DataTypeFactory
 
@@ -1635,7 +1638,7 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
         datatype_factory = DataTypeFactory()
 
         new_resource = copy.copy(self)
-        new_resource.pk = None
+        new_resource.pk = uuid.uuid4()
         new_resource._state.adding = True
 
         id_map = {}
@@ -1662,13 +1665,7 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
             if original_parent_id:
                 new_tile.parenttile = id_map[original_parent_id]
 
-        with transaction.atomic():
-            ResourceInstance.save(new_resource)
-            for tile in new_tiles:
-                tile.resourceinstance = new_resource
-            TileModel.objects.bulk_create(new_tiles)
-
-        return new_resource
+        return new_resource, new_tiles
 
 
 class ResourceIdentifier(models.Model):
@@ -2046,10 +2043,10 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
         ).aggregate(Max("sortorder"))["sortorder__max"]
         self.sortorder = sortorder_max + 1 if sortorder_max is not None else 0
 
-    def copy(self, serialized_graph=None, datatype_factory=None, resource=None):
+    def copy(self, resource, serialized_graph=None, datatype_factory=None):
         """Returns a new unsaved TileModel cloned from this tile.
 
-        The caller must set resourceinstance and parenttile on the returned tile.
+        The implementor must set parenttile on the returned tile.
         provisionaledits are not copied.
 
         If serialized_graph and datatype_factory are provided, runs
@@ -2059,6 +2056,7 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
             data=copy.deepcopy(self.data),
             nodegroup_id=self.nodegroup_id,
             sortorder=self.sortorder,
+            resourceinstance_id=resource.resourceinstanceid,
         )
 
         if serialized_graph and datatype_factory and new_tile.data:

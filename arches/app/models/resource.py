@@ -1024,10 +1024,10 @@ class Resource(models.ResourceInstance):
         tiles. Delegates to ResourceInstance.copy() for the base copy, then
         adds edit logging and indexing.
         """
-        new_resource = super().copy()
-        new_resource.tiles = list(
-            models.TileModel.objects.filter(resourceinstance=new_resource)
-        )
+        new_resource, new_tiles = super().copy()
+        models.ResourceInstance.save(new_resource)
+        models.TileModel.objects.bulk_create(new_tiles)
+        new_resource.tiles = new_tiles
         new_resource.save_edit(edit_type="create")
         new_resource.index()
 

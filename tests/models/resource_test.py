@@ -938,7 +938,10 @@ class ResourceTests(ArchesTestCase):
         all_datatypes_resource = self._create_all_datatypes_resource()
         original_pk = all_datatypes_resource.pk
         resource_instance = models.ResourceInstance.objects.get(pk=original_pk)
-        copied_instance = resource_instance.copy()
+        copied_instance, copied_tiles = resource_instance.copy()
+
+        models.ResourceInstance.save(copied_instance)
+        models.TileModel.objects.bulk_create(copied_tiles)
 
         self.assertEqual(all_datatypes_resource.pk, original_pk)
         self.assertNotEqual(original_pk, copied_instance.pk)
