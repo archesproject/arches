@@ -114,17 +114,20 @@ var viewModel = function (params) {
         };
         // If the geometries change without editing, then zoom to them this
         // fixes the apply provisional edits issue
-        self.tile.data[id].subscribe(function () {
-            if (
-                (ko.unwrap(self.featureLookup[id].features).length ?? 0 > 0) &&
-                (self.draw?.getMode() ?? "") === "simple_select"
-            ) {
-                self.fitFeatures(
-                    ko.unwrap(self.featureLookup[id].features),
-                    true,
-                );
-            }
-        });
+        if (self.tile.data[id].subscribe) {
+            self.tile.data[id].subscribe(function () {
+                if (
+                    (ko.unwrap(self.featureLookup[id].features).length ??
+                        0 > 0) &&
+                    (self.draw?.getMode() ?? "") === "simple_select"
+                ) {
+                    self.fitFeatures(
+                        ko.unwrap(self.featureLookup[id].features),
+                        true,
+                    );
+                }
+            });
+        }
         self.featureLookup[id].selectedTool.subscribe(function (tool) {
             if (self.draw) {
                 if (tool === "") {
