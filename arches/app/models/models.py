@@ -1631,10 +1631,7 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
         """
         from arches.app.datatypes.datatypes import DataTypeFactory
 
-        original_tiles = self.tilemodel_set.all()
-
-        published_graph = self.graph.get_published_graph()
-        serialized_graph = published_graph.serialized_graph if published_graph else None
+        original_tiles = self.tilemodel_set.prefetch_related("nodegroup__node_set")
         datatype_factory = DataTypeFactory()
 
         new_resource = copy.copy(self)
@@ -1649,7 +1646,6 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
             original_tile_id = tile.tileid
             original_parent_id = tile.parenttile_id
             new_tile = tile.copy(
-                serialized_graph=serialized_graph,
                 datatype_factory=datatype_factory,
                 resource=new_resource,
             )
@@ -2043,14 +2039,15 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
         ).aggregate(Max("sortorder"))["sortorder__max"]
         self.sortorder = sortorder_max + 1 if sortorder_max is not None else 0
 
-    def copy(self, resource, serialized_graph=None, datatype_factory=None):
+    def copy(self, resource, datatype_factory=None):
         """Returns a new unsaved TileModel cloned from this tile.
 
         The implementor must set parenttile on the returned tile.
         provisionaledits are not copied.
 
-        If serialized_graph and datatype_factory are provided, runs
-        datatype.copy() transforms on each node's data.
+        If datatype_factory is provided, runs datatype.copy() transforms
+        on each node's data. Expects nodegroup.node_set to be prefetched
+        by the caller for optimal performance.
         """
         new_tile = TileModel(
             data=copy.deepcopy(self.data),
@@ -2059,14 +2056,12 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
             resourceinstance_id=resource.resourceinstanceid,
         )
 
-        if serialized_graph and datatype_factory and new_tile.data:
+        if datatype_factory and new_tile.data:
+            nodes_by_id = {str(node.pk): node for node in self.nodegroup.node_set.all()}
             for nodeid in list(new_tile.data.keys()):
-                node = next(
-                    (n for n in serialized_graph["nodes"] if n["nodeid"] == nodeid),
-                    None,
-                )
+                node = nodes_by_id.get(nodeid)
                 if node:
-                    datatype = datatype_factory.get_instance(node["datatype"])
+                    datatype = datatype_factory.get_instance(node.datatype)
                     new_tile.data[nodeid] = datatype.copy(
                         new_tile.data[nodeid], resource=resource
                     )

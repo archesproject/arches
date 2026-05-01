@@ -938,7 +938,11 @@ class ResourceTests(ArchesTestCase):
         all_datatypes_resource = self._create_all_datatypes_resource()
         original_pk = all_datatypes_resource.pk
         resource_instance = models.ResourceInstance.objects.get(pk=original_pk)
-        copied_instance, copied_tiles = resource_instance.copy()
+
+        with CaptureQueriesContext(connection) as ctx:
+            copied_instance, copied_tiles = resource_instance.copy()
+        # 1: tile queryset, 2: prefetch nodegroup, 3: prefetch node_set
+        self.assertLessEqual(len(ctx), 3)
 
         models.ResourceInstance.save(copied_instance)
         models.TileModel.objects.bulk_create(copied_tiles)
