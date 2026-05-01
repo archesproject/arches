@@ -34,6 +34,80 @@ class ArcgisJsonToGeojsonTests(TestCase):
         )
 
 
+class StripZMTests(TestCase):
+    def setUp(self):
+        self.geo_utils = GeoUtils()
+
+    def test_none_returns_none(self):
+        self.assertIsNone(self.geo_utils._strip_z_m(None))
+
+    def test_point_strips_z(self):
+        geom = {"type": "Point", "coordinates": [1.0, 2.0, 3.0]}
+        self.geo_utils._strip_z_m(geom)
+        self.assertEqual(geom["coordinates"], [1.0, 2.0])
+
+    def test_point_strips_z_and_m(self):
+        geom = {"type": "Point", "coordinates": [1.0, 2.0, 3.0, 4.0]}
+        self.geo_utils._strip_z_m(geom)
+        self.assertEqual(geom["coordinates"], [1.0, 2.0])
+
+    def test_linestring_strips_z(self):
+        geom = {
+            "type": "LineString",
+            "coordinates": [[0.0, 1.0, 100.0], [2.0, 3.0, 200.0]],
+        }
+        self.geo_utils._strip_z_m(geom)
+        self.assertEqual(geom["coordinates"], [[0.0, 1.0], [2.0, 3.0]])
+
+    def test_polygon_strips_z(self):
+        geom = {
+            "type": "Polygon",
+            "coordinates": [
+                [[0.0, 0.0, 10.0], [1.0, 0.0, 10.0], [1.0, 1.0, 10.0], [0.0, 0.0, 10.0]]
+            ],
+        }
+        self.geo_utils._strip_z_m(geom)
+        self.assertEqual(
+            geom["coordinates"],
+            [[[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 0.0]]],
+        )
+
+    def test_geometry_collection_strips_z(self):
+        geom = {
+            "type": "GeometryCollection",
+            "geometries": [
+                {"type": "Point", "coordinates": [1.0, 2.0, 3.0]},
+                {
+                    "type": "LineString",
+                    "coordinates": [[0.0, 0.0, 5.0], [1.0, 1.0, 6.0]],
+                },
+                {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [
+                            [0.0, 0.0, 10.0],
+                            [1.0, 0.0, 10.0],
+                            [1.0, 1.0, 10.0],
+                            [0.0, 0.0, 10.0],
+                        ]
+                    ],
+                },
+            ],
+        }
+        self.geo_utils._strip_z_m(geom)
+        self.assertEqual(geom["geometries"][0]["coordinates"], [1.0, 2.0])
+        self.assertEqual(geom["geometries"][1]["coordinates"], [[0.0, 0.0], [1.0, 1.0]])
+        self.assertEqual(
+            geom["geometries"][2]["coordinates"],
+            [[[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 0.0]]],
+        )
+
+    def test_geometry_collection_empty_geometries(self):
+        geom = {"type": "GeometryCollection", "geometries": []}
+        self.geo_utils._strip_z_m(geom)
+        self.assertEqual(geom["geometries"], [])
+
+
 class GeoUtilsTests(TestCase):
 
     def test_convert_multipoint_to_single(self):
