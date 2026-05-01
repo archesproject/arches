@@ -2046,8 +2046,9 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
         provisionaledits are not copied.
 
         If datatype_factory is provided, runs datatype.copy() transforms
-        on each node's data. Expects nodegroup.node_set to be prefetched
-        by the caller for optimal performance.
+        on each node's data.
+
+        Expects nodegroup.node_set to be prefetched for efficient access to node datatypes
         """
         new_tile = TileModel(
             data=copy.deepcopy(self.data),
