@@ -146,9 +146,7 @@ class Resource(models.ResourceInstance):
         if context is None:
             context = {}
 
-        requested_language = context.get("language")
-        language = requested_language or get_language()
-
+        language = context.get("language", get_language())
         if language not in self.descriptors:
             self.descriptors[language] = {}
 

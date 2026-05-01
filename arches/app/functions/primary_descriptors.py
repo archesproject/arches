@@ -46,11 +46,6 @@ class PrimaryDescriptorsFunction(AbstractPrimaryDescriptorsFunction):
 
         if context is None:
             context = {}
-        elif not isinstance(context, dict):
-            raise TypeError(
-                "Primary descriptor context must be a dict or None, "
-                f"got {type(context).__name__}."
-            )
 
         datatype_factory = None
         language = context.get("language", None)
