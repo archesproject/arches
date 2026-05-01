@@ -461,7 +461,6 @@ class Tile(models.TileModel):
             user = None
 
         with transaction.atomic():
-            mode = context.get("mode")
             for nodeid in self.data.keys():
                 node = next(
                     item
@@ -469,10 +468,6 @@ class Tile(models.TileModel):
                     if item["nodeid"] == nodeid
                 )
                 datatype = self.datatype_factory.get_instance(node["datatype"])
-                if mode == "copy":
-                    self.data[nodeid] = datatype.copy(
-                        self.data[nodeid], resource=resource
-                    )
                 datatype.pre_tile_save(self, nodeid)
             self.__preSave(request, context=context)
             self.check_for_missing_nodes()
