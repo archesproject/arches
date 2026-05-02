@@ -870,6 +870,19 @@ class JsonLdReader(Reader):
                         # This is when the current option doesn't match, but could be
                         # non-ambiguous resource-instance vs semantic node
                         continue
+                elif not is_literal and o["datatype"].is_a_literal_in_rdf():
+                    # Legacy format: a literal datatype was serialized as an entity node
+                    # with the value carried in rdf:value. Extract it and validate.
+                    rdf_value_nodes = vi.get(
+                        "http://www.w3.org/1999/02/22-rdf-syntax-ns#value", []
+                    )
+                    if rdf_value_nodes:
+                        extracted = rdf_value_nodes[0].get("@value")
+                        if (
+                            extracted is not None
+                            and len(o["datatype"].validate_from_rdf(extracted)) == 0
+                        ):
+                            possible.append([o, extracted])
 
             if not possible:
                 # self.printline(f"Tried: {options}")
@@ -994,10 +1007,7 @@ class JsonLdReader(Reader):
                     k, [vi], tree_node, result, None, indent=0
                 )
 
-                if (
-                    k == "http://www.w3.org/2000/01/rdf-schema#label"
-                    and branches is None
-                ):
+                if branches is None:
                     continue
 
                 x = result.copy()
