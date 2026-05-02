@@ -139,7 +139,7 @@ class RDFExportUnitTests(ArchesTestCase):
         dt = self.DT.get_instance("date")
         edge_info, edge = mock_edge(1, CIDOC_NS["some_value"], None, "", "2018-12-11")
         graph = dt.to_rdf(edge_info, edge)
-        obj = Literal(edge_info["range_tile_data"])
+        obj = Literal(edge_info["range_tile_data"], datatype=XSD.dateTime)
         self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, obj) in graph)
 
     def test_rdf_resource(self):
