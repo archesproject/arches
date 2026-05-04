@@ -926,10 +926,18 @@ class ResourceTests(ArchesTestCase):
                         original_value["inverseOntologyProperty"],
                         copied_value["inverseOntologyProperty"],
                     )
+                    copied_cross_record = copied_value["resourceXresourceId"]
                     self.assertNotEqual(
                         original_value["resourceXresourceId"],
-                        copied_value["resourceXresourceId"],
+                        copied_cross_record,
                     )
+                    self.assertTrue(
+                        models.ResourceXResource.objects.filter(
+                            tile_id=copied_tile.tileid,
+                            resourcexid=copied_cross_record,
+                        ).exists()
+                    )
+
             else:
                 self.assertEqual(original_tile.data, copied_tile.data)
 
@@ -983,9 +991,16 @@ class ResourceTests(ArchesTestCase):
                         original_value["inverseOntologyProperty"],
                         copied_value["inverseOntologyProperty"],
                     )
+                    copied_cross_record = copied_value["resourceXresourceId"]
                     self.assertNotEqual(
                         original_value["resourceXresourceId"],
-                        copied_value["resourceXresourceId"],
+                        copied_cross_record,
+                    )
+                    self.assertTrue(
+                        models.ResourceXResource.objects.filter(
+                            tile_id=copied_tile.tileid,
+                            resourcexid=copied_cross_record,
+                        ).exists()
                     )
             else:
                 self.assertEqual(original_tile.data, copied_tile.data)
