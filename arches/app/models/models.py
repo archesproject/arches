@@ -2045,9 +2045,6 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
         The implementor must set parenttile on the returned tile.
         provisionaledits are not copied.
 
-        If datatype_factory is provided, runs datatype.copy() transforms
-        on each node's data.
-
         Expects nodegroup.node_set to be prefetched for efficient access to node datatypes
         """
         new_tile = TileModel(
@@ -2057,7 +2054,10 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
             resourceinstance_id=resource.resourceinstanceid,
         )
 
-        if datatype_factory and new_tile.data:
+        if not datatype_factory:
+            datatype_factory = DataTypeFactory()
+
+        if new_tile.data:
             nodes_by_id = {str(node.pk): node for node in self.nodegroup.node_set.all()}
             for nodeid in list(new_tile.data.keys()):
                 node = nodes_by_id.get(nodeid)
