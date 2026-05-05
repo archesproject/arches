@@ -889,6 +889,44 @@ class ResourceTests(ArchesTestCase):
             "read_nodegroup", self.test_resource.tiles[0].nodegroup
         )
 
+    def test_nested_tile_copy(self):
+        """Verify parent-child tile relationships are preserved during Resource.copy()."""
+        parent_nodegroup = models.NodeGroup.objects.get(
+            pk="c9b38db0-17b3-11eb-a708-acde48001122"
+        )
+        child_nodegroup = models.NodeGroup.objects.get(
+            parentnodegroup=parent_nodegroup,
+            pk="c9b3906c-17b3-11eb-a708-acde48001122",
+        )
+
+        resource = Resource(graph_id=self.search_model_graphid)
+        parent_tile = Tile(
+            data={str(parent_nodegroup.pk): None},
+            nodegroup=parent_nodegroup,
+            sortorder=0,
+        )
+        child_tile = Tile(
+            data={str(child_nodegroup.pk): None},
+            nodegroup=child_nodegroup,
+            parenttile=parent_tile,
+            sortorder=0,
+        )
+        parent_tile.tiles.append(child_tile)
+        resource.tiles.append(parent_tile)
+        resource.save(index=False)
+
+        copied_resource = resource.copy()
+
+        self.assertEqual(len(copied_resource.tiles), 1)
+        copied_parent = copied_resource.tiles[0]
+        self.assertEqual(len(copied_parent.tiles), 1)
+        copied_child = copied_parent.tiles[0]
+
+        self.assertNotEqual(parent_tile.tileid, copied_parent.tileid)
+        self.assertNotEqual(child_tile.tileid, copied_child.tileid)
+        self.assertEqual(str(copied_child.parenttile_id), str(copied_parent.tileid))
+        self.assertEqual(copied_child.data, child_tile.data)
+
     def test_resource_copy(self):
         """
         Test copy method of proxy model, expects side effects to be run
