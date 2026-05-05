@@ -518,7 +518,10 @@ class TileTreeOperation:
                 sorted(upserts, key=attrgetter("pk")),
                 strict=True,
             ):
-                upsert_proxy._existing_data = upsert_proxy.data
+                if upsert_proxy._state.adding:
+                    upsert_proxy._existing_data = {}
+                else:
+                    upsert_proxy._existing_data = upsert_proxy.data
                 upsert_proxy._existing_provisionaledits = upsert_proxy.provisionaledits
 
                 # Sync proxy instance fields.
@@ -549,6 +552,7 @@ class TileTreeOperation:
                 if not user_is_resource_reviewer(self.request.user):
                     if upsert_proxy._state.adding:
                         vanilla_instance.data = {}
+                        upsert_proxy.data = {}
                         vanilla_instance.set_missing_keys_to_none()
                     else:
                         vanilla_instance.data = upsert_proxy._existing_data
