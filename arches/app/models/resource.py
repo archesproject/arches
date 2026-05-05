@@ -1021,15 +1021,37 @@ class Resource(models.ResourceInstance):
     def copy(self):
         """
         Returns a copy of this resource instance including a copy of all
-        tiles. Delegates to ResourceInstance.copy() for the base copy, then
-        adds edit logging and indexing.
+        tiles. Delegates to ResourceInstance._copy() for the base copy, then
+        saves via proxy models so side effects (pre/post tile save, functions,
+        ResourceXResource creation, edit logging, indexing) all run.
         """
-        new_resource, new_tiles = super().copy()
-        models.ResourceInstance.save(new_resource)
-        models.TileModel.objects.bulk_create(new_tiles)
-        new_resource.tiles = new_tiles
-        new_resource.save_edit(edit_type="create")
-        new_resource.index()
+        from arches.app.models.tile import Tile
+
+        new_resource, new_tiles = super()._copy()
+
+        proxy_by_id = {}
+        for tile_model in new_tiles:
+            proxy_tile = Tile(
+                tileid=tile_model.tileid,
+                data=tile_model.data,
+                nodegroup_id=tile_model.nodegroup_id,
+                sortorder=tile_model.sortorder,
+                resourceinstance_id=tile_model.resourceinstance_id,
+            )
+            proxy_by_id[tile_model.tileid] = proxy_tile
+
+        top_level_tiles = []
+        for tile_model in new_tiles:
+            proxy_tile = proxy_by_id[tile_model.tileid]
+            if tile_model.parenttile_id and tile_model.parenttile_id in proxy_by_id:
+                parent_proxy = proxy_by_id[tile_model.parenttile_id]
+                proxy_tile.parenttile = parent_proxy
+                parent_proxy.tiles.append(proxy_tile)
+            else:
+                top_level_tiles.append(proxy_tile)
+
+        new_resource.tiles = top_level_tiles
+        new_resource.save()
 
         return new_resource
 

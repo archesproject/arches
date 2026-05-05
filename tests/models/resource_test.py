@@ -890,6 +890,9 @@ class ResourceTests(ArchesTestCase):
         )
 
     def test_resource_copy(self):
+        """
+        Test copy method of proxy model, expects side effects to be run
+        """
         self.maxDiff = None
         all_datatypes_resource = self._create_all_datatypes_resource()
         copied_resource = all_datatypes_resource.copy()
@@ -942,13 +945,16 @@ class ResourceTests(ArchesTestCase):
                 self.assertEqual(original_tile.data, copied_tile.data)
 
     def test_resource_instance_copy(self):
+        """
+        Test copy method of base model, no side effects are expected
+        """
         self.maxDiff = None
         all_datatypes_resource = self._create_all_datatypes_resource()
         original_pk = all_datatypes_resource.pk
         resource_instance = models.ResourceInstance.objects.get(pk=original_pk)
 
         with CaptureQueriesContext(connection) as ctx:
-            copied_instance, copied_tiles = resource_instance.copy()
+            copied_instance, copied_tiles = resource_instance._copy()
         # 1: tile queryset, 2: prefetch nodegroup, 3: prefetch node_set
         self.assertLessEqual(len(ctx), 3)
 
@@ -996,11 +1002,8 @@ class ResourceTests(ArchesTestCase):
                         original_value["resourceXresourceId"],
                         copied_cross_record,
                     )
-                    self.assertTrue(
-                        models.ResourceXResource.objects.filter(
-                            tile_id=copied_tile.tileid,
-                            resourcexid=copied_cross_record,
-                        ).exists()
-                    )
+                    # _copy() on the base model does not run side effects,
+                    # a ResourceXResource record will not have been created for the copied tile
+                    self.assertEqual(copied_cross_record, "")
             else:
                 self.assertEqual(original_tile.data, copied_tile.data)

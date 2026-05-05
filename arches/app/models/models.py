@@ -1620,7 +1620,7 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
         edit.edittype = edit_type
         edit.save()
 
-    def copy(self):
+    def _copy(self):
         """
         Returns a copy of this resource instance including a copy of all
         associated tiles. Runs datatype.copy() transforms but does NOT run
@@ -1645,7 +1645,7 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
         for tile in original_tiles:
             original_tile_id = tile.tileid
             original_parent_id = tile.parenttile_id
-            new_tile = tile.copy(
+            new_tile = tile._copy(
                 datatype_factory=datatype_factory,
                 resource=new_resource,
             )
@@ -2039,8 +2039,12 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
         ).aggregate(Max("sortorder"))["sortorder__max"]
         self.sortorder = sortorder_max + 1 if sortorder_max is not None else 0
 
-    def copy(self, resource, datatype_factory=None):
-        """Returns a new unsaved TileModel cloned from this tile.
+    def _copy(self, resource, datatype_factory=None):
+        """Returns an unsaved copy of this tile, to be associated with the provided resource instance.
+
+        Side effects like indexing, edit log, and some datatype-specific copy behavior are
+        not executed. For instance, a copied tile with resource-instance node will not
+        have a new resource_x_resource created. For this functionality, use the Resource proxy model copy() method.
 
         The implementor must set parenttile on the returned tile.
         provisionaledits are not copied.
