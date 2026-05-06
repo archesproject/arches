@@ -41,7 +41,7 @@ export interface Card {
 export interface CardXNodeXWidgetData {
     card: Card;
     config: {
-        defaultValue: unknown | null;
+        defaultValue?: unknown | null;
         multiline?: boolean;
         placeholder?: string;
     };
