@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "12548_remove_whitespace_from_db_function"),
+        ("models", "12547_fix_db_nodevalue_display_value"),
     ]
 
     def forward(apps, schema_editor):

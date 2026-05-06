@@ -75,7 +75,7 @@ def _update_published_graphs(apps, graph_transformer):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "12586_tile_cardinality_check"),
+        ("models", "12548_remove_whitespace_from_db_function"),
     ]
 
     def forward(apps, schema_editor):
