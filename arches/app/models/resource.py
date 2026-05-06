@@ -1020,10 +1020,9 @@ class Resource(models.ResourceInstance):
 
     def copy(self):
         """
-        Returns a copy of this resource instance including a copy of all
-        tiles. Delegates to ResourceInstance._copy() for the base copy, then
-        saves via proxy models so side effects (pre/post tile save, functions,
-        ResourceXResource creation, edit logging, indexing) all run.
+        Returns an unsaved copy of this resource instance including a copy of all
+        tiles. Implementor should use `save` or `bulk_save` to ensure side effects
+        (like indexing, edit logging, pre/post tile save) are handled properly.
         """
         from arches.app.models.tile import Tile
 
@@ -1051,7 +1050,6 @@ class Resource(models.ResourceInstance):
                 top_level_tiles.append(proxy_tile)
 
         new_resource.tiles = top_level_tiles
-        new_resource.save()
 
         return new_resource
 

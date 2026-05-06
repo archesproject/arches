@@ -916,6 +916,7 @@ class ResourceTests(ArchesTestCase):
         resource.save(index=False)
 
         copied_resource = resource.copy()
+        copied_resource.save()
 
         self.assertEqual(len(copied_resource.tiles), 1)
         copied_parent = copied_resource.tiles[0]
@@ -934,6 +935,7 @@ class ResourceTests(ArchesTestCase):
         self.maxDiff = None
         all_datatypes_resource = self._create_all_datatypes_resource()
         copied_resource = all_datatypes_resource.copy()
+        copied_resource.save()
 
         self.assertNotEqual(all_datatypes_resource.pk, copied_resource.pk)
         self.assertEqual(all_datatypes_resource.graph_id, copied_resource.graph_id)
