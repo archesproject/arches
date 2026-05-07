@@ -51,6 +51,11 @@ runs:
           npm install
       shell: bash
 
+    - name: Audit frontend dependencies for security vulnerabilities
+      run: |
+          npm audit --omit=dev || true
+      shell: bash
+
     - name: Webpack frontend files
       run: |
           npm run build_test
