@@ -1,6 +1,4 @@
 import ko from 'knockout';
-import $ from 'jquery';
-import 'bootstrap';
 
 function escapeAttr(str) {
     return String(str || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -26,30 +24,37 @@ ko.bindingHandlers.carousel = {
                 return;
             }
 
-            var indicators = '<ol class="carousel-indicators">';
+            var indicators = '<div class="carousel-indicators">';
             var slides = '<div class="carousel-inner">';
 
             for (var i = 0; i < data.length; i++) {
                 var item = data[i];
                 var active = i === 0 ? ' active' : '';
-                indicators += '<li data-target="#' + id + '" data-slide-to="' + i + '" class="' + active + '"></li>';
-                slides += '<div class="item' + active + '">' +
-                    '<img src="' + escapeAttr(ko.unwrap(item.src)) + '" alt="' + escapeAttr(ko.unwrap(item.alt)) + '">' +
+                var ariaCurrent = i === 0 ? ' aria-current="true"' : '';
+                indicators += '<button type="button" data-bs-target="#' + id + '" data-bs-slide-to="' + i + '" class="' + active + '"' + ariaCurrent + '></button>';
+                slides += '<div class="carousel-item' + active + '">' +
+                    '<img class="d-block w-100" src="' + escapeAttr(ko.unwrap(item.src)) + '" alt="' + escapeAttr(ko.unwrap(item.alt)) + '">' +
                     '</div>';
             }
 
-            indicators += '</ol>';
+            indicators += '</div>';
             slides += '</div>';
 
-            var controls = '<a class="left carousel-control" href="#' + id + '" data-slide="prev"><span class="icon-prev"></span></a>' +
-                '<a class="right carousel-control" href="#' + id + '" data-slide="next"><span class="icon-next"></span></a>';
+            var controls =
+                '<button class="carousel-control-prev" type="button" data-bs-target="#' + id + '" data-bs-slide="prev">' +
+                '<span class="carousel-control-prev-icon" aria-hidden="true"></span></button>' +
+                '<button class="carousel-control-next" type="button" data-bs-target="#' + id + '" data-bs-slide="next">' +
+                '<span class="carousel-control-next-icon" aria-hidden="true"></span></button>';
 
             element.innerHTML = indicators + slides + controls;
-            $(element).carousel(ko.unwrap(value.options) || {});
+
+            import('bootstrap').then(function (bootstrap) {
+                new bootstrap.Carousel(element, ko.unwrap(value.options) || {});
+            });
         };
 
         ko.computed(render, null, { disposeWhenNodeIsRemoved: element });
-        $(element).addClass('carousel slide');
+        element.classList.add('carousel', 'slide');
 
         return { controlsDescendantBindings: true };
     }

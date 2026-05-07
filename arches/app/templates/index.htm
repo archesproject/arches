@@ -71,8 +71,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <button
                         type="button"
                         class="navbar-toggle collapsed"
-                        data-toggle="collapse"
-                        data-target="#myNavbar"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#myNavbar"
                         aria-expanded="false"
                         aria-controls="myNavbar"
                     >
@@ -535,52 +535,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <script src="{% webpack_static 'node_modules/underscore/underscore-min.js' %}"></script>
     <script src="{% webpack_static 'node_modules/chosen-js/chosen.jquery.min.js' %}"></script>
     <script src="{% webpack_static 'node_modules/knockout/build/output/knockout-latest.js' %}"></script>
-    <script src="{% webpack_static 'node_modules/bootstrap/dist/js/bootstrap.min.js' %}"></script>
-    <script>
-        // Bootstrap 3.4.1 XSS mitigation (SNYK-JS-BOOTSTRAP-10176066, SNYK-JS-BOOTSTRAP-7444617)
-        (function($) {
-            var Tooltip = $.fn.tooltip.Constructor;
-            var Popover = $.fn.popover.Constructor;
-            var Button = $.fn.button.Constructor;
-
-            Tooltip.prototype.setContent = function () {
-                var $tip = this.tip();
-                $tip.find('.tooltip-inner').text(this.getTitle());
-                $tip.removeClass('fade in top bottom left right');
-            };
-
-            Popover.prototype.setContent = function () {
-                var $tip = this.tip();
-                var content = this.getContent();
-                $tip.find('.popover-title').text(this.getTitle());
-                if (typeof content === 'function') { content = content.call(this.$element[0]); }
-                if (typeof content === 'string') {
-                    $tip.find('.popover-content').text(content);
-                } else {
-                    $tip.find('.popover-content').children().detach().end().append(content);
-                }
-                $tip.removeClass('fade top bottom left right in');
-            };
-
-            Button.prototype.setState = function (state) {
-                var d = 'disabled', $el = this.$element;
-                var isInput = $el.is('input'), data = $el.data();
-                state += 'Text';
-                if (data.resetText == null) { $el.data('resetText', isInput ? $el.val() : $el.text()); }
-                setTimeout($.proxy(function () {
-                    var value = data[state] == null ? this.options[state] : data[state];
-                    if (isInput) { $el.val(value); } else { $el.text(value); }
-                    if (state == 'loadingText') {
-                        this.isLoading = true;
-                        $el.addClass(d).attr(d, d).prop(d, true);
-                    } else if (this.isLoading) {
-                        this.isLoading = false;
-                        $el.removeClass(d).removeAttr(d).prop(d, false);
-                    }
-                }, this), 0);
-            };
-        })(jQuery);
-    </script>
+    <script src="{% webpack_static 'node_modules/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% webpack_static 'plugins/one.app.js' %}"></script>
     <script src="{% webpack_static 'plugins/revolution-slider/rs-plugin/js/jquery.themepunch.tools.min.js' %}"></script>
     <script

@@ -1,0 +1,229 @@
+/*
+ * Bootstrap 3 → 5 compatibility shim.
+ *
+ * Maps removed/renamed BS3 classes to their BS5 equivalents so that legacy
+ * templates continue to render correctly after the CSS upgrade. This file
+ * should be removed once all templates are migrated to BS5 classes.
+ */
+
+/* --- Panels → Cards --- */
+.panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: var(--bs-card-bg, #fff);
+    background-clip: border-box;
+    border: var(--bs-card-border-width, 1px) solid var(--bs-card-border-color, rgba(0,0,0,.125));
+    border-radius: var(--bs-card-border-radius, .375rem);
+    margin-bottom: 20px;
+}
+
+.panel-default {
+    border-color: var(--bs-border-color, #dee2e6);
+}
+
+.panel-heading {
+    padding: .75rem 1.25rem;
+    margin-bottom: 0;
+    background-color: var(--bs-tertiary-bg, rgba(0,0,0,.03));
+    border-bottom: 1px solid var(--bs-border-color, rgba(0,0,0,.125));
+    border-radius: calc(.375rem - 1px) calc(.375rem - 1px) 0 0;
+}
+
+.panel-title {
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 1rem;
+    color: inherit;
+}
+
+.panel-body {
+    flex: 1 1 auto;
+    padding: 1.25rem;
+}
+
+.panel-footer {
+    padding: .75rem 1.25rem;
+    background-color: var(--bs-tertiary-bg, rgba(0,0,0,.03));
+    border-top: 1px solid var(--bs-border-color, rgba(0,0,0,.125));
+    border-radius: 0 0 calc(.375rem - 1px) calc(.375rem - 1px);
+}
+
+.panel-group .panel {
+    margin-bottom: 0;
+    border-radius: .375rem;
+}
+
+.panel-group .panel + .panel {
+    margin-top: 5px;
+}
+
+.panel-collapse {
+    /* collapse is handled by BS5 collapse utility */
+}
+
+/* --- Well → Card-like container --- */
+.well {
+    min-height: 20px;
+    padding: 19px;
+    margin-bottom: 20px;
+    background-color: var(--bs-tertiary-bg, #f8f9fa);
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    border-radius: .375rem;
+}
+
+/* --- btn-default → btn-secondary --- */
+.btn-default {
+    --bs-btn-color: #333;
+    --bs-btn-bg: #fff;
+    --bs-btn-border-color: #ccc;
+    --bs-btn-hover-color: #333;
+    --bs-btn-hover-bg: #e6e6e6;
+    --bs-btn-hover-border-color: #adadad;
+    --bs-btn-active-color: #333;
+    --bs-btn-active-bg: #e6e6e6;
+    --bs-btn-active-border-color: #adadad;
+}
+
+/* --- Glyphicons → (no-op, retained for selector matching) --- */
+.glyphicon {
+    display: inline-block;
+    font-family: inherit;
+}
+
+/* --- Responsive visibility helpers → BS5 display utilities --- */
+.hidden-xs { display: none !important; }
+.hidden-sm { display: none !important; }
+.hidden-md { display: none !important; }
+.hidden-lg { display: none !important; }
+
+@media (min-width: 576px) { .hidden-xs { display: initial !important; } }
+@media (min-width: 768px) { .hidden-sm { display: initial !important; } }
+@media (min-width: 992px) { .hidden-md { display: initial !important; } }
+@media (min-width: 1200px) { .hidden-lg { display: initial !important; } }
+
+.visible-xs,
+.visible-sm,
+.visible-md,
+.visible-lg { display: none !important; }
+
+@media (max-width: 575.98px) { .visible-xs { display: initial !important; } }
+@media (min-width: 576px) and (max-width: 767.98px) { .visible-sm { display: initial !important; } }
+@media (min-width: 768px) and (max-width: 991.98px) { .visible-md { display: initial !important; } }
+@media (min-width: 992px) and (max-width: 1199.98px) { .visible-lg { display: initial !important; } }
+
+/* --- pull-left/right → float --- */
+.pull-left { float: left !important; }
+.pull-right { float: right !important; }
+
+/* --- img-responsive → img-fluid --- */
+.img-responsive {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+/* --- Form classes --- */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.control-label {
+    display: inline-block;
+    margin-bottom: .5rem;
+    font-weight: 600;
+}
+
+/* --- Input sizing --- */
+.input-lg {
+    min-height: calc(1.5em + 1rem + calc(var(--bs-border-width) * 2));
+    padding: .5rem 1rem;
+    font-size: 1.25rem;
+    border-radius: var(--bs-border-radius-lg);
+}
+
+.input-sm {
+    min-height: calc(1.5em + .5rem + calc(var(--bs-border-width) * 2));
+    padding: .25rem .5rem;
+    font-size: .875rem;
+    border-radius: var(--bs-border-radius-sm);
+}
+
+/* --- col-xs-* → col-* (BS5 removed the xs infix) --- */
+.col-xs-1 { flex: 0 0 auto; width: 8.33333333%; }
+.col-xs-2 { flex: 0 0 auto; width: 16.66666667%; }
+.col-xs-3 { flex: 0 0 auto; width: 25%; }
+.col-xs-4 { flex: 0 0 auto; width: 33.33333333%; }
+.col-xs-5 { flex: 0 0 auto; width: 41.66666667%; }
+.col-xs-6 { flex: 0 0 auto; width: 50%; }
+.col-xs-7 { flex: 0 0 auto; width: 58.33333333%; }
+.col-xs-8 { flex: 0 0 auto; width: 66.66666667%; }
+.col-xs-9 { flex: 0 0 auto; width: 75%; }
+.col-xs-10 { flex: 0 0 auto; width: 83.33333333%; }
+.col-xs-11 { flex: 0 0 auto; width: 91.66666667%; }
+.col-xs-12 { flex: 0 0 auto; width: 100%; }
+.col-xs-offset-1 { margin-left: 8.33333333%; }
+.col-xs-offset-2 { margin-left: 16.66666667%; }
+.col-xs-offset-3 { margin-left: 25%; }
+.col-xs-offset-4 { margin-left: 33.33333333%; }
+.col-xs-offset-5 { margin-left: 41.66666667%; }
+.col-xs-offset-6 { margin-left: 50%; }
+.col-xs-offset-7 { margin-left: 58.33333333%; }
+.col-xs-offset-8 { margin-left: 66.66666667%; }
+.col-xs-offset-9 { margin-left: 75%; }
+.col-xs-offset-10 { margin-left: 83.33333333%; }
+.col-xs-offset-11 { margin-left: 91.66666667%; }
+.col-xs-offset-12 { margin-left: 100%; }
+.col-xs-push-1 { left: 8.33333333%; position: relative; }
+.col-xs-push-2 { left: 16.66666667%; position: relative; }
+.col-xs-pull-1 { right: 8.33333333%; position: relative; }
+.col-xs-pull-2 { right: 16.66666667%; position: relative; }
+
+/* --- Input group addons (renamed in BS5) --- */
+.input-group-addon {
+    display: flex;
+    align-items: center;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--bs-body-color);
+    text-align: center;
+    white-space: nowrap;
+    background-color: var(--bs-tertiary-bg, #e9ecef);
+    border: var(--bs-border-width) solid var(--bs-border-color, #dee2e6);
+    border-radius: var(--bs-border-radius);
+}
+
+/* --- Carousel (BS3 used .item, BS5 uses .carousel-item) --- */
+.carousel-inner > .item {
+    display: none;
+    position: relative;
+    width: 100%;
+}
+.carousel-inner > .item.active {
+    display: block;
+}
+
+/* --- Misc --- */
+.radio, .checkbox {
+    position: relative;
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.help-block {
+    display: block;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    color: var(--bs-secondary-color, #6c757d);
+}
+
+.page-header {
+    padding-bottom: .5rem;
+    margin: 2.5rem 0 1.25rem;
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+}

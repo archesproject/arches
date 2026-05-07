@@ -128,7 +128,7 @@
                             <a href="{% url 'user_profile_manager' %}"
                                 class="ep-tools ep-tools-login">
                                 <div data-placement="bottom"
-                                    data-toggle="tooltip"
+                                    data-bs-toggle="tooltip"
                                     data-original-title="{% trans 'Profile' %}">
                                     <!-- ko let: {user: '{{ user.first_name|default:user.username }}' }  -->
                                     <span class="hidden-xs h5" data-bind="attr: {'aria-label': $root.translations.welcomeUserEditProfile(user) }"
@@ -155,13 +155,13 @@
                         <!-- Notifications -->
                         {% if nav.notifs %}
                         <li>
-                            <button id="ep-notifs-button" class="ep-tools ep-notifs-toggle ep-tools-right" data-toggle="collapse" data-target="#ep-notifs-panel"
+                            <button id="ep-notifs-button" class="ep-tools ep-notifs-toggle ep-tools-right" data-bs-toggle="collapse" data-bs-target="#ep-notifs-panel"
                                 aria-label="{% trans 'Show recent notifications' %}" aria-controls="ep-notifs-panel"
                                 data-bind="click: function(data, event) { 
                                     openNotifs(event.currentTarget, '#ep-notifs-panel', '#ep-close-notifs-button'); 
                                 }, attr: {'aria-expanded': notifsOpen().toString()},
                             ">
-                                <div data-placement="bottom" data-toggle="tooltip"
+                                <div data-placement="bottom" data-bs-toggle="tooltip"
                                     data-original-title="{% trans 'Notifications' %}">
                                     <div>
                                         <div data-bind="visible: unreadNotifs()" id="circle-outline"></div>
@@ -178,7 +178,7 @@
                         <li>
                             <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" aria-label="{% trans 'Visit the Search page' %}"
                                 data-bind="click:function () { navigate('{% url 'search_home' %}') }">
-                                <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Search" %}">
+                                <div data-placement="bottom" data-bs-toggle="tooltip" data-original-title="{% trans "Search" %}">
                                     <i class="ion-search"></i>
 
                                 </div>
@@ -189,13 +189,13 @@
                         <!-- Prov edit history-->
                         {% if user_is_reviewer == False and user_can_edit %}
                         <li>
-                            <button id="ep-edits-button" class="ep-edits-toggle ep-tools ep-tools-right" data-toggle="collapse" data-target="#ep-edits-panel"
+                            <button id="ep-edits-button" class="ep-edits-toggle ep-tools ep-tools-right" data-bs-toggle="collapse" data-bs-target="#ep-edits-panel"
                                 aria-label="{% trans 'Show my recent edits' %}" aria-controls="ep-edits-panel"
                                 data-bind="click:function (data, event) { 
                                     openEdits(event.currentTarget, '#ep-edits-panel', '#ep-close-edits-button');
                                 }, attr: {'aria-expanded': editsOpen().toString()},
                             ">
-                                <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "My Recent Edits" %}">
+                                <div data-placement="bottom" data-bs-toggle="tooltip" data-original-title="{% trans "My Recent Edits" %}">
                                     <i class="ion-clock"></i>
                                 </div>
                             </button>
@@ -206,7 +206,7 @@
                         <li>
                             <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right"
                                 data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }" aria-label="{% trans 'Edit Resource' %}">
-                                <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Edit Resource" %}">
+                                <div data-placement="bottom" data-bs-toggle="tooltip" data-original-title="{% trans "Edit Resource" %}">
                                     <i class="ion-edit"></i>
                                 </div>
                             </a>
@@ -217,7 +217,7 @@
                         <li>
                             <a href="{% url 'resource_report' resourceid %}" class="ep-tools ep-tools-right"
                                 data-bind="click:function () { navigate('{% url 'resource_report' resourceid %}') }" aria-label="{% trans 'View Report' %}">
-                                <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "View Report" %}">
+                                <div data-placement="bottom" data-bs-toggle="tooltip" data-original-title="{% trans "View Report" %}">
                                     <i class="ion-android-document"></i>
                                 </div>
                             </a>
@@ -227,7 +227,7 @@
                         {% if nav.print %}
                         <li>
                             <button class="ep-tools ep-tools-right" data-bind="click: function() { window.print() }" aria-label="{% trans 'Print the page' %}">
-                                <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Print" %}">
+                                <div data-placement="bottom" data-bs-toggle="tooltip" data-original-title="{% trans "Print" %}">
                                     <i class="ion-printer"></i>
                                 </div>
                             </button>
@@ -236,13 +236,13 @@
 
                         {% if nav.help %}
                         <li>
-                            <button id="ep-help-button" class="ep-help-toggle ep-tools ep-tools-right" data-toggle="collapse" data-target="#ep-help-panel"
+                            <button id="ep-help-button" class="ep-help-toggle ep-tools ep-tools-right" data-bs-toggle="collapse" data-bs-target="#ep-help-panel"
                                 aria-label="{% trans 'Show help' %}" aria-controls="ep-help-panel"
                                 data-bind="click: function(data, event){ 
                                     openHelp({{ nav.help.templates }}, event.currentTarget, '#ep-help-panel', '#ep-close-help-button');
                                 }, attr: { 'aria-expanded': helpOpen().toString()},
                             ">
-                                <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Help" %}">
+                                <div data-placement="bottom" data-bs-toggle="tooltip" data-original-title="{% trans "Help" %}">
                                     <i class="ion-help"></i>
                                 </div>
                             </button>
@@ -257,7 +257,7 @@
                                 class="ep-help-toggle ep-tools ep-tools-right"
                                 aria-label="{% trans 'Login' %}"
                             >
-                                <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans 'Login' %}">
+                                <div data-placement="bottom" data-bs-toggle="tooltip" data-original-title="{% trans 'Login' %}">
                                     <i class="ion-log-in"></i>
                                 </div>
                             </a>
@@ -267,7 +267,7 @@
                                 class="ep-help-toggle ep-tools ep-tools-right"
                                 aria-label="{% trans 'Logout' %}"
                             >
-                                <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans 'Logout' %}">
+                                <div data-placement="bottom" data-bs-toggle="tooltip" data-original-title="{% trans 'Logout' %}">
                                     <i class="ion-log-out"></i>
                                 </div>
                             </a>
@@ -289,7 +289,7 @@
                     <a href="javascript:void(0);" id="ep-close-notifs-button" role="button" aria-label="{% trans 'Close Notifications' %}"
                         class="ep-notifs-toggle ep-notifs-close ep-tools ep-tools-right" data-bind="click: closeNotifs"
                     >
-                        <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Close" %}">
+                        <div data-placement="bottom" data-bs-toggle="tooltip" data-original-title="{% trans "Close" %}">
                             <i class="fa fa-times-circle fa-lg"></i>
                         </div>
                     </a>
@@ -314,7 +314,7 @@
                     <a href="javascript:void(0);" id="ep-close-edits-button" role="button" style="border:none;" aria-label="{% trans 'Close Edit History' %}"
                         class="ep-edits-toggle ep-edits-close ep-tools ep-tools-right" data-bind="click: closeEdits"
                     >
-                        <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Close" %}">
+                        <div data-placement="bottom" data-bs-toggle="tooltip" data-original-title="{% trans "Close" %}">
                             <i class="fa fa-times-circle fa-lg"></i>
                         </div>
                     </a>
@@ -338,7 +338,7 @@
                     <a href="javascript:void(0);" id="ep-close-help-button" role="button" style="border:none" aria-label="{% trans 'Close Help' %}"
                         class="ep-help-toggle ep-help-close ep-tools ep-tools-right" data-bind="click: closeHelp"
                     >
-                        <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Close Help" %}">
+                        <div data-placement="bottom" data-bs-toggle="tooltip" data-original-title="{% trans "Close Help" %}">
                             <i class="fa fa-times-circle fa-lg"></i>
                         </div>
                     </a>

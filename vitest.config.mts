@@ -29,7 +29,7 @@ function generateConfig(): Promise<UserConfig> {
         const alias: { [key: string]: string } = {
             '@/arches': path.join(parsedData['ROOT_DIR'], 'app', 'src', 'arches'),
             'arches': path.join(parsedData['ROOT_DIR'], 'app', 'media', 'js', 'arches.js'),
-            'bootstrap-original': path.join(filePath, 'node_modules', 'bootstrap', 'dist', 'js', 'bootstrap.min.js'),
+            'bootstrap-bundle': path.join(filePath, 'node_modules', 'bootstrap', 'dist', 'js', 'bootstrap.bundle.min.js'),
         };
 
         for (

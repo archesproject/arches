@@ -22,7 +22,7 @@
             {% if concept.nodetype == 'Concept' or concept.nodetype == 'ConceptScheme'%}
             <!-- Concept Management Tools for larger screens -->
             <div class="btn-group hidden-xs">
-                <button type="button" class="btn btn-primary dropdown-toggle arches-RDM-button" data-toggle="dropdown">
+                <button type="button" class="btn btn-primary dropdown-toggle arches-RDM-button" data-bs-toggle="dropdown">
                     {% trans "Manage" %}
                     <i class="fa fa-chevron-down"></i>
                     <span class="sr-only">{% trans "Toggle Dropdown" %}</span>
@@ -46,7 +46,7 @@
 
             <!-- Concept Management Tools for xs screens -->
             <div class="btn-group hidden-sm hidden-md hidden-lg">
-                <button type="button" class="btn btn-primary dropdown-toggle arches-RDM-button-xs" data-toggle="dropdown">
+                <button type="button" class="btn btn-primary dropdown-toggle arches-RDM-button-xs" data-bs-toggle="dropdown">
                     {% trans "Manage" %}
                     <i class="fa fa-chevron-down"></i>
                     <span class="sr-only">{% trans "Toggle Dropdown" %}</span>
@@ -292,7 +292,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">{% trans "Are you ready to delete this item?" %}</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true">&times;</button>
                 </div>
                 <div class="modal-body">
                     <h5 name="warning-text">
@@ -301,7 +301,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-u btn-u-default" data-dismiss="modal">{% trans "No" %}</button>
+                    <button type="button" class="btn-u btn-u-default" data-bs-dismiss="modal">{% trans "No" %}</button>
                     <button class="btn-u btn-u-red confirm-delete-yes" href="javascript:void(0);" data-id="" data-action="delete">{% trans "Yes" %}</button>
                 </div>
             </div>

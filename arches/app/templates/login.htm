@@ -74,7 +74,7 @@
                             </div>
                             <div class="row" style="padding-top:1em; margin: -2em 0 0.5em 0;">
                                 <div style="{% if not auth_failed %}display:none;{% endif %}" id="login-failed-alert" class="alert alert-danger fade in" aria-labelledby="login-fail-header login-fail-message"  aria-live="assertive" role="alert">
-                                    <button type="button" class="close" data-dismiss="alert" onclick="document.getElementById('login-failed-alert').remove();">
+                                    <button type="button" class="close" data-bs-dismiss="alert" onclick="document.getElementById('login-failed-alert').remove();">
                                         <span aria-hidden="true">&times;</span>
                                         <span class="sr-only">{% trans "Close" %}</span>
                                     </button>

@@ -128,7 +128,7 @@
                                         </div>
                                     </div>
                                     <div class="btn-group map-server-basemap-button" data-bind="if: selection().isoverlay">
-                                        <button class="dropdown-toggle btn" data-toggle="dropdown" aria-label="{% trans 'Overlays' %}" aria-expanded="false"><i class="fa fa-globe"></i></button>
+                                        <button class="dropdown-toggle btn" data-bs-toggle="dropdown" aria-label="{% trans 'Overlays' %}" aria-expanded="false"><i class="fa fa-globe"></i></button>
                                         <ul class="dropdown-menu dropdown-menu-right">
                                             <!-- ko foreach: basemaps -->
                                             <li><a href="#" data-bind="text: name, click: function () { select(); }"></a></li>
@@ -164,11 +164,11 @@
                                         <!-- Resource Styling Tabs -->
                                         <ul class="nav nav-tabs map-service-nav-tabs" role="tablist">
                                             <li class="active">
-                                                <a class="config-title-tab mar-no" data-toggle="tab" href="#settings-panel" aria-expanded="false" aria-expanded="true" role="tab"
+                                                <a class="config-title-tab mar-no" data-bs-toggle="tab" href="#settings-panel" aria-expanded="false" aria-expanded="true" role="tab"
                                                 ><i class="ion-ios-settings-strong"></i> {% trans "Settings" %}</a>
                                             </li>
                                             <li>
-                                                <a class="config-title-tab mar-no" data-toggle="tab" href="#styling-panel" aria-expanded="false" aria-expanded="false" role="tab"
+                                                <a class="config-title-tab mar-no" data-bs-toggle="tab" href="#styling-panel" aria-expanded="false" aria-expanded="false" role="tab"
                                                 ><i class="ion-image"></i> {% trans "Service Styling" %}</a>
                                             </li>
                                         </ul>

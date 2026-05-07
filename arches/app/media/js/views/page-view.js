@@ -189,7 +189,7 @@ var PageView = Backbone.View.extend({
         ko.applyBindings(this.viewModel);
         this.viewModel.getNotifications();
 
-        $('[data-toggle="tooltip"]').tooltip();
+        $('[data-bs-toggle="tooltip"]').tooltip();
 
         backToTop.scrollToTopHandler();
     }
