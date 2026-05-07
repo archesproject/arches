@@ -1,6 +1,6 @@
 name: 'Build and test branch'
 description: 'Builds and tests a branch'
-inputs: 
+inputs:
   branch-type:
     description: 'String denoting either `target` or `feature` branch'
     required: true

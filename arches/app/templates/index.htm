@@ -68,12 +68,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div class="v5-splash-navbar navbar">
             <div class="container-fluid">
                 <div class="navbar-header">
-                    <button 
-                        type="button" 
-                        class="navbar-toggle collapsed" 
-                        data-toggle="collapse" 
+                    <button
+                        type="button"
+                        class="navbar-toggle collapsed"
+                        data-toggle="collapse"
                         data-target="#myNavbar"
-                        aria-expanded="false" 
+                        aria-expanded="false"
                         aria-controls="myNavbar"
                     >
                         <span class="sr-only">{% trans 'Toggle navigation' %}</span>
@@ -95,8 +95,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                 </div>
 
-                <nav 
-                    id="myNavbar" 
+                <nav
+                    id="myNavbar"
                     class="navbar-collapse collapse"
                     aria-label="{% trans 'Arches Application Navigation' %}"
                 >
@@ -116,8 +116,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         {% if user.username == 'anonymous' %}
                         <li>
-                            <a 
-                                class="application-login" 
+                            <a
+                                class="application-login"
                                 id="auth-link"
                                 href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}"
                             >
@@ -126,8 +126,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </li>
                         {% else %}
                         <li>
-                            <a 
-                                class="auth-welcome" 
+                            <a
+                                class="auth-welcome"
                                 href="{% url 'user_profile_manager' %}"
                                 aria-label="{% trans 'Visit user profile' %}"
                             >
@@ -137,7 +137,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </a>
                         </li>
                         <li>
-                            <a 
+                            <a
                                 class="application-login"
                                 href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}"
                             >
@@ -242,9 +242,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- Slider - End -->
 
                 <!-- Down button -->
-                <a 
-                    href="#info-block-1" 
-                    class="down-button" 
+                <a
+                    href="#info-block-1"
+                    class="down-button"
                     aria-label="{% trans 'Go to content' %}"
                 >
                     <i class="fa fa-angle-down down-button-icon"></i>
@@ -442,9 +442,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div class="col-lg-4">
                             <ul class="splash-link-container">
                                 <li>
-                                    <a 
+                                    <a
                                         class="splash-link-address"
-                                        href="https://www.archesproject.org/what-is-arches/" 
+                                        href="https://www.archesproject.org/what-is-arches/"
                                         target="_blank"
                                     >
                                         {% trans "What is Arches" %}
@@ -483,9 +483,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div class="col-lg-4">
                             <ul class="splash-link-container">
                                 <li>
-                                    <a 
+                                    <a
                                         class="splash-link-address"
-                                        href="https://www.archesproject.org/project-background/" 
+                                        href="https://www.archesproject.org/project-background/"
                                         target="_blank"
                                     >
                                         {% trans "Arches Project Background" %}

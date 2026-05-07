@@ -33,7 +33,7 @@ function generateConfig(): Promise<UserConfig> {
         };
 
         for (
-            const [archesApplicationName, archesApplicationPath] 
+            const [archesApplicationName, archesApplicationPath]
             of Object.entries(
                 parsedData['ARCHES_APPLICATIONS_PATHS'] as { [key: string]: string }
             )
