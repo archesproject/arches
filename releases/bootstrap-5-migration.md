@@ -46,8 +46,33 @@ The following npm packages have been removed from arches core and are no longer 
 |---|---|
 | `knockstrap` | Custom KO bindings (see `arches/app/media/js/bindings/carousel.js`) |
 | `bootstrap-colorpicker` | Native `<input type="color">` via KO binding (see `arches/app/media/js/bindings/color-picker.js`) |
+| `eonasdan-bootstrap-datetimepicker` | `@eonasdan/tempus-dominus@6.10.4` (see below) |
 
 If your extension imports either of these, remove the import and switch to the new bindings.
+
+### Datetimepicker Migration
+
+The `eonasdan-bootstrap-datetimepicker` (BS3-only) has been replaced by `@eonasdan/tempus-dominus@6.10.4` (BS5-native, same author). The arches `datepicker` Knockout binding has been rewritten to use the new library internally, so **template code using `data-bind="datepicker: {format: ..., viewMode: ...}"` does not need to change**.
+
+If your extension imports `bootstrap-datetimepicker` directly (not via the KO binding), update the import:
+
+```javascript
+// Before:
+import 'bootstrap-datetimepicker';
+
+// After: remove the import — the KO binding handles its own initialization.
+// If you need the TD6 API directly:
+import { TempusDominus, DateTime } from 'bootstrap-datetimepicker';
+```
+
+Key differences in the new library:
+- **Format tokens** use ICU convention: `YYYY-MM-DD` → `yyyy-MM-dd`, `DD` → `dd`
+- **ViewMode** values: `days` → `calendar` (the KO binding handles this mapping automatically)
+- **CSS class**: `.bootstrap-datetimepicker-widget` → `.tempus-dominus-widget`
+- **Event**: `dp.change` → `change.td`
+- **API**: `$(el).datetimepicker(opts)` → `new TempusDominus(el, opts)` (vanilla JS, no jQuery required)
+
+If your extension has CSS targeting `.bootstrap-datetimepicker-widget`, update the selector to `.tempus-dominus-widget`.
 
 ### 3. jQuery Plugin Bridge
 
@@ -130,6 +155,56 @@ Bootstrap 5 does not include Glyphicons. Arches uses Font Awesome 4 (`font-aweso
 | `glyphicon glyphicon-pencil` | `fa fa-pencil` |
 | `glyphicon glyphicon-trash` | `fa fa-trash` |
 
+## Core Internal Migration Scope
+
+The compatibility shim (`bootstrap3-compat.css`) keeps all legacy class names working, so these are non-blocking. Files are listed by total BS3 class count to help prioritize incremental cleanup.
+
+### Summary
+
+| BS3 Class Category | Occurrences | Files |
+|---|---|---|
+| `col-xs-*` → `col-*` | 230 | 55 |
+| `.panel*` → `.card*` | 243 | 57 |
+| `.form-group`, `.control-label`, `.help-block` | ~180 | ~45 |
+| `pull-left`/`pull-right` → `float-start`/`float-end` | 22 | 15 |
+| `.well`, `.input-group-addon`, visibility helpers | ~50 | ~25 |
+| `.btn-default` → `.btn-secondary` | 4 | 3 |
+| **Total** | **~730** | **~90 unique files** |
+
+### Top 15 Files by BS3 Class Density
+
+| File | `col-xs` | `.panel` | Other | Total |
+|---|---|---|---|---|
+| `graph-designer/node-form.htm` | 25 | 8 | 31 | 64 |
+| `graph-designer/graph-settings.htm` | 25 | 8 | 30 | 63 |
+| `datatypes/geojson-feature-collection.htm` | 2 | 36 | 0 | 38 |
+| `widgets/resource-instance-select.htm` | 21 | 5 | 5 | 31 |
+| `functions/primary-descriptors.htm` | 12 | 1 | 17 | 30 |
+| `widgets/number.htm` | 10 | 0 | 16 | 26 |
+| `map-layer-manager.htm` | 0 | 11 | 15 | 26 |
+| `signup.htm` | 0 | 4 | 20 | 24 |
+| `iiif-annotation.htm` | 1 | 5 | 16 | 22 |
+| `iiif-widget-annotation.htm` | 1 | 1 | 17 | 19 |
+| `widgets/datepicker.htm` | 5 | 0 | 10 | 15 |
+| `user-profile-manager.htm` | 0 | 0 | 20 | 20 |
+| `widgets/urldatatype.htm` | 6 | 0 | 11 | 17 |
+| `rdm/modals/value-form.htm` | 9 | 0 | 3 | 12 |
+| `file-workbench.htm` | 1 | 11 | 0 | 12 |
+
+### Recommended Migration Order
+
+1. **Mechanical rename (`col-xs-*` → `col-*`):** Safest — no visual change in BS5 since `col-*` behaves identically to the old `col-xs-*`. Can be done with a single codemod.
+2. **`pull-left`/`pull-right` → `float-start`/`float-end`:** Direct rename, no layout side effects.
+3. **`.btn-default` → `.btn-secondary`:** Only 4 occurrences, trivial.
+4. **`.panel*` → `.card*`:** Requires per-file review since `.card` has different padding/border defaults. Best done file-by-file when touching the template for other reasons.
+5. **Form classes (`.form-group`, `.control-label`, `.help-block`):** BS5 form layout is structurally different. Migrate when rewriting forms or converting to Vue.
+
+**Codemod for `col-xs-*`:**
+
+```bash
+find arches/app/templates -name '*.htm' -exec sed -i '' 's/col-xs-/col-/g' {} +
+```
+
 ## Extension Impact Summary
 
 Based on audit of downstream extensions:
@@ -144,8 +219,6 @@ Based on audit of downstream extensions:
 | arches-component-lab | 2 | `data-toggle` (1) — index.htm navbar only |
 | arches-modular-reports | 2 | `.panel` (2) |
 | arches-querysets | 0 | Clean |
-| arches-ai-agent | 0 | Clean |
-| arches-addressing | 0 | Clean (own source) |
 
 ## Migration Checklist
 

@@ -1,7 +1,7 @@
 @import url(../fonts/openSans.css);
 @import url(node_modules/bootstrap/dist/css/bootstrap.min.css);
 @import url(bootstrap3-compat.css);
-@import url(node_modules/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css);
+@import url(node_modules/@eonasdan/tempus-dominus/dist/css/tempus-dominus.min.css);
 @import url(nifty.css);
 @import url(node_modules/font-awesome/css/font-awesome.min.css);
 @import url(node_modules/primeicons/primeicons.css);
@@ -13,9 +13,9 @@
 @import url(node_modules/nouislider/distribute/nouislider.min.css);
 @import url(node_modules/codemirror/lib/codemirror.css);
 @import url(node_modules/codemirror/theme/monokai.css);
-@import url(node_modules/datatables.net-bs/css/dataTables.bootstrap.css);
-@import url(node_modules/datatables.net-responsive-bs/css/responsive.bootstrap.css);
-@import url(node_modules/datatables.net-buttons-bs/css/buttons.bootstrap.min.css);
+@import url(node_modules/datatables.net-bs5/css/dataTables.bootstrap5.css);
+@import url(node_modules/datatables.net-responsive-bs5/css/responsive.bootstrap5.css);
+@import url(node_modules/datatables.net-buttons-bs5/css/buttons.bootstrap5.css);
 @import url(node_modules/leaflet/dist/leaflet.css);
 @import url(node_modules/leaflet-draw/dist/leaflet.draw.css);
 @import url(../css/tree/tree.css);
@@ -6445,7 +6445,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
         color: #f1f1f1;
     }
 
-    .panel-config .bootstrap-datetimepicker-widget {
+    .panel-config .tempus-dominus-widget {
         color: #2d3c4b;
     }
 
