@@ -87,6 +87,13 @@ class JsonLDImportTests(ArchesTestCase):
             archesfile2 = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile2["graph"])
 
+        with open(
+            os.path.join("tests/fixtures/jsonld_base/models/date_literal_test.json"),
+            "r",
+        ) as f:
+            archesfile = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile["graph"])
+
         skos = SKOSReader()
         rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/5098-thesaurus.xml")
         ret = skos.save_concepts_from_skos(rdf)
@@ -1933,3 +1940,27 @@ class JsonLDImportTests(ArchesTestCase):
                 "ddb04a66-c163-11ea-8354-3af9d3b32b71"
             ]
             self.assertEqual(datetime_value[-6:], "-09:00")
+
+    def test_date_node_literal_ontologyclass(self):
+        """A date node whose ontologyclass is rdfs:Literal should accept a typed xsd:dateTime literal."""
+        data = """{
+            "@id": "http://localhost:8000/resources/a91fae7b-b3d7-4d77-b4ae-17fd4250d3ae",
+            "@type": "http://www.cidoc-crm.org/cidoc-crm/E53_Place",
+            "http://www.cidoc-crm.org/cidoc-crm/P172_contains": {
+                "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+                "@value": "2026-05-06"
+            }
+        }"""
+
+        graph_id = "5d38d494-4b27-11f1-9249-acde48001122"
+        resource_id = "a91fae7b-b3d7-4d77-b4ae-17fd4250d3ae"
+        date_node_id = "5d38db88-4b27-11f1-9249-acde48001122"
+
+        data = JSONDeserializer().deserialize(data)
+        reader = JsonLdReader()
+        reader.read_resource(data, resourceid=resource_id, graphid=graph_id)
+        for resource in reader.resources:
+            resource.save(request=None)
+            date_value = resource.tiles[0].data[date_node_id]
+            self.assertIsNotNone(date_value)
+            self.assertTrue(date_value.startswith("2026-05-06"))
