@@ -1945,8 +1945,8 @@ class JsonLDImportTests(ArchesTestCase):
         """A date node whose ontologyclass is rdfs:Literal should accept a typed xsd:dateTime literal."""
         data = """{
             "@id": "http://localhost:8000/resources/a91fae7b-b3d7-4d77-b4ae-17fd4250d3ae",
-            "@type": "http://www.cidoc-crm.org/cidoc-crm/E53_Place",
-            "http://www.cidoc-crm.org/cidoc-crm/P172_contains": {
+            "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation",
+            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": {
                 "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
                 "@value": "2026-05-06"
             }
