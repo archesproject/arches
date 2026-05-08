@@ -23,6 +23,88 @@ from arches_querysets.utils.models import (
 NOT_PROVIDED = object()
 
 
+def reprocess_tiles_aliased_data(tiles, as_representation, grouping_node_lookup):
+    """Re-run aliased_data processing for a specific list of tiles.
+
+    This is equivalent to TileTreeQuerySet._set_aliased_data() but operates on
+    an arbitrary list of tiles rather than a queryset's _result_cache.  Used by
+    ResourceTileTree._targeted_refresh_aliased_data() to re-process only the
+    tiles that actually changed after a save, avoiding the full re-fetch of all
+    tiles that refresh_from_db() would trigger.
+
+    grouping_node_lookup: {node_pk: grouping_node} for the graph (used to
+    re-attach child tiles under the correct alias).
+    """
+    from arches_querysets.models import AliasedData
+
+    values_by_datatype = defaultdict(list)
+    aliased_data_to_update = {}
+
+    for tile in tiles:
+        tile.aliased_data = AliasedData()
+        tile._as_representation = as_representation
+        for node in tile.nodegroup.node_set.all():
+            if node.datatype == "semantic":
+                continue
+            datatype_instance = DataTypeFactory().get_instance(node.datatype)
+            tile_data = datatype_instance.get_tile_data(tile)
+            node_value = tile_data.get(str(node.pk))
+            if node_value is None:
+                tile_data[str(node.pk)] = None
+            aliased_data_to_update[(tile, node)] = node_value
+            values_by_datatype[node.datatype].append(node_value)
+
+    datatype_contexts = {}
+    for datatype, values in values_by_datatype.items():
+        datatype_instance = DataTypeFactory().get_instance(datatype)
+        bulk_values = datatype_instance.get_display_value_context_in_bulk(values)
+        datatype_instance.set_display_value_context_in_bulk(bulk_values)
+        datatype_contexts[datatype] = bulk_values
+
+    for (tile, node), node_value in aliased_data_to_update.items():
+        tile.set_aliased_data(node, node_value, datatype_contexts)
+
+    # Re-attach child tiles under the correct aliases on aliased_data, mirroring
+    # TileTreeQuerySet._set_child_tile_data().
+    for tile in tiles:
+        child_tiles = getattr(tile, "_tile_trees", [])
+        for child_tile in sorted(child_tiles, key=lambda t: t.sortorder or 0):
+            child_nodegroup_alias = child_tile.find_nodegroup_alias(
+                grouping_node_lookup
+            )
+            if child_tile.nodegroup.cardinality == "1" and child_nodegroup_alias:
+                setattr(tile.aliased_data, child_nodegroup_alias, child_tile)
+            else:
+                existing = getattr(tile.aliased_data, child_nodegroup_alias, [])
+                existing.append(child_tile)
+                setattr(tile.aliased_data, child_nodegroup_alias, existing)
+            child_tile.parent = tile
+            child_tile._as_representation = as_representation
+
+        # Set default empty values for child nodegroups that have no tiles.
+        child_nodegroups = (
+            getattr(tile.nodegroup, "children")
+            if arches_version >= Version("8.0")
+            else getattr(tile.nodegroup, "nodegroup_set")
+        )
+        for child_nodegroup in child_nodegroups.all():
+            for node in child_nodegroup.node_set.all():
+                if node.pk == child_nodegroup.pk:
+                    grouping_node = node
+                    break
+            else:
+                continue
+            if (
+                getattr(tile.aliased_data, grouping_node.alias, NOT_PROVIDED)
+                is NOT_PROVIDED
+            ):
+                setattr(
+                    tile.aliased_data,
+                    grouping_node.alias,
+                    None if child_nodegroup.cardinality == "1" else [],
+                )
+
+
 class NodeAliasValuesMixin:
     def values(self, *args, **kwargs):
         """Allow using a node_alias as a field name in a values() query."""
@@ -75,8 +157,6 @@ class TileTreeManager(models.Manager):
         qs = super().get_queryset().select_related("resourceinstance")
         # arches_version==9.0.0
         if arches_version >= Version("8.0"):
-            # TODO: could get this once?
-            qs = qs.prefetch_related("resourceinstance__from_resxres__to_resource")
             qs = qs.select_related("nodegroup__grouping_node")
         else:
             # Annotate nodegroup_alias on Arches 7.6.
@@ -88,7 +168,6 @@ class TileTreeManager(models.Manager):
             )
             qs = qs.prefetch_related(
                 "nodegroup__nodegroup_set__node_set",
-                "resourceinstance__resxres_resource_instance_ids_from__resourceinstanceidto",
             )
         return qs
 
@@ -345,6 +424,7 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         as_representation=False,
         nodes=None,
         depth=20,
+        graph_query=None,
     ):
         """Aliases a ResourceTileTreeQuerySet with tile data unpacked
         and mapped onto nodegroup aliases, e.g.:
@@ -394,7 +474,8 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         """
         from arches_querysets.models import GraphWithPrefetching, TileTree
 
-        graph_query = GraphWithPrefetching.objects.prefetch(graph_slug)
+        if graph_query is None:
+            graph_query = GraphWithPrefetching.objects.prefetch(graph_slug)
         self._add_hints(as_representation=as_representation, graph_query=graph_query)
 
         if not nodes:
@@ -436,7 +517,7 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
                         nodes=nodes,
                         graph_query=graph_query,
                         depth=depth,
-                    ),
+                    ).filter(parenttile=None),
                     to_attr="_tile_trees",
                 ),
             )
@@ -509,8 +590,6 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
 
             # Fill aliased data with top nodegroup data.
             for tile in getattr(resource, "_tile_trees", []):
-                if tile.nodegroup.parentnodegroup_id:
-                    continue
                 nodegroup_alias = grouping_nodes[tile.nodegroup_id].alias
                 if tile.nodegroup.cardinality == "n":
                     tile_array = getattr(resource.aliased_data, nodegroup_alias)

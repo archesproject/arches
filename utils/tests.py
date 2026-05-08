@@ -49,11 +49,17 @@ class GraphTestCase(TestCase):
         if arches_version < Version("8.0"):
             graph_proxy.refresh_from_database()
             # Repair parent nodegroup link broken by get_nodegroups()!
+            repairs = [
+                (cls.nodegroup_1_child, cls.nodegroup_1),
+                (cls.nodegroup_1_n_child, cls.nodegroup_1),
+                (cls.nodegroup_n_1_child, cls.nodegroup_n),
+            ]
             for node in graph_proxy.nodes.values():
-                if node.nodegroup == cls.nodegroup_1_child:
-                    if node.nodegroup.parentnodegroup != cls.nodegroup_1:
-                        node.nodegroup.parentnodegroup = cls.nodegroup_1
-                        node.nodegroup.save()
+                for child_ng, parent_ng in repairs:
+                    if node.nodegroup == child_ng:
+                        if node.nodegroup.parentnodegroup != parent_ng:
+                            node.nodegroup.parentnodegroup = parent_ng
+                            node.nodegroup.save()
         graph_proxy.publish(user=None)
         cls.graph.publication = graph_proxy.publication
         for resource in [cls.resource_42, cls.resource_none]:
@@ -153,7 +159,9 @@ class GraphTestCase(TestCase):
         def get_node_to_append_to(node):
             if node.pk == node.nodegroup_id:
                 if node.nodegroup.parentnodegroup_id:
-                    if node == cls.nodegroup_1_child:
+                    # Child nodegroup's grouping node: attach under parent nodegroup's grouping node.
+                    parent_pk = node.nodegroup.parentnodegroup_id
+                    if parent_pk == cls.nodegroup_1.pk:
                         return cls.grouping_node_1
                     else:
                         return cls.grouping_node_n
@@ -166,6 +174,10 @@ class GraphTestCase(TestCase):
                 return cls.grouping_node_1_child
             if node.nodegroup == cls.nodegroup_n_child:
                 return cls.grouping_node_n_child
+            if node.nodegroup == cls.nodegroup_1_n_child:
+                return cls.grouping_node_1_n_child
+            if node.nodegroup == cls.nodegroup_n_1_child:
+                return cls.grouping_node_n_1_child
             raise ValueError
 
         edges = [
@@ -184,7 +196,14 @@ class GraphTestCase(TestCase):
     @classmethod
     def create_cards(cls):
         nodegroups = [cls.nodegroup_1, cls.nodegroup_n]
-        nodegroups.extend([cls.nodegroup_1_child, cls.nodegroup_n_child])
+        nodegroups.extend(
+            [
+                cls.nodegroup_1_child,
+                cls.nodegroup_n_child,
+                cls.nodegroup_1_n_child,
+                cls.nodegroup_n_1_child,
+            ]
+        )
         cards = [
             CardModel(
                 graph=cls.graph,
@@ -503,6 +522,40 @@ class GraphTestCase(TestCase):
         )
         cls.setNodesOnClass()
 
+        # Mixed-cardinality children: card-n under card-1 parent, card-1 under card-n parent.
+        # These are created after setNodesOnClass() to avoid attribute name collisions.
+        cls.nodegroup_1_n_child, cls.grouping_node_1_n_child = cls.create_nodegroup(
+            "datatypes_1_n_child", "n", parent_nodegroup=cls.nodegroup_1
+        )
+        cls.nodegroup_n_1_child, cls.grouping_node_n_1_child = cls.create_nodegroup(
+            "datatypes_n_1_child", "1", parent_nodegroup=cls.nodegroup_n
+        )
+        non_loc_dt = next(dt for dt in cls.datatypes if dt.pk == "non-localized-string")
+        mixed_nodes = Node.objects.bulk_create(
+            [
+                Node(
+                    graph=cls.graph,
+                    alias="non_localized_string_alias_1_n_child",
+                    name="non-localized-string-1-n-child",
+                    datatype="non-localized-string",
+                    istopnode=False,
+                    nodegroup=cls.nodegroup_1_n_child,
+                    config=non_loc_dt.defaultconfig,
+                ),
+                Node(
+                    graph=cls.graph,
+                    alias="non_localized_string_alias_n_1_child",
+                    name="non-localized-string-n-1-child",
+                    datatype="non-localized-string",
+                    istopnode=False,
+                    nodegroup=cls.nodegroup_n_1_child,
+                    config=non_loc_dt.defaultconfig,
+                ),
+            ]
+        )
+        cls.non_localized_string_node_1_n_child = mixed_nodes[0]
+        cls.non_localized_string_node_n_1_child = mixed_nodes[1]
+
     @classmethod
     def create_child_tiles(cls):
         cls.cardinality_1_child_tile = TileModel.objects.create(
@@ -546,6 +599,32 @@ class GraphTestCase(TestCase):
             str(cls.non_localized_string_child_node_n.pk): "child-n-value",
         }
         cls.cardinality_n_child_tile.save()
+
+        # Mixed-cardinality child tiles.
+        cls.cardinality_1_n_child_tile = TileModel.objects.create(
+            nodegroup=cls.nodegroup_1_n_child,
+            resourceinstance=cls.resource_42,
+            data={str(cls.non_localized_string_node_1_n_child.pk): "child-1-n-value"},
+            parenttile=cls.cardinality_1_tile,
+        )
+        cls.cardinality_n_1_child_tile = TileModel.objects.create(
+            nodegroup=cls.nodegroup_n_1_child,
+            resourceinstance=cls.resource_42,
+            data={str(cls.non_localized_string_node_n_1_child.pk): "child-n-1-value"},
+            parenttile=cls.cardinality_n_tile,
+        )
+        cls.cardinality_1_n_child_tile_none = TileModel.objects.create(
+            nodegroup=cls.nodegroup_1_n_child,
+            resourceinstance=cls.resource_none,
+            data={},
+            parenttile=cls.cardinality_1_tile_none,
+        )
+        cls.cardinality_n_1_child_tile_none = TileModel.objects.create(
+            nodegroup=cls.nodegroup_n_1_child,
+            resourceinstance=cls.resource_none,
+            data={},
+            parenttile=cls.cardinality_n_tile_none,
+        )
 
         cls.resource_42 = ResourceTileTree.get_tiles(
             "datatype_lookups", as_representation=True

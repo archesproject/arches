@@ -135,6 +135,7 @@ class ArchesModelAPIMixin:
 
     def get_object(self, permission_callable=None, fill_blanks=False):
         ret = super().get_object()
+
         if isinstance(ret, TileTree):
             self.graph_nodes = ret.resourceinstance.graph.node_set.all()
         else:
@@ -168,7 +169,14 @@ class ArchesModelAPIMixin:
 
         # Freeze some keyword arguments to the model save() method.
         is_partial_update = self.request.method == "PATCH"
-        ret.save = partial(ret.save, request=self.request, partial=is_partial_update)
+        # Allow callers to skip synchronous Elasticsearch indexing via ?index=false.
+        # Useful when the client will trigger reindexing separately, or when
+        # EVENTUALLY_CONSISTENT_ES_INDEXING is not enabled but sync indexing is
+        # the primary cause of slow PUT/PATCH responses.
+        index = self.request.GET.get("index", "true").lower() != "false"
+        ret.save = partial(
+            ret.save, request=self.request, partial=is_partial_update, index=index
+        )
 
         if fill_blanks:
             ret.fill_blanks()
@@ -228,6 +236,7 @@ class ArchesModelAPIMixin:
             permission_callable=user_can_edit_resource,
             fill_blanks=self.fill_blanks,
         )
+
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
@@ -252,6 +261,7 @@ class ArchesModelAPIMixin:
         Discussion:
         https://github.com/encode/django-rest-framework/discussions/7850
         """
+
         try:
             serializer.save()
         except DjangoValidationError as django_error:

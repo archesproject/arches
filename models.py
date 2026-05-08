@@ -1,5 +1,6 @@
 import logging
 import uuid
+from collections import defaultdict
 from types import SimpleNamespace
 from typing import Mapping
 
@@ -198,6 +199,7 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         resource_ids=None,
         as_representation=False,
         nodes=None,
+        graph_query=None,
     ):
         """Return a chainable QuerySet for a requested graph's instances,
         with tile data keyed by node and nodegroup aliases.
@@ -209,6 +211,7 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
             resource_ids=resource_ids,
             as_representation=as_representation,
             nodes=nodes,
+            graph_query=graph_query,
         )
 
     def append_tile(self, nodegroup_alias):
@@ -248,9 +251,32 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
     def refresh_from_db(self, using=None, fields=None, from_queryset=None):
         if from_queryset is None:
             # TODO: symptom that we need a backreference to the queryset args.
+            # Reuse the already-loaded GraphWithPrefetching instance (set by
+            # ResourceTileTreeIterable) to avoid re-running the expensive
+            # multi-level prefetch query on every save.  Also derive nodes from
+            # the prefetched graph.node_set to skip the separate Node query.
+            cached_graph = getattr(self, "graph", None)
+            # GraphWithPrefetching is defined later in this module; the name is
+            # resolved at call time so the forward reference works fine.
+            if isinstance(cached_graph, GraphWithPrefetching):
+                filters = models.Q()
+                if arches_version >= Version("8.0"):
+                    filters &= models.Q(source_identifier=None)
+
+                nodes = (
+                    cached_graph.node_set.filter(filters)
+                    .exclude(datatype="semantic")
+                    .exclude(nodegroup=None)
+                )
+                graph_query = [cached_graph]
+            else:
+                nodes = None
+                graph_query = None
             from_queryset = self.__class__.get_tiles(
                 self.graph.slug,
                 as_representation=getattr(self, "_as_representation", False),
+                nodes=nodes or None,
+                graph_query=graph_query,
             )
         self._refresh_aliased_data(using, fields, from_queryset)
 
@@ -264,10 +290,19 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         )
         for_new_resource = self._state.adding
 
+        # Capture pre-save tile tree for the targeted refresh path.
+        pre_save_tile_trees = list(getattr(self, "_tile_trees", None) or [])
+
         # This will also call ResourceInstance.save()
         operation.validate_and_save_tiles()
         if not self.pk:
             self.pk = operation.resourceid
+
+        # Capture changed tile PKs before references become stale.
+        changed_tile_pks = frozenset(
+            str(t.pk) for t in operation.to_insert | operation.to_update
+        )
+        deleted_tile_pks = frozenset(str(t.pk) for t in operation.to_delete)
 
         # Run side effects trapped on Resource.save()
         proxy_resource = (
@@ -276,6 +311,7 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
             .get()
         )
         proxy_resource.save_descriptors()
+
         if index:
             if (
                 getattr(settings, "EVENTUALLY_CONSISTENT_ES_INDEXING", False)
@@ -293,11 +329,212 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
                 edit_type="create",
             )
 
-        self.refresh_from_db(
-            using=kwargs.get("using"), fields=kwargs.get("update_fields")
+        # Use targeted refresh when the pre-save tile tree is available and only
+        # a small number of tiles changed.  This re-processes only the changed
+        # tiles' aliased_data instead of re-fetching and re-processing every tile.
+        # Fall back to full refresh_from_db() for new resources or bulk changes.
+        _TARGETED_REFRESH_THRESHOLD = 20
+        use_targeted_refresh = (
+            not for_new_resource
+            and pre_save_tile_trees
+            and len(changed_tile_pks) + len(deleted_tile_pks)
+            <= _TARGETED_REFRESH_THRESHOLD
         )
+        if use_targeted_refresh:
+            self._targeted_refresh_aliased_data(
+                pre_save_tile_trees=pre_save_tile_trees,
+                operation=operation,
+                changed_tile_pks=changed_tile_pks,
+                deleted_tile_pks=deleted_tile_pks,
+            )
+        else:
+            self.refresh_from_db(
+                using=kwargs.get("using"), fields=kwargs.get("update_fields")
+            )
+
         if request.GET.get("fill_blanks", "f").lower().startswith("t"):
             self.fill_blanks()
+
+    def _targeted_refresh_aliased_data(
+        self, *, pre_save_tile_trees, operation, changed_tile_pks, deleted_tile_pks
+    ):
+        """Efficiently refresh aliased_data after a save.
+
+        Instead of re-fetching and re-processing all tiles (as refresh_from_db
+        does), this:
+          1. Refreshes the resource's own DB fields (descriptors, etc.) cheaply.
+          2. Walks the existing in-memory tile tree, removing deleted tiles and
+             marking updated/inserted tiles for re-processing.
+          3. Re-processes aliased_data only for tiles that actually changed.
+          4. Rebuilds the resource's top-level aliased_data from the updated tree.
+
+        This reduces the post-save work from O(all tiles) to O(changed tiles),
+        which is a major win when editing a single tile in a large resource.
+        """
+        from arches_querysets.querysets import reprocess_tiles_aliased_data
+
+        # Step 1: Refresh the resource's own scalar fields cheaply (1 DB query).
+        # We use ResourceInstance directly (bypassing our overridden refresh_from_db)
+        # to avoid triggering the expensive tile prefetch.
+        cached_graph = getattr(self, "graph", None)
+        # Call Django's base Model.refresh_from_db with a plain ResourceInstance
+        # queryset so only the resource row fields are refreshed, no tile prefetch.
+        from arches.app.models.models import ResourceInstance as _RI
+
+        fresh_row = _RI.objects.values("descriptors").get(pk=self.pk)
+        self.descriptors = fresh_row["descriptors"]
+        if cached_graph is not None:
+            self.graph = cached_graph  # restore the expensive prefetched graph
+
+        # Step 2: Build lookup: parent_pk (str or None) -> list of inserted tiles.
+        inserted_tiles = list(operation.to_insert)
+        inserted_by_parent = defaultdict(list)
+        top_level_inserted = []
+        for tile in inserted_tiles:
+            parent_pk = str(tile.parenttile_id) if tile.parenttile_id else None
+            if parent_pk:
+                inserted_by_parent[parent_pk].append(tile)
+            else:
+                top_level_inserted.append(tile)
+
+        # Step 3: Walk the existing tile tree recursively.
+        # - Remove deleted tiles.
+        # - Attach any newly inserted child tiles to their parents.
+        def walk_and_patch(tile_list):
+            result = []
+            for tile in tile_list:
+                pk_str = str(tile.pk)
+                if pk_str in deleted_tile_pks:
+                    continue
+                tile._tile_trees = walk_and_patch(getattr(tile, "_tile_trees", []))
+                if pk_str in inserted_by_parent:
+                    existing_child_pks = {str(t.pk) for t in tile._tile_trees}
+                    tile._tile_trees.extend(
+                        t
+                        for t in inserted_by_parent[pk_str]
+                        if str(t.pk) not in existing_child_pks
+                    )
+                result.append(tile)
+            return result
+
+        # Build a pk→tile lookup of all tiles in the pre-save tree so we
+        # can find parents of inserted/deleted/updated tiles in O(1).
+        all_existing_by_pk = {}
+
+        def collect_tiles(tile_list):
+            for tile in tile_list:
+                all_existing_by_pk[str(tile.pk)] = tile
+                collect_tiles(getattr(tile, "_tile_trees", []))
+
+        collect_tiles(pre_save_tile_trees)
+
+        updated_tile_trees = walk_and_patch(pre_save_tile_trees)
+        updated_tile_trees.extend(top_level_inserted)
+        self._tile_trees = updated_tile_trees
+
+        # walk_and_patch only attaches inserted children to *existing* parents.
+        # For newly inserted parents (not in pre_save_tile_trees), also wire up
+        # their inserted children so reprocess_tiles_aliased_data sees the full
+        # subtree when it rebuilds the parent's aliased_data.
+        inserted_by_pk = {str(tile.pk): tile for tile in inserted_tiles}
+        for tile in inserted_tiles:
+            if tile.parenttile_id and str(tile.parenttile_id) in inserted_by_pk:
+                parent = inserted_by_pk[str(tile.parenttile_id)]
+                parent._tile_trees = [*getattr(parent, "_tile_trees", []), tile]
+
+        # Step 4: Re-process aliased_data for tiles that actually changed.
+        # Updated tiles: already in the tree with `.data` updated in-place.
+        # Inserted tiles: new instances that need initial aliased_data processing.
+        #
+        # Also reprocess the *parent* of any inserted or deleted child tile:
+        # the parent's aliased_data.{child_alias} is set during initial
+        # _set_aliased_data and won't be updated unless we explicitly reprocess
+        # the parent (e.g. None → new_child for an insert, old_child → None
+        # for a delete).
+        parent_tiles_to_reprocess = set()
+        for tile in (
+            inserted_tiles + list(operation.to_delete) + list(operation.to_update)
+        ):
+            if tile.parenttile_id:
+                parent = all_existing_by_pk.get(str(tile.parenttile_id))
+                if parent is not None:
+                    parent_tiles_to_reprocess.add(parent)
+
+        # Deduplicate tiles_to_reprocess by object identity, preserving order.
+        # A tile may appear in both to_update and parent_tiles_to_reprocess
+        # (e.g. the parent of a newly inserted child was also updated in the same
+        # save).  Processing it twice would append its children to aliased_data
+        # twice, producing duplicate entries.
+        _seen_ids: set[int] = set()
+        tiles_to_reprocess = []
+        for _t in (
+            list(operation.to_update) + inserted_tiles + list(parent_tiles_to_reprocess)
+        ):
+            if id(_t) not in _seen_ids:
+                _seen_ids.add(id(_t))
+                tiles_to_reprocess.append(_t)
+        if tiles_to_reprocess:
+            graph = cached_graph or self.graph
+
+            filters = models.Q()
+            if arches_version >= Version("8.0"):
+                filters &= models.Q(source_identifier=None)
+
+            grouping_node_lookup = {
+                node.pk: node
+                for node in graph.node_set.filter(filters)
+                if node.pk == node.nodegroup_id
+            }
+            reprocess_tiles_aliased_data(
+                tiles_to_reprocess,
+                as_representation=getattr(self, "_as_representation", False),
+                grouping_node_lookup=grouping_node_lookup,
+            )
+
+        # Step 5: Rebuild the resource's top-level aliased_data from the updated tree.
+        self.aliased_data = AliasedData()
+        self._rebuild_resource_aliased_data(
+            grouping_node_lookup=grouping_node_lookup if tiles_to_reprocess else None
+        )
+
+    def _rebuild_resource_aliased_data(self, *, grouping_node_lookup=None):
+        """Rebuild self.aliased_data from the current self._tile_trees.
+
+        Mirrors the logic of ResourceTileTreeQuerySet._set_aliased_data() for the
+        "attach tiles to resource" step, without re-fetching anything from the DB.
+        """
+        graph = getattr(self, "graph", None)
+        if graph is None:
+            return
+
+        if grouping_node_lookup is not None:
+            grouping_nodes = grouping_node_lookup
+        else:
+            filters = models.Q()
+            if arches_version >= Version("8.0"):
+                filters &= models.Q(source_identifier=None)
+
+            grouping_nodes = {
+                node.pk: node
+                for node in graph.node_set.filter(filters).exclude(nodegroup=None)
+                if node.pk == node.nodegroup_id
+            }
+
+        # Set default empty containers for top-level nodegroups.
+        for grouping_node in grouping_nodes.values():
+            if grouping_node.nodegroup.parentnodegroup_id:
+                continue
+            default = None if grouping_node.nodegroup.cardinality == "1" else []
+            setattr(self.aliased_data, grouping_node.alias, default)
+
+        # Attach top-level tiles under their nodegroup alias.
+        for tile in getattr(self, "_tile_trees", []):
+            nodegroup_alias = grouping_nodes[tile.nodegroup_id].alias
+            if tile.nodegroup.cardinality == "n":
+                tile_array = getattr(self.aliased_data, nodegroup_alias)
+                tile_array.append(tile)
+            else:
+                setattr(self.aliased_data, nodegroup_alias, tile)
 
 
 class TileTree(TileModel, AliasedDataMixin):

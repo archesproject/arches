@@ -288,7 +288,22 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.db.DatabaseCache",
         "LOCATION": "user_permission_cache",
     },
+    "querysets_concepts": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "querysets_concepts_cache",
+        "TIMEOUT": 86400,  # one day in seconds
+        "OPTIONS": {"MAX_ENTRIES": 1000},
+    },
+    "querysets_resource_instances": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "querysets_resource_instances_cache",
+        "TIMEOUT": 86400,  # one day in seconds
+        "OPTIONS": {"MAX_ENTRIES": 1000},
+    },
 }
+
+ARCHES_QUERYSETS_CONCEPT_CACHE = "querysets_concepts"
+ARCHES_QUERYSETS_RESOURCE_INSTANCE_CACHE = "querysets_resource_instances"
 
 # Hide nodes and cards in a report that have no data
 HIDE_EMPTY_NODES_IN_REPORT = False

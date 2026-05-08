@@ -90,7 +90,13 @@ class TileTreeOperation:
         else:
             self.resourceid = self.entry.pk
             self.nodegroups = []  # not necessary to populate.
-            existing_tiles = getattr(self.entry, "_tile_trees", [])
+
+            def _collect_all(tile_list):
+                for tile in tile_list:
+                    yield tile
+                    yield from _collect_all(getattr(tile, "_tile_trees", []))
+
+            existing_tiles = list(_collect_all(getattr(self.entry, "_tile_trees", [])))
 
         self.for_new_resource = self.resourceid is None
         if self.for_new_resource:
@@ -140,6 +146,7 @@ class TileTreeOperation:
             == "true"
         )
         self.validate(delete_missing_tiles=delete_missing_tiles)
+
         try:
             self._save()
         except ProgrammingError as e:
@@ -150,6 +157,7 @@ class TileTreeOperation:
                 msg = _("Tile Cardinality Error")
                 raise ValidationError({nodegroup_alias: msg}) from e
             raise
+
         self.after_update_all()
 
     def validate(self, delete_missing_tiles=False):
@@ -275,6 +283,8 @@ class TileTreeOperation:
                 to_update.add(existing_tile)
 
         nodes = grouping_node.nodegroup.node_set.all()
+        non_semantic_nodes = [n for n in nodes if n.datatype != "semantic"]
+
         for tile in to_insert | to_update:
             # arches_version==9.0.0
             if arches_version >= Version("8.0"):
@@ -291,15 +301,25 @@ class TileTreeOperation:
                     incoming_tiles=incoming_tiles,
                     delete_missing_tiles=delete_missing_tiles,
                 )
+
+            # Fast path: skip expensive datatype validation for existing tiles
+            # whose incoming data is provably identical to what's already stored.
+            original = (
+                original_tile_by_tile_id.get(tile.pk) if tile in to_update else None
+            )
+
+            if original and self._is_incoming_data_unchanged(
+                tile, original, non_semantic_nodes
+            ):
+                to_update.remove(tile)
+                continue
+
             self._validate_and_patch_incoming_values(tile, nodes=nodes)
 
             tile.set_missing_keys_to_none()
 
-        for tile in list(to_update):
-            # Remove no-op upserts.
-            if (
-                original_tile := original_tile_by_tile_id.pop(tile.pk, None)
-            ) and tile._tile_update_is_noop(original_tile):
+            # Remove no-op upserts (validation may normalize values to match existing).
+            if original and tile._tile_update_is_noop(original):
                 to_update.remove(tile)
 
         self.to_insert |= to_insert
@@ -366,6 +386,49 @@ class TileTreeOperation:
             if new_tile not in matched_new_tiles:
                 pairs.append((NOT_PROVIDED, new_tile))
         return pairs
+
+    def _is_incoming_data_unchanged(self, tile, original_tile, non_semantic_nodes):
+        """Return True only when we can be certain the incoming data is identical
+        to what's already stored, so that the full (and potentially expensive)
+        datatype validation pipeline in _validate_and_patch_incoming_values can
+        be skipped entirely.
+
+        Conservative: returns False whenever the comparison is ambiguous (e.g.
+        the incoming value is absent, the aliased_data format is unrecognised,
+        or the raw value differs from the stored value).  A False result just
+        means we fall through to the normal validation path — never a data loss.
+        """
+        from arches_querysets.models import AliasedData, TileTree
+
+        incoming = tile._incoming_tile
+
+        # Check sortorder: treat None as "keep existing".
+        incoming_sortorder = (
+            incoming.sortorder if incoming.sortorder is not None else tile.sortorder
+        )
+        if incoming_sortorder != original_tile["sortorder"]:
+            return False
+
+        incoming_aliased = incoming.aliased_data
+
+        for node in non_semantic_nodes:
+            node_id_str = str(node.pk)
+            existing_value = original_tile["data"].get(node_id_str)
+
+            if isinstance(incoming_aliased, AliasedData):
+                incoming_value = getattr(incoming_aliased, node.alias, NOT_PROVIDED)
+            elif isinstance(incoming_aliased, dict):
+                incoming_value = incoming_aliased.get(node.alias, NOT_PROVIDED)
+            else:
+                return False  # Unrecognised format — can't determine.
+
+            if incoming_value is NOT_PROVIDED:
+                return False  # Missing value — uncertain.
+
+            if incoming_value != existing_value:
+                return False
+
+        return True
 
     def _validate_and_patch_incoming_values(self, tile, *, nodes):
         """Validate data found on tile._incoming_tile and move it to tile.data.
