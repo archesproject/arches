@@ -27,12 +27,6 @@ APP_ROOT = ""
 TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, "..", "tests"))
 STATICFILES_DIRS = []
 
-# LOAD_V3_DATA_DURING_TESTS = True will engage the most extensive the of the v3
-# data migration tests, which could add over a minute to the test process. It's
-# recommended that this setting only be set to True in tests/settings_local.py
-# and run in specific cases at the discretion of the developer.
-LOAD_V3_DATA_DURING_TESTS = False
-
 RESOURCE_GRAPH_LOCATIONS = [
     os.path.join(TEST_ROOT, "fixtures", "resource_graphs"),
     os.path.join(
