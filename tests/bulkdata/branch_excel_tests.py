@@ -30,19 +30,19 @@ from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.etl_modules.branch_excel_importer import BranchExcelImporter
 from arches.app.etl_modules.branch_excel_exporter import BranchExcelExporter
 from arches.app.models.system_settings import settings
+from tests.base_test import ArchesTransactionTestCase
 from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
 from django.core.management import call_command
 from django.db import connection
 from django.http import HttpRequest
-from django.test import TransactionTestCase
 
 
 # these tests can be run from the command line via
 # python manage.py test tests.bulkdata.branch_excel_tests --settings="tests.test_settings"
 
 
-class BranchExcelTests(TransactionTestCase):
+class BranchExcelTests(ArchesTransactionTestCase):
     serialized_rollback = True
 
     def setUp(self):
@@ -53,12 +53,11 @@ class BranchExcelTests(TransactionTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         resource_graph_importer(archesfile["graph"])
         graph = Graph.objects.get(graphid="a5c3946a-a9c0-4472-9191-ffc0f35a5901")
-        admin = User.objects.get(username="admin")
-        graph.publish(user=admin)
+        graph.publish(user=self.test_users["admin"])
 
         request = HttpRequest()
         request.method = "POST"
-        request.user = User.objects.get(username="admin")
+        request.user = self.test_users["admin"]
         load_id = "d481d116-7c1e-4b36-b7ef-85963d482db0"
         xls_file = "branch_excel_test.xlsx"
         details = {

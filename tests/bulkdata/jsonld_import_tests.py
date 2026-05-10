@@ -30,14 +30,15 @@ from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
 from django.http import HttpRequest
 from django.urls import reverse
-from django.test import TransactionTestCase
 from django.test.client import Client
+
+from tests.base_test import ArchesTransactionTestCase
 
 # these tests can be run from the command line via
 # python manage.py test tests.bulkdata.jsonld_import_tests --settings="tests.test_settings"
 
 
-class JSONLDImportTests(TransactionTestCase):
+class JSONLDImportTests(ArchesTransactionTestCase):
     """
     Subclass TransactionTestCase because
     the functionality under test in the etl modules uses a raw cursor to
@@ -148,7 +149,7 @@ class JSONLDImportTests(TransactionTestCase):
     def test_write(self):
         request = HttpRequest()
         request.method = "POST"
-        request.user = User.objects.get(username="admin")
+        request.user = self.test_users["admin"]
 
         start_event = LoadEvent.objects.create(
             user=request.user, etl_module=self.module, status="running"

@@ -873,7 +873,7 @@ class SearchTests(ArchesTestCase):
     def test_searchview_searchview_component_from_admin(self):
         request = HttpRequest()
         request.method = "GET"
-        request.user = User.objects.get(username="admin")
+        request.user = self.test_users["admin"]
         search_component_factory = SearchFilterFactory(request)
         searchview_component_instance = (
             search_component_factory.get_searchview_instance()

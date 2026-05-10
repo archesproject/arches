@@ -5,7 +5,6 @@ from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from arches.app.models.models import UserPreference
 from arches.app.models import models
-from django.test.client import Client
 
 
 # these tests can be run from the command line via
@@ -18,7 +17,7 @@ class UserPrefApiTest(ArchesTestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.client = Client()
+        super().setUpTestData()
         # Test admin user preference
         cls.user_preference = UserPreference.objects.create(
             userpreferenceid=cls.admin_preference_id,

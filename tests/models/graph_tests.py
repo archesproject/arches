@@ -1572,8 +1572,7 @@ class GraphTests(ArchesTestCase):
         )
 
         graph = Graph.objects.get(pk="49a7eea8-2e2b-48e3-8b6e-650f25ec2954")
-        admin = User.objects.get(username="admin")
-        graph.publish(user=admin)
+        graph.publish(user=self.test_users["admin"])
         graph.create_draft_graph()
 
         draft_graph = Graph.objects.get(slug="test-graph", source_identifier=graph.pk)
@@ -2026,20 +2025,19 @@ class DraftGraphTests(ArchesTestCase):
             is_resource=True,
         )
         draft_graph = source_graph.get_draft_graph()
-        admin = User.objects.get(username="admin")
 
         result = draft_graph.append_node()
         result["node"].datatype = "number"
         draft_graph.save()
         updated_source_graph = source_graph.promote_draft_graph_to_active_graph()
-        updated_source_graph.publish(user=admin)
+        updated_source_graph.publish(user=self.test_users["admin"])
 
         # Record bulk data manager history.
         nodegroup = models.NodeGroup.objects.get(
             node__graph=source_graph, node__datatype="number"
         )
         event = models.LoadEvent.objects.create(
-            etl_module=models.ETLModule.objects.first(), user=admin
+            etl_module=models.ETLModule.objects.first(), user=self.test_users["admin"]
         )
         load_errors = models.LoadErrors.objects.create(
             load_event=event, nodegroup=nodegroup, node=result["node"]

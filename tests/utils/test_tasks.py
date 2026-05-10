@@ -6,6 +6,7 @@ from django.test import RequestFactory, TestCase
 from arches.app.models import models
 from arches.app.tasks import package_load_complete
 from arches.app.views.notifications import NotificationView
+from tests.base_test import ArchesTestCase
 
 
 class TaskTests(TestCase):
@@ -21,10 +22,10 @@ class TaskTests(TestCase):
         self.assertEqual(notif_x_user.recipient_id, 1)
 
 
-class NotificationViewTests(TestCase):
+class NotificationViewTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = models.User.objects.get(username="admin")
+        super().setUpTestData()
         notifs = []
         user_x_notifs = []
         for idx in range(100):
@@ -34,7 +35,7 @@ class NotificationViewTests(TestCase):
             )
             notifs.append(notif)
             user_x_notif = models.UserXNotification(
-                recipient=cls.user,
+                recipient=cls.test_users["admin"],
                 notif=notif,
                 isread=(idx % 2 == 0),  # Mark even indexed notifications as read
             )
@@ -55,7 +56,7 @@ class NotificationViewTests(TestCase):
                 "items": page_size,
             },
         )
-        request.user = self.user
+        request.user = self.test_users["admin"]
         response = NotificationView.as_view()(request)
         data = json.loads(response.content)
         self.assertEqual(response.status_code, 200)
@@ -83,7 +84,7 @@ class NotificationViewTests(TestCase):
                 # No unread_only parameter to get all notifications
             },
         )
-        request.user = self.user
+        request.user = self.test_users["admin"]
         response = NotificationView.as_view()(request)
         data = json.loads(response.content)
         self.assertEqual(response.status_code, 200)
@@ -102,7 +103,7 @@ class NotificationViewTests(TestCase):
     def test_notification_no_pagination(self):
         factory = RequestFactory()
         request = factory.get("/get_notifications/")
-        request.user = self.user
+        request.user = self.test_users["admin"]
         response = NotificationView.as_view()(request)
         data = json.loads(response.content)
         self.assertEqual(response.status_code, 200)

@@ -24,8 +24,6 @@ from pathlib import Path
 from django.conf import settings
 from django.core.management import call_command
 from django.db import connection
-from django.http import HttpRequest
-from django.test import TransactionTestCase
 
 from arches.app.models.models import TileModel
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
@@ -42,11 +40,13 @@ from arches.app.etl_modules.base_import_module import FileValidationError
 
 from arches.app.models.models import ETLModule, LoadEvent
 
+from tests.base_test import ArchesTransactionTestCase
+
 # these tests can be run from the command line via
 # python manage.py test tests.bulkdata.tile_excel_tests --settings="tests.test_settings"
 
 
-class TileExcelTests(TransactionTestCase):
+class TileExcelTests(ArchesTransactionTestCase):
     serialized_rollback = True
 
     def setUp(self):

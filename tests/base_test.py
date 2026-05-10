@@ -21,7 +21,7 @@ from pathlib import Path
 
 from django.db import connection
 from django.core import management
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 from django.test.utils import captured_stdout
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
@@ -52,6 +52,20 @@ DELETE_TOKEN_SQL = (
     "DELETE FROM public.oauth2_provider_accesstoken WHERE application_id = 44;"
 )
 SYSTEM_SETINGS_GRAPH_ID = "ff623370-fa12-11e6-b98b-6c4008b05c4c"
+
+
+class ArchesTransactionTestCase(TransactionTestCase):
+    test_users = {}
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        for user in User.objects.all():
+            cls.test_users[user.username] = user
+            # Overwrite admin password to "admin" using the configured hasher.
+            if user.username == "admin" and not user.check_password("admin"):
+                user.set_password("admin")
+                user.save()
 
 
 class ArchesTestCase(TestCase):
@@ -118,6 +132,10 @@ class ArchesTestCase(TestCase):
         LanguageSynchronizer.synchronize_settings_with_db(update_published_graphs=False)
         for user in User.objects.all():
             cls.test_users[user.username] = user
+            # Overwrite admin password to "admin" using the configured hasher.
+            if user.username == "admin":
+                user.set_password("admin")
+                user.save()
         cls.loadOntology()
         if not cls.graph_fixtures:
             return

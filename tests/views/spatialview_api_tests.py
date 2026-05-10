@@ -1,7 +1,7 @@
 import json
 import random
 import os, uuid
-from django.test import TransactionTestCase
+
 from django.urls import reverse
 from django.test.utils import captured_stdout
 from django.core import management
@@ -10,13 +10,14 @@ from arches.app.utils.data_management.resources.importer import BusinessDataImpo
 from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.models import models
 from tests import test_settings
+from tests.base_test import ArchesTransactionTestCase
 
 
 # these tests can be run from the command line via
 # python manage.py test tests.views.spatialview_api_tests --settings="tests.test_settings"
 
 
-class SpatialViewApiTest(TransactionTestCase):
+class SpatialViewApiTest(ArchesTransactionTestCase):
 
     serialized_rollback = True
 

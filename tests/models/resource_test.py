@@ -587,7 +587,7 @@ class ResourceTests(ArchesTestCase):
                 },
             },
         )
-        user = User.objects.get(username="admin")
+        user = self.test_users["admin"]
         graph.save(validate=False)
         # Publish the graph to make it available for resources
         graph.publish(user=user)

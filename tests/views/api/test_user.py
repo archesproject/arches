@@ -11,6 +11,7 @@ from django.urls import reverse
 class UserAPITests(TestCase):
     @classmethod
     def setUpTestData(cls):
+        super().setUpTestData()
         cls.visitor = User.objects.create(
             username="visitor",
             first_name="Esperanza",

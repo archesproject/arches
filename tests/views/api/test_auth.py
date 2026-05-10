@@ -15,6 +15,7 @@ from tests.base_test import ArchesTestCase
 class AuthAPITests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
+        super().setUpTestData()
         cls.visitor = User.objects.create(
             username="visitor",
             first_name="Esperanza",
