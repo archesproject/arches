@@ -1974,6 +1974,7 @@ class JsonLDImportTests(ArchesTestCase):
             date_value = resource.tiles[0].data[date_node_id]
             self.assertIsNotNone(date_value)
             self.assertTrue(date_value.startswith("2026-05-06"))
+
     # -------------------------------------------------------------------------
     # EDTF import/export tests
     # -------------------------------------------------------------------------
