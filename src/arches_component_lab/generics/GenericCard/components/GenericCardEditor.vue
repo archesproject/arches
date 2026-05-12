@@ -58,6 +58,8 @@ const emit = defineEmits([
     "reset",
 ]);
 
+defineOptions({ inheritAttrs: false });
+
 function deepClone<T>(sourceObject: T): T {
     return JSON.parse(JSON.stringify(sourceObject));
 }
@@ -263,6 +265,7 @@ defineExpose({ save });
             >
                 <GenericWidget
                     v-if="cardXNodeXWidgetDatum.visible"
+                    v-bind="$attrs"
                     ref="genericWidget"
                     :is-dirty="
                         localWidgetDirtyStates[cardXNodeXWidgetDatum.node.alias]

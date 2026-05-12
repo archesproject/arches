@@ -1,11 +1,3 @@
 <script setup lang="ts">
-import type { GeoJSONFeatureCollectionValue } from "@/arches_component_lab/datatypes/geojson-feature-collection/types";
-
-defineProps<{
-    aliasedNodeData: GeoJSONFeatureCollectionValue | null;
-}>();
+// TODO: This component is currently just a placeholder to get the viewer up and running. It should be fleshed out to match the functionality of the editor, minus the editing capabilities.
 </script>
-
-<template>
-    <div>{{ aliasedNodeData?.display_value }}</div>
-</template>

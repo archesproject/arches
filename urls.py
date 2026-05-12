@@ -2,6 +2,11 @@ from django.urls import path
 
 from arches_component_lab.apps import ArchesComponentLabConfig
 from arches_component_lab.views.api.language import LanguageViewWithRequestLanguage
+from arches_component_lab.views.api.map import (
+    FeatureBufferAPI,
+    GeoJSONBoundsAPI,
+    MapDataAPI,
+)
 from arches_component_lab.views.api.relatable_resources import RelatableResourcesView
 from arches_component_lab.views.api.card_x_node_x_widget import (
     CardXNodeXWidgetView,
@@ -18,6 +23,9 @@ from arches_querysets.rest_framework.generic_views import (
 app_name = ArchesComponentLabConfig.name
 
 urlpatterns = [
+    path("api/map-data", MapDataAPI.as_view(), name="api-map-data"),
+    path("api/feature-buffer", FeatureBufferAPI.as_view(), name="api-feature-buffer"),
+    path("api/geojson-bounds", GeoJSONBoundsAPI.as_view(), name="api-geojson-bounds"),
     path(
         "api/languages-with-request-language",
         LanguageViewWithRequestLanguage.as_view(),

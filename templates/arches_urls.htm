@@ -7,6 +7,9 @@
 {% block arches_urls %}
 {{ block.super }}
 <div class="arches-urls"
+    arches-component-lab-api-map-data="{% url 'arches_component_lab:api-map-data' %}"
+    arches-component-lab-api-feature-buffer="{% url 'arches_component_lab:api-feature-buffer' %}"
+    arches-component-lab-api-geojson-bounds="{% url 'arches_component_lab:api-geojson-bounds' %}"
     api_languages_with_request_language="{% url 'arches_component_lab:api-languages-with-request-language' %}"
     api_relatable_resources='(graph_slug, node_alias) => {return "{% url "arches_component_lab:api-relatable-resources" "----p1" "----p2" %}".replace("----p1", graph_slug).replace("----p2", node_alias)}'
     api_card_x_node_x_widget='(graph_slug, node_alias) => {return "{% url "arches_component_lab:api-card-x-node-x-widget" "----p1" "----p2" %}".replace("----p1", graph_slug).replace("----p2", node_alias)}'
