@@ -6,6 +6,7 @@ import InputText from "primevue/inputtext";
 import Select from "primevue/select";
 import Textarea from "primevue/textarea";
 
+import { MULTILINE_RENDER_CONTEXT } from "@/arches_component_lab/widgets/TextWidget/constants.ts";
 import { fetchLanguages } from "@/arches_component_lab/widgets/api.ts";
 
 import type {
@@ -16,12 +17,17 @@ import type { StringValue } from "@/arches_component_lab/datatypes/string/types.
 
 const { $gettext } = useGettext();
 
-const { cardXNodeXWidgetData, aliasedNodeData, shouldEmitSimplifiedValue } =
-    defineProps<{
-        cardXNodeXWidgetData: StringCardXNodeXWidgetData;
-        aliasedNodeData: StringValue | null;
-        shouldEmitSimplifiedValue?: boolean;
-    }>();
+const {
+    cardXNodeXWidgetData,
+    aliasedNodeData,
+    renderContext,
+    shouldEmitSimplifiedValue,
+} = defineProps<{
+    cardXNodeXWidgetData: StringCardXNodeXWidgetData;
+    aliasedNodeData: StringValue | null;
+    renderContext?: string;
+    shouldEmitSimplifiedValue?: boolean;
+}>();
 
 const emit = defineEmits<{
     (
@@ -103,7 +109,7 @@ function onUpdateModelValue(updatedValue: string | undefined) {
             :placeholder="$gettext('Language')"
         />
         <Textarea
-            v-if="cardXNodeXWidgetData.config.multiline"
+            v-if="renderContext === MULTILINE_RENDER_CONTEXT"
             :auto-resize="true"
             :fluid="true"
             :maxlength="cardXNodeXWidgetData.config.maxLength ?? undefined"

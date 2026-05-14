@@ -2,16 +2,20 @@
 import InputText from "primevue/inputtext";
 import Textarea from "primevue/textarea";
 
+import { MULTILINE_RENDER_CONTEXT } from "@/arches_component_lab/widgets/NonLocalizedTextWidget/constants.ts";
+
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { NonLocalizedTextValue } from "@/arches_component_lab/datatypes/non-localized-text/types.ts";
 
 const {
     cardXNodeXWidgetData,
     aliasedNodeData,
+    renderContext,
     shouldEmitSimplifiedValue = false,
 } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData;
     aliasedNodeData: NonLocalizedTextValue | null;
+    renderContext?: string;
     shouldEmitSimplifiedValue?: boolean;
 }>();
 
@@ -38,7 +42,7 @@ function onUpdateModelValue(updatedValue: string | undefined) {
 
 <template>
     <Textarea
-        v-if="cardXNodeXWidgetData.config.multiline"
+        v-if="renderContext === MULTILINE_RENDER_CONTEXT"
         :auto-resize="true"
         :fluid="true"
         :model-value="aliasedNodeData?.node_value || ''"
