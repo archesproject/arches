@@ -261,14 +261,14 @@ def _build_tile_data(staged_value):
     return tile_data
 
 
-def _post_process_staging(records, max_workers=4):
+def _post_process_staging(staging_records, max_workers=4):
     """
     File associations + resource relationship refreshes.
     These are independent per-tile, so they parallize well.
     """
     resource_refresh_tile_ids = set()
 
-    for record in records:
+    for record in staging_records:
         if not record.value:
             continue
         for value_dict in record.value.values():
