@@ -267,11 +267,18 @@ def _post_process_staging(load_id, max_workers=4):
     Streams staging records via iterator to avoid holding them all in memory.
     """
     logger.debug("Post-processing staging records for load_id=%s", load_id)
+    _process_staging_records(
+        LoadStaging.objects.filter(load_event_id=load_id).iterator(chunk_size=2000),
+        max_workers=max_workers,
+    )
+    logger.debug("Post-processing complete for load_id=%s", load_id)
+
+
+def _process_staging_records(records, max_workers=4):
+    """Core post-processing loop over an iterable of LoadStaging records."""
     resource_refresh_tile_ids = set()
 
-    for record in LoadStaging.objects.filter(load_event_id=load_id).iterator(
-        chunk_size=2000
-    ):
+    for record in records:
         if not record.value:
             continue
         for value_dict in record.value.values():
@@ -299,7 +306,6 @@ def _post_process_staging(load_id, max_workers=4):
             }
             for future in as_completed(futures):
                 future.result()  # re-raise any exceptions
-    logger.debug("Post-processing complete for load_id=%s", load_id)
 
 
 def _refresh_resource_relationships(tile_id):
