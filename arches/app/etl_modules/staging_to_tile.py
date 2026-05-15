@@ -220,7 +220,10 @@ def staging_to_tile(load_id, max_workers=4):
             EditLog.objects.bulk_create(edit_logs, settings.BULK_IMPORT_BATCH_SIZE)
 
     logger.debug("Tile processing complete")
-    _post_process_staging(load_id, max_workers=max_workers)
+    _post_process_staging(
+        LoadStaging.objects.filter(load_event_id=load_id).iterator(chunk_size=2000),
+        max_workers=max_workers,
+    )
 
     LoadEvent.objects.filter(loadid=load_id).update(
         load_end_time=now,
@@ -258,22 +261,11 @@ def _build_tile_data(staged_value):
     return tile_data
 
 
-def _post_process_staging(load_id, max_workers=4):
+def _post_process_staging(records, max_workers=4):
     """
     File associations + resource relationship refreshes.
     These are independent per-tile, so they parallize well.
-    Streams staging records via iterator to avoid holding them all in memory.
     """
-    logger.debug("Post-processing staging records for load_id=%s", load_id)
-    _post_process_staging_records(
-        LoadStaging.objects.filter(load_event_id=load_id).iterator(chunk_size=2000),
-        max_workers=max_workers,
-    )
-    logger.debug("Post-processing complete for load_id=%s", load_id)
-
-
-def _post_process_staging_records(records, max_workers=4):
-    """Core post-processing loop over an iterable of LoadStaging records."""
     resource_refresh_tile_ids = set()
 
     for record in records:
