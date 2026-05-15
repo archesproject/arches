@@ -28,13 +28,15 @@ def staging_to_tile(load_id, max_workers=4):
     now = timezone.now()
 
     logger.debug("Loading staging records for load_id=%s", load_id)
-    valid_staging = LoadStaging.objects.filter(
+    valid_staged_tiles = LoadStaging.objects.filter(
         load_event_id=load_id, passes_validation=True
     ).order_by("nodegroup_depth")
 
     # Lightweight pass: only the three fields needed for metadata — avoids
     # fetching the (potentially large) value JSON for the metadata phase.
-    valid_meta = list(valid_staging.values("nodegroup_id", "resourceid", "legacyid"))
+    valid_meta = list(
+        valid_staged_tiles.values("nodegroup_id", "resourceid", "legacyid")
+    )
     logger.debug(
         "Loaded %d valid staging records for load_id=%s", len(valid_meta), load_id
     )
@@ -115,13 +117,13 @@ def staging_to_tile(load_id, max_workers=4):
 
     # Stream full ORM objects one chunk at a time — never holds all records in memory.
     for depth, group in groupby(
-        valid_staging.iterator(chunk_size=2000), key=lambda r: r.nodegroup_depth
+        valid_staged_tiles.iterator(chunk_size=2000), key=lambda r: r.nodegroup_depth
     ):
         staged_tiles = list(group)
         logger.debug(
             "Processing nodegroup depth %s: %d staged tiles", depth, len(staged_tiles)
         )
-        depth_edit_logs = []
+        edit_logs = []
         inserts = [
             staged_tile
             for staged_tile in staged_tiles
@@ -171,7 +173,7 @@ def staging_to_tile(load_id, max_workers=4):
                 ],
                 settings.BULK_IMPORT_BATCH_SIZE,
             )
-            depth_edit_logs += [
+            edit_logs += [
                 EditLog(
                     resourceclassid=nodegroup_to_graph.get(r.nodegroup_id),
                     resourceinstanceid=str(r.resourceid),
@@ -194,7 +196,7 @@ def staging_to_tile(load_id, max_workers=4):
                 if not tile:
                     continue
                 new_data = _build_tile_data(r.value)
-                depth_edit_logs.append(
+                edit_logs.append(
                     EditLog(
                         resourceclassid=nodegroup_to_graph.get(r.nodegroup_id),
                         resourceinstanceid=str(r.resourceid),
@@ -213,13 +215,9 @@ def staging_to_tile(load_id, max_workers=4):
                 tiles_to_update.append(tile)
             TileModel.objects.bulk_update(tiles_to_update, ["data", "sortorder"])
 
-        if depth_edit_logs:
-            logger.debug(
-                "Writing %d edit logs for depth %s", len(depth_edit_logs), depth
-            )
-            EditLog.objects.bulk_create(
-                depth_edit_logs, settings.BULK_IMPORT_BATCH_SIZE
-            )
+        if edit_logs:
+            logger.debug("Writing %d edit logs for depth %s", len(edit_logs), depth)
+            EditLog.objects.bulk_create(edit_logs, settings.BULK_IMPORT_BATCH_SIZE)
 
     logger.debug("Tile processing complete")
     _post_process_staging(load_id, max_workers=max_workers)
@@ -267,14 +265,14 @@ def _post_process_staging(load_id, max_workers=4):
     Streams staging records via iterator to avoid holding them all in memory.
     """
     logger.debug("Post-processing staging records for load_id=%s", load_id)
-    _process_staging_records(
+    _post_process_staging_records(
         LoadStaging.objects.filter(load_event_id=load_id).iterator(chunk_size=2000),
         max_workers=max_workers,
     )
     logger.debug("Post-processing complete for load_id=%s", load_id)
 
 
-def _process_staging_records(records, max_workers=4):
+def _post_process_staging_records(records, max_workers=4):
     """Core post-processing loop over an iterable of LoadStaging records."""
     resource_refresh_tile_ids = set()
 

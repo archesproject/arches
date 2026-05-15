@@ -8,7 +8,7 @@ from arches.app.const import DefaultLifecycleStates
 from arches.app.etl_modules.staging_to_tile import (
     _build_tile_data,
     _post_process_staging,
-    _process_staging_records,
+    _post_process_staging_records,
     staging_to_tile,
 )
 from arches.app.models.models import (
@@ -295,7 +295,7 @@ class PostProcessStagingTests(TestCase):
             {"n": {"datatype": "resource-instance", "value": [{"resourceId": "x"}]}}
         )
         record.tileid = tile_id
-        _process_staging_records([record])
+        _post_process_staging_records([record])
         mock_refresh.assert_called_once_with(tile_id)
 
     @patch("arches.app.etl_modules.staging_to_tile._refresh_resource_relationships")
@@ -305,26 +305,26 @@ class PostProcessStagingTests(TestCase):
             {"n": {"datatype": "resource-instance-list", "value": []}}
         )
         record.tileid = tile_id
-        _process_staging_records([record])
+        _post_process_staging_records([record])
         mock_refresh.assert_called_once_with(tile_id)
 
     @patch("arches.app.etl_modules.staging_to_tile._refresh_resource_relationships")
     def test_non_resource_datatype_does_not_trigger_refresh(self, mock_refresh):
         record = self._make_record({"n": {"datatype": "string", "value": "hi"}})
-        _process_staging_records([record])
+        _post_process_staging_records([record])
         mock_refresh.assert_not_called()
 
     @patch("arches.app.etl_modules.staging_to_tile._refresh_resource_relationships")
     def test_null_value_record_skipped(self, mock_refresh):
         record = self._make_record(None)
-        _process_staging_records([record])
+        _post_process_staging_records([record])
         mock_refresh.assert_not_called()
 
     @patch("arches.app.etl_modules.staging_to_tile._refresh_resource_relationships")
     def test_non_dict_node_value_skipped(self, mock_refresh):
         """Non-dict values in the staged value dict should not cause errors."""
         record = self._make_record({"n": "not-a-dict"})
-        _process_staging_records([record])  # should not raise
+        _post_process_staging_records([record])  # should not raise
         mock_refresh.assert_not_called()
 
     @patch("arches.app.etl_modules.staging_to_tile._refresh_resource_relationships")
@@ -336,7 +336,7 @@ class PostProcessStagingTests(TestCase):
             {"n": {"datatype": "file-list", "value": [{"file_id": file_id}]}}
         )
         record.tileid = tile_id
-        _process_staging_records([record])
+        _post_process_staging_records([record])
         mock_file.objects.filter.assert_called_once_with(fileid=file_id)
         mock_file.objects.filter.return_value.update.assert_called_once_with(
             tile_id=tile_id
@@ -348,7 +348,7 @@ class PostProcessStagingTests(TestCase):
         record = self._make_record(
             {"n": {"datatype": "file-list", "value": [{"no_file_id_key": "x"}]}}
         )
-        _process_staging_records([record])
+        _post_process_staging_records([record])
         mock_file.objects.filter.assert_not_called()
 
     @patch("arches.app.etl_modules.staging_to_tile._refresh_resource_relationships")
@@ -362,5 +362,5 @@ class PostProcessStagingTests(TestCase):
             }
         )
         record.tileid = tile_id
-        _process_staging_records([record])
+        _post_process_staging_records([record])
         mock_refresh.assert_called_once_with(tile_id)
