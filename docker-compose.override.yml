@@ -1,0 +1,26 @@
+# Place this file in the same folder as your docker-compose.yml
+# Docker Compose automatically merges it — no edits to the original needed.
+#
+# Purpose: Forces all services to run under linux/amd64 emulation via Rosetta 2
+# Required for: Mac M1/M2/M3 (Apple Silicon) where ARM64 images are unavailable
+#
+# Pre-requisite: Enable Rosetta emulation in Docker Desktop
+#   → Settings → General → "Use Rosetta for x86/amd64 emulation on Apple Silicon" ✓
+ 
+services:
+ 
+  arches:
+    platform: linux/amd64
+ 
+  nginx:
+    platform: linux/amd64
+ 
+  db:
+    platform: linux/amd64
+ 
+  elasticsearch:
+    platform: linux/amd64
+ 
+  letsencrypt:
+    platform: linux/amd64
+ 
