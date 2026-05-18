@@ -1,9 +1,15 @@
+import argparse
 import os
 import sys
 import shutil
 import subprocess
 import tempfile
+from unittest.mock import patch
+
 from django.test import SimpleTestCase
+
+import arches
+from arches.install.arches_admin import command_startproject
 
 
 class ArchesAdminTestCase(SimpleTestCase):
@@ -51,7 +57,8 @@ class ArchesAdminCommandTests(ArchesAdminTestCase):
         stdout, stderr = self.run_arches_admin(["--help"])
         self.assertIn("startproject", stdout)
 
-    def test_startproject_uses_kebab_case_directory(self):
+    @patch("arches.install.arches_admin.subprocess.call")
+    def test_startproject_uses_kebab_case_directory(self, mock_npm):
         """
         When a project name contains underscores, `arches-admin startproject`
         should create the top-level project directory using the kebab-case
@@ -68,11 +75,17 @@ class ArchesAdminCommandTests(ArchesAdminTestCase):
 
         temp_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, temp_dir, ignore_errors=True)
+        self.addCleanup(os.chdir, os.getcwd())
 
-        self.run_arches_admin(
-            ["startproject", project_name, "--yes"],
-            cwd=temp_dir,
+        args = argparse.Namespace(
+            name=project_name,
+            yes=True,
+            verbosity=1,
+            command="startproject",
         )
+
+        os.chdir(temp_dir)
+        command_startproject(args)
 
         top_level = os.path.join(temp_dir, expected_top_level_dir)
         self.assertTrue(
@@ -92,3 +105,5 @@ class ArchesAdminCommandTests(ArchesAdminTestCase):
             os.path.isdir(inner_package),
             msg=f"Expected inner Python package '{project_name}' was not found inside '{expected_top_level_dir}'.",
         )
+
+        mock_npm.assert_called_once_with("npm install", shell=True)
