@@ -25,15 +25,15 @@ class BaseExternalDomainDataType(BaseDataType):
 
     @abstractmethod
     def get_option_id(self, record):
-        """Return the value that gets stored in tile data for *record*."""
+        """Return the value that gets stored in tile data."""
 
     @abstractmethod
     def get_option_display(self, record):
-        """Return the human-readable display string for *record*."""
+        """Return the human-readable display string."""
 
     @abstractmethod
     def get_lookup_filter(self, value):
-        """Return a ``Q`` object that filters the options queryset for *value*.
+        """Return a ``Q`` object that filters the options queryset for value.
 
         The filter should match on both the stored id field and the display
         field so that callers can pass either form.
@@ -116,6 +116,3 @@ class BaseExternalDomainDataType(BaseDataType):
                     query.must_not(match_query)
         except KeyError:
             pass
-
-    def is_a_literal_in_rdf(self):
-        return True
