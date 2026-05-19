@@ -7,7 +7,7 @@ USER_WIDGET_ID = "d3a09f3e-5b1c-4a2d-8e6f-7c9b0a1d2e3f"
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "12586_tile_cardinality_check"),
+        ("models", "12587_move_default_value_to_node_config"),
     ]
 
     def forward(apps, schema_editor):
