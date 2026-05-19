@@ -628,9 +628,9 @@ urlpatterns = [
         name="get_frontend_i18n_data",
     ),
     path(
-        "api/datatypes/<str:datatype>/options",
-        api.DatatypeOptions.as_view(),
-        name="api_datatype_options",
+        "api/external_domain/<str:datatype>/options",
+        api.ExternalDomainOptions.as_view(),
+        name="api_external_domain_options",
     ),
     re_path(
         r"^api/search/export_results$",

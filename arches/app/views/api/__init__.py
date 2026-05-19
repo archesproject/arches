@@ -22,4 +22,4 @@ from .user import *
 from .userpreference import *
 from .validator import *
 from .workflow import *
-from .datatype import *
+from .external_domain import *

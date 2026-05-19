@@ -125,6 +125,7 @@
     api_user="{% url 'api_user' %}"
     api_user_incomplete_workflows="{% url 'api_user_incomplete_workflows' %}"
     api_get_frontend_i18n_data="{% url 'get_frontend_i18n_data' %}"
+    api_external_domain_options='(datatype)=>{return "{% url "api_external_domain_options" "aaaa" %}".replace("aaaa", datatype)}'
     geojson="{% url 'geojson' %}"
     icons="{% url 'icons' %}"
     ontology_properties="{% url 'ontology_properties' %}"

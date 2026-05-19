@@ -1,27 +1,24 @@
-from django.http import Http404
-
 from arches.app.datatypes.core.external_domain import BaseExternalDomainDataType
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.utils.response import JSONResponse
+from arches.app.utils.response import JSONErrorResponse, JSONResponse
 from arches.app.views.api import APIBase
 
 
-class DatatypeOptions(APIBase):
+class ExternalDomainOptions(APIBase):
     """Return ``[{id, text}]`` option pairs for any external-domain datatype.
 
-    Only datatypes that subclass ``BaseExternalDomainDataType`` are supported;
-    all others return 404.
+    Only datatypes that subclass ``BaseExternalDomainDataType`` are supported.
     """
 
     def get(self, request, datatype):
         factory = DataTypeFactory()
         try:
             instance = factory.get_instance(datatype)
-        except Exception:
-            raise Http404
+        except Exception as e:
+            raise JSONErrorResponse(status=500, reason=e)
 
         if not isinstance(instance, BaseExternalDomainDataType):
-            raise Http404
+            raise JSONErrorResponse(status=400, reason=f"{datatype} not supported")
 
         options = [
             {
