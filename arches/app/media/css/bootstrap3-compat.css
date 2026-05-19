@@ -207,6 +207,24 @@
     display: block;
 }
 
+/* --- .in → .show (BS3 used .in to trigger visibility on fade/collapse) --- */
+.fade.in {
+    opacity: 1;
+}
+.collapse.in {
+    display: block;
+}
+
+/* --- Nav tabs: BS3 puts .active on <li>, BS5 expects .nav-link.active on <a> --- */
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+    color: #495057;
+    background-color: #fff;
+    border-color: #dee2e6 #dee2e6 #fff;
+    border-bottom-color: transparent;
+}
+
 /* --- Misc --- */
 .radio, .checkbox {
     position: relative;

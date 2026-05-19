@@ -282,14 +282,14 @@ module.exports = () => {
                     cacheGroups: {
                         vendors: {
                             test: /[\\/]node_modules[\\/]/,
-                            enforce: true, 
+                            enforce: true,
                             priority: -10,
                             reuseExistingChunk: true,
                             filename: 'chunks/vendors.[contenthash].js'
                         },
                         commons: {
                             minChunks: 2,
-                            enforce: true, 
+                            enforce: true,
                             priority: -20,
                             reuseExistingChunk: true,
                             filename: 'chunks/commons.[contenthash].js'
@@ -305,7 +305,7 @@ module.exports = () => {
                 new webpack.DefinePlugin({
                     ARCHES_URLS: webpack.DefinePlugin.runtimeValue(
                         () => fs.readFileSync(
-                            Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, '..', 'frontend_configuration', 'urls.json'), 
+                            Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, '..', 'frontend_configuration', 'urls.json'),
                             'utf-8'
                         ),
                         true  // should be re-evaluated on rebuild
