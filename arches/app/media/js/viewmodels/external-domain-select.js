@@ -1,4 +1,5 @@
 import ko from "knockout";
+import arches from "arches";
 import WidgetViewModel from "viewmodels/widget";
 
 const OPTIONS_CACHE = {};
@@ -22,8 +23,8 @@ const ExternalDomainSelectViewModel = function(params) {
         if (OPTIONS_CACHE[datatype]) {
             self.options(OPTIONS_CACHE[datatype]);
         } else {
-            fetch(`/api/datatypes/${datatype}/options`)
-                .then((r) => r.json())
+            fetch(arches.urls.api_external_domain_options(datatype))
+                .then((response) => response.json())
                 .then((data) => {
                     OPTIONS_CACHE[datatype] = data.options;
                     self.options(data.options);
