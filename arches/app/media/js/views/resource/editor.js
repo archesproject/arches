@@ -247,7 +247,6 @@ var vm = {
                         null,
                         function () { }
                     ));
-                    window.open(arches.urls.resource_editor + data.resourceid, '_blank');
                 },
                 error: function () {
                     vm.alert(new AlertViewModel('ep-alert-red', arches.translations.resourceCopyFailed.title, arches.translations.resourceCopyFailed.text, null, function () { }));
