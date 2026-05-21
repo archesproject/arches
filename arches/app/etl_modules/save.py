@@ -54,9 +54,6 @@ def save_to_tiles(userid, loadid, multiprocessing=False, max_subprocesses=0):
             )
             return error
 
-    # Cursor above is now closed. _post_save_edit_log opens fresh cursors itself —
-    # index_resources_by_transaction can run for many minutes and may close/recycle
-    # the underlying connection, which would invalidate any cursor held across it.
     logger.debug("save_to_tiles proceeding to post-save edit log for loadid=%s", loadid)
     return _post_save_edit_log(
         userid, loadid, multiprocessing, max_subprocesses=max_subprocesses
