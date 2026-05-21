@@ -66,7 +66,6 @@ class ConceptListDataType(concept_types.ConceptListDataType):
 
         cached_value = caches[qs_settings.CONCEPT_CACHE].get(value_id)
         if cached_value is None:
-            print(f"Cache miss for concept value {value_id}")
             cached_value = super().get_value(value_id)
             caches[qs_settings.CONCEPT_CACHE].set(value_id, cached_value)
         return cached_value
