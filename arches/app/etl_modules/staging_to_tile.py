@@ -115,8 +115,7 @@ def staging_to_tile(load_id, max_workers=4):
         ],
         settings.BULK_IMPORT_BATCH_SIZE,
     )
-    # Only nodegroup_to_graph is referenced inside the depth loop below; the rest
-    # of the metadata is finished with the initial-resource creates.
+
     del resource_meta, existing_ids, new_ids, graph_to_lifecycle_state
 
     # Stream full ORM objects one chunk at a time — never holds all records in memory.
