@@ -805,7 +805,7 @@ class TileTree(TileModel, AliasedDataMixin):
             parenttile=parent_tile,
             data={
                 str(node.pk): cls.get_default_value(node)
-                for node in nodegroup.node_set.all()
+                for node in nodegroup.node_set.prefetch_related("cardxnodexwidget_set")
                 if node.datatype != "semantic"
             },
         )

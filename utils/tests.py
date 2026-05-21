@@ -212,6 +212,7 @@ class GraphTestCase(TestCase):
             for nodegroup in nodegroups
         ]
         cards = CardModel.objects.bulk_create(cards)
+        prefetch_related_objects(cls.data_nodes, "nodegroup__cardmodel_set")
 
     @classmethod
     def create_widgets(cls):

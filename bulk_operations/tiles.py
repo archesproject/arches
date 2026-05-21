@@ -601,6 +601,11 @@ class TileTreeOperation:
                     if ":" in error.message:
                         self.parse_required_error(error)
                     raise ValidationError(error.message) from error
+
+                # Since preSave() just ran, now sync vanilla instance fields.
+                for field in field_attnames(upsert_proxy):
+                    setattr(vanilla_instance, field, getattr(upsert_proxy, field))
+
                 (
                     oldprovisionalvalue,
                     newprovisionalvalue,
@@ -631,23 +636,7 @@ class TileTreeOperation:
                 delete_proxy._Tile__preDelete(request=self.request)
 
             if self.to_insert:
-                inserted = sorted(
-                    TileModel.objects.bulk_create(self.to_insert), key=attrgetter("pk")
-                )
-                # Pay the cost of a second TileModel -> Tile transform until refactored.
-                refreshed_insert_proxies = list(
-                    Tile.objects.filter(pk__in=[t.pk for t in inserted]).order_by("pk")
-                )
-                for before, after in zip(
-                    insert_proxies, refreshed_insert_proxies, strict=True
-                ):
-                    after._newprovisionalvalue = before._newprovisionalvalue
-                    after._provisional_edit_log_details = (
-                        before._provisional_edit_log_details
-                    )
-                upsert_proxies = refreshed_insert_proxies + update_proxies
-            else:
-                insert_proxies = Tile.objects.none()
+                TileModel.objects.bulk_create(self.to_insert)
             if self.to_update:
                 TileModel.objects.bulk_update(
                     self.to_update,
@@ -706,26 +695,7 @@ class TileTreeOperation:
     def after_update_all(self):
         for datatype in self.datatype_factory.datatype_instances.values():
             try:
-                if (
-                    datatype.__class__.__name__ == "GeojsonFeatureCollectionDataType"
-                    and self.resourceid
-                ):
-                    nodes_exist_subquery = Node.objects.filter(
-                        nodegroup_id=OuterRef("nodegroup_id"),
-                        datatype="geojson-feature-collection",
-                    )
-                    tiles = (
-                        TileModel.objects.filter(
-                            resourceinstance_id=self.resourceid,
-                        )
-                        .annotate(has_geojson_node=Exists(nodes_exist_subquery))
-                        .filter(has_geojson_node=True)
-                        .all()
-                    )
-                    for tile in tiles:
-                        datatype.after_update_all(tile)
-                else:
-                    datatype.after_update_all()
+                datatype.after_update_all()
             except:
                 # This wide catch can leave the DB in an unusable state, so not only is
                 # this the *last* operation, but durable=True on the transaction.
