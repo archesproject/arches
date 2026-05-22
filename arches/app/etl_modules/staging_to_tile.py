@@ -161,11 +161,11 @@ def staging_to_tile(load_id, max_workers=4):
 
         if inserts:
             logger.debug("Bulk inserting %d tiles at depth %s", len(inserts), depth)
-            for i in range(0, len(inserts), chunk_size):
-                chunk = inserts[i : i + chunk_size]
+            for chunk_start in range(0, len(inserts), chunk_size):
+                chunk = inserts[chunk_start : chunk_start + chunk_size]
                 tile_data_map = {r.tileid: _build_tile_data(r.value) for r in chunk}
-                for r in chunk:
-                    r.value = None
+                for staged_tile in chunk:
+                    staged_tile.value = None
                 TileModel.objects.bulk_create(
                     [
                         TileModel(
@@ -201,8 +201,8 @@ def staging_to_tile(load_id, max_workers=4):
 
         if real_updates:
             logger.debug("Bulk updating %d tiles at depth %s", len(real_updates), depth)
-            for i in range(0, len(real_updates), chunk_size):
-                chunk = real_updates[i : i + chunk_size]
+            for chunk_start in range(0, len(real_updates), chunk_size):
+                chunk = real_updates[chunk_start : chunk_start + chunk_size]
                 chunk_ids = [r.tileid for r in chunk]
                 existing_tiles = {
                     tile.tileid: tile
@@ -210,18 +210,20 @@ def staging_to_tile(load_id, max_workers=4):
                 }
                 tiles_to_update = []
                 chunk_edit_logs = []
-                for r in chunk:
-                    tile = existing_tiles.get(r.tileid)
+                for staged_tile in chunk:
+                    tile = existing_tiles.get(staged_tile.tileid)
                     if not tile:
                         continue
-                    new_data = _build_tile_data(r.value)
-                    r.value = None
+                    new_data = _build_tile_data(staged_tile.value)
+                    staged_tile.value = None
                     chunk_edit_logs.append(
                         EditLog(
-                            resourceclassid=nodegroup_to_graph.get(r.nodegroup_id),
-                            resourceinstanceid=str(r.resourceid),
-                            nodegroupid=str(r.nodegroup_id),
-                            tileinstanceid=str(r.tileid),
+                            resourceclassid=nodegroup_to_graph.get(
+                                staged_tile.nodegroup_id
+                            ),
+                            resourceinstanceid=str(staged_tile.resourceid),
+                            nodegroupid=str(staged_tile.nodegroup_id),
+                            tileinstanceid=str(staged_tile.tileid),
                             edittype="tile edit",
                             newvalue=new_data,
                             oldvalue=tile.data,
@@ -231,7 +233,7 @@ def staging_to_tile(load_id, max_workers=4):
                         )
                     )
                     tile.data = new_data
-                    tile.sortorder = r.sortorder
+                    tile.sortorder = staged_tile.sortorder
                     tiles_to_update.append(tile)
                 TileModel.objects.bulk_update(tiles_to_update, ["data", "sortorder"])
                 EditLog.objects.bulk_create(chunk_edit_logs, batch_size=chunk_size)
