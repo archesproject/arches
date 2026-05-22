@@ -15,6 +15,7 @@ var ResourceEditLogView = BaseManagerView.extend({
 
         var editTypeLookup = {
             'create': {icon: 'fa fa-chevron-circle-right fa-lg', color: 'bg-mint'},
+            'copy': {icon: 'fa fa-copy fa-lg', color: 'bg-info'},
             'tile edit': {icon: 'fa fa-repeat fa-lg', color: 'bg-purple'},
             'tile create': {icon: 'fa fa-plus fa-lg', color: 'bg-dark'},
             'tile delete': {icon: 'fa fa-minus fa-lg', color: 'bg-danger'},

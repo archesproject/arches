@@ -52,6 +52,15 @@
                     <p>{% trans 'Record created by Arches with unique identifer' %}<span class="text-bold" data-bind="text: ' ' + resourceinstanceid"></span></p>
                 </div>
             <!--/ko-->
+            <!--ko if: edittype == 'copy' -->
+                <h4 class="mar-no pad-btm">{% trans 'Resource Record Copied' %}</h4>
+                <div class="eh-node-group">
+                    <p>{% trans 'Record copied by' %} <span class="text-bold" data-bind="text: editor"></span></p>
+                    <!--ko if: note -->
+                    <p data-bind="text: note"></p>
+                    <!--/ko-->
+                </div>
+            <!--/ko-->
             <!--ko if: edittype == 'tile create'-->
                 <!--ko if: cardContainerName -->
                 <h4 class="mar-no pad-btm"><span data-bind="text: cardContainerName + ': ' + card.name + ' '"></span>{% trans 'Created' %}</h4>

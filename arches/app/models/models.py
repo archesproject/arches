@@ -1515,7 +1515,8 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
 
     def get_instance_creator(self) -> int:
         create_record = EditLog.objects.filter(
-            resourceinstanceid=self.resourceinstanceid, edittype="create"
+            resourceinstanceid=self.resourceinstanceid,
+            edittype__in=["create", "copy"],
         ).first()
         creatorid = None
 
