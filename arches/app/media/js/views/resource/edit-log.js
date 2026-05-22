@@ -49,20 +49,21 @@ var ResourceEditLogView = BaseManagerView.extend({
                 return value;
             }
 
-            _.each(value, function(v, k){
-                if (_.isObject(v) && v['features']) {
-                    v = _.map(v['features'], function(feature){return JSON.stringify(feature['geometry'], rounder, 4);});
+            _.each(value, function(val, nodeid){
+                var is_array = _.isArray(val);
+                if (_.isObject(val) && val['features']) {
+                    val = _.map(val['features'], function(feature){return JSON.stringify(feature['geometry'], rounder, 4);});
                 }
-                full_value[k] = {new_value: v};
+                full_value[nodeid] = {new_value: val, is_array: is_array};
                 if (edit.card) {
                     _.each(edit.card.nodes, function(node){
-                        if (k == node.nodeid) {
+                        if (nodeid == node.nodeid) {
                             full_value[node.nodeid].node = node;
                         }
                     }, this);
                 }
             });
-            return _.map(full_value, function(v,k){return v;});   // eslint-disable-line @typescript-eslint/no-unused-vars
+            return _.map(full_value, function(val,nodeid){return val;});   // eslint-disable-line @typescript-eslint/no-unused-vars
         };
 
         _.each(edits, function(edit){
