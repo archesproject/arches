@@ -11,7 +11,7 @@ import time
 from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError, no_translations
 from django.db import DEFAULT_DB_ALIAS, connections
-from django.db.migrations.state import ProjectState
+from django.db.migrations.loader import MigrationLoader
 
 from arches.db.data_migration_registry import (
     DataMigrationRecorder,
@@ -119,7 +119,7 @@ class Command(BaseCommand):
                 self.stdout.write("  No data migrations to apply.")
             return
 
-        state = ProjectState()
+        state = MigrationLoader(connection).project_state()
         with connection.schema_editor() as schema_editor:
             for (app, name, migration), backwards in plan:
                 if backwards:
