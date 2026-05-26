@@ -234,7 +234,7 @@ class Resource(models.ResourceInstance):
         user=None,
         should_update_resource_instance_lifecycle_state=False,
         current_resource_instance_lifecycle_state=None,
-        edit_type="create",
+        edit_type=None,
         **kwargs,
     ):
         """
@@ -261,6 +261,9 @@ class Resource(models.ResourceInstance):
             kwargs = add_to_update_fields(kwargs, "principaluser_id")
 
         note = kwargs.pop("note", "")
+        edit_type = (
+            "create" if self.createdtime is None and not edit_type else edit_type
+        )
 
         super(Resource, self).save(
             context=context,
@@ -277,9 +280,10 @@ class Resource(models.ResourceInstance):
             # Saving tiles at the same time as updating lifecycle state is not supported.
             return
 
-        self.save_edit(
-            user=user, edit_type=edit_type, transaction_id=transaction_id, note=note
-        )
+        if edit_type:
+            self.save_edit(
+                user=user, edit_type=edit_type, transaction_id=transaction_id, note=note
+            )
 
         for tile in self.tiles:
             tile.resourceinstance_id = self.resourceinstanceid
