@@ -397,15 +397,31 @@ class ResourceEditorView(MapBaseManagerView):
             return JSONErrorResponse(delete_error, delete_msg)
 
     def copy(self, request, resourceid=None):
-        resource_instance = Resource.objects.get(pk=resourceid)
-        resource = resource_instance.copy()
-        resource.save(
+        transaction_id = uuid.uuid4()
+        original_resource = Resource.objects.get(pk=resourceid)
+        copied_resource = original_resource.copy()
+        original_resource.save_edit(
+            transaction_id=transaction_id,
+            user=request.user,
+            edit_type="copy",
+            note="Copied to",
+            newvalue={
+                "resourceinstanceid": str(copied_resource.pk),
+                "descriptors": copied_resource.descriptors,
+            },
+        )
+        copied_resource.save(
+            transaction_id=transaction_id,
             request=request,
             user=request.user,
             edit_type="copy",
-            note=f"Copied to {resource.resourceinstanceid}",
+            note="Copied from",
+            newvalue={
+                "resourceinstanceid": str(original_resource.resourceinstanceid),
+                "descriptors": original_resource.descriptors,
+            },
         )
-        return JSONResponse({"resourceid": resource.resourceinstanceid})
+        return JSONResponse({"resourceid": copied_resource.resourceinstanceid})
 
 
 @method_decorator(group_required("Resource Editor"), name="dispatch")
@@ -593,6 +609,7 @@ class ResourceEditLogView(BaseManagerView):
             ).select_related("graph")
             edit_type_lookup = {
                 "create": _("Resource Created"),
+                "copy": _("Resource Copied"),
                 "delete": _("Resource Deleted"),
                 "tile delete": _("Tile Deleted"),
                 "tile create": _("Tile Created"),
@@ -659,6 +676,27 @@ class ResourceEditLogView(BaseManagerView):
                         permitted_edits.append(edit)
                 else:
                     permitted_edits.append(edit)
+
+            # Process copy edits to extract descriptor in requested language
+            language = translation.get_language()
+            for edit in permitted_edits:
+                if edit.edittype == "copy" and edit.newvalue is not None:
+                    if (
+                        "descriptors" in edit.newvalue
+                        and "resourceinstanceid" in edit.newvalue
+                    ):
+                        descriptors = edit.newvalue["descriptors"]
+                        # Try to get descriptor in current language, fall back to first available
+                        if language in descriptors and "name" in descriptors[language]:
+                            edit.newvalue["displayname"] = descriptors[language]["name"]
+                        elif descriptors:
+                            # Get first available language
+                            first_lang = next(iter(descriptors.keys()))
+                            if "name" in descriptors[first_lang]:
+                                edit.newvalue["displayname"] = descriptors[first_lang][
+                                    "name"
+                                ]
+
             resource = Resource.objects.get(pk=resourceid)
             displayname = resource.displayname()
             cards = Card.objects.filter(

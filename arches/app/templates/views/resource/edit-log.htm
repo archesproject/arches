@@ -56,7 +56,13 @@
                 <h4 class="mar-no pad-btm">{% trans 'Resource Copied' %}</h4>
                 <div class="eh-node-group">
                     <p>{% trans 'Resource copied by' %} <span class="text-bold" data-bind="text: editor"></span></p>
-                    <!--ko if: note -->
+                    <!--ko if: copiedResourceUrl -->
+                    <p>
+                        <span data-bind="text: note"></span>
+                        <a data-bind="attr: { href: copiedResourceUrl }, text: newvalue.displayname"></a>
+                    </p>
+                    <!--/ko-->
+                    <!--ko if: !copiedResourceUrl && note -->
                     <p data-bind="text: note"></p>
                     <!--/ko-->
                 </div>

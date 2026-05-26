@@ -2,6 +2,7 @@ import $ from 'jquery';
 import _ from 'underscore';
 import ko from 'knockout';
 import moment from 'moment';
+import arches from 'arches';
 import BaseManagerView from 'views/base-manager';
 import data from 'views/resource/resource-edit-history-data';
 import 'bindings/chosen';
@@ -72,6 +73,9 @@ var ResourceEditLogView = BaseManagerView.extend({
             edit.day = datetime.format('DD MMMM, YYYY');
             edit.editor = edit.user_email != '' ? edit.user_email : edit.user_username;
             edit.edit_type_icon = editTypeLookup[edit.edittype];
+            if (edit.edittype === 'copy' && edit.newvalue && edit.newvalue.resourceinstanceid) {
+                edit.copiedResourceUrl = arches.urls.resource_report + edit.newvalue.resourceinstanceid;
+            }
             if (edit.nodegroupid) {
                 edit.full_new_value = createFullValue(edit.newvalue, edit);
                 edit.full_old_value = createFullValue(edit.oldvalue, edit);

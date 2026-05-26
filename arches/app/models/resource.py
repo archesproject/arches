@@ -261,6 +261,8 @@ class Resource(models.ResourceInstance):
             kwargs = add_to_update_fields(kwargs, "principaluser_id")
 
         note = kwargs.pop("note", "")
+        newvalue = kwargs.pop("newvalue", None)
+        oldvalue = kwargs.pop("oldvalue", None)
         edit_type = (
             "create" if self.createdtime is None and not edit_type else edit_type
         )
@@ -282,7 +284,12 @@ class Resource(models.ResourceInstance):
 
         if edit_type:
             self.save_edit(
-                user=user, edit_type=edit_type, transaction_id=transaction_id, note=note
+                user=user,
+                edit_type=edit_type,
+                transaction_id=transaction_id,
+                note=note,
+                newvalue=newvalue,
+                oldvalue=oldvalue,
             )
 
         for tile in self.tiles:
