@@ -2684,82 +2684,25 @@ class AnnotationDataType(BaseDataType):
         return mapping
 
 
-class LanguageDataType(BaseDataType):
-    def __init__(self, model=None):
-        super(LanguageDataType, self).__init__(model=model)
-        self.language_lookup = {}  # {code or name: Language model}
+class LanguageDataType(BaseExternalDomainDataType):
+    def get_options_queryset(self):
+        return models.Language.objects.all()
 
-    def validate(
-        self,
-        value,
-        row_number=None,
-        source="",
-        node=None,
-        nodeid=None,
-        strict=False,
-        **kwargs,
-    ):
-        errors = []
-        if value is not None:
-            found_language = self.lookup_language(value)
-            if not found_language:
-                message = _(
-                    "The language '{0}' is not a valid language code or name.".format(
-                        value
-                    )
-                )
-                title = _("Invalid Language Datatype")
-                error_message = self.create_error_message(
-                    value, source, row_number, message, title
-                )
-                errors.append(error_message)
-        return errors
+    def get_option_id(self, language):
+        return language.code
 
-    def transform_value_for_tile(self, value, **kwargs):
-        if value is not None:
-            found_language = self.lookup_language(value)
-            if found_language:
-                return found_language.code
-        return None
+    def get_option_display(self, language):
+        return language.name
 
-    # TODO: add RDF export method that uses this value as language tag for literals
-    # likely a tile method
-    # def transform_export_values(self, value, *args, **kwargs):
-    #     return super().transform_export_values(value, *args, **kwargs)
+    def get_lookup_filter(self, value):
+        return Q(code=value) | Q(name=value)
+
+    def get_invalid_message(self, value):
+        message = _(
+            "The language '{0}' is not a valid language code or name.".format(value)
+        )
+        title = _("Invalid Language Datatype")
+        return message, title
 
     def lookup_language(self, value) -> models.Language | None:
-        if type(value) == list and len(value) > 0:
-            value = value[0]  # Arches with i18n may send list of values
-        if not value:
-            return None
-        if value in self.language_lookup:
-            return self.language_lookup[value]
-        language = models.Language.objects.filter(Q(code=value) | Q(name=value)).first()
-        if language:
-            self.language_lookup[language.code] = language
-            self.language_lookup[language.name] = language
-            return language
-        return None
-
-    def get_display_value(self, tile, node, **kwargs):
-        data = self.get_tile_data(tile)
-        if data:
-            language = self.lookup_language(data[str(node.nodeid)])
-            if language:
-                return language.name
-        return ""
-
-    def append_search_filters(self, value, node, query, request):
-        try:
-            operation = value["op"]
-            if operation == "null" or operation == "not_null":
-                self.append_null_search_filters(value, node, query, request)
-            elif value["val"] != "":
-                field = f"tiles.data.{str(node.pk)}"
-                match_query = Term(field=field, term=value["val"])
-                if "!" not in operation:
-                    query.must(match_query)
-                else:
-                    query.must_not(match_query)
-        except KeyError:
-            pass
+        return self.lookup_record(value)
