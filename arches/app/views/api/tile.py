@@ -1,5 +1,5 @@
 import json
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
@@ -97,7 +97,7 @@ class NodeValue(APIBase):
                 )
             if operation == "append":
                 data = datatype.update(tile, data, nodeid, action=operation)
-        except ObjectDoesNotExist:
+        except (ObjectDoesNotExist, ValidationError):
             if (
                 resourceid
                 and models.ResourceInstance.objects.filter(pk=resourceid).exists()

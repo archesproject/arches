@@ -757,31 +757,29 @@ class JsonLdReader(Reader):
                 value = None
                 is_literal = False
 
-            # Here we try and find a possible match between the node_tree and data_tree
-            # we're matching "key" which equals the concatentaion of property and class
-            # at the same level in the trees
-            # Find precomputed possible branches by prop/class combination
+            # Find precomputed possible branches by prop/class combination.
+            # key = concatenation of ontology property and class from the incomming json-ld.
             key = f"{k} {clss}"
             if key in tree_node["datatype"].ignore_keys():
-                # these are handled by the datatype itself
                 continue
-            elif not key in tree_node["children"] and is_literal:
-                # grumble grumble
-                # model has xsd:string, default is rdfs:Literal
-                key = f"{k} http://www.w3.org/2001/XMLSchema#string"
-                if not key in tree_node["children"]:
-                    raise ValueErrorWithNodeInfo(
-                        f"property/class combination does not exist in model: {k} {clss}\nWhile processing: {vi}",
-                        value=value or uri,
-                        datatype=tree_node["datatype_type"],
-                        node_id=tree_node["node_id"],
-                        nodegroup_id=(
-                            None
-                            if tree_node["nodegroup_id"] == "None"
-                            else tree_node["nodegroup_id"]
-                        ),
-                    )
-            elif not key in tree_node["children"]:
+
+            if key not in tree_node["children"] and is_literal:
+                # The graph model may store a different literal type than the data:
+                # model uses xsd:string but data defaults to rdfs:Literal, or a date
+                # was exported as xsd:dateTime instead of rdfs:Literal — see #12716.
+                xsd_string_key = f"{k} http://www.w3.org/2001/XMLSchema#string"
+                rdfs_literal_key = f"{k} http://www.w3.org/2000/01/rdf-schema#Literal"
+                if (
+                    clss == "http://www.w3.org/2001/XMLSchema#dateTime"
+                    and rdfs_literal_key in tree_node["children"]
+                    and tree_node["children"][rdfs_literal_key][0]["datatype_type"]
+                    == "date"
+                ):
+                    key = rdfs_literal_key
+                elif xsd_string_key in tree_node["children"]:
+                    key = xsd_string_key
+
+            if key not in tree_node["children"]:
                 raise ValueErrorWithNodeInfo(
                     f"property/class combination does not exist in model: {k} {clss}\nWhile processing: {vi}",
                     value=value or uri,
@@ -882,6 +880,19 @@ class JsonLdReader(Reader):
                         # This is when the current option doesn't match, but could be
                         # non-ambiguous resource-instance vs semantic node
                         continue
+                elif not is_literal and o["datatype"].is_a_literal_in_rdf():
+                    # Legacy format: a literal datatype was serialized as an entity node
+                    # with the value carried in rdf:value. Extract it and validate.
+                    rdf_value_nodes = vi.get(
+                        "http://www.w3.org/1999/02/22-rdf-syntax-ns#value", []
+                    )
+                    if rdf_value_nodes:
+                        extracted = rdf_value_nodes[0].get("@value")
+                        if (
+                            extracted is not None
+                            and len(o["datatype"].validate_from_rdf(extracted)) == 0
+                        ):
+                            possible.append([o, extracted])
 
             if not possible:
                 # self.printline(f"Tried: {options}")
@@ -1006,10 +1017,7 @@ class JsonLdReader(Reader):
                     k, [vi], tree_node, result, None, indent=0
                 )
 
-                if (
-                    k == "http://www.w3.org/2000/01/rdf-schema#label"
-                    and branches is None
-                ):
+                if branches is None:
                     continue
 
                 x = result.copy()

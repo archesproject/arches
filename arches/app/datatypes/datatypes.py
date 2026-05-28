@@ -931,6 +931,43 @@ class EDTFDataType(BaseDataType):
     def pre_tile_save(self, tile, nodeid):
         tile.data[nodeid] = self.transform_value_for_tile(tile.data[nodeid])
 
+    def is_a_literal_in_rdf(self):
+        return True
+
+    def to_rdf(self, edge_info, edge):
+        g = Graph()
+        if edge_info["range_tile_data"] is not None:
+            g.add((edge_info["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+            g.add(
+                (
+                    edge_info["d_uri"],
+                    URIRef(edge.ontologyproperty),
+                    Literal(edge_info["range_tile_data"]),
+                )
+            )
+        return g
+
+    def from_rdf(self, json_ld_node):
+        # Legacy format: value was encoded as an entity node carrying rdf:value
+        if isinstance(json_ld_node, dict) and "@value" not in json_ld_node:
+            rdf_value_nodes = json_ld_node.get(
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#value", []
+            )
+            if rdf_value_nodes:
+                return rdf_value_nodes[0].get("@value")
+        value = get_value_from_jsonld(json_ld_node)
+        try:
+            return value[0]
+        except (AttributeError, KeyError):
+            pass
+
+    def ignore_keys(self):
+        # Prevents errors when the importer recurses into a legacy entity node and
+        # encounters the rdf:value property that EDTF now handles itself.
+        return [
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#value http://www.w3.org/2000/01/rdf-schema#Literal"
+        ]
+
     def validate(
         self,
         value,
@@ -1174,7 +1211,7 @@ class FileListDataType(BaseDataType):
                                 ).format(metadata["name"]),
                             }
                         )
-                files = self._get_files_from_request(request, node.nodeid)
+                files = self._get_files_from_request(request, str(node.nodeid))
                 for file in files:
                     width, height = get_image_dimensions(file.file)
                     if not width or not height:

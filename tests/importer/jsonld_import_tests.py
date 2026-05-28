@@ -18,7 +18,10 @@ from arches.app.utils.data_management.resource_graphs.importer import (
     import_graph as ResourceGraphImporter,
 )
 from arches.app.utils.data_management.resources.formats import rdffile
-from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
+from arches.app.utils.data_management.resources.formats.rdffile import (
+    JsonLdReader,
+    JsonLdWriter,
+)
 from pyld.jsonld import expand
 
 # these tests can be run from the command line via
@@ -91,6 +94,13 @@ class JsonLDImportTests(ArchesTestCase):
         ) as f:
             archesfile2 = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile2["graph"])
+
+        with open(
+            os.path.join("tests/fixtures/jsonld_base/models/date_literal_test.json"),
+            "r",
+        ) as f:
+            archesfile = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile["graph"])
 
         skos = SKOSReader()
         rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/5098-thesaurus.xml")
@@ -180,10 +190,17 @@ class JsonLDImportTests(ArchesTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
+        with open(
+            os.path.join("tests/fixtures/jsonld_base/models/edtf_test.json"), "r"
+        ) as f:
+            archesfile = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile["graph"])
+
         for graph_id in [
             "bf734b4e-f6b5-11e9-8f09-a4d18cec433a",
             "f13f8a92-3e76-11ec-9a49-faffc210b420",
             "37b50648-78ef-11ec-9508-faffc210b420",
+            "a1b2c3d4-3df2-11f1-89bf-acde48001122",
         ]:
             graph = Graph.objects.get(pk=graph_id)
 
@@ -1942,3 +1959,106 @@ class JsonLDImportTests(ArchesTestCase):
                 "ddb04a66-c163-11ea-8354-3af9d3b32b71"
             ]
             self.assertEqual(datetime_value[-6:], "-09:00")
+
+    def test_date_node_literal_ontologyclass(self):
+        """A date node whose ontologyclass is rdfs:Literal should accept a typed xsd:dateTime literal."""
+        data = """{
+            "@id": "http://localhost:8000/resources/a91fae7b-b3d7-4d77-b4ae-17fd4250d3ae",
+            "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation",
+            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": {
+                "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+                "@value": "2026-05-06"
+            }
+        }"""
+
+        graph_id = "5d38d494-4b27-11f1-9249-acde48001122"
+        resource_id = "a91fae7b-b3d7-4d77-b4ae-17fd4250d3ae"
+        date_node_id = "5d38db88-4b27-11f1-9249-acde48001122"
+
+        data = JSONDeserializer().deserialize(data)
+        reader = JsonLdReader()
+        reader.read_resource(data, resourceid=resource_id, graphid=graph_id)
+        for resource in reader.resources:
+            resource.save(request=None)
+            date_value = resource.tiles[0].data[date_node_id]
+            self.assertIsNotNone(date_value)
+            self.assertTrue(date_value.startswith("2026-05-06"))
+
+    # -------------------------------------------------------------------------
+    # EDTF import/export tests
+    # -------------------------------------------------------------------------
+    EDTF_GRAPH_ID = "a1b2c3d4-3df2-11f1-89bf-acde48001122"
+    EDTF_NODE_ID = "a1b2c3d6-3df2-11f1-89bf-acde48001122"
+    EDTF_ROOT_TYPE = "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object"
+    EDTF_PROP = "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
+    EDTF_VALUE = "1965/1999"
+
+    def _import_edtf(self, data, resource_id):
+        reader = JsonLdReader()
+        reader.read_resource(
+            JSONDeserializer().deserialize(data),
+            resourceid=resource_id,
+            graphid=self.EDTF_GRAPH_ID,
+        )
+        for resource in reader.resources:
+            resource.save(request=None)
+        return reader.resources
+
+    def test_edtf_import_new_format(self):
+        """Literal string format produced by the fixed EDTFDataType.to_rdf()."""
+        resource_id = "b1b2c3d4-3df2-11f1-89bf-acde48001122"
+        data = f"""{{
+            "@id": "http://localhost:8000/resources/{resource_id}",
+            "@type": "{self.EDTF_ROOT_TYPE}",
+            "{self.EDTF_PROP}": "{self.EDTF_VALUE}"
+        }}"""
+        resources = self._import_edtf(data, resource_id)
+        self.assertEqual(len(resources), 1)
+        tile_data = resources[0].tiles[0].data
+        self.assertEqual(tile_data[self.EDTF_NODE_ID], self.EDTF_VALUE)
+
+    def test_edtf_import_legacy_format(self):
+        """Entity-node format emitted by the old base-class to_rdf() implementation."""
+        resource_id = "c1b2c3d4-3df2-11f1-89bf-acde48001122"
+        tile_id = "96171266-93bf-4ed2-a8aa-903d3462c7d6"
+        data = f"""{{
+            "@id": "http://localhost:8000/resources/{resource_id}",
+            "@type": "{self.EDTF_ROOT_TYPE}",
+            "{self.EDTF_PROP}": {{
+                "@id": "http://localhost:8000/tile/{tile_id}/node/{self.EDTF_NODE_ID}",
+                "@type": "http://www.w3.org/2000/01/rdf-schema#Literal",
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": "{self.EDTF_VALUE}"
+            }}
+        }}"""
+        resources = self._import_edtf(data, resource_id)
+        self.assertEqual(len(resources), 1)
+        tile_data = resources[0].tiles[0].data
+        self.assertEqual(tile_data[self.EDTF_NODE_ID], self.EDTF_VALUE)
+
+    def test_edtf_export_produces_literal(self):
+        """Round-trip: import then export; the exported JSON-LD must use a plain
+        literal rather than the legacy entity-node encoding."""
+        resource_id = "d1b2c3d4-3df2-11f1-89bf-acde48001122"
+        data = f"""{{
+            "@id": "http://localhost:8000/resources/{resource_id}",
+            "@type": "{self.EDTF_ROOT_TYPE}",
+            "{self.EDTF_PROP}": "{self.EDTF_VALUE}"
+        }}"""
+        self._import_edtf(data, resource_id)
+
+        writer = JsonLdWriter()
+        js = writer.build_json(
+            graph_id=self.EDTF_GRAPH_ID,
+            resourceinstanceids=[resource_id],
+        )
+
+        self.assertIn(self.EDTF_PROP, js)
+        prop_value = js[self.EDTF_PROP]
+
+        # The value must be the bare EDTF string (or a {"@value": ...} dict),
+        # not a legacy entity node that has its own @id and nested rdf:value.
+        if isinstance(prop_value, dict):
+            self.assertEqual(prop_value.get("@value"), self.EDTF_VALUE)
+            self.assertNotIn("@id", prop_value)
+        else:
+            self.assertEqual(prop_value, self.EDTF_VALUE)
