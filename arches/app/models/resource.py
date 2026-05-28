@@ -263,6 +263,11 @@ class Resource(models.ResourceInstance):
             self.principaluser_id = user.id
             kwargs = add_to_update_fields(kwargs, "principaluser_id")
 
+        # set edit_log_type as create before base model instance is saved
+        edit_log_type = (
+            "create" if self._state.adding and not edit_log_type else edit_log_type
+        )
+
         super(Resource, self).save(
             context=context,
             index=index,
