@@ -233,6 +233,8 @@ class ImportSingleCsv(BaseImportModule):
         if csv_mapping and type(csv_mapping) == str:
             csv_mapping = json.loads(csv_mapping)
         csv_file_name = request.POST.get("csvFileName")
+        multiprocessing = request.POST.get("multiprocessing", False)
+        max_subprocesses = int(request.POST.get("max_subprocesses", 0) or 0)
         column_names = [fieldname for fieldname in fieldnames if fieldname != ""]
         id_label = "resourceid"
 
@@ -266,6 +268,8 @@ class ImportSingleCsv(BaseImportModule):
                 csv_mapping,
                 csv_file_name,
                 id_label,
+                multiprocessing,
+                max_subprocesses,
             )
 
         return response
@@ -280,6 +284,8 @@ class ImportSingleCsv(BaseImportModule):
         csv_mapping,
         csv_file_name,
         id_label,
+        multiprocessing=False,
+        max_subprocesses=0,
     ):
 
         self.populate_staging_table(
@@ -300,7 +306,7 @@ class ImportSingleCsv(BaseImportModule):
                     ("validated", loadid),
                 )
             self.loadid = loadid  # currently redundant, but be certain
-            response = save_to_tiles(userid, loadid)
+            response = save_to_tiles(userid, loadid, multiprocessing, max_subprocesses)
             with connection.cursor() as cursor:
                 cursor.execute(
                     """CALL __arches_update_resource_x_resource_with_graphids();"""
