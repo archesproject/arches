@@ -332,7 +332,9 @@ class JSONLDImporter(BaseImportModule):
         # Do this later, after any prior resources have been deleted.
         return None
 
-    def save_to_tiles(self, cursor, userid, loadid, multiprocessing=False):
+    def save_to_tiles(
+        self, cursor, userid, loadid, multiprocessing=False, max_subprocesses=0
+    ):
         error_saving_tiles = None
         error_response = {
             "status": 400,
@@ -369,7 +371,7 @@ class JSONLDImporter(BaseImportModule):
         finally:
             reenable_tile_triggers(cursor, loadid)
 
-        return _post_save_edit_log(userid, loadid)
+        return _post_save_edit_log(userid, loadid, multiprocessing, max_subprocesses)
 
     @load_data_async
     def run_load_task_async(self, request):
