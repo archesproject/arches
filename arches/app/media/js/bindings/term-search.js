@@ -48,7 +48,7 @@ ko.bindingHandlers.termSearch = {
             ajax: {
                 url: arches.urls.search_terms,
                 dataType: 'json',
-                quietMillis: 500,
+                delay: 500,
                 data: function(requestParams) {
                     let term = requestParams.term || '';
                     return {

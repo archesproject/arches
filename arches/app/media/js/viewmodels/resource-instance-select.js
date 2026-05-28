@@ -396,7 +396,7 @@ var ResourceInstanceSelectViewModel = function(params) {
                 return self.url();
             },
             dataType: 'json',
-            quietMillis: 250,
+            delay: 250,
             data: function(requestParams) {
                 let term = requestParams.term || '';
                 let page = requestParams.page || 1;

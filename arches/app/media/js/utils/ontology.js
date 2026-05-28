@@ -37,7 +37,7 @@ const ontologyUtils = {
                     return data;
                 },
                 dataType: 'json',
-                quietMillis: 250,
+                delay: 250,
                 processResults: function(data, params) {
                     let ret = data;
                     if (!!params.term && params.term !== "") {
