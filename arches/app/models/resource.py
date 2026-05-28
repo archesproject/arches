@@ -243,6 +243,8 @@ class Resource(models.ResourceInstance):
         """
         Saves and indexes a single resource
 
+        edit_log_ args (type, note, newvalue, oldvalue) are passed through to the save_edit method
+
         Keyword Arguments:
         request -- the request object
         user -- the user to associate the edit with if the user can't be derived from the request
