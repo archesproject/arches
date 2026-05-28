@@ -680,22 +680,23 @@ class ResourceEditLogView(BaseManagerView):
             # Process copy edits to extract descriptor in requested language
             language = translation.get_language()
             for edit in permitted_edits:
-                if edit.edittype == "copy" and edit.newvalue is not None:
-                    if (
-                        "descriptors" in edit.newvalue
-                        and "resourceinstanceid" in edit.newvalue
-                    ):
-                        descriptors = edit.newvalue["descriptors"]
-                        # Try to get descriptor in current language, fall back to first available
-                        if language in descriptors and "name" in descriptors[language]:
-                            edit.newvalue["displayname"] = descriptors[language]["name"]
-                        elif descriptors:
-                            # Get first available language
-                            first_lang = next(iter(descriptors.keys()))
-                            if "name" in descriptors[first_lang]:
-                                edit.newvalue["displayname"] = descriptors[first_lang][
-                                    "name"
-                                ]
+                if (
+                    edit.edittype == "copy"
+                    and edit.newvalue is not None
+                    and "descriptors" in edit.newvalue
+                    and "resourceinstanceid" in edit.newvalue
+                ):
+                    descriptors = edit.newvalue["descriptors"]
+                    # Try to get descriptor in current language, fall back to first available
+                    if language in descriptors and "name" in descriptors[language]:
+                        edit.newvalue["displayname"] = descriptors[language]["name"]
+                    elif descriptors:
+                        # Get first available language
+                        first_lang = next(iter(descriptors.keys()))
+                        if "name" in descriptors[first_lang]:
+                            edit.newvalue["displayname"] = descriptors[first_lang][
+                                "name"
+                            ]
 
             resource = Resource.objects.get(pk=resourceid)
             displayname = resource.displayname()
