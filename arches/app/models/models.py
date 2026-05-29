@@ -40,7 +40,6 @@ from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
 from django.conf import settings
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -2636,11 +2635,6 @@ class LoadStaging(models.Model):
         managed = True
         db_table = "load_staging"
         indexes = [
-            # Speeds up the per-row correlated subquery in
-            # __arches_check_tile_cardinality_violation_for_load, which
-            # correlates on (resourceid, nodegroupid). Without it the cardinality
-            # check falls back to the nodegroupid-only index and scans thousands
-            # of rows per staged row, making large loads O(n^2).
             models.Index(fields=["resourceid", "nodegroup"]),
         ]
 

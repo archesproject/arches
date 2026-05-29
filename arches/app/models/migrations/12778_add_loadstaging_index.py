@@ -7,18 +7,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '12587_move_default_value_to_node_config'),
+        ("models", "12587_move_default_value_to_node_config"),
     ]
 
     operations = [
-        django_migrate_sql.operations.AlterSQL(
-            name='__arches_get_nodevalue_label',
-            sql="\nDROP FUNCTION IF EXISTS public.__arches_get_nodevalue_label(jsonb, uuid, text);\n\nCREATE OR REPLACE FUNCTION public.__arches_get_nodevalue_label(\n    node_value uuid,\n    in_nodeid uuid,\n    language_id text DEFAULT 'en')\n    RETURNS text\n    LANGUAGE 'plpgsql'\n    COST 100\n    VOLATILE PARALLEL UNSAFE\nAS $BODY$\n    declare\n        return_label         text := '';\n        nodevalue_tileid     text;\n        value_nodeid         uuid;\n    begin\n\n        if node_value is null or in_nodeid is null then\n            return '';\n        end if;\n\n        select n.config ->> 'nodeid'\n        into value_nodeid\n        from nodes n\n        where n.nodeid = in_nodeid;\n\n        select __arches_get_node_display_value(t.tiledata, value_nodeid, language_id)\n        into return_label\n        from tiles t\n        where t.tileid = node_value;\n        \n        if return_label is null then\n            return_label := '';\n        end if;\n        \n    return return_label;\n    end;                \n$BODY$;\n",
-            reverse_sql="\nDROP FUNCTION IF EXISTS public.__arches_get_nodevalue_label(jsonb, uuid, text);\n\nCREATE OR REPLACE FUNCTION public.__arches_get_nodevalue_label(\n    node_value uuid,\n    in_nodeid uuid,\n    language_id text DEFAULT 'en')\n    RETURNS text\n    LANGUAGE 'plpgsql'\n    COST 100\n    VOLATILE PARALLEL UNSAFE\nAS $BODY$\n    declare\n        return_label         text := '';\n        nodevalue_tileid     text;\n        value_nodeid         uuid;\n    begin\n\n        if node_value is null or in_nodeid is null then\n            return '';\n        end if;\n\n        select n.config ->> 'nodeid'\n        into value_nodeid\n        from nodes n\n        where n.nodeid = in_nodeid;\n\n        select __arches_get_node_display_value(t.tiledata, value_nodeid, language_id)\n        into return_label\n        from tiles t\n        where t.tileid = node_value;\n\n        if return_label is null then\n            return_label := '';\n        end if;\n\n    return return_label;\n    end;                \n$BODY$;\n",
-            state_reverse_sql='drop function __arches_get_nodevalue_label;',
-        ),
         migrations.AddIndex(
-            model_name='loadstaging',
-            index=models.Index(fields=['resourceid', 'nodegroup'], name='load_stagin_resourc_72c547_idx'),
+            model_name="loadstaging",
+            index=models.Index(
+                fields=["resourceid", "nodegroup"],
+                name="load_stagin_resourc_72c547_idx",
+            ),
         ),
     ]
