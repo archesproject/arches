@@ -268,11 +268,17 @@ class BaseImportModule:
                     self.save_to_tiles(
                         cursor, userid, loadid, multiprocessing, max_subprocesses
                     )
-                    cursor.execute(
-                        """CALL __arches_update_resource_x_resource_with_graphids();"""
-                    )
-                    cursor.execute("""SELECT __arches_refresh_spatial_views();""")
-                    refresh_successful = cursor.fetchone()[0]
+                    # Multiprocessed indexing calls connections.close_all(), which
+                    # invalidates the cursor opened above. Re-acquire one (Django
+                    # reconnects lazily) for the post-index refresh.
+                    with connection.cursor() as post_index_cursor:
+                        post_index_cursor.execute(
+                            """CALL __arches_update_resource_x_resource_with_graphids();"""
+                        )
+                        post_index_cursor.execute(
+                            """SELECT __arches_refresh_spatial_views();"""
+                        )
+                        refresh_successful = post_index_cursor.fetchone()[0]
                     if not refresh_successful:
                         raise Exception("Unable to refresh spatial views")
                 else:
