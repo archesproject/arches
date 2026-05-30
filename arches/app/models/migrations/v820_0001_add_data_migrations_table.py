@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "12587_move_default_value_to_node_config"),
+        ("models", "12778_add_loadstaging_index"),
     ]
 
     operations = [
