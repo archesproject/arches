@@ -38,10 +38,6 @@ class UpdateGraphFromJSON(ArchesDataMigration):
         )
         publication.save()
 
-        previous_graph.restore_state_from_serialized_graph(
-            system_default_language_localized_graph_data
-        )
-
         for language_tuple in settings.LANGUAGES:
             published_graph = models.PublishedGraph.objects.create(
                 publication=publication,
@@ -51,6 +47,10 @@ class UpdateGraphFromJSON(ArchesDataMigration):
                 language=models.Language.objects.get(code=language_tuple[0]),
             )
             published_graph.save()
+
+        previous_graph.restore_state_from_serialized_graph(
+            system_default_language_localized_graph_data
+        )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         with open(self.json_path, "r") as f:
