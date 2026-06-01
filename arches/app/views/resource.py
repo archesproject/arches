@@ -414,9 +414,9 @@ class ResourceEditorView(MapBaseManagerView):
             transaction_id=transaction_id,
             request=request,
             user=request.user,
-            edit_type="copy",
-            note="Copied from",
-            newvalue={
+            edit_log_type="copy",
+            edit_log_note="Copied from",
+            edit_log_newvalue={
                 "resourceinstanceid": str(original_resource.resourceinstanceid),
                 "descriptors": original_resource.descriptors,
             },
