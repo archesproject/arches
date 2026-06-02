@@ -323,7 +323,7 @@ class JsonLdWriter(RdfWriter):
             graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs
         )
         g = self.get_rdf_graph()
-        value = g.serialize(format="nquads").decode("utf-8")
+        value = g.serialize(format="nquads")
 
         js = from_rdf(value, {"format": "application/nquads", "useNativeTypes": True})
 
