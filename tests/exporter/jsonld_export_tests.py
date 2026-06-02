@@ -207,9 +207,9 @@ class JsonLDExportTests(ArchesTestCase):
         dt = ts["http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin"]
         self.assertTrue(type(dt) == dict)
         self.assertTrue("@value" in dt)
-        self.assertTrue(dt["@value"] == "2019-10-01T00:00:00")
+        self.assertTrue(dt["@value"] == "2019-10-01")
         self.assertTrue("@type" in dt)
-        self.assertTrue(dt["@type"] == "http://www.w3.org/2001/XMLSchema#dateTime")
+        self.assertTrue(dt["@type"] == "http://www.w3.org/2001/XMLSchema#date")
         # Test domain data type
         self.assertTrue(
             "http://www.cidoc-crm.org/cidoc-crm/P79_beginning_is_qualified_by" in ts
@@ -724,4 +724,4 @@ class JsonLDExportTests(ArchesTestCase):
             tsdata = conts[0][ts]
 
         botb = "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin"
-        self.assertTrue(tsdata[botb]["@value"] == "2019-11-01T00:00:00")
+        self.assertTrue(tsdata[botb]["@value"] == "2019-11-01")
