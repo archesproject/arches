@@ -656,7 +656,9 @@ class JsonLDImportTests(ArchesTestCase):
             if qual in t:
                 self.assertTrue(t[qual]["@value"] in ["example", "example 2"])
             if botb in t:
-                self.assertTrue(t[botb]["@value"] in ["2019-11-15", "1903-10-28"])
+                self.assertTrue(
+                    t[botb]["@value"] in ["2019-11-15T00:00:00", "1903-10-28T00:00:00"]
+                )
 
     def test_3_5098_concepts(self):
         data = """
@@ -1221,7 +1223,7 @@ class JsonLDImportTests(ArchesTestCase):
             # print(f"note data: {contl[1]}")
             self.assertTrue(contl[1][note]["@value"] == "Import Note")
             jsts = contl[0][ts]
-        self.assertTrue(jsts[botb]["@value"] == "2018-01-01")
+        self.assertTrue(jsts[botb]["@value"] == "2018-01-01T00:00:00")
 
     def test_b_5600_concept_label(self):
 
