@@ -85,7 +85,6 @@ class Command(BaseCommand):
                 "Provide either two publication IDs as positional arguments, "
                 "or a graph slug via --slug."
             )
-
         graph_a = self._get_serialized_graph(pub_a.publicationid, lang)
         graph_b = self._get_serialized_graph(pub_b.publicationid, lang)
 
@@ -234,6 +233,8 @@ class Command(BaseCommand):
             pub = PublishedGraph.objects.get(
                 publication_id=publication_id, language_id=language
             )
+            if "publication_id" not in pub.serialized_graph.keys():
+                pub.serialized_graph["publication_id"] = publication_id
         except PublishedGraph.DoesNotExist:
             raise CommandError(
                 f"No PublishedGraph found for publicationid={publication_id!r} "
@@ -271,12 +272,13 @@ class GraphPublicationComparator:
 
     def check_is_new_graph(self) -> bool:
         ops = []
-        graph_a_pub_time = GraphXPublishedGraph.objects.get(
-            publicationid=self.graph_a.get("publication_id"),
-        ).published_time
         is_new_graph = not GraphXPublishedGraph.objects.filter(
             graph_id=self.graph_a.get("graphid"),
-            published_time__lt=graph_a_pub_time,
+        ).exclude(
+            publicationid__in=[
+                self.graph_a.get("publication_id"),
+                self.graph_b.get("publication_id"),
+            ]
         ).exists()
 
         if is_new_graph:
@@ -294,7 +296,6 @@ class GraphPublicationComparator:
     def check_nodes_created_or_deleted(self) -> list[dict]:
         ops = []
         ids_a, ids_b = set(self.nodes_a), set(self.nodes_b)
-
         for nodeid in sorted(ids_b - ids_a):
             n = self.nodes_b[nodeid]
             nodegroup_id = n.get("nodegroup_id")
@@ -546,7 +547,7 @@ class MigrationWriter:
         return dep_lines
 
     def _collect_imports(self) -> list[str]:
-        needed = {"UpdateResourceInstancesPublicationId"}
+        needed = {"UpdateResourceInstancesPublicationId", "UpdateGraphFromJSON"}
         for op in self.operations:
             if op["op"] == "CreateGraph":
                 needed.add("CreateGraph")
@@ -560,8 +561,19 @@ class MigrationWriter:
         rendered = []
         for op in self.operations:
             rendered.append(self._render_op(op))
+        rendered.append(self._render_update_graph_from_json_op())
         rendered.append(self._render_update_publication_op())
         return "\n".join(rendered)
+
+    def _render_update_graph_from_json_op(self) -> str:
+        pub_a_id = str(self.pub_a.publicationid)
+        pub_b_id = str(self.pub_b.publicationid)
+        return (
+            f"        UpdateGraphFromJSON(\n"
+            f"            current_publicationid={pub_b_id!r},\n"
+            f"            previous_publicationid={pub_a_id!r},\n"
+            f"        ),"
+        )
 
     def _render_op(self, op: dict) -> str:
         pub_a_id = str(self.pub_a.publicationid)
