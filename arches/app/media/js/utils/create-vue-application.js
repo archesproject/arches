@@ -8,6 +8,7 @@ import ToastService from 'primevue/toastservice';
 import Tooltip from 'primevue/tooltip';
 
 import { createApp } from 'vue';
+import { createPinia } from 'pinia';
 import { createGettext } from "vue3-gettext";
 
 import { DEFAULT_THEME } from "@/arches/themes/default.ts";
@@ -46,6 +47,8 @@ export default async function createVueApplication(
             silent: true,
         });
 
+        const pinia = createPinia();
+
         const app = createApp(vueComponent, initialProps);
         const darkModeClass = themeConfiguration.theme.options.darkModeSelector.substring(1);
         const darkModeStorageKey = `arches.${darkModeClass}`;
@@ -61,6 +64,7 @@ export default async function createVueApplication(
 
         app.use(PrimeVue, themeConfiguration);
         app.use(gettext);
+        app.use(pinia);
         app.use(ConfirmationService);
         app.use(DialogService);
         app.use(ToastService);
