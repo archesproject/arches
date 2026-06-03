@@ -137,9 +137,9 @@ class SKOSReader(SKOSReader):
                         object_language = (
                             allowed_languages[object.language] or default_lang
                         )
-                        relation_or_value_type = predicate.replace(SKOS, "").replace(
-                            ARCHES, ""
-                        )
+                        relation_or_value_type = predicate.replace(
+                            str(SKOS), ""
+                        ).replace(str(ARCHES), "")
                         list_item_value = ListItemValue(
                             list_item=list_item,
                             valuetype=skos_value_types.get(relation_or_value_type),
@@ -290,7 +290,11 @@ class SKOSWriter(SKOSWriter):
 
             for value in lst_item.list_item_values.all():
                 valuetype = value.valuetype.valuetype
-                predicate = SKOS[valuetype] or ARCHES[valuetype]
+                predicate = (
+                    SKOS[valuetype]
+                    if value.valuetype.namespace == "skos"
+                    else ARCHES[valuetype]
+                )
                 if value.language:
                     rdf_graph.add(
                         (

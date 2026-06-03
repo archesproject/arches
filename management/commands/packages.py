@@ -343,7 +343,9 @@ class Command(PackagesCommand):
         )
 
         if data_dest != "" and data_dest != ".":
-            with open(os.path.join(data_dest, f"{file_name}.xml"), "wb") as file:
+            with open(
+                os.path.join(data_dest, f"{file_name}.xml"), "w", encoding="utf-8"
+            ) as file:
                 file.write(skos_file)
             self.stdout.write(f"Data exported successfully to {file_name}.xml")
 
