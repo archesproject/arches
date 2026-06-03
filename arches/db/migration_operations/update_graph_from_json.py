@@ -12,22 +12,27 @@ class UpdateGraphFromJSON(ArchesDataMigration):
     reduces_to_sql = False
     reversible = True
 
-    def __init__(self, json_path):
+    def __init__(self, json_path=None, current_publicationid=None, previous_publicationid=None):
         self.json_path = json_path
+        self.current_publicationid = current_publicationid
+        self.previous_publicationid = previous_publicationid
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        if self.json_path is None:
+            return
+
         with open(self.json_path, "r") as f:
             data = json.load(f)
 
         graph_data = data["graph"][0]
-        previous_graph = Graph.objects.get(pk=graph_data["graphid"])
+        forward_graph = Graph.objects.get(pk=graph_data["graphid"])
 
         system_default_language_localized_graph_data = self.localize_json(
             copy.deepcopy(graph_data), settings.LANGUAGE_CODE
         )
 
         publication = models.GraphXPublishedGraph.objects.create(
-            graph=previous_graph,
+            graph=forward_graph,
             notes=system_default_language_localized_graph_data["publication"]["notes"],
             published_time=system_default_language_localized_graph_data["publication"][
                 "published_time"
@@ -48,36 +53,41 @@ class UpdateGraphFromJSON(ArchesDataMigration):
             )
             published_graph.save()
 
-        previous_graph.restore_state_from_serialized_graph(
+        forward_graph.restore_state_from_serialized_graph(
             system_default_language_localized_graph_data
         )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        with open(self.json_path, "r") as f:
-            data = json.load(f)
+        if self.current_publicationid is not None:
+            current_publication_id = self.current_publicationid
+        else:
+            with open(self.json_path, "r") as f:
+                data = json.load(f)
+            current_publication_id = data["graph"][0]["publication"]["publicationid"]
 
-        graph_data = data["graph"][0]
-        current_publication_id = graph_data["publication"]["publicationid"]
-        current_graph = Graph.objects.get(pk=graph_data["graphid"])
+        if self.previous_publicationid is None:
+            raise ValueError(
+                "previous_publicationid must be provided to reverse this migration."
+            )
 
-        previous_publication = (
-            models.GraphXPublishedGraph.objects.filter(graph=current_graph)
-            .exclude(publicationid=current_publication_id)
-            .order_by("-published_time")
-            .first()
-        )
+        if models.GraphXPublishedGraph.objects.filter(
+            publicationid=self.previous_publicationid
+        ).exists():
+            previous_publication = models.GraphXPublishedGraph.objects.get(
+                publicationid=self.previous_publicationid
+            )
+        
+            published_graph = models.PublishedGraph.objects.get(
+                publication=previous_publication,
+                language=settings.LANGUAGE_CODE,
+            )
 
-        published_graph = models.PublishedGraph.objects.get(
-            publication=previous_publication,
-            language=settings.LANGUAGE_CODE,
-        )
-
-        previous_graph = Graph.objects.get(
-            pk=published_graph.serialized_graph["graphid"]
-        )
-        previous_graph.restore_state_from_serialized_graph(
-            published_graph.serialized_graph
-        )
+            previous_graph = Graph.objects.get(
+                pk=published_graph.serialized_graph["graphid"]
+            )
+            previous_graph.restore_state_from_serialized_graph(
+                published_graph.serialized_graph
+            )
 
         models.GraphXPublishedGraph.objects.get(
             publicationid=current_publication_id
