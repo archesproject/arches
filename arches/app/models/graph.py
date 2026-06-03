@@ -2660,9 +2660,10 @@ class Graph(models.GraphModel):
 
         # update graph data
         serialized_draft_graph["graphid"] = serialized_source_graph["graphid"]
-        serialized_draft_graph["resource_instance_lifecycle_id"] = (
-            serialized_source_graph["resource_instance_lifecycle_id"]
-        )
+        if "resource_instance_lifecycle_id" in serialized_source_graph.keys():
+            serialized_draft_graph["resource_instance_lifecycle_id"] = (
+                serialized_source_graph["resource_instance_lifecycle_id"]
+            )
         serialized_draft_graph["source_identifier_id"] = None
 
         # update permissions
