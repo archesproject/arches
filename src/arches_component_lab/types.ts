@@ -30,6 +30,12 @@ export interface Node {
     };
 }
 
+export interface NodeGroup {
+    nodegroupid: string;
+    parentnodegroup_id: string | null;
+    cardinality: string;
+}
+
 export interface Card {
     name: string;
     sortorder: number;
