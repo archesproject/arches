@@ -16,7 +16,7 @@ from arches.app.models.models import (
     Value,
     Widget,
 )
-from arches_controlled_lists.models import List, ListItem
+from arches_controlled_lists.models import List, ListItem, ListItemValue
 
 
 class Command(BaseCommand):
@@ -35,6 +35,7 @@ class Command(BaseCommand):
             choices=[
                 "migrate_collections_to_controlled_lists",
                 "migrate_concept_nodes_to_reference_datatype",
+                "migrate_domain_nodes_to_controlled_lists",
                 "change_url_base",
             ],
             help="The operation to perform",
@@ -94,6 +95,15 @@ class Command(BaseCommand):
             help="The graphid or slug which associated concept nodes will be migrated to use the reference datatype",
         )
 
+        parser.add_argument(
+            "-n",
+            "--node-aliases",
+            action="store",
+            dest="node_aliases",
+            nargs="+",
+            help="One or more node aliases to migrate. If omitted, all domain/domain-list nodes in the graph are migrated.",
+        )
+
     def handle(self, *args, **options):
         if options["operation"] == "migrate_collections_to_controlled_lists":
             psl = options["preferred_sort_language"]
@@ -124,6 +134,16 @@ class Command(BaseCommand):
             if not graph or graph is None:
                 raise CommandError("Please provide a graph id or slug")
             self.migrate_concept_nodes_to_reference_datatype(graph)
+        elif options["operation"] == "migrate_domain_nodes_to_controlled_lists":
+            graph = options["graph"]
+            if not graph:
+                raise CommandError("Please provide a graph id or slug with -g/--graph")
+            self.migrate_domain_nodes_to_controlled_lists(
+                graph=graph,
+                node_aliases=options.get("node_aliases") or [],
+                overwrite=options["overwrite"],
+                host=options["host"],
+            )
         elif options["operation"] == "change_url_base":
             if not options["host"] or options["host"] is None:
                 raise CommandError("Please provide a target host")
@@ -211,6 +231,149 @@ class Command(BaseCommand):
             )
             result = cursor.fetchone()
             self.stdout.write(result[0])
+
+    def migrate_domain_nodes_to_controlled_lists(
+        self, graph, node_aliases, overwrite, host
+    ):
+        """
+        Creates a controlled list for each domain/domain-list node in the given graph,
+        using the node alias as the list name and the domain option id as the list item id.
+        URIs are minted as <host>/<option-id>.
+
+        Example usage:
+            python manage.py controlled_lists
+                -o migrate_domain_nodes_to_controlled_lists
+                -g <graphid-or-slug>
+                -ho http://localhost:8000/plugins/controlled-list-manager/item/
+
+            python manage.py controlled_lists
+                -o migrate_domain_nodes_to_controlled_lists
+                -g <graphid-or-slug>
+                -n <node-alias-1> <node-alias-2>
+                -ho http://localhost:8000/plugins/controlled-list-manager/item/
+                --overwrite
+        """
+        try:
+            UUID(graph)
+            graph_query = models.Q(graphid=graph)
+        except ValueError:
+            graph_query = models.Q(slug=graph)
+
+        try:
+            graph = Graph.objects.get(graph_query & models.Q(source_identifier=None))
+        except Graph.DoesNotExist as e:
+            raise CommandError(e)
+
+        nodes_qs = Node.objects.filter(
+            graph=graph,
+            datatype__in=["domain-value", "domain-value-list"],
+        )
+        if node_aliases:
+            nodes_qs = nodes_qs.filter(alias__in=node_aliases)
+
+        nodes = list(nodes_qs)
+
+        if not nodes:
+            raise CommandError(
+                "No domain/domain-list nodes found for graph '{0}'{1}".format(
+                    graph.name,
+                    f" with aliases: {', '.join(node_aliases)}" if node_aliases else "",
+                )
+            )
+
+        if node_aliases:
+            found_aliases = {n.alias for n in nodes}
+            missing = set(node_aliases) - found_aliases
+            if missing:
+                raise CommandError(
+                    "Could not find domain nodes with aliases: {0}".format(
+                        ", ".join(sorted(missing))
+                    )
+                )
+
+        if not overwrite:
+            for node in nodes:
+                if List.objects.filter(name=node.alias).exists():
+                    raise CommandError(
+                        f"A controlled list named '{node.alias}' already exists. "
+                        "Use --overwrite to replace it."
+                    )
+
+        default_language = Language.objects.filter(isdefault=True).first()
+
+        with transaction.atomic():
+            for node in nodes:
+                options = (node.config or {}).get("options", [])
+                if not options:
+                    self.stdout.write(
+                        self.style.WARNING(
+                            f"Node '{node.alias}' has no options, skipping."
+                        )
+                    )
+                    continue
+
+                if overwrite:
+                    List.objects.filter(name=node.alias).delete()
+
+                controlled_list = List.objects.create(name=node.alias)
+
+                new_list_items = []
+                new_list_item_values = []
+
+                new_ids_for_current_node = {UUID(option["id"]) for option in options}
+                existing_ids = set(
+                    ListItem.objects.filter(
+                        id__in=new_ids_for_current_node
+                    ).values_list("id", flat=True)
+                )
+
+                for sortorder, option in enumerate(options):
+                    desired_id = UUID(option["id"])
+                    if desired_id in existing_ids:
+                        item_id = UUID.uuid4()
+                    else:
+                        item_id = desired_id
+                    list_item = ListItem(
+                        id=item_id,
+                        uri=f"{host.rstrip('/')}/{item_id}",
+                        list=controlled_list,
+                        sortorder=sortorder,
+                        parent=None,
+                    )
+                    new_list_items.append(list_item)
+
+                    text = option.get("text", "")
+                    if isinstance(text, dict):
+                        for lang_code, label in text.items():
+                            if label:
+                                new_list_item_values.append(
+                                    ListItemValue(
+                                        list_item=list_item,
+                                        valuetype_id="prefLabel",
+                                        language_id=lang_code,
+                                        value=label,
+                                    )
+                                )
+                    elif isinstance(text, str) and text and default_language:
+                        new_list_item_values.append(
+                            ListItemValue(
+                                list_item=list_item,
+                                valuetype_id="prefLabel",
+                                language_id=default_language.code,
+                                value=text,
+                            )
+                        )
+
+                ListItem.objects.bulk_create(new_list_items)
+                ListItemValue.objects.bulk_create(new_list_item_values)
+
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        "Created controlled list '{0}' with {1} items from node '{2}'.".format(
+                            controlled_list.name, len(new_list_items), node.alias
+                        )
+                    )
+                )
 
     def migrate_concept_nodes_to_reference_datatype(self, graph):
         try:
