@@ -1,7 +1,7 @@
 """
-Arches showdatamigrations management command.
+Arches showpkgmigrations management command.
 
-Lists all data migrations found in <app>/migrations/data_migrations/ directories,
+Lists all package migrations found in <app>/migrations/package_migrations/ directories,
 showing which have been applied and which are pending — modelled on Django's
 built-in showmigrations command.
 """
@@ -13,16 +13,16 @@ from django.apps import apps
 from django.core.management.base import BaseCommand
 from django.db import DEFAULT_DB_ALIAS, connections
 
-from arches.app.models.models import DataMigration as DataMigrationRecord
-from arches.db.data_migration_registry import (
+from arches.app.models.models import PackageMigration as PackageMigrationRecord
+from arches.db.package_migration_registry import (
     APPLIED_SENTINEL,
-    DataMigrationRecorder,
-    discover_data_migrations,
+    PackageMigrationRecorder,
+    discover_package_migrations,
 )
 
 
 class Command(BaseCommand):
-    help = "Shows all available data migrations and whether they have been applied."
+    help = "Shows all available package migrations and whether they have been applied."
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -61,10 +61,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.verbosity = options["verbosity"]
         connection = connections[options["database"]]
-        recorder = DataMigrationRecorder(connection)
+        recorder = PackageMigrationRecorder(connection)
         applied = recorder.applied_migrations
 
-        all_migrations = discover_data_migrations()
+        all_migrations = discover_package_migrations()
 
         app_labels = options["app_label"]
         if app_labels:
@@ -88,10 +88,10 @@ class Command(BaseCommand):
             sys.exit(2)
 
     def _applied_datetimes(self):
-        """Return {(app, name): applied_datetime} for all applied data migrations."""
+        """Return {(app, name): applied_datetime} for all applied package migrations."""
         return {
             (r.app, r.name): r.applied
-            for r in DataMigrationRecord.objects.filter(operation=APPLIED_SENTINEL)
+            for r in PackageMigrationRecord.objects.filter(operation=APPLIED_SENTINEL)
         }
 
     def _show_list(self, all_migrations, applied):
@@ -101,7 +101,7 @@ class Command(BaseCommand):
             self.stdout.write(app_label, self.style.MIGRATE_LABEL)
             migrations = list(group)
             if not migrations:
-                self.stdout.write("  (no data migrations)", self.style.ERROR)
+                self.stdout.write("  (no package migrations)", self.style.ERROR)
                 continue
             for _, name, _ in migrations:
                 if (app_label, name) in applied:
@@ -113,11 +113,11 @@ class Command(BaseCommand):
                     self.stdout.write(f" [ ] {name}")
 
         if not all_migrations:
-            self.stdout.write("(no data migrations found)", self.style.ERROR)
+            self.stdout.write("(no package migrations found)", self.style.ERROR)
 
     def _show_plan(self, all_migrations, applied):
         if not all_migrations:
-            self.stdout.write("(no data migrations found)", self.style.ERROR)
+            self.stdout.write("(no package migrations found)", self.style.ERROR)
             return
 
         datetimes = self._applied_datetimes() if self.verbosity >= 2 else {}

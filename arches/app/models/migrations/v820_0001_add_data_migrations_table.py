@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name="DataMigration",
+            name="PackageMigration",
             fields=[
                 (
                     "id",
@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ("applied", models.DateTimeField(auto_now_add=True)),
             ],
             options={
-                "db_table": "data_migrations",
+                "db_table": "package_migrations",
                 "managed": True,
             },
         )

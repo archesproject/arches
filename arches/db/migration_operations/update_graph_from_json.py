@@ -5,10 +5,10 @@ from arches.app.models import models
 from arches.app.models.graph import Graph
 from arches.app.models.system_settings import settings
 
-from .base import ArchesDataMigration
+from .base import ArchesPackageMigration
 
 
-class UpdateGraphFromJSON(ArchesDataMigration):
+class UpdateGraphFromJSON(ArchesPackageMigration):
     reduces_to_sql = False
     reversible = True
 

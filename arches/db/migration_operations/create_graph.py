@@ -1,9 +1,9 @@
 from arches.app.models.graph import Graph
 
-from .base import ArchesDataMigration
+from .base import ArchesPackageMigration
 
 
-class CreateGraph(ArchesDataMigration):
+class CreateGraph(ArchesPackageMigration):
     reduces_to_sql = False
     reversible = True
 

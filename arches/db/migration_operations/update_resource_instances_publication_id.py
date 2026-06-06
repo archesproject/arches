@@ -1,7 +1,7 @@
-from .base import ArchesDataMigration
+from .base import ArchesPackageMigration
 
 
-class UpdateResourceInstancesPublicationId(ArchesDataMigration):
+class UpdateResourceInstancesPublicationId(ArchesPackageMigration):
     reduces_to_sql = False
     reversible = True
 

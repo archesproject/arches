@@ -2827,7 +2827,7 @@ class UserPreference(models.Model):
         ]
 
 
-class DataMigration(models.Model):
+class PackageMigration(models.Model):
     id = models.BigAutoField(
         auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
     )
@@ -2837,7 +2837,7 @@ class DataMigration(models.Model):
 
     class Meta:
         managed = True
-        db_table = "data_migrations"
+        db_table = "package_migrations"
 
 
 # Import proxy models to ensure they are always discovered.

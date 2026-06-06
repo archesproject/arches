@@ -1,8 +1,8 @@
 """
-Arches rundatamigrations management command.
+Arches migratepkg management command.
 
-Applies data migrations found in <app>/migrations/data_migrations/ directories,
-tracking applied migrations using the DataMigration model (analogous to how
+Applies package migrations found in <app>/migrations/package_migrations/ directories,
+tracking applied migrations using the PackageMigration model (analogous to how
 Django's migrate command uses the django_migrations table via MigrationRecorder).
 """
 
@@ -13,16 +13,16 @@ from django.core.management.base import BaseCommand, CommandError, no_translatio
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.loader import MigrationLoader
 
-from arches.db.data_migration_registry import (
-    DataMigrationRecorder,
-    discover_data_migrations,
+from arches.db.package_migration_registry import (
+    PackageMigrationRecorder,
+    discover_package_migrations,
 )
 
 
 class Command(BaseCommand):
     help = (
-        "Applies data migrations stored in <app>/migrations/data_migrations/ "
-        "directories, tracking state in the DataMigration model."
+        "Applies package migrations stored in <app>/migrations/package_migrations/ "
+        "directories, tracking state in the PackageMigration model."
     )
 
     def add_arguments(self, parser):
@@ -72,7 +72,7 @@ class Command(BaseCommand):
         self.interactive = options["interactive"]
         connection = connections[database]
 
-        recorder = DataMigrationRecorder(connection)
+        recorder = PackageMigrationRecorder(connection)
 
         # Validate app_label if provided.
         app_label = options["app_label"]
@@ -82,8 +82,8 @@ class Command(BaseCommand):
             except LookupError as exc:
                 raise CommandError(str(exc))
 
-        # Discover all data migrations on disk.
-        all_migrations = discover_data_migrations()
+        # Discover all package migrations on disk.
+        all_migrations = discover_package_migrations()
 
         # Determine which migrations have already been applied.
         applied = recorder.applied_migrations
@@ -112,11 +112,11 @@ class Command(BaseCommand):
                 self.stdout.write("  (none)")
 
         if self.verbosity >= 1:
-            self.stdout.write(self.style.MIGRATE_HEADING("Running data migrations:"))
+            self.stdout.write(self.style.MIGRATE_HEADING("Running package migrations:"))
 
         if not plan:
             if self.verbosity >= 1:
-                self.stdout.write("  No data migrations to apply.")
+                self.stdout.write("  No package migrations to apply.")
             return
 
         state = MigrationLoader(connection).project_state()
