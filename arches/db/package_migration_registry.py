@@ -1,8 +1,8 @@
 """
-Shared infrastructure for Arches data migrations.
+Shared infrastructure for Arches package migrations.
 
-Used by both the rundatamigrations management command and the
-ArchesDataMigration operation base class so they operate on the same
+Used by both the runpackagemigrations management command and the
+ArchesPackageMigration operation base class so they operate on the same
 migration graph and recorder.
 """
 
@@ -12,21 +12,21 @@ from importlib import import_module
 from django.apps import apps
 from django.db import DEFAULT_DB_ALIAS, connections
 
-from arches.app.models.models import DataMigration as DataMigrationRecord
+from arches.app.models.models import PackageMigration as PackageMigrationRecord
 
 
-DATA_MIGRATIONS_SUBMODULE = "data_migrations"
+PACKAGE_MIGRATIONS_SUBMODULE = "package_migrations"
 
-# Sentinel value stored in DataMigration.operation to mark migration-level
+# Sentinel value stored in PackageMigration.operation to mark migration-level
 # tracking records (one per applied migration file).  Distinct from the
 # per-operation records written by the operations themselves (e.g.
 # "UpdateResourceInstancesPublicationId").
 APPLIED_SENTINEL = "__applied__"
 
 
-class DataMigrationRecorder:
+class PackageMigrationRecorder:
     """
-    Tracks applied data migrations using the DataMigration model,
+    Tracks applied package migrations using the PackageMigration model,
     analogous to Django's MigrationRecorder for django_migrations.
     """
 
@@ -35,34 +35,34 @@ class DataMigrationRecorder:
 
     def has_table(self):
         with self.connection.cursor() as cursor:
-            return "data_migrations" in self.connection.introspection.table_names(
+            return "package_migrations" in self.connection.introspection.table_names(
                 cursor
             )
 
     def ensure_schema(self):
-        # The data_migrations table is created by Django's own migrate command
+        # The package_migrations table is created by Django's own migrate command
         # (via the Arches models migration), so it is guaranteed to exist when
         # this command runs.
         pass
 
     @property
     def applied_migrations(self):
-        """Return a set of (app, name) tuples for applied data migrations."""
+        """Return a set of (app, name) tuples for applied package migrations."""
         if not self.has_table():
             return set()
-        return set(DataMigrationRecord.objects.filter().values_list("app", "name"))
+        return set(PackageMigrationRecord.objects.filter().values_list("app", "name"))
 
     def record_applied(self, app, name):
-        DataMigrationRecord.objects.create(app=app, name=name)
+        PackageMigrationRecord.objects.create(app=app, name=name)
 
     def record_unapplied(self, app, name):
-        DataMigrationRecord.objects.filter(app=app, name=name).delete()
+        PackageMigrationRecord.objects.filter(app=app, name=name).delete()
 
 
-def discover_data_migrations():
+def discover_package_migrations():
     """
     Return a sorted list of (app_label, name, migration_obj) tuples for all
-    data migrations found under <app>/migrations/data_migrations/ across all
+    package migrations found under <app>/migrations/package_migrations/ across all
     installed apps.
 
     Results are sorted by (app_label, name) so numeric prefixes determine
@@ -72,7 +72,7 @@ def discover_data_migrations():
 
     result = []
     for app_config in apps.get_app_configs():
-        module_path = f"{app_config.name}.migrations.{DATA_MIGRATIONS_SUBMODULE}"
+        module_path = f"{app_config.name}.migrations.{PACKAGE_MIGRATIONS_SUBMODULE}"
         try:
             pkg = import_module(module_path)
         except ImportError:
@@ -94,22 +94,22 @@ def discover_data_migrations():
     return result
 
 
-def get_next_unapplied_data_migration_name():
+def get_next_unapplied_package_migration_name():
     """
-    Return the name of the first unapplied data migration, or None if all
+    Return the name of the first unapplied package migration, or None if all
     are applied.
 
-    This is called from within a data migration operation's database_forwards
+    This is called from within a package migration operation's database_forwards
     to determine which migration file is currently being applied.  Because
-    rundatamigrations records a migration as applied only *after* apply()
+    runpackagemigrations records a migration as applied only *after* apply()
     returns (i.e. after all database_forwards calls complete), the migration
     currently being executed will always be the first unapplied one.
     """
     connection = connections[DEFAULT_DB_ALIAS]
-    recorder = DataMigrationRecorder(connection)
+    recorder = PackageMigrationRecorder(connection)
     applied = recorder.applied_migrations
 
-    for app_label, name, _migration in discover_data_migrations():
+    for app_label, name, _migration in discover_package_migrations():
         if (app_label, name) not in applied:
             return name
 

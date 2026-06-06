@@ -1,7 +1,7 @@
 from django.db.migrations.operations.base import Operation
 
 
-class ArchesDataMigration(Operation):
+class ArchesPackageMigration(Operation):
     reduces_to_sql = False
     reversible = True
 
@@ -12,10 +12,10 @@ class ArchesDataMigration(Operation):
                 input = input[language_code]
             else:
                 for key, value in input.items():
-                    input[key] = ArchesDataMigration.localize_json(value, language_code)
+                    input[key] = ArchesPackageMigration.localize_json(value, language_code)
         elif isinstance(input, list):
             for item in input:
-                ArchesDataMigration.localize_json(item, language_code)
+                ArchesPackageMigration.localize_json(item, language_code)
         return input
 
     def __init__(self, arg1, arg2):

@@ -5,10 +5,10 @@ from django.db.models.expressions import RawSQL
 
 from arches.app.models import models
 
-from .base import ArchesDataMigration
+from .base import ArchesPackageMigration
 
 
-class AddNodeToTileData(ArchesDataMigration):
+class AddNodeToTileData(ArchesPackageMigration):
     reduces_to_sql = False
     reversible = True
 
