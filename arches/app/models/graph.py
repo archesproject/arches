@@ -2767,7 +2767,7 @@ class Graph(models.GraphModel):
 
             updated_graph = Graph(serialized_graph)
             updated_graph.widgets = widget_dict
-            updated_graph.is_active = self.is_active
+            updated_graph.is_active = serialized_graph.get("is_active", self.is_active)
 
             updated_graph.update_permissions_from_serialized_graph(serialized_graph)
 
