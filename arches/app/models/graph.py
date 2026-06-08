@@ -2790,6 +2790,8 @@ class Graph(models.GraphModel):
             models.GraphModel.objects.filter(pk=updated_graph.pk).update(
                 has_unpublished_changes=False,
             )
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT * FROM refresh_geojson_geometries();")
 
             return Graph.objects.get(pk=updated_graph.pk)
 
