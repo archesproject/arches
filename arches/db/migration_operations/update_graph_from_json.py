@@ -70,13 +70,14 @@ class UpdateGraphFromJSON(ArchesPackageMigration):
                 "previous_publicationid must be provided to reverse this migration."
             )
 
+        previous_publication = None # if None, resources without pub should CASCADE delete
         if models.GraphXPublishedGraph.objects.filter(
             publicationid=self.previous_publicationid
         ).exists():
             previous_publication = models.GraphXPublishedGraph.objects.get(
                 publicationid=self.previous_publicationid
             )
-        
+
             published_graph = models.PublishedGraph.objects.get(
                 publication=previous_publication,
                 language=settings.LANGUAGE_CODE,
@@ -88,6 +89,10 @@ class UpdateGraphFromJSON(ArchesPackageMigration):
             previous_graph.restore_state_from_serialized_graph(
                 published_graph.serialized_graph
             )
+
+        models.ResourceInstance.objects.filter(
+            graph_publication_id=current_publication_id
+        ).update(graph_publication=previous_publication)
 
         models.GraphXPublishedGraph.objects.get(
             publicationid=current_publication_id
