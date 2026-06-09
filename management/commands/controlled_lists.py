@@ -5,7 +5,7 @@ from django.db import connection, models, transaction
 from django.db.models.expressions import CombinedExpression
 from django.db.models.fields.json import KT
 from django.db.models.functions import Cast
-from uuid import UUID
+import uuid
 
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.fields.i18n import I18n_JSONField
@@ -254,7 +254,7 @@ class Command(BaseCommand):
                 --overwrite
         """
         try:
-            UUID(graph)
+            uuid.UUID(graph)
             graph_query = models.Q(graphid=graph)
         except ValueError:
             graph_query = models.Q(slug=graph)
@@ -320,7 +320,9 @@ class Command(BaseCommand):
                 new_list_items = []
                 new_list_item_values = []
 
-                new_ids_for_current_node = {UUID(option["id"]) for option in options}
+                new_ids_for_current_node = {
+                    uuid.UUID(option["id"]) for option in options
+                }
                 existing_ids = set(
                     ListItem.objects.filter(
                         id__in=new_ids_for_current_node
@@ -328,9 +330,9 @@ class Command(BaseCommand):
                 )
 
                 for sortorder, option in enumerate(options):
-                    desired_id = UUID(option["id"])
+                    desired_id = uuid.UUID(option["id"])
                     if desired_id in existing_ids:
-                        item_id = UUID.uuid4()
+                        item_id = uuid.uuid4()
                     else:
                         item_id = desired_id
                     list_item = ListItem(
@@ -377,7 +379,7 @@ class Command(BaseCommand):
 
     def migrate_concept_nodes_to_reference_datatype(self, graph):
         try:
-            UUID(graph)
+            uuid.UUID(graph)
             query = models.Q(graphid=graph, source_identifier=None)
         except ValueError:
             query = models.Q(slug=graph, source_identifier=None)
