@@ -293,9 +293,9 @@ class Command(BaseCommand):
 
         if not overwrite:
             for node in nodes:
-                if List.objects.filter(name=node.alias).exists():
+                if List.objects.filter(name=f"{node.alias}_{node.nodeid}").exists():
                     raise CommandError(
-                        f"A controlled list named '{node.alias}' already exists. "
+                        f"A controlled list named '{node.alias}_{node.nodeid}' already exists. "
                         "Use --overwrite to replace it."
                     )
 
@@ -303,6 +303,7 @@ class Command(BaseCommand):
 
         with transaction.atomic():
             for node in nodes:
+                list_name = f"{node.alias}_{node.nodeid}"
                 options = (node.config or {}).get("options", [])
                 if not options:
                     self.stdout.write(
@@ -313,9 +314,9 @@ class Command(BaseCommand):
                     continue
 
                 if overwrite:
-                    List.objects.filter(name=node.alias).delete()
+                    List.objects.filter(name=list_name).delete()
 
-                controlled_list = List.objects.create(name=node.alias)
+                controlled_list = List.objects.create(name=list_name)
 
                 new_list_items = []
                 new_list_item_values = []
