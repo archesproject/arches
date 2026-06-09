@@ -262,16 +262,7 @@ class Command(BaseCommand):
                 -ho http://localhost:8000/plugins/controlled-list-manager/item/
                 --overwrite
         """
-        try:
-            uuid.UUID(graph)
-            graph_query = models.Q(graphid=graph)
-        except ValueError:
-            graph_query = models.Q(slug=graph)
-
-        try:
-            graph = Graph.objects.get(graph_query & models.Q(source_identifier=None))
-        except Graph.DoesNotExist as e:
-            raise CommandError(e)
+        graph = self._resolve_graph(graph)
 
         nodes_qs = Node.objects.filter(
             graph=graph,
@@ -388,20 +379,7 @@ class Command(BaseCommand):
                 )
 
     def migrate_concept_nodes_to_reference_datatype(self, graph):
-        try:
-            uuid.UUID(graph)
-            query = models.Q(graphid=graph, source_identifier=None)
-        except ValueError:
-            query = models.Q(slug=graph, source_identifier=None)
-
-        try:
-            source_graph = Graph.objects.get(query)
-        except Graph.DoesNotExist as e:
-            raise CommandError(e)
-
-        draft_graph = source_graph.draft.first()
-        if not draft_graph:
-            draft_graph = source_graph.create_draft_graph()
+        source_graph, draft_graph = self._resolve_draft_graph(graph)
 
         nodes = (
             Node.objects.filter(
@@ -463,15 +441,7 @@ class Command(BaseCommand):
                     node.full_clean()
                     node.save()
 
-                    cross_records = node.cardxnodexwidget_set.annotate(
-                        config_without_options=CombinedExpression(
-                            models.F("config"),
-                            "-",
-                            models.Value("options", output_field=models.CharField()),
-                            output_field=I18n_JSONField(),
-                        )
-                    )
-                    for cross_record in cross_records:
+                    for cross_record in self._card_cross_records(node):
                         # work around for i18n as_sql method issue detailed here: https://github.com/archesproject/arches/issues/11473
                         cross_record.config = {}
                         cross_record.save()
@@ -503,10 +473,9 @@ class Command(BaseCommand):
                                 new_default_value
                             )
 
-                        cross_record.config = cross_record.config_without_options
-                        cross_record.widget = REFERENCE_SELECT_WIDGET
-                        cross_record.full_clean()
-                        cross_record.save()
+                        self._finalize_card_as_reference(
+                            cross_record, REFERENCE_SELECT_WIDGET
+                        )
 
             updated_graph = source_graph.promote_draft_graph_to_active_graph()
             updated_graph.publish(
@@ -520,20 +489,7 @@ class Command(BaseCommand):
             )
 
     def migrate_domain_nodes_to_reference_datatype(self, graph, node_aliases=[]):
-        try:
-            uuid.UUID(graph)
-            query = models.Q(graphid=graph, source_identifier=None)
-        except ValueError:
-            query = models.Q(slug=graph, source_identifier=None)
-
-        try:
-            source_graph = Graph.objects.get(query)
-        except Graph.DoesNotExist as e:
-            raise CommandError(e)
-
-        draft_graph = source_graph.draft.first()
-        if not draft_graph:
-            draft_graph = source_graph.create_draft_graph()
+        source_graph, draft_graph = self._resolve_draft_graph(graph)
 
         nodes = (
             Node.objects.filter(
@@ -643,23 +599,14 @@ class Command(BaseCommand):
                     node.full_clean()
                     node.save()
 
-                    cross_records = node.cardxnodexwidget_set.annotate(
-                        config_without_options=CombinedExpression(
-                            models.F("config"),
-                            "-",
-                            models.Value("options", output_field=models.CharField()),
-                            output_field=I18n_JSONField(),
-                        )
-                    )
-                    for cross_record in cross_records:
+                    for cross_record in self._card_cross_records(node):
                         # work around for i18n as_sql method issue detailed here: https://github.com/archesproject/arches/issues/11473
                         cross_record.config = {}
                         cross_record.save()
 
-                        cross_record.config = cross_record.config_without_options
-                        cross_record.widget = REFERENCE_SELECT_WIDGET
-                        cross_record.full_clean()
-                        cross_record.save()
+                        self._finalize_card_as_reference(
+                            cross_record, REFERENCE_SELECT_WIDGET
+                        )
 
             updated_graph = source_graph.promote_draft_graph_to_active_graph()
             updated_graph.publish(
@@ -671,6 +618,40 @@ class Command(BaseCommand):
                     source_graph.name
                 )
             )
+
+    def _resolve_graph(self, graph):
+        try:
+            uuid.UUID(graph)
+            query = models.Q(graphid=graph, source_identifier=None)
+        except ValueError:
+            query = models.Q(slug=graph, source_identifier=None)
+        try:
+            return Graph.objects.get(query)
+        except Graph.DoesNotExist as e:
+            raise CommandError(e)
+
+    def _resolve_draft_graph(self, graph):
+        source_graph = self._resolve_graph(graph)
+        draft_graph = source_graph.draft.first()
+        if not draft_graph:
+            draft_graph = source_graph.create_draft_graph()
+        return source_graph, draft_graph
+
+    def _card_cross_records(self, node):
+        return node.cardxnodexwidget_set.annotate(
+            config_without_options=CombinedExpression(
+                models.F("config"),
+                "-",
+                models.Value("options", output_field=models.CharField()),
+                output_field=I18n_JSONField(),
+            )
+        )
+
+    def _finalize_card_as_reference(self, cross_record, reference_select_widget):
+        cross_record.config = cross_record.config_without_options
+        cross_record.widget = reference_select_widget
+        cross_record.full_clean()
+        cross_record.save()
 
     # Replaces the base URL for all list items in all controlled lists
     def bulk_change_url_base(self, target_hostname: str, list_ids: list) -> str:
