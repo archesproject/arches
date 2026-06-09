@@ -338,7 +338,7 @@ class Command(BaseCommand):
                         item_id = desired_id
                     list_item = ListItem(
                         id=item_id,
-                        uri=f"{host.rstrip('/')}/{item_id}",
+                        uri=f"{host.rstrip('/')}/{desired_id}",
                         list=controlled_list,
                         sortorder=sortorder,
                         parent=None,
