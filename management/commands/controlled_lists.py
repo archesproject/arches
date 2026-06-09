@@ -488,7 +488,7 @@ class Command(BaseCommand):
                 )
             )
 
-    def migrate_domain_nodes_to_reference_datatype(self, graph, node_aliases=[]):
+    def migrate_domain_nodes_to_reference_datatype(self, graph, node_aliases=None):
         source_graph, draft_graph = self._resolve_draft_graph(graph)
 
         nodes = (
@@ -496,6 +496,7 @@ class Command(BaseCommand):
                 graph=draft_graph,
                 datatype__in=["domain-value", "domain-value-list"],
                 is_immutable=False,
+                **({"alias__in": node_aliases} if node_aliases else {}),
             )
             .annotate(
                 controlled_list_name=Concat(
