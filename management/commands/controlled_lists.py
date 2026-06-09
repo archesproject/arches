@@ -4,7 +4,7 @@ from django.core import management
 from django.db import connection, models, transaction
 from django.db.models.expressions import CombinedExpression
 from django.db.models.fields.json import KT
-from django.db.models.functions import Cast
+from django.db.models.functions import Cast, Concat
 import uuid
 
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -36,6 +36,7 @@ class Command(BaseCommand):
                 "migrate_collections_to_controlled_lists",
                 "migrate_concept_nodes_to_reference_datatype",
                 "migrate_domain_nodes_to_controlled_lists",
+                "migrate_domain_nodes_to_reference_datatype",
                 "change_url_base",
             ],
             help="The operation to perform",
@@ -143,6 +144,14 @@ class Command(BaseCommand):
                 node_aliases=options.get("node_aliases") or [],
                 overwrite=options["overwrite"],
                 host=options["host"],
+            )
+        elif options["operation"] == "migrate_domain_nodes_to_reference_datatype":
+            graph = options["graph"]
+            node_aliases = options.get("node_aliases") or []
+            if not graph or graph is None:
+                raise CommandError("Please provide a graph id or slug")
+            self.migrate_domain_nodes_to_reference_datatype(
+                graph, node_aliases=node_aliases
             )
         elif options["operation"] == "change_url_base":
             if not options["host"] or options["host"] is None:
@@ -506,6 +515,159 @@ class Command(BaseCommand):
 
             self.stdout.write(
                 "All concept/concept-list nodes for the {0} graph have been successfully migrated to reference datatype".format(
+                    source_graph.name
+                )
+            )
+
+    def migrate_domain_nodes_to_reference_datatype(self, graph, node_aliases=[]):
+        try:
+            uuid.UUID(graph)
+            query = models.Q(graphid=graph, source_identifier=None)
+        except ValueError:
+            query = models.Q(slug=graph, source_identifier=None)
+
+        try:
+            source_graph = Graph.objects.get(query)
+        except Graph.DoesNotExist as e:
+            raise CommandError(e)
+
+        draft_graph = source_graph.draft.first()
+        if not draft_graph:
+            draft_graph = source_graph.create_draft_graph()
+
+        nodes = (
+            Node.objects.filter(
+                graph=draft_graph,
+                datatype__in=["domain-value", "domain-value-list"],
+                is_immutable=False,
+            )
+            .annotate(
+                controlled_list_name=Concat(
+                    models.F("alias"),
+                    models.Value("_"),
+                    Cast(
+                        models.F("source_identifier_id"),
+                        output_field=models.CharField(),
+                    ),
+                    output_field=models.CharField(),
+                )
+            )
+            .prefetch_related("cardxnodexwidget_set")
+        )
+
+        if len(nodes) == 0:
+            raise CommandError(
+                "No concept/concept-list nodes found for the {0} graph".format(
+                    source_graph.name
+                )
+            )
+
+        REFERENCE_SELECT_WIDGET = Widget.objects.get(name="reference-select-widget")
+        REFERENCE_FACTORY = DataTypeFactory().get_instance("reference")
+        controlled_lists = List.objects.all()
+        controlled_lists_lookup = {lst.name: str(lst.pk) for lst in controlled_lists}
+
+        errors = []
+        # Check that domain values have been migrated to controlled lists
+        for node in nodes:
+            if node.controlled_list_name not in controlled_lists_lookup.keys():
+                errors.append(
+                    {
+                        "node_alias": node.alias,
+                        "controlled_list_name": node.controlled_list_name,
+                    }
+                )
+        if errors:
+            self.stderr.write(
+                "The following domain values for the associated nodes have not been migrated to controlled lists:"
+            )
+            for error in errors:
+                self.stderr.write(
+                    "Node alias: {0}, Controlled List Name: {1}".format(
+                        error["node_alias"], error["controlled_list_name"]
+                    )
+                )
+        else:
+            with transaction.atomic():
+                for node in nodes:
+                    expected_list_name = f"{node.alias}_{node.source_identifier_id}"
+                    controlled_list_id = controlled_lists_lookup.get(expected_list_name)
+
+                    default_value = node.config.get("defaultValue", None)
+                    new_default_value = []
+                    if default_value:
+                        if isinstance(default_value, str):
+                            default_value = [default_value]
+                        for value in default_value:
+                            config = {"controlledList": controlled_list_id}
+                            # first pass transform from domain value id UUID
+                            new_value = REFERENCE_FACTORY.transform_value_for_tile(
+                                value=value,
+                                **config,
+                            )
+                            # if transform failed, presumably because a new id was minted, get the label to transform
+                            if not new_value:
+                                options = node.config["options"]
+                                text = [
+                                    option["text"]
+                                    for option in options
+                                    if option["id"] == value
+                                ]
+                                new_value = REFERENCE_FACTORY.transform_value_for_tile(
+                                    value=text.values()[0] if text else "",
+                                    **config,
+                                )
+                            if isinstance(new_value, list):
+                                new_default_value.append(new_value[0])
+                            else:
+                                raise CommandError(
+                                    f"Failed to convert original default value: {value} in list: {controlled_list_id} for node: {node.name} into a reference datatype instance"
+                                )
+                        node.config["defaultValue"] = new_default_value
+                    if not len(new_default_value):
+                        new_default_value = None
+
+                    if node.datatype == "domain-value":
+                        node.config = {
+                            "multiValue": False,
+                            "controlledList": controlled_list_id,
+                            "defaultValue": new_default_value,
+                        }
+                    elif node.datatype == "domain-value-list":
+                        node.config = {
+                            "multiValue": True,
+                            "controlledList": controlled_list_id,
+                            "defaultValue": new_default_value,
+                        }
+                    node.datatype = "reference"
+                    node.full_clean()
+                    node.save()
+
+                    cross_records = node.cardxnodexwidget_set.annotate(
+                        config_without_options=CombinedExpression(
+                            models.F("config"),
+                            "-",
+                            models.Value("options", output_field=models.CharField()),
+                            output_field=I18n_JSONField(),
+                        )
+                    )
+                    for cross_record in cross_records:
+                        # work around for i18n as_sql method issue detailed here: https://github.com/archesproject/arches/issues/11473
+                        cross_record.config = {}
+                        cross_record.save()
+
+                        cross_record.config = cross_record.config_without_options
+                        cross_record.widget = REFERENCE_SELECT_WIDGET
+                        cross_record.full_clean()
+                        cross_record.save()
+
+            updated_graph = source_graph.promote_draft_graph_to_active_graph()
+            updated_graph.publish(
+                notes="Migrated domain-value/domain-value-list nodes to reference datatype"
+            )
+
+            self.stdout.write(
+                "All domain-value/domain-value-list nodes for the {0} graph have been successfully migrated to reference datatype".format(
                     source_graph.name
                 )
             )
