@@ -79,7 +79,7 @@ class NodeValue(APIBase):
         try:
             node = models.Node.objects.get(nodeid=nodeid)
         except Exception as e:
-            return JSONResponse(_("Node not found"), status=404)
+            return JSONResponse(_("Node not found"), status=400)
 
         if not request.user.has_perm("write_nodegroup", node.nodegroup):
             return JSONResponse(

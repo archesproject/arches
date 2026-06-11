@@ -1,6 +1,5 @@
 import logging
 import uuid
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from itertools import groupby
 
 from django.db import connection, transaction
@@ -308,14 +307,8 @@ def _post_process_staging(staging_records, max_workers=4):
     logger.debug(
         "Refreshing resource relationships for %d tiles", len(resource_refresh_tile_ids)
     )
-    if resource_refresh_tile_ids:
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            futures = {
-                executor.submit(_refresh_resource_relationships, tid): tid
-                for tid in resource_refresh_tile_ids
-            }
-            for future in as_completed(futures):
-                future.result()  # re-raise any exceptions
+    for tile_id in resource_refresh_tile_ids:
+        _refresh_resource_relationships(tile_id)
 
 
 def _refresh_resource_relationships(tile_id):

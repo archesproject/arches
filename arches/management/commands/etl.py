@@ -49,16 +49,40 @@ class Command(BaseCommand):
             default="",
             help="The configuration for the etl-module to run",
         )
+        parser.add_argument(
+            "-mp",
+            "--use_multiprocessing",
+            action="store_true",
+            dest="use_multiprocessing",
+            default=False,
+            help="Use multiprocessing to index resources after loading",
+        )
+        parser.add_argument(
+            "-mxp",
+            "--max_subprocesses",
+            action="store",
+            type=int,
+            dest="max_subprocesses",
+            default=0,
+            help="Sets the process pool size when using multiprocessing. Default is ceil(cpu_count()/2)",
+        )
 
     def handle(self, *args, **options):
         self.run(
-            module=options["module"], source=options["source"], config=options["config"]
+            module=options["module"],
+            source=options["source"],
+            config=options["config"],
+            use_multiprocessing=options["use_multiprocessing"],
+            max_subprocesses=options["max_subprocesses"],
         )
 
-    def run(self, module, source, config):
+    def run(
+        self, module, source, config, use_multiprocessing=False, max_subprocesses=0
+    ):
         """
         Run the specified module
-        Params --source(-s), and --config(-c)
+        Params --source(-s), --config(-c), --use_multiprocessing(-mp),
+        and --max_subprocesses(-mxp)
 
         """
         loadid = str(uuid.uuid4())
@@ -67,6 +91,8 @@ class Command(BaseCommand):
                 config = json.load(f)
         else:
             config = {}
+        config["multiprocessing"] = use_multiprocessing
+        config["max_subprocesses"] = max_subprocesses
         try:
             etl_module = ETLModule.objects.get(componentname=module)
             config["module"] = etl_module.etlmoduleid

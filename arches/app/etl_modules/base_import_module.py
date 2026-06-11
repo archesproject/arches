@@ -237,7 +237,15 @@ class BaseImportModule:
         return lookup
 
     def run_load_task(
-        self, userid, files, summary, result, temp_dir, loadid, multiprocessing=False
+        self,
+        userid,
+        files,
+        summary,
+        result,
+        temp_dir,
+        loadid,
+        multiprocessing=False,
+        max_subprocesses=0,
     ):
         try:
             with connection.cursor() as cursor:
@@ -257,12 +265,20 @@ class BaseImportModule:
                 self.check_tile_cardinality(cursor)
                 result["validation"] = self.validate(loadid)
                 if len(result["validation"]["data"]) == 0:
-                    self.save_to_tiles(cursor, userid, loadid, multiprocessing)
-                    cursor.execute(
-                        """CALL __arches_update_resource_x_resource_with_graphids();"""
+                    self.save_to_tiles(
+                        cursor, userid, loadid, multiprocessing, max_subprocesses
                     )
-                    cursor.execute("""SELECT __arches_refresh_spatial_views();""")
-                    refresh_successful = cursor.fetchone()[0]
+                    # Multiprocessed indexing calls connections.close_all(), which
+                    # invalidates the cursor opened above. Re-acquire one (Django
+                    # reconnects lazily) for the post-index refresh.
+                    with connection.cursor() as post_index_cursor:
+                        post_index_cursor.execute(
+                            """CALL __arches_update_resource_x_resource_with_graphids();"""
+                        )
+                        post_index_cursor.execute(
+                            """SELECT __arches_refresh_spatial_views();"""
+                        )
+                        refresh_successful = post_index_cursor.fetchone()[0]
                     if not refresh_successful:
                         raise Exception("Unable to refresh spatial views")
                 else:
@@ -308,8 +324,10 @@ class BaseImportModule:
             [self.loadid],
         )
 
-    def save_to_tiles(self, cursor, userid, loadid, multiprocessing=False):
-        return save_to_tiles(userid, loadid, multiprocessing)
+    def save_to_tiles(
+        self, cursor, userid, loadid, multiprocessing=False, max_subprocesses=0
+    ):
+        return save_to_tiles(userid, loadid, multiprocessing, max_subprocesses)
 
     ### Actions ###
 
@@ -444,6 +462,7 @@ class BaseImportModule:
         self.temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         self.file_details = request.POST.get("load_details", None)
         multiprocessing = request.POST.get("multiprocessing", False)
+        max_subprocesses = int(request.POST.get("max_subprocesses", 0) or 0)
         result = {}
         if self.file_details:
             details = json.loads(self.file_details)
@@ -467,6 +486,7 @@ class BaseImportModule:
                     self.temp_dir,
                     self.loadid,
                     multiprocessing,
+                    max_subprocesses,
                 )
 
             return response
