@@ -427,52 +427,40 @@ class Command(BaseCommand):
         else:
             with transaction.atomic():
                 for node in nodes:
-                    if node.datatype == "concept":
-                        node.config = {
-                            "multiValue": False,
-                            "controlledList": str(node.collection_id),
-                        }
-                    elif node.datatype == "concept-list":
-                        node.config = {
-                            "multiValue": True,
-                            "controlledList": str(node.collection_id),
-                        }
+
+                    default_value = node.config.get("defaultValue", None)
+                    new_default_value = []
+                    if default_value:
+                        if isinstance(default_value, str):
+                            default_value = [default_value]
+                        for value in default_value:
+                            value_rec = Value.objects.get(pk=value)
+                            config = {"controlledList": node.collection_id}
+                            new_value = REFERENCE_FACTORY.transform_value_for_tile(
+                                value=value_rec.value,
+                                **config,
+                            )
+                            if isinstance(new_value, list):
+                                new_default_value.append(new_value[0])
+                            else:
+                                raise CommandError(
+                                    f"Failed to convert original default value: {value_rec.value} in list: {node.collection_id} for node: {node.name} into a reference datatype instance"
+                                )
+
+                    node.config = {
+                        "multiValue": (
+                            True if node.datatype == "concept-list" else False
+                        ),
+                        "controlledList": str(node.collection_id),
+                        "defaultValue": (
+                            new_default_value if new_default_value else None
+                        ),
+                    }
                     node.datatype = "reference"
                     node.full_clean()
                     node.save()
 
                     for cross_record in self._card_cross_records(node):
-                        # work around for i18n as_sql method issue detailed here: https://github.com/archesproject/arches/issues/11473
-                        cross_record.config = {}
-                        cross_record.save()
-
-                        # Crosswalk concept version of default values to reference versions
-                        original_default_value = (
-                            cross_record.config_without_options.get(
-                                "defaultValue", None
-                            )
-                        )
-                        if original_default_value:
-                            new_default_value = []
-                            if isinstance(original_default_value, str):
-                                original_default_value = [original_default_value]
-                            for value in original_default_value:
-                                value_rec = Value.objects.get(pk=value)
-                                config = {"controlledList": node.collection_id}
-                                new_value = REFERENCE_FACTORY.transform_value_for_tile(
-                                    value=value_rec.value,
-                                    **config,
-                                )
-                                if isinstance(new_value, list):
-                                    new_default_value.append(new_value[0])
-                                else:
-                                    raise CommandError(
-                                        f"Failed to convert original default value: {value_rec.value} in list: {node.collection_id} for node: {node.name} into a reference datatype instance"
-                                    )
-                            cross_record.config_without_options["defaultValue"] = (
-                                new_default_value
-                            )
-
                         self._finalize_card_as_reference(
                             cross_record, REFERENCE_SELECT_WIDGET
                         )
@@ -584,27 +572,19 @@ class Command(BaseCommand):
                     if not len(new_default_value):
                         new_default_value = None
 
-                    if node.datatype == "domain-value":
-                        node.config = {
-                            "multiValue": False,
-                            "controlledList": controlled_list_id,
-                            "defaultValue": new_default_value,
-                        }
-                    elif node.datatype == "domain-value-list":
-                        node.config = {
-                            "multiValue": True,
-                            "controlledList": controlled_list_id,
-                            "defaultValue": new_default_value,
-                        }
+                    multi_value = (
+                        True if node.datatype == "domain-value-list" else False
+                    )
+                    node.config = {
+                        "multiValue": multi_value,
+                        "controlledList": controlled_list_id,
+                        "defaultValue": new_default_value,
+                    }
                     node.datatype = "reference"
                     node.full_clean()
                     node.save()
 
                     for cross_record in self._card_cross_records(node):
-                        # work around for i18n as_sql method issue detailed here: https://github.com/archesproject/arches/issues/11473
-                        cross_record.config = {}
-                        cross_record.save()
-
                         self._finalize_card_as_reference(
                             cross_record, REFERENCE_SELECT_WIDGET
                         )
@@ -641,14 +621,23 @@ class Command(BaseCommand):
     def _card_cross_records(self, node):
         return node.cardxnodexwidget_set.annotate(
             config_without_options=CombinedExpression(
-                models.F("config"),
+                CombinedExpression(
+                    models.F("config"),
+                    "-",
+                    models.Value("options", output_field=models.CharField()),
+                    output_field=I18n_JSONField(),
+                ),
                 "-",
-                models.Value("options", output_field=models.CharField()),
+                models.Value("defaultValue", output_field=models.CharField()),
                 output_field=I18n_JSONField(),
             )
         )
 
     def _finalize_card_as_reference(self, cross_record, reference_select_widget):
+        # work around for i18n as_sql method issue detailed here: https://github.com/archesproject/arches/issues/11473
+        cross_record.config = {}
+        cross_record.save()
+
         cross_record.config = cross_record.config_without_options
         cross_record.widget = reference_select_widget
         cross_record.full_clean()
