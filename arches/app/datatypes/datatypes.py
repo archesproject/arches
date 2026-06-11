@@ -1832,14 +1832,20 @@ class DomainDataType(BaseDomainDataType):
         if value is not None:
             try:
                 uuid.UUID(str(value))
-                found_option = (
-                    len(
-                        models.Node.objects.filter(
-                            config__contains={"options": [{"id": value}]}
-                        )
+                if node is not None:
+                    found_option = any(
+                        option["id"] == value
+                        for option in (node.config or {}).get("options", [])
                     )
-                    > 0
-                )
+                else:
+                    found_option = (
+                        len(
+                            models.Node.objects.filter(
+                                config__contains={"options": [{"id": value}]}
+                            )
+                        )
+                        > 0
+                    )
             except ValueError:
                 found_option = (
                     True if self.get_option_id_from_text(value) is not None else False
@@ -2057,7 +2063,7 @@ class DomainListDataType(BaseDomainDataType):
         errors = []
         if values is not None:
             for value in values:
-                errors = errors + domainDataType.validate(value, row_number)
+                errors = errors + domainDataType.validate(value, row_number, node=node)
         return errors
 
     def get_search_terms(self, nodevalue, nodeid=None):
