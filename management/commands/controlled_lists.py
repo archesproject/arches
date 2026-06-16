@@ -447,15 +447,20 @@ class Command(BaseCommand):
                                     f"Failed to convert original default value: {value_rec.value} in list: {node.collection_id} for node: {node.name} into a reference datatype instance"
                                 )
 
-                    node.config = {
-                        "multiValue": (
-                            True if node.datatype == "concept-list" else False
-                        ),
-                        "controlledList": str(node.collection_id),
-                        "defaultValue": (
-                            new_default_value if new_default_value else None
-                        ),
-                    }
+                    new_config = dict(node.config or {})
+                    new_config.update(
+                        {
+                            "multiValue": (
+                                True if node.datatype == "concept-list" else False
+                            ),
+                            "controlledList": str(node.collection_id),
+                            "defaultValue": (
+                                new_default_value if new_default_value else None
+                            ),
+                        }
+                    )
+                    new_config.pop("rdmCollection", None)
+                    node.config = new_config
                     node.datatype = "reference"
                     node.full_clean()
                     node.save()
@@ -575,11 +580,19 @@ class Command(BaseCommand):
                     multi_value = (
                         True if node.datatype == "domain-value-list" else False
                     )
-                    node.config = {
-                        "multiValue": multi_value,
-                        "controlledList": controlled_list_id,
-                        "defaultValue": new_default_value,
-                    }
+                    # Preserve options so the migrate-to-reference-datatype
+                    # ETL module can do label fallback against the legacy
+                    # option-id -> text mapping when a tile value's id does
+                    # not directly resolve to a ListItem.
+                    new_config = dict(node.config or {})
+                    new_config.update(
+                        {
+                            "multiValue": multi_value,
+                            "controlledList": controlled_list_id,
+                            "defaultValue": new_default_value,
+                        }
+                    )
+                    node.config = new_config
                     node.datatype = "reference"
                     node.full_clean()
                     node.save()
