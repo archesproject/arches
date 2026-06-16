@@ -97,7 +97,11 @@ def reverse_edit_log_entries(transaction_id, user=None, chunk_size=2000):
         for tile in Tile.objects.filter(
             tileid__in=tile_edit_changes.values_list("tileinstanceid_uuid", flat=True)
         ).iterator(chunk_size=2000):
-            tile.data = tile_edit_changes.get(tileinstanceid=str(tile.tileid)).oldvalue
+            tile.data = (
+                tile_edit_changes.filter(tileinstanceid=str(tile.tileid))
+                .first()
+                .oldvalue
+            )
             tile.save(
                 index=False,
                 recalculate_descriptors=False,
