@@ -22,6 +22,7 @@ import json
 import os
 import uuid
 import shutil
+from rdflib.util import guess_format
 from django.utils.translation import gettext as _
 from django.core.management.base import BaseCommand, CommandError
 from django.core.files import File
@@ -188,22 +189,11 @@ class Command(BaseCommand):
     def add_ontology(
         self, id=None, data_source=None, version=None, name=None, parentontology=None
     ):
-        extension_format_map = {
-            ".rdfs": "xml",
-            ".rdf": "xml",
-            ".owl": "xml",
-            ".ttl": "turtle",
-            ".n3": "n3",
-            ".nt": "nt",
-            ".jsonld": "json-ld",
-        }
-        _, extension = os.path.splitext(data_source)
-        rdf_format = extension_format_map.get(extension.lower())
-        (
+        rdf_format = guess_format(data_source)
+        if rdf_format:
             self.graph.parse(data_source, format=rdf_format)
-            if rdf_format
-            else self.graph.parse(data_source)
-        )
+        else:
+            self.graph.parse(data_source)
         filename = os.path.split(data_source)[1]
         namespaces = {
             str(namespace[1]): str(namespace[0])
