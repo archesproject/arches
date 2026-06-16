@@ -28,11 +28,11 @@ import {
     findNodeInTree,
     getItemLabel,
     itemAsNode,
-    listAsNode,
     nodeIsList,
     reorderItems,
     shouldUseContrast,
 } from "@/arches_controlled_lists/utils.ts";
+import { useListStore } from "@/arches_controlled_lists/stores/useListStore.ts";
 import MoveRow from "@/arches_controlled_lists/components/tree/MoveRow.vue";
 
 import type { ComponentPublicInstance, Ref } from "vue";
@@ -55,7 +55,8 @@ const { $gettext } = useGettext();
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 const systemLanguage = inject(systemLanguageKey) as Language;
 
-const tree = defineModel<TreeNode[]>("tree", { required: true });
+const listStore = useListStore();
+
 const expandedKeys = defineModel<TreeExpandedKeys>("expandedKeys", {
     required: true,
 });
@@ -74,14 +75,21 @@ const newListFormValue = defineModel<string>("newListFormValue", {
 });
 const filterValue = defineModel<string>("filterValue", { required: true });
 
-const { isMultiSelecting, shouldCopyChildren, node, iconLabels, moveLabels } =
-    defineProps<{
-        shouldCopyChildren: boolean;
-        isMultiSelecting: boolean;
-        iconLabels: IconLabels;
-        moveLabels: MoveLabels;
-        node: TreeNode;
-    }>();
+const {
+    isMultiSelecting,
+    shouldCopyChildren,
+    node,
+    iconLabels,
+    moveLabels,
+    tree,
+} = defineProps<{
+    shouldCopyChildren: boolean;
+    isMultiSelecting: boolean;
+    iconLabels: IconLabels;
+    moveLabels: MoveLabels;
+    node: TreeNode;
+    tree: TreeNode[];
+}>();
 const { setDisplayedRow }: { setDisplayedRow: RowSetter } =
     inject(displayedRowKey)!;
 
@@ -152,7 +160,18 @@ const setParent = async (parentNode: TreeNode) => {
         siblings.push(item);
     } else {
         item.parent_id = parentNode.key;
-        list = findNodeInTree(tree.value, parentNode.data.list_id).found!.data;
+        let parentListNode = findNodeInTree(
+            tree,
+            parentNode.data.list_id,
+        ).found;
+        if (!parentListNode) {
+            await listStore.loadAncestorPath(parentNode.key as string);
+            parentListNode = findNodeInTree(
+                tree,
+                parentNode.data.list_id,
+            ).found;
+        }
+        list = parentListNode!.data;
         siblings = parentNode.data.children;
         siblings.push(item);
     }
@@ -260,10 +279,12 @@ const acceptNewItemShortcutEntry = async () => {
         newItem.values = [newLabel];
     }
 
-    const parent = findNodeInTree(
-        tree.value,
-        newItem.parent_id ?? newItem.list_id,
-    ).found;
+    const parentId = newItem.parent_id ?? newItem.list_id;
+    let parent = findNodeInTree(tree, parentId).found;
+    if (!parent) {
+        await listStore.loadAncestorPath(parentId);
+        parent = findNodeInTree(tree, parentId).found;
+    }
     if (!parent) {
         throw new Error();
     }
@@ -308,10 +329,11 @@ const acceptNewListShortcutEntry = async () => {
         });
         return;
     }
-    tree.value = [
-        ...tree.value.filter((cList) => !dataIsNew(cList.data)),
-        listAsNode(newList, selectedLanguage.value, iconLabels),
-    ];
+    try {
+        await listStore.refresh();
+    } catch {
+        // Refresh failure isn't blocking — the new list will appear on next reload.
+    }
     selectedKeys.value = { [newList.id]: true };
     setDisplayedRow(newList);
     newListFormValue.value = "";
@@ -380,11 +402,11 @@ const acceptNewListShortcutEntry = async () => {
         >
             <MoveRow
                 v-if="!isMultiSelecting"
-                v-model:tree="tree"
                 v-model:expanded-keys="expandedKeys"
                 v-model:selected-keys="selectedKeys"
                 v-model:moving-item="movingItem"
                 v-model:next-new-item="nextNewItem"
+                :tree
                 :node
                 :icon-labels
                 :move-labels

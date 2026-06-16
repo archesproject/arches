@@ -1,5 +1,6 @@
 from django.contrib.postgres.expressions import ArraySubquery
 from django.db import models
+from django.db.models import Exists, OuterRef
 from django.db.models.fields.json import KT
 from django.db.models.functions import Cast
 
@@ -43,6 +44,15 @@ class ListItemQuerySet(models.QuerySet):
                 "list_item_values",
                 ListItemValue.objects.labels(),
                 to_attr="list_item_labels",
+            )
+        )
+
+    def annotate_has_children(self):
+        from arches_controlled_lists.models import ListItem
+
+        return self.annotate(
+            has_children_annotated=Exists(
+                ListItem.objects.filter(parent_id=OuterRef("pk"))
             )
         )
 

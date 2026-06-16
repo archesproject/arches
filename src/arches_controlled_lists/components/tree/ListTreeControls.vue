@@ -3,13 +3,13 @@ import ActionBanner from "@/arches_controlled_lists/components/tree/ActionBanner
 import AddDeleteControls from "@/arches_controlled_lists/components/tree/AddDeleteControls.vue";
 import PresentationControls from "@/arches_controlled_lists/components/tree/PresentationControls.vue";
 
+import { useListStore } from "@/arches_controlled_lists/stores/useListStore.ts";
+
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree";
 import type { TreeNode } from "primevue/treenode";
 import type { ControlledList } from "@/arches_controlled_lists/types";
 
-const controlledListItemsTree = defineModel<TreeNode[]>("tree", {
-    required: true,
-});
+const { tree } = defineProps<{ tree: TreeNode[] }>();
 const rerenderTree = defineModel<number>("rerenderTree", { required: true });
 const expandedKeys = defineModel<TreeExpandedKeys>("expandedKeys", {
     required: true,
@@ -29,8 +29,20 @@ const newListFormValue = defineModel<string>("newListFormValue", {
     required: true,
 });
 
-const expandAll = () => {
-    for (const node of controlledListItemsTree.value) {
+const listStore = useListStore();
+
+// Expand all is a deliberate user action — eager-load every list so the
+// expansion has the full subtree to walk. Plan §28.
+const expandAll = async () => {
+    for (const node of tree) {
+        const listId = node.data?.id;
+        if (listId && !listStore.isListEagerlyLoaded(listId)) {
+            try {
+                await listStore.loadListEagerly(listId);
+            } catch {
+                // Skip this list; expansion will only reveal what's loaded.
+            }
+        }
         expandNode(node);
     }
 };
@@ -53,11 +65,11 @@ const expandNode = (node: TreeNode) => {
 <template>
     <div class="controls">
         <AddDeleteControls
-            v-model="controlledListItemsTree"
             v-model:is-multi-selecting="isMultiSelecting"
             v-model:selected-keys="selectedKeys"
             v-model:next-new-list="nextNewList"
             v-model:new-list-form-value="newListFormValue"
+            :tree="tree"
         />
     </div>
     <ActionBanner

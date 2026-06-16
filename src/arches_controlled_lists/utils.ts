@@ -143,15 +143,29 @@ export const itemAsNode = (
     item: ControlledListItem,
     selectedLanguage: Language,
     iconLabels: IconLabels,
+    hasLoadedChildren?: (itemId: string) => boolean,
 ): TreeNode => {
+    // leaf=false tells PrimeVue Tree the node has children that haven't been
+    // loaded yet (renders an expand chevron). leaf=true forces no chevron.
+    // Otherwise we leave it undefined and PrimeVue falls back to the children
+    // array length.
+    let leaf: boolean | undefined;
+    const childrenLoaded = hasLoadedChildren?.(item.id) ?? false;
+    if (item.has_children && !childrenLoaded) {
+        leaf = false;
+    } else if (!item.has_children && !item.children?.length) {
+        leaf = true;
+    }
+
     return {
         key: item.id,
-        children: item.children.map((child) =>
-            itemAsNode(child, selectedLanguage, iconLabels),
+        children: (item.children ?? []).map((child) =>
+            itemAsNode(child, selectedLanguage, iconLabels, hasLoadedChildren),
         ),
         data: item,
         icon: item.guide ? "pi pi-bookmark" : "pi pi-tag",
         iconLabel: iconLabels.item,
+        ...(leaf !== undefined ? { leaf } : {}),
     };
 };
 
@@ -159,11 +173,12 @@ export const listAsNode = (
     list: ControlledList,
     selectedLanguage: Language,
     iconLabels: IconLabels,
+    hasLoadedChildren?: (itemId: string) => boolean,
 ): TreeNode => {
     return {
         key: list.id,
         children: list.items.map((item: ControlledListItem) =>
-            itemAsNode(item, selectedLanguage, iconLabels),
+            itemAsNode(item, selectedLanguage, iconLabels, hasLoadedChildren),
         ),
         data: list,
         icon: "pi pi-folder",

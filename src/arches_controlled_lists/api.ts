@@ -38,6 +38,97 @@ export const fetchLists = async () => {
     }
 };
 
+export const fetchListsShallow = async () => {
+    const response = await fetch(
+        `${arches.urls.controlled_lists}?shallow=true`,
+    );
+    try {
+        const parsed = await response.json();
+        if (response.ok) {
+            return parsed;
+        }
+        throw new Error(parsed.message);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
+    }
+};
+
+export const fetchListShallow = async (listId: string) => {
+    const response = await fetch(
+        `${arches.urls.controlled_list(listId)}?shallow=true`,
+    );
+    try {
+        const parsed = await response.json();
+        if (response.ok) {
+            return parsed;
+        }
+        throw new Error(parsed.message);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
+    }
+};
+
+export const fetchListEagerly = async (listId: string) => {
+    const response = await fetch(arches.urls.controlled_list(listId));
+    try {
+        const parsed = await response.json();
+        if (response.ok) {
+            return parsed;
+        }
+        throw new Error(parsed.message);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
+    }
+};
+
+export const fetchListItemChildren = async (itemId: string) => {
+    const response = await fetch(
+        arches.urls.controlled_list_item_children(itemId),
+    );
+    try {
+        const parsed = await response.json();
+        if (response.ok) {
+            return parsed;
+        }
+        throw new Error(parsed.message);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
+    }
+};
+
+export const fetchListItemAncestorPath = async (itemId: string) => {
+    const response = await fetch(arches.urls.controlled_list_item_path(itemId));
+    try {
+        const parsed = await response.json();
+        if (response.ok) {
+            return parsed;
+        }
+        throw new Error(parsed.message);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
+    }
+};
+
+export const fetchFilteredList = async (listId: string, term: string) => {
+    const url = new URL(
+        arches.urls.filtered_controlled_list(listId),
+        window.location.origin,
+    );
+    if (term) {
+        url.searchParams.set("term", term);
+    }
+    const response = await fetch(url.toString());
+    try {
+        const parsed = await response.json();
+        if (response.ok) {
+            return parsed;
+        }
+        throw new Error(parsed.message);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
+    }
+};
+
 export const createList = async (name: string) => {
     const response = await fetch(arches.urls.controlled_list_add, {
         method: "POST",

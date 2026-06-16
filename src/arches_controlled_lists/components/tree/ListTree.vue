@@ -1,22 +1,33 @@
 <script setup lang="ts">
-import { inject, ref, useTemplateRef, watch } from "vue";
+import { computed, inject, onMounted, reactive, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useGettext } from "vue3-gettext";
 import { useToast } from "primevue/usetoast";
 
+import InputText from "primevue/inputtext";
+import Message from "primevue/message";
 import Tree from "primevue/tree";
 
 import {
     DEFAULT_ERROR_TOAST_LIFE,
     ERROR,
     displayedRowKey,
+    selectedLanguageKey,
 } from "@/arches_controlled_lists/constants.ts";
 import { routeNames } from "@/arches_controlled_lists/routes.ts";
-import { findNodeInTree, nodeIsList } from "@/arches_controlled_lists/utils.ts";
+import {
+    findNodeInTree,
+    itemAsNode,
+    listAsNode,
+    nodeIsList,
+} from "@/arches_controlled_lists/utils.ts";
+import { useCappedTreeFilter } from "@/arches_controlled_lists/components/tree/utils/capped-filter.ts";
+import { fetchFilteredList } from "@/arches_controlled_lists/api.ts";
+import { useListStore } from "@/arches_controlled_lists/stores/useListStore.ts";
 import ListTreeControls from "@/arches_controlled_lists/components/tree/ListTreeControls.vue";
 import TreeRow from "@/arches_controlled_lists/components/tree/TreeRow.vue";
 
-import type { ComponentPublicInstance, Ref } from "vue";
+import type { Ref } from "vue";
 import type { RouteLocationNormalizedLoadedGeneric } from "vue-router";
 import type { TreePassThroughMethodOptions } from "primevue/tree";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree";
@@ -24,14 +35,17 @@ import type { TreeNode } from "primevue/treenode";
 import type {
     ControlledList,
     ControlledListItem,
+    Language,
     RowSetter,
     Value,
 } from "@/arches_controlled_lists/types";
 
+const FILTER_DEBOUNCE_MS = 250;
+const FILTER_RENDER_CAP = 2500;
+
 const toast = useToast();
 const { $gettext } = useGettext();
 
-// Defining these in the parent avoids re-running $gettext in thousands of children.
 const moveLabels = Object.freeze({
     addChild: $gettext("Add child item"),
     moveUp: $gettext("Move item up"),
@@ -42,26 +56,28 @@ const iconLabels = Object.freeze({
     list: $gettext("List"),
     item: $gettext("Item"),
 });
+const FILTER_PLACEHOLDER = $gettext("Find");
+const FILTER_CAPPED_MESSAGE = $gettext(
+    "Too many matches to display. Please refine your query.",
+);
 
-const tree: Ref<TreeNode[]> = ref([]);
+const listStore = useListStore();
+const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
+
 const selectedKeys: Ref<TreeSelectionKeys> = ref({});
 const expandedKeys: Ref<TreeExpandedKeys> = ref({});
 const movingItem: Ref<TreeNode | undefined> = ref();
 const shouldCopyChildren = ref(true);
 const isMultiSelecting = ref(false);
-const refetcher = ref(0);
 const filterValue = ref("");
-const treeComponent = useTemplateRef<ComponentPublicInstance>("treeComponent");
+const loadingNodeKeys = reactive(new Set<string>());
 
-// For next new item's pref label (input textbox)
-const newLabelFormValue = ref("");
 const nextNewItem = ref<ControlledListItem>();
-// For new list entry (input textbox)
+const newLabelFormValue = ref("");
 const newListFormValue = ref("");
-const nextNewList = ref<ControlledList>();
+const nextNewList = ref();
+const refetcher = ref(0);
 const rerenderTree = ref(0);
-const nextFilterChangeNeedsExpandAll = ref(false);
-const expandedKeysSnapshotBeforeSearch = ref<TreeExpandedKeys>({});
 
 const { setDisplayedRow } = inject<{ setDisplayedRow: RowSetter }>(
     displayedRowKey,
@@ -69,7 +85,150 @@ const { setDisplayedRow } = inject<{ setDisplayedRow: RowSetter }>(
 
 const route = useRoute();
 
-const navigate = (newRoute: RouteLocationNormalizedLoadedGeneric) => {
+// Tree is derived from the store. The store owns the canonical
+// ControlledList/ControlledListItem data; we project that into TreeNodes
+// for PrimeVue.
+const tree = computed<TreeNode[]>(() =>
+    listStore.lists.map((list: ControlledList) =>
+        listAsNode(
+            list,
+            selectedLanguage.value,
+            iconLabels,
+            listStore.hasLoadedChildren,
+        ),
+    ),
+);
+
+function getSearchableText(node: TreeNode): string {
+    if (nodeIsList(node)) {
+        return (node.data.name ?? "").toLowerCase();
+    }
+    const values = (node.data.values ?? []) as Value[];
+    return values.map((v) => (v.value ?? "").toLowerCase()).join("\n");
+}
+
+const { debouncedFilterValue, filteredTree, isFilterCapped } =
+    useCappedTreeFilter(
+        tree,
+        expandedKeys,
+        filterValue,
+        FILTER_DEBOUNCE_MS,
+        FILTER_RENDER_CAP,
+        getSearchableText,
+    );
+
+// Hydrate the store the first time the tree mounts so we don't refetch
+// across route changes inside the manager.
+onMounted(async () => {
+    try {
+        await listStore.initialize();
+    } catch (error) {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Unable to fetch lists"),
+            detail: error instanceof Error ? error.message : undefined,
+        });
+    }
+});
+
+async function onNodeExpand(node: TreeNode) {
+    if (nodeIsList(node)) {
+        // Lists ship their root items eagerly; nothing to lazy-load.
+        return;
+    }
+    const itemId = node.key as string;
+    if (listStore.hasLoadedChildren(itemId)) {
+        return;
+    }
+    loadingNodeKeys.add(itemId);
+    try {
+        await listStore.loadChildren(itemId);
+    } catch (error) {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Unable to fetch children"),
+            detail: error instanceof Error ? error.message : undefined,
+        });
+    } finally {
+        loadingNodeKeys.delete(itemId);
+    }
+}
+
+const updateSelectedAndExpanded = (node: TreeNode) => {
+    if (isMultiSelecting.value || movingItem.value?.key) {
+        return;
+    }
+    setDisplayedRow(node.data);
+    expandedKeys.value = {
+        ...expandedKeys.value,
+        [node.key]: true,
+    };
+};
+
+// Eager-load the affected list whenever the user enters a flow that needs
+// the whole subtree (multi-select, item move). Plan §23.
+watch(isMultiSelecting, async (active) => {
+    if (!active) return;
+    const displayedListId = inferListIdFromDisplayedRow();
+    if (displayedListId) {
+        try {
+            await listStore.loadListEagerly(displayedListId);
+        } catch (error) {
+            toast.add({
+                severity: ERROR,
+                life: DEFAULT_ERROR_TOAST_LIFE,
+                summary: $gettext("Unable to load list for multi-select"),
+                detail: error instanceof Error ? error.message : undefined,
+            });
+        }
+    }
+});
+
+watch(movingItem, async (next) => {
+    if (!next?.data?.list_id) return;
+    try {
+        await listStore.loadListEagerly(next.data.list_id);
+    } catch (error) {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Unable to load list for move"),
+            detail: error instanceof Error ? error.message : undefined,
+        });
+    }
+});
+
+function inferListIdFromDisplayedRow(): string | null {
+    // The displayed row is provided via injection by the parent. We rely on
+    // the selectedKeys reactive to find what's currently being edited
+    // because we don't have direct displayedRow access in this scope.
+    const firstSelected = Object.keys(selectedKeys.value)[0];
+    if (!firstSelected) return null;
+    const item = listStore.findItem(firstSelected);
+    if (item) return item.list_id;
+    const list = listStore.findList(firstSelected);
+    return list ? list.id : null;
+}
+
+async function revealItemInTree(itemId: string): Promise<TreeNode | null> {
+    try {
+        const { found } = findNodeInTree(tree.value, itemId);
+        if (found) return found;
+    } catch {
+        // not in memory yet; fall through to ancestor load
+    }
+    try {
+        await listStore.loadAncestorPath(itemId);
+        const { found } = findNodeInTree(tree.value, itemId);
+        return found ?? null;
+    } catch {
+        return null;
+    }
+}
+
+async function navigate(newRoute: RouteLocationNormalizedLoadedGeneric) {
     switch (newRoute.name) {
         case routeNames.splash:
             setDisplayedRow(null);
@@ -77,9 +236,7 @@ const navigate = (newRoute: RouteLocationNormalizedLoadedGeneric) => {
             selectedKeys.value = {};
             break;
         case routeNames.list: {
-            if (!tree.value.length) {
-                return;
-            }
+            if (!tree.value.length) return;
             const list = tree.value.find(
                 (node) => node.data.id === newRoute.params.id,
             );
@@ -96,46 +253,38 @@ const navigate = (newRoute: RouteLocationNormalizedLoadedGeneric) => {
             break;
         }
         case routeNames.item: {
-            if (!tree.value.length) {
-                return;
-            }
-            try {
-                const { found, path } = findNodeInTree(
-                    tree.value,
-                    newRoute.params.id as string,
-                );
-
-                if (found) {
-                    setDisplayedRow(found.data);
-                    const itemsToExpandIds = path.map(
-                        (itemInPath: TreeNode) => itemInPath.key,
-                    );
-                    expandedKeys.value = {
-                        ...expandedKeys.value,
-                        ...Object.fromEntries(
-                            [
-                                found.data.controlled_list_id,
-                                ...itemsToExpandIds,
-                            ].map((x) => [x, true]),
-                        ),
-                    };
-                    selectedKeys.value = { [found.data.id]: true };
+            if (!tree.value.length) return;
+            const itemId = newRoute.params.id as string;
+            const found = await revealItemInTree(itemId);
+            if (found) {
+                setDisplayedRow(found.data);
+                // Collect ancestor ids so we can expand them all at once.
+                let ancestorId = (found.data as ControlledListItem).parent_id;
+                const idsToExpand: string[] = [
+                    (found.data as ControlledListItem).list_id,
+                ];
+                while (ancestorId) {
+                    idsToExpand.push(ancestorId);
+                    const ancestor = listStore.findItem(ancestorId);
+                    ancestorId = ancestor?.parent_id ?? null;
                 }
-            } catch (error) {
+                expandedKeys.value = {
+                    ...expandedKeys.value,
+                    ...Object.fromEntries(idsToExpand.map((id) => [id, true])),
+                };
+                selectedKeys.value = { [found.data.id]: true };
+            } else {
                 toast.add({
                     severity: ERROR,
                     life: DEFAULT_ERROR_TOAST_LIFE,
-                    summary: $gettext(
-                        `List Item ${newRoute.params.id} not found`,
-                    ),
-                    detail: error instanceof Error ? error.message : undefined,
+                    summary: $gettext(`List Item ${itemId} not found`),
                 });
                 setDisplayedRow(null);
             }
             break;
         }
     }
-};
+}
 
 // React to route changes.
 watch(
@@ -149,102 +298,66 @@ watch(
     },
 );
 
-// Navigate on initial load of the tree.
-watch(tree, () => navigate(route), { once: true });
+// Navigate on initial population of the tree.
+watch(
+    () => tree.value.length,
+    (length) => {
+        if (length > 0) {
+            navigate(route);
+        }
+    },
+);
 
-const updateSelectedAndExpanded = (node: TreeNode) => {
-    if (isMultiSelecting.value || movingItem.value?.key) {
+// Server-side fallback when the in-memory capped filter finds nothing.
+// Plan §29: when the filter doesn't match anything in the loaded shallow
+// tree, hit FilteredListView per visible list, then lazy-load the
+// returned branches so the capped filter re-evaluates.
+let serverFilterAbortToken = 0;
+watch(debouncedFilterValue, async (next) => {
+    if (!next || filteredTree.value.length > 0 || isFilterCapped.value) {
         return;
     }
-    setDisplayedRow(node.data);
-    expandedKeys.value = {
-        ...expandedKeys.value,
-        [node.key]: true,
-    };
-};
-
-const expandAll = () => {
-    const newExpandedKeys = {};
-    for (const node of tree.value) {
-        expandNode(node, newExpandedKeys);
-    }
-    expandedKeys.value = { ...newExpandedKeys };
-};
-
-const expandNode = (node: TreeNode, newExpandedKeys: TreeExpandedKeys) => {
-    if (node.children && node.children.length) {
-        newExpandedKeys[node.key] = true;
-
-        for (const child of node.children) {
-            expandNode(child, newExpandedKeys);
+    const token = ++serverFilterAbortToken;
+    for (const list of listStore.lists) {
+        if (token !== serverFilterAbortToken) return;
+        try {
+            const data = await fetchFilteredList(list.id, next);
+            const items = (data.items ?? []) as Array<{
+                id: string;
+                parent_ids?: string[];
+            }>;
+            const parentIdsToLoad = new Set<string>();
+            for (const item of items) {
+                for (const pid of item.parent_ids ?? []) {
+                    parentIdsToLoad.add(pid);
+                }
+            }
+            // Load ancestors sequentially so a parent loads before its child
+            // (each load may surface new ids that need expanding).
+            for (const pid of parentIdsToLoad) {
+                if (token !== serverFilterAbortToken) return;
+                if (!listStore.hasLoadedChildren(pid)) {
+                    try {
+                        await listStore.loadChildren(pid);
+                    } catch {
+                        /* surface via toast only if all loads fail */
+                    }
+                }
+            }
+        } catch (error) {
+            // One list failing shouldn't block searches in other lists.
+            console.warn(
+                `Server-side search of list ${list.id} failed:`,
+                error,
+            );
         }
     }
-};
-
-const expandPathsToFilterResults = (newFilterValue: string) => {
-    // https://github.com/primefaces/primevue/issues/3996
-    if (filterValue.value && !newFilterValue) {
-        expandedKeys.value = { ...expandedKeysSnapshotBeforeSearch.value };
-        expandedKeysSnapshotBeforeSearch.value = {};
-        // Rerender to avoid error emitted in PrimeVue tree re: aria-selected.
-        rerenderTree.value += 1;
-    }
-    // Expand all on the first interaction with the filter, or if the user
-    // has collapsed a node and changes the filter.
-    if (
-        (!filterValue.value && newFilterValue) ||
-        (nextFilterChangeNeedsExpandAll.value &&
-            filterValue.value !== newFilterValue)
-    ) {
-        expandedKeysSnapshotBeforeSearch.value = { ...expandedKeys.value };
-        expandAll();
-    }
-    nextFilterChangeNeedsExpandAll.value = false;
-};
-
-function getInputElement() {
-    if (treeComponent.value !== null) {
-        return treeComponent.value.$el.ownerDocument.querySelector(
-            'input[data-pc-name="pcfilterinput"]',
-        ) as HTMLInputElement;
-    }
-}
-
-const restoreFocusToInput = () => {
-    // The current implementation of collapsing all nodes when
-    // backspacing out the search value relies on rerendering the
-    // <Tree> component. Restore focus to the input element.
-    if (rerenderTree.value > 0) {
-        const inputEl = getInputElement();
-        if (inputEl) {
-            inputEl.focus();
-        }
-    }
-};
-
-const snoopOnFilterValue = () => {
-    // If we wait to react to the emitted filter event, the templated rows
-    // will have already rendered. (<TreeRow> bolds search terms.)
-    const inputEl = getInputElement();
-    if (inputEl) {
-        expandPathsToFilterResults(inputEl.value);
-        filterValue.value = inputEl.value;
-    }
-};
-
-function lazyLabelLookup(node: TreeNode) {
-    if (nodeIsList(node)) {
-        return node.data.name;
-    } else {
-        return node.data.values.map((val: Value) => val.value);
-    }
-}
+});
 </script>
 
 <template>
     <ListTreeControls
         :key="refetcher"
-        v-model:tree="tree"
         v-model:rerender-tree="rerenderTree"
         v-model:expanded-keys="expandedKeys"
         v-model:selected-keys="selectedKeys"
@@ -253,18 +366,31 @@ function lazyLabelLookup(node: TreeNode) {
         v-model:should-copy-children="shouldCopyChildren"
         v-model:next-new-list="nextNewList"
         v-model:new-list-form-value="newListFormValue"
+        :tree="tree"
     />
+    <div class="filter-container">
+        <InputText
+            v-model="filterValue"
+            class="tree-filter-input"
+            type="text"
+            :placeholder="FILTER_PLACEHOLDER"
+            :aria-label="FILTER_PLACEHOLDER"
+        />
+        <Message
+            v-if="isFilterCapped"
+            severity="warn"
+            :closable="false"
+            class="filter-cap-message"
+        >
+            {{ FILTER_CAPPED_MESSAGE }}
+        </Message>
+    </div>
     <Tree
-        v-if="tree"
-        ref="treeComponent"
+        v-if="filteredTree"
         :key="rerenderTree"
         v-model:selection-keys="selectedKeys"
         v-model:expanded-keys="expandedKeys"
-        :value="tree"
-        :filter="true"
-        :filter-by="lazyLabelLookup"
-        filter-mode="lenient"
-        :filter-placeholder="$gettext('Find')"
+        :value="filteredTree"
         :selection-mode="isMultiSelecting ? 'checkbox' : 'single'"
         :pt="{
             root: {
@@ -273,12 +399,6 @@ function lazyLabelLookup(node: TreeNode) {
                     overflowY: 'hidden',
                     paddingBottom: '5rem',
                     paddingRight: '0rem',
-                },
-            },
-            pcFilter: {
-                root: {
-                    ariaLabel: $gettext('Find'),
-                    style: { width: '100%', fontSize: 'small' },
                 },
             },
             wrapper: {
@@ -305,17 +425,19 @@ function lazyLabelLookup(node: TreeNode) {
                     width: '100%',
                 },
             },
-            hooks: {
-                onBeforeUpdate: snoopOnFilterValue,
-                onMounted: restoreFocusToInput,
-            },
+            nodeToggleButton: ({ instance }: TreePassThroughMethodOptions) => ({
+                class: {
+                    'node-children-loading': loadingNodeKeys.has(
+                        instance.node?.key as string,
+                    ),
+                },
+            }),
         }"
-        @node-collapse="nextFilterChangeNeedsExpandAll = true"
         @node-select="updateSelectedAndExpanded"
+        @node-expand="onNodeExpand"
     >
         <template #default="slotProps">
             <TreeRow
-                v-model:tree="tree"
                 v-model:expanded-keys="expandedKeys"
                 v-model:selected-keys="selectedKeys"
                 v-model:moving-item="movingItem"
@@ -325,6 +447,7 @@ function lazyLabelLookup(node: TreeNode) {
                 v-model:new-label-form-value="newLabelFormValue"
                 v-model:new-list-form-value="newListFormValue"
                 v-model:filter-value="filterValue"
+                :tree="tree"
                 :icon-labels
                 :move-labels
                 :node="slotProps.node"
@@ -340,13 +463,40 @@ function lazyLabelLookup(node: TreeNode) {
     border: dashed;
 }
 
-:deep(.p-tree-filter-input) {
+.filter-container {
+    padding: 0.5rem 1rem;
+    background: var(--p-content-hover-background);
+    border-bottom: 1px solid var(--p-content-border-color);
+}
+
+.tree-filter-input {
+    width: 100%;
     height: 3.5rem;
     font-size: 1.4rem;
     border-radius: 2px;
 }
 
+.filter-cap-message {
+    margin-top: 0.5rem;
+    font-size: 1.2rem;
+}
+
 :deep(.p-tree-node) {
     margin-inline-end: 0.5rem;
+}
+
+/* Spin the expand toggle icon while children are being fetched. */
+:deep(.node-children-loading .p-tree-node-toggle-icon) {
+    animation: tree-toggle-spin 0.6s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes tree-toggle-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 </style>

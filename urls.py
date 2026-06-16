@@ -8,6 +8,8 @@ from arches_controlled_lists.views import (
     ListsView,
     ListView,
     ListExportView,
+    ListItemAncestorPathView,
+    ListItemChildrenView,
     ListItemView,
     ListItemImageView,
     ListItemImageMetadataView,
@@ -33,6 +35,16 @@ urlpatterns = [
         "api/controlled_list_item/<uuid:item_id>/copy",
         ListItemCopyView.as_view(),
         name="controlled_list_item_copy",
+    ),
+    path(
+        "api/controlled_list_item/<uuid:item_id>/children",
+        ListItemChildrenView.as_view(),
+        name="controlled_list_item_children",
+    ),
+    path(
+        "api/controlled_list_item/<uuid:item_id>/path",
+        ListItemAncestorPathView.as_view(),
+        name="controlled_list_item_path",
     ),
     path(
         "api/controlled_list_export",
