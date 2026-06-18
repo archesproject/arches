@@ -1,6 +1,5 @@
 import logging
 
-from django.contrib.auth.models import User
 from django.db import connection, transaction
 from django.utils.translation import gettext as _
 
@@ -20,73 +19,71 @@ from arches.app.models.models import (
 )
 from arches.app.models.system_settings import settings as arches_settings
 
-from arches_controlled_lists.models import ListItem
-
 
 logger = logging.getLogger(__name__)
 
 
 CONCEPT_ORIGIN = "concept"
 DOMAIN_ORIGIN = "domain"
-CONCEPT_LEGACY_DATATYPES = ("concept", "concept-list")
-DOMAIN_LEGACY_DATATYPES = ("domain-value", "domain-value-list")
+CELERY_TILE_THRESHOLD = 500
 
 
 def _config_marker(origin):
     return "options" if origin == DOMAIN_ORIGIN else "rdmCollection"
 
 
-class ValueResolver:
-    """Caches list-item lookups for one (node, list) pair and resolves a
-    legacy tile value to a ListItem via either an id match or a label
-    fallback.
-
-    The id branch mirrors `ReferenceDataType.transform_value_for_tile`'s UUID
-    path; the label branch mirrors its label path. Both branches read from
-    in-memory dicts so per-tile resolution is O(1).
+class LegacyValueTranslator:
+    """Resolves a legacy tile value (concept valueid or domain option id)
+    to the reference-datatype tile representation by delegating to
+    `ReferenceDataType.transform_value_for_tile`. First attempts to resolve
+    the legacy id directly (works when the legacy id was preserved as the
+    ListItem.id during retype); if that yields no items, falls back to the
+    legacy value's label and retries. Results are memoized per legacy id
+    so repeated tile values only hit the datatype once.
 
     Subclasses provide `_build_label_index`, returning a mapping
     {legacy_id_str: label_string} sourced from either `node.config["options"]`
     (domain) or the Value/Concept tables (concept).
     """
 
-    def __init__(self, node, list_id, language_code, legacy_ids=None):
+    def __init__(
+        self, node, list_id, language_code, reference_datatype, legacy_ids=None
+    ):
         self.node = node
         self.list_id = list_id
         self.language_code = language_code
-
-        items = list(
-            ListItem.objects.filter(list_id=list_id).prefetch_related(
-                "list_item_values"
-            )
-        )
-        self.list_items_by_id = {str(item.pk): item for item in items}
-        self.list_items_by_label = {}
-        for item in items:
-            for liv in item.list_item_values.all():
-                key = (liv.value or "").casefold()
-                if key:
-                    self.list_items_by_label.setdefault(key, item)
-
+        self.reference_datatype = reference_datatype
         self.label_for_legacy_id = self._build_label_index(legacy_ids or set())
+        self.legacy_id_to_reference_val_cache = {}
 
     def _build_label_index(self, legacy_ids):
         return {}
 
     def resolve(self, legacy_id):
+        """Return a list of reference tile-value dicts for `legacy_id`, or
+        None if neither the id nor its label resolves against the target
+        list. Caches per legacy id."""
         if legacy_id is None:
             return None
         legacy_str = str(legacy_id)
-        item = self.list_items_by_id.get(legacy_str)
-        if item is not None:
-            return item
-        label = self.label_for_legacy_id.get(legacy_str)
-        if not label:
-            return None
-        return self.list_items_by_label.get(label.casefold())
+        if legacy_str in self.legacy_id_to_reference_val_cache:
+            return self.legacy_id_to_reference_val_cache[legacy_str]
+
+        resolved = self.reference_datatype.transform_value_for_tile(
+            [legacy_str], controlledList=self.list_id
+        )
+        if not resolved:
+            label = self.label_for_legacy_id.get(legacy_str)
+            if label:
+                resolved = self.reference_datatype.transform_value_for_tile(
+                    [label], controlledList=self.list_id
+                )
+
+        self.legacy_id_to_reference_val_cache[legacy_str] = resolved or None
+        return self.legacy_id_to_reference_val_cache[legacy_str]
 
 
-class DomainValueResolver(ValueResolver):
+class DomainLegacyValueTranslator(LegacyValueTranslator):
     def _build_label_index(self, legacy_ids):
         labels = {}
         for option in (self.node.config or {}).get("options") or []:
@@ -104,7 +101,7 @@ class DomainValueResolver(ValueResolver):
         return labels
 
 
-class ConceptValueResolver(ValueResolver):
+class ConceptLegacyValueTranslator(LegacyValueTranslator):
     def _build_label_index(self, legacy_ids):
         labels = {}
         if not legacy_ids:
@@ -143,9 +140,10 @@ class ConceptValueResolver(ValueResolver):
 class MigrateToReferenceDatatype(BaseBulkEditor):
     """Bulk editor that rewrites tile data for nodes which have already been
     retyped from concept/concept-list/domain/domain-list to reference. For
-    each tile touching a candidate node, the legacy id value(s) are resolved
-    to ListItem instances and the tile slot is replaced with the reference-
-    datatype shape via ListItem.build_tile_value.
+    each tile touching a candidate node, the legacy id value(s) are
+    translated to either a ListItem.id or a label string and handed to
+    ReferenceDataType.transform_value_for_tile, which returns the
+    reference-shaped tile slot.
     """
 
     def validate(self, request):
@@ -196,6 +194,26 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
             )
         return {"success": True, "data": node_payload}
 
+    def _count_candidate_tiles(self, graph_id, origin):
+        marker = _config_marker(origin)
+        candidate_node_ids = [
+            str(pk)
+            for pk in Node.objects.filter(graph_id=graph_id, datatype="reference")
+            .filter(**{"config__has_key": marker})
+            .values_list("pk", flat=True)
+        ]
+        if not candidate_node_ids:
+            return 0
+        nodegroup_ids = set(
+            Node.objects.filter(pk__in=candidate_node_ids).values_list(
+                "nodegroup_id", flat=True
+            )
+        )
+        return TileModel.objects.filter(
+            nodegroup_id__in=nodegroup_ids,
+            data__has_any_keys=candidate_node_ids,
+        ).count()
+
     def write(self, request):
         try:
             self.validate_inputs(request)
@@ -224,7 +242,18 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
                 self.log_event(cursor, "failed")
                 return {"success": False, "data": event_created["message"]}
 
-        return self.run_load_task_async(request, self.loadid)
+        tile_count = self._count_candidate_tiles(graph_id, origin)
+        if tile_count > CELERY_TILE_THRESHOLD:
+            return self.run_load_task_async(request, self.loadid)
+
+        return self.run_load_task(
+            self.userid,
+            self.loadid,
+            self.moduleid,
+            graph_id,
+            origin,
+            language_code,
+        )
 
     @load_data_async
     def run_load_task_async(self, request):
@@ -264,7 +293,7 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
         self.loadid = loadid
         self.moduleid = module_id
         try:
-            self._migrate_graph(graph_id, origin, language_code)
+            self._rewrite_tile_data(graph_id, origin, language_code)
         except Exception as exc:
             logger.exception(exc)
             with connection.cursor() as cursor:
@@ -277,7 +306,11 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
         save_to_tiles(userid, loadid)
         return {"success": True, "data": "done"}
 
-    def _migrate_graph(self, graph_id, origin, language_code):
+    def _rewrite_tile_data(self, graph_id, origin, language_code):
+        """Rewrite tile data for every tile in `graph_id` that touches a
+        retyped reference node of the given origin. One LoadStaging row per
+        tile, even when multiple reference nodes are present in the same
+        tile."""
         marker = _config_marker(origin)
         candidate_nodes = list(
             Node.objects.filter(graph_id=graph_id, datatype="reference").filter(
@@ -296,127 +329,195 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
                 f"done|Found {len(candidate_nodes)} candidate node(s) to migrate.",
             )
 
-        total_staged = 0
-        total_errored = 0
-        for node in candidate_nodes:
-            staged, errored = self._migrate_node(node, origin, language_code)
-            total_staged += staged
-            total_errored += errored
+        candidates_by_node_id = {str(node.pk): node for node in candidate_nodes}
+        candidate_node_ids = list(candidates_by_node_id.keys())
+        nodegroup_ids = {node.nodegroup_id for node in candidate_nodes}
 
-        with connection.cursor() as cursor:
-            self.log_event_details(
-                cursor,
-                f"done|Staged {total_staged} tile(s); "
-                f"{total_errored} skipped due to unresolvable values.",
-            )
-
-    def _migrate_node(self, node, origin, language_code):
-        list_id = (node.config or {}).get("controlledList")
-        if not list_id:
-            with connection.cursor() as cursor:
-                self.log_event_details(
-                    cursor,
-                    f"done|Skipping node '{node.alias}' - no controlledList in config.",
-                )
-            return 0, 0
-
-        nodeid_str = str(node.pk)
-        multi_value = bool((node.config or {}).get("multiValue"))
-
-        tile_qs = TileModel.objects.filter(
-            nodegroup_id=node.nodegroup_id,
-            data__has_key=nodeid_str,
+        translators = self._build_translators(
+            candidates_by_node_id, origin, language_code, nodegroup_ids
         )
+        sibling_datatypes_by_nodegroup = {}
 
-        legacy_ids = set()
-        if origin == CONCEPT_ORIGIN:
-            for tile_data in tile_qs.values_list("data", flat=True):
-                value = (tile_data or {}).get(nodeid_str)
-                if isinstance(value, list):
-                    legacy_ids.update(item for item in value if item)
-                elif value:
-                    legacy_ids.add(value)
-
-        resolver_cls = (
-            DomainValueResolver if origin == DOMAIN_ORIGIN else ConceptValueResolver
-        )
-        resolver = resolver_cls(node, list_id, language_code, legacy_ids=legacy_ids)
-
-        sibling_node_datatypes = {
-            str(n.pk): n.datatype
-            for n in Node.objects.filter(nodegroup_id=node.nodegroup_id)
-        }
+        tiles = TileModel.objects.filter(
+            nodegroup_id__in=nodegroup_ids,
+            data__has_any_keys=candidate_node_ids,
+        ).iterator()
 
         staged_count = 0
         errored_count = 0
         with transaction.atomic():
-            for tile in tile_qs.iterator():
-                legacy_value = (tile.data or {}).get(nodeid_str)
-                if legacy_value in (None, [], ""):
-                    continue
-                ids = legacy_value if isinstance(legacy_value, list) else [legacy_value]
-
-                resolved = []
-                missing = []
-                for legacy_id in ids:
-                    item = resolver.resolve(legacy_id)
-                    if item is None:
-                        missing.append(legacy_id)
-                    else:
-                        resolved.append(item)
-
-                if missing:
-                    LoadErrors.objects.create(
-                        load_event_id=self.loadid,
-                        nodegroup_id=node.nodegroup_id,
-                        node_id=node.pk,
-                        type="WARNING",
-                        error="UnresolvedLegacyValue",
-                        source="migrate_to_reference_datatype",
-                        value=", ".join(str(item) for item in missing),
-                        message=(
-                            f"Could not resolve legacy {origin} id(s) "
-                            f"{missing} on tile {tile.pk} for node "
-                            f"'{node.alias}' against list {list_id}."
-                        ),
-                        datatype="reference",
-                    )
-                    errored_count += 1
-                    continue
-
-                new_value = [item.build_tile_value() for item in resolved]
-                if not multi_value and len(new_value) > 1:
-                    new_value = new_value[:1]
-
-                staged_value = self._build_staged_value(
-                    tile, nodeid_str, new_value, sibling_node_datatypes
+            for tile in tiles:
+                sibling_datatypes = sibling_datatypes_by_nodegroup.get(
+                    tile.nodegroup_id
                 )
+                if sibling_datatypes is None:
+                    sibling_datatypes = {
+                        str(sibling.pk): sibling.datatype
+                        for sibling in Node.objects.filter(
+                            nodegroup_id=tile.nodegroup_id
+                        )
+                    }
+                    sibling_datatypes_by_nodegroup[tile.nodegroup_id] = (
+                        sibling_datatypes
+                    )
 
-                LoadStaging.objects.create(
+                staged, errored = self._rewrite_tile(
+                    tile=tile,
+                    candidates_by_node_id=candidates_by_node_id,
+                    translators=translators,
+                    origin=origin,
+                    sibling_datatypes=sibling_datatypes,
+                )
+                staged_count += staged
+                errored_count += errored
+
+        with connection.cursor() as cursor:
+            self.log_event_details(
+                cursor,
+                f"done|Staged {staged_count} tile(s); "
+                f"{errored_count} skipped due to unresolvable values.",
+            )
+
+    def _build_translators(
+        self, candidates_by_node_id, origin, language_code, nodegroup_ids
+    ):
+        """Construct one translator per candidate node, sharing per-node
+        legacy-id collection so concept-side label indexing only fires for
+        the values actually referenced by tiles."""
+        translator_cls = (
+            DomainLegacyValueTranslator
+            if origin == DOMAIN_ORIGIN
+            else ConceptLegacyValueTranslator
+        )
+        reference_datatype = self.datatype_factory.get_instance("reference")
+
+        legacy_ids_by_node_id = {node_id: set() for node_id in candidates_by_node_id}
+        if origin == CONCEPT_ORIGIN:
+            for tile_data in TileModel.objects.filter(
+                nodegroup_id__in=nodegroup_ids,
+                data__has_any_keys=list(candidates_by_node_id.keys()),
+            ).values_list("data", flat=True):
+                for node_id in candidates_by_node_id:
+                    value = (tile_data or {}).get(node_id)
+                    if isinstance(value, list):
+                        legacy_ids_by_node_id[node_id].update(
+                            item for item in value if item
+                        )
+                    elif value:
+                        legacy_ids_by_node_id[node_id].add(value)
+
+        translators = {}
+        for node_id, node in candidates_by_node_id.items():
+            list_id = (node.config or {}).get("controlledList")
+            if not list_id:
+                continue
+            translators[node_id] = translator_cls(
+                node,
+                list_id,
+                language_code,
+                reference_datatype,
+                legacy_ids=legacy_ids_by_node_id[node_id],
+            )
+        return translators
+
+    def _rewrite_tile(
+        self,
+        *,
+        tile,
+        candidates_by_node_id,
+        translators,
+        origin,
+        sibling_datatypes,
+    ):
+        """Rewrite every reference-typed slot in `tile.data` and stage one
+        LoadStaging row for the tile. Returns (1, 0) on success, (0, 1) if
+        any candidate slot has unresolvable values (the whole tile is
+        skipped to avoid producing partial/invalid reference data), or
+        (0, 0) if no candidate slot is present in the tile."""
+        rewritten_values_by_node_id = {}
+        unresolved_per_node = {}
+
+        for node_id, node in candidates_by_node_id.items():
+            if node.nodegroup_id != tile.nodegroup_id:
+                continue
+            translator = translators.get(node_id)
+            if translator is None:
+                continue
+            legacy_value = (tile.data or {}).get(node_id)
+            if legacy_value in (None, [], ""):
+                continue
+            legacy_ids = (
+                legacy_value if isinstance(legacy_value, list) else [legacy_value]
+            )
+
+            resolved_entries = []
+            missing = []
+            for legacy_id in legacy_ids:
+                entries = translator.resolve(legacy_id)
+                if not entries:
+                    missing.append(legacy_id)
+                else:
+                    resolved_entries.extend(entries)
+
+            if missing:
+                unresolved_per_node[node_id] = (node, translator.list_id, missing)
+                continue
+
+            if (
+                not bool((node.config or {}).get("multiValue"))
+                and len(resolved_entries) > 1
+            ):
+                resolved_entries = resolved_entries[:1]
+            rewritten_values_by_node_id[node_id] = resolved_entries
+
+        if unresolved_per_node:
+            for node_id, (node, list_id, missing) in unresolved_per_node.items():
+                LoadErrors.objects.create(
                     load_event_id=self.loadid,
                     nodegroup_id=node.nodegroup_id,
-                    resourceid=tile.resourceinstance_id,
-                    legacyid=str(tile.resourceinstance_id),
-                    tileid=tile.pk,
-                    parenttileid=tile.parenttile_id,
-                    value=staged_value,
-                    sortorder=tile.sortorder or 0,
-                    nodegroup_depth=0,
-                    source_description="migrate_to_reference_datatype",
-                    operation="update",
-                    passes_validation=True,
+                    node_id=node.pk,
+                    type="WARNING",
+                    error="UnresolvedLegacyValue",
+                    source="migrate_to_reference_datatype",
+                    value=", ".join(str(item) for item in missing),
+                    message=(
+                        f"Could not resolve legacy {origin} id(s) "
+                        f"{missing} on tile {tile.pk} for node "
+                        f"'{node.alias}' against list {list_id}."
+                    ),
+                    datatype="reference",
                 )
-                staged_count += 1
+            return 0, 1
 
-        return staged_count, errored_count
+        if not rewritten_values_by_node_id:
+            return 0, 0
+
+        staged_value = self._build_staged_value(
+            tile, rewritten_values_by_node_id, sibling_datatypes
+        )
+        LoadStaging.objects.create(
+            load_event_id=self.loadid,
+            nodegroup_id=tile.nodegroup_id,
+            resourceid=tile.resourceinstance_id,
+            legacyid=str(tile.resourceinstance_id),
+            tileid=tile.pk,
+            parenttileid=tile.parenttile_id,
+            value=staged_value,
+            sortorder=tile.sortorder or 0,
+            nodegroup_depth=0,
+            source_description="migrate_to_reference_datatype",
+            operation="update",
+            passes_validation=True,
+        )
+        return 1, 0
 
     @staticmethod
-    def _build_staged_value(tile, target_nodeid, new_value, sibling_node_datatypes):
+    def _build_staged_value(tile, rewritten_values_by_node_id, sibling_datatypes):
         staged = {}
         for key, val in (tile.data or {}).items():
-            if key == target_nodeid:
+            if key in rewritten_values_by_node_id:
                 staged[key] = {
-                    "value": new_value,
+                    "value": rewritten_values_by_node_id[key],
                     "valid": True,
                     "source": "bulk_edit",
                     "notes": "",
@@ -428,14 +529,15 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
                     "valid": True,
                     "source": "bulk_edit",
                     "notes": "",
-                    "datatype": sibling_node_datatypes.get(key, "string"),
+                    "datatype": sibling_datatypes.get(key, "string"),
                 }
-        if target_nodeid not in staged:
-            staged[target_nodeid] = {
-                "value": new_value,
-                "valid": True,
-                "source": "bulk_edit",
-                "notes": "",
-                "datatype": "reference",
-            }
+        for node_id, new_value in rewritten_values_by_node_id.items():
+            if node_id not in staged:
+                staged[node_id] = {
+                    "value": new_value,
+                    "valid": True,
+                    "source": "bulk_edit",
+                    "notes": "",
+                    "datatype": "reference",
+                }
         return staged
