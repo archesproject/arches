@@ -182,6 +182,7 @@ var viewModel = function (params) {
                     if (!feature.id) {
                         feature.id = uuid.generate();
                     }
+                    if (!feature.properties) feature.properties = {}
                     feature.properties.nodeId = id;
                 });
                 drawFeatures = drawFeatures.concat(
