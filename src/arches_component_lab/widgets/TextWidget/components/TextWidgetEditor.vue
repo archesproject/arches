@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, watchEffect } from "vue";
+import { ref, watchEffect } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import InputText from "primevue/inputtext";
@@ -49,27 +49,25 @@ watchEffect(async () => {
     languages.value = response.languages;
     selectedLanguage.value =
         languages.value.find(
-            (lang) => lang.code === response.request_language,
+            (lang: Language) => lang.code === response.request_language,
         ) ?? response.languages[0];
 });
 
-watch(languages, () => {
+watchEffect(() => {
     const workingObject = { ...aliasedNodeData?.node_value };
-    for (const language of languages.value) {
-        if (!workingObject[language.code]) {
-            workingObject[language.code] = {
+    for (const knownLanguage of languages.value) {
+        if (!workingObject[knownLanguage.code]) {
+            workingObject[knownLanguage.code] = {
                 value: "",
-                direction: language.default_direction,
+                direction: knownLanguage.default_direction,
             };
         }
     }
     managedNodeValue.value = workingObject;
-});
 
-watch(selectedLanguage, () => {
     if (selectedLanguage.value && managedNodeValue.value) {
         singleInputValue.value =
-            managedNodeValue.value[selectedLanguage.value.code].value;
+            managedNodeValue.value[selectedLanguage.value.code].value ?? "";
     } else {
         singleInputValue.value = "";
     }

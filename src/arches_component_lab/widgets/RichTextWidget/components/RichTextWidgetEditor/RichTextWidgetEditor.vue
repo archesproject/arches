@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, watchEffect } from "vue";
+import { ref, watchEffect } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Editor from "primevue/editor";
@@ -12,7 +12,7 @@ import type {
     Language,
 } from "@/arches_component_lab/types.ts";
 import type { StringValue } from "@/arches_component_lab/datatypes/string/types.ts";
-import FocusController from "./components/FocusController.vue";
+import FocusController from "@/arches_component_lab/widgets/RichTextWidget/components/RichTextWidgetEditor/components/FocusController.vue";
 
 const { $gettext } = useGettext();
 
@@ -47,14 +47,13 @@ watchEffect(async () => {
     languages.value = response.languages;
 
     selectedLanguage.value =
-        languages.value.find((lang) => {
+        languages.value.find((lang: Language) => {
             return lang.code === response.request_language;
         }) ?? response.languages[0];
 });
 
-watch(languages, () => {
+watchEffect(() => {
     const workingObject = { ...aliasedNodeData?.node_value };
-
     for (const knownLanguage of languages.value) {
         if (!workingObject[knownLanguage.code]) {
             workingObject[knownLanguage.code] = {
@@ -63,11 +62,8 @@ watch(languages, () => {
             };
         }
     }
-
     managedNodeValue.value = workingObject;
-});
 
-watch(selectedLanguage, () => {
     if (selectedLanguage.value && managedNodeValue.value) {
         singleInputValue.value =
             managedNodeValue.value[selectedLanguage.value.code].value ?? "";
