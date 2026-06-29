@@ -1695,6 +1695,8 @@ class FileListDataType(BaseDataType):
 
             # range URI should be the file URL/URI, and the rest of the details should hang off that
             # FIXME - (Poor) assumption that file is on same host as Arches instance host config.
+            if not f_data.get("url"):
+                continue
             if f_data["url"].startswith("/"):
                 f_uri = URIRef(archesproject[f_data["url"][1:]])
             else:
@@ -1706,7 +1708,7 @@ class FileListDataType(BaseDataType):
 
             # FIXME - improve this ms in timestamp handling code in case of odd OS environments
             # FIXME - Use the timezone settings for export?
-            if f_data["lastModified"]:
+            if f_data.get("lastModified"):
                 lm = f_data["lastModified"]
                 if (
                     lm > 9999999999
