@@ -24,6 +24,9 @@ module.exports = () => {
                                     drop_console: true,
                                 },
                                 mangle: true,
+                                // Keep names so runtime constructor.name checks survive minification
+                                keep_classnames: true,
+                                keep_fnames: true,
                             },
                         }),
                     ],
