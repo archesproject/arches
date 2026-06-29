@@ -1,6 +1,9 @@
 import logging
 
 from django.db import connection, transaction
+from django.db.models import F, OuterRef, Subquery, UUIDField
+from django.db.models.fields.json import KeyTextTransform
+from django.db.models.functions import Cast
 from django.utils.translation import gettext as _
 
 from arches.app.etl_modules.base_data_editor import (
@@ -18,6 +21,8 @@ from arches.app.models.models import (
     Value,
 )
 from arches.app.models.system_settings import settings as arches_settings
+
+from arches_controlled_lists.models import List
 
 
 logger = logging.getLogger(__name__)
@@ -168,8 +173,21 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
                 "success": False,
                 "data": {"message": _("Missing graph or origin.")},
             }
+        list_name_subquery = Subquery(
+            List.objects.filter(
+                id=Cast(
+                    KeyTextTransform("controlledList", OuterRef("config")),
+                    UUIDField(),
+                )
+            ).values("name")[:1]
+        )
         nodes = list(
-            self._get_candidate_nodes_queryset(graph_id, origin).order_by("name")
+            self._get_candidate_nodes_queryset(graph_id, origin)
+            .annotate(
+                nodegroup_name=F("nodegroup__grouping_node__alias"),
+                list_name=list_name_subquery,
+            )
+            .order_by("nodegroup__grouping_node__alias", "alias")
         )
         node_payload = []
         for node in nodes:
@@ -182,14 +200,17 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
                     "nodeid": str(node.pk),
                     "alias": node.alias,
                     "name": str(node.name),
-                    "list_id": (node.config or {}).get("controlledList"),
+                    "nodegroup": node.nodegroup_name,
+                    "list_name": node.list_name,
                     "tile_count": tile_count,
                 }
             )
         return {"success": True, "data": node_payload}
 
     def _get_candidate_nodes_queryset(self, graph_id, origin):
-        queryset = Node.objects.filter(graph_id=graph_id, datatype="reference")
+        queryset = Node.objects.filter(
+            graph_id=graph_id, datatype="reference"
+        ).prefetch_related("nodegroup")
         if origin == DOMAIN_ORIGIN:
             queryset = queryset.filter(**{"config__has_key": "options"})
         elif origin == CONCEPT_ORIGIN:
