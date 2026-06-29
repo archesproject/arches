@@ -532,22 +532,22 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
     @staticmethod
     def _build_staged_value(tile, rewritten_values_by_node_id, sibling_datatypes):
         staged = {}
-        for key, val in (tile.data or {}).items():
-            if key in rewritten_values_by_node_id:
-                staged[key] = {
-                    "value": rewritten_values_by_node_id[key],
+        for nodeid, node_val in (tile.data or {}).items():
+            if nodeid in rewritten_values_by_node_id:
+                staged[nodeid] = {
+                    "value": rewritten_values_by_node_id[nodeid],
                     "valid": True,
                     "source": "bulk_edit",
                     "notes": "",
                     "datatype": "reference",
                 }
             else:
-                staged[key] = {
-                    "value": val,
+                staged[nodeid] = {
+                    "value": node_val,
                     "valid": True,
                     "source": "bulk_edit",
                     "notes": "",
-                    "datatype": sibling_datatypes.get(key, "string"),
+                    "datatype": sibling_datatypes.get(nodeid, "string"),
                 }
         for node_id, new_value in rewritten_values_by_node_id.items():
             if node_id not in staged:
