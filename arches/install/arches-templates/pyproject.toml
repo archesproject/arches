@@ -31,9 +31,9 @@ version = "0.0.1"
 dev = [
     "black==24.4.2",
     "coverage",
-    "django-silk==5.1.0",
+    "django-silk==5.4.3",
     "livereload",
-    "pre-commit==3.8.0",
+    "pre-commit==4.5.1",
     "sst",
 ]
 

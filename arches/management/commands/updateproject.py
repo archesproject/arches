@@ -1,12 +1,9 @@
 import arches
-
 import os
+import re
 import shutil
 
-from django.core import management
 from django.core.management.base import BaseCommand
-from arches.app.models.system_settings import settings
-
 from arches.app.models.system_settings import settings
 
 
@@ -43,6 +40,8 @@ class Command(BaseCommand):  # pragma: no cover
     def update_to_v8_2(self):
         self.stdout.write("Updating project to version 8.2...")
 
+        project_root = os.path.join(settings.APP_ROOT, "..")
+
         # Updates webpack config files
         if os.path.isdir(os.path.join(settings.APP_ROOT, "..", "webpack")):
             self.stdout.write("Removing previous webpack directory...")
@@ -56,10 +55,33 @@ class Command(BaseCommand):  # pragma: no cover
             os.path.join(settings.ROOT_DIR, "install", "arches-templates", "webpack"),
             os.path.join(settings.APP_ROOT, "..", "webpack"),
         )
-
         self.stdout.write("Done!")
 
+        self._update_ci_workflow(project_root)
+
         self.stdout.write("Project successfully updated to version 8.2")
+
+    def _update_ci_workflow(self, project_root):
+        workflow_path = os.path.join(project_root, ".github", "workflows", "main.yml")
+        if not os.path.exists(workflow_path):
+            self.stdout.write(".github/workflows/main.yml not found, skipping...")
+            return
+
+        self.stdout.write("Updating CI Python version matrix...")
+
+        with open(workflow_path) as f:
+            content = f.read()
+
+        content = re.sub(
+            r'(python-version:\s*\[)[^\]]*"3\.11"[^\]]*\]',
+            'python-version: ["3.12", "3.13", "3.14"]',
+            content,
+        )
+
+        with open(workflow_path, "w") as f:
+            f.write(content)
+
+        self.stdout.write("Done!")
 
     def update_to_v8_1(self):
         self.stdout.write("Updating project to version 8.1...")
