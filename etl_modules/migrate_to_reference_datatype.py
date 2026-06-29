@@ -28,10 +28,6 @@ DOMAIN_ORIGIN = "domain"
 CELERY_TILE_THRESHOLD = 500
 
 
-def _config_marker(origin):
-    return "options" if origin == DOMAIN_ORIGIN else "rdmCollection"
-
-
 class LegacyValueTranslator:
     """Resolves a legacy tile value (concept valueid or domain option id)
     to the reference-datatype tile representation by delegating to
@@ -173,9 +169,7 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
                 "data": {"message": _("Missing graph or origin.")},
             }
         nodes = list(
-            Node.objects.filter(graph_id=graph_id, datatype="reference")
-            .filter(**{"config__has_key": _config_marker(origin)})
-            .order_by("name")
+            self._get_candidate_nodes_queryset(graph_id, origin).order_by("name")
         )
         node_payload = []
         for node in nodes:
@@ -194,13 +188,20 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
             )
         return {"success": True, "data": node_payload}
 
+    def _get_candidate_nodes_queryset(self, graph_id, origin):
+        queryset = Node.objects.filter(graph_id=graph_id, datatype="reference")
+        if origin == DOMAIN_ORIGIN:
+            queryset = queryset.filter(**{"config__has_key": "options"})
+        elif origin == CONCEPT_ORIGIN:
+            queryset = queryset.exclude(**{"config__has_key": "options"})
+        return queryset
+
     def _count_candidate_tiles(self, graph_id, origin):
-        marker = _config_marker(origin)
         candidate_node_ids = [
             str(pk)
-            for pk in Node.objects.filter(graph_id=graph_id, datatype="reference")
-            .filter(**{"config__has_key": marker})
-            .values_list("pk", flat=True)
+            for pk in self._get_candidate_nodes_queryset(graph_id, origin).values_list(
+                "pk", flat=True
+            )
         ]
         if not candidate_node_ids:
             return 0
@@ -293,30 +294,21 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
         self.loadid = loadid
         self.moduleid = module_id
         try:
-            self._rewrite_tile_data(graph_id, origin, language_code)
-        except Exception as exc:
-            logger.exception(exc)
+            self._stage_tile_edits(graph_id, origin, language_code)
+        except Exception as e:
+            logger.exception(e)
             with connection.cursor() as cursor:
                 self.log_event(cursor, "failed")
             return {
                 "success": False,
-                "data": {"title": _("Error"), "message": str(exc)},
+                "data": {"title": _("Error"), "message": str(e)},
             }
 
         save_to_tiles(userid, loadid)
         return {"success": True, "data": "done"}
 
-    def _rewrite_tile_data(self, graph_id, origin, language_code):
-        """Rewrite tile data for every tile in `graph_id` that touches a
-        retyped reference node of the given origin. One LoadStaging row per
-        tile, even when multiple reference nodes are present in the same
-        tile."""
-        marker = _config_marker(origin)
-        candidate_nodes = list(
-            Node.objects.filter(graph_id=graph_id, datatype="reference").filter(
-                **{"config__has_key": marker}
-            )
-        )
+    def _stage_tile_edits(self, graph_id, origin, language_code):
+        candidate_nodes = list(self._get_candidate_nodes_queryset(graph_id, origin))
         with connection.cursor() as cursor:
             if not candidate_nodes:
                 self.log_event_details(
@@ -345,6 +337,8 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
 
         staged_count = 0
         errored_count = 0
+        staging_records = []
+        error_records = []
         with transaction.atomic():
             for tile in tiles:
                 sibling_datatypes = sibling_datatypes_by_nodegroup.get(
@@ -368,8 +362,14 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
                     origin=origin,
                     sibling_datatypes=sibling_datatypes,
                 )
-                staged_count += staged
-                errored_count += errored
+                if staged:
+                    staging_records.append(staged)
+                    staged_count += 1
+                if errored:
+                    error_records.append(errored)
+                    errored_count += 1
+            LoadStaging.objects.bulk_create(staging_records)
+            LoadErrors.objects.bulk_create(error_records)
 
         with connection.cursor() as cursor:
             self.log_event_details(
@@ -428,12 +428,9 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
         translators,
         origin,
         sibling_datatypes,
-    ):
-        """Rewrite every reference-typed slot in `tile.data` and stage one
-        LoadStaging row for the tile. Returns (1, 0) on success, (0, 1) if
-        any candidate slot has unresolvable values (the whole tile is
-        skipped to avoid producing partial/invalid reference data), or
-        (0, 0) if no candidate slot is present in the tile."""
+    ) -> tuple[LoadStaging | None, LoadErrors | None]:
+        load_staging_record = None
+        load_error_record = None
         rewritten_values_by_node_id = {}
         unresolved_per_node = {}
 
@@ -472,7 +469,7 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
 
         if unresolved_per_node:
             for node_id, (node, list_id, missing) in unresolved_per_node.items():
-                LoadErrors.objects.create(
+                load_error_record = LoadErrors(
                     load_event_id=self.loadid,
                     nodegroup_id=node.nodegroup_id,
                     node_id=node.pk,
@@ -487,15 +484,15 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
                     ),
                     datatype="reference",
                 )
-            return 0, 1
+            return load_staging_record, load_error_record
 
         if not rewritten_values_by_node_id:
-            return 0, 0
+            return load_staging_record, load_error_record
 
         staged_value = self._build_staged_value(
             tile, rewritten_values_by_node_id, sibling_datatypes
         )
-        LoadStaging.objects.create(
+        load_staging_record = LoadStaging(
             load_event_id=self.loadid,
             nodegroup_id=tile.nodegroup_id,
             resourceid=tile.resourceinstance_id,
@@ -509,7 +506,7 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
             operation="update",
             passes_validation=True,
         )
-        return 1, 0
+        return load_staging_record, load_error_record
 
     @staticmethod
     def _build_staged_value(tile, rewritten_values_by_node_id, sibling_datatypes):
