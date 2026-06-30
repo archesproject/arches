@@ -209,7 +209,7 @@ class JsonLDExportTests(ArchesTestCase):
         self.assertTrue("@value" in dt)
         self.assertTrue(dt["@value"] == "2019-10-01")
         self.assertTrue("@type" in dt)
-        self.assertTrue(dt["@type"] == "http://www.w3.org/2001/XMLSchema#dateTime")
+        self.assertTrue(dt["@type"] == "http://www.w3.org/2001/XMLSchema#date")
         # Test domain data type
         self.assertTrue(
             "http://www.cidoc-crm.org/cidoc-crm/P79_beginning_is_qualified_by" in ts

@@ -8,7 +8,7 @@ readme = "README.md"
 authors = [
     {name = "Arches Project"}
 ]
-version = "8.2.0a4"
+version = "8.2.0a7"
 license = "AGPL-3.0-or-later"
 requires-python = ">=3.12"
 description = "Arches is an open-source, web-based, geospatial information system for cultural heritage inventory and management."
@@ -22,6 +22,7 @@ classifiers = [
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Framework :: Django",
     "Framework :: Django :: 6.0",
 ]
@@ -60,7 +61,7 @@ dependencies = [
     "python-memcached==1.62",
     "python-slugify==8.0.4",
     "qrcode>=7.3.1",
-    "rdflib==4.2.2",
+    "rdflib==7.6.0",
     "requests-oauthlib==2.0.0",
     "requests[security]>=2.32.5",
     "semantic-version==2.10.0",

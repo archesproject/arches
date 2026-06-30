@@ -881,12 +881,18 @@ class DateDataType(BaseDataType):
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
         if edge_info["range_tile_data"] is not None:
+            value = edge_info["range_tile_data"]
+            literal_datatype = XSD.dateTime
+            if isinstance(value, str):
+                valid_date_format, valid = self.get_valid_date_format(value)
+                if valid and valid_date_format == "%Y-%m-%d":
+                    literal_datatype = XSD.date
             g.add((edge_info["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass)))
             g.add(
                 (
                     edge_info["d_uri"],
                     URIRef(edge.ontologyproperty),
-                    Literal(edge_info["range_tile_data"], datatype=XSD.dateTime),
+                    Literal(value, datatype=literal_datatype),
                 )
             )
         return g
@@ -1832,14 +1838,20 @@ class DomainDataType(BaseDomainDataType):
         if value is not None:
             try:
                 uuid.UUID(str(value))
-                found_option = (
-                    len(
-                        models.Node.objects.filter(
-                            config__contains={"options": [{"id": value}]}
-                        )
+                if node is not None:
+                    found_option = any(
+                        option["id"] == value
+                        for option in (node.config or {}).get("options", [])
                     )
-                    > 0
-                )
+                else:
+                    found_option = (
+                        len(
+                            models.Node.objects.filter(
+                                config__contains={"options": [{"id": value}]}
+                            )
+                        )
+                        > 0
+                    )
             except ValueError:
                 found_option = (
                     True if self.get_option_id_from_text(value) is not None else False
@@ -2057,7 +2069,7 @@ class DomainListDataType(BaseDomainDataType):
         errors = []
         if values is not None:
             for value in values:
-                errors = errors + domainDataType.validate(value, row_number)
+                errors = errors + domainDataType.validate(value, row_number, node=node)
         return errors
 
     def get_search_terms(self, nodevalue, nodeid=None):
