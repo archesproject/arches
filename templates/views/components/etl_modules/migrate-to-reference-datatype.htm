@@ -73,17 +73,17 @@
             <table class="table table-striped csv-mapping-table">
                 <thead>
                     <tr>
-                        <th>{% blocktrans %}Node{% endblocktrans %}</th>
-                        <th>{% blocktrans %}Alias{% endblocktrans %}</th>
+                        <th>{% blocktrans %}Node Alias{% endblocktrans %}</th>
+                        <th>{% blocktrans %}Nodegroup{% endblocktrans %}</th>
                         <th>{% blocktrans %}Controlled List{% endblocktrans %}</th>
                         <th>{% blocktrans %}Tiles to Rewrite{% endblocktrans %}</th>
                     </tr>
                 </thead>
                 <tbody data-bind="foreach: candidateNodes">
                     <tr>
-                        <td data-bind="text: name"></td>
                         <td data-bind="text: alias"></td>
-                        <td data-bind="text: list_id"></td>
+                        <td data-bind="text: nodegroup"></td>
+                        <td data-bind="text: list_name"></td>
                         <td data-bind="text: tile_count"></td>
                     </tr>
                 </tbody>
