@@ -1,4 +1,5 @@
 import logging
+import uuid
 
 from django.db import connection, transaction
 from django.db.models import F, OuterRef, Subquery, UUIDField
@@ -13,6 +14,7 @@ from arches.app.etl_modules.base_data_editor import (
 from arches.app.etl_modules.decorators import load_data_async
 from arches.app.etl_modules.save import save_to_tiles
 from arches.app.models.models import (
+    ETLModule,
     GraphModel,
     LoadErrors,
     LoadStaging,
@@ -20,7 +22,7 @@ from arches.app.models.models import (
     TileModel,
     Value,
 )
-from arches.app.models.system_settings import settings as arches_settings
+from arches.app.models.system_settings import settings as settings
 
 from arches_controlled_lists.models import List
 
@@ -147,20 +149,32 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
     reference-shaped tile slot.
     """
 
+    def __init__(self, request=None, loadid=None, userid=None, **kwargs):
+        super().__init__(request=request, loadid=loadid)
+        if request is None:
+            self.userid = userid
+            self.moduleid = kwargs.get("moduleid") or str(
+                ETLModule.objects.get(slug="migrate-to-reference-datatype").pk
+            )
+            if self.loadid is None:
+                self.loadid = str(uuid.uuid4())
+        self._graph_id = kwargs.get("graph_id")
+        self._origin = kwargs.get("origin")
+        self._language_code = kwargs.get("language_code")
+
     def validate(self, request):
         return {"success": True, "data": {}}
 
-    def validate_inputs(self, request):
-        required = {
-            "graph_id": _("Resource Model"),
-            "origin": _("Origin Datatype"),
-        }
-        for key, label in required.items():
-            if not request.POST.get(key):
-                raise MissingRequiredInputError(
-                    _("Missing required value: {label}").format(label=label)
-                )
-        if request.POST.get("origin") not in {CONCEPT_ORIGIN, DOMAIN_ORIGIN}:
+    def validate_inputs(self, graph_id, origin):
+        if not graph_id:
+            raise MissingRequiredInputError(
+                _("Missing required value: {label}").format(label=_("Resource Model"))
+            )
+        if not origin:
+            raise MissingRequiredInputError(
+                _("Missing required value: {label}").format(label=_("Origin Datatype"))
+            )
+        if origin not in {CONCEPT_ORIGIN, DOMAIN_ORIGIN}:
             raise MissingRequiredInputError(
                 _("Origin must be either 'concept' or 'domain'.")
             )
@@ -237,19 +251,19 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
         ).count()
 
     def write(self, request):
+        graph_id = request.POST.get("graph_id") if request else self._graph_id
+        origin = request.POST.get("origin") if request else self._origin
+        language_code = (
+            request.POST.get("language_code") if request else self._language_code
+        ) or settings.LANGUAGE_CODE
+
         try:
-            self.validate_inputs(request)
+            self.validate_inputs(graph_id, origin)
         except MissingRequiredInputError as e:
             return {
                 "success": False,
                 "data": {"title": _("Missing input error"), "message": str(e)},
             }
-
-        graph_id = request.POST["graph_id"]
-        origin = request.POST["origin"]
-        language_code = (
-            request.POST.get("language_code") or arches_settings.LANGUAGE_CODE
-        )
 
         graph_name = str(GraphModel.objects.get(pk=graph_id).name)
         load_details = {
@@ -283,9 +297,7 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
 
         graph_id = request.POST["graph_id"]
         origin = request.POST["origin"]
-        language_code = (
-            request.POST.get("language_code") or arches_settings.LANGUAGE_CODE
-        )
+        language_code = request.POST.get("language_code") or settings.LANGUAGE_CODE
         edit_task = cl_tasks.migrate_to_reference_datatype.apply_async(
             (
                 self.userid,

@@ -15,8 +15,13 @@ from arches.app.models.models import (
     Node,
     Value,
     Widget,
+    User,
 )
+from arches.app.models.system_settings import settings as settings
 from arches_controlled_lists.models import List, ListItem, ListItemValue
+from arches_controlled_lists.etl_modules.migrate_to_reference_datatype import (
+    MigrateToReferenceDatatype,
+)
 
 
 class Command(BaseCommand):
@@ -37,6 +42,7 @@ class Command(BaseCommand):
                 "migrate_concept_nodes_to_reference_datatype",
                 "migrate_domain_nodes_to_controlled_lists",
                 "migrate_domain_nodes_to_reference_datatype",
+                "migrate_tile_data_to_reference_datatype",
                 "change_url_base",
             ],
             help="The operation to perform",
@@ -105,6 +111,23 @@ class Command(BaseCommand):
             help="One or more node aliases to migrate. If omitted, all domain/domain-list nodes in the graph are migrated.",
         )
 
+        parser.add_argument(
+            "--origin",
+            action="store",
+            dest="origin",
+            choices=["concept", "domain"],
+            help="Legacy datatype origin: 'concept' for concept/concept-list nodes, 'domain' for domain-value/domain-value-list nodes.",
+        )
+
+        parser.add_argument(
+            "-l",
+            "--language",
+            action="store",
+            dest="language",
+            default=None,
+            help="Language code for label fallback resolution. Defaults to LANGUAGE_CODE from settings.",
+        )
+
     def handle(self, *args, **options):
         if options["operation"] == "migrate_collections_to_controlled_lists":
             psl = options["preferred_sort_language"]
@@ -152,6 +175,15 @@ class Command(BaseCommand):
                 raise CommandError("Please provide a graph id or slug")
             self.migrate_domain_nodes_to_reference_datatype(
                 graph, node_aliases=node_aliases
+            )
+        elif options["operation"] == "migrate_tile_data_to_reference_datatype":
+            graph = options["graph"]
+            origin = options.get("origin")
+            graph = self._resolve_graph(graph)
+            self.migrate_tile_data_to_reference_datatype(
+                graph=graph,
+                origin=origin,
+                language=options.get("language"),
             )
         elif options["operation"] == "change_url_base":
             if not options["host"] or options["host"] is None:
@@ -655,6 +687,28 @@ class Command(BaseCommand):
         cross_record.widget = reference_select_widget
         cross_record.full_clean()
         cross_record.save()
+
+    def migrate_tile_data_to_reference_datatype(self, graph, origin, language=None):
+        editor = MigrateToReferenceDatatype(
+            loadid=str(uuid.uuid4()),
+            userid=User.objects.get(username="admin").pk,
+            graph_id=str(graph.pk),
+            origin=origin,
+            language_code=language or settings.LANGUAGE_CODE,
+        )
+        result = editor.write(request=None)
+        if not result or not result["success"]:
+            message = (
+                result["data"].get("message", "Migration failed")
+                if result
+                else "Migration failed"
+            )
+            raise CommandError(message)
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Tile data migration complete (graph={graph.pk}, origin={origin})."
+            )
+        )
 
     # Replaces the base URL for all list items in all controlled lists
     def bulk_change_url_base(self, target_hostname: str, list_ids: list) -> str:
