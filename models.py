@@ -10,8 +10,11 @@ class WidgetMapping(models.Model):
         Widget,
         on_delete=models.CASCADE,
     )
-    component = models.CharField(max_length=255, unique=True)
+    component = models.CharField(max_length=255)
 
     def __str__(self):
         widget_name = self.widget.name if self.widget else "<no widget>"
         return f"{widget_name} → {self.component}"
+
+    class Meta:
+        unique_together = (("widget", "component"),)
