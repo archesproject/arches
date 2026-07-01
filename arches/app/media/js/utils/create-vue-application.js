@@ -14,11 +14,22 @@ import { DEFAULT_THEME } from "@/arches/themes/default.ts";
 import { generateArchesURL } from '@/arches/utils/generate-arches-url.ts';
 
 
+/**
+ * @deprecated Use createVueApplication from arches-component-lab instead.
+ * This version will be removed in a future release and does not include Pinia support.
+ * @see import { createVueApplication } from '@/arches_component_lab/application'
+ */
 export default async function createVueApplication(
-    vueComponent, 
+    vueComponent,
     themeConfiguration = DEFAULT_THEME,
     initialProps = {},
 ) {
+    console.warn(
+        '[arches] createVueApplication is deprecated. ' +
+        'Import from arches-component-lab instead: ' +
+        "import { createVueApplication } from '@/arches_component_lab/application'"
+    );
+
     /**
      * This wrapper allows us to maintain a level of control inside arches-core
      * over Vue apps. For instance this allows us to abstract i18n setup/config
