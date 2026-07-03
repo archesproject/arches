@@ -29,6 +29,21 @@ from arches_controlled_lists.models import List
 
 logger = logging.getLogger(__name__)
 
+details = {
+    "etlmoduleid": "b0d3c7e0-7b6f-4a4e-8c8c-1f8a3b9d4d20",
+    "name": "Migrate to Reference Datatype",
+    "description": "Rewrite tile data on nodes already retyped to the reference datatype but still holding legacy concept or domain values.",
+    "etl_type": "edit",
+    "component": "views/components/etl_modules/migrate-to-reference-datatype",
+    "componentname": "migrate-to-reference-datatype",
+    "modulename": "migrate_to_reference_datatype.py",
+    "classname": "MigrateToReferenceDatatype",
+    "config": {"bgColor": "#1f8af7", "circleColor": "#7fc4ff", "show": True},
+    "icon": "fa fa-exchange",
+    "slug": "migrate-to-reference-datatype",
+    "helpsortorder": 6,
+    "helptemplate": "migrate-to-reference-datatype-help",
+}
 
 CONCEPT_ORIGIN = "concept"
 DOMAIN_ORIGIN = "domain"
