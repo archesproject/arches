@@ -1509,6 +1509,14 @@ class FileListDataType(BaseDataType):
                 file_info if isinstance(file_info, str) else file_info.get("name")
             )
             original_file_path = file_path
+
+            # If file_info is a dict with an existing file_id, the file is already
+            # stored on the server. Pass it through without creating a new File record.
+            if isinstance(file_info, dict) and file_info.get("file_id"):
+                tile_file = {**file_info}
+                tile_data.append(tile_file)
+                continue
+
             tile_file = {}
             try:
                 file_stats = os.stat(file_path)
@@ -2260,9 +2268,7 @@ class ResourceInstanceDataType(BaseDataType):
         ret = False
         sql = """
             SELECT * FROM __arches_create_resource_x_resource_relationships('%s') as t;
-        """ % (
-            tile.pk
-        )
+        """ % (tile.pk)
 
         with connection.cursor() as cursor:
             cursor.execute(sql)
