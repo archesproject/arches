@@ -154,14 +154,10 @@ class Command(BaseCommand):
                 preferred_sort_language=psl,
             )
         elif options["operation"] == "migrate_concept_nodes_to_reference_datatype":
-            graph = options["graph"]
-            if not graph or graph is None:
-                raise CommandError("Please provide a graph id or slug")
+            graph = self._resolve_graph(options["graph"])
             self.migrate_concept_nodes_to_reference_datatype(graph)
         elif options["operation"] == "migrate_domain_nodes_to_controlled_lists":
-            graph = options["graph"]
-            if not graph:
-                raise CommandError("Please provide a graph id or slug with -g/--graph")
+            graph = self._resolve_graph(options["graph"])
             self.migrate_domain_nodes_to_controlled_lists(
                 graph=graph,
                 node_aliases=options.get("node_aliases") or [],
@@ -169,17 +165,14 @@ class Command(BaseCommand):
                 host=options["host"],
             )
         elif options["operation"] == "migrate_domain_nodes_to_reference_datatype":
-            graph = options["graph"]
+            graph = self._resolve_graph(options["graph"])
             node_aliases = options.get("node_aliases") or []
-            if not graph or graph is None:
-                raise CommandError("Please provide a graph id or slug")
             self.migrate_domain_nodes_to_reference_datatype(
                 graph, node_aliases=node_aliases
             )
         elif options["operation"] == "migrate_tile_data_to_reference_datatype":
-            graph = options["graph"]
+            graph = self._resolve_graph(options["graph"])
             origin = options.get("origin")
-            graph = self._resolve_graph(graph)
             self.migrate_tile_data_to_reference_datatype(
                 graph=graph,
                 origin=origin,
@@ -521,7 +514,7 @@ class Command(BaseCommand):
 
         if len(nodes) == 0:
             raise CommandError(
-                "No concept/concept-list nodes found for the {0} graph".format(
+                "No domain/domain-list nodes found for the {0} graph".format(
                     source_graph.name
                 )
             )
@@ -597,6 +590,10 @@ class Command(BaseCommand):
             )
 
     def _resolve_graph(self, graph):
+        if not graph or graph is None:
+            raise CommandError(
+                "Please provide a valid graph id or slug with -g/--graph"
+            )
         try:
             uuid.UUID(graph)
             query = models.Q(graphid=graph, source_identifier=None)
@@ -659,10 +656,11 @@ class Command(BaseCommand):
                 options = node.config.get("options", [])
                 for value in original_default_value:
                     # first pass transform from domain value id UUID
-                    new_value = REFERENCE_FACTORY.transform_value_for_tile(
-                        value=value,
-                        **config,
-                    )
+                    # new_value = REFERENCE_FACTORY.transform_value_for_tile(
+                    #     value=value,
+                    #     **config,
+                    # )
+                    new_value = None
                     # if transform failed, presumably because a new id was minted, get the label to transform
                     if not new_value:
                         options = node.config["options"]
@@ -672,7 +670,7 @@ class Command(BaseCommand):
                             if option["id"] == value
                         ]
                         new_value = REFERENCE_FACTORY.transform_value_for_tile(
-                            value=text.values()[0] if text else "",
+                            value=list(text[0].values())[0] if text else "",
                             **config,
                         )
                     if isinstance(new_value, list):
