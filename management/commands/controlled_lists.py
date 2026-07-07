@@ -460,25 +460,6 @@ class Command(BaseCommand):
             with transaction.atomic():
                 for node in nodes:
 
-                    default_value = node.config.get("defaultValue", None)
-                    new_default_value = []
-                    if default_value:
-                        if isinstance(default_value, str):
-                            default_value = [default_value]
-                        for value in default_value:
-                            value_rec = Value.objects.get(pk=value)
-                            config = {"controlledList": node.collection_id}
-                            new_value = REFERENCE_FACTORY.transform_value_for_tile(
-                                value=value_rec.value,
-                                **config,
-                            )
-                            if isinstance(new_value, list):
-                                new_default_value.append(new_value[0])
-                            else:
-                                raise CommandError(
-                                    f"Failed to convert original default value: {value_rec.value} in list: {node.collection_id} for node: {node.name} into a reference datatype instance"
-                                )
-
                     new_config = dict(node.config or {})
                     new_config.update(
                         {
@@ -486,9 +467,6 @@ class Command(BaseCommand):
                                 True if node.datatype == "concept-list" else False
                             ),
                             "controlledList": str(node.collection_id),
-                            "defaultValue": (
-                                new_default_value if new_default_value else None
-                            ),
                         }
                     )
                     new_config.pop("rdmCollection", None)
@@ -497,9 +475,13 @@ class Command(BaseCommand):
                     node.full_clean()
                     node.save()
 
-                    for cross_record in self._card_cross_records(node):
-                        self._finalize_card_as_reference(
-                            cross_record, REFERENCE_SELECT_WIDGET
+                    for cross_record in self._annotate_cross_record(node):
+                        self._finalize_widget_as_reference(
+                            node,
+                            cross_record,
+                            "concept",
+                            REFERENCE_SELECT_WIDGET,
+                            REFERENCE_FACTORY,
                         )
 
             updated_graph = source_graph.promote_draft_graph_to_active_graph()
@@ -575,40 +557,6 @@ class Command(BaseCommand):
                     expected_list_name = f"{node.alias}_{node.source_identifier_id}"
                     controlled_list_id = controlled_lists_lookup.get(expected_list_name)
 
-                    default_value = node.config.get("defaultValue", None)
-                    new_default_value = []
-                    if default_value:
-                        if isinstance(default_value, str):
-                            default_value = [default_value]
-                        for value in default_value:
-                            config = {"controlledList": controlled_list_id}
-                            # first pass transform from domain value id UUID
-                            new_value = REFERENCE_FACTORY.transform_value_for_tile(
-                                value=value,
-                                **config,
-                            )
-                            # if transform failed, presumably because a new id was minted, get the label to transform
-                            if not new_value:
-                                options = node.config["options"]
-                                text = [
-                                    option["text"]
-                                    for option in options
-                                    if option["id"] == value
-                                ]
-                                new_value = REFERENCE_FACTORY.transform_value_for_tile(
-                                    value=text.values()[0] if text else "",
-                                    **config,
-                                )
-                            if isinstance(new_value, list):
-                                new_default_value.append(new_value[0])
-                            else:
-                                raise CommandError(
-                                    f"Failed to convert original default value: {value} in list: {controlled_list_id} for node: {node.name} into a reference datatype instance"
-                                )
-                        node.config["defaultValue"] = new_default_value
-                    if not len(new_default_value):
-                        new_default_value = None
-
                     multi_value = (
                         True if node.datatype == "domain-value-list" else False
                     )
@@ -621,7 +569,6 @@ class Command(BaseCommand):
                         {
                             "multiValue": multi_value,
                             "controlledList": controlled_list_id,
-                            "defaultValue": new_default_value,
                         }
                     )
                     node.config = new_config
@@ -629,9 +576,13 @@ class Command(BaseCommand):
                     node.full_clean()
                     node.save()
 
-                    for cross_record in self._card_cross_records(node):
-                        self._finalize_card_as_reference(
-                            cross_record, REFERENCE_SELECT_WIDGET
+                    for cross_record in self._annotate_cross_record(node):
+                        self._finalize_widget_as_reference(
+                            node,
+                            cross_record,
+                            "domain",
+                            REFERENCE_SELECT_WIDGET,
+                            REFERENCE_FACTORY,
                         )
 
             updated_graph = source_graph.promote_draft_graph_to_active_graph()
@@ -663,28 +614,80 @@ class Command(BaseCommand):
             draft_graph = source_graph.create_draft_graph()
         return source_graph, draft_graph
 
-    def _card_cross_records(self, node):
+    def _annotate_cross_record(self, node):
         return node.cardxnodexwidget_set.annotate(
             config_without_options=CombinedExpression(
-                CombinedExpression(
-                    models.F("config"),
-                    "-",
-                    models.Value("options", output_field=models.CharField()),
-                    output_field=I18n_JSONField(),
-                ),
+                models.F("config"),
                 "-",
-                models.Value("defaultValue", output_field=models.CharField()),
+                models.Value("options", output_field=models.CharField()),
                 output_field=I18n_JSONField(),
             )
         )
 
-    def _finalize_card_as_reference(self, cross_record, reference_select_widget):
+    def _finalize_widget_as_reference(
+        self, node, cross_record, origin, REFERENCE_SELECT_WIDGET, REFERENCE_FACTORY
+    ):
         # work around for i18n as_sql method issue detailed here: https://github.com/archesproject/arches/issues/11473
         cross_record.config = {}
         cross_record.save()
 
+        # TODO: when upgrading to Arches 8.2, default values live on the node, not the widget
+        # this commit will essentially need to be undone
+        original_default_value = cross_record.config_without_options.get(
+            "defaultValue", None
+        )
+        if original_default_value:
+            new_default_value = []
+            controlled_list = node.config.get("controlledList")
+            config = {"controlledList": controlled_list}
+            if isinstance(original_default_value, str):
+                original_default_value = [original_default_value]
+            if origin == "concept":
+                for value in original_default_value:
+                    value_rec = Value.objects.get(pk=value)
+                    new_value = REFERENCE_FACTORY.transform_value_for_tile(
+                        value=value_rec.value,
+                        **config,
+                    )
+                    if isinstance(new_value, list):
+                        new_default_value.append(new_value[0])
+                    else:
+                        raise CommandError(
+                            f"Failed to convert original default value: {value_rec.value} in list: {controlled_list} for node: {node.name} into a reference datatype instance"
+                        )
+            elif origin == "domain":
+                options = node.config.get("options", [])
+                for value in original_default_value:
+                    # first pass transform from domain value id UUID
+                    new_value = REFERENCE_FACTORY.transform_value_for_tile(
+                        value=value,
+                        **config,
+                    )
+                    # if transform failed, presumably because a new id was minted, get the label to transform
+                    if not new_value:
+                        options = node.config["options"]
+                        text = [
+                            option["text"]
+                            for option in options
+                            if option["id"] == value
+                        ]
+                        new_value = REFERENCE_FACTORY.transform_value_for_tile(
+                            value=text.values()[0] if text else "",
+                            **config,
+                        )
+                    if isinstance(new_value, list):
+                        new_default_value.append(new_value[0])
+                    else:
+                        raise CommandError(
+                            f"Failed to convert original default value: {value} in list: {controlled_list} for node: {node.name} into a reference datatype instance"
+                        )
+            if new_default_value:
+                cross_record.config_without_options["defaultValue"] = new_default_value
+            else:
+                cross_record.config_without_options["defaultValue"] = None
+
         cross_record.config = cross_record.config_without_options
-        cross_record.widget = reference_select_widget
+        cross_record.widget = REFERENCE_SELECT_WIDGET
         cross_record.full_clean()
         cross_record.save()
 
