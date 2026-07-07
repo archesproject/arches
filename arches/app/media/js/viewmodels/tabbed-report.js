@@ -93,6 +93,5 @@ define([
                 this.tabs.remove(tab);
             }
         };
-
     };
 });

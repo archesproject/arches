@@ -8,7 +8,7 @@
     <div class="tabbed-report-tab-list" role="tablist">
         <!-- ko foreach: {data: tabs, as: 'tab'}  -->
         <div data-bind="let: {tabuid: Math.random().toString(16).slice(2)}">
-            <div tabindex="0" data-bind="onEnterkeyClick, onSpaceClick, click: function(){ $parent.setActiveTab($index()); document.querySelector('.rp-tabpanel-id').setAttribute('id', tabuid); }, css: { 'active': ko.unwrap($parent.activeTabIndex) === $index() }, attr: { 'aria-expanded': ko.unwrap($parent.activeTabIndex) === $index() ? 'true' : 'false', 'aria-controls': tabuid }" class="report-tab" role="tab">
+            <div tabindex="0" data-bind="onEnterkeyClick, onSpaceClick, click: function(){ $parent.setActiveTab($index()); document.querySelector('.rp-tabpanel-id').setAttribute('id', tabuid); }, css: { 'active': ko.unwrap($parent.activeTabIndex) === $index() }, attr: { 'aria-expanded': ko.unwrap($parent.activeTabIndex) === $index() ? 'true' : 'false', 'aria-controls': tabuid, 'aria-label': ko.unwrap(tab.name), 'data-tooltip': ko.unwrap(tab.name) }" class="report-tab" role="tab">
                 <span><i data-bind="attr: {class: ('fa '+ ko.unwrap(tab.icon)), 'aria-label': 'Display '+ko.unwrap(tab.name)+' information'}"></i></span>
             </div>
         </div>
