@@ -40,7 +40,7 @@ class Command(BaseCommand):
             choices=[
                 "migrate_collections_to_controlled_lists",
                 "migrate_concept_nodes_to_reference_datatype",
-                "migrate_domain_nodes_to_controlled_lists",
+                "extract_domain_values_to_controlled_lists",
                 "migrate_domain_nodes_to_reference_datatype",
                 "migrate_tile_data_to_reference_datatype",
                 "change_url_base",
@@ -156,9 +156,9 @@ class Command(BaseCommand):
         elif options["operation"] == "migrate_concept_nodes_to_reference_datatype":
             graph = self._resolve_graph(options["graph"])
             self.migrate_concept_nodes_to_reference_datatype(graph)
-        elif options["operation"] == "migrate_domain_nodes_to_controlled_lists":
+        elif options["operation"] == "extract_domain_values_to_controlled_lists":
             graph = self._resolve_graph(options["graph"])
-            self.migrate_domain_nodes_to_controlled_lists(
+            self.extract_domain_values_to_controlled_lists(
                 graph=graph,
                 node_aliases=options.get("node_aliases") or [],
                 overwrite=options["overwrite"],
@@ -266,7 +266,7 @@ class Command(BaseCommand):
             result = cursor.fetchone()
             self.stdout.write(result[0])
 
-    def migrate_domain_nodes_to_controlled_lists(
+    def extract_domain_values_to_controlled_lists(
         self, graph, node_aliases, overwrite, host
     ):
         """
@@ -276,12 +276,12 @@ class Command(BaseCommand):
 
         Example usage:
             python manage.py controlled_lists
-                -o migrate_domain_nodes_to_controlled_lists
+                -o extract_domain_values_to_controlled_lists
                 -g <graphid-or-slug>
                 -ho http://localhost:8000/plugins/controlled-list-manager/item/
 
             python manage.py controlled_lists
-                -o migrate_domain_nodes_to_controlled_lists
+                -o extract_domain_values_to_controlled_lists
                 -g <graphid-or-slug>
                 -n <node-alias-1> <node-alias-2>
                 -ho http://localhost:8000/plugins/controlled-list-manager/item/
