@@ -25,6 +25,7 @@ from arches.app.models.models import (
 from arches.app.models.system_settings import settings as settings
 
 from arches_controlled_lists.models import List
+from arches_controlled_lists import tasks
 
 
 logger = logging.getLogger(__name__)
@@ -247,19 +248,11 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
         return queryset
 
     def _count_candidate_tiles(self, graph_id, origin):
-        candidate_node_ids = [
-            str(pk)
-            for pk in self._get_candidate_nodes_queryset(graph_id, origin).values_list(
-                "pk", flat=True
-            )
-        ]
+        queryset = self._get_candidate_nodes_queryset(graph_id, origin)
+        candidate_node_ids = [str(pk) for pk in queryset.values_list("pk", flat=True)]
         if not candidate_node_ids:
             return 0
-        nodegroup_ids = set(
-            Node.objects.filter(pk__in=candidate_node_ids).values_list(
-                "nodegroup_id", flat=True
-            )
-        )
+        nodegroup_ids = set(queryset.values_list("nodegroup_id", flat=True))
         return TileModel.objects.filter(
             nodegroup_id__in=nodegroup_ids,
             data__has_any_keys=candidate_node_ids,
@@ -308,12 +301,12 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
 
     @load_data_async
     def run_load_task_async(self, request):
-        from arches_controlled_lists import tasks as cl_tasks
-
-        graph_id = request.POST["graph_id"]
-        origin = request.POST["origin"]
-        language_code = request.POST.get("language_code") or settings.LANGUAGE_CODE
-        edit_task = cl_tasks.migrate_to_reference_datatype.apply_async(
+        graph_id = request.POST["graph_id"] if request else self._graph_id
+        origin = request.POST["origin"] if request else self._origin
+        language_code = (
+            request.POST.get("language_code") if request else self._language_code
+        )
+        edit_task = tasks.migrate_to_reference_datatype.apply_async(
             (
                 self.userid,
                 self.loadid,
