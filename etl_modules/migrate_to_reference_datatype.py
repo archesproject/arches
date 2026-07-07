@@ -407,7 +407,7 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
                     staging_records.append(staged)
                     staged_count += 1
                 if errored:
-                    error_records.append(errored)
+                    error_records.extend(errored)
                     errored_count += 1
             LoadStaging.objects.bulk_create(staging_records)
             LoadErrors.objects.bulk_create(error_records)
@@ -471,7 +471,7 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
         sibling_datatypes,
     ) -> tuple[LoadStaging | None, LoadErrors | None]:
         load_staging_record = None
-        load_error_record = None
+        load_error_record = []
         rewritten_values_by_node_id = {}
         unresolved_per_node = {}
 
@@ -488,42 +488,48 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
                 legacy_value if isinstance(legacy_value, list) else [legacy_value]
             )
 
-            resolved_entries = []
-            missing = []
+            resolved_reference_value = []
+            missing_values = []
             for legacy_id in legacy_ids:
-                entries = translator.resolve(legacy_id)
-                if not entries:
-                    missing.append(legacy_id)
+                resolved = translator.resolve(legacy_id)
+                if not resolved:
+                    missing_values.append(legacy_id)
                 else:
-                    resolved_entries.extend(entries)
+                    resolved_reference_value.extend(resolved)
 
-            if missing:
-                unresolved_per_node[node_id] = (node, translator.list_id, missing)
+            if missing_values:
+                unresolved_per_node[node_id] = (
+                    node,
+                    translator.list_id,
+                    missing_values,
+                )
                 continue
 
             if (
                 not bool((node.config or {}).get("multiValue"))
-                and len(resolved_entries) > 1
+                and len(resolved_reference_value) > 1
             ):
-                resolved_entries = resolved_entries[:1]
-            rewritten_values_by_node_id[node_id] = resolved_entries
+                resolved_reference_value = resolved_reference_value[:1]
+            rewritten_values_by_node_id[node_id] = resolved_reference_value
 
         if unresolved_per_node:
-            for node_id, (node, list_id, missing) in unresolved_per_node.items():
-                load_error_record = LoadErrors(
-                    load_event_id=self.loadid,
-                    nodegroup_id=node.nodegroup_id,
-                    node_id=node.pk,
-                    type="WARNING",
-                    error="UnresolvedLegacyValue",
-                    source="migrate_to_reference_datatype",
-                    value=", ".join(str(item) for item in missing),
-                    message=(
-                        f"Could not resolve legacy {origin} id(s) "
-                        f"{missing} on tile {tile.pk} for node "
-                        f"'{node.alias}' against list {list_id}."
-                    ),
-                    datatype="reference",
+            for node_id, (node, list_id, missing_values) in unresolved_per_node.items():
+                load_error_record.append(
+                    LoadErrors(
+                        load_event_id=self.loadid,
+                        nodegroup_id=node.nodegroup_id,
+                        node_id=node.pk,
+                        type="WARNING",
+                        error="UnresolvedLegacyValue",
+                        source="migrate_to_reference_datatype",
+                        value=", ".join(str(item) for item in missing_values),
+                        message=(
+                            f"Could not resolve legacy {origin} id(s) "
+                            f"{missing_values} on tile {tile.pk} for node "
+                            f"'{node.alias}' in list {list_id}."
+                        ),
+                        datatype="reference",
+                    )
                 )
             return load_staging_record, load_error_record
 
