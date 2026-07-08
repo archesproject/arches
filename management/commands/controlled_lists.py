@@ -716,13 +716,15 @@ class Command(BaseCommand):
         normalized_url = self._normalize_url(target_hostname)
         try:
             with transaction.atomic():
+                list_items_to_update = []
                 list_item_query = ListItem.objects.all()
                 if list_ids:
                     list_item_query = list_item_query.filter(list_id__in=list_ids)
                 for list_item in list_item_query.all():
                     new_uri = self._replace_hostname(list_item.uri, normalized_url)
                     list_item.uri = new_uri
-                    list_item.save()
+                    list_items_to_update.append(list_item)
+                ListItem.objects.bulk_update(list_items_to_update, ["uri"])
         except Exception as e:
             self.stderr.write(f"Could not change base url: {str(e)}")
             return
