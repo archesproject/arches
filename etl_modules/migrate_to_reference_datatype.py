@@ -469,11 +469,11 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
         translators,
         origin,
         sibling_datatypes,
-    ) -> tuple[LoadStaging | None, LoadErrors | None]:
+    ) -> tuple[LoadStaging | None, list[LoadErrors | None]]:
         load_staging_record = None
         load_error_record = []
         rewritten_values_by_node_id = {}
-        unresolved_per_node = {}
+        unresolved_legacy_val_per_node = {}
 
         for node_id, node in candidates_by_node_id.items():
             if node.nodegroup_id != tile.nodegroup_id:
@@ -498,7 +498,7 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
                     resolved_reference_value.extend(resolved)
 
             if missing_values:
-                unresolved_per_node[node_id] = (
+                unresolved_legacy_val_per_node[node_id] = (
                     node,
                     translator.list_id,
                     missing_values,
@@ -512,8 +512,12 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
                 resolved_reference_value = resolved_reference_value[:1]
             rewritten_values_by_node_id[node_id] = resolved_reference_value
 
-        if unresolved_per_node:
-            for node_id, (node, list_id, missing_values) in unresolved_per_node.items():
+        if unresolved_legacy_val_per_node:
+            for node_id, (
+                node,
+                list_id,
+                missing_values,
+            ) in unresolved_legacy_val_per_node.items():
                 load_error_record.append(
                     LoadErrors(
                         load_event_id=self.loadid,
@@ -557,10 +561,10 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
 
     @staticmethod
     def _build_staged_value(tile, rewritten_values_by_node_id, sibling_datatypes):
-        staged = {}
+        staging_tile_value = {}
         for nodeid, node_val in (tile.data or {}).items():
             if nodeid in rewritten_values_by_node_id:
-                staged[nodeid] = {
+                staging_tile_value[nodeid] = {
                     "value": rewritten_values_by_node_id[nodeid],
                     "valid": True,
                     "source": "bulk_edit",
@@ -568,7 +572,7 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
                     "datatype": "reference",
                 }
             else:
-                staged[nodeid] = {
+                staging_tile_value[nodeid] = {
                     "value": node_val,
                     "valid": True,
                     "source": "bulk_edit",
@@ -576,12 +580,12 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
                     "datatype": sibling_datatypes.get(nodeid, "string"),
                 }
         for node_id, new_value in rewritten_values_by_node_id.items():
-            if node_id not in staged:
-                staged[node_id] = {
+            if node_id not in staging_tile_value:
+                staging_tile_value[node_id] = {
                     "value": new_value,
                     "valid": True,
                     "source": "bulk_edit",
                     "notes": "",
                     "datatype": "reference",
                 }
-        return staged
+        return staging_tile_value
