@@ -17,13 +17,13 @@ def migrate_to_reference_datatype(
     origin,
     language_code,
 ):
-    from arches_controlled_lists.etl_modules import (
-        migrate_to_reference_datatype as module,
+    from arches_controlled_lists.etl_modules.migrate_to_reference_datatype import (
+        MigrateToReferenceDatatype,
     )
 
     logger = logging.getLogger(__name__)
     try:
-        editor = module.MigrateToReferenceDatatype(loadid=load_id)
+        editor = MigrateToReferenceDatatype(loadid=load_id)
         editor.run_load_task(
             userid,
             load_id,
