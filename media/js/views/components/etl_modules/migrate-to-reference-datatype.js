@@ -16,7 +16,7 @@ const ViewModel = function(params) {
     this.moduleId = params.etlmoduleid;
     this.formData = new window.FormData();
 
-    this.dropdowngraph = ko.observableArray();
+    this.availableGraphs = ko.observableArray();
     this.selectedGraph = ko.observable();
     this.origin = ko.observable();
     this.languageCode = ko.observable(arches.activeLanguage);
@@ -24,14 +24,12 @@ const ViewModel = function(params) {
         (arches.languages || [{ code: arches.activeLanguage, name: arches.activeLanguage }])
             .map(language => ({
                 code: language.code,
-                name: language.default_direction
-                    ? `${language.name} (${language.code})`
-                    : language.name || language.code,
+                name: `${language.name} (${language.code})`,
             })),
     );
 
-    this.previewing = ko.observable(false);
-    this.showPreview = ko.observable(false);
+    this.isPreviewLoading = ko.observable(false);
+    this.shouldShowPreview = ko.observable(false);
     this.candidateNodes = ko.observableArray([]);
 
     this.showStatusDetails = ko.observable(false);
@@ -42,18 +40,18 @@ const ViewModel = function(params) {
     this.alert = params.alert || ko.observable();
 
     this.canPreview = ko.computed(() => {
-        return !!self.selectedGraph() && !!self.origin() && !self.previewing();
+        return !!self.selectedGraph() && !!self.origin() && !self.isPreviewLoading();
     });
 
     this.canWrite = ko.computed(() => {
-        return self.canPreview() && self.showPreview() && self.candidateNodes().length > 0;
+        return self.canPreview() && self.shouldShowPreview() && self.candidateNodes().length > 0;
     });
 
     const inputsChanged = ko.computed(() => {
         return [self.selectedGraph(), self.origin(), self.languageCode()].join('|');
     });
     inputsChanged.subscribe(() => {
-        self.showPreview(false);
+        self.shouldShowPreview(false);
         self.candidateNodes([]);
     });
 
@@ -80,10 +78,10 @@ const ViewModel = function(params) {
     };
 
     this.fetchGraphs = function() {
-        self.dropdowngraph.removeAll();
+        self.availableGraphs.removeAll();
         self.submit('get_graphs').then(data => {
             data.result.forEach(graph => {
-                self.dropdowngraph.push({ graphName: graph.name, graphid: graph.graphid });
+                self.availableGraphs.push({ graphName: graph.name, graphid: graph.graphid });
             });
         }).fail(err => {
             self.alert(new JsonErrorAlertViewModel('ep-alert-red', err.responseJSON?.data, null, () => {}));
@@ -92,20 +90,20 @@ const ViewModel = function(params) {
 
     this.previewCandidates = function() {
         if (!self.canPreview()) { return; }
-        self.previewing(true);
+        self.isPreviewLoading(true);
         self.submit('get_candidate_nodes').then(data => {
             self.candidateNodes(data.result || []);
-            self.showPreview(true);
+            self.shouldShowPreview(true);
         }).fail(err => {
             self.alert(new JsonErrorAlertViewModel('ep-alert-red', err.responseJSON?.data, null, () => {}));
         }).always(() => {
-            self.previewing(false);
+            self.isPreviewLoading(false);
         });
     };
 
     this.write = function() {
         if (!self.canWrite()) { return; }
-        self.showPreview(false);
+        self.shouldShowPreview(false);
         params.activeTab('import');
         self.submit('write').fail(err => {
             self.alert(new JsonErrorAlertViewModel('ep-alert-red', err.responseJSON?.data, null, () => {}));

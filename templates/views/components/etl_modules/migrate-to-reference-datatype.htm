@@ -4,79 +4,73 @@
 {% block task_details %}
 <div class="etl-module-component-container">
     <div class="etl-module-body">
-        <h2>
-            <span style="font-weight: 400; font-size: 1.7rem; color: #565656;">
-                {% blocktrans %}Migrate Tile Values to Reference Datatype{% endblocktrans %}
-            </span>
-        </h2>
+        <p style="font-weight: 400; font-size: 1.7rem; color: #565656;">
+            {% trans "Migrate Tile Values to Reference Datatype" %}
+        </p>
         <p class="pad-btm">
-            {% blocktrans %}Rewrite tile data on nodes that have already been retyped to the reference datatype but still hold legacy concept or domain values.{% endblocktrans %}
+            {% trans "Rewrite tile data on nodes that have already been retyped to the reference datatype but still hold legacy concept or domain values." %}
         </p>
 
         <div class="etl-module-component-block">
-            <h3>
-                <label style="font-weight: normal; font-size: 1.5rem; color: #565656;">
-                    {% blocktrans %}Resource Model{% endblocktrans %}
-                </label>
-            </h3>
+            <label for="graph-select" style="display: block; font-weight: normal; font-size: 1.5rem; color: #565656;">
+                {% trans "Resource Model" %}
+            </label>
             <div>
-                <select data-bind="options: dropdowngraph, optionsText: 'graphName', optionsValue: 'graphid', value: selectedGraph, valueAllowUnset: true, optionsCaption: ' ', chosen: {width: '400px'}"></select>
+                <select id="graph-select" data-bind="options: availableGraphs, optionsText: 'graphName', optionsValue: 'graphid', value: selectedGraph, valueAllowUnset: true, optionsCaption: ' ', chosen: {width: '400px'}"></select>
             </div>
         </div>
 
         <div class="etl-module-component-block" data-bind="visible: selectedGraph()">
-            <h3>
-                <label style="font-weight: normal; font-size: 1.5rem; color: #565656;">
-                    {% blocktrans %}Origin Datatype{% endblocktrans %}
-                </label>
-            </h3>
-            <div style="display: flex; flex-direction: column; gap: 6px;">
-                <label style="font-weight: normal;">
-                    <input type="radio" value="concept" data-bind="checked: origin"/>
-                    {% blocktrans %}Concept / Concept-list (legacy valueid){% endblocktrans %}
-                </label>
-                <label style="font-weight: normal;">
-                    <input type="radio" value="domain" data-bind="checked: origin"/>
-                    {% blocktrans %}Domain-value / Domain-value-list (legacy option id){% endblocktrans %}
-                </label>
-            </div>
+            <fieldset style="border: none; padding: 0; margin: 0;">
+                <legend style="font-weight: normal; font-size: 1.5rem; color: #565656; padding: 0;">
+                    {% trans "Origin Datatype" %}
+                </legend>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <label style="font-weight: normal;">
+                        <input type="radio" value="concept" data-bind="checked: origin"/>
+                        {% trans "Concept / Concept-list (legacy valueid)" %}
+                    </label>
+                    <label style="font-weight: normal;">
+                        <input type="radio" value="domain" data-bind="checked: origin"/>
+                        {% trans "Domain-value / Domain-value-list (legacy option id)" %}
+                    </label>
+                </div>
+            </fieldset>
         </div>
 
         <div class="etl-module-component-block" data-bind="visible: selectedGraph() && origin()">
-            <h3>
-                <label style="font-weight: normal; font-size: 1.5rem; color: #565656;">
-                    {% blocktrans %}Language for Label Fallback{% endblocktrans %}
-                </label>
-            </h3>
+            <label for="language-select" style="display: block; font-weight: normal; font-size: 1.5rem; color: #565656;">
+                {% trans "Language for Label Fallback" %}
+            </label>
             <div>
-                <select data-bind="options: languages, optionsText: 'name', optionsValue: 'code', value: languageCode, valueAllowUnset: true, chosen: {width: '400px'}"></select>
+                <select id="language-select" data-bind="options: languages, optionsText: 'name', optionsValue: 'code', value: languageCode, valueAllowUnset: true, chosen: {width: '400px'}"></select>
             </div>
         </div>
 
         <button data-bind="click: previewCandidates, attr: {disabled: !canPreview()}" class="btn btn-success">
-            <span>{% blocktrans %}Preview Candidate Nodes{% endblocktrans %}</span>
-            <i class="fa fa-spin fa-spinner" data-bind="visible: previewing()"></i>
+            <span>{% trans "Preview Candidate Nodes" %}</span>
+            <i class="fa fa-spin fa-spinner" data-bind="visible: isPreviewLoading()"></i>
         </button>
 
-        <!-- ko if: showPreview -->
+        <!-- ko if: shouldShowPreview -->
         <section class="etl-preview">
             <!-- ko if: candidateNodes().length === 0 -->
-            <h3 style="margin-top: 0px;">
+            <p style="margin-top: 0px;">
                 <span style="margin: 2px;" class="fa fa-info-circle"></span>
-                <span>{% blocktrans %}No reference nodes with legacy markers were found for the selected model and origin.{% endblocktrans %}</span>
-            </h3>
+                <span>{% trans "No reference nodes with legacy markers were found for the selected model and origin." %}</span>
+            </p>
             <!-- /ko -->
             <!-- ko if: candidateNodes().length > 0 -->
-            <h3 style="margin-top: 0px;">
-                <span data-bind="text: candidateNodes().length + ' {% blocktrans %}candidate node(s){% endblocktrans %}'"></span>
-            </h3>
+            <p style="margin-top: 0px;">
+                <span data-bind="text: candidateNodes().length + ' {% trans "candidate node(s)" %}'"></span>
+            </p>
             <table class="table table-striped csv-mapping-table">
                 <thead>
                     <tr>
-                        <th>{% blocktrans %}Node Alias{% endblocktrans %}</th>
-                        <th>{% blocktrans %}Nodegroup{% endblocktrans %}</th>
-                        <th>{% blocktrans %}Controlled List{% endblocktrans %}</th>
-                        <th>{% blocktrans %}Tiles to Rewrite{% endblocktrans %}</th>
+                        <th>{% trans "Node Alias" %}</th>
+                        <th>{% trans "Nodegroup" %}</th>
+                        <th>{% trans "Controlled List" %}</th>
+                        <th>{% trans "Tiles to Rewrite" %}</th>
                     </tr>
                 </thead>
                 <tbody data-bind="foreach: candidateNodes">
@@ -95,7 +89,7 @@
 
     <div class="tabbed-workflow-footer, etl-module-footer">
         <button style="margin-right: 8px;" data-bind="click: write, attr: {disabled: !canWrite()}" class="btn btn-success">
-            <span>{% blocktrans %}Run Migration{% endblocktrans %}</span>
+            <span>{% trans "Run Migration" %}</span>
         </button>
     </div>
 </div>
@@ -104,25 +98,25 @@
 {% block etl_status %}
 <div class="bulk-load-status">
     <h4 class="summary-title">
-        <span>{% blocktrans %}Migration Summary{% endblocktrans %}</span>
+        <span>{% trans "Migration Summary" %}</span>
     </h4>
     <div style="padding-top: 10px;">
-        <span class="etl-loading-metadata-key">{% blocktrans %}Resource Model:{% endblocktrans %}</span>
+        <span class="etl-loading-metadata-key">{% trans "Resource Model:" %}</span>
         <span class="etl-loading-metadata-value" data-bind="text: load_details.graph"></span>
     </div>
     <div data-bind="if: load_details.details">
-        <span class="etl-loading-metadata-key">{% blocktrans %}Origin:{% endblocktrans %}</span>
+        <span class="etl-loading-metadata-key">{% trans "Origin:" %}</span>
         <span class="etl-loading-metadata-value" data-bind="text: load_details.details.origin"></span>
     </div>
     <div data-bind="if: load_details.details">
-        <span class="etl-loading-metadata-key">{% blocktrans %}Language:{% endblocktrans %}</span>
+        <span class="etl-loading-metadata-key">{% trans "Language:" %}</span>
         <span class="etl-loading-metadata-value" data-bind="text: load_details.details.language_code"></span>
     </div>
     <div data-bind="if: editHistoryUrl">
-        <span class="etl-loading-metadata-key">{% blocktrans %}Edited Resources:{% endblocktrans %}</span>
+        <span class="etl-loading-metadata-key">{% trans "Edited Resources:" %}</span>
         <span class="etl-loading-metadata-value">
             <a class="etl-status-link" target="_blank" data-bind="attr: { href: editHistoryUrl }">
-                {% blocktrans %}View in Edit Log{% endblocktrans %}
+                {% trans "View in Edit Log" %}
             </a>
         </span>
     </div>
@@ -132,10 +126,10 @@
 {% block loading_status %}
 <div class="bulk-load-status">
     <h4 class="summary-header">
-        <span>{% blocktrans %}Progress Details{% endblocktrans %}</span>
+        <span>{% trans "Progress Details" %}</span>
     </h4>
     <div style="display:flex;" data-bind="click: function() { showStatusDetails(!showStatusDetails())}">
-        <a class="etl-status-link etl-loading-metadata-key">{% blocktrans %}Status:{% endblocktrans %}</a>
+        <a class="etl-status-link etl-loading-metadata-key">{% trans "Status:" %}</a>
         <div style="padding: 1px 4px;">
             <div>
                 <!-- ko ifnot: showStatusDetails -->
@@ -170,15 +164,15 @@
         </div>
     </div>
     <div style="padding-top: 10px;">
-        <span class="etl-loading-metadata-key">{% blocktrans %}Started:{% endblocktrans %}</span>
+        <span class="etl-loading-metadata-key">{% trans "Started:" %}</span>
         <span class="etl-loading-metadata-value" data-bind="text: selectedLoadEvent() ? formatTime(selectedLoadEvent().load_start_time) : ''"></span>
     </div>
     <div data-bind="if: selectedLoadEvent() && selectedLoadEvent().load_end_time">
-        <span class="etl-loading-metadata-key">{% blocktrans %}Ended:{% endblocktrans %}</span>
+        <span class="etl-loading-metadata-key">{% trans "Ended:" %}</span>
         <span class="etl-loading-metadata-value" data-bind="text: selectedLoadEvent() ? formatTime(selectedLoadEvent().load_end_time) : ''"></span>
     </div>
     <div data-bind="if: selectedLoadEvent() && selectedLoadEvent().load_end_time">
-        <span class="etl-loading-metadata-key">{% blocktrans %}Duration:{% endblocktrans %}</span>
+        <span class="etl-loading-metadata-key">{% trans "Duration:" %}</span>
         <span class="etl-loading-metadata-value" data-bind="text: selectedLoadEvent() ? timeDifference(selectedLoadEvent().load_end_time, selectedLoadEvent().load_start_time) : ''"></span>
     </div>
 </div>
