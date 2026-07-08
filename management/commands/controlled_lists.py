@@ -594,6 +594,8 @@ class Command(BaseCommand):
             raise CommandError(
                 "Please provide a valid graph id or slug with -g/--graph"
             )
+        if isinstance(graph, Graph):
+            return graph
         try:
             uuid.UUID(graph)
             query = models.Q(graphid=graph, source_identifier=None)

@@ -107,14 +107,10 @@ class DomainLegacyValueTranslator(LegacyValueTranslator):
         labels = {}
         for option in (self.node.config or {}).get("options") or []:
             option_id = option.get("id")
-            text = option.get("text")
-            label = None
-            if isinstance(text, dict):
-                label = text.get(self.language_code) or next(
-                    (val for val in text.values() if val), None
-                )
-            elif isinstance(text, str):
-                label = text
+            option_val = option.get("text")
+            label = option_val.get(self.language_code) or next(
+                (val for val in option_val.values() if val), None
+            )
             if option_id and label:
                 labels[str(option_id)] = label
         return labels
@@ -183,12 +179,10 @@ class MigrateToReferenceDatatype(BaseBulkEditor):
 
     def validate_inputs(self, graph_id, origin):
         if not graph_id:
-            raise MissingRequiredInputError(
-                _("Missing required value: {label}").format(label=_("Resource Model"))
-            )
+            raise MissingRequiredInputError(_("Missing required value: Graph ID"))
         if not origin:
             raise MissingRequiredInputError(
-                _("Missing required value: {label}").format(label=_("Origin Datatype"))
+                _("Missing required value: Origin Datatype")
             )
         if origin not in {CONCEPT_ORIGIN, DOMAIN_ORIGIN}:
             raise MissingRequiredInputError(
