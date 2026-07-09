@@ -1,10 +1,10 @@
+export type AliasedNodegroupData = AliasedTileData | AliasedTileData[] | null;
+
 export interface AliasedNodeData {
     display_value: string;
     node_value: unknown;
     details: unknown[];
 }
-
-export type AliasedNodegroupData = AliasedTileData | AliasedTileData[] | null;
 
 export interface AliasedData {
     [key: string]: AliasedNodeData | AliasedNodegroupData;

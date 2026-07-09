@@ -1,51 +1,52 @@
 <script setup lang="ts">
+import { onMounted } from "vue";
 import InputNumber from "primevue/inputnumber";
 
+import { buildNumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/utils.ts";
+
 import type {
+    NumberAliasedNodeData,
     NumberCardXNodeXWidgetData,
-    NumberValue,
 } from "@/arches_component_lab/datatypes/number/types.ts";
 
-const { cardXNodeXWidgetData, aliasedNodeData, shouldEmitSimplifiedValue } =
-    defineProps<{
-        cardXNodeXWidgetData: NumberCardXNodeXWidgetData;
-        aliasedNodeData: NumberValue | null;
-        shouldEmitSimplifiedValue?: boolean;
-    }>();
-
-const emit = defineEmits<{
-    (event: "update:value", updatedValue: NumberValue | number | null): void;
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+    cardXNodeXWidgetData?: NumberCardXNodeXWidgetData;
+    aliasedNodeData: NumberAliasedNodeData | null;
 }>();
 
+const emit = defineEmits<{
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: NumberAliasedNodeData,
+    ): void;
+    (event: "initialized", updatedValue: NumberAliasedNodeData): void;
+}>();
+
+onMounted(() => {
+    emit("initialized", aliasedNodeData ?? buildNumberAliasedNodeData(null));
+});
+
 function onUpdateModelValue(updatedValue: number | null) {
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", updatedValue);
-    } else {
-        emit("update:value", {
-            display_value: updatedValue !== null ? updatedValue.toString() : "",
-            node_value: updatedValue,
-            details: [],
-        });
-    }
+    emit("update:aliasedNodeData", buildNumberAliasedNodeData(updatedValue));
 }
 </script>
 
 <template>
     <InputNumber
-        :model-value="aliasedNodeData?.node_value"
+        :model-value="aliasedNodeData?.node_value ?? null"
         :fluid="true"
-        :input-id="cardXNodeXWidgetData.node.alias"
-        :placeholder="cardXNodeXWidgetData.config.placeholder"
-        :prefix="cardXNodeXWidgetData.config.prefix ?? ''"
-        :suffix="cardXNodeXWidgetData.config.suffix ?? ''"
+        :input-id="cardXNodeXWidgetData?.node.alias"
+        :placeholder="cardXNodeXWidgetData?.config.placeholder"
+        :prefix="cardXNodeXWidgetData?.config.prefix ?? ''"
+        :suffix="cardXNodeXWidgetData?.config.suffix ?? ''"
         :min-fraction-digits="
-            Number(cardXNodeXWidgetData.config.precision) || 0
+            Number(cardXNodeXWidgetData?.config.precision) || 0
         "
         :max-fraction-digits="
-            Number(cardXNodeXWidgetData.config.precision) || 0
+            Number(cardXNodeXWidgetData?.config.precision) || 0
         "
-        :min="Number(cardXNodeXWidgetData.config.min) || -Infinity"
-        :max="Number(cardXNodeXWidgetData.config.max) || Infinity"
+        :min="Number(cardXNodeXWidgetData?.config.min) || -Infinity"
+        :max="Number(cardXNodeXWidgetData?.config.max) || Infinity"
         @update:model-value="onUpdateModelValue($event)"
     />
 </template>

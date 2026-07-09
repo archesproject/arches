@@ -9,7 +9,7 @@ const { $gettext } = useGettext();
 const { openFileChooser, cardXNodeXWidgetData, isDisabled, acceptedFileTypes } =
     defineProps<{
         openFileChooser: () => void;
-        cardXNodeXWidgetData: CardXNodeXWidgetData;
+        cardXNodeXWidgetData?: CardXNodeXWidgetData;
         isDisabled: boolean;
         acceptedFileTypes: string[];
     }>();
@@ -48,7 +48,7 @@ const displayFileTypes = computed(() => {
         }"
     >
         <div
-            :id="cardXNodeXWidgetData.node.alias"
+            :id="cardXNodeXWidgetData?.node.alias"
             class="upload-container"
             role="button"
             tabindex="0"

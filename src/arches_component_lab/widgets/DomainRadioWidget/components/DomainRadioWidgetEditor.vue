@@ -1,50 +1,51 @@
 <script setup lang="ts">
+import { onMounted } from "vue";
 import RadioButton from "primevue/radiobutton";
 import RadioButtonGroup from "primevue/radiobuttongroup";
 
+import { buildDomainAliasedNodeData } from "@/arches_component_lab/datatypes/domain/utils.ts";
+
 import type {
+    DomainAliasedNodeData,
     DomainDatatypeCardXNodeXWidgetData,
-    DomainValue,
-    DomainOption,
 } from "@/arches_component_lab/datatypes/domain/types.ts";
 
-const {
-    cardXNodeXWidgetData,
-    aliasedNodeData,
-    shouldEmitSimplifiedValue = false,
-} = defineProps<{
-    cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
-    aliasedNodeData: DomainValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+const { aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
+    cardXNodeXWidgetData?: DomainDatatypeCardXNodeXWidgetData;
+    aliasedNodeData: DomainAliasedNodeData | null;
 }>();
 
-const options = cardXNodeXWidgetData.node.config.options;
+const options = cardXNodeXWidgetData?.node.config.options ?? [];
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: DomainValue | string | null): void;
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: DomainAliasedNodeData,
+    ): void;
+    (event: "initialized", updatedValue: DomainAliasedNodeData): void;
 }>();
 
-function onUpdateModelValue(updatedValue: string | null) {
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", updatedValue);
-    } else {
-        const updatedDisplayValue =
-            options.find((option: DomainOption) => option.id === updatedValue)
-                ?.text || "";
+onMounted(() => {
+    emit(
+        "initialized",
+        aliasedNodeData ?? buildDomainAliasedNodeData(null, options),
+    );
+});
 
-        emit("update:value", {
-            display_value: updatedDisplayValue,
-            node_value: updatedValue,
-            details: [],
-        });
-    }
+function onUpdateModelValue(updatedValue: string | null) {
+    emit(
+        "update:aliasedNodeData",
+        buildDomainAliasedNodeData(updatedValue, options),
+    );
 }
 </script>
 
 <template>
     <RadioButtonGroup
-        :model-value="aliasedNodeData?.node_value"
+        :id="cardXNodeXWidgetData?.node.alias"
+        :model-value="aliasedNodeData?.node_value ?? null"
         class="button-group"
+        tabindex="-1"
         @update:model-value="onUpdateModelValue($event)"
     >
         <div

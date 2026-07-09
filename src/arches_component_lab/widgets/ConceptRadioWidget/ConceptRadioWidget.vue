@@ -1,27 +1,71 @@
 <script setup lang="ts">
+import { computed, ref, toRef, watch } from "vue";
+
 import ConceptRadioWidgetEditor from "@/arches_component_lab/widgets/ConceptRadioWidget/components/ConceptRadioWidgetEditor.vue";
 import ConceptRadioWidgetViewer from "@/arches_component_lab/widgets/ConceptRadioWidget/components/ConceptRadioWidgetViewer.vue";
+
+import { useConceptLabelResolver } from "@/arches_component_lab/datatypes/concept/useConceptLabelResolver.ts";
+import { buildConceptAliasedNodeData } from "@/arches_component_lab/datatypes/concept/utils.ts";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { ConceptRadioCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { ConceptValue } from "@/arches_component_lab/datatypes/concept/types.ts";
+import type { ConceptAliasedNodeData } from "@/arches_component_lab/datatypes/concept/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-defineProps<{
+const { aliasedNodeData, value, mode, graphSlug, nodeAlias } = defineProps<{
     mode: WidgetMode;
-    nodeAlias: string;
-    graphSlug: string;
-    cardXNodeXWidgetData: ConceptRadioCardXNodeXWidgetData;
-    aliasedNodeData: ConceptValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    nodeAlias?: string;
+    graphSlug?: string;
+    cardXNodeXWidgetData?: ConceptRadioCardXNodeXWidgetData;
+    aliasedNodeData?: ConceptAliasedNodeData | null;
+    value?: string | null;
 }>();
 
-const emit = defineEmits([
-    "update:isDirty",
-    "update:isLoading",
-    "update:value",
-]);
+const emit = defineEmits<{
+    "update:isDirty": [isDirty: boolean];
+    "update:isLoading": [isLoading: boolean];
+    "update:value": [updatedValue: string | null];
+    "update:aliasedNodeData": [updatedValue: ConceptAliasedNodeData];
+    initialized: [updatedValue: ConceptAliasedNodeData];
+}>();
+
+const { resolved, loading } = useConceptLabelResolver(
+    toRef(() => {
+        if (!aliasedNodeData) {
+            return value ?? null;
+        }
+        return null;
+    }),
+    graphSlug ?? "",
+    nodeAlias ?? "",
+);
+
+const isEditorLoading = ref(false);
+
+const resolvedAliasedNodeData = computed(() => {
+    if (aliasedNodeData) {
+        return aliasedNodeData;
+    }
+    if (loading.value) {
+        return null;
+    }
+    return buildConceptAliasedNodeData(
+        value ?? null,
+        resolved.value ? [resolved.value] : [],
+    );
+});
+
+watch([loading, isEditorLoading], ([resolverLoading, editorLoading]) =>
+    emit("update:isLoading", resolverLoading || editorLoading),
+);
+
+function onUpdateAliasedNodeData(
+    updatedAliasedNodeData: ConceptAliasedNodeData,
+) {
+    emit("update:aliasedNodeData", updatedAliasedNodeData);
+    emit("update:value", updatedAliasedNodeData.node_value);
+}
 </script>
 
 <template>
@@ -30,13 +74,14 @@ const emit = defineEmits([
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :graph-slug="graphSlug"
         :node-alias="nodeAlias"
-        :aliased-node-data="aliasedNodeData"
-        :should-emit-simplified-value="shouldEmitSimplifiedValue"
-        @update:is-loading="emit('update:isLoading', $event)"
-        @update:value="emit('update:value', $event)"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @update:is-loading="isEditorLoading = $event"
+        @update:aliased-node-data="onUpdateAliasedNodeData"
+        @initialized="emit('initialized', $event)"
     />
     <ConceptRadioWidgetViewer
         v-if="mode === VIEW"
-        :aliased-node-data="aliasedNodeData"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @initialized="emit('initialized', $event)"
     />
 </template>

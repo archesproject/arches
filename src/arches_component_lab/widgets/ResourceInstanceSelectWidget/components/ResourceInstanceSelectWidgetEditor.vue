@@ -8,52 +8,51 @@ import Select from "primevue/select";
 import ResourceInstanceCreation from "@/arches_component_lab/widgets/components/ResourceInstanceCreation.vue";
 
 import { fetchRelatableResources } from "@/arches_component_lab/datatypes/resource-instance/api.ts";
+import { buildResourceInstanceAliasedNodeData } from "@/arches_component_lab/datatypes/resource-instance/utils.ts";
 import { debounce } from "@/arches_component_lab/utils.ts";
 
 import type { SelectFilterEvent } from "primevue/select";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
 
 import type {
-    ResourceInstanceValue,
+    ResourceInstanceReference,
     ResourceInstanceDataItem,
     ResourceInstanceSelectOption,
     ResourceInstanceCardXNodeXWidgetData,
 } from "@/arches_component_lab/datatypes/resource-instance/types.ts";
 
 import type { AliasedTileData } from "@/arches_component_lab/types";
+import type { ResourceInstanceAliasedNodeData } from "@/arches_component_lab/datatypes/resource-instance/types.ts";
+
+// in future iteration these may be declared in the CardXNodeXWidgetData config
+const ITEM_SIZE = 36;
 
 const {
     cardXNodeXWidgetData,
     nodeAlias,
     graphSlug,
     aliasedNodeData,
-    shouldEmitSimplifiedValue,
     defaultTerm,
 } = defineProps<{
-    cardXNodeXWidgetData: ResourceInstanceCardXNodeXWidgetData;
-    nodeAlias: string;
-    graphSlug: string;
-    aliasedNodeData: ResourceInstanceValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    cardXNodeXWidgetData?: ResourceInstanceCardXNodeXWidgetData;
+    nodeAlias?: string;
+    graphSlug?: string;
+    aliasedNodeData?: ResourceInstanceAliasedNodeData | null;
     defaultTerm?: string;
 }>();
 
 const emit = defineEmits<{
-    (
-        event: "update:value",
-        updatedValue: ResourceInstanceValue | string[],
-    ): void;
     (event: "update:isLoading", isLoading: boolean): void;
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: ResourceInstanceAliasedNodeData,
+    ): void;
+    (event: "initialized", updatedValue: ResourceInstanceAliasedNodeData): void;
 }>();
 
 const { $gettext } = useGettext();
 
-// in future iteration these may be declared in the CardXNodeXWidgetData config
-const itemSize = 36;
-
-const options = ref<ResourceInstanceSelectOption[]>(
-    aliasedNodeData?.details ?? [],
-);
+const options = ref<ResourceInstanceSelectOption[]>([]);
 const isLoading = ref(false);
 const resourceResultsPage = ref(0);
 const resourceResultsTotalCount = ref(0);
@@ -64,10 +63,12 @@ const selectedGraphId = ref<string>("");
 const showResourceCreation = ref(false);
 const resourceCreationDialogKey = ref(0);
 
-const resourceResultsCurrentCount = computed(() => options.value.length);
 const selectedValue = ref<string | null>(
-    aliasedNodeData?.details?.[0]?.resource_id ?? null,
+    aliasedNodeData?.node_value?.[0]?.resourceId ?? null,
 );
+
+const resourceResultsCurrentCount = computed(() => options.value.length);
+const hasInitialized = ref(false);
 
 watch(isLoading, (newValue) => {
     emit("update:isLoading", newValue);
@@ -77,11 +78,8 @@ watchEffect(() => {
     getOptions(1);
 });
 
-const onFilter = debounce((event: SelectFilterEvent) => {
-    getOptions(1, event.value);
-}, 600);
-
 async function getOptions(page: number, filterTerm?: string) {
+    if (!graphSlug || !nodeAlias) return;
     try {
         isLoading.value = true;
         emptyFilterMessage.value = $gettext("Searching...");
@@ -97,7 +95,7 @@ async function getOptions(page: number, filterTerm?: string) {
             nodeAlias,
             page,
             filterTerms,
-            selectedValue.value || aliasedNodeData?.details?.[0]?.resource_id,
+            selectedValue.value,
         );
 
         const references = resourceData.data.map(
@@ -121,11 +119,20 @@ async function getOptions(page: number, filterTerm?: string) {
         fetchError.value = (error as Error).message;
     } finally {
         isLoading.value = false;
-        if (
-            options.value.length - (aliasedNodeData?.details?.length ?? 0) ==
-            0
-        ) {
+        if (options.value.length === 0) {
             emptyFilterMessage.value = $gettext("Search returned no results");
+        }
+        if (page === 1 && !hasInitialized.value) {
+            hasInitialized.value = true;
+            const displayName =
+                options.value.find(
+                    (option) => option.resource_id === selectedValue.value,
+                )?.display_value ?? "";
+            emit(
+                "initialized",
+                aliasedNodeData ??
+                    buildResourceInstanceAliasedNodeData(null, displayName),
+            );
         }
     }
 }
@@ -162,9 +169,9 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     await getOptions((resourceResultsPage.value || 0) + 1);
 }
 
-function getOption(value: string): ResourceInstanceSelectOption | undefined {
-    return options.value.find((option) => option.resource_id === value);
-}
+const onFilter = debounce(function onFilterDebounced(event: SelectFilterEvent) {
+    getOptions(1, event.value);
+}, 600);
 
 function onCreateNewResource(graphId: string) {
     selectedGraphId.value = graphId;
@@ -174,24 +181,25 @@ function onCreateNewResource(graphId: string) {
 
 function onUpdateModelValue(updatedValue: string | null) {
     selectedValue.value = updatedValue;
-
-    const option = updatedValue ? getOption(updatedValue) : undefined;
-
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", updatedValue ? [updatedValue] : []);
+    if (updatedValue) {
+        const nodeValue: ResourceInstanceReference = {
+            inverseOntologyProperty: "",
+            ontologyProperty: "",
+            resourceId: updatedValue,
+            resourceXresourceId: "",
+        };
+        const displayName =
+            options.value.find((option) => option.resource_id === updatedValue)
+                ?.display_value ?? "";
+        emit(
+            "update:aliasedNodeData",
+            buildResourceInstanceAliasedNodeData(nodeValue, displayName),
+        );
     } else {
-        emit("update:value", {
-            display_value: option ? option.display_value : "",
-            node_value: updatedValue
-                ? {
-                      inverseOntologyProperty: "",
-                      ontologyProperty: "",
-                      resourceId: updatedValue,
-                      resourceXresourceId: "",
-                  }
-                : null,
-            details: option ? [option] : [],
-        } as ResourceInstanceValue);
+        emit(
+            "update:aliasedNodeData",
+            buildResourceInstanceAliasedNodeData(null, ""),
+        );
     }
 }
 
@@ -213,15 +221,16 @@ async function onResourceCreated(createdTile: AliasedTileData) {
         :empty-filter-message="emptyFilterMessage"
         :filter-placeholder="$gettext('Filter Resources')"
         :fluid="true"
-        :label-id="cardXNodeXWidgetData.node.alias"
+        :input-id="cardXNodeXWidgetData?.node.alias"
+        :label-id="cardXNodeXWidgetData?.node.alias"
         :loading="isLoading"
         :model-value="selectedValue"
         :options="options"
-        :placeholder="cardXNodeXWidgetData.config.placeholder"
+        :placeholder="cardXNodeXWidgetData?.config.placeholder"
         :reset-filter-on-hide="true"
         :show-clear="true"
         :virtual-scroller-options="{
-            itemSize: itemSize,
+            itemSize: ITEM_SIZE,
             lazy: true,
             loading: isLoading,
             onLazyLoad: onLazyLoadResources,
@@ -232,12 +241,12 @@ async function onResourceCreated(createdTile: AliasedTileData) {
         @update:model-value="onUpdateModelValue($event)"
     >
         <template
-            v-if="cardXNodeXWidgetData.node.config.graphs?.length"
+            v-if="cardXNodeXWidgetData?.node.config.graphs?.length"
             #header
         >
             <div class="create-new-options-header">
                 <div
-                    v-for="graph in cardXNodeXWidgetData.node.config.graphs"
+                    v-for="graph in cardXNodeXWidgetData?.node.config.graphs"
                     :key="graph.graphid"
                     class="create-new-option"
                     @click="onCreateNewResource(graph.graphid)"

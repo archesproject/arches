@@ -1,41 +1,37 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
+import { useGettext } from "vue3-gettext";
 import InputText from "primevue/inputtext";
 import Button from "primevue/button";
 
 import EDTFHelpDrawer from "@/arches_component_lab/widgets/EDTFWidget/components/EDTFWidgetEditor/components/EDTFHelpDrawer.vue";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { EDTFValue } from "@/arches_component_lab/datatypes/edtf/types";
+import { buildEDTFAliasedNodeData } from "@/arches_component_lab/datatypes/edtf/utils.ts";
 
-const {
-    cardXNodeXWidgetData,
-    aliasedNodeData,
-    shouldEmitSimplifiedValue = false,
-} = defineProps<{
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
-    aliasedNodeData: EDTFValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type { EDTFAliasedNodeData } from "@/arches_component_lab/datatypes/edtf/types.ts";
+
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+    cardXNodeXWidgetData?: CardXNodeXWidgetData;
+    aliasedNodeData: EDTFAliasedNodeData | null;
 }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: EDTFValue | string | undefined): void;
+    (event: "update:aliasedNodeData", updatedValue: EDTFAliasedNodeData): void;
+    (event: "initialized", updatedValue: EDTFAliasedNodeData): void;
 }>();
+
+const { $gettext } = useGettext();
 
 const shouldShowHelpDrawer = ref(false);
 
-function handleUpdateModelValue(updatedValue: string | undefined) {
-    const normalizedValue = updatedValue ?? "";
+onMounted(() => {
+    emit("initialized", aliasedNodeData ?? buildEDTFAliasedNodeData(null));
+});
 
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", normalizedValue);
-    } else {
-        emit("update:value", {
-            display_value: normalizedValue,
-            node_value: normalizedValue,
-            details: [],
-        });
-    }
+function handleUpdateModelValue(updatedValue: string | undefined) {
+    const newValue = updatedValue ?? "";
+    emit("update:aliasedNodeData", buildEDTFAliasedNodeData(newValue || null));
 }
 </script>
 
@@ -45,9 +41,9 @@ function handleUpdateModelValue(updatedValue: string | undefined) {
             class="flex-input"
             type="text"
             :fluid="true"
-            :model-value="aliasedNodeData?.node_value"
-            :placeholder="cardXNodeXWidgetData.config.placeholder"
-            :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
+            :model-value="aliasedNodeData?.node_value ?? ''"
+            :placeholder="cardXNodeXWidgetData?.config.placeholder"
+            :pt="{ root: { id: cardXNodeXWidgetData?.node.alias } }"
             @update:model-value="handleUpdateModelValue"
         />
         <Button

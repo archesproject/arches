@@ -1,31 +1,28 @@
 <script setup lang="ts">
+import { computed, onMounted } from "vue";
+
 import arches from "arches";
-import { computed } from "vue";
 import { Image, Galleria } from "primevue";
 
 import type {
-    FileListValue,
+    FileListAliasedNodeData,
     FileReference,
 } from "@/arches_component_lab/datatypes/file-list/types";
 
-const props = defineProps<{
-    value: FileListValue | null;
+const { aliasedNodeData } = defineProps<{
+    aliasedNodeData: FileListAliasedNodeData;
 }>();
 
-const getFileUrl = (originalUrl: string) => {
-    const httpRegex = /^(blob:|https?:\/\/)/;
-    if (
-        !originalUrl ||
-        httpRegex.test(originalUrl) ||
-        originalUrl.startsWith(arches.urls.url_subpath)
-    ) {
-        return originalUrl;
-    }
-    return (arches.urls.url_subpath + originalUrl).replace("//", "/");
-};
+const emit = defineEmits<{
+    initialized: [updatedValue: FileListAliasedNodeData];
+}>();
+
+onMounted(() => {
+    emit("initialized", aliasedNodeData);
+});
 
 const imageData = computed(() => {
-    return props.value?.node_value?.map((fileReference: FileReference) => {
+    return aliasedNodeData?.node_value?.map((fileReference: FileReference) => {
         return {
             thumbnailImageSrc: getFileUrl(fileReference.url),
             itemImageSrc: getFileUrl(fileReference.url),
@@ -38,6 +35,18 @@ const imageData = computed(() => {
 const showThumbnails = computed(() => {
     return imageData.value && imageData.value.length > 1;
 });
+
+function getFileUrl(originalUrl: string) {
+    const httpRegex = /^(blob:|https?:\/\/)/;
+    if (
+        !originalUrl ||
+        httpRegex.test(originalUrl) ||
+        originalUrl.startsWith(arches.urls.url_subpath)
+    ) {
+        return originalUrl;
+    }
+    return (arches.urls.url_subpath + originalUrl).replace("//", "/");
+}
 </script>
 
 <template>

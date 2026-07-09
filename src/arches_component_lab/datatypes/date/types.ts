@@ -1,5 +1,7 @@
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
+import type {
+    AliasedNodeData,
+    CardXNodeXWidgetData,
+} from "@/arches_component_lab/types.ts";
 
 export interface DateDatatypeCardXNodeXWidgetData extends CardXNodeXWidgetData {
     node: CardXNodeXWidgetData["node"] & {
@@ -14,8 +16,7 @@ export interface DateDatatypeCardXNodeXWidgetData extends CardXNodeXWidgetData {
     };
 }
 
-export interface DateValue extends AliasedNodeData {
-    display_value: string;
+export interface DateAliasedNodeData extends AliasedNodeData {
     node_value: string | null;
     details: never[];
 }

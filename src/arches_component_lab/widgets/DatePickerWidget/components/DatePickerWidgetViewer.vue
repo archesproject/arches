@@ -1,13 +1,23 @@
 <script setup lang="ts">
+import { onMounted } from "vue";
+
 import type {
+    DateAliasedNodeData,
     DateDatatypeCardXNodeXWidgetData,
-    DateValue,
 } from "@/arches_component_lab/datatypes/date/types.ts";
 
-defineProps<{
-    aliasedNodeData: DateValue | null;
-    cardXNodeXWidgetData: DateDatatypeCardXNodeXWidgetData;
+const { aliasedNodeData } = defineProps<{
+    cardXNodeXWidgetData?: DateDatatypeCardXNodeXWidgetData;
+    aliasedNodeData: DateAliasedNodeData;
 }>();
+
+const emit = defineEmits<{
+    initialized: [updatedValue: DateAliasedNodeData];
+}>();
+
+onMounted(() => {
+    emit("initialized", aliasedNodeData);
+});
 </script>
 
 <template>

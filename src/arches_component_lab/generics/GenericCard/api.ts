@@ -3,10 +3,7 @@ import Cookies from "js-cookie";
 
 import { extractFileEntriesFromAliasedData } from "@/arches_component_lab/generics/GenericCard/utils.ts";
 
-import type {
-    AliasedTileData,
-    CardXNodeXWidgetData,
-} from "@/arches_component_lab/types.ts";
+import type { AliasedTileData } from "@/arches_component_lab/types.ts";
 
 export async function fetchTileData(
     graphSlug: string,
@@ -28,46 +25,6 @@ export async function fetchTileData(
         throw new Error(parsed.message ?? response.statusText);
     }
     return parsed;
-}
-
-// Promise-based cache: graph config is static for the lifetime of the SPA.
-const nodegroupConfigCache = new Map<string, Promise<CardXNodeXWidgetData[]>>();
-
-async function fetchCardXNodeXWidgetDataFromNodeGroupFromServer(
-    graphSlug: string,
-    nodegroupAlias: string,
-): Promise<CardXNodeXWidgetData[]> {
-    const response = await fetch(
-        arches.urls.api_card_x_node_x_widget_list_from_nodegroup(
-            graphSlug,
-            nodegroupAlias,
-        ),
-    );
-    const parsed = await response.json();
-    if (!response.ok) {
-        throw new Error(parsed.message ?? response.statusText);
-    }
-    return parsed;
-}
-
-export function fetchCardXNodeXWidgetDataFromNodeGroup(
-    graphSlug: string,
-    nodegroupAlias: string,
-): Promise<CardXNodeXWidgetData[]> {
-    const cacheKey = `${graphSlug}:${nodegroupAlias}`;
-
-    if (!nodegroupConfigCache.has(cacheKey)) {
-        const fetchRequest = fetchCardXNodeXWidgetDataFromNodeGroupFromServer(
-            graphSlug,
-            nodegroupAlias,
-        );
-
-        // On failure, evict so a retry can re-fetch.
-        fetchRequest.catch(() => nodegroupConfigCache.delete(cacheKey));
-        nodegroupConfigCache.set(cacheKey, fetchRequest);
-    }
-
-    return nodegroupConfigCache.get(cacheKey)!;
 }
 
 export async function upsertTile(

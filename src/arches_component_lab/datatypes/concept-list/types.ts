@@ -1,13 +1,12 @@
 import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
-import type {
+import type { CollectionItem } from "@/arches_component_lab/datatypes/concept/types.ts";
+
+export type {
     ConceptFetchResult,
     CollectionItem,
 } from "@/arches_component_lab/datatypes/concept/types.ts";
 
-export type { ConceptFetchResult, CollectionItem };
-
-export interface ConceptListValue extends AliasedNodeData {
-    display_value: string;
+export interface ConceptListAliasedNodeData extends AliasedNodeData {
     node_value: string[] | null;
     details: CollectionItem[];
 }

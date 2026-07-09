@@ -13,8 +13,7 @@ export interface CollectionItem {
     children: CollectionItem[];
 }
 
-export interface ConceptValue extends AliasedNodeData {
-    display_value: string;
+export interface ConceptAliasedNodeData extends AliasedNodeData {
     node_value: string | null;
     details: CollectionItem[];
 }

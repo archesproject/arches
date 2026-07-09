@@ -6,7 +6,7 @@ import { REMOVE } from "@/arches_component_lab/datatypes/file-list/constants.ts"
 
 import type { FileReference } from "@/arches_component_lab/datatypes/file-list/types.ts";
 
-defineProps<{
+const { files } = defineProps<{
     files: FileReference[];
 }>();
 

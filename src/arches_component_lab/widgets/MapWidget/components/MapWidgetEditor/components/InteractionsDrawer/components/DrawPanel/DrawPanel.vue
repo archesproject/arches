@@ -13,7 +13,7 @@ import DrawnFeaturesList from "@/arches_component_lab/widgets/MapWidget/componen
 import type { Feature } from "geojson";
 import type { Map as MaplibreMap } from "maplibre-gl";
 
-defineProps<{
+const { map } = defineProps<{
     map: MaplibreMap;
 }>();
 

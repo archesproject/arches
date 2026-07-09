@@ -1,42 +1,35 @@
 <script setup lang="ts">
+import { onMounted } from "vue";
 import RadioButton from "primevue/radiobutton";
 import RadioButtonGroup from "primevue/radiobuttongroup";
-import { useGettext } from "vue3-gettext";
+
+import { buildBooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/utils.ts";
 
 import type { BooleanCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { BooleanValue } from "@/arches_component_lab/datatypes/boolean/types.ts";
+import type { BooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/types.ts";
 
-const { $gettext } = useGettext();
-
-const {
-    cardXNodeXWidgetData,
-    aliasedNodeData,
-    shouldEmitSimplifiedValue = false,
-} = defineProps<{
-    cardXNodeXWidgetData: BooleanCardXNodeXWidgetData;
-    aliasedNodeData: BooleanValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+    cardXNodeXWidgetData?: BooleanCardXNodeXWidgetData;
+    aliasedNodeData: BooleanAliasedNodeData | null;
 }>();
 
 const emit = defineEmits<{
     (
-        event: "update:value",
-        updatedValue: BooleanValue | boolean | undefined | null,
+        event: "update:aliasedNodeData",
+        updatedValue: BooleanAliasedNodeData,
     ): void;
+    (event: "initialized", updatedValue: BooleanAliasedNodeData): void;
 }>();
 
-function getDisplayValue(value: boolean | null | undefined): string {
-    if (value === true) {
-        return cardXNodeXWidgetData.node.config.trueLabel || $gettext("True");
-    } else if (value === false) {
-        return cardXNodeXWidgetData.node.config.falseLabel || $gettext("False");
-    } else {
-        return "";
-    }
-}
+onMounted(() => {
+    emit(
+        "initialized",
+        buildBooleanAliasedNodeData(aliasedNodeData?.node_value ?? null),
+    );
+});
 
 function onUpdateModelValue(updatedValue: string | null) {
-    let booleanValue;
+    let booleanValue: boolean | null;
     switch (updatedValue) {
         case "true":
             booleanValue = true;
@@ -48,44 +41,37 @@ function onUpdateModelValue(updatedValue: string | null) {
             booleanValue = null;
             break;
     }
-
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", booleanValue);
-    } else {
-        emit("update:value", {
-            display_value: getDisplayValue(booleanValue),
-            node_value: booleanValue,
-            details: [],
-        });
-    }
+    emit("update:aliasedNodeData", buildBooleanAliasedNodeData(booleanValue));
 }
 </script>
 
 <template>
     <RadioButtonGroup
+        :id="cardXNodeXWidgetData?.node.alias"
         fluid="true"
         class="button-group"
-        :model-value="aliasedNodeData?.node_value?.toString() || ''"
+        :model-value="aliasedNodeData?.node_value?.toString() ?? ''"
+        tabindex="-1"
         @update:model-value="onUpdateModelValue($event)"
     >
         <div class="radio-options">
             <RadioButton
-                input-id="`${cardXNodeXWidgetData.node.alias}-true`"
+                :input-id="`${cardXNodeXWidgetData?.node.alias}-true`"
                 size="small"
                 value="true"
             />
-            <label for="`${cardXNodeXWidgetData.node.alias}-true`">{{
-                cardXNodeXWidgetData.node.config.trueLabel
+            <label :for="`${cardXNodeXWidgetData?.node.alias}-true`">{{
+                cardXNodeXWidgetData?.node.config.trueLabel
             }}</label>
         </div>
         <div class="radio-options">
             <RadioButton
-                input-id="`${cardXNodeXWidgetData.node.alias}-false`"
+                :input-id="`${cardXNodeXWidgetData?.node.alias}-false`"
                 size="small"
                 value="false"
             />
-            <label for="`${cardXNodeXWidgetData.node.alias}-false`">{{
-                cardXNodeXWidgetData.node.config.falseLabel
+            <label :for="`${cardXNodeXWidgetData?.node.alias}-false`">{{
+                cardXNodeXWidgetData?.node.config.falseLabel
             }}</label>
         </div>
     </RadioButtonGroup>

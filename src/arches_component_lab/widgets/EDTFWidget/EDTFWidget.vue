@@ -1,37 +1,53 @@
 <script setup lang="ts">
+import { computed } from "vue";
+
 import EDTFWidgetEditor from "@/arches_component_lab/widgets/EDTFWidget/components/EDTFWidgetEditor/EDTFWidgetEditor.vue";
 import EDTFWidgetViewer from "@/arches_component_lab/widgets/EDTFWidget/components/EDTFWidgetViewer.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
+import { buildEDTFAliasedNodeData } from "@/arches_component_lab/datatypes/edtf/utils.ts";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { EDTFValue } from "@/arches_component_lab/datatypes/edtf/types.ts";
+import type { EDTFAliasedNodeData } from "@/arches_component_lab/datatypes/edtf/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-defineProps<{
+const { aliasedNodeData, value } = defineProps<{
     mode: WidgetMode;
-    nodeAlias: string;
-    graphSlug: string;
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
-    aliasedNodeData: EDTFValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    nodeAlias?: string;
+    graphSlug?: string;
+    cardXNodeXWidgetData?: CardXNodeXWidgetData;
+    aliasedNodeData?: EDTFAliasedNodeData | null;
+    value?: string | null;
 }>();
 
-const emit = defineEmits(["update:isDirty", "update:value"]);
+const emit = defineEmits<{
+    "update:isDirty": [isDirty: boolean];
+    "update:value": [updatedValue: string | null];
+    "update:aliasedNodeData": [updatedValue: EDTFAliasedNodeData];
+    initialized: [updatedValue: EDTFAliasedNodeData];
+}>();
+
+const resolvedAliasedNodeData = computed(
+    () => aliasedNodeData ?? buildEDTFAliasedNodeData(value ?? null),
+);
+
+function onUpdateAliasedNodeData(updatedAliasedNodeData: EDTFAliasedNodeData) {
+    emit("update:aliasedNodeData", updatedAliasedNodeData);
+    emit("update:value", updatedAliasedNodeData.node_value);
+}
 </script>
 
 <template>
     <EDTFWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :graph-slug="graphSlug"
-        :aliased-node-data="aliasedNodeData"
-        :should-emit-simplified-value="shouldEmitSimplifiedValue"
-        @update:value="emit('update:value', $event)"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @update:aliased-node-data="onUpdateAliasedNodeData"
+        @initialized="emit('initialized', $event)"
     />
     <EDTFWidgetViewer
         v-if="mode === VIEW"
-        :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :aliased-node-data="aliasedNodeData"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @initialized="emit('initialized', $event)"
     />
 </template>

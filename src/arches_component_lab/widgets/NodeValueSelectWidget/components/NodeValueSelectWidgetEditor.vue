@@ -1,11 +1,26 @@
 <script setup lang="ts">
+import { onMounted } from "vue";
 import InputText from "primevue/inputtext";
 
-import type { NodeValueValue } from "@/arches_component_lab/datatypes/node-value/types";
+import { buildNodeValueAliasedNodeData } from "@/arches_component_lab/datatypes/node-value/utils.ts";
 
-defineProps<{
-    aliasedNodeData: NodeValueValue | null;
+import type { NodeValueAliasedNodeData } from "@/arches_component_lab/datatypes/node-value/types.ts";
+
+const { aliasedNodeData } = defineProps<{
+    aliasedNodeData: NodeValueAliasedNodeData | null;
 }>();
+
+const emit = defineEmits<{
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: NodeValueAliasedNodeData,
+    ): void;
+    (event: "initialized", updatedValue: NodeValueAliasedNodeData): void;
+}>();
+
+onMounted(() => {
+    emit("initialized", aliasedNodeData ?? buildNodeValueAliasedNodeData(null));
+});
 </script>
 
 <template>
@@ -13,6 +28,6 @@ defineProps<{
         disabled
         type="text"
         :fluid="true"
-        :model-value="aliasedNodeData?.display_value || ''"
+        :model-value="aliasedNodeData?.node_value ?? ''"
     />
 </template>

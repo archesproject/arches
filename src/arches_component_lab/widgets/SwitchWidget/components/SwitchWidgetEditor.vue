@@ -1,57 +1,42 @@
 <script setup lang="ts">
+import { onMounted } from "vue";
 import ToggleSwitch from "primevue/toggleswitch";
-import { useGettext } from "vue3-gettext";
+
+import { buildBooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/utils.ts";
 
 import type { BooleanCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { BooleanValue } from "@/arches_component_lab/datatypes/boolean/types.ts";
+import type { BooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/types.ts";
 
-const { $gettext } = useGettext();
-
-const {
-    cardXNodeXWidgetData,
-    aliasedNodeData,
-    shouldEmitSimplifiedValue = false,
-} = defineProps<{
-    cardXNodeXWidgetData: BooleanCardXNodeXWidgetData;
-    aliasedNodeData: BooleanValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+    cardXNodeXWidgetData?: BooleanCardXNodeXWidgetData;
+    aliasedNodeData: BooleanAliasedNodeData | null;
 }>();
 
 const emit = defineEmits<{
     (
-        event: "update:value",
-        updatedValue: BooleanValue | boolean | undefined | null,
+        event: "update:aliasedNodeData",
+        updatedValue: BooleanAliasedNodeData,
     ): void;
+    (event: "initialized", updatedValue: BooleanAliasedNodeData): void;
 }>();
 
-function getDisplayValue(value: boolean | null | undefined): string {
-    if (value === true) {
-        return cardXNodeXWidgetData.node.config.trueLabel || $gettext("True");
-    } else if (value === false) {
-        return cardXNodeXWidgetData.node.config.falseLabel || $gettext("False");
-    } else {
-        return "";
-    }
-}
+onMounted(() => {
+    emit(
+        "initialized",
+        buildBooleanAliasedNodeData(aliasedNodeData?.node_value ?? null),
+    );
+});
 
 function onUpdateModelValue(updatedValue: boolean | null) {
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", updatedValue);
-    } else {
-        emit("update:value", {
-            display_value: getDisplayValue(updatedValue),
-            node_value: updatedValue,
-            details: [],
-        });
-    }
+    emit("update:aliasedNodeData", buildBooleanAliasedNodeData(updatedValue));
 }
 </script>
 
 <template>
     <ToggleSwitch
         :fluid="true"
-        :input-id="cardXNodeXWidgetData.node.alias"
-        :model-value="aliasedNodeData?.node_value || ''"
+        :input-id="cardXNodeXWidgetData?.node.alias"
+        :model-value="aliasedNodeData?.node_value ?? false"
         @update:model-value="onUpdateModelValue($event)"
     />
 </template>

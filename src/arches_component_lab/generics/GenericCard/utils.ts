@@ -1,4 +1,35 @@
-import type { AliasedData } from "@/arches_component_lab/types.ts";
+import type {
+    AliasedData,
+    AliasedNodeData,
+} from "@/arches_component_lab/types.ts";
+
+export function deepClone<T>(sourceObject: T): T {
+    return JSON.parse(JSON.stringify(sourceObject));
+}
+
+export function isAliasedNodeData(value: unknown): value is AliasedNodeData {
+    return (
+        value !== null &&
+        value !== undefined &&
+        typeof value === "object" &&
+        "node_value" in value &&
+        "display_value" in value &&
+        "details" in value
+    );
+}
+
+export function extractAliasedNodeDataEntries(
+    data: Record<string, unknown>,
+): Record<string, AliasedNodeData> {
+    return Object.fromEntries(
+        Object.entries(data)
+            .filter(([, rawNodeData]) => isAliasedNodeData(rawNodeData))
+            .map(([nodeAlias, rawNodeData]) => [
+                nodeAlias,
+                rawNodeData as AliasedNodeData,
+            ]),
+    );
+}
 
 export function extractFileEntriesFromAliasedData(
     payload: AliasedData,

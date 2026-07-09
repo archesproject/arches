@@ -1,11 +1,37 @@
 <script setup lang="ts">
-import type { BooleanValue } from "@/arches_component_lab/datatypes/boolean/types";
+import { computed, onMounted } from "vue";
+import { useGettext } from "vue3-gettext";
 
-defineProps<{
-    aliasedNodeData: BooleanValue | null;
+import type { BooleanCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type { BooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/types.ts";
+
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+    cardXNodeXWidgetData?: BooleanCardXNodeXWidgetData;
+    aliasedNodeData: BooleanAliasedNodeData;
 }>();
+
+const emit = defineEmits<{
+    initialized: [updatedValue: BooleanAliasedNodeData];
+}>();
+
+const { $gettext } = useGettext();
+
+onMounted(() => {
+    emit("initialized", aliasedNodeData);
+});
+
+const displayValue = computed(() => {
+    if (aliasedNodeData?.node_value === true) {
+        return cardXNodeXWidgetData?.node.config.trueLabel || $gettext("True");
+    } else if (aliasedNodeData?.node_value === false) {
+        return (
+            cardXNodeXWidgetData?.node.config.falseLabel || $gettext("False")
+        );
+    }
+    return null;
+});
 </script>
 
 <template>
-    <div>{{ aliasedNodeData?.display_value }}</div>
+    <div>{{ displayValue }}</div>
 </template>

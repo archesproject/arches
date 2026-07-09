@@ -1,9 +1,19 @@
 <script setup lang="ts">
-import type { EDTFValue } from "@/arches_component_lab/datatypes/edtf/types";
+import { onMounted } from "vue";
 
-defineProps<{
-    aliasedNodeData: EDTFValue | null;
+import type { EDTFAliasedNodeData } from "@/arches_component_lab/datatypes/edtf/types.ts";
+
+const { aliasedNodeData } = defineProps<{
+    aliasedNodeData: EDTFAliasedNodeData;
 }>();
+
+const emit = defineEmits<{
+    initialized: [updatedValue: EDTFAliasedNodeData];
+}>();
+
+onMounted(() => {
+    emit("initialized", aliasedNodeData);
+});
 </script>
 
 <template>

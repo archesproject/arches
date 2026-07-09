@@ -1,50 +1,45 @@
 <script setup lang="ts">
-import { ref, computed, watch, watchEffect } from "vue";
+import { ref, watch, watchEffect } from "vue";
 
 import RadioButton from "primevue/radiobutton";
 import RadioButtonGroup from "primevue/radiobuttongroup";
 
-import { fetchConceptsTree } from "@/arches_component_lab/datatypes/concept/api.ts";
+import { useConceptTreeStore } from "@/arches_component_lab/stores/useConceptTreeStore.ts";
 import type {
-    ConceptValue,
     ConceptFetchResult,
     CollectionItem,
+    ConceptAliasedNodeData,
 } from "@/arches_component_lab/datatypes/concept/types.ts";
 
 import {
-    convertConceptOptionToFormValue,
+    buildConceptAliasedNodeData,
     flattenCollectionItems,
 } from "@/arches_component_lab/datatypes/concept/utils.ts";
 import type { ConceptRadioCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
-const {
-    graphSlug,
-    nodeAlias,
-    aliasedNodeData,
-    cardXNodeXWidgetData,
-    shouldEmitSimplifiedValue = false,
-} = defineProps<{
-    graphSlug: string;
-    nodeAlias: string;
-    aliasedNodeData: ConceptValue | null;
-    cardXNodeXWidgetData: ConceptRadioCardXNodeXWidgetData;
-    shouldEmitSimplifiedValue?: boolean;
-}>();
+const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } =
+    defineProps<{
+        graphSlug?: string;
+        nodeAlias?: string;
+        aliasedNodeData?: ConceptAliasedNodeData | null;
+        cardXNodeXWidgetData?: ConceptRadioCardXNodeXWidgetData;
+    }>();
 
 const emit = defineEmits<{
-    (event: "update:value", updatedValue: ConceptValue | string | null): void;
     (event: "update:isLoading", isLoading: boolean): void;
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: ConceptAliasedNodeData,
+    ): void;
+    (event: "initialized", updatedValue: ConceptAliasedNodeData): void;
 }>();
 
-const flexDirection = computed(() =>
-    cardXNodeXWidgetData.config.groupDirection === "column"
+const flexDirection =
+    cardXNodeXWidgetData?.config?.groupDirection === "column"
         ? "flex-column"
-        : "flex-row",
-);
+        : "flex-row";
 
 const options = ref<CollectionItem[]>([]);
-const selectedId = ref<string | null>(aliasedNodeData?.node_value ?? null);
-
 const isLoading = ref(false);
 const optionsLoaded = ref(false);
 const optionsTotalCount = ref(0);
@@ -60,41 +55,49 @@ watchEffect(() => {
 
 async function getOptions() {
     try {
-        if (optionsLoaded.value) return;
+        if (optionsLoaded.value) {
+            return;
+        }
+        if (!graphSlug || !nodeAlias) {
+            return;
+        }
+
         isLoading.value = true;
-        const fetchedData: ConceptFetchResult = await fetchConceptsTree(
-            graphSlug,
-            nodeAlias,
-        );
+        const fetchedData: ConceptFetchResult =
+            await useConceptTreeStore().fetchTree(graphSlug, nodeAlias);
 
         options.value = flattenCollectionItems(fetchedData.results);
-
         optionsTotalCount.value = options.value.length;
     } catch (error) {
         fetchError.value = (error as Error).message;
     } finally {
         isLoading.value = false;
+        if (!optionsLoaded.value) {
+            emit(
+                "initialized",
+                aliasedNodeData ??
+                    buildConceptAliasedNodeData(null, options.value ?? []),
+            );
+        }
         optionsLoaded.value = true;
     }
 }
 
-function onUpdateModelValue(selectedOption: Record<string, boolean> | null) {
-    const formattedValue: ConceptValue = convertConceptOptionToFormValue(
-        selectedOption,
-        options.value,
+function onUpdateModelValue(updatedValue: string | null) {
+    const nodeValue = updatedValue ?? null;
+    emit(
+        "update:aliasedNodeData",
+        buildConceptAliasedNodeData(nodeValue, options.value),
     );
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", formattedValue.node_value);
-    } else {
-        emit("update:value", formattedValue);
-    }
 }
 </script>
 
 <template>
     <RadioButtonGroup
-        :model-value="selectedId"
+        :id="cardXNodeXWidgetData?.node.alias"
+        :model-value="aliasedNodeData?.node_value ?? null"
         :class="['button-group', flexDirection]"
+        tabindex="-1"
         @update:model-value="onUpdateModelValue"
     >
         <div

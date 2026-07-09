@@ -8,38 +8,40 @@ import Textarea from "primevue/textarea";
 
 import { MULTILINE_RENDER_CONTEXT } from "@/arches_component_lab/widgets/TextWidget/constants.ts";
 import { fetchLanguages } from "@/arches_component_lab/widgets/api.ts";
+import { buildStringAliasedNodeData } from "@/arches_component_lab/datatypes/string/utils.ts";
 
 import type {
     StringCardXNodeXWidgetData,
     Language,
 } from "@/arches_component_lab/types.ts";
-import type { StringValue } from "@/arches_component_lab/datatypes/string/types.ts";
+import type {
+    LanguageValue,
+    StringAliasedNodeData,
+} from "@/arches_component_lab/datatypes/string/types.ts";
 
-const { $gettext } = useGettext();
-
-const {
-    cardXNodeXWidgetData,
-    aliasedNodeData,
-    renderContext,
-    shouldEmitSimplifiedValue,
-} = defineProps<{
-    cardXNodeXWidgetData: StringCardXNodeXWidgetData;
-    aliasedNodeData: StringValue | null;
+const { cardXNodeXWidgetData, aliasedNodeData, renderContext } = defineProps<{
+    cardXNodeXWidgetData?: StringCardXNodeXWidgetData;
+    aliasedNodeData: StringAliasedNodeData | null;
     renderContext?: string;
-    shouldEmitSimplifiedValue?: boolean;
 }>();
+
+const initialNodeValue = aliasedNodeData?.node_value;
 
 const emit = defineEmits<{
     (
-        event: "update:value",
-        updatedValue: StringValue | Record<Language["code"], string>,
+        event: "update:aliasedNodeData",
+        updatedValue: StringAliasedNodeData,
     ): void;
+    (event: "initialized", updatedValue: StringAliasedNodeData): void;
 }>();
+
+const { $gettext } = useGettext();
 
 const languages = ref<Language[]>([]);
 const selectedLanguage = ref<Language>();
-const managedNodeValue = ref<StringValue["node_value"]>();
+const managedNodeValue = ref<Record<string, LanguageValue>>();
 const singleInputValue = ref<string>();
+const hasInitialized = ref(false);
 
 watchEffect(async () => {
     const response = (await fetchLanguages()) as {
@@ -47,14 +49,41 @@ watchEffect(async () => {
         request_language: string;
     };
     languages.value = response.languages;
+
+    const nonEmptyLanguageCodes = Object.entries(initialNodeValue ?? {})
+        .filter(([, language]) => language.value !== "")
+        .map(([code]) => code);
+
+    const targetLanguageCode =
+        nonEmptyLanguageCodes.length === 1
+            ? nonEmptyLanguageCodes[0]
+            : response.request_language;
+
     selectedLanguage.value =
         languages.value.find(
-            (lang: Language) => lang.code === response.request_language,
-        ) ?? response.languages[0];
+            (lang: Language) => lang.code === targetLanguageCode,
+        ) ??
+        response.languages.find((lang: Language) => lang.isdefault) ??
+        response.languages[0];
+
+    if (!hasInitialized.value && selectedLanguage.value) {
+        hasInitialized.value = true;
+        emit(
+            "initialized",
+            aliasedNodeData ??
+                buildStringAliasedNodeData(
+                    (managedNodeValue.value ?? {}) as Record<
+                        string,
+                        LanguageValue
+                    >,
+                    selectedLanguage.value.code,
+                ),
+        );
+    }
 });
 
 watchEffect(() => {
-    const workingObject = { ...aliasedNodeData?.node_value };
+    const workingObject = { ...(aliasedNodeData?.node_value ?? {}) };
     for (const knownLanguage of languages.value) {
         if (!workingObject[knownLanguage.code]) {
             workingObject[knownLanguage.code] = {
@@ -78,26 +107,22 @@ function onUpdateModelValue(updatedValue: string | undefined) {
         updatedValue = "";
     }
 
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", { [selectedLanguage.value!.code]: updatedValue });
-    } else {
-        emit("update:value", {
-            display_value: updatedValue,
-            node_value: {
-                ...managedNodeValue.value,
-                [selectedLanguage.value!.code]: {
-                    value: updatedValue,
-                    direction: selectedLanguage.value!.default_direction,
-                },
-            },
-            details: [],
-        });
-    }
+    const newNodeValue = {
+        ...managedNodeValue.value,
+        [selectedLanguage.value!.code]: {
+            value: updatedValue,
+            direction: selectedLanguage.value!.default_direction,
+        },
+    };
+    emit(
+        "update:aliasedNodeData",
+        buildStringAliasedNodeData(newNodeValue, selectedLanguage.value!.code),
+    );
 }
 </script>
 
 <template>
-    <div style="display: flex; column-gap: 0.5rem">
+    <div class="widget-language-inputs">
         <Select
             v-model="selectedLanguage"
             class="language-selector"
@@ -110,11 +135,11 @@ function onUpdateModelValue(updatedValue: string | undefined) {
             v-if="renderContext === MULTILINE_RENDER_CONTEXT"
             :auto-resize="true"
             :fluid="true"
-            :maxlength="cardXNodeXWidgetData.config.maxLength ?? undefined"
+            :maxlength="cardXNodeXWidgetData?.config.maxLength ?? undefined"
             :model-value="singleInputValue"
-            :placeholder="cardXNodeXWidgetData.config.placeholder"
-            :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
-            :required="cardXNodeXWidgetData.node.isrequired"
+            :placeholder="cardXNodeXWidgetData?.config.placeholder"
+            :pt="{ root: { id: cardXNodeXWidgetData?.node.alias } }"
+            :required="cardXNodeXWidgetData?.node.isrequired"
             rows="4"
             @update:model-value="onUpdateModelValue($event)"
         />
@@ -122,15 +147,22 @@ function onUpdateModelValue(updatedValue: string | undefined) {
             v-else
             type="text"
             :fluid="true"
-            :maxlength="cardXNodeXWidgetData.config.maxLength ?? undefined"
+            :maxlength="cardXNodeXWidgetData?.config.maxLength ?? undefined"
             :model-value="singleInputValue"
-            :placeholder="cardXNodeXWidgetData.config.placeholder"
-            :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
-            :required="cardXNodeXWidgetData.node.isrequired"
+            :placeholder="cardXNodeXWidgetData?.config.placeholder"
+            :pt="{ root: { id: cardXNodeXWidgetData?.node.alias } }"
+            :required="cardXNodeXWidgetData?.node.isrequired"
             @update:model-value="onUpdateModelValue($event)"
         />
     </div>
 </template>
+
+<style scoped>
+.widget-language-inputs {
+    display: flex;
+    column-gap: 0.5rem;
+}
+</style>
 
 <style>
 .p-select-options,

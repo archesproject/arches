@@ -1,37 +1,57 @@
 <script setup lang="ts">
+import { computed } from "vue";
+
 import NumberWidgetEditor from "@/arches_component_lab/widgets/NumberWidget/components/NumberWidgetEditor.vue";
 import NumberWidgetViewer from "@/arches_component_lab/widgets/NumberWidget/components/NumberWidgetViewer.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
+import { buildNumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/utils.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { NumberValue } from "@/arches_component_lab/datatypes/number/types.ts";
+import type {
+    NumberAliasedNodeData,
+    NumberCardXNodeXWidgetData,
+} from "@/arches_component_lab/datatypes/number/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-defineProps<{
+const { aliasedNodeData, value } = defineProps<{
     mode: WidgetMode;
-    nodeAlias: string;
-    graphSlug: string;
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
-    aliasedNodeData: NumberValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    nodeAlias?: string;
+    graphSlug?: string;
+    cardXNodeXWidgetData?: NumberCardXNodeXWidgetData;
+    aliasedNodeData?: NumberAliasedNodeData | null;
+    value?: number | null;
 }>();
 
-const emit = defineEmits(["update:isDirty", "update:value"]);
+const emit = defineEmits<{
+    "update:isDirty": [isDirty: boolean];
+    "update:value": [updatedValue: number | null];
+    "update:aliasedNodeData": [updatedValue: NumberAliasedNodeData];
+    initialized: [updatedValue: NumberAliasedNodeData];
+}>();
+
+const resolvedAliasedNodeData = computed(
+    () => aliasedNodeData ?? buildNumberAliasedNodeData(value ?? null),
+);
+
+function onUpdateAliasedNodeData(
+    updatedAliasedNodeData: NumberAliasedNodeData,
+) {
+    emit("update:aliasedNodeData", updatedAliasedNodeData);
+    emit("update:value", updatedAliasedNodeData.node_value);
+}
 </script>
 
 <template>
     <NumberWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :graph-slug="graphSlug"
-        :aliased-node-data="aliasedNodeData"
-        :should-emit-simplified-value="shouldEmitSimplifiedValue"
-        @update:value="emit('update:value', $event)"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @update:aliased-node-data="onUpdateAliasedNodeData"
+        @initialized="emit('initialized', $event)"
     />
     <NumberWidgetViewer
         v-if="mode === VIEW"
-        :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :aliased-node-data="aliasedNodeData"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @initialized="emit('initialized', $event)"
     />
 </template>

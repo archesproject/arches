@@ -6,15 +6,13 @@ import { VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-const props = defineProps<{
+const { mode, cardXNodeXWidgetData } = defineProps<{
     mode: WidgetMode;
     cardXNodeXWidgetData: CardXNodeXWidgetData;
 }>();
 
 const shouldShowRequiredAsterisk = computed(() => {
-    return Boolean(
-        props.mode !== VIEW && props.cardXNodeXWidgetData.node.isrequired,
-    );
+    return Boolean(mode !== VIEW && cardXNodeXWidgetData.node.isrequired);
 });
 </script>
 

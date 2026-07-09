@@ -5,26 +5,39 @@ import MapWidgetEditor from "@/arches_component_lab/widgets/MapWidget/components
 import MapWidgetViewer from "@/arches_component_lab/widgets/MapWidget/components/MapWidgetViewer.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
+import { buildGeoJSONFeatureCollectionAliasedNodeData } from "@/arches_component_lab/datatypes/geojson-feature-collection/utils.ts";
 
-import type { GeoJSONFeatureCollectionValue } from "@/arches_component_lab/datatypes/geojson-feature-collection/types.ts";
+import type { FeatureCollection } from "geojson";
+
+import type { GeoJSONFeatureCollectionAliasedNodeData } from "@/arches_component_lab/datatypes/geojson-feature-collection/types.ts";
 import type { MapCardXNodeXWidgetData } from "@/arches_component_lab/widgets/MapWidget/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-defineProps<{
+const { aliasedNodeData, value } = defineProps<{
     mode: WidgetMode;
     renderContext?: string;
     nodeAlias?: string;
     graphSlug?: string;
     cardXNodeXWidgetData?: MapCardXNodeXWidgetData;
-    aliasedNodeData: GeoJSONFeatureCollectionValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    aliasedNodeData?: GeoJSONFeatureCollectionAliasedNodeData | null;
+    value?: FeatureCollection | null;
 }>();
 
-const emit = defineEmits([
-    "update:isLoading",
-    "update:value",
-    "update:overlays",
-]);
+const emit = defineEmits<{
+    "update:isLoading": [isLoading: boolean];
+    "update:value": [updatedValue: FeatureCollection];
+    "update:overlays": [];
+    "update:aliasedNodeData": [
+        updatedValue: GeoJSONFeatureCollectionAliasedNodeData,
+    ];
+    initialized: [updatedValue: GeoJSONFeatureCollectionAliasedNodeData];
+}>();
+
+const resolvedAliasedNodeData = computed(
+    () =>
+        aliasedNodeData ??
+        buildGeoJSONFeatureCollectionAliasedNodeData(value ?? null),
+);
 
 const editorRef =
     useTemplateRef<InstanceType<typeof MapWidgetEditor>>("editor");
@@ -39,17 +52,18 @@ defineExpose({
         v-if="mode === EDIT"
         ref="editor"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :aliased-node-data="aliasedNodeData"
+        :aliased-node-data="resolvedAliasedNodeData"
         :render-context="renderContext"
-        :should-emit-simplified-value="shouldEmitSimplifiedValue"
         @update:is-loading="emit('update:isLoading', $event)"
         @update:value="emit('update:value', $event)"
+        @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
         @update:overlays="emit('update:overlays')"
+        @initialized="emit('initialized', $event)"
     />
     <MapWidgetViewer
         v-if="mode === VIEW"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :aliased-node-data="aliasedNodeData"
+        :aliased-node-data="resolvedAliasedNodeData"
         @update:is-loading="emit('update:isLoading', $event)"
     />
 </template>

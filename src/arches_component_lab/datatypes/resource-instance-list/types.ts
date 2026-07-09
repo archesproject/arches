@@ -1,11 +1,8 @@
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { AliasedNodeData } from "@/arches_component_lab/types.ts";
+import type {
+    AliasedNodeData,
+    CardXNodeXWidgetData,
+} from "@/arches_component_lab/types.ts";
 
-export interface ResourceInstanceListValue extends AliasedNodeData {
-    display_value: string;
-    node_value: ResourceInstanceReference[];
-    details: { display_value: string; resource_id: string }[];
-}
 export interface ResourceInstanceReference {
     resourceId: string;
     ontologyProperty?: string;
@@ -36,4 +33,9 @@ export interface ResourceInstanceListCardXNodeXWidgetData
                 | undefined;
         };
     };
+}
+
+export interface ResourceInstanceListAliasedNodeData extends AliasedNodeData {
+    node_value: ResourceInstanceReference[] | null;
+    details: ResourceInstanceListOption[];
 }

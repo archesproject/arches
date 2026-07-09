@@ -11,20 +11,19 @@ export interface DomainDatatypeCardXNodeXWidgetData
         };
     };
 }
-export interface DomainValue extends AliasedNodeData {
-    display_value: string;
-    node_value: string | null;
-    details: never[];
-}
-
-export interface DomainValueList extends AliasedNodeData {
-    display_value: string;
-    node_value: string[] | null;
-    details: never[];
-}
 
 export interface DomainOption {
     id: string;
     text: string;
     selected: boolean;
+}
+
+export interface DomainAliasedNodeData extends AliasedNodeData {
+    node_value: string | null;
+    details: never[];
+}
+
+export interface DomainListAliasedNodeData extends AliasedNodeData {
+    node_value: string[] | null;
+    details: never[];
 }

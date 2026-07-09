@@ -7,10 +7,8 @@ import Skeleton from "primevue/skeleton";
 import GenericCardEditor from "@/arches_component_lab/generics/GenericCard/components/GenericCardEditor.vue";
 import GenericCardViewer from "@/arches_component_lab/generics/GenericCard/components/GenericCardViewer.vue";
 
-import {
-    fetchTileData,
-    fetchCardXNodeXWidgetDataFromNodeGroup,
-} from "@/arches_component_lab/generics/GenericCard/api.ts";
+import { fetchTileData } from "@/arches_component_lab/generics/GenericCard/api.ts";
+import { useNodegroupWidgetConfigStore } from "@/arches_component_lab/stores/useNodegroupWidgetConfigStore.ts";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
@@ -46,6 +44,7 @@ const emit = defineEmits([
     "update:widgetFocusStates",
     "save",
     "reset",
+    "initialized",
 ]);
 
 const isLoading = ref(true);
@@ -60,7 +59,10 @@ watchEffect(async () => {
 
     try {
         const cardXNodeXWidgetDataPromise =
-            fetchCardXNodeXWidgetDataFromNodeGroup(graphSlug, nodegroupAlias);
+            useNodegroupWidgetConfigStore().fetchNodegroupWidgetConfigs(
+                graphSlug,
+                nodegroupAlias,
+            );
 
         if (tileData) {
             aliasedTileData.value = tileData;
@@ -115,7 +117,6 @@ defineExpose({
                 v-model:tile-data="aliasedTileData"
                 :card-x-node-x-widget-data="cardXNodeXWidgetData"
                 :graph-slug="graphSlug"
-                :mode="mode"
                 :nodegroup-alias="nodegroupAlias"
                 :resource-instance-id="resourceInstanceId"
                 :selected-node-alias="selectedNodeAlias"
@@ -129,14 +130,15 @@ defineExpose({
                 @update:widget-focus-states="
                     emit('update:widgetFocusStates', $event)
                 "
+                @initialized="emit('initialized', $event)"
             />
             <GenericCardViewer
                 v-else-if="mode === VIEW"
                 v-model:tile-data="aliasedTileData"
                 :card-x-node-x-widget-data="cardXNodeXWidgetData"
                 :graph-slug="graphSlug"
-                :mode="mode"
                 :nodegroup-alias="nodegroupAlias"
+                @initialized="emit('initialized', $event)"
             />
         </template>
     </div>

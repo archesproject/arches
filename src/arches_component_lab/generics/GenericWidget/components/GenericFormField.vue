@@ -20,21 +20,17 @@ type FormFieldType = {
     };
 };
 
-const { isDirty, nodeAlias, aliasedNodeData } = defineProps<{
+const { isDirty, nodeAlias, initialValue } = defineProps<{
     isDirty: boolean;
     nodeAlias: string;
-    aliasedNodeData: AliasedNodeData | null;
+    initialValue: AliasedNodeData | null;
 }>();
 
 const emit = defineEmits<{
-    (e: "update:value", newValue: AliasedNodeData): void;
     (e: "update:isDirty", dirty: boolean): void;
 }>();
 
 const formFieldRef = useTemplateRef<FormFieldType>("formField");
-
-// cannot inline, this allows the dirty state to be set on first input
-const initialValue = Object.freeze({ ...aliasedNodeData });
 
 watchEffect(() => {
     if (isDirty) {
@@ -52,35 +48,31 @@ function markFormFieldAsDirty() {
     formFieldRef.value.field.states.touched = true;
 }
 
-function resolver(
-    updatedAliasedNodeData: FormFieldResolverOptions,
-): AliasedNodeData {
-    validate(updatedAliasedNodeData as unknown as AliasedNodeData);
-    return updatedAliasedNodeData as unknown as AliasedNodeData;
+function resolver(updatedNodeValue: FormFieldResolverOptions) {
+    const errors = validate(updatedNodeValue);
+    return errors.length ? { errors } : {};
 }
 
-function validate(aliasedNodeData: AliasedNodeData) {
-    console.log("validateValue", aliasedNodeData);
+function validate(
+    _value: FormFieldResolverOptions,
+): Array<{ message: string }> {
+    return [];
 }
 
-function onUpdateValue(updatedAliasedNodeData: AliasedNodeData) {
-    if (aliasedNodeData === updatedAliasedNodeData) {
-        return;
-    }
-
+function onUpdateAliasedNodeData(aliasedNodeData: AliasedNodeData) {
     formFieldRef.value?.field?.props?.onChange({
-        value: updatedAliasedNodeData,
+        value: aliasedNodeData,
     });
 
-    emit("update:value", updatedAliasedNodeData);
     emit("update:isDirty", true);
 }
 </script>
 
 <template>
-    <slot :on-update-value="onUpdateValue" />
+    <slot :on-update-aliased-node-data="onUpdateAliasedNodeData" />
 
     <FormField
+        v-if="initialValue"
         ref="formField"
         v-slot="$field"
         :name="nodeAlias"

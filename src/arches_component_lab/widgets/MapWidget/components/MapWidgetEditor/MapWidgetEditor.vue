@@ -30,6 +30,7 @@ import {
     fetchDrawnFeaturesBuffer,
     fetchGeoJSONBounds,
 } from "@/arches_component_lab/widgets/MapWidget/api.ts";
+import { buildGeoJSONFeatureCollectionAliasedNodeData } from "@/arches_component_lab/datatypes/geojson-feature-collection/utils.ts";
 
 import {
     BUFFER_FILL_COLOR,
@@ -52,6 +53,7 @@ import {
 
 import type { Ref } from "vue";
 import type { Feature, FeatureCollection } from "geojson";
+import type { GeoJSONFeatureCollectionAliasedNodeData } from "@/arches_component_lab/datatypes/geojson-feature-collection/types.ts";
 import type {
     AddLayerObject,
     GeoJSONSource,
@@ -63,7 +65,6 @@ import type {
     SourceSpecification,
 } from "maplibre-gl";
 
-import type { GeoJSONFeatureCollectionValue } from "@/arches_component_lab/datatypes/geojson-feature-collection/types.ts";
 import type {
     Basemap,
     LayerDefinition,
@@ -78,25 +79,24 @@ interface DrawEvent {
     features: Feature[];
 }
 
-const {
-    aliasedNodeData,
-    cardXNodeXWidgetData,
-    renderContext,
-    shouldEmitSimplifiedValue = false,
-} = defineProps<{
-    aliasedNodeData: GeoJSONFeatureCollectionValue | null;
+const { aliasedNodeData, cardXNodeXWidgetData, renderContext } = defineProps<{
+    aliasedNodeData: GeoJSONFeatureCollectionAliasedNodeData | null;
     cardXNodeXWidgetData?: MapCardXNodeXWidgetData;
     renderContext?: string;
-    shouldEmitSimplifiedValue?: boolean;
 }>();
 
 const emit = defineEmits<{
-    (
-        event: "update:value",
-        value: GeoJSONFeatureCollectionValue | FeatureCollection,
-    ): void;
+    (event: "update:value", value: FeatureCollection): void;
     (event: "update:isLoading", isLoading: boolean): void;
     (event: "update:overlays"): void;
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: GeoJSONFeatureCollectionAliasedNodeData,
+    ): void;
+    (
+        event: "initialized",
+        updatedValue: GeoJSONFeatureCollectionAliasedNodeData,
+    ): void;
 }>();
 
 const { $gettext } = useGettext();
@@ -104,6 +104,8 @@ const { $gettext } = useGettext();
 const mapContainer = useTemplateRef<HTMLDivElement>("mapContainer");
 
 const map = shallowRef<MaplibreMap | null>(null);
+defineExpose({ map });
+
 const isLoading = ref(false);
 const selectedDrawnFeature: Ref<Feature | null> = ref(null);
 const drawnFeatures = shallowRef<Feature[]>([]);
@@ -233,6 +235,15 @@ onMounted(async () => {
     });
 
     await loadMapData();
+    emit(
+        "initialized",
+        buildGeoJSONFeatureCollectionAliasedNodeData(
+            aliasedNodeData?.node_value ?? {
+                type: "FeatureCollection",
+                features: [],
+            },
+        ),
+    );
 });
 
 onUnmounted(() => {
@@ -500,20 +511,11 @@ async function updateDrawnFeatures() {
         console.error("Error updating drawn features:", error);
     }
 
-    const count = drawnFeatureCollection.features.length;
-    const displayValue = $gettext("%{ count } feature(s)", {
-        " count ": String(count),
-    });
-
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", drawnFeatureCollection);
-    } else {
-        emit("update:value", {
-            display_value: displayValue,
-            node_value: drawnFeatureCollection,
-            details: [],
-        });
-    }
+    emit("update:value", drawnFeatureCollection);
+    emit(
+        "update:aliasedNodeData",
+        buildGeoJSONFeatureCollectionAliasedNodeData(drawnFeatureCollection),
+    );
 }
 
 function addOverlayToMap(overlay: MapLayer) {
@@ -582,8 +584,6 @@ function updateMapOverlays(overlays: MapLayer[]) {
         }
     }
 }
-
-defineExpose({ map });
 </script>
 
 <template>

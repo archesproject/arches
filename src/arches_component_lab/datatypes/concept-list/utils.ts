@@ -1,39 +1,21 @@
-import type {
-    CollectionItem,
-    ConceptListValue,
-} from "@/arches_component_lab/datatypes/concept-list/types.ts";
-import {
-    getOption,
-    flattenCollectionItems,
-} from "@/arches_component_lab/datatypes/concept/utils.ts";
+import { getOption } from "@/arches_component_lab/datatypes/concept/utils.ts";
 
-export { flattenCollectionItems };
+import type { CollectionItem } from "@/arches_component_lab/datatypes/concept/types.ts";
+import type { ConceptListAliasedNodeData } from "@/arches_component_lab/datatypes/concept-list/types.ts";
 
-export function convertSelectionToModelValue(
-    conceptOptionIds: string[],
+export function buildConceptListAliasedNodeData(
+    nodeValues: string[] | null,
     options: CollectionItem[],
-): ConceptListValue {
-    if (!conceptOptionIds || conceptOptionIds.length == 0)
-        return blankConceptListValue();
-    const allSelectedOptions: CollectionItem[] = Object.keys(
-        conceptOptionIds,
-    ).map((key) => getOption(key, options) as CollectionItem);
-
+): ConceptListAliasedNodeData {
+    if (!nodeValues?.length) {
+        return { node_value: nodeValues, display_value: "", details: [] };
+    }
+    const resolvedOptions = nodeValues
+        .map((id) => getOption(id, options))
+        .filter((option): option is CollectionItem => option !== null);
     return {
-        display_value: allSelectedOptions
-            .map((option: CollectionItem) => option.label)
-            .join(", "),
-        node_value: allSelectedOptions.map(
-            (option: CollectionItem) => option.key,
-        ),
-        details: allSelectedOptions,
-    };
-}
-
-export function blankConceptListValue(): ConceptListValue {
-    return {
-        display_value: "",
-        node_value: null,
-        details: [],
+        node_value: nodeValues,
+        display_value: resolvedOptions.map((option) => option.label).join(", "),
+        details: resolvedOptions,
     };
 }

@@ -1,42 +1,44 @@
 <script setup lang="ts">
 import { ref, watchEffect } from "vue";
-import { useGettext } from "vue3-gettext";
 
+import { useGettext } from "vue3-gettext";
 import Editor from "primevue/editor";
 import Select from "primevue/select";
 
+import FocusController from "@/arches_component_lab/widgets/RichTextWidget/components/RichTextWidgetEditor/components/FocusController.vue";
+
 import { fetchLanguages } from "@/arches_component_lab/widgets/api.ts";
+import { buildStringAliasedNodeData } from "@/arches_component_lab/datatypes/string/utils.ts";
 
 import type {
     StringCardXNodeXWidgetData,
     Language,
 } from "@/arches_component_lab/types.ts";
-import type { StringValue } from "@/arches_component_lab/datatypes/string/types.ts";
-import FocusController from "@/arches_component_lab/widgets/RichTextWidget/components/RichTextWidgetEditor/components/FocusController.vue";
+import type {
+    LanguageValue,
+    StringAliasedNodeData,
+} from "@/arches_component_lab/datatypes/string/types.ts";
 
-const { $gettext } = useGettext();
-
-const {
-    cardXNodeXWidgetData,
-    aliasedNodeData,
-    shouldEmitSimplifiedValue = false,
-} = defineProps<{
-    cardXNodeXWidgetData: StringCardXNodeXWidgetData;
-    aliasedNodeData: StringValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+    cardXNodeXWidgetData?: StringCardXNodeXWidgetData;
+    aliasedNodeData: StringAliasedNodeData | null;
 }>();
 
 const emit = defineEmits<{
     (
-        event: "update:value",
-        updatedValue: StringValue | Record<Language["code"], string>,
+        event: "update:aliasedNodeData",
+        updatedValue: StringAliasedNodeData,
     ): void;
+    (event: "initialized", updatedValue: StringAliasedNodeData): void;
 }>();
+
+const { $gettext } = useGettext();
 
 const languages = ref<Language[]>([]);
 const selectedLanguage = ref<Language>();
-const managedNodeValue = ref<StringValue["node_value"]>();
+const managedNodeValue = ref<Record<string, LanguageValue>>();
 const singleInputValue = ref<string>("");
+const hasInitialized = ref(false);
 
 watchEffect(async () => {
     const response = (await fetchLanguages()) as {
@@ -49,11 +51,28 @@ watchEffect(async () => {
     selectedLanguage.value =
         languages.value.find((lang: Language) => {
             return lang.code === response.request_language;
-        }) ?? response.languages[0];
+        }) ??
+        response.languages.find((lang: Language) => lang.isdefault) ??
+        response.languages[0];
+
+    if (!hasInitialized.value && selectedLanguage.value) {
+        hasInitialized.value = true;
+        emit(
+            "initialized",
+            aliasedNodeData ??
+                buildStringAliasedNodeData(
+                    (managedNodeValue.value ?? {}) as Record<
+                        string,
+                        LanguageValue
+                    >,
+                    selectedLanguage.value.code,
+                ),
+        );
+    }
 });
 
 watchEffect(() => {
-    const workingObject = { ...aliasedNodeData?.node_value };
+    const workingObject = { ...(aliasedNodeData?.node_value ?? {}) };
     for (const knownLanguage of languages.value) {
         if (!workingObject[knownLanguage.code]) {
             workingObject[knownLanguage.code] = {
@@ -76,28 +95,22 @@ function onUpdateModelValue(updatedValue: string | undefined) {
     if (updatedValue === undefined) {
         updatedValue = "";
     }
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", {
-            [selectedLanguage.value!.code]: updatedValue,
-        });
-    } else {
-        emit("update:value", {
-            display_value: updatedValue,
-            node_value: {
-                ...managedNodeValue.value,
-                [selectedLanguage.value!.code]: {
-                    value: updatedValue,
-                    direction: selectedLanguage.value!.default_direction,
-                },
-            },
-            details: [],
-        });
-    }
+    const newNodeValue = {
+        ...managedNodeValue.value,
+        [selectedLanguage.value!.code]: {
+            value: updatedValue,
+            direction: selectedLanguage.value!.default_direction,
+        },
+    };
+    emit(
+        "update:aliasedNodeData",
+        buildStringAliasedNodeData(newNodeValue, selectedLanguage.value!.code),
+    );
 }
 </script>
 
 <template>
-    <div style="display: flex; flex-direction: column; row-gap: 0.5rem">
+    <div class="widget-language-inputs">
         <Select
             v-model="selectedLanguage"
             class="language-selector"
@@ -106,17 +119,25 @@ function onUpdateModelValue(updatedValue: string | undefined) {
             :option-label="(lang: Language) => `${lang.name} (${lang.code})`"
             :placeholder="$gettext('Language')"
         />
-        <FocusController :node-alias="cardXNodeXWidgetData.node.alias">
+        <FocusController :node-alias="cardXNodeXWidgetData?.node.alias ?? ''">
             <Editor
                 :fluid="true"
                 :model-value="singleInputValue"
-                :placeholder="cardXNodeXWidgetData.config.placeholder ?? ''"
-                :required="cardXNodeXWidgetData.node.isrequired"
+                :placeholder="cardXNodeXWidgetData?.config.placeholder ?? ''"
+                :required="cardXNodeXWidgetData?.node.isrequired"
                 @update:model-value="onUpdateModelValue($event)"
             />
         </FocusController>
     </div>
 </template>
+
+<style scoped>
+.widget-language-inputs {
+    display: flex;
+    flex-direction: column;
+    row-gap: 0.5rem;
+}
+</style>
 
 <style>
 .p-select-options,

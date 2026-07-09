@@ -1,39 +1,61 @@
 <script setup lang="ts">
+import { computed } from "vue";
+
 import DomainRadioWidgetEditor from "@/arches_component_lab/widgets/DomainRadioWidget/components/DomainRadioWidgetEditor.vue";
 import DomainRadioWidgetViewer from "@/arches_component_lab/widgets/DomainRadioWidget/components/DomainRadioWidgetViewer.vue";
 
+import { buildDomainAliasedNodeData } from "@/arches_component_lab/datatypes/domain/utils.ts";
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type {
+    DomainAliasedNodeData,
     DomainDatatypeCardXNodeXWidgetData,
-    DomainValue,
 } from "@/arches_component_lab/datatypes/domain/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-defineProps<{
+const { aliasedNodeData, value, cardXNodeXWidgetData } = defineProps<{
     mode: WidgetMode;
-    nodeAlias: string;
-    graphSlug: string;
-    cardXNodeXWidgetData: DomainDatatypeCardXNodeXWidgetData;
-    aliasedNodeData: DomainValue | null;
-    shouldEmitSimplifiedValue?: boolean;
+    nodeAlias?: string;
+    graphSlug?: string;
+    cardXNodeXWidgetData?: DomainDatatypeCardXNodeXWidgetData;
+    aliasedNodeData?: DomainAliasedNodeData | null;
+    value?: string | null;
 }>();
 
-const emit = defineEmits(["update:value"]);
+const emit = defineEmits<{
+    "update:value": [updatedValue: string | null];
+    "update:aliasedNodeData": [updatedValue: DomainAliasedNodeData];
+    initialized: [updatedValue: DomainAliasedNodeData];
+}>();
+
+const resolvedAliasedNodeData = computed(
+    () =>
+        aliasedNodeData ??
+        buildDomainAliasedNodeData(
+            value ?? null,
+            cardXNodeXWidgetData?.node.config.options ?? [],
+        ),
+);
+
+function onUpdateAliasedNodeData(
+    updatedAliasedNodeData: DomainAliasedNodeData,
+) {
+    emit("update:aliasedNodeData", updatedAliasedNodeData);
+    emit("update:value", updatedAliasedNodeData.node_value);
+}
 </script>
 
 <template>
     <DomainRadioWidgetEditor
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :graph-slug="graphSlug"
-        :aliased-node-data="aliasedNodeData"
-        :should-emit-simplified-value="shouldEmitSimplifiedValue"
-        @update:value="emit('update:value', $event)"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @update:aliased-node-data="onUpdateAliasedNodeData"
+        @initialized="emit('initialized', $event)"
     />
     <DomainRadioWidgetViewer
         v-if="mode === VIEW"
-        :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :aliased-node-data="aliasedNodeData"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @initialized="emit('initialized', $event)"
     />
 </template>

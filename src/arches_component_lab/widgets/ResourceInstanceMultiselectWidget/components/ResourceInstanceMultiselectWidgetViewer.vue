@@ -1,22 +1,39 @@
 <script setup lang="ts">
+import { watch } from "vue";
+
 import arches from "arches";
 
-import type { ResourceInstanceListValue } from "@/arches_component_lab/datatypes/resource-instance-list/types";
+import type { ResourceInstanceListAliasedNodeData } from "@/arches_component_lab/datatypes/resource-instance-list/types";
 
-defineProps<{
-    aliasedNodeData: ResourceInstanceListValue | null;
+const { aliasedNodeData } = defineProps<{
+    aliasedNodeData?: ResourceInstanceListAliasedNodeData | null;
 }>();
+
+const emit = defineEmits<{
+    initialized: [updatedValue: ResourceInstanceListAliasedNodeData];
+}>();
+
+watch(
+    () => aliasedNodeData,
+    (newValue) => {
+        if (newValue) {
+            emit("initialized", newValue);
+        }
+    },
+    { immediate: true },
+);
 </script>
+
 <template>
     <div
-        v-for="resourceInstanceDetail in aliasedNodeData?.details"
-        :key="resourceInstanceDetail.resource_id"
+        v-for="item in aliasedNodeData?.details"
+        :key="item.resource_id"
     >
         <a
-            :href="`${arches.urls.resource_editor}${resourceInstanceDetail.resource_id}`"
+            :href="`${arches.urls.resource_editor}${item.resource_id}`"
             class="resource-instance-link"
         >
-            {{ resourceInstanceDetail.display_value }}
+            {{ item.display_value }}
         </a>
     </div>
 </template>

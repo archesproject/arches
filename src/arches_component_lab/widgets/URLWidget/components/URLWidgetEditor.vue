@@ -1,67 +1,53 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { useGettext } from "vue3-gettext";
+import { onMounted, ref } from "vue";
 
+import { useGettext } from "vue3-gettext";
 import InputText from "primevue/inputtext";
 
+import { buildURLAliasedNodeData } from "@/arches_component_lab/datatypes/url/utils.ts";
+
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { URL, URLValue } from "@/arches_component_lab/datatypes/url/types";
+import type { URLAliasedNodeData } from "@/arches_component_lab/datatypes/url/types";
+
+const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+    cardXNodeXWidgetData?: CardXNodeXWidgetData;
+    aliasedNodeData: URLAliasedNodeData | null;
+}>();
+
+const emit = defineEmits<{
+    (event: "update:aliasedNodeData", updatedValue: URLAliasedNodeData): void;
+    (event: "initialized", updatedValue: URLAliasedNodeData): void;
+}>();
 
 const { $gettext } = useGettext();
 
-const {
-    cardXNodeXWidgetData,
-    aliasedNodeData,
-    shouldEmitSimplifiedValue = false,
-} = defineProps<{
-    cardXNodeXWidgetData: CardXNodeXWidgetData;
-    aliasedNodeData: URLValue | null;
-    shouldEmitSimplifiedValue?: boolean;
-}>();
+const urlLabel = ref(aliasedNodeData?.node_value?.url_label ?? "");
+const url = ref(aliasedNodeData?.node_value?.url ?? "");
 
-const urlLabel = ref(aliasedNodeData!.node_value?.url_label || "");
-const url = ref(aliasedNodeData!.node_value?.url || "");
-
-const emit = defineEmits<{
-    (event: "update:value", updatedValue: URLValue | URL): void;
-}>();
+onMounted(() => {
+    emit(
+        "initialized",
+        aliasedNodeData ??
+            buildURLAliasedNodeData({
+                url: url.value,
+                url_label: urlLabel.value,
+            }),
+    );
+});
 
 function onUpdateURLValue(updatedValue: string | undefined) {
-    if (updatedValue === undefined) {
-        updatedValue = "";
-    }
-    url.value = updatedValue;
+    url.value = updatedValue ?? "";
     updateValue();
 }
 
 function onUpdateURLLabelValue(updatedValue: string | undefined) {
-    if (updatedValue === undefined) {
-        updatedValue = "";
-    }
-    urlLabel.value = updatedValue;
+    urlLabel.value = updatedValue ?? "";
     updateValue();
 }
 
 function updateValue() {
-    let displayValue;
-    if (urlLabel.value) {
-        displayValue = `${urlLabel.value}(${url.value})`;
-    } else {
-        displayValue = url.value;
-    }
-    const formattedValue = {
-        url: url.value,
-        url_label: urlLabel.value,
-    };
-    if (shouldEmitSimplifiedValue) {
-        emit("update:value", formattedValue);
-    } else {
-        emit("update:value", {
-            display_value: displayValue,
-            node_value: formattedValue,
-            details: [],
-        });
-    }
+    const newNodeValue = { url: url.value, url_label: urlLabel.value };
+    emit("update:aliasedNodeData", buildURLAliasedNodeData(newNodeValue));
 }
 </script>
 
@@ -80,7 +66,7 @@ function updateValue() {
         required="true"
         :fluid="true"
         :model-value="url"
-        :pt="{ root: { id: cardXNodeXWidgetData.node.alias } }"
+        :pt="{ root: { id: cardXNodeXWidgetData?.node.alias } }"
         :placeholder="$gettext('Enter URL...')"
         @update:model-value="onUpdateURLValue($event)"
     />

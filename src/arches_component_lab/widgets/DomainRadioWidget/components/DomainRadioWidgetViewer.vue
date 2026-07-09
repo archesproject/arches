@@ -1,9 +1,19 @@
 <script setup lang="ts">
-import type { DomainValue } from "@/arches_component_lab/datatypes/domain/types.ts";
+import { onMounted } from "vue";
 
-defineProps<{
-    aliasedNodeData: DomainValue | null;
+import type { DomainAliasedNodeData } from "@/arches_component_lab/datatypes/domain/types.ts";
+
+const { aliasedNodeData } = defineProps<{
+    aliasedNodeData: DomainAliasedNodeData;
 }>();
+
+const emit = defineEmits<{
+    initialized: [updatedValue: DomainAliasedNodeData];
+}>();
+
+onMounted(() => {
+    emit("initialized", aliasedNodeData);
+});
 </script>
 
 <template>

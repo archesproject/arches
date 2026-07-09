@@ -1,11 +1,21 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
+
 import DOMPurify from "dompurify";
-import type { StringValue } from "@/arches_component_lab/datatypes/string/types";
+
+import type { StringAliasedNodeData } from "@/arches_component_lab/datatypes/string/types.ts";
 
 const { aliasedNodeData } = defineProps<{
-    aliasedNodeData: StringValue | null;
+    aliasedNodeData: StringAliasedNodeData;
 }>();
+
+const emit = defineEmits<{
+    initialized: [updatedValue: StringAliasedNodeData];
+}>();
+
+onMounted(() => {
+    emit("initialized", aliasedNodeData);
+});
 
 const cleanHtml = computed(() =>
     DOMPurify.sanitize(aliasedNodeData?.display_value ?? "", {

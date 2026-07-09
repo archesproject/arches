@@ -5,8 +5,7 @@ export interface LanguageValue {
     direction: "ltr" | "rtl";
 }
 
-export interface StringValue extends AliasedNodeData {
-    display_value: string;
+export interface StringAliasedNodeData extends AliasedNodeData {
     node_value: Record<string, LanguageValue> | null;
     details: never[];
 }
