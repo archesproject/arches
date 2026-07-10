@@ -31,8 +31,8 @@ class WidgetSynchronizer:
                 _("A component path must be provided to create a widget mapping.")
             )
 
-        mapping = WidgetMapping.objects.create(
+        mapping, _created = WidgetMapping.objects.update_or_create(
             widget=widget,
-            component=component_path,
+            defaults={"component": component_path},
         )
         return mapping
