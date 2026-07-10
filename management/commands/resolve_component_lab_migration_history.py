@@ -27,12 +27,6 @@ class Command(BaseCommand):
         recorder = MigrationRecorder(connection)
         applied = recorder.applied_migrations()
 
-        # Any applied migration that directly depends on arches_vue_components
-        # is a widget-mapping consumer. Always re-sync it, regardless of
-        # whether its arches_vue_components dependency is currently marked
-        # applied - arches_vue_components may have been applied previously
-        # with buggy or incomplete data, so "already applied" doesn't mean
-        # "already correct".
         consumers = []
         for migration_key in applied:
             if migration_key[0] == "arches_vue_components":
