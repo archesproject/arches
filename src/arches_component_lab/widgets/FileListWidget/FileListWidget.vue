@@ -9,19 +9,11 @@ import { buildFileListAliasedNodeData } from "@/arches_component_lab/datatypes/f
 
 import type {
     FileListAliasedNodeData,
-    FileListCardXNodeXWidgetData,
     FileReference,
 } from "@/arches_component_lab/datatypes/file-list/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import type { FileListWidgetProps } from "@/arches_component_lab/widgets/FileListWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps<{
-    mode: WidgetMode;
-    nodeAlias?: string;
-    graphSlug?: string;
-    cardXNodeXWidgetData?: FileListCardXNodeXWidgetData;
-    aliasedNodeData?: FileListAliasedNodeData | null;
-    value?: FileReference[] | null;
-}>();
+const { aliasedNodeData, value } = defineProps<FileListWidgetProps>();
 
 const emit = defineEmits<{
     "update:value": [updatedValue: FileReference[] | null];

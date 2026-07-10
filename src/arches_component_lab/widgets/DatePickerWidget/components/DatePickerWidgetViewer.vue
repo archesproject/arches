@@ -1,13 +1,9 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 
-import type {
-    DateAliasedNodeData,
-    DateDatatypeCardXNodeXWidgetData,
-} from "@/arches_component_lab/datatypes/date/types.ts";
+import type { DateAliasedNodeData } from "@/arches_component_lab/datatypes/date/types.ts";
 
 const { aliasedNodeData } = defineProps<{
-    cardXNodeXWidgetData?: DateDatatypeCardXNodeXWidgetData;
     aliasedNodeData: DateAliasedNodeData;
 }>();
 

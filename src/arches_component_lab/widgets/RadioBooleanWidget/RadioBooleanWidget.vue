@@ -7,18 +7,10 @@ import RadioBooleanWidgetViewer from "@/arches_component_lab/widgets/RadioBoolea
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildBooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/utils.ts";
 
-import type { BooleanCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { BooleanAliasedNodeData } from "@/arches_component_lab/datatypes/boolean/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import type { RadioBooleanWidgetProps } from "@/arches_component_lab/widgets/RadioBooleanWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps<{
-    mode: WidgetMode;
-    nodeAlias?: string;
-    graphSlug?: string;
-    cardXNodeXWidgetData?: BooleanCardXNodeXWidgetData;
-    aliasedNodeData?: BooleanAliasedNodeData | null;
-    value?: boolean | null;
-}>();
+const { aliasedNodeData, value } = defineProps<RadioBooleanWidgetProps>();
 
 const emit = defineEmits<{
     "update:value": [updatedValue: boolean | null];

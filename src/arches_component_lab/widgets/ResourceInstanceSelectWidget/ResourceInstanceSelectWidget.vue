@@ -8,12 +8,11 @@ import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { useResourceDisplayNameResolver } from "@/arches_component_lab/datatypes/resource-instance/useResourceDisplayNameResolver.ts";
 import { buildResourceInstanceAliasedNodeData } from "@/arches_component_lab/datatypes/resource-instance/utils.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 import type {
     ResourceInstanceAliasedNodeData,
     ResourceInstanceReference,
 } from "@/arches_component_lab/datatypes/resource-instance/types";
+import type { ResourceInstanceSelectWidgetProps } from "@/arches_component_lab/widgets/ResourceInstanceSelectWidget/types.ts";
 
 const {
     aliasedNodeData,
@@ -23,15 +22,7 @@ const {
     cardXNodeXWidgetData,
     value,
     defaultTerm,
-} = defineProps<{
-    aliasedNodeData?: ResourceInstanceAliasedNodeData | null;
-    mode: WidgetMode;
-    nodeAlias?: string;
-    graphSlug?: string;
-    cardXNodeXWidgetData?: CardXNodeXWidgetData;
-    value?: ResourceInstanceReference | null;
-    defaultTerm?: string;
-}>();
+} = defineProps<ResourceInstanceSelectWidgetProps>();
 
 const emit = defineEmits<{
     "update:isLoading": [isLoading: boolean];

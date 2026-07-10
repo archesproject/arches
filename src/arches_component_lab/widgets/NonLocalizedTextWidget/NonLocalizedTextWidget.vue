@@ -7,19 +7,10 @@ import NonLocalizedTextWidgetViewer from "@/arches_component_lab/widgets/NonLoca
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildNonLocalizedTextAliasedNodeData } from "@/arches_component_lab/datatypes/non-localized-text/utils.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { NonLocalizedTextAliasedNodeData } from "@/arches_component_lab/datatypes/non-localized-text/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import type { NonLocalizedTextWidgetProps } from "@/arches_component_lab/widgets/NonLocalizedTextWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps<{
-    mode: WidgetMode;
-    nodeAlias?: string;
-    graphSlug?: string;
-    cardXNodeXWidgetData?: CardXNodeXWidgetData;
-    aliasedNodeData?: NonLocalizedTextAliasedNodeData | null;
-    value?: string | null;
-    renderContext?: string;
-}>();
+const { aliasedNodeData, value } = defineProps<NonLocalizedTextWidgetProps>();
 
 const emit = defineEmits<{
     "update:value": [updatedValue: string | null];

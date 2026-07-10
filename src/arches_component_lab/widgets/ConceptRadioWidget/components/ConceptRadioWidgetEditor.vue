@@ -15,14 +15,14 @@ import {
     buildConceptAliasedNodeData,
     flattenCollectionItems,
 } from "@/arches_component_lab/datatypes/concept/utils.ts";
-import type { ConceptRadioCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type { ConceptCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 
 const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } =
     defineProps<{
         graphSlug?: string;
         nodeAlias?: string;
         aliasedNodeData?: ConceptAliasedNodeData | null;
-        cardXNodeXWidgetData?: ConceptRadioCardXNodeXWidgetData;
+        cardXNodeXWidgetData?: ConceptCardXNodeXWidgetData;
     }>();
 
 const emit = defineEmits<{

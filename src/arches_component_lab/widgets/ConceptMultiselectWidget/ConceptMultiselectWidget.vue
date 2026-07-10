@@ -9,18 +9,11 @@ import { buildConceptListAliasedNodeData } from "@/arches_component_lab/datatype
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { ConceptListAliasedNodeData } from "@/arches_component_lab/datatypes/concept-list/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import type { ConceptMultiselectWidgetProps } from "@/arches_component_lab/widgets/ConceptMultiselectWidget/types.ts";
 
-const { aliasedNodeData, value, mode, graphSlug, nodeAlias } = defineProps<{
-    mode: WidgetMode;
-    nodeAlias?: string;
-    graphSlug?: string;
-    cardXNodeXWidgetData?: CardXNodeXWidgetData;
-    aliasedNodeData?: ConceptListAliasedNodeData | null;
-    value?: string[] | null;
-}>();
+const { aliasedNodeData, graphSlug, nodeAlias, value } =
+    defineProps<ConceptMultiselectWidgetProps>();
 
 const emit = defineEmits<{
     "update:isLoading": [isLoading: boolean];

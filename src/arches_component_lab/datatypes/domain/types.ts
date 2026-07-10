@@ -3,8 +3,7 @@ import type {
     CardXNodeXWidgetData,
 } from "@/arches_component_lab/types.ts";
 
-export interface DomainDatatypeCardXNodeXWidgetData
-    extends CardXNodeXWidgetData {
+export interface DomainCardXNodeXWidgetData extends CardXNodeXWidgetData {
     node: CardXNodeXWidgetData["node"] & {
         config: {
             options: DomainOption[];

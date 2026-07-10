@@ -7,21 +7,13 @@ import URLWidgetViewer from "@/arches_component_lab/widgets/URLWidget/components
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildURLAliasedNodeData } from "@/arches_component_lab/datatypes/url/utils.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 import type {
     URLAliasedNodeData,
     URLNodeValue,
-} from "@/arches_component_lab/datatypes/url/types";
+} from "@/arches_component_lab/datatypes/url/types.ts";
+import type { URLWidgetProps } from "@/arches_component_lab/widgets/URLWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps<{
-    mode: WidgetMode;
-    nodeAlias?: string;
-    graphSlug?: string;
-    cardXNodeXWidgetData?: CardXNodeXWidgetData;
-    aliasedNodeData?: URLAliasedNodeData | null;
-    value?: URLNodeValue | null;
-}>();
+const { aliasedNodeData, value } = defineProps<URLWidgetProps>();
 
 const emit = defineEmits<{
     "update:value": [updatedValue: URLNodeValue | null];

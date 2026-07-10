@@ -7,20 +7,10 @@ import DatePickerWidgetViewer from "@/arches_component_lab/widgets/DatePickerWid
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildDateAliasedNodeData } from "@/arches_component_lab/datatypes/date/utils.ts";
 
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
-import type {
-    DateAliasedNodeData,
-    DateDatatypeCardXNodeXWidgetData,
-} from "@/arches_component_lab/datatypes/date/types.ts";
+import type { DateAliasedNodeData } from "@/arches_component_lab/datatypes/date/types.ts";
+import type { DatePickerWidgetProps } from "@/arches_component_lab/widgets/DatePickerWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps<{
-    mode: WidgetMode;
-    nodeAlias?: string;
-    graphSlug?: string;
-    cardXNodeXWidgetData?: DateDatatypeCardXNodeXWidgetData;
-    aliasedNodeData?: DateAliasedNodeData | null;
-    value?: string | null;
-}>();
+const { aliasedNodeData, value } = defineProps<DatePickerWidgetProps>();
 
 const emit = defineEmits<{
     "update:value": [updatedValue: string | null];

@@ -68,7 +68,7 @@ export interface StringCardXNodeXWidgetData extends CardXNodeXWidgetData {
     };
 }
 
-export interface ConceptRadioCardXNodeXWidgetData extends CardXNodeXWidgetData {
+export interface ConceptCardXNodeXWidgetData extends CardXNodeXWidgetData {
     config: CardXNodeXWidgetData["config"] & {
         groupDirection: string | null;
     };

@@ -10,18 +10,9 @@ import { buildGeoJSONFeatureCollectionAliasedNodeData } from "@/arches_component
 import type { FeatureCollection } from "geojson";
 
 import type { GeoJSONFeatureCollectionAliasedNodeData } from "@/arches_component_lab/datatypes/geojson-feature-collection/types.ts";
-import type { MapCardXNodeXWidgetData } from "@/arches_component_lab/widgets/MapWidget/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import type { MapWidgetProps } from "@/arches_component_lab/widgets/MapWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps<{
-    mode: WidgetMode;
-    renderContext?: string;
-    nodeAlias?: string;
-    graphSlug?: string;
-    cardXNodeXWidgetData?: MapCardXNodeXWidgetData;
-    aliasedNodeData?: GeoJSONFeatureCollectionAliasedNodeData | null;
-    value?: FeatureCollection | null;
-}>();
+const { aliasedNodeData, value } = defineProps<MapWidgetProps>();
 
 const emit = defineEmits<{
     "update:isLoading": [isLoading: boolean];

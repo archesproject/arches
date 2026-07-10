@@ -8,28 +8,14 @@ import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { useResourceDisplayNamesResolver } from "@/arches_component_lab/datatypes/resource-instance-list/useResourceDisplayNamesResolver.ts";
 import { buildResourceInstanceListAliasedNodeData } from "@/arches_component_lab/datatypes/resource-instance-list/utils.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type {
     ResourceInstanceListAliasedNodeData,
     ResourceInstanceReference,
 } from "@/arches_component_lab/datatypes/resource-instance-list/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import type { ResourceInstanceMultiselectWidgetProps } from "@/arches_component_lab/widgets/ResourceInstanceMultiselectWidget/types.ts";
 
-const {
-    aliasedNodeData,
-    mode,
-    nodeAlias,
-    graphSlug,
-    cardXNodeXWidgetData,
-    value,
-} = defineProps<{
-    mode: WidgetMode;
-    nodeAlias?: string;
-    graphSlug?: string;
-    cardXNodeXWidgetData?: CardXNodeXWidgetData;
-    aliasedNodeData?: ResourceInstanceListAliasedNodeData | null;
-    value?: ResourceInstanceReference[] | null;
-}>();
+const { aliasedNodeData, graphSlug, nodeAlias, value } =
+    defineProps<ResourceInstanceMultiselectWidgetProps>();
 
 const emit = defineEmits<{
     "update:isLoading": [isLoading: boolean];

@@ -7,18 +7,10 @@ import NodeValueSelectWidgetViewer from "@/arches_component_lab/widgets/NodeValu
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildNodeValueAliasedNodeData } from "@/arches_component_lab/datatypes/node-value/utils.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { NodeValueAliasedNodeData } from "@/arches_component_lab/datatypes/node-value/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import type { NodeValueSelectWidgetProps } from "@/arches_component_lab/widgets/NodeValueSelectWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps<{
-    mode: WidgetMode;
-    nodeAlias?: string;
-    graphSlug?: string;
-    cardXNodeXWidgetData?: CardXNodeXWidgetData;
-    aliasedNodeData?: NodeValueAliasedNodeData | null;
-    value?: string | null;
-}>();
+const { aliasedNodeData, value } = defineProps<NodeValueSelectWidgetProps>();
 
 const emit = defineEmits<{
     "update:value": [updatedValue: string | null];

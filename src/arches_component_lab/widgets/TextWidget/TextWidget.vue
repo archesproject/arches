@@ -9,22 +9,13 @@ import TextWidgetViewer from "@/arches_component_lab/widgets/TextWidget/componen
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildStringAliasedNodeData } from "@/arches_component_lab/datatypes/string/utils.ts";
 
-import type { StringCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type {
     LanguageValue,
     StringAliasedNodeData,
-} from "@/arches_component_lab/datatypes/string/types";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+} from "@/arches_component_lab/datatypes/string/types.ts";
+import type { TextWidgetProps } from "@/arches_component_lab/widgets/TextWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps<{
-    mode: WidgetMode;
-    nodeAlias?: string;
-    graphSlug?: string;
-    cardXNodeXWidgetData?: StringCardXNodeXWidgetData;
-    aliasedNodeData?: StringAliasedNodeData | null;
-    value?: Record<string, LanguageValue> | null;
-    renderContext?: string;
-}>();
+const { aliasedNodeData, value } = defineProps<TextWidgetProps>();
 
 const emit = defineEmits<{
     "update:value": [updatedValue: Record<string, LanguageValue> | null];

@@ -7,20 +7,10 @@ import NumberWidgetViewer from "@/arches_component_lab/widgets/NumberWidget/comp
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildNumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/utils.ts";
 
-import type {
-    NumberAliasedNodeData,
-    NumberCardXNodeXWidgetData,
-} from "@/arches_component_lab/datatypes/number/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import type { NumberAliasedNodeData } from "@/arches_component_lab/datatypes/number/types.ts";
+import type { NumberWidgetProps } from "@/arches_component_lab/widgets/NumberWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps<{
-    mode: WidgetMode;
-    nodeAlias?: string;
-    graphSlug?: string;
-    cardXNodeXWidgetData?: NumberCardXNodeXWidgetData;
-    aliasedNodeData?: NumberAliasedNodeData | null;
-    value?: number | null;
-}>();
+const { aliasedNodeData, value } = defineProps<NumberWidgetProps>();
 
 const emit = defineEmits<{
     "update:isDirty": [isDirty: boolean];

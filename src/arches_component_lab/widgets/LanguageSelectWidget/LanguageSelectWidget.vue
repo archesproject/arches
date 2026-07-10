@@ -8,18 +8,10 @@ import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { useLanguageStore } from "@/arches_component_lab/stores/useLanguageStore.ts";
 import { buildLanguageAliasedNodeData } from "@/arches_component_lab/datatypes/language/utils.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { LanguageAliasedNodeData } from "@/arches_component_lab/datatypes/language/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import type { LanguageSelectWidgetProps } from "@/arches_component_lab/widgets/LanguageSelectWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps<{
-    mode: WidgetMode;
-    nodeAlias?: string;
-    graphSlug?: string;
-    cardXNodeXWidgetData?: CardXNodeXWidgetData;
-    aliasedNodeData?: LanguageAliasedNodeData | null;
-    value?: string | null;
-}>();
+const { aliasedNodeData, value } = defineProps<LanguageSelectWidgetProps>();
 
 const emit = defineEmits<{
     "update:isLoading": [isLoading: boolean];

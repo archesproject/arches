@@ -6,11 +6,11 @@ import { buildDomainAliasedNodeData } from "@/arches_component_lab/datatypes/dom
 
 import type {
     DomainAliasedNodeData,
-    DomainDatatypeCardXNodeXWidgetData,
+    DomainCardXNodeXWidgetData,
 } from "@/arches_component_lab/datatypes/domain/types.ts";
 
 const { aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
-    cardXNodeXWidgetData?: DomainDatatypeCardXNodeXWidgetData;
+    cardXNodeXWidgetData?: DomainCardXNodeXWidgetData;
     aliasedNodeData: DomainAliasedNodeData | null;
 }>();
 

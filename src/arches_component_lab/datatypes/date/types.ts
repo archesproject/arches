@@ -3,7 +3,7 @@ import type {
     CardXNodeXWidgetData,
 } from "@/arches_component_lab/types.ts";
 
-export interface DateDatatypeCardXNodeXWidgetData extends CardXNodeXWidgetData {
+export interface DateCardXNodeXWidgetData extends CardXNodeXWidgetData {
     node: CardXNodeXWidgetData["node"] & {
         config: {
             dateFormat: string;

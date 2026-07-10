@@ -5,12 +5,12 @@ import MultiSelect from "primevue/multiselect";
 import { buildDomainListAliasedNodeData } from "@/arches_component_lab/datatypes/domain/utils.ts";
 
 import type {
-    DomainDatatypeCardXNodeXWidgetData,
+    DomainCardXNodeXWidgetData,
     DomainListAliasedNodeData,
 } from "@/arches_component_lab/datatypes/domain/types.ts";
 
 const { aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
-    cardXNodeXWidgetData?: DomainDatatypeCardXNodeXWidgetData;
+    cardXNodeXWidgetData?: DomainCardXNodeXWidgetData;
     aliasedNodeData: DomainListAliasedNodeData | null;
 }>();
 

@@ -9,21 +9,13 @@ import RichTextWidgetViewer from "@/arches_component_lab/widgets/RichTextWidget/
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildStringAliasedNodeData } from "@/arches_component_lab/datatypes/string/utils.ts";
 
-import type { StringCardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type {
     LanguageValue,
     StringAliasedNodeData,
 } from "@/arches_component_lab/datatypes/string/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import type { RichTextWidgetProps } from "@/arches_component_lab/widgets/RichTextWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps<{
-    mode: WidgetMode;
-    nodeAlias?: string;
-    graphSlug?: string;
-    cardXNodeXWidgetData?: StringCardXNodeXWidgetData;
-    aliasedNodeData?: StringAliasedNodeData | null;
-    value?: Record<string, LanguageValue> | null;
-}>();
+const { aliasedNodeData, value } = defineProps<RichTextWidgetProps>();
 
 const emit = defineEmits<{
     "update:value": [updatedValue: Record<string, LanguageValue> | null];

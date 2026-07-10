@@ -7,20 +7,11 @@ import DomainRadioWidgetViewer from "@/arches_component_lab/widgets/DomainRadioW
 import { buildDomainAliasedNodeData } from "@/arches_component_lab/datatypes/domain/utils.ts";
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type {
-    DomainAliasedNodeData,
-    DomainDatatypeCardXNodeXWidgetData,
-} from "@/arches_component_lab/datatypes/domain/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import type { DomainAliasedNodeData } from "@/arches_component_lab/datatypes/domain/types.ts";
+import type { DomainRadioWidgetProps } from "@/arches_component_lab/widgets/DomainRadioWidget/types.ts";
 
-const { aliasedNodeData, value, cardXNodeXWidgetData } = defineProps<{
-    mode: WidgetMode;
-    nodeAlias?: string;
-    graphSlug?: string;
-    cardXNodeXWidgetData?: DomainDatatypeCardXNodeXWidgetData;
-    aliasedNodeData?: DomainAliasedNodeData | null;
-    value?: string | null;
-}>();
+const { aliasedNodeData, cardXNodeXWidgetData, value } =
+    defineProps<DomainRadioWidgetProps>();
 
 const emit = defineEmits<{
     "update:value": [updatedValue: string | null];

@@ -7,18 +7,10 @@ import EDTFWidgetViewer from "@/arches_component_lab/widgets/EDTFWidget/componen
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { buildEDTFAliasedNodeData } from "@/arches_component_lab/datatypes/edtf/utils.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
 import type { EDTFAliasedNodeData } from "@/arches_component_lab/datatypes/edtf/types.ts";
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import type { EDTFWidgetProps } from "@/arches_component_lab/widgets/EDTFWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps<{
-    mode: WidgetMode;
-    nodeAlias?: string;
-    graphSlug?: string;
-    cardXNodeXWidgetData?: CardXNodeXWidgetData;
-    aliasedNodeData?: EDTFAliasedNodeData | null;
-    value?: string | null;
-}>();
+const { aliasedNodeData, value } = defineProps<EDTFWidgetProps>();
 
 const emit = defineEmits<{
     "update:isDirty": [isDirty: boolean];

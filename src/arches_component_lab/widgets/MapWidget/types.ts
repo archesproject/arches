@@ -1,7 +1,9 @@
 import type { Component } from "vue";
-import type { GeoJSON } from "geojson";
+import type { FeatureCollection, GeoJSON } from "geojson";
 
 import type { CardXNodeXWidgetData } from "@/arches_component_lab/types.ts";
+import type { BaseWidgetProps } from "@/arches_component_lab/widgets/types.ts";
+import type { GeoJSONFeatureCollectionAliasedNodeData } from "@/arches_component_lab/datatypes/geojson-feature-collection/types.ts";
 
 export interface GeometryTypeConfig {
     id: string;
@@ -102,4 +104,11 @@ export interface MapSource {
         coordinates?: [number, number];
     };
     source_json?: string;
+}
+
+export interface MapWidgetProps extends BaseWidgetProps {
+    renderContext?: string;
+    cardXNodeXWidgetData?: MapCardXNodeXWidgetData;
+    aliasedNodeData?: GeoJSONFeatureCollectionAliasedNodeData | null;
+    value?: FeatureCollection | null;
 }
