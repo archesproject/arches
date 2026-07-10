@@ -1,5 +1,5 @@
 """
-Django settings for arches_component_lab project.
+Django settings for arches_vue_components project.
 """
 
 import os
@@ -13,7 +13,7 @@ try:
 except ImportError:
     pass
 
-APP_NAME = "arches_component_lab"
+APP_NAME = "arches_vue_components"
 APP_VERSION = semantic_version.Version(major=0, minor=0, patch=0)
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
@@ -23,10 +23,10 @@ WEBPACK_LOADER = {
     },
 }
 
-DATATYPE_LOCATIONS.append("arches_component_lab.datatypes")
-FUNCTION_LOCATIONS.append("arches_component_lab.functions")
-ETL_MODULE_LOCATIONS.append("arches_component_lab.etl_modules")
-SEARCH_COMPONENT_LOCATIONS.append("arches_component_lab.search_components")
+DATATYPE_LOCATIONS.append("arches_vue_components.datatypes")
+FUNCTION_LOCATIONS.append("arches_vue_components.functions")
+ETL_MODULE_LOCATIONS.append("arches_vue_components.etl_modules")
+SEARCH_COMPONENT_LOCATIONS.append("arches_vue_components.search_components")
 
 LOCALE_PATHS.insert(0, os.path.join(APP_ROOT, "locale"))
 
@@ -56,10 +56,10 @@ SECRET_KEY = "django-insecure-=2sbet4-w$k4#^slj4l7!p!2+%8hmm!(w5m6=h$x#l08_d**gh
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ROOT_URLCONF = "arches_component_lab.arches_component_lab_urls"
-ROOT_HOSTCONF = "arches_component_lab.hosts"
+ROOT_URLCONF = "arches_vue_components.arches_vue_components_urls"
+ROOT_HOSTCONF = "arches_vue_components.hosts"
 
-DEFAULT_HOST = "arches_component_lab"
+DEFAULT_HOST = "arches_vue_components"
 
 # Modify this line as needed for your project to connect to elasticsearch with a password that you generate
 ELASTICSEARCH_CONNECTION_OPTIONS = {
@@ -81,11 +81,11 @@ ELASTICSEARCH_CONNECTION_OPTIONS = {
 # Or Kibana: https://www.elastic.co/guide/en/kibana/current/api-keys.html
 
 # a prefix to append to all elasticsearch indexes, note: must be lower case
-ELASTICSEARCH_PREFIX = "arches_component_lab"
+ELASTICSEARCH_PREFIX = "arches_vue_components"
 
 ELASTICSEARCH_CUSTOM_INDEXES = []
 # [{
-#     'module': 'arches_component_lab.search_indexes.sample_index.SampleIndex',
+#     'module': 'arches_vue_components.search_indexes.sample_index.SampleIndex',
 #     'name': 'my_new_custom_index', <-- follow ES index naming rules
 #     'should_update_asynchronously': False  <-- denotes if asynchronously updating the index would affect custom functionality within the project.
 # }]
@@ -109,7 +109,7 @@ DATABASES = {
         "CONN_MAX_AGE": 0,
         "ENGINE": "django.contrib.gis.db.backends.postgis",
         "HOST": "localhost",
-        "NAME": "arches_component_lab",
+        "NAME": "arches_vue_components",
         "OPTIONS": {
             "options": "-c cursor_tuple_fraction=1",
         },
@@ -134,7 +134,7 @@ INSTALLED_APPS = (
     "django.contrib.staticfiles",
     "django.contrib.gis",
     "django_hosts",
-    "arches_component_lab",
+    "arches_vue_components",
     "arches_querysets",
     "arches",
     "arches.app.models",
@@ -190,7 +190,7 @@ ALLOWED_HOSTS = []
 SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(
     APP_ROOT, "system_settings", "System_Settings.json"
 )
-WSGI_APPLICATION = "arches_component_lab.wsgi.application"
+WSGI_APPLICATION = "arches_vue_components.wsgi.application"
 
 # URL that handles the media served from MEDIA_ROOT, used for managing stored files.
 # It must end in a slash if set to a non-empty value.
@@ -254,7 +254,7 @@ RATE_LIMIT = "5/m"
 DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
 
 # Unique session cookie ensures that logins are treated separately for each app
-SESSION_COOKIE_NAME = "arches_component_lab"
+SESSION_COOKIE_NAME = "arches_vue_components"
 
 # For more info on configuring your cache: https://docs.djangoproject.com/en/2.2/topics/cache/
 CACHES = {
@@ -424,7 +424,7 @@ SHOW_LANGUAGE_SWITCH = len(LANGUAGES) > 1
 
 # Implement this class to associate custom documents to the ES resource index
 # See tests.views.search_tests.TestEsMappingModifier class for example
-# ES_MAPPING_MODIFIER_CLASSES = ["arches_component_lab.search.es_mapping_modifier.EsMappingModifier"]
+# ES_MAPPING_MODIFIER_CLASSES = ["arches_vue_components.search.es_mapping_modifier.EsMappingModifier"]
 
 try:
     from .package_settings import *

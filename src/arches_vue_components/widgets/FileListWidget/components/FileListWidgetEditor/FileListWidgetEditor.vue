@@ -1,0 +1,167 @@
+<script setup lang="ts">
+import { computed, onMounted, ref, watchEffect } from "vue";
+
+import FileUpload from "primevue/fileupload";
+
+import FileList from "@/arches_vue_components/widgets/FileListWidget/components/FileListWidgetEditor/components/FileList.vue";
+import FileDropZone from "@/arches_vue_components/widgets/FileListWidget/components/FileListWidgetEditor/components/FileDropZone.vue";
+
+import { buildFileListAliasedNodeData } from "@/arches_vue_components/datatypes/file-list/utils.ts";
+
+import type {
+    FileListAliasedNodeData,
+    FileListCardXNodeXWidgetData,
+    FileReference,
+} from "@/arches_vue_components/datatypes/file-list/types.ts";
+import type {
+    FileData,
+    PrimeVueFile,
+} from "@/arches_vue_components/widgets/FileListWidget/types.ts";
+
+const { aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
+    aliasedNodeData: FileListAliasedNodeData | null;
+    cardXNodeXWidgetData?: FileListCardXNodeXWidgetData;
+}>();
+
+const emit = defineEmits<{
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: FileListAliasedNodeData,
+    ): void;
+    (event: "initialized", updatedValue: FileListAliasedNodeData): void;
+}>();
+
+const fileUploadRef = ref<InstanceType<typeof FileUpload> | null>(null);
+
+const savedFiles = ref<FileReference[]>([]);
+const pendingFiles = ref<FileData[]>([]);
+const maxFiles = ref(
+    (cardXNodeXWidgetData?.node.config.maxFiles ?? 0) as number,
+);
+
+const isDisabled = computed(() => {
+    const totalFiles = savedFiles.value.length + pendingFiles.value.length;
+    return maxFiles.value ? maxFiles.value <= totalFiles : false;
+});
+
+const acceptedFileTypes = computed(() => {
+    const fileTypes: string[] = [];
+    const acceptedFiles = cardXNodeXWidgetData?.config.acceptedFiles;
+    const imagesOnly = cardXNodeXWidgetData?.node.config?.imagesOnly;
+
+    if (acceptedFiles) {
+        fileTypes.push(...acceptedFiles.split(","));
+    }
+    if (imagesOnly) {
+        fileTypes.push("image/*");
+    }
+
+    return fileTypes;
+});
+
+watchEffect(() => {
+    if (aliasedNodeData?.node_value) {
+        savedFiles.value = aliasedNodeData.node_value.map((file) => ({
+            ...file,
+            node_id: cardXNodeXWidgetData?.node.nodeid ?? "",
+        }));
+    } else {
+        savedFiles.value = [];
+    }
+});
+
+onMounted(() => {
+    emit("initialized", aliasedNodeData ?? buildFileListAliasedNodeData(null));
+});
+
+function emitUpdatedValue() {
+    const allFiles = [
+        ...savedFiles.value,
+        ...pendingFiles.value,
+    ] as FileReference[];
+    emit("update:aliasedNodeData", buildFileListAliasedNodeData(allFiles));
+}
+
+function onSelect(event: { files: PrimeVueFile[] }): void {
+    pendingFiles.value = event.files.map((file) => ({
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        url: file.objectURL,
+        file: file,
+        node_id: cardXNodeXWidgetData?.node.nodeid ?? "",
+    }));
+
+    emitUpdatedValue();
+}
+
+function onRemovePendingFile(
+    fileIndex: number,
+    removeFileCallback: (index: number) => void,
+): void {
+    removeFileCallback(fileIndex);
+    pendingFiles.value.splice(fileIndex, 1);
+
+    emitUpdatedValue();
+}
+
+function onRemoveSavedFile(fileIndex: number): void {
+    savedFiles.value.splice(fileIndex, 1);
+    emitUpdatedValue();
+}
+
+function openFileChooser(): void {
+    // @ts-expect-error FileUpload does not have a type definition for $el
+    const rootElement = fileUploadRef.value?.$el;
+    rootElement?.querySelector('input[type="file"]')?.click();
+}
+</script>
+
+<template>
+    <FileUpload
+        ref="fileUploadRef"
+        :accept="
+            acceptedFileTypes.length ? acceptedFileTypes.join(',') : undefined
+        "
+        :model-value="aliasedNodeData?.node_value"
+        :multiple="maxFiles && maxFiles > 1 ? true : false"
+        :show-cancel-button="false"
+        :show-upload-button="false"
+        :with-credentials="true"
+        :custom-upload="true"
+        @select="onSelect($event)"
+    >
+        <template #content="{ removeFileCallback }">
+            <FileDropZone
+                :card-x-node-x-widget-data="cardXNodeXWidgetData"
+                :open-file-chooser="openFileChooser"
+                :is-disabled="isDisabled"
+                :accepted-file-types="acceptedFileTypes"
+            />
+
+            <FileList
+                :files="pendingFiles as unknown as FileReference[]"
+                @remove="
+                    (_fileReference, fileIndex) =>
+                        onRemovePendingFile(fileIndex, removeFileCallback)
+                "
+            />
+
+            <FileList
+                :files="savedFiles"
+                @remove="
+                    (_fileReference, fileIndex) => onRemoveSavedFile(fileIndex)
+                "
+            />
+        </template>
+    </FileUpload>
+</template>
+
+<style scoped>
+:deep(.p-fileupload-header) {
+    display: none;
+}
+:deep(.p-fileupload-content) {
+    padding: 0;
+}
+</style>

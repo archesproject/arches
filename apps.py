@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class ArchesComponentLabConfig(AppConfig):
-    name = "arches_component_lab"
+class ArchesVueComponentsConfig(AppConfig):
+    name = "arches_vue_components"
     is_arches_application = True

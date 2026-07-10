@@ -1,0 +1,53 @@
+<script setup lang="ts">
+import { computed } from "vue";
+
+import { useGettext } from "vue3-gettext";
+
+import TextWidgetEditor from "@/arches_vue_components/widgets/TextWidget/components/TextWidgetEditor.vue";
+import TextWidgetViewer from "@/arches_vue_components/widgets/TextWidget/components/TextWidgetViewer.vue";
+
+import { EDIT, VIEW } from "@/arches_vue_components/widgets/constants.ts";
+import { buildStringAliasedNodeData } from "@/arches_vue_components/datatypes/string/utils.ts";
+
+import type {
+    LanguageValue,
+    StringAliasedNodeData,
+} from "@/arches_vue_components/datatypes/string/types.ts";
+import type { TextWidgetProps } from "@/arches_vue_components/widgets/TextWidget/types.ts";
+
+const { aliasedNodeData, value } = defineProps<TextWidgetProps>();
+
+const emit = defineEmits<{
+    "update:value": [updatedValue: Record<string, LanguageValue> | null];
+    "update:aliasedNodeData": [updatedValue: StringAliasedNodeData];
+    initialized: [updatedValue: StringAliasedNodeData];
+}>();
+
+const { current } = useGettext();
+const resolvedAliasedNodeData = computed(
+    () => aliasedNodeData ?? buildStringAliasedNodeData(value ?? null, current),
+);
+
+function onUpdateAliasedNodeData(
+    updatedAliasedNodeData: StringAliasedNodeData,
+) {
+    emit("update:aliasedNodeData", updatedAliasedNodeData);
+    emit("update:value", updatedAliasedNodeData.node_value);
+}
+</script>
+
+<template>
+    <TextWidgetEditor
+        v-if="mode === EDIT"
+        :card-x-node-x-widget-data="cardXNodeXWidgetData"
+        :aliased-node-data="resolvedAliasedNodeData"
+        :render-context="renderContext"
+        @update:aliased-node-data="onUpdateAliasedNodeData"
+        @initialized="emit('initialized', $event)"
+    />
+    <TextWidgetViewer
+        v-if="mode === VIEW"
+        :aliased-node-data="resolvedAliasedNodeData"
+        @initialized="emit('initialized', $event)"
+    />
+</template>

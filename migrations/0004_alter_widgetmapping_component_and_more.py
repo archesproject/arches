@@ -7,7 +7,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("models", "11499_add_editlog_resourceinstance_idx"),
-        ("arches_component_lab", "0003_add_pk_default"),
+        ("arches_vue_components", "0003_add_pk_default"),
     ]
 
     operations = [

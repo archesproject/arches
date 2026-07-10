@@ -7,7 +7,7 @@ import platform
 if platform.system().lower() == "windows":
     os.environ.setdefault("FORKED_BY_MULTIPROCESSING", "1")
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arches_component_lab.settings")
-app = Celery("arches_component_lab")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arches_vue_components.settings")
+app = Celery("arches_vue_components")
 app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()

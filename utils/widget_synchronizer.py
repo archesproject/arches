@@ -5,7 +5,7 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext as _
 
 from arches.app.models.models import Widget
-from arches_component_lab.models import WidgetMapping
+from arches_vue_components.models import WidgetMapping
 
 
 class WidgetSynchronizer:
