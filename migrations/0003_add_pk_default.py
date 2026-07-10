@@ -5,7 +5,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("arches_component_lab", "0002_populate_widget_mappings"),
+        ("arches_vue_components", "0002_populate_widget_mappings"),
     ]
 
     operations = [

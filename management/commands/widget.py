@@ -1,5 +1,5 @@
 from arches.management.commands.widget import Command as WidgetCommand
-from arches_component_lab.utils.widget_synchronizer import WidgetSynchronizer
+from arches_vue_components.utils.widget_synchronizer import WidgetSynchronizer
 
 
 class Command(WidgetCommand):

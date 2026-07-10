@@ -7,16 +7,16 @@ from arches.management.commands.validate import Command as BaseValidateCommand
 from arches.management.commands.validate import CommandModes
 from arches.app.models.models import Widget
 
-from arches_component_lab.utils.widget_synchronizer import WidgetSynchronizer
+from arches_vue_components.utils.widget_synchronizer import WidgetSynchronizer
 
 IntegrityCheckDescriptions = {
-    2001: "Widgets without a mapping to a Component Lab Vue component",
+    2001: "Widgets without a mapping to an Arches Vue Components Vue component",
 }
 
 
 @unique
 class IntegrityCheck(Enum):
-    """Quasi-subclass of Core Arches ValidateCommand's IntegrityCheck, specific to Component Lab."""
+    """Quasi-subclass of Core Arches ValidateCommand's IntegrityCheck, specific to Arches Vue Components."""
 
     MISSING_WIDGET_MAPPINGS = 2001
 
@@ -25,7 +25,7 @@ class IntegrityCheck(Enum):
 
 
 class FixActions(StrEnum):
-    """Quasi-subclass of Core Arches ValidateCommand's FixActions, specific to Component Lab."""
+    """Quasi-subclass of Core Arches ValidateCommand's FixActions, specific to Arches Vue Components."""
 
     CREATE_WIDGET_MAPPINGS = auto()
 
@@ -94,7 +94,7 @@ class Command(BaseValidateCommand):
             elif queryset.exists():
                 fix_status = self.style.ERROR("No")  # until actually fixed below
 
-                ##### Component Lab Specific Fix Logic
+                ##### Arches Vue Components Specific Fix Logic
                 if fix_action == FixActions.CREATE_WIDGET_MAPPINGS:
                     synchronizer = WidgetSynchronizer()
                     mappings = []

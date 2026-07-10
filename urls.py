@@ -1,18 +1,18 @@
 from django.urls import path
 
-from arches_component_lab.apps import ArchesComponentLabConfig
-from arches_component_lab.views.api.language import LanguageViewWithRequestLanguage
-from arches_component_lab.views.api.map import (
+from arches_vue_components.apps import ArchesVueComponentsConfig
+from arches_vue_components.views.api.language import LanguageViewWithRequestLanguage
+from arches_vue_components.views.api.map import (
     FeatureBufferAPI,
     GeoJSONBoundsAPI,
     MapDataAPI,
 )
-from arches_component_lab.views.api.relatable_resources import RelatableResourcesView
-from arches_component_lab.views.api.card_x_node_x_widget import (
+from arches_vue_components.views.api.relatable_resources import RelatableResourcesView
+from arches_vue_components.views.api.card_x_node_x_widget import (
     CardXNodeXWidgetView,
     CardXNodeXWidgetListFromNodegroupView,
 )
-from arches_component_lab.views.api.concept import ConceptsTreeView
+from arches_vue_components.views.api.concept import ConceptsTreeView
 
 from arches_querysets.rest_framework.generic_views import (
     ArchesTileBlankView,
@@ -20,7 +20,7 @@ from arches_querysets.rest_framework.generic_views import (
     ArchesTileListCreateView,
 )
 
-app_name = ArchesComponentLabConfig.name
+app_name = ArchesVueComponentsConfig.name
 
 urlpatterns = [
     path("api/map-data", MapDataAPI.as_view(), name="api-map-data"),
