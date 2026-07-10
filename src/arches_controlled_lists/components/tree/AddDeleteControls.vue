@@ -160,12 +160,12 @@ const toDelete = computed(() => {
     }
     if (isMultiSelecting.value) {
         return Object.entries(selectedKeys.value)
-            .filter(([, v]) => v.checked)
-            .map(([k]) => k);
+            .filter(([, selectionState]) => selectionState.checked)
+            .map(([selectedKey]) => selectedKey);
     }
     return Object.entries(selectedKeys.value)
-        .filter(([, v]) => v)
-        .map(([k]) => k);
+        .filter(([, selectionState]) => selectionState)
+        .map(([selectedKey]) => selectedKey);
 });
 
 function parseSingleDetail(error: unknown) {
