@@ -1,6 +1,6 @@
 /**
- * @deprecated Use generateArchesURL from arches-component-lab instead.
- * @see import { generateArchesURL } from '@/arches_component_lab/application'
+ * @deprecated Use generateArchesURL from arches-vue-components instead.
+ * @see import { generateArchesURL } from '@/arches_vue_components/application'
  */
 export function generateArchesURL(
     urlName: string,
@@ -9,8 +9,8 @@ export function generateArchesURL(
 ) {
     console.warn(
         "[arches] generateArchesURL is deprecated. " +
-            "Import from arches-component-lab instead: " +
-            "import { generateArchesURL } from '@/arches_component_lab/application'",
+            "Import from arches-vue-components instead: " +
+            "import { generateArchesURL } from '@/arches_vue_components/application'",
     );
 
     // @ts-expect-error ARCHES_URLS is defined globally

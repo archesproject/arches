@@ -15,9 +15,9 @@ import { generateArchesURL } from '@/arches/utils/generate-arches-url.ts';
 
 
 /**
- * @deprecated Use createVueApplication from arches-component-lab instead.
+ * @deprecated Use createVueApplication from arches-vue-components instead.
  * This version will be removed in a future release and does not include Pinia support.
- * @see import { createVueApplication } from '@/arches_component_lab/application'
+ * @see import { createVueApplication } from '@/arches_vue_components/application'
  */
 export default async function createVueApplication(
     vueComponent,
@@ -26,8 +26,8 @@ export default async function createVueApplication(
 ) {
     console.warn(
         '[arches] createVueApplication is deprecated. ' +
-        'Import from arches-component-lab instead: ' +
-        "import { createVueApplication } from '@/arches_component_lab/application'"
+        'Import from arches-vue-components instead: ' +
+        "import { createVueApplication } from '@/arches_vue_components/application'"
     );
 
     /**

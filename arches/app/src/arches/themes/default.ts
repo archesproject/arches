@@ -11,8 +11,8 @@ const archesColors = Object.freeze({
 });
 
 /**
- * @deprecated Use ArchesPreset from arches-component-lab instead.
- * @see import { ArchesPreset } from '@/arches_component_lab/themes'
+ * @deprecated Use ArchesPreset from arches-vue-components instead.
+ * @see import { ArchesPreset } from '@/arches_vue_components/themes'
  */
 export const ArchesPreset = definePreset(Aura, {
     primitive: {
@@ -53,8 +53,8 @@ export const ArchesPreset = definePreset(Aura, {
 });
 
 /**
- * @deprecated Use DEFAULT_THEME from arches-component-lab instead.
- * @see import { DEFAULT_THEME } from '@/arches_component_lab/themes'
+ * @deprecated Use DEFAULT_THEME from arches-vue-components instead.
+ * @see import { DEFAULT_THEME } from '@/arches_vue_components/themes'
  */
 export const DEFAULT_THEME = {
     theme: {
