@@ -6,17 +6,17 @@ import { useGettext } from "vue3-gettext";
 import ReferenceSelectWidgetEditor from "@/arches_controlled_lists/widgets/ReferenceSelectWidget/components/ReferenceSelectWidgetEditor.vue";
 import ReferenceSelectWidgetViewer from "@/arches_controlled_lists/widgets/ReferenceSelectWidget/components/ReferenceSelectWidgetViewer.vue";
 
-import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
-import { useLanguageStore } from "@/arches_component_lab/stores/useLanguageStore.ts";
+import { EDIT, VIEW } from "@/arches_vue_components/widgets/constants.ts";
+import { useLanguageStore } from "@/arches_vue_components/stores/useLanguageStore.ts";
 import { buildReferenceSelectAliasedNodeData } from "@/arches_controlled_lists/datatypes/reference-select/utils.ts";
 
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
-import type { Language } from "@/arches_component_lab/types.ts";
+import type { WidgetMode } from "@/arches_vue_components/widgets/types";
+import type { Language } from "@/arches_vue_components/types";
 import type {
     ReferenceSelectAliasedNodeData,
     ReferenceSelectDatatypeCardXNodeXWidgetData,
     ReferenceSelectNodeValue,
-} from "@/arches_controlled_lists/datatypes/reference-select/types.ts";
+} from "@/arches_controlled_lists/datatypes/reference-select/types";
 
 const { aliasedNodeData, value } = defineProps<{
     mode: WidgetMode;

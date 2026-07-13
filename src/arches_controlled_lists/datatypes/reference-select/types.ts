@@ -3,7 +3,7 @@ import type { TreeNode } from "primevue/treenode";
 import type {
     AliasedNodeData,
     CardXNodeXWidgetData,
-} from "@/arches_component_lab/types.ts";
+} from "@/arches_vue_components/types.ts";
 
 export interface ReferenceSelectDatatypeCardXNodeXWidgetData
     extends CardXNodeXWidgetData {
