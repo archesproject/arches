@@ -96,8 +96,8 @@ urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 # Only handle i18n routing in active project. This will still handle the routes provided by Arches core and Arches applications,
 # but handling i18n routes in multiple places causes application errors.
 if settings.ROOT_URLCONF == __name__:
-    # Include component lab URLs if running as a project.
-    urlpatterns.append(path("", include("arches_component_lab.urls")))
+    # Include arches_vue_components URLs if running as a project.
+    urlpatterns.append(path("", include("arches_vue_components.urls")))
 
     if settings.SHOW_LANGUAGE_SWITCH is True:
         urlpatterns = i18n_patterns(*urlpatterns)
