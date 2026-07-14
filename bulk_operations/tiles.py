@@ -24,7 +24,10 @@ from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile, TileValidationError
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 
-from arches_querysets.datatypes.datatypes import DataTypeFactory
+from arches_querysets.datatypes.datatypes import (
+    DataTypeFactory,
+    GeojsonFeatureCollectionDataType,
+)
 from arches_querysets.utils.models import (
     field_attnames,
     get_nodegroups_here_and_below,
@@ -695,7 +698,12 @@ class TileTreeOperation:
     def after_update_all(self):
         for datatype in self.datatype_factory.datatype_instances.values():
             try:
-                datatype.after_update_all()
+                if isinstance(datatype, GeojsonFeatureCollectionDataType):
+                    datatype.after_update_all(
+                        changed_tiles=self.to_insert | self.to_update
+                    )
+                else:
+                    datatype.after_update_all()
             except:
                 # This wide catch can leave the DB in an unusable state, so not only is
                 # this the *last* operation, but durable=True on the transaction.
