@@ -7,14 +7,17 @@ import { buildReferenceSelectAliasedNodeData } from "@/arches_controlled_lists/d
 
 import type { ReferenceSelectAliasedNodeData } from "@/arches_controlled_lists/datatypes/reference-select/types";
 
-const { aliasedNodeData, systemLanguageCode } = defineProps<{
+const { aliasedNodeData, systemLanguageCode } = defineProps([
+    "aliasedNodeData",
+    "systemLanguageCode",
+]) as {
     aliasedNodeData?: ReferenceSelectAliasedNodeData | null;
     systemLanguageCode: string;
-}>();
+};
 
-const emit = defineEmits<{
-    initialized: [updatedValue: ReferenceSelectAliasedNodeData];
-}>();
+const emit = defineEmits(["initialized"]) as {
+    (event: "initialized", updatedValue: ReferenceSelectAliasedNodeData): void;
+};
 
 const { current: preferredLanguageCode } = useGettext();
 

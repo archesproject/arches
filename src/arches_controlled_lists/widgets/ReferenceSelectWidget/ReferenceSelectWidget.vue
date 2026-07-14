@@ -18,21 +18,36 @@ import type {
     ReferenceSelectNodeValue,
 } from "@/arches_controlled_lists/datatypes/reference-select/types";
 
-const { aliasedNodeData, value } = defineProps<{
+const { aliasedNodeData, value } = defineProps([
+    "mode",
+    "nodeAlias",
+    "graphSlug",
+    "cardXNodeXWidgetData",
+    "aliasedNodeData",
+    "value",
+]) as {
     mode: WidgetMode;
     nodeAlias?: string;
     graphSlug?: string;
     cardXNodeXWidgetData?: ReferenceSelectDatatypeCardXNodeXWidgetData;
     aliasedNodeData?: ReferenceSelectAliasedNodeData | null;
     value?: ReferenceSelectNodeValue[] | null;
-}>();
+};
 
-const emit = defineEmits<{
-    "update:isLoading": [isLoading: boolean];
-    "update:value": [updatedValue: ReferenceSelectNodeValue[]];
-    "update:aliasedNodeData": [updatedValue: ReferenceSelectAliasedNodeData];
-    initialized: [updatedValue: ReferenceSelectAliasedNodeData];
-}>();
+const emit = defineEmits([
+    "update:isLoading",
+    "update:value",
+    "update:aliasedNodeData",
+    "initialized",
+]) as {
+    (event: "update:isLoading", isLoading: boolean): void;
+    (event: "update:value", updatedValue: ReferenceSelectNodeValue[]): void;
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: ReferenceSelectAliasedNodeData,
+    ): void;
+    (event: "initialized", updatedValue: ReferenceSelectAliasedNodeData): void;
+};
 
 const { current: preferredLanguageCode } = useGettext();
 const languageStore = useLanguageStore();
