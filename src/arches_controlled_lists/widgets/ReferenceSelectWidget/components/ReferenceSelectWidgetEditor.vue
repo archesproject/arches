@@ -24,15 +24,26 @@ const {
     graphSlug,
     nodeAlias,
     systemLanguageCode,
-} = defineProps<{
+} = defineProps([
+    "aliasedNodeData",
+    "cardXNodeXWidgetData",
+    "graphSlug",
+    "nodeAlias",
+    "systemLanguageCode",
+]) as {
     aliasedNodeData: ReferenceSelectAliasedNodeData | null;
     cardXNodeXWidgetData?: ReferenceSelectDatatypeCardXNodeXWidgetData;
     graphSlug?: string;
     nodeAlias?: string;
     systemLanguageCode: string;
-}>();
+};
 
-const emit = defineEmits<{
+const emit = defineEmits([
+    "update:isLoading",
+    "update:value",
+    "update:aliasedNodeData",
+    "initialized",
+]) as {
     (event: "update:isLoading", updatedValue: boolean): void;
     (event: "update:value", updatedValue: ReferenceSelectNodeValue[]): void;
     (
@@ -40,7 +51,7 @@ const emit = defineEmits<{
         updatedValue: ReferenceSelectAliasedNodeData,
     ): void;
     (event: "initialized", updatedValue: ReferenceSelectAliasedNodeData): void;
-}>();
+};
 
 const { current: preferredLanguageCode } = useGettext();
 
