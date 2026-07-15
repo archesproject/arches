@@ -28,12 +28,45 @@ import arches.app.utils.data_management.resources.remover as resource_remover
 
 class Command(BaseCommand):
     """
-    Commands for managing Arches functions
+    Commands for managing Arches resources
 
     """
 
+    help = (
+        "Manage Arches resource instances.\n\n"
+        "Operations:\n"
+        "  remove_resources      Delete resource instances, optionally filtered by graph.\n"
+        "  clear_edit_log        Truncate the edit log, optionally filtered by graph.\n"
+        "  calculate_descriptors Recalculate and persist the name, description, and\n"
+        "                        map_popup descriptors for resource instances without\n"
+        "                        triggering an Elasticsearch (re)index.  Useful for\n"
+        "                        correcting stale or missing descriptor values after a\n"
+        "                        data migration.  Processes resources in batches and\n"
+        "                        writes results back via a single bulk_update per batch.\n"
+        "\n"
+        "Examples:\n"
+        "  # Recalculate descriptors for every resource (skips confirmation prompt):\n"
+        "  python manage.py resources calculate_descriptors --yes\n"
+        "\n"
+        "  # Recalculate descriptors for one Resource Model only:\n"
+        "  python manage.py resources calculate_descriptors -g <graph-uuid> --yes\n"
+        "\n"
+        "  # Recalculate descriptors only for resources touched in a given transaction:\n"
+        "  python manage.py resources calculate_descriptors -t <transaction-uuid>\n"
+        "\n"
+        "  # Use a smaller batch size to reduce peak memory usage:\n"
+        "  python manage.py resources calculate_descriptors --yes --batch-size 500\n"
+    )
+
     def add_arguments(self, parser):
-        parser.add_argument("operation", nargs="?")
+        parser.add_argument(
+            "operation",
+            nargs="?",
+            help=(
+                "Operation to perform. One of: "
+                "'remove_resources', 'clear_edit_log', 'calculate_descriptors'."
+            ),
+        )
 
         parser.add_argument(
             "-y",
@@ -48,7 +81,12 @@ class Command(BaseCommand):
             "--graph",
             action="store",
             dest="graph",
-            help="A graphid of the Resource Model you would like to remove all instances from.",
+            help=(
+                "UUID of the Resource Model (graph) to filter by. "
+                "For 'remove_resources': only instances of this graph are deleted. "
+                "For 'calculate_descriptors': only resources of this graph have "
+                "their descriptors recalculated."
+            ),
         )
 
         parser.add_argument(
