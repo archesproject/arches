@@ -1,5 +1,6 @@
 /* eslint-disable */
 
+const fs = require('fs');
 const Path = require('path');
 
 // vue's compiler can't find a tsconfig.json for a regular (non-editable) pip install, so
@@ -17,25 +18,29 @@ function requireVueLoaderWithTypeResolutionPatch() {
         );
     }
 
+    const frontendConfigurationDirectory = Path.join(__dirname, '..', '..', 'frontend_configuration');
+    const { compilerOptions: { paths: tsconfigPathsRelativeToFrontendConfiguration } } = JSON.parse(
+        fs.readFileSync(Path.join(frontendConfigurationDirectory, 'tsconfig-paths.json'), 'utf-8')
+    );
+
+    const archesApplicationPathAliases = Object.fromEntries(
+        Object.entries(tsconfigPathsRelativeToFrontendConfiguration).map(([alias, relativePaths]) => [
+            alias,
+            relativePaths.map((relativePath) => Path.resolve(frontendConfigurationDirectory, relativePath)),
+        ])
+    );
+
+    const virtualTsconfigContent = JSON.stringify({
+        compilerOptions: {
+            moduleResolution: 'bundler',
+            module: 'ESNext',
+            paths: archesApplicationPathAliases,
+        },
+    });
+
     const originalCompileScript = vueSingleFileComponentCompiler.compileScript;
     vueSingleFileComponentCompiler.compileScript = function (descriptor, options) {
         const tsConfigPath = Path.join(global.SITE_PACKAGES_DIRECTORY, 'tsconfig.json');
-
-        const archesApplicationPathAliases = [
-            Path.join(global.APP_ROOT, 'src') + '/*',
-            ...global.ARCHES_APPLICATIONS.map((archesApplication) => (
-                Path.join(global.ARCHES_APPLICATIONS_PATHS[archesApplication], 'src') + '/*'
-            )),
-            Path.join(global.ROOT_DIR, 'app', 'src') + '/*',
-        ];
-
-        const virtualTsconfigContent = JSON.stringify({
-            compilerOptions: {
-                moduleResolution: 'bundler',
-                module: 'ESNext',
-                paths: { '@/*': archesApplicationPathAliases },
-            },
-        });
 
         const virtualFileSystem = {
             fileExists(filePath) {
