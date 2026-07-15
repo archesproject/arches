@@ -6,10 +6,7 @@ import re
 
 from django.utils.translation import get_language, gettext as _
 
-# This duplicates the configuration declared in migration 0004,
-# but on first package load, the function will be re-registered, because
-# the .py file has not yet been placed in the destination folder.
-# Re-registration will overwrite whatever the migration inserted.
+
 details = {
     "functionid": "00b2d15a-fda0-4578-b79a-784e4138664b",
     "name": "Multi-card Resource Descriptor",
