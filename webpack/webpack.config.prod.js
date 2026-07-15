@@ -24,6 +24,8 @@ module.exports = () => {
                                     drop_console: true,
                                 },
                                 mangle: true,
+                                keep_classnames: true,
+                                keep_fnames: true,
                             },
                         }),
                     ],
