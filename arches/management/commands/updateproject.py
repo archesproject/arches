@@ -22,11 +22,14 @@ class Command(BaseCommand):  # pragma: no cover
             "This will replace the following files in your project:\n"
             "  - .github/dependabot.yml\n"
             "  - eslint.config.mjs\n"
+            "This will also delete your project's entire webpack/ directory and recreate it "
+            "from scratch, including:\n"
             "  - webpack/webpack-utils/build-filepath-lookup.js\n"
             "  - webpack/webpack-utils/patch-vue-compiler-sfc-type-resolution.js\n"
             "  - webpack/webpack.common.js\n"
             "  - webpack/webpack.config.dev.js\n"
             "  - webpack/webpack.config.prod.js\n"
+            "Any other files you've added under webpack/ will be lost.\n"
             "Continue? "
         )
 
