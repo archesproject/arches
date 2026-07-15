@@ -46,6 +46,7 @@ dependencies = [
     "elasticsearch>=8.19.1,<9.0.0",
     "filetype==1.2.0",
     "openpyxl==3.1.5",
+    "packaging==26.2",
     "pillow>=11.3.0",
     "polib==1.1.1",
     "psycopg2==2.9.11",
