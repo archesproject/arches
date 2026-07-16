@@ -175,6 +175,7 @@ class CalculateDescriptorsCommandTest(ArchesTestCase):
             "resources",
             "calculate_descriptors",
             transaction=str(transaction_id),
+            yes=True,
             stdout=StringIO(),
         )
 
