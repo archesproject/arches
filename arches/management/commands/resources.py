@@ -194,23 +194,25 @@ class Command(BaseCommand):
                 .distinct()
             )
             resources = resources.filter(resourceinstanceid__in=resource_ids)
-        elif not force:
-            if not utils.get_yn_input(
-                "Descriptors for all resources will be recalculated. continue?"
-            ):
-                return
 
         if graphid:
             resources = resources.filter(graph_id=graphid)
 
         total = resources.count()
-        self.stdout.write(f"Processing descriptors for {total} resource(s)...")
 
         if total == 0:
             self.stdout.write(
                 self.style.WARNING("No resources matched the given criteria.")
             )
             return
+
+        elif not force:
+            if not utils.get_yn_input(
+                f"Descriptors for {total} resources will be recalculated. Continue?"
+            ):
+                return
+
+        self.stdout.write(f"Processing descriptors for {total} resource(s)...")
 
         graph_ids = list(resources.values_list("graph_id", flat=True).distinct())
         descriptor_functions_by_graph = {}
