@@ -66,9 +66,12 @@ class MulticardResourceDescriptor(AbstractPrimaryDescriptorsFunction):
         if resource.tiles:
             tiles_by_nodegroup = {}
             for tile in resource.tiles:
-                ng = tile.nodegroup_id
-                if ng not in tiles_by_nodegroup:
-                    tiles_by_nodegroup[ng] = tile
+                nodegroup = tile.nodegroup_id
+                if (
+                    nodegroup not in tiles_by_nodegroup
+                    or tile.sortorder < tiles_by_nodegroup[nodegroup].sortorder
+                ):
+                    tiles_by_nodegroup[nodegroup] = tile
         else:
             tiles_by_nodegroup = None
 
@@ -79,10 +82,14 @@ class MulticardResourceDescriptor(AbstractPrimaryDescriptorsFunction):
             if tiles_by_nodegroup is not None:
                 tile = tiles_by_nodegroup.get(node.nodegroup_id)
             else:
-                tile = models.TileModel.objects.filter(
-                    resourceinstance_id=resource.resourceinstanceid,
-                    nodegroup_id=node.nodegroup_id,
-                ).first()
+                tile = (
+                    models.TileModel.objects.filter(
+                        resourceinstance_id=resource.resourceinstanceid,
+                        nodegroup_id=node.nodegroup_id,
+                    )
+                    .order_by("sortorder")
+                    .first()
+                )
 
             if tile is not None:
                 value = datatype.get_display_value(tile, node, language=lookup_language)
