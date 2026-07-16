@@ -73,23 +73,19 @@ class MulticardResourceDescriptor(AbstractPrimaryDescriptorsFunction):
                 ):
                     tiles_by_nodegroup[nodegroup] = tile
         else:
-            tiles_by_nodegroup = None
+            tiles_by_nodegroup = {}
+            nodegroup_ids = [node.nodegroup_id for node in nodes]
+            for tile in models.TileModel.objects.filter(
+                resourceinstance_id=resource.resourceinstanceid,
+                nodegroup_id__in=nodegroup_ids,
+            ).order_by("nodegroup_id", "sortorder"):
+                tiles_by_nodegroup.setdefault(tile.nodegroup_id, tile)
 
         datatype_factory = DataTypeFactory()
         for node in nodes:
             datatype = datatype_factory.get_instance(node.datatype)
 
-            if tiles_by_nodegroup is not None:
-                tile = tiles_by_nodegroup.get(node.nodegroup_id)
-            else:
-                tile = (
-                    models.TileModel.objects.filter(
-                        resourceinstance_id=resource.resourceinstanceid,
-                        nodegroup_id=node.nodegroup_id,
-                    )
-                    .order_by("sortorder")
-                    .first()
-                )
+            tile = tiles_by_nodegroup.get(node.nodegroup_id)
 
             if tile is not None:
                 value = datatype.get_display_value(tile, node, language=lookup_language)
