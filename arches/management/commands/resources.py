@@ -22,7 +22,7 @@ from arches.management.commands import utils
 from arches.app.models import models
 from arches.app.models.graph import Graph
 from arches.app.models.system_settings import settings
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 import arches.app.utils.data_management.resources.remover as resource_remover
 
 
