@@ -7,7 +7,7 @@
 <div>
     <div class="tabbed-report-tab-list" role="tablist">
         <!-- ko foreach: {data: tabs, as: 'tab'}  -->
-        <div tabindex="0" aria-controls="report-tabpanel" data-bind="onEnterkeyClick, onSpaceClick, click: function(){ $parent.setActiveTab($index()); }, css: { 'active': ko.unwrap($parent.activeTabIndex) === $index() }, attr: { 'aria-selected': ko.unwrap($parent.activeTabIndex) === $index() ? 'true' : 'false', 'aria-label': ko.unwrap(tab.name), 'data-tooltip': ko.unwrap(tab.name) }" class="report-tab" role="tab">
+        <div tabindex="0" aria-controls="report-tabpanel" data-bind="onEnterkeyClick, onSpaceClick, click: function(){ $parent.setActiveTab($index()); }, css: { 'active': ko.unwrap($parent.activeTabIndex) === $index() }, attr: { 'aria-selected': ko.unwrap($parent.activeTabIndex) === $index() ? 'true' : 'false', 'aria-controls': $parent.tabpanelId, 'aria-label': ko.unwrap(tab.name), 'data-tooltip': ko.unwrap(tab.name) }" class="report-tab" role="tab">
             <span aria-hidden="true"><i data-bind="attr: {class: ('fa '+ ko.unwrap(tab.icon))}"></i></span>
         </div>
         <!-- /ko -->
@@ -113,7 +113,7 @@
     }"></div>
     <!--/ko-->
     <!-- ko if: !tabs()[activeTabIndex()].empty_component || !activeTabEmpty()  -->
-    <div class="rp-report-section relative rp-report-section-root" id="report-tabpanel" role="tabpanel" data-bind="attr: {'aria-label': tabs()[activeTabIndex()].name}">
+    <div class="rp-report-section relative rp-report-section-root" role="tabpanel" data-bind="attr: {id: tabpanelId, 'aria-label': tabs()[activeTabIndex()].name}">
         <!-- ko if: tabs()[activeTabIndex()].side_component  -->
         <div class="tabbed-report-sidepanel-wrapper">
             <div class="tabbed-report-sidepanel" data-bind="component: {
