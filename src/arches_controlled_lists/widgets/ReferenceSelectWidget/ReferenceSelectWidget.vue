@@ -10,13 +10,12 @@ import { EDIT, VIEW } from "@/arches_vue_components/widgets/constants.ts";
 import { useLanguageStore } from "@/arches_vue_components/stores/useLanguageStore.ts";
 import { buildReferenceSelectAliasedNodeData } from "@/arches_controlled_lists/datatypes/reference-select/utils.ts";
 
-import type { WidgetMode } from "@/arches_vue_components/widgets/types";
 import type { Language } from "@/arches_vue_components/types";
 import type {
     ReferenceSelectAliasedNodeData,
-    ReferenceSelectDatatypeCardXNodeXWidgetData,
     ReferenceSelectNodeValue,
 } from "@/arches_controlled_lists/datatypes/reference-select/types";
+import type { ReferenceSelectWidgetProps } from "@/arches_controlled_lists/widgets/ReferenceSelectWidget/types.ts";
 
 const { aliasedNodeData, value } = defineProps([
     "mode",
@@ -25,14 +24,7 @@ const { aliasedNodeData, value } = defineProps([
     "cardXNodeXWidgetData",
     "aliasedNodeData",
     "value",
-]) as {
-    mode: WidgetMode;
-    nodeAlias?: string;
-    graphSlug?: string;
-    cardXNodeXWidgetData?: ReferenceSelectDatatypeCardXNodeXWidgetData;
-    aliasedNodeData?: ReferenceSelectAliasedNodeData | null;
-    value?: ReferenceSelectNodeValue[] | null;
-};
+]) as ReferenceSelectWidgetProps;
 
 const emit = defineEmits([
     "update:isLoading",
