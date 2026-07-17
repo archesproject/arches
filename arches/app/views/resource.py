@@ -52,7 +52,6 @@ from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
     user_can_delete_resource,
     user_can_read_resource,
-    user_can_edit_resource,
     get_nodegroups_by_perm,
 )
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
