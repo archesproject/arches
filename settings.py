@@ -126,7 +126,6 @@ SEARCH_THUMBNAILS = False
 
 INSTALLED_APPS = (
     "webpack_loader",
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -134,24 +133,29 @@ INSTALLED_APPS = (
     "django.contrib.staticfiles",
     "django.contrib.gis",
     "django_hosts",
-    "arches_vue_components",
-    "arches_querysets",
-    "arches",
     "arches.app.models",
     "arches.management",
     "guardian",
-    # "captcha",
+    "django_recaptcha",
     "revproxy",
     "corsheaders",
     "oauth2_provider",
     "django_celery_results",
-    # "silk",
+    "django_migrate_sql",
     "pgtrigger",
+    # "silk",
+    "arches_querysets",
+    "arches_vue_components",  # Ensure the project is listed before any other arches applications
 )
 
-# Placing this last ensures any templates provided by Arches Applications
-# take precedence over core arches templates in arches/app/templates.
-INSTALLED_APPS += ("arches.app",)
+# Placing this last ensures any templates and modules provided by
+# Arches Applications take precedence over core arches templates
+# in arches/app/templates.
+INSTALLED_APPS += (
+    "arches",
+    "arches.app",
+    "django.contrib.admin",
+)
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -241,7 +245,17 @@ LOGGING = {
             "handlers": ["file", "console"],
             "level": "WARNING",
             "propagate": True,
-        }
+        },
+        "arches_vue_components": {
+            "handlers": ["file", "console"],
+            "level": "WARNING",
+            "propagate": True,
+        },
+        "django.request": {
+            "handlers": ["file", "console"],
+            "level": "WARNING",
+            "propagate": True,
+        },
     },
 }
 
@@ -283,6 +297,15 @@ EXPORT_DATA_FIELDS_IN_CARD_ORDER = False
 
 # Identify the usernames and duration (seconds) for which you want to cache the time wheel
 CACHE_BY_USER = {"default": 3600 * 24, "anonymous": 3600 * 24}  # 24hrs  # 24hrs
+
+# Changing PERMISSION_FRAMEWORK requires reindexing.
+PERMISSION_FRAMEWORK = "arches_default_deny.ArchesDefaultDenyPermissionFramework"
+
+# Changing PERMISSION_DEFAULTS requires reindexing.
+PERMISSION_DEFAULTS = {}
+# PERMISSION_DEFAULTS = {
+#     "graphid": [{"id": "1", "type": "user", "permissions": ["no_access_to_resourceinstance"]}]
+# }
 
 TILE_CACHE_TIMEOUT = 600  # seconds
 CLUSTER_DISTANCE_MAX = 5000  # meters
