@@ -1,26 +1,18 @@
 from django.db.models import Q
-from arches import __version__ as _arches_version_str
-from packaging.version import Version
-
-arches_version = Version(_arches_version_str)
 from arches.app.models import models
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
 
 
 class CardNodeWidgetConfigMixin:
-    # Mixin for standard handling of card_x_node_x_widget data. Centralizes logic required to handle
-    # Arches Core 7 & 8 version model differences.
+    # Mixin for standard handling of card_x_node_x_widget data.
     @staticmethod
     def get_card_x_node_x_widget(graph_slug, node_alias):
         query_filter = Q(
             node__graph__slug=graph_slug,
             node__alias=node_alias,
+            node__source_identifier_id__isnull=True,
         )
-        if arches_version >= Version("8.0"):
-            query_filter = query_filter & Q(
-                node__source_identifier_id__isnull=True,
-            )
 
         card_x_node_x_widget = (
             models.CardXNodeXWidget.objects.select_related("node")
@@ -30,9 +22,9 @@ class CardNodeWidgetConfigMixin:
 
         if not card_x_node_x_widget:
             # Supply default widget configuration.
-            nodes = models.Node.objects.filter(graph__slug=graph_slug, alias=node_alias)
-            if arches_version >= Version("8.0"):
-                nodes = nodes.filter(source_identifier=None)
+            nodes = models.Node.objects.filter(
+                graph__slug=graph_slug, alias=node_alias, source_identifier=None
+            )
             node = nodes.get()
             datatype_factory = DataTypeFactory()
             d_data_type = datatype_factory.datatypes[node.datatype]
