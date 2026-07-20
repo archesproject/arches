@@ -36,11 +36,11 @@
                     <h3>
                         <label for="export-file-name" data-bind="text: $root.translations.chooseNameForFile"></label>
                     </h3>
-                    <input 
-                        type="text" 
+                    <input
+                        type="text"
                         id="export-file-name"
-                        size="69" 
-                        style="border: 1px solid #ddd; padding: 4px; border-radius: 2px;" 
+                        size="69"
+                        style="border: 1px solid #ddd; padding: 4px; border-radius: 2px;"
                         data-bind="textInput: $data.filename"
                     />
                 </div>
@@ -67,7 +67,7 @@
         <!-- ko if: loadDetails.graph && !loadDetails.number_of_resources -->
         <div class="etl-loading-metadata-value">
             <span  data-bind="text: loadDetails.graph + ' ' + $root.translations.isBeingPrepared"></span>
-            <i class="fa fa-spin fa-spinner"></i>    
+            <i class="fa fa-spin fa-spinner"></i>
         </div>
         <!-- /ko -->
         <!-- ko if: loadDetails.number_of_resources -->
@@ -84,11 +84,11 @@
         </div>
         <div class="summary-contents" style="padding-bottom: 20px;">
             <div class="etl-loading-metadata-value">
-                <a 
-                    class="file-listing-link" 
+                <a
+                    class="file-listing-link"
                     style="color: blue;"
-                    download 
-                    data-bind="text: loadDetails.zipfile.name, attr: { href: '/temp_file/'+loadDetails.zipfile.fileid }"
+                    download
+                    data-bind="text: loadDetails.zipfile.name, attr: { href: exportFilename }"
                 ></a>
             </div>
         </div>
@@ -100,8 +100,8 @@
         <div class="summary-contents" style="padding-bottom: 20px;">
             <!-- ko foreach: { data: loadDetails.skipped_files, as: 'file' } -->
             <div class="etl-loading-metadata-value">
-                <a 
-                    class="file-listing-link" 
+                <a
+                    class="file-listing-link"
                     style="color: blue;"
                     data-bind="text: file.name, attr: { download: file.name, href: file.url }"
                 ></a>
