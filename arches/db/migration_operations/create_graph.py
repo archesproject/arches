@@ -30,7 +30,7 @@ class CreateGraph(ArchesPackageMigration):
         Graph.objects.filter(graphid=self.graphid).delete()
 
     def describe(self):
-        return "Creates a graph with id %s" % self.graphid
+        return f"Creates a graph with id {self.graphid}"
 
     @staticmethod
     def as_migration_string(op: dict) -> str:
