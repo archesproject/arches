@@ -36,7 +36,7 @@ const ExcelFileExportViewModel = function(params) {
     this.filename = ko.observable();
 
     this.exportFilename = ko.computed(function() {
-        if (!ko.unwrap(self.loadDetails))
+        if (!ko.unwrap(self.loadDetails)?.zipfile?.fileid)
             return '';
         const url = `${arches.urls.url_subpath}/temp_file/${ko.unwrap(self.loadDetails).zipfile.fileid}`;
         return url.replace('//', '/');
