@@ -94,9 +94,12 @@ class UpdateGraphFromJSON(ArchesPackageMigration):
             graph_publication_id=current_publication_id
         ).update(graph_publication=previous_publication)
 
-        models.GraphXPublishedGraph.objects.get(
-            publicationid=current_publication_id
-        ).delete()
+        try:
+            models.GraphXPublishedGraph.objects.get(
+                publicationid=current_publication_id
+            ).delete()
+        except models.GraphXPublishedGraph.DoesNotExist:
+            pass
 
     def describe(self):
         return "Updates a graph from exported JSON"
