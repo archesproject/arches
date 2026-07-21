@@ -612,11 +612,10 @@ class ResourceEditLogView(BaseManagerView):
                     .filter(nodegroupid__in=permitted_nodegroupids)
                     .order_by("-timestamp")[:100]
                 )
-            edited_ids = list({edit.resourceinstanceid for edit in recent_edits})
             permitted_ids = {
-                res_id
-                for res_id in edited_ids
-                if user_can_read_resource(request.user, res_id)
+                resource_id
+                for resource_id in {edit.resourceinstanceid for edit in recent_edits}
+                if user_can_read_resource(request.user, resource_id)
             }
             recent_edits = [
                 edit
