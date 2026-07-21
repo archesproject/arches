@@ -36,9 +36,9 @@ const ExcelFileExportViewModel = function(params) {
     this.filename = ko.observable();
 
     this.exportFilename = ko.computed(function() {
-        if (!self.loadDetails)
+        if (!ko.unwrap(self.loadDetails))
             return '';
-        const url = `${arches.urls.url_subpath}/temp_file/${self.loadDetails.zipfile.fileid}`;
+        const url = `${arches.urls.url_subpath}/temp_file/${ko.unwrap(self.loadDetails).zipfile.fileid}`;
         return url.replace('//', '/');
     });
 
