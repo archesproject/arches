@@ -20,17 +20,16 @@ class Command(BaseCommand):  # pragma: no cover
         answer = input(
             "This operation will upgrade your project to version 8.1\n"
             "This will replace the following files in your project:\n"
-            "  - <project>/apps.py\n"
-            "  - .github/actions/build-and-test-branch/action.yml\n"
             "  - .github/dependabot.yml\n"
-            "  - .github/workflows/main.yml\n"
             "  - eslint.config.mjs\n"
-            "  - tsconfig.json\n"
-            "  - vitest.config.mts\n"
+            "This will also delete your project's entire webpack/ directory and recreate it "
+            "from scratch, including:\n"
             "  - webpack/webpack-utils/build-filepath-lookup.js\n"
+            "  - webpack/webpack-utils/patch-vue-compiler-sfc-type-resolution.js\n"
             "  - webpack/webpack.common.js\n"
             "  - webpack/webpack.config.dev.js\n"
             "  - webpack/webpack.config.prod.js\n"
+            "Any other files you've added under webpack/ will be lost.\n"
             "Continue? "
         )
 
@@ -69,5 +68,19 @@ class Command(BaseCommand):  # pragma: no cover
             os.path.join(settings.APP_ROOT, "..", ".github", "dependabot.yml"),
         )
         self.stdout.write("Done!")
+
+        # Updates webpack config files
+        if os.path.isdir(os.path.join(settings.APP_ROOT, "..", "webpack")):
+            self.stdout.write("Removing previous webpack directory...")
+            shutil.rmtree(
+                os.path.join(settings.APP_ROOT, "..", "webpack"), ignore_errors=True
+            )
+            self.stdout.write("Done!")
+
+        self.stdout.write("Creating updated webpack directory at project root...")
+        shutil.copytree(
+            os.path.join(settings.ROOT_DIR, "install", "arches-templates", "webpack"),
+            os.path.join(settings.APP_ROOT, "..", "webpack"),
+        )
 
         self.stdout.write("Project successfully updated to version 8.1")

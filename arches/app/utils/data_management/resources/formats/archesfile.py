@@ -176,7 +176,7 @@ class ArchesFileReader(Reader):
                     )
                     defaults = {
                         "graph_id": graph_uuid,
-                        "legacyid": resource["resourceinstance"]["legacyid"],
+                        "legacyid": resource["resourceinstance"].get("legacyid"),
                     }
                     new_values = {
                         "resourceinstanceid": resourceinstanceid,
