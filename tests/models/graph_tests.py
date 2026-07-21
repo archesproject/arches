@@ -2336,7 +2336,6 @@ class DraftGraphTests(ArchesTestCase):
             Graph, "update_permissions_from_serialized_graph"
         ) as mock_update_permissions:
             Graph(published_graph.serialized_graph)
-            Graph(published_graph.serialized_graph)
 
         mock_update_permissions.assert_not_called()
         self.assertEqual(get_perms(group, nodegroup), ["no_access_to_nodegroup"])
