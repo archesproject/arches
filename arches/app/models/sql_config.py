@@ -43,4 +43,42 @@ sql_items = [
         reverse_sql="drop procedure __arches_check_tile_cardinality_violation_for_load;",
         replace=True,
     ),
+    SQLItem(
+        "__arches_slugify",
+        format_file_into_sql("__arches_slugify.sql", "sql/functions"),
+        reverse_sql="drop function __arches_slugify;",
+        replace=True,
+    ),
+    SQLItem(
+        "__arches_get_node_value_sql",
+        format_file_into_sql("__arches_get_node_value_sql.sql", "sql/functions"),
+        reverse_sql="drop function __arches_get_node_value_sql;",
+        replace=True,
+    ),
+    SQLItem(
+        "__arches_create_nodegroup_view",
+        format_file_into_sql("__arches_create_nodegroup_view.sql", "sql/functions"),
+        reverse_sql="drop function __arches_create_nodegroup_view;",
+        dependencies=[("models", "__arches_get_node_value_sql")],
+        replace=True,
+    ),
+    SQLItem(
+        "__arches_create_branch_views",
+        format_file_into_sql("__arches_create_branch_views.sql", "sql/functions"),
+        reverse_sql="drop function __arches_create_branch_views;",
+        dependencies=[("models", "__arches_create_nodegroup_view")],
+        replace=True,
+    ),
+    SQLItem(
+        "__arches_create_resource_model_views",
+        format_file_into_sql(
+            "__arches_create_resource_model_views.sql", "sql/functions"
+        ),
+        reverse_sql="drop function __arches_create_resource_model_views;",
+        dependencies=[
+            ("models", "__arches_slugify"),
+            ("models", "__arches_create_branch_views"),
+        ],
+        replace=True,
+    ),
 ]
