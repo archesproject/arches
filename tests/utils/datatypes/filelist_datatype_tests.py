@@ -158,9 +158,7 @@ class FileListDataTypeTests(TestCase):
             self.assertEqual(file_count_after - file_count_before, 1)
 
         with self.subTest("no File record is created for the existing file"):
-            self.assertFalse(
-                FileModel.objects.filter(fileid=existing_file_id).exists()
-            )
+            self.assertFalse(FileModel.objects.filter(fileid=existing_file_id).exists())
 
     def test_get_files_from_request(self):
         datatype = DataTypeFactory().get_instance("file-list")
