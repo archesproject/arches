@@ -90,13 +90,6 @@ class Graph(models.GraphModel):
                     ):
                         setattr(self, key, value)
 
-                try:
-                    self.update_permissions_from_serialized_graph(args[0])
-                except (
-                    AttributeError
-                ):  # AttributeError happens if attempting to update permissions on a non-existent NodeGroup
-                    pass
-
                 nodegroups = dict(
                     (item["nodegroupid"], item) for item in args[0]["nodegroups"]
                 )
@@ -1752,7 +1745,7 @@ class Graph(models.GraphModel):
                                 group_permission["object_pk"]
                             ]
                         )
-                        user_permissions_to_create.append(
+                        group_permissions_to_create.append(
                             GroupObjectPermission(**group_permission)
                         )
 
@@ -2759,7 +2752,12 @@ class Graph(models.GraphModel):
             updated_graph.widgets = widget_dict
             updated_graph.is_active = self.is_active
 
-            updated_graph.update_permissions_from_serialized_graph(serialized_graph)
+            try:
+                updated_graph.update_permissions_from_serialized_graph(serialized_graph)
+            except (
+                AttributeError
+            ):  # AttributeError happens if attempting to update permissions on a non-existent NodeGroup
+                pass
 
             relatable_resource_model_nodes = models.Node.objects.filter(
                 graph_id__in=serialized_graph["relatable_resource_model_ids"],

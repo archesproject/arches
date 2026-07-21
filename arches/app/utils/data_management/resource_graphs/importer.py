@@ -109,6 +109,14 @@ def import_graph(graphs, overwrite_graphs=True, user=None):
 
             try:
                 graph = Graph(resource)
+
+                try:
+                    graph.update_permissions_from_serialized_graph(resource)
+                except (
+                    AttributeError
+                ):  # AttributeError happens if attempting to update permissions on a non-existent NodeGroup
+                    pass
+
                 ontology_classes = [
                     str(f["source"])
                     for f in OntologyClass.objects.all().values("source")
