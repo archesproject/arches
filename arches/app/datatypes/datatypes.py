@@ -2259,7 +2259,7 @@ class ResourceInstanceDataType(BaseDataType):
     def post_tile_save(self, tile, nodeid, request):
         ret = False
         sql = """
-            SELECT * FROM __arches_create_resource_x_resource_relationships('%s') as t;
+            SELECT * FROM __arches_refresh_tile_resource_relationships('%s') as t;
         """ % (
             tile.pk
         )
