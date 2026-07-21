@@ -22,6 +22,11 @@ class CreateGraph(ArchesPackageMigration):
         )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        from arches.app.models import models
+
+        models.ResourceInstance.objects.filter(graph_id=self.graphid).update(
+            graph_publication=None
+        )
         Graph.objects.filter(graphid=self.graphid).delete()
 
     def describe(self):
