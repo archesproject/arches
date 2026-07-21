@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "12778_add_loadstaging_index"),
+        ("models", "12779_add_multicard_resource_descriptor"),
     ]
 
     operations = [
