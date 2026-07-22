@@ -21,6 +21,7 @@ import logging
 import uuid
 from contextlib import contextmanager
 from copy import deepcopy
+from django.core.cache import caches
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connection
 from django.db.models import Q, prefetch_related_objects
@@ -1752,6 +1753,8 @@ class Graph(models.GraphModel):
                     GroupObjectPermission.objects.bulk_create(
                         group_permissions_to_create
                     )
+
+                transaction.on_commit(lambda: caches["user_permission"].clear())
 
     def get_user_permissions(self, force_recalculation=False):
         """
