@@ -102,7 +102,7 @@
         "async": "node_modules/requirejs-plugins/src/async",
         "text": "node_modules/requirejs-text/text",
         "jquery": "node_modules/jquery/dist/jquery.min",
-        "js-cookie": "node_modules/js-cookie/src/js.cookie",
+        "js-cookie": "node_modules/js-cookie/dist/js.cookie",
         "select-woo": "node_modules/select-woo/dist/js/selectWoo.full",
         "select-woo-src": "node_modules/select-woo/src/js/select2",
         "bootstrap": "node_modules/bootstrap/dist/js/bootstrap.min",
