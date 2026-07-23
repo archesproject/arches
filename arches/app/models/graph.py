@@ -1005,10 +1005,6 @@ class Graph(models.GraphModel):
         for node in copy_of_self.nodes.values():
             node.is_immutable = bool(node.is_immutable or self.is_copy_immutable)
 
-            if node.datatype == "geojson-feature-collection":
-                node.config["advancedStyle"] = ""
-                node.config["advancedStyling"] = False
-
         copy_of_self.pk = uuid.uuid4()
         node_map = {}
         card_map = {}
@@ -2212,10 +2208,8 @@ class Graph(models.GraphModel):
 
         if self.get_draft_graph():
             raise GraphValidationError(
-                _(
-                    "You cannot save a graph that has an active draft. \
-                        Please publish or delete the draft before saving this graph."
-                ),
+                _("You cannot save a graph that has an active draft. \
+                        Please publish or delete the draft before saving this graph."),
                 1019,
             )
 
