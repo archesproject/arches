@@ -13,6 +13,7 @@ export default function(params) {
 
     ReportViewModel.apply(this, [params]);
 
+    this.tabpanelId = 'report-tabpanel-' + Math.random().toString(16).slice(2);
     if (this.activeTabIndex() > self.tabs().length - 1) {
         this.activeTabIndex(0);
     }

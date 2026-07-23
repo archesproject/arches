@@ -29,6 +29,13 @@ class FileValidator(object):
                 and (settings.FILE_TYPE_CHECKING != "lenient" or extension is not None)
             ):
                 errors.append(f"File type is not permitted: {extension}")
+            case "docx":
+                try:
+                    with zipfile.ZipFile(io.BytesIO(file)) as zf:
+                        if "word/document.xml" not in zf.namelist():
+                            raise zipfile.BadZipFile("Missing word/document.xml")
+                except (zipfile.BadZipFile, KeyError):
+                    errors.append("Invalid docx file")
             case "xlsx":
                 try:
                     load_workbook(io.BytesIO(file), read_only=True)
@@ -66,7 +73,7 @@ class FileValidator(object):
         if settings.FILE_TYPE_CHECKING:
             contents = file.read()
             file_type = filetype.guess(contents)
-            if file_type is None or extension == "xlsx":
+            if file_type is None or extension in ("xlsx", "docx"):
                 errors = errors + self.test_unknown_filetypes(contents, extension)
                 return errors
 

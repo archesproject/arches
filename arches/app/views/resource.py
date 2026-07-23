@@ -53,6 +53,8 @@ from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
     user_can_edit_resource,
     user_can_delete_resource,
+    user_can_read_resource,
+    get_nodegroups_by_perm,
 )
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.utils.string_utils import str_to_bool
@@ -603,21 +605,36 @@ class ResourceEditLogView(BaseManagerView):
     def get(
         self, request, resourceid=None, view_template="views/resource/edit-log.htm"
     ):
+        permitted_nodegroupids = get_nodegroups_by_perm(
+            request.user, "models.read_nodegroup"
+        )
         transaction_id = request.GET.get("transactionid", None)
         if resourceid is None:
             if transaction_id:
                 recent_edits = models.EditLog.objects.filter(
-                    transactionid=transaction_id
+                    transactionid=transaction_id,
+                    nodegroupid__in=permitted_nodegroupids,
                 ).order_by("-timestamp")
             else:
                 recent_edits = (
-                    models.EditLog.objects.all()
-                    .exclude(resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+                    models.EditLog.objects.exclude(
+                        resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
+                    )
+                    .filter(nodegroupid__in=permitted_nodegroupids)
                     .order_by("-timestamp")[:100]
                 )
-            edited_ids = list({edit.resourceinstanceid for edit in recent_edits})
+            permitted_ids = {
+                resource_id
+                for resource_id in {edit.resourceinstanceid for edit in recent_edits}
+                if user_can_read_resource(request.user, resource_id)
+            }
+            recent_edits = [
+                edit
+                for edit in recent_edits
+                if edit.resourceinstanceid in permitted_ids
+            ]
             resources = Resource.objects.filter(
-                resourceinstanceid__in=edited_ids
+                resourceinstanceid__in=permitted_ids
             ).select_related("graph")
             edit_type_lookup = {
                 "create": _("Resource Created"),
