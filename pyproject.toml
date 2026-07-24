@@ -92,6 +92,7 @@ exclude = ["*.tests", "*.tests.*", "tests.*", "tests"]
 namespaces = false
 
 [tool.black]
+target-version = ["py311", "py312", "py313"]
 include = '\.pyi?$'
 exclude = '''
 /(
