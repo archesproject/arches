@@ -431,8 +431,7 @@ class SpatialViewTriggerTests(TransactionTestCase):
         )
 
         with connection.cursor() as cursor:
-            cursor.execute(
-                f"""
+            cursor.execute(f"""
                 SELECT
                     gid,
                     tileid,
@@ -454,8 +453,7 @@ class SpatialViewTriggerTests(TransactionTestCase):
                     domain_list,
                     other_spatialviews,
                     other_models_list
-                FROM public.{self.test_spatial_view.slug}_polygon"""
-            )
+                FROM public.{self.test_spatial_view.slug}_polygon""")
             rows = cursor.fetchall()
             self.assertTrue(len(rows) == 1)
             row = rows[0]

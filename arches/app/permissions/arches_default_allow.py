@@ -18,7 +18,6 @@ from arches.app.search.elasticsearch_dsl_builder import Bool, Ids, Terms, Nested
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.search.search import SearchEngine
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -81,13 +80,11 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
         )
 
         if not deny_read_exists or not deny_edit_exists:
-            logger.warning(
-                """
+            logger.warning("""
                 PROBLEM WITH INDEX - it appears that your index permissions are malformed.
                 This can happen when switching permission frameworks and may cause search
                 results to appear incorrectly or with invalid permissions.  You can correct it by reindexing arches.
-                """
-            )
+                """)
 
         result["can_read"] = (
             deny_read_exists

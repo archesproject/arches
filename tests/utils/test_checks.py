@@ -7,7 +7,6 @@ from django.core.management import call_command
 from django.core.management.base import SystemCheckError
 from django.test import SimpleTestCase, override_settings
 
-
 # these tests can be run from the command line via
 # python manage.py test tests.utils.test_checks.SystemCheckTests --settings="tests.test_settings"
 

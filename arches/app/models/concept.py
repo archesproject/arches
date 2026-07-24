@@ -32,7 +32,6 @@ from psycopg2.extensions import AsIs
 
 import logging
 
-
 logger = logging.getLogger(__name__)
 
 CORE_CONCEPTS = (
@@ -1410,13 +1409,10 @@ class Concept(object):
         in_use = False
         cursor = connection.cursor()
         for value in self.values:
-            sql = (
-                """
+            sql = """
                 SELECT count(*) from tiles t, jsonb_each_text(t.tiledata) as json_data
                 WHERE json_data.value = '%s'
-            """
-                % value.id
-            )
+            """ % value.id
             cursor.execute(sql)
             rows = cursor.fetchall()
             if rows[0][0] > 0:

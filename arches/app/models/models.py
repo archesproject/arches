@@ -39,7 +39,6 @@ from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
 from django.conf import settings
 
-
 logger = logging.getLogger(__name__)
 
 

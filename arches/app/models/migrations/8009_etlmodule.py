@@ -216,12 +216,10 @@ add_functions_to_get_nodegroup_tree = """
     $func$;
     """
 
-remove_functions_to_get_nodegroup_tree = [
-    """
+remove_functions_to_get_nodegroup_tree = ["""
     DROP FUNCTION public.__get_nodegroup_tree(nodegroup_id uuid);
     DROP FUNCTION public.__get_nodegroup_tree_by_graph(graph_id uuid);
-    """
-]
+    """]
 
 add_staging_to_tile_function = """
     CREATE OR REPLACE FUNCTION public.__arches_staging_to_tile(load_id uuid)

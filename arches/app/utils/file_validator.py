@@ -24,9 +24,8 @@ class FileValidator(object):
                     )
                 else:
                     errors.append(f"File type is not permitted: {extension}")
-            case _ if (
-                extension not in settings.FILE_TYPES
-                and (settings.FILE_TYPE_CHECKING != "lenient" or extension is not None)
+            case _ if extension not in settings.FILE_TYPES and (
+                settings.FILE_TYPE_CHECKING != "lenient" or extension is not None
             ):
                 errors.append(f"File type is not permitted: {extension}")
             case "docx":

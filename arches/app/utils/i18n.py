@@ -17,7 +17,6 @@ from django.contrib.gis.db.models import Model
 from django.utils.translation import get_language, get_language_info
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
-
 ArchesPOFile = namedtuple("ArchesPOFile", ["language", "file"])
 
 

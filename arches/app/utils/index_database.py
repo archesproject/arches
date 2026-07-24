@@ -23,7 +23,6 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils import import_class_from_string
 from typing import Iterable
 
-
 logger = logging.getLogger(__name__)
 serialized_graphs = {}
 
@@ -502,9 +501,7 @@ def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
                         and v.valuetype in ({1})
                         and (d.relationtype = 'narrower' or d.relationtype = 'hasTopConcept')
                 ) SELECT valueid, value, conceptid, languageid, valuetype FROM children_inclusive ORDER BY depth;
-            """.format(
-                topConcept, valueTypes
-            )
+            """.format(topConcept, valueTypes)
 
             cursor.execute(sql)
             for conceptValue in cursor.fetchall():

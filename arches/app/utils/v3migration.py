@@ -48,9 +48,7 @@ class DataValueConverter:
             # coordinates in polygons and remove any repeated points
             sql = """
             SELECT ST_AsGeoJSON(ST_RemoveRepeatedPoints(ST_Reverse(ST_ForceRHR('{0}'))));
-            """.format(
-                value
-            )
+            """.format(value)
             self.dbcursor.execute(sql)
             rows = self.dbcursor.fetchall()
 

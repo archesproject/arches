@@ -41,7 +41,6 @@ from arches.app.views.resource import (
     get_resource_relationship_types,
 )
 
-
 logger = logging.getLogger(__name__)
 
 

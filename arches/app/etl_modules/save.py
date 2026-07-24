@@ -37,25 +37,21 @@ def disable_tile_triggers(cursor, loadid):
     log_event_details(
         cursor, loadid, "done|Disabling the triggers in the tile table..."
     )
-    cursor.execute(
-        """
+    cursor.execute("""
         ALTER TABLE TILES DISABLE TRIGGER __arches_check_excess_tiles_trigger;
         ALTER TABLE TILES DISABLE TRIGGER __arches_trg_update_spatial_attributes;
-    """
-    )
+    """)
 
 
 def reenable_tile_triggers(cursor, loadid):
     log_event_details(
         cursor, loadid, "done|Reenabling the triggers in the tile table..."
     )
-    cursor.execute(
-        """
+    cursor.execute("""
         COMMIT;
         ALTER TABLE TILES ENABLE TRIGGER __arches_check_excess_tiles_trigger;
         ALTER TABLE TILES ENABLE TRIGGER __arches_trg_update_spatial_attributes;
-    """
-    )
+    """)
 
 
 def _save_to_tiles(cursor, loadid):

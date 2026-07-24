@@ -21,9 +21,7 @@ class Migration(migrations.Migration):
         '{{"i18n_properties": ["placeholder"]}}'
         WHERE datatype = 'resource-instance';
 
-    """.format(
-        settings.LANGUAGE_CODE
-    )
+    """.format(settings.LANGUAGE_CODE)
 
     reverse_sql = """
         UPDATE public.cards_x_nodes_x_widgets
@@ -36,9 +34,7 @@ class Migration(migrations.Migration):
         WHERE datatype = 'resource-instance';
 
 
-    """.format(
-        settings.LANGUAGE_CODE
-    )
+    """.format(settings.LANGUAGE_CODE)
 
     operations = [
         migrations.RunSQL(sql, reverse_sql),

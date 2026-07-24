@@ -20,7 +20,6 @@ from django.utils.translation import gettext as _
 from datetime import datetime
 import logging
 
-
 details = {
     "searchcomponentid": "69695d63-6f03-4536-8da9-841b07116381",
     "name": "Standard Search View",

@@ -24,9 +24,7 @@ class Migration(migrations.Migration):
         '{{"i18n_properties": ["url_label_placeholder", "url_placeholder"]}}'
         WHERE datatype = 'url';
 
-    """.format(
-        settings.LANGUAGE_CODE
-    )
+    """.format(settings.LANGUAGE_CODE)
 
     reverse_sql = """
         UPDATE public.cards_x_nodes_x_widgets
@@ -40,9 +38,7 @@ class Migration(migrations.Migration):
         WHERE datatype = 'url';
 
 
-    """.format(
-        settings.LANGUAGE_CODE
-    )
+    """.format(settings.LANGUAGE_CODE)
 
     operations = [
         migrations.RunSQL(sql, reverse_sql),

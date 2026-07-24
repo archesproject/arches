@@ -7,7 +7,6 @@ from arches.app.models.models import UserPreference
 from arches.app.models import models
 from django.test.client import Client
 
-
 # these tests can be run from the command line via
 # python manage.py test tests.views.user_preference_api_tests --settings="tests.test_settings"
 

@@ -305,10 +305,8 @@ class Tile(models.TileModel):
                                 match = False
                                 break
                         if match is True:
-                            message = _(
-                                "This card violates a unique constraint. \
-                                The following value is already saved: "
-                            )
+                            message = _("This card violates a unique constraint. \
+                                The following value is already saved: ")
                             raise TileValidationError(
                                 message + (", ").join(duplicate_values)
                             )

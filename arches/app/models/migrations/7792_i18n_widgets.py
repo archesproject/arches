@@ -14,15 +14,11 @@ class Migration(migrations.Migration):
         SET CONSTRAINTS ALL IMMEDIATE;
         UPDATE public.cards_x_nodes_x_widgets SET label=json_build_object('{0}', label);
         SET CONSTRAINTS ALL DEFERRED;
-    """.format(
-        settings.LANGUAGE_CODE
-    )
+    """.format(settings.LANGUAGE_CODE)
 
     reverse_sql = """
         UPDATE public.cards_x_nodes_x_widgets SET label=label::jsonb->>'{0}'::text;
-    """.format(
-        settings.LANGUAGE_CODE
-    )
+    """.format(settings.LANGUAGE_CODE)
 
     operations = [
         migrations.RunSQL(sql, reverse_sql),

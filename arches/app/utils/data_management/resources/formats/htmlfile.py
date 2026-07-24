@@ -11,7 +11,6 @@ from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from pathlib import Path
 
-
 logger = logging.getLogger(__name__)
 
 

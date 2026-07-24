@@ -16,17 +16,13 @@ class Migration(migrations.Migration):
         UPDATE public.graphs SET description=json_build_object('{0}', description);
         UPDATE public.graphs SET subtitle=json_build_object('{0}', subtitle);
         SET CONSTRAINTS ALL DEFERRED;
-    """.format(
-        settings.LANGUAGE_CODE
-    )
+    """.format(settings.LANGUAGE_CODE)
 
     reverse_sql = """
         UPDATE public.graphs SET name=name::jsonb->>'{0}'::text;
         UPDATE public.graphs SET description=description::jsonb->>'{0}'::text;
         UPDATE public.graphs SET subtitle=subtitle::jsonb->>'{0}'::text;
-    """.format(
-        settings.LANGUAGE_CODE
-    )
+    """.format(settings.LANGUAGE_CODE)
 
     operations = [
         migrations.RunSQL(sql, reverse_sql),

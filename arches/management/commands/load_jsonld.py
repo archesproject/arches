@@ -34,7 +34,6 @@ from arches.app.search.search_engine_factory import SearchEngineInstance
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.models.system_settings import settings
 
-
 # This is a map of graph directory name to graph UUID
 try:
     graph_uuid_map = settings.MODEL_NAME_UUID_MAP
@@ -318,7 +317,7 @@ class Command(BaseCommand):
                 blocks = [b for b in blocks if b[0] not in ["_", "."]]
                 if "," in block:
                     # {slice},{max-slices}
-                    (cslice, mslice) = block.split(",")
+                    cslice, mslice = block.split(",")
                     cslice = int(cslice) - 1
                     mslice = int(mslice)
                     blocks = blocks[cslice::mslice]

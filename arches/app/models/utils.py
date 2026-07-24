@@ -1,7 +1,6 @@
 import warnings
 from pathlib import Path
 
-
 PRIOR_UPDATE_FIELDS_SENTINEL = []
 FUTURE_UPDATE_FIELDS_SENTINEL = []
 

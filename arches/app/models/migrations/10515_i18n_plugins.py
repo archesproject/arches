@@ -20,18 +20,14 @@ class Migration(migrations.Migration):
          ||
         '{{"i18n_properties": ["description"]}}';
         SET CONSTRAINTS ALL DEFERRED;
-    """.format(
-        settings.LANGUAGE_CODE
-    )
+    """.format(settings.LANGUAGE_CODE)
 
     reverse_sql = """
         UPDATE public.plugins SET name=name::jsonb->>'{0}'::text;
         UPDATE public.plugins
         set config = config - 'i18n_properties' ||
         json_build_object('description', jsonb_extract_path(config, 'description', '{0}'))::jsonb 
-    """.format(
-        settings.LANGUAGE_CODE
-    )
+    """.format(settings.LANGUAGE_CODE)
 
     operations = [
         migrations.RunSQL(sql, reverse_sql),

@@ -163,9 +163,7 @@ SELECT pg_terminate_backend(pid) FROM pg_stat_activity
         cursor.execute(terminate_sql)
 
         drop_query = """
-DROP DATABASE IF EXISTS {0};""".format(
-            arches_db["NAME"]
-        )
+DROP DATABASE IF EXISTS {0};""".format(arches_db["NAME"])
         print(drop_query)
         cursor.execute(drop_query)
 

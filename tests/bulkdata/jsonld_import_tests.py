@@ -162,8 +162,7 @@ class JSONLDImportTests(TransactionTestCase):
         # Mock a read() operation
         request.POST.__setitem__(
             "load_details",
-            textwrap.dedent(
-                """
+            textwrap.dedent("""
             {"result":
                 {"summary":
                     {"cumulative_files_size":255,
@@ -176,8 +175,7 @@ class JSONLDImportTests(TransactionTestCase):
                     }
                 }
             }
-            """
-            ),
+            """),
         )
         importer = JSONLDImporter(request=request)
         importer.prepare_temp_dir(request)  # ordinarily done with the .read() request

@@ -17,7 +17,6 @@ from arches.app.models import models
 from arches.app.utils.external_oauth_backend import ExternalOauthAuthenticationBackend
 from arches.app.utils.permission_backend import process_new_user
 
-
 logger = logging.getLogger(__name__)
 
 

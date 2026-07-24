@@ -14,7 +14,6 @@ from django.utils.crypto import get_random_string
 from arches import __version__
 from packaging.version import Version
 
-
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arches.settings")
 here = os.path.abspath(os.path.dirname(__file__))
 COMMANDS = {}
