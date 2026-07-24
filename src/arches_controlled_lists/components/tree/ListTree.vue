@@ -17,7 +17,6 @@ import {
 import { routeNames } from "@/arches_controlled_lists/routes.ts";
 import {
     findNodeInTree,
-    itemAsNode,
     listAsNode,
     nodeIsList,
 } from "@/arches_controlled_lists/utils.ts";
