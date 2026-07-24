@@ -2208,8 +2208,10 @@ class Graph(models.GraphModel):
 
         if self.get_draft_graph():
             raise GraphValidationError(
-                _("You cannot save a graph that has an active draft. \
-                        Please publish or delete the draft before saving this graph."),
+                _(
+                    "You cannot save a graph that has an active draft. \
+                        Please publish or delete the draft before saving this graph."
+                ),
                 1019,
             )
 
