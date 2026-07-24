@@ -131,7 +131,9 @@ export const getItemLabel = (
             valuetype_id: "",
         };
     }
-    return labels.sort(
+    // Sort a copy: mutating the reactive source array inside a computed
+    // getter would dirty the computed's own dependency, defeating caching.
+    return [...labels].sort(
         (a, b) =>
             rankLabel(b, preferredLanguageCode, systemLanguageCode) -
             rankLabel(a, preferredLanguageCode, systemLanguageCode),
