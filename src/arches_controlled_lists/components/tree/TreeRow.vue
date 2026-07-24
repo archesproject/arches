@@ -401,7 +401,7 @@ const acceptNewListShortcutEntry = async () => {
             class="actions"
         >
             <MoveRow
-                v-if="!isMultiSelecting"
+                v-if="!isMultiSelecting && node.key in selectedKeys"
                 v-model:expanded-keys="expandedKeys"
                 v-model:selected-keys="selectedKeys"
                 v-model:moving-item="movingItem"
