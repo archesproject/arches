@@ -3,10 +3,9 @@
 const fs = require('fs');
 const Path = require('path');
 
-// vue's compiler can't find a tsconfig.json for a regular (non-editable) pip install, so
-// defineProps<T>() type resolution breaks. We feed it a fake one in memory using its own fs
-// option. Don't move this below the vue-loader require. vue-loader grabs compileScript once when
-// it loads and never looks again.
+// We answer every tsconfig.json lookup vue's type resolver makes with our own config, so it
+// never walks into some dependency's own (possibly missing/broken) tsconfig.json chain.
+// Don't move this below the vue-loader require -- it only patches compileScript once, on load.
 function requireVueLoaderWithTypeResolutionPatch() {
     const ts = require('typescript');
     const vueSingleFileComponentCompiler = require('vue/compiler-sfc');
@@ -40,22 +39,10 @@ function requireVueLoaderWithTypeResolutionPatch() {
 
     const originalCompileScript = vueSingleFileComponentCompiler.compileScript;
     vueSingleFileComponentCompiler.compileScript = function (descriptor, options) {
-        const tsConfigPath = Path.join(global.SITE_PACKAGES_DIRECTORY, 'tsconfig.json');
-
         const virtualFileSystem = {
-            fileExists(filePath) {
-                if (filePath === tsConfigPath) {
-                    return true;
-                }
-                return ts.sys.fileExists(filePath);
-            },
-            readFile(filePath, encoding) {
-                if (filePath === tsConfigPath) {
-                    return virtualTsconfigContent;
-                }
-                return ts.sys.readFile(filePath, encoding);
-            },
-            realpath: ts.sys.realpath,
+            ...ts.sys,
+            fileExists: (filePath) => Path.basename(filePath) === 'tsconfig.json' || ts.sys.fileExists(filePath),
+            readFile: (filePath, encoding) => Path.basename(filePath) === 'tsconfig.json' ? virtualTsconfigContent : ts.sys.readFile(filePath, encoding),
         };
 
         return originalCompileScript(descriptor, { ...options, fs: virtualFileSystem });
