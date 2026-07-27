@@ -70,6 +70,7 @@ const shouldCopyChildren = ref(true);
 const isMultiSelecting = ref(false);
 const filterValue = ref("");
 const loadingNodeKeys = reactive(new Set<string>());
+const expandingNodeKeys = reactive(new Set<string>());
 
 const nextNewItem = ref<ControlledListItem>();
 const newLabelFormValue = ref("");
@@ -132,11 +133,18 @@ onMounted(async () => {
 });
 
 async function onNodeExpand(node: TreeNode) {
+    const nodeKey = node.key as string;
+
+    expandingNodeKeys.add(nodeKey);
+    requestAnimationFrame(() => {
+        setTimeout(() => expandingNodeKeys.delete(nodeKey), 600);
+    });
+
     if (nodeIsList(node)) {
         // Lists ship their root items eagerly; nothing to lazy-load.
         return;
     }
-    const itemId = node.key as string;
+    const itemId = nodeKey;
     if (listStore.hasLoadedChildren(itemId)) {
         return;
     }
@@ -160,6 +168,14 @@ const updateSelectedAndExpanded = (node: TreeNode) => {
         return;
     }
     setDisplayedRow(node.data);
+
+    if (!expandedKeys.value[node.key]) {
+        expandingNodeKeys.add(node.key as string);
+        requestAnimationFrame(() => {
+            setTimeout(() => expandingNodeKeys.delete(node.key as string), 600);
+        });
+    }
+
     expandedKeys.value = {
         ...expandedKeys.value,
         [node.key]: true,
@@ -426,9 +442,9 @@ watch(debouncedFilterValue, async (next) => {
             },
             nodeToggleButton: ({ instance }: TreePassThroughMethodOptions) => ({
                 class: {
-                    'node-children-loading': loadingNodeKeys.has(
-                        instance.node?.key as string,
-                    ),
+                    'node-children-loading':
+                        loadingNodeKeys.has(instance.node?.key as string) ||
+                        expandingNodeKeys.has(instance.node?.key as string),
                 },
             }),
         }"
@@ -482,6 +498,11 @@ watch(debouncedFilterValue, async (next) => {
 
 :deep(.p-tree-node) {
     margin-inline-end: 0.5rem;
+}
+
+/* Ensure smooth chevron rotation on expand/collapse */
+:deep(.p-tree-node-toggle-button .p-tree-node-toggle-icon) {
+    transition: transform 0.2s ease-in-out;
 }
 
 /* Spin the expand toggle icon while children are being fetched. */
