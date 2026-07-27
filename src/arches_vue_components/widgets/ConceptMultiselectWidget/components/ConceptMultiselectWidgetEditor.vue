@@ -5,12 +5,14 @@ import TreeSelect from "primevue/treeselect";
 
 import { useConceptTreeStore } from "@/arches_vue_components/stores/useConceptTreeStore.ts";
 import { buildConceptListAliasedNodeData } from "@/arches_vue_components/datatypes/concept-list/utils.ts";
+import { getOption } from "@/arches_vue_components/datatypes/concept/utils.ts";
 
 import type { Ref } from "vue";
 import type { TreeNode } from "primevue/treenode";
 import type { CardXNodeXWidgetData } from "@/arches_vue_components/types.ts";
 import type {
     CollectionItem,
+    ConceptValueItem,
     ConceptFetchResult,
 } from "@/arches_vue_components/datatypes/concept/types.ts";
 import type { ConceptListAliasedNodeData } from "@/arches_vue_components/datatypes/concept-list/types.ts";
@@ -41,15 +43,31 @@ const optionsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 
 const initialValue = computed<Record<string, boolean> | null>(() => {
-    return (
-        aliasedNodeData?.node_value?.reduce(
-            (acc: Record<string, boolean>, id: string) => ({
-                ...acc,
-                [id]: true,
-            }),
-            {},
-        ) ?? null
-    );
+    if (!aliasedNodeData?.node_value?.length) return null;
+    if (!options.value) return null;
+    const result: Record<string, boolean> = {};
+    for (const id of aliasedNodeData.node_value) {
+        const option = getOption(id, options.value);
+        if (option) {
+            result[option.key] = true;
+        } else {
+            // the option was not found using the key(valueid),
+            // try to find it in the details array using valueid
+            // and then mathching on the concept_id of the detail
+            if (aliasedNodeData?.details?.length) {
+                const detail = aliasedNodeData.details.find(
+                    (detailItem: ConceptValueItem) => detailItem.valueid === id,
+                );
+                if (detail) {
+                    const option = getOption(detail.concept_id, options.value);
+                    if (option) {
+                        result[option.key] = true;
+                    }
+                }
+            }
+        }
+    }
+    return Object.keys(result).length ? result : null;
 });
 
 watch(isLoading, (newValue) => {
