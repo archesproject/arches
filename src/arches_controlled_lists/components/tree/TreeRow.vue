@@ -150,6 +150,26 @@ const setParent = async (parentNode: TreeNode) => {
     }
     const item = movingItem.value.data;
 
+    const oldParentId = item.parent_id ?? item.list_id;
+    const oldParent = findNodeInTree(tree, oldParentId).found;
+    if (oldParent) {
+        if (nodeIsList(oldParent)) {
+            oldParent.data.items = oldParent.data.items.filter(
+                (sibling: ControlledListItem) => sibling.id !== item.id,
+            );
+            oldParent.children = oldParent.children?.filter(
+                (child: TreeNode) => child.key !== item.id,
+            );
+        } else {
+            oldParent.data.children = oldParent.data.children.filter(
+                (sibling: ControlledListItem) => sibling.id !== item.id,
+            );
+            oldParent.children = oldParent.children?.filter(
+                (child: TreeNode) => child.key !== item.id,
+            );
+        }
+    }
+
     let list: ControlledList;
     let siblings: ControlledListItem[];
     if (nodeIsList(parentNode)) {
