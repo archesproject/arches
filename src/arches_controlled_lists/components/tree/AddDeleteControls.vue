@@ -67,7 +67,7 @@ const listStore = useListStore();
 
 // Switching into multi-select on a partially-loaded list would leave the
 // partial-check tri-state checkboxes wrong. Eager-load the touched list
-// before recursing through its items. Plan §24.
+// before recursing through its items.
 const multiSelectStateFromDisplayedRow = async () => {
     if (!displayedRow.value || !displayedRow.value.id) {
         return {};

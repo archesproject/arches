@@ -183,7 +183,7 @@ const updateSelectedAndExpanded = (node: TreeNode) => {
 };
 
 // Eager-load the affected list whenever the user enters a flow that needs
-// the whole subtree (multi-select, item move). Plan §23.
+// the whole subtree (multi-select, item move).
 watch(isMultiSelecting, async (active) => {
     if (!active) return;
     const displayedListId = inferListIdFromDisplayedRow();
@@ -323,8 +323,7 @@ watch(
     },
 );
 
-// Server-side fallback when the in-memory capped filter finds nothing.
-// Plan §29: when the filter doesn't match anything in the loaded shallow
+// When the filter doesn't match anything in the loaded shallow
 // tree, hit FilteredListView per visible list, then lazy-load the
 // returned branches so the capped filter re-evaluates.
 let serverFilterAbortToken = 0;

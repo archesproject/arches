@@ -32,7 +32,7 @@ const newListFormValue = defineModel<string>("newListFormValue", {
 const listStore = useListStore();
 
 // Expand all is a deliberate user action — eager-load every list so the
-// expansion has the full subtree to walk. Plan §28.
+// expansion has the full subtree to walk.
 const expandAll = async () => {
     for (const node of tree) {
         const listId = node.data?.id;
