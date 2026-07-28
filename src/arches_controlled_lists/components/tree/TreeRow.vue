@@ -250,6 +250,22 @@ const copyItemTo = async (parentNode: TreeNode) => {
         return;
     }
 
+    try {
+        if (parent_id) {
+            await listStore.loadChildren(parent_id);
+        } else {
+            await listStore.loadListShallow(list_id);
+        }
+    } catch (error) {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Please refresh to see the copied item"),
+            detail: error instanceof Error ? error.message : undefined,
+        });
+        return;
+    }
+
     awaitingMove.value = false;
     // Clear custom classes added in <Tree> pass-through
     rerenderTree.value += 1;
