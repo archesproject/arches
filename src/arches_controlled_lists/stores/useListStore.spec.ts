@@ -228,11 +228,15 @@ describe("useListStore", () => {
                 children: [shallowItem("child-1", "list-1", "item-1", false)],
             });
 
-            const first = await store.loadChildren("item-1");
-            const second = await store.loadChildren("item-1");
-
-            expect(first).toBe(second);
+            await store.loadChildren("item-1");
             expect(fetchChildrenMock).toHaveBeenCalledTimes(1);
+
+            // Second call should hit cache, not refetch
+            await store.loadChildren("item-1");
+            expect(fetchChildrenMock).toHaveBeenCalledTimes(1);
+
+            const parent = store.findItem("item-1");
+            expect(parent?.children).toHaveLength(1);
         });
     });
 });
