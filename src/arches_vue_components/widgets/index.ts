@@ -1,3 +1,4 @@
+export { default as ConceptCheckboxWidget } from "@/arches_vue_components/widgets/ConceptCheckboxWidget/ConceptCheckboxWidget.vue";
 export { default as ConceptMultiselectWidget } from "@/arches_vue_components/widgets/ConceptMultiselectWidget/ConceptMultiselectWidget.vue";
 export { default as ConceptRadioWidget } from "@/arches_vue_components/widgets/ConceptRadioWidget/ConceptRadioWidget.vue";
 export { default as ConceptSelectWidget } from "@/arches_vue_components/widgets/ConceptSelectWidget/ConceptSelectWidget.vue";
@@ -21,6 +22,7 @@ export { default as SwitchWidget } from "@/arches_vue_components/widgets/SwitchW
 export { default as TextWidget } from "@/arches_vue_components/widgets/TextWidget/TextWidget.vue";
 export { default as URLWidget } from "@/arches_vue_components/widgets/URLWidget/URLWidget.vue";
 
+export type { ConceptCheckboxWidgetProps } from "@/arches_vue_components/widgets/ConceptCheckboxWidget/types.ts";
 export type { ConceptMultiselectWidgetProps } from "@/arches_vue_components/widgets/ConceptMultiselectWidget/types.ts";
 export type { ConceptRadioWidgetProps } from "@/arches_vue_components/widgets/ConceptRadioWidget/types.ts";
 export type { ConceptSelectWidgetProps } from "@/arches_vue_components/widgets/ConceptSelectWidget/types.ts";
