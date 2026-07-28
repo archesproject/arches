@@ -14,7 +14,7 @@ class ListQuerySet(models.QuerySet):
     def annotate_node_fields(self, **kwargs):
         from arches_controlled_lists.models import NodeProxy
 
-        qs = self
+        queryset = self
         for annotation_name, node_field in kwargs.items():
             subquery = ArraySubquery(
                 NodeProxy.objects.with_controlled_lists()
@@ -25,9 +25,9 @@ class ListQuerySet(models.QuerySet):
                 .order_by("pk")
                 .values(node_field)
             )
-            qs = qs.annotate(**{annotation_name: subquery})
+            queryset = queryset.annotate(**{annotation_name: subquery})
 
-        return qs
+        return queryset
 
 
 class ListItemQuerySet(models.QuerySet):
