@@ -224,8 +224,7 @@ class FilteredListView(APIBase):
         return " > ".join(reversed(parts))
 
     def _get_parent_ids(self, item, item_map):
-        """Returns ancestor ids ordered root → immediate parent. Used by the
-        frontend to lazy-load every branch needed to reveal a match."""
+        # Returns ancestor ids ordered root → immediate parent.
         ids = []
         current_id = item.get("parent_id")
         while current_id and current_id in item_map:
@@ -478,8 +477,6 @@ class ListItemAncestorPathView(APIBase):
             if str(a.pk) in serialized_by_id
         ]
 
-        # The leaf's list itself comes first so the frontend can locate the
-        # list row before walking into items.
         try:
             lst = List.objects.get(pk=leaf.list_id)
         except List.DoesNotExist:

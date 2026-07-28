@@ -147,10 +147,6 @@ export const itemAsNode = (
     iconLabels: IconLabels,
     hasLoadedChildren?: (itemId: string) => boolean,
 ): TreeNode => {
-    // leaf=false tells PrimeVue Tree the node has children that haven't been
-    // loaded yet (renders an expand chevron). leaf=true forces no chevron.
-    // Otherwise we leave it undefined and PrimeVue falls back to the children
-    // array length.
     let leaf: boolean | undefined;
     const childrenLoaded = hasLoadedChildren?.(item.id) ?? false;
     if (item.has_children && !childrenLoaded) {
