@@ -26,9 +26,9 @@ urlpatterns = [
         name="controlled_list",
     ),
     path(
-        "api/filtered_controlled_list/<uuid:list_id>",
+        "api/controlled_lists_filtered/<uuid:list_id>",
         FilteredListView.as_view(),
-        name="filtered_controlled_list",
+        name="controlled_lists_filtered",
     ),
     path("api/controlled_list", ListView.as_view(), name="controlled_list_add"),
     path(
