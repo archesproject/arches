@@ -65,9 +65,6 @@ const confirm = useConfirm();
 const toast = useToast();
 const listStore = useListStore();
 
-// Switching into multi-select on a partially-loaded list would leave the
-// partial-check tri-state checkboxes wrong. Eager-load the touched list
-// before recursing through its items.
 const multiSelectStateFromDisplayedRow = async () => {
     if (!displayedRow.value || !displayedRow.value.id) {
         return {};
@@ -76,9 +73,13 @@ const multiSelectStateFromDisplayedRow = async () => {
         [displayedRow.value.id]: { checked: true, partialChecked: false },
     };
 
-    const listId = dataIsItem(displayedRow.value)
-        ? (displayedRow.value as ControlledListItem).list_id
-        : (displayedRow.value as ControlledList).id;
+    const isItem = dataIsItem(displayedRow.value);
+    let listId: string;
+    if (isItem) {
+        listId = (displayedRow.value as ControlledListItem).list_id;
+    } else {
+        listId = (displayedRow.value as ControlledList).id;
+    }
     try {
         await listStore.loadListEagerly(listId);
     } catch (error) {
