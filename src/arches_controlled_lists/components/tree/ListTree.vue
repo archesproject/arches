@@ -85,9 +85,6 @@ const { setDisplayedRow } = inject<{ setDisplayedRow: RowSetter }>(
 
 const route = useRoute();
 
-// Tree is derived from the store. The store owns the canonical
-// ControlledList/ControlledListItem data; we project that into TreeNodes
-// for PrimeVue.
 const tree = computed<TreeNode[]>(() =>
     listStore.lists.map((list: ControlledList) =>
         listAsNode(
@@ -117,8 +114,6 @@ const { debouncedFilterValue, filteredTree, isFilterCapped } =
         getSearchableText,
     );
 
-// Hydrate the store the first time the tree mounts so we don't refetch
-// across route changes inside the manager.
 onMounted(async () => {
     try {
         await listStore.initialize();
@@ -182,8 +177,6 @@ const updateSelectedAndExpanded = (node: TreeNode) => {
     };
 };
 
-// Eager-load the affected list whenever the user enters a flow that needs
-// the whole subtree (multi-select, item move).
 watch(isMultiSelecting, async (active) => {
     if (!active) return;
     const displayedListId = inferListIdFromDisplayedRow();
@@ -216,9 +209,6 @@ watch(movingItem, async (next) => {
 });
 
 function inferListIdFromDisplayedRow(): string | null {
-    // The displayed row is provided via injection by the parent. We rely on
-    // the selectedKeys reactive to find what's currently being edited
-    // because we don't have direct displayedRow access in this scope.
     const firstSelected = Object.keys(selectedKeys.value)[0];
     if (!firstSelected) return null;
     const item = listStore.findItem(firstSelected);
@@ -313,7 +303,6 @@ watch(
     },
 );
 
-// Navigate on initial population of the tree.
 watch(
     () => tree.value.length,
     (length) => {
@@ -323,9 +312,6 @@ watch(
     },
 );
 
-// When the filter doesn't match anything in the loaded shallow
-// tree, hit FilteredListView per visible list, then lazy-load the
-// returned branches so the capped filter re-evaluates.
 let serverFilterAbortToken = 0;
 watch(debouncedFilterValue, async (next) => {
     if (!next || filteredTree.value.length > 0 || isFilterCapped.value) {
@@ -346,8 +332,6 @@ watch(debouncedFilterValue, async (next) => {
                     parentIdsToLoad.add(pid);
                 }
             }
-            // Load ancestors sequentially so a parent loads before its child
-            // (each load may surface new ids that need expanding).
             for (const pid of parentIdsToLoad) {
                 if (token !== serverFilterAbortToken) return;
                 if (!listStore.hasLoadedChildren(pid)) {
@@ -359,7 +343,6 @@ watch(debouncedFilterValue, async (next) => {
                 }
             }
         } catch (error) {
-            // One list failing shouldn't block searches in other lists.
             console.warn(
                 `Server-side search of list ${list.id} failed:`,
                 error,

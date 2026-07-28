@@ -7,7 +7,6 @@ import ControlledListManager from '@/arches_controlled_lists/plugins/ControlledL
 import { createVueApplication } from '@/arches_vue_components/application';
 import ControlledListManagerTemplate from 'templates/views/components/plugins/controlled-list-manager.htm';
 
-import { createPinia } from 'pinia';
 import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
@@ -75,8 +74,7 @@ const ControlledListsTheme = {
 
 ko.components.register('controlled-list-manager', {
     viewModel: function() {
-        createVueApplication({component: ControlledListManager, theme: ControlledListsTheme}).then((vueApp) => {
-            vueApp.use(createPinia());
+        createVueApplication({component: ControlledListManager, themeConfiguration: ControlledListsTheme}).then((vueApp) => {
             vueApp.use(router);
             vueApp.mount('#controlled-list-manager-mounting-point');
         });
