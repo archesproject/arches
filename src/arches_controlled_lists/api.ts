@@ -111,7 +111,7 @@ export const fetchListItemAncestorPath = async (itemId: string) => {
 
 export const fetchFilteredList = async (listId: string, term: string) => {
     const url = new URL(
-        arches.urls.controlled_lists_filtered(listId),
+        arches.urls.controlled_list_filtered(listId),
         window.location.origin,
     );
     if (term) {
