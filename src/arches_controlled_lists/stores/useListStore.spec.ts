@@ -150,4 +150,89 @@ describe("useListStore", () => {
         expect(fetchChildrenMock).toHaveBeenCalledWith("mid");
         expect(store.findItem("leaf")).not.toBeNull();
     });
+
+    describe("error handling and retry flows", () => {
+        beforeEach(async () => {
+            fetchListsShallowMock.mockResolvedValue({
+                controlled_lists: [
+                    shallowList("list-1", [
+                        shallowItem("item-1", "list-1", null, true),
+                    ]),
+                ],
+            });
+            const store = useListStore();
+            await store.initialize();
+        });
+
+        it("allows retrying loadChildren after a rejected fetch", async () => {
+            const store = useListStore();
+
+            fetchChildrenMock.mockRejectedValueOnce(new Error("network"));
+            await expect(store.loadChildren("item-1")).rejects.toThrow(
+                "network",
+            );
+
+            fetchChildrenMock.mockResolvedValueOnce({
+                children: [shallowItem("child-1", "list-1", "item-1", false)],
+            });
+            const result = await store.loadChildren("item-1");
+            expect(result).toHaveLength(1);
+            expect(store.hasLoadedChildren("item-1")).toBe(true);
+        });
+
+        it("cleans up inflight requests after error", async () => {
+            const store = useListStore();
+
+            fetchChildrenMock.mockRejectedValueOnce(new Error("fail"));
+            await expect(store.loadChildren("item-1")).rejects.toThrow();
+
+            // Second call should trigger a new fetch, not reuse a stale promise
+            fetchChildrenMock.mockResolvedValueOnce({
+                children: [shallowItem("child-1", "list-1", "item-1", false)],
+            });
+            await store.loadChildren("item-1");
+
+            expect(fetchChildrenMock).toHaveBeenCalledTimes(2);
+        });
+
+        it("rejects all concurrent callers when fetch fails", async () => {
+            const store = useListStore();
+
+            fetchChildrenMock.mockRejectedValueOnce(
+                new Error("concurrent fail"),
+            );
+
+            const first = store.loadChildren("item-1");
+            const second = store.loadChildren("item-1");
+
+            await expect(first).rejects.toThrow("concurrent fail");
+            await expect(second).rejects.toThrow("concurrent fail");
+            expect(fetchChildrenMock).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("caching behavior", () => {
+        it("returns cached children without refetching", async () => {
+            fetchListsShallowMock.mockResolvedValue({
+                controlled_lists: [
+                    shallowList("list-1", [
+                        shallowItem("item-1", "list-1", null, true),
+                    ]),
+                ],
+            });
+
+            const store = useListStore();
+            await store.initialize();
+
+            fetchChildrenMock.mockResolvedValue({
+                children: [shallowItem("child-1", "list-1", "item-1", false)],
+            });
+
+            const first = await store.loadChildren("item-1");
+            const second = await store.loadChildren("item-1");
+
+            expect(first).toBe(second);
+            expect(fetchChildrenMock).toHaveBeenCalledTimes(1);
+        });
+    });
 });
