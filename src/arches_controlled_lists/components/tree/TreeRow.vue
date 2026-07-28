@@ -131,6 +131,10 @@ const splitFilterValue = computed(() => {
     return unstyledLabel.value.split(regex);
 });
 
+const isNodeSelected = computed(() => {
+    return !isMultiSelecting && node.key in selectedKeys.value;
+});
+
 const showMoveHereButton = (rowId: string) => {
     return (
         movingItem.value &&
@@ -421,7 +425,7 @@ const acceptNewListShortcutEntry = async () => {
             class="actions"
         >
             <MoveRow
-                v-if="!isMultiSelecting && node.key in selectedKeys"
+                v-if="isNodeSelected"
                 v-model:expanded-keys="expandedKeys"
                 v-model:selected-keys="selectedKeys"
                 v-model:moving-item="movingItem"
