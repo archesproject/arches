@@ -74,7 +74,7 @@ const ControlledListsTheme = {
 
 ko.components.register('controlled-list-manager', {
     viewModel: function() {
-        createVueApplication({component: ControlledListManager, themeConfiguration: ControlledListsTheme}).then((vueApp) => {
+        createVueApplication({ component: ControlledListManager, themeConfiguration: ControlledListsTheme }).then((vueApp) => {
             vueApp.use(router);
             vueApp.mount('#controlled-list-manager-mounting-point');
         });
