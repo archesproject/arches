@@ -14,12 +14,45 @@ import type {
     ControlledListItem,
 } from "@/arches_controlled_lists/types";
 
-function registerItemRecursive(
+function createLoader<K, V>(
+    fetch: (key: K) => Promise<V>,
+    onError?: (key: K, err: Error) => void,
+) {
+    const inflight = new Map<K, Promise<V>>();
+    return (key: K): Promise<V> => {
+        const existing = inflight.get(key);
+        if (existing) return existing;
+
+        const promise = fetch(key)
+            .catch((err) => {
+                if (onError) {
+                    onError(
+                        key,
+                        err instanceof Error ? err : new Error(String(err)),
+                    );
+                }
+                throw err;
+            })
+            .finally(() => inflight.delete(key));
+
+        inflight.set(key, promise);
+        return promise;
+    };
+}
+
+function registerItem(
     item: ControlledListItem,
     canonical: Map<string, ControlledListItem>,
-    loadedChildrenIds: Set<string>,
+    loadedChildrenIds: Set<string> | null,
+    recursive: boolean,
 ): ControlledListItem {
     const existing = canonical.get(item.id);
+    const target = existing ?? {
+        ...item,
+        children: [],
+        has_children: item.has_children ?? (item.children ?? []).length > 0,
+    };
+
     if (existing) {
         existing.uri = item.uri;
         existing.sortorder = item.sortorder;
@@ -29,25 +62,23 @@ function registerItemRecursive(
         existing.parent_id = item.parent_id;
         existing.depth = item.depth;
         existing.has_children =
-            item.has_children ?? (item.children ?? []).length > 0;
-        existing.children = (item.children ?? []).map((child) =>
-            registerItemRecursive(child, canonical, loadedChildrenIds),
-        );
-        loadedChildrenIds.add(existing.id);
-        return existing;
+            item.has_children ??
+            existing.has_children ??
+            (item.children ?? []).length > 0;
     }
 
-    const normalized: ControlledListItem = {
-        ...item,
-        children: [],
-        has_children: item.has_children ?? (item.children ?? []).length > 0,
-    };
-    canonical.set(normalized.id, normalized);
-    normalized.children = (item.children ?? []).map((child) =>
-        registerItemRecursive(child, canonical, loadedChildrenIds),
-    );
-    loadedChildrenIds.add(normalized.id);
-    return normalized;
+    canonical.set(target.id, target);
+
+    if (recursive) {
+        target.children = (item.children ?? []).map((child) =>
+            registerItem(child, canonical, loadedChildrenIds, true),
+        );
+        if (loadedChildrenIds) {
+            loadedChildrenIds.add(target.id);
+        }
+    }
+
+    return target;
 }
 
 export const useListStore = defineStore("controlled-lists", () => {
@@ -59,37 +90,12 @@ export const useListStore = defineStore("controlled-lists", () => {
     const loadedChildrenIds = ref<Set<string>>(new Set());
     const eagerLoadedListIds = ref<Set<string>>(new Set());
 
-    const inflightChildFetches = new Map<
-        string,
-        Promise<ControlledListItem[]>
-    >();
-    const inflightListFetches = new Map<string, Promise<ControlledList>>();
     let inflightRefresh: Promise<void> | null = null;
 
-    function registerShallowItem(item: ControlledListItem): ControlledListItem {
-        const existing = itemsById.value.get(item.id);
-        if (existing) {
-            existing.uri = item.uri;
-            existing.sortorder = item.sortorder;
-            existing.guide = item.guide;
-            existing.values = item.values;
-            existing.images = item.images;
-            existing.parent_id = item.parent_id;
-            existing.depth = item.depth;
-            existing.has_children = item.has_children ?? existing.has_children;
-            return existing;
-        }
-        const normalized: ControlledListItem = {
-            ...item,
-            children: item.children ?? [],
-            has_children: item.has_children ?? false,
-        };
-        itemsById.value.set(normalized.id, normalized);
-        return normalized;
-    }
-
     function ingestShallowList(list: ControlledList): ControlledList {
-        const normalizedItems = (list.items ?? []).map(registerShallowItem);
+        const normalizedItems = (list.items ?? []).map((item) =>
+            registerItem(item, itemsById.value, null, false),
+        );
         return {
             ...list,
             items: normalizedItems,
@@ -127,20 +133,17 @@ export const useListStore = defineStore("controlled-lists", () => {
         return fetchPromise;
     }
 
-    async function loadChildren(itemId: string): Promise<ControlledListItem[]> {
-        const existing = itemsById.value.get(itemId);
-        if (existing && loadedChildrenIds.value.has(itemId)) {
-            return existing.children;
-        }
-        const inflight = inflightChildFetches.get(itemId);
-        if (inflight) {
-            return inflight;
-        }
-
-        const promise = (async () => {
+    const loadChildren = createLoader(
+        async (itemId: string): Promise<ControlledListItem[]> => {
+            const existing = itemsById.value.get(itemId);
+            if (existing && loadedChildrenIds.value.has(itemId)) {
+                return existing.children;
+            }
             const data = await fetchListItemChildren(itemId);
             const fetched = (data.children ?? []) as ControlledListItem[];
-            const normalizedChildren = fetched.map(registerShallowItem);
+            const normalizedChildren = fetched.map((item) =>
+                registerItem(item, itemsById.value, null, false),
+            );
             const parent = itemsById.value.get(itemId);
             if (parent) {
                 parent.children = normalizedChildren;
@@ -148,32 +151,23 @@ export const useListStore = defineStore("controlled-lists", () => {
                     parent.has_children || normalizedChildren.length > 0;
                 loadedChildrenIds.value.add(itemId);
             }
-            inflightChildFetches.delete(itemId);
             return normalizedChildren;
-        })();
+        },
+    );
 
-        inflightChildFetches.set(itemId, promise);
-        return promise;
-    }
-
-    async function loadListEagerly(
-        listId: string,
-    ): Promise<ControlledList | null> {
-        if (eagerLoadedListIds.value.has(listId)) {
-            return findList(listId);
-        }
-        const inflight = inflightListFetches.get(listId);
-        if (inflight) {
-            return inflight;
-        }
-
-        const promise = (async () => {
+    const loadListEagerly = createLoader(
+        async (listId: string): Promise<ControlledList> => {
+            if (eagerLoadedListIds.value.has(listId)) {
+                const list = findList(listId);
+                if (list) return list;
+            }
             const fetched = (await fetchListEagerly(listId)) as ControlledList;
             const normalizedItems = (fetched.items ?? []).map((item) =>
-                registerItemRecursive(
+                registerItem(
                     item,
                     itemsById.value,
                     loadedChildrenIds.value,
+                    true,
                 ),
             );
             const merged: ControlledList = {
@@ -187,13 +181,9 @@ export const useListStore = defineStore("controlled-lists", () => {
                 lists.value.push(merged);
             }
             eagerLoadedListIds.value.add(listId);
-            inflightListFetches.delete(listId);
             return merged;
-        })();
-
-        inflightListFetches.set(listId, promise);
-        return promise;
-    }
+        },
+    );
 
     async function loadListShallow(
         listId: string,
@@ -225,24 +215,19 @@ export const useListStore = defineStore("controlled-lists", () => {
             return;
         }
 
-        // First entry is the list dict {id, name}; we expect the list to
-        // already exist in `lists` because refresh() loaded all summaries.
-        // Items follow in root → target order. Lazy-load each ancestor's
-        // children so the target ends up attached to the canonical tree.
         for (let i = 1; i < searchResults.length - 1; i++) {
             const ancestor = searchResults[i] as unknown as ControlledListItem;
-            registerShallowItem(ancestor);
+            registerItem(ancestor, itemsById.value, null, false);
             if (!loadedChildrenIds.value.has(ancestor.id)) {
                 await loadChildren(ancestor.id);
             }
         }
 
-        // Register the target itself.
         const target = searchResults[
             searchResults.length - 1
         ] as unknown as ControlledListItem;
         if (target?.id) {
-            registerShallowItem(target);
+            registerItem(target, itemsById.value, null, false);
         }
     }
 
