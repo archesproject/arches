@@ -53,6 +53,7 @@
         "dropzone": "5.7.0",
         "eonasdan-bootstrap-datetimepicker": "4.17.49",
         "font-awesome": "4.6.3",
+        "globals": "17.8.0",
         "ionicons": "2.0.1",
         "jqtree": "1.3.4",
         "jquery": "3.7.1",
