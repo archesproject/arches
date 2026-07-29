@@ -234,8 +234,6 @@ ENABLE_USER_SIGNUP = True
 # If True, users must authenticate their accout via email to complete the account creation process.
 FORCE_USER_SIGNUP_EMAIL_AUTHENTICATION = True
 
-POSTGIS_VERSION = (3, 0, 0)
-
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = True
