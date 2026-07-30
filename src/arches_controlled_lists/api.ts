@@ -34,7 +34,9 @@ export const fetchLists = async () => {
         }
         throw new Error(parsed.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -49,7 +51,9 @@ export const fetchListsShallow = async () => {
         }
         throw new Error(parsed.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -64,7 +68,9 @@ export const fetchListShallow = async (listId: string) => {
         }
         throw new Error(parsed.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -77,7 +83,9 @@ export const fetchListEagerly = async (listId: string) => {
         }
         throw new Error(parsed.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -92,7 +100,9 @@ export const fetchListItemChildren = async (itemId: string) => {
         }
         throw new Error(parsed.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -105,7 +115,9 @@ export const fetchListItemAncestorPath = async (itemId: string) => {
         }
         throw new Error(parsed.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -125,7 +137,9 @@ export const fetchFilteredList = async (listId: string, term: string) => {
         }
         throw new Error(parsed.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -142,7 +156,9 @@ export const createList = async (name: string) => {
         }
         throw new Error(parsed.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -162,7 +178,9 @@ export const importList = async (file: File, overwriteOption: string) => {
         }
         throw new Error(parsed.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -185,7 +203,9 @@ export const exportList = async (listIds: string[]) => {
             return { blob, filename };
         }
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -202,7 +222,9 @@ export const createItem = async (item: NewControlledListItem) => {
         }
         throw new Error(parsed.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -222,7 +244,9 @@ export const patchItem = async (
         const error = await response.json();
         throw new Error(error.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -251,7 +275,9 @@ export const copyItem = async (
         const error = await response.json();
         throw new Error(error.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -291,7 +317,9 @@ export const patchList = async (
         const error = await response.json();
         throw new Error(error.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -360,7 +388,9 @@ export const upsertValue = async (value: Value | NewValue) => {
         }
         throw new Error(parsed.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -379,7 +409,9 @@ export const deleteValue = async (value: Value) => {
         const error = await response.json();
         throw new Error(error.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -402,7 +434,9 @@ export const upsertMetadata = async (
         }
         throw new Error(parsed.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -423,7 +457,9 @@ export const deleteMetadata = async (
         const error = await response.json();
         throw new Error(error.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -442,6 +478,8 @@ export const deleteImage = async (image: ControlledListItemImage) => {
         const error = await response.json();
         throw new Error(error.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };

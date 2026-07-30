@@ -99,7 +99,8 @@ describe("useListStore", () => {
         expect(firstResult).toHaveLength(2);
 
         const parent = store.findItem("parent-1");
-        expect(parent).not.toBeNull();
+        expect(parent).toBeDefined();
+        expect(parent).toBeTruthy();
         expect(parent!.children).toHaveLength(2);
         expect(store.hasLoadedChildren("parent-1")).toBe(true);
     });
@@ -148,7 +149,8 @@ describe("useListStore", () => {
         // root and mid were lazy-loaded so the leaf attaches to the canonical tree.
         expect(fetchChildrenMock).toHaveBeenCalledWith("root");
         expect(fetchChildrenMock).toHaveBeenCalledWith("mid");
-        expect(store.findItem("leaf")).not.toBeNull();
+        expect(store.findItem("leaf")).toBeDefined();
+        expect(store.findItem("leaf")).toBeTruthy();
     });
 
     describe("error handling and retry flows", () => {
