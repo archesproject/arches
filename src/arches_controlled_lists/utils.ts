@@ -131,7 +131,9 @@ export const getItemLabel = (
             valuetype_id: "",
         };
     }
-    return labels.sort(
+    // Sort a copy: mutating the reactive source array inside a computed
+    // getter would dirty the computed's own dependency, defeating caching.
+    return [...labels].sort(
         (a, b) =>
             rankLabel(b, preferredLanguageCode, systemLanguageCode) -
             rankLabel(a, preferredLanguageCode, systemLanguageCode),
@@ -143,15 +145,25 @@ export const itemAsNode = (
     item: ControlledListItem,
     selectedLanguage: Language,
     iconLabels: IconLabels,
+    hasLoadedChildren?: (itemId: string) => boolean,
 ): TreeNode => {
+    let leaf: boolean | undefined;
+    const childrenLoaded = hasLoadedChildren?.(item.id) ?? false;
+    if (item.has_children && !childrenLoaded) {
+        leaf = false;
+    } else if (!item.has_children && !item.children?.length) {
+        leaf = true;
+    }
+
     return {
         key: item.id,
-        children: item.children.map((child) =>
-            itemAsNode(child, selectedLanguage, iconLabels),
+        children: (item.children ?? []).map((child) =>
+            itemAsNode(child, selectedLanguage, iconLabels, hasLoadedChildren),
         ),
         data: item,
         icon: item.guide ? "pi pi-bookmark" : "pi pi-tag",
         iconLabel: iconLabels.item,
+        ...(leaf !== undefined ? { leaf } : {}),
     };
 };
 
@@ -159,11 +171,12 @@ export const listAsNode = (
     list: ControlledList,
     selectedLanguage: Language,
     iconLabels: IconLabels,
+    hasLoadedChildren?: (itemId: string) => boolean,
 ): TreeNode => {
     return {
         key: list.id,
         children: list.items.map((item: ControlledListItem) =>
-            itemAsNode(item, selectedLanguage, iconLabels),
+            itemAsNode(item, selectedLanguage, iconLabels, hasLoadedChildren),
         ),
         data: list,
         icon: "pi pi-folder",

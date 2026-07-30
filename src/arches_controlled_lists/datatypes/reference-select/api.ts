@@ -1,22 +1,19 @@
 import arches from "arches";
 
-export const fetchWidgetOptions = async (
+import type { ReferenceSelectTreeNode } from "@/arches_controlled_lists/datatypes/reference-select/types.ts";
+
+export async function fetchControlledListOptions(
     graphSlug: string,
     nodeAlias: string,
-) => {
-    const params = new URLSearchParams();
-    params.append("graph_slug", graphSlug);
-    params.append("node_alias", nodeAlias);
+): Promise<ReferenceSelectTreeNode[]> {
+    const queryParams = new URLSearchParams({
+        graph_slug: graphSlug,
+        node_alias: nodeAlias,
+    });
     const response = await fetch(
-        `${arches.urls.controlled_list_options}?${params}`,
+        `${arches.urls.controlled_list_options}?${queryParams}`,
     );
-    try {
-        const parsed = await response.json();
-        if (response.ok) {
-            return parsed;
-        }
-        throw new Error(parsed.message);
-    } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
-    }
-};
+    const parsed = await response.json();
+    if (!response.ok) throw new Error(parsed.message || response.statusText);
+    return parsed;
+}

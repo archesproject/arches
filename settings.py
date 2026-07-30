@@ -168,7 +168,7 @@ INSTALLED_APPS = (
     "django_celery_results",
     "django_migrate_sql",
     "pgtrigger",
-    "arches_component_lab",
+    "arches_vue_components",
     # "silk",
 )
 

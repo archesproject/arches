@@ -89,6 +89,7 @@ export interface ControlledListItem {
     children: ControlledListItem[];
     parent_id: string | null;
     depth: number;
+    has_children?: boolean;
 }
 
 export interface NewControlledListItem {

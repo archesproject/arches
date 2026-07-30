@@ -63,44 +63,59 @@ class List(models.Model):
         else:
             self.delete_index()
 
-    def serialize(self, depth_map=None, flat=False, permitted_nodegroups=None):
+    def serialize(
+        self, depth_map=None, flat=False, permitted_nodegroups=None, shallow=False
+    ):
         if depth_map is None:
             depth_map = defaultdict(int)
-        if flat:
-            list_items_lookup = {str(item.pk): item for item in self.list_items.all()}
-
-            def get_path(item):
-                parent_id = item["parent_id"]
-                path = [item["id"]]
-                loop_breaker = 0
-                while parent_id and loop_breaker < 1000:
-                    path.insert(0, parent_id)
-                    if parent_id := list_items_lookup[parent_id].parent_id:
-                        parent_id = str(parent_id)
-                    loop_breaker += 1
-                return path
-
-            sort_fn = lambda item: (
-                tuple(
-                    list_items_lookup[item_in_path].sortorder
-                    for item_in_path in get_path(item)
-                )
+        if shallow:
+            serialized_items = sorted(
+                [
+                    item.serialize_shallow()
+                    for item in self.list_items.all()
+                    if item.parent_id is None
+                ],
+                key=lambda item: item["sortorder"],
             )
         else:
-            sort_fn = lambda item: item["sortorder"]
-        data = {
-            "id": str(self.id),
-            "name": self.name,
-            "dynamic": self.dynamic,
-            "searchable": self.searchable,
-            "items": sorted(
+            if flat:
+                list_items_lookup = {
+                    str(item.pk): item for item in self.list_items.all()
+                }
+
+                def get_path(item):
+                    parent_id = item["parent_id"]
+                    path = [item["id"]]
+                    loop_breaker = 0
+                    while parent_id and loop_breaker < 1000:
+                        path.insert(0, parent_id)
+                        if parent_id := list_items_lookup[parent_id].parent_id:
+                            parent_id = str(parent_id)
+                        loop_breaker += 1
+                    return path
+
+                sort_fn = lambda item: (
+                    tuple(
+                        list_items_lookup[item_in_path].sortorder
+                        for item_in_path in get_path(item)
+                    )
+                )
+            else:
+                sort_fn = lambda item: item["sortorder"]
+            serialized_items = sorted(
                 [
                     item.serialize(depth_map, flat)
                     for item in self.list_items.all()
                     if flat or item.parent_id is None
                 ],
                 key=sort_fn,
-            ),
+            )
+        data = {
+            "id": str(self.id),
+            "name": self.name,
+            "dynamic": self.dynamic,
+            "searchable": self.searchable,
+            "items": serialized_items,
         }
         if hasattr(self, "node_ids"):
             data["nodes"] = [
@@ -323,6 +338,35 @@ class ListItem(models.Model):
                 child.serialize(depth_map, flat) for child in self.children.all()
             ]
         return data
+
+    def serialize_shallow(self):
+        """Serialize this item without its descendants. Includes a `has_children`
+        boolean so the frontend can render an expand toggle for lazy loading.
+
+        Prefers the `has_children_annotated` attribute set by
+        ``ListItemQuerySet.annotate_has_children`` to avoid an N+1 query;
+        falls back to `self.children.exists()` if the annotation is absent.
+        """
+        has_children = getattr(self, "has_children_annotated", None)
+        if has_children is None:
+            has_children = self.children.exists()
+        return {
+            "id": str(self.id),
+            "list_id": str(self.list_id),
+            "uri": self.uri,
+            "sortorder": self.sortorder,
+            "guide": self.guide,
+            "values": [
+                value.serialize()
+                for value in self.list_item_values.all()
+                if value.valuetype_id != "image"
+            ],
+            "images": [image.serialize() for image in self.list_item_images.all()],
+            "parent_id": str(self.parent_id) if self.parent_id else None,
+            "depth": 0 if self.parent_id is None else None,
+            "has_children": bool(has_children),
+            "children": [],
+        }
 
     def build_tile_value(self):
         tile_value = {

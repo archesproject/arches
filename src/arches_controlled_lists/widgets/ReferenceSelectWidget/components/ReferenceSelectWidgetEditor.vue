@@ -1,18 +1,20 @@
 <script setup lang="ts">
-import { computed, ref, watchEffect } from "vue";
+import { computed, onMounted, ref, watch, watchEffect } from "vue";
 
+import { useGettext } from "vue3-gettext";
 import TreeSelect from "primevue/treeselect";
 
-import { fetchWidgetOptions } from "@/arches_controlled_lists/datatypes/reference-select/api.ts";
+import { useReferenceSelectOptionsStore } from "@/arches_controlled_lists/stores/useReferenceSelectOptionsStore.ts";
+import { buildReferenceSelectAliasedNodeData } from "@/arches_controlled_lists/datatypes/reference-select/utils.ts";
 
 import type { Ref } from "vue";
 import type { TreeExpandedKeys } from "primevue/tree";
 
+import type { ReferenceSelectAliasedNodeData } from "@/arches_controlled_lists/datatypes/reference-select/types.ts";
 import type {
     ReferenceSelectDatatypeCardXNodeXWidgetData,
     ReferenceSelectDetails,
     ReferenceSelectTreeNode,
-    ReferenceSelectValue,
     ReferenceSelectNodeValue,
 } from "@/arches_controlled_lists/datatypes/reference-select/types.ts";
 
@@ -21,21 +23,37 @@ const {
     cardXNodeXWidgetData,
     graphSlug,
     nodeAlias,
-    shouldEmitSimplifiedValue,
-} = defineProps<{
-    aliasedNodeData: ReferenceSelectValue;
-    cardXNodeXWidgetData: ReferenceSelectDatatypeCardXNodeXWidgetData;
-    graphSlug: string;
-    nodeAlias: string;
-    shouldEmitSimplifiedValue?: boolean;
-}>();
+    systemLanguageCode,
+} = defineProps([
+    "aliasedNodeData",
+    "cardXNodeXWidgetData",
+    "graphSlug",
+    "nodeAlias",
+    "systemLanguageCode",
+]) as {
+    aliasedNodeData: ReferenceSelectAliasedNodeData | null;
+    cardXNodeXWidgetData?: ReferenceSelectDatatypeCardXNodeXWidgetData;
+    graphSlug?: string;
+    nodeAlias?: string;
+    systemLanguageCode: string;
+};
 
-const emit = defineEmits<{
+const emit = defineEmits([
+    "update:isLoading",
+    "update:value",
+    "update:aliasedNodeData",
+    "initialized",
+]) as {
+    (event: "update:isLoading", updatedValue: boolean): void;
+    (event: "update:value", updatedValue: ReferenceSelectNodeValue[]): void;
     (
-        event: "update:value",
-        updatedValue: ReferenceSelectValue | string[],
+        event: "update:aliasedNodeData",
+        updatedValue: ReferenceSelectAliasedNodeData,
     ): void;
-}>();
+    (event: "initialized", updatedValue: ReferenceSelectAliasedNodeData): void;
+};
+
+const { current: preferredLanguageCode } = useGettext();
 
 const options = ref<ReferenceSelectTreeNode[]>();
 const isLoading = ref(false);
@@ -43,10 +61,13 @@ const optionsError = ref<string | null>(null);
 const expandedKeys: Ref<TreeExpandedKeys> = ref({});
 
 const initialValueFromTileData = computed(() => {
-    if (aliasedNodeData?.details?.length) {
-        return aliasedNodeData.details.reduce<Record<string, boolean>>(
-            (accumulator, selectedOption) => {
-                accumulator[selectedOption.list_item_id] = true;
+    if (aliasedNodeData?.node_value?.length) {
+        return aliasedNodeData.node_value.reduce<Record<string, boolean>>(
+            (accumulator, item) => {
+                const listItemId = item.labels?.[0]?.list_item_id;
+                if (listItemId) {
+                    accumulator[listItemId] = true;
+                }
                 return accumulator;
             },
             {},
@@ -78,8 +99,24 @@ const initialValueFromTileData = computed(() => {
     );
 });
 
+onMounted(() => {
+    emit(
+        "initialized",
+        aliasedNodeData ??
+            buildReferenceSelectAliasedNodeData(
+                null,
+                preferredLanguageCode,
+                systemLanguageCode,
+            ),
+    );
+});
+
 watchEffect(() => {
     getOptions();
+});
+
+watch(isLoading, (newValue) => {
+    emit("update:isLoading", newValue);
 });
 
 function optionAsNode(item: ReferenceSelectTreeNode): ReferenceSelectTreeNode {
@@ -105,9 +142,14 @@ function optionsAsNodes(
 }
 
 async function getOptions() {
+    if (!graphSlug || !nodeAlias) return;
     isLoading.value = true;
     try {
-        const widgetOptions = await fetchWidgetOptions(graphSlug, nodeAlias);
+        const widgetOptions =
+            await useReferenceSelectOptionsStore().fetchWidgetOptions(
+                graphSlug,
+                nodeAlias,
+            );
 
         options.value = optionsAsNodes(widgetOptions);
     } catch (error) {
@@ -121,22 +163,19 @@ function onUpdateModelValue(
     updatedValue: { [key: string]: boolean } | null,
 ): void {
     if (!updatedValue) {
-        if (shouldEmitSimplifiedValue) {
-            emit("update:value", []);
-        } else {
-            emit("update:value", {
-                node_value: [],
-                display_value: "",
-                details: [],
-            });
-        }
-
+        emit("update:value", []);
+        emit(
+            "update:aliasedNodeData",
+            buildReferenceSelectAliasedNodeData(
+                null,
+                preferredLanguageCode,
+                systemLanguageCode,
+            ),
+        );
         return;
     }
 
-    const nodeValue = [];
-    const details = [];
-    const simplifiedValue = [];
+    const nodeValue: ReferenceSelectNodeValue[] = [];
 
     for (const updatedListItemId of Object.keys(updatedValue)) {
         const optionsQueue = [...(options.value || [])];
@@ -162,25 +201,17 @@ function onUpdateModelValue(
             labels: selectedOption!.data.list_item_values,
             uri: selectedOption!.data.uri,
         });
-        details.push(selectedOption!.data);
-
-        simplifiedValue.push(listId!);
     }
 
-    const displayValue = details.map((item) => item.display_value).join(", ");
-
-    if (shouldEmitSimplifiedValue) {
-        emit(
-            "update:value",
-            details.map((item) => item.display_value),
-        );
-    } else {
-        emit("update:value", {
-            node_value: nodeValue,
-            display_value: displayValue,
-            details: details,
-        });
-    }
+    emit("update:value", nodeValue);
+    emit(
+        "update:aliasedNodeData",
+        buildReferenceSelectAliasedNodeData(
+            nodeValue,
+            preferredLanguageCode,
+            systemLanguageCode,
+        ),
+    );
 }
 </script>
 
@@ -188,14 +219,15 @@ function onUpdateModelValue(
     <TreeSelect
         style="display: flex"
         option-value="list_item_id"
+        :input-id="nodeAlias"
         :fluid="true"
         :loading="isLoading"
         :options="options"
         :expanded-keys="expandedKeys"
         :model-value="initialValueFromTileData"
-        :placeholder="cardXNodeXWidgetData.config.placeholder"
+        :placeholder="cardXNodeXWidgetData?.config.placeholder"
         :selection-mode="
-            cardXNodeXWidgetData.node.config.multiValue ? 'multiple' : 'single'
+            cardXNodeXWidgetData?.node.config.multiValue ? 'multiple' : 'single'
         "
         :show-clear="true"
         @update:model-value="onUpdateModelValue($event)"
