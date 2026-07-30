@@ -3,7 +3,7 @@ import { watch } from "vue";
 
 import type { ConceptListAliasedNodeData } from "@/arches_vue_components/datatypes/concept-list/types.ts";
 
-const { aliasedNodeData } = defineProps<{
+const { aliasedNodeData = null } = defineProps<{
     aliasedNodeData?: ConceptListAliasedNodeData | null;
 }>();
 

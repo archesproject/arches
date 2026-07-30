@@ -101,12 +101,13 @@ function navigateToNextFeature() {
                 />
             </template>
             <template v-else-if="descriptor">
-                <!-- eslint-disable-next-line vue/no-v-html -->
+                <!-- eslint-disable vue/no-v-html -->
                 <div
                     v-if="descriptor.map_popup"
                     class="popup-html-content"
                     v-html="descriptor.map_popup"
                 />
+                <!-- eslint-enable vue/no-v-html -->
                 <div class="popup-metadata-block">
                     <div
                         v-if="descriptor.graph_name"

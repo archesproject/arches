@@ -17,13 +17,17 @@ import type {
 } from "@/arches_vue_components/datatypes/concept/types.ts";
 import type { ConceptListAliasedNodeData } from "@/arches_vue_components/datatypes/concept-list/types.ts";
 
-const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } =
-    defineProps<{
-        graphSlug?: string;
-        nodeAlias?: string;
-        aliasedNodeData?: ConceptListAliasedNodeData | null;
-        cardXNodeXWidgetData?: ConceptCardXNodeXWidgetData;
-    }>();
+const {
+    graphSlug = undefined,
+    nodeAlias = undefined,
+    aliasedNodeData = null,
+    cardXNodeXWidgetData = undefined,
+} = defineProps<{
+    graphSlug?: string;
+    nodeAlias?: string;
+    aliasedNodeData?: ConceptListAliasedNodeData | null;
+    cardXNodeXWidgetData?: ConceptCardXNodeXWidgetData;
+}>();
 
 const emit = defineEmits<{
     (event: "update:isLoading", isLoading: boolean): void;

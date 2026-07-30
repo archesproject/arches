@@ -79,7 +79,11 @@ interface DrawEvent {
     features: Feature[];
 }
 
-const { aliasedNodeData, cardXNodeXWidgetData, renderContext } = defineProps<{
+const {
+    aliasedNodeData,
+    cardXNodeXWidgetData = undefined,
+    renderContext = undefined,
+} = defineProps<{
     aliasedNodeData: GeoJSONFeatureCollectionAliasedNodeData | null;
     cardXNodeXWidgetData?: MapCardXNodeXWidgetData;
     renderContext?: string;

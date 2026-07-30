@@ -28,11 +28,11 @@ import type { ResourceInstanceAliasedNodeData } from "@/arches_vue_components/da
 const ITEM_SIZE = 36;
 
 const {
-    cardXNodeXWidgetData,
-    nodeAlias,
-    graphSlug,
-    aliasedNodeData,
-    defaultTerm,
+    cardXNodeXWidgetData = undefined,
+    nodeAlias = undefined,
+    graphSlug = undefined,
+    aliasedNodeData = null,
+    defaultTerm = undefined,
 } = defineProps<{
     cardXNodeXWidgetData?: ResourceInstanceCardXNodeXWidgetData;
     nodeAlias?: string;
