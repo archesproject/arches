@@ -34,7 +34,112 @@ export const fetchLists = async () => {
         }
         throw new Error(parsed.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
+    }
+};
+
+export const fetchListsShallow = async () => {
+    const response = await fetch(
+        `${arches.urls.controlled_lists}?shallow=true`,
+    );
+    try {
+        const parsed = await response.json();
+        if (response.ok) {
+            return parsed;
+        }
+        throw new Error(parsed.message);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
+    }
+};
+
+export const fetchListShallow = async (listId: string) => {
+    const response = await fetch(
+        `${arches.urls.controlled_list(listId)}?shallow=true`,
+    );
+    try {
+        const parsed = await response.json();
+        if (response.ok) {
+            return parsed;
+        }
+        throw new Error(parsed.message);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
+    }
+};
+
+export const fetchListEagerly = async (listId: string) => {
+    const response = await fetch(arches.urls.controlled_list(listId));
+    try {
+        const parsed = await response.json();
+        if (response.ok) {
+            return parsed;
+        }
+        throw new Error(parsed.message);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
+    }
+};
+
+export const fetchListItemChildren = async (itemId: string) => {
+    const response = await fetch(
+        arches.urls.controlled_list_item_children(itemId),
+    );
+    try {
+        const parsed = await response.json();
+        if (response.ok) {
+            return parsed;
+        }
+        throw new Error(parsed.message);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
+    }
+};
+
+export const fetchListItemAncestorPath = async (itemId: string) => {
+    const response = await fetch(arches.urls.controlled_list_item_path(itemId));
+    try {
+        const parsed = await response.json();
+        if (response.ok) {
+            return parsed;
+        }
+        throw new Error(parsed.message);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
+    }
+};
+
+export const fetchFilteredList = async (listId: string, term: string) => {
+    const url = new URL(
+        arches.urls.controlled_list_filtered(listId),
+        window.location.origin,
+    );
+    if (term) {
+        url.searchParams.set("term", term);
+    }
+    const response = await fetch(url.toString());
+    try {
+        const parsed = await response.json();
+        if (response.ok) {
+            return parsed;
+        }
+        throw new Error(parsed.message);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -51,7 +156,9 @@ export const createList = async (name: string) => {
         }
         throw new Error(parsed.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -71,7 +178,9 @@ export const importList = async (file: File, overwriteOption: string) => {
         }
         throw new Error(parsed.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -94,7 +203,9 @@ export const exportList = async (listIds: string[]) => {
             return { blob, filename };
         }
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -111,7 +222,9 @@ export const createItem = async (item: NewControlledListItem) => {
         }
         throw new Error(parsed.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -131,7 +244,9 @@ export const patchItem = async (
         const error = await response.json();
         throw new Error(error.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -160,7 +275,9 @@ export const copyItem = async (
         const error = await response.json();
         throw new Error(error.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -200,7 +317,9 @@ export const patchList = async (
         const error = await response.json();
         throw new Error(error.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -269,7 +388,9 @@ export const upsertValue = async (value: Value | NewValue) => {
         }
         throw new Error(parsed.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -288,7 +409,9 @@ export const deleteValue = async (value: Value) => {
         const error = await response.json();
         throw new Error(error.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -311,7 +434,9 @@ export const upsertMetadata = async (
         }
         throw new Error(parsed.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -332,7 +457,9 @@ export const deleteMetadata = async (
         const error = await response.json();
         throw new Error(error.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };
 
@@ -351,6 +478,8 @@ export const deleteImage = async (image: ControlledListItemImage) => {
         const error = await response.json();
         throw new Error(error.message);
     } catch (error) {
-        throw new Error((error as Error).message || response.statusText);
+        throw new Error((error as Error).message || response.statusText, {
+            cause: error,
+        });
     }
 };

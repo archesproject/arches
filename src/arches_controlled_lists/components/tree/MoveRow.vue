@@ -19,7 +19,6 @@ import {
     dataIsItem,
     findNodeInTree,
     itemAsNode,
-    listAsNode,
     nodeIsItem,
     nodeIsList,
     reorderItems,
@@ -50,13 +49,13 @@ const { displayedRow, setDisplayedRow } = inject<{
     setDisplayedRow: RowSetter;
 }>(displayedRowKey)!;
 
-const { iconLabels, moveLabels, node } = defineProps<{
+const { iconLabels, moveLabels, node, tree } = defineProps<{
     iconLabels: IconLabels;
     moveLabels: MoveLabels;
     node: TreeNode;
+    tree: TreeNode[];
 }>();
 
-const tree = defineModel<TreeNode[]>("tree", { required: true });
 const expandedKeys = defineModel<TreeExpandedKeys>("expandedKeys", {
     required: true,
 });
@@ -76,8 +75,8 @@ watch(displayedRow, () => {
 
 const isFirstItem = (item: ControlledListItem) => {
     const siblings: TreeNode[] = item.parent_id
-        ? findNodeInTree(tree.value, item.parent_id).found!.data.children
-        : findNodeInTree(tree.value, item.list_id).found!.data.items;
+        ? findNodeInTree(tree, item.parent_id).found!.data.children
+        : findNodeInTree(tree, item.list_id).found!.data.items;
     if (!siblings.length) {
         throw new Error();
     }
@@ -86,8 +85,8 @@ const isFirstItem = (item: ControlledListItem) => {
 
 const isLastItem = (item: ControlledListItem) => {
     const siblings: TreeNode[] = item.parent_id
-        ? findNodeInTree(tree.value, item.parent_id).found!.data.children
-        : findNodeInTree(tree.value, item.list_id).found!.data.items;
+        ? findNodeInTree(tree, item.parent_id).found!.data.children
+        : findNodeInTree(tree, item.list_id).found!.data.items;
     if (!siblings.length) {
         throw new Error();
     }
@@ -148,15 +147,13 @@ const addItem = (parent: TreeNode) => {
 };
 
 const reorder = async (item: ControlledListItem, up: boolean) => {
-    const list: ControlledList = findNodeInTree(tree.value, item.list_id).found!
-        .data;
+    const list: ControlledList = findNodeInTree(tree, item.list_id).found!.data;
 
     let siblings: ControlledListItem[];
     if (item.parent_id) {
-        siblings = findNodeInTree(
-            tree.value,
-            item.parent_id,
-        ).found!.children!.map((child: TreeNode) => child.data);
+        siblings = findNodeInTree(tree, item.parent_id).found!.children!.map(
+            (child: TreeNode) => child.data,
+        );
     } else {
         siblings = list.items;
     }
@@ -175,14 +172,6 @@ const reorder = async (item: ControlledListItem, up: boolean) => {
         });
         return;
     }
-    const oldListIndex = tree.value.findIndex(
-        (listNode) => listNode.data.id === list.id,
-    );
-    tree.value = [
-        ...tree.value.slice(0, oldListIndex),
-        listAsNode(list, selectedLanguage.value, iconLabels),
-        ...tree.value.slice(oldListIndex + 1),
-    ];
     selectedKeys.value = {
         ...selectedKeys.value,
         [item.id]: true,

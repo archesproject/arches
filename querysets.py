@@ -1,5 +1,6 @@
 from django.contrib.postgres.expressions import ArraySubquery
 from django.db import models
+from django.db.models import Exists, OuterRef
 from django.db.models.fields.json import KT
 from django.db.models.functions import Cast
 
@@ -13,7 +14,7 @@ class ListQuerySet(models.QuerySet):
     def annotate_node_fields(self, **kwargs):
         from arches_controlled_lists.models import NodeProxy
 
-        qs = self
+        queryset = self
         for annotation_name, node_field in kwargs.items():
             subquery = ArraySubquery(
                 NodeProxy.objects.with_controlled_lists()
@@ -24,9 +25,9 @@ class ListQuerySet(models.QuerySet):
                 .order_by("pk")
                 .values(node_field)
             )
-            qs = qs.annotate(**{annotation_name: subquery})
+            queryset = queryset.annotate(**{annotation_name: subquery})
 
-        return qs
+        return queryset
 
 
 class ListItemQuerySet(models.QuerySet):
@@ -43,6 +44,15 @@ class ListItemQuerySet(models.QuerySet):
                 "list_item_values",
                 ListItemValue.objects.labels(),
                 to_attr="list_item_labels",
+            )
+        )
+
+    def annotate_has_children(self):
+        from arches_controlled_lists.models import ListItem
+
+        return self.annotate(
+            has_children_annotated=Exists(
+                ListItem.objects.filter(parent_id=OuterRef("pk"))
             )
         )
 

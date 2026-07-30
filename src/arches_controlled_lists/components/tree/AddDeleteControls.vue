@@ -10,11 +10,7 @@ import SplitButton from "primevue/splitbutton";
 import ImportList from "@/arches_controlled_lists/components/misc/ImportList.vue";
 import ExportList from "@/arches_controlled_lists/components/misc/ExportList.vue";
 
-import {
-    deleteItems,
-    deleteLists,
-    fetchLists,
-} from "@/arches_controlled_lists/api.ts";
+import { deleteItems, deleteLists } from "@/arches_controlled_lists/api.ts";
 import {
     CONTRAST,
     DANGER,
@@ -27,9 +23,9 @@ import {
 } from "@/arches_controlled_lists/constants.ts";
 import {
     dataIsItem,
-    listAsNode,
     shouldUseContrast,
 } from "@/arches_controlled_lists/utils.ts";
+import { useListStore } from "@/arches_controlled_lists/stores/useListStore.ts";
 
 import type { Ref } from "vue";
 import type { TreeSelectionKeys } from "primevue/tree";
@@ -37,7 +33,6 @@ import type { TreeNode } from "primevue/treenode";
 import type {
     ControlledList,
     ControlledListItem,
-    IconLabels,
     Language,
     RowSetter,
     Selectable,
@@ -47,9 +42,11 @@ const { displayedRow, setDisplayedRow } = inject<{
     displayedRow: Ref<Selectable>;
     setDisplayedRow: RowSetter;
 }>(displayedRowKey)!;
-const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
+// Retained for downstream side-effects (e.g. ExportList rendering) even
+// though this component no longer drives selectedLanguage directly.
+inject(selectedLanguageKey) as Ref<Language>;
 
-const tree = defineModel<TreeNode[]>({ required: true });
+const { tree } = defineProps<{ tree: TreeNode[] }>();
 const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", {
     required: true,
 });
@@ -61,20 +58,39 @@ const newListFormValue = defineModel<string>("newListFormValue", {
     required: true,
 });
 
-// For new list entry (input textbox)
 const newListCounter = ref(1);
 
 const { $gettext, $ngettext } = useGettext();
 const confirm = useConfirm();
 const toast = useToast();
+const listStore = useListStore();
 
-const multiSelectStateFromDisplayedRow = computed(() => {
+const multiSelectStateFromDisplayedRow = async () => {
     if (!displayedRow.value || !displayedRow.value.id) {
         return {};
     }
     const newSelectedKeys: TreeSelectionKeys = {
         [displayedRow.value.id]: { checked: true, partialChecked: false },
     };
+
+    const isItem = dataIsItem(displayedRow.value);
+    let listId: string;
+    if (isItem) {
+        listId = (displayedRow.value as ControlledListItem).list_id;
+    } else {
+        listId = (displayedRow.value as ControlledList).id;
+    }
+    try {
+        await listStore.loadListEagerly(listId);
+    } catch (error) {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Unable to load list for multi-select"),
+            detail: error instanceof Error ? error.message : undefined,
+        });
+        return newSelectedKeys;
+    }
 
     const recurse = (items: ControlledListItem[]) => {
         for (const child of items) {
@@ -91,22 +107,17 @@ const multiSelectStateFromDisplayedRow = computed(() => {
         recurse((displayedRow.value as ControlledList).items);
     }
     return newSelectedKeys;
-});
+};
 
 const deleteSelectOptions = [
     {
         label: $gettext("Delete Multiple"),
-        command: () => {
+        command: async () => {
             isMultiSelecting.value = true;
-            selectedKeys.value = { ...multiSelectStateFromDisplayedRow.value };
+            selectedKeys.value = await multiSelectStateFromDisplayedRow();
         },
     },
 ];
-
-const iconLabels: IconLabels = {
-    list: $gettext("List"),
-    item: $gettext("Item"),
-};
 
 const createList = () => {
     const newList: ControlledList = {
@@ -121,7 +132,7 @@ const createList = () => {
     nextNewList.value = newList;
     newListCounter.value += 1;
 
-    tree.value.push(listAsNode(newList, selectedLanguage.value, iconLabels));
+    listStore.addListShallow(newList);
 
     selectedKeys.value = { [newList.id]: true };
     setDisplayedRow(newList);
@@ -140,10 +151,19 @@ const addNewListOptions = [
     },
 ];
 
-function onImport() {
+async function onImport() {
     showImportList.value = false;
     importDialogKey.value++;
-    fetchListsAndPopulateTree();
+    try {
+        await listStore.refresh();
+    } catch (error) {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Unable to refresh lists"),
+            detail: error instanceof Error ? error.message : undefined,
+        });
+    }
 }
 
 const showExportList = ref(false);
@@ -160,12 +180,12 @@ const toDelete = computed(() => {
     }
     if (isMultiSelecting.value) {
         return Object.entries(selectedKeys.value)
-            .filter(([, v]) => v.checked)
-            .map(([k]) => k);
+            .filter(([, selectionState]) => selectionState.checked)
+            .map(([selectedKey]) => selectedKey);
     }
     return Object.entries(selectedKeys.value)
-        .filter(([, v]) => v)
-        .map(([k]) => k);
+        .filter(([, selectionState]) => selectionState)
+        .map(([selectedKey]) => selectedKey);
 });
 
 function parseSingleDetail(error: unknown) {
@@ -179,7 +199,7 @@ const deleteSelected = async () => {
     if (!selectedKeys.value) {
         return;
     }
-    const allListIds = tree.value.map((node) => node.data.id);
+    const allListIds = tree.map((node) => node.data.id);
 
     const listIdsToDelete = toDelete.value.filter((id) =>
         allListIds.includes(id),
@@ -245,46 +265,21 @@ const confirmDelete = () => {
             style: { fontSize: "small" },
         },
         accept: async () => {
-            await deleteSelected().then(fetchListsAndPopulateTree);
+            await deleteSelected();
+            try {
+                await listStore.refresh();
+            } catch (error) {
+                toast.add({
+                    severity: ERROR,
+                    life: DEFAULT_ERROR_TOAST_LIFE,
+                    summary: $gettext("Unable to refresh lists"),
+                    detail: error instanceof Error ? error.message : undefined,
+                });
+            }
         },
         reject: () => {},
     });
 };
-
-const fetchListsAndPopulateTree = async () => {
-    /*
-    Currently, rather than inspecting the results of the batched
-    delete requests, we just refetch everything. This requires being
-    a little clever about resorting the ordered response from the API
-    to preserve the existing sort (and avoid confusion).
-    */
-    const priorSortedListIds = tree.value.map((node) => node.key);
-
-    await fetchLists()
-        .then(
-            ({ controlled_lists }: { controlled_lists: ControlledList[] }) => {
-                tree.value = controlled_lists
-                    .map((list) =>
-                        listAsNode(list, selectedLanguage.value, iconLabels),
-                    )
-                    .sort(
-                        (a, b) =>
-                            priorSortedListIds.indexOf(a.key) -
-                            priorSortedListIds.indexOf(b.key),
-                    );
-            },
-        )
-        .catch((error: Error) => {
-            toast.add({
-                severity: ERROR,
-                life: DEFAULT_ERROR_TOAST_LIFE,
-                summary: $gettext("Unable to fetch lists"),
-                detail: error.message,
-            });
-        });
-};
-
-await fetchListsAndPopulateTree();
 </script>
 
 <template>

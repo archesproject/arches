@@ -29,34 +29,22 @@ from arches_controlled_lists.models import (
     NodeProxy,
 )
 from arches_controlled_lists.utils.skos import SKOSReader, SKOSWriter
-
-
-def _prefetch_terms(request):
-    """Children at arbitrary depth will still be returned, but tell
-    the ORM to prefetch a certain depth to mitigate N+1 queries after."""
-    flat = str_to_bool(request.GET.get("flat", "false"))
-
-    # Raising the prefetch depth will only save queries, never cause more.
-    # Might add slight python overhead? ~12-14 is enough for Getty AAT.
-    # https://forum.djangoproject.com/t/prefetching-relations-to-arbitrary-depth/39328
-    prefetch_depth = 1 if flat else 14
-
-    terms = []
-    for i in range(prefetch_depth):
-        terms.extend(
-            [
-                f"list_items{'__children' * i}",
-                f"list_items{'__children' * i}__list_item_values",
-                f"list_items{'__children' * i}__list_item_images",
-                f"list_items{'__children' * i}__list_item_images__list_item_image_metadata",
-            ]
-        )
-    return terms
+from arches_controlled_lists.utils.view_utils import (
+    _prefetch_terms,
+    _shallow_list_items_prefetch,
+)
 
 
 class ListsView(APIBase):
     def get(self, request):
-        """Returns either a flat representation (?flat=true) or a tree (default)."""
+        """Returns either a flat representation (?flat=true), a shallow
+        representation with root items only and ``has_children`` flags
+        (?shallow=true), or a full tree (default)."""
+        shallow = str_to_bool(request.GET.get("shallow", "false"))
+        prefetch_args = _prefetch_terms(request)
+        if shallow:
+            prefetch_args = [_shallow_list_items_prefetch(), *prefetch_args]
+
         lists = (
             List.objects.annotate_node_fields(
                 node_ids="pk",
@@ -66,13 +54,14 @@ class ListsView(APIBase):
                 graph_names="graph__name",
             )
             .order_by("name")
-            .prefetch_related(*_prefetch_terms(request))
+            .prefetch_related(*prefetch_args)
         )
 
         flat = str_to_bool(request.GET.get("flat", "false"))
         permitted = get_nodegroups_by_perm(request.user, "read_nodegroup")
         serialized = [
-            obj.serialize(flat=flat, permitted_nodegroups=permitted) for obj in lists
+            obj.serialize(flat=flat, shallow=shallow, permitted_nodegroups=permitted)
+            for obj in lists
         ]
 
         return JSONResponse({"controlled_lists": serialized})
@@ -80,17 +69,24 @@ class ListsView(APIBase):
 
 class ListView(APIBase):
     def get(self, request, list_id):
-        """Returns either a flat representation (?flat=true) or a tree (default)."""
+        """Returns either a flat representation (?flat=true), a shallow
+        representation with root items only and ``has_children`` flags
+        (?shallow=true), or a full tree (default)."""
+        shallow = str_to_bool(request.GET.get("shallow", "false"))
+        prefetch_args = _prefetch_terms(request)
+        if shallow:
+            prefetch_args = [_shallow_list_items_prefetch(), *prefetch_args]
+
         try:
-            lst = List.objects.prefetch_related(*_prefetch_terms(request)).get(
-                pk=list_id
-            )
+            lst = List.objects.prefetch_related(*prefetch_args).get(pk=list_id)
         except List.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
 
         flat = str_to_bool(request.GET.get("flat", "false"))
         permitted = get_nodegroups_by_perm(request.user, "read_nodegroup")
-        serialized = lst.serialize(flat=flat, permitted_nodegroups=permitted)
+        serialized = lst.serialize(
+            flat=flat, shallow=shallow, permitted_nodegroups=permitted
+        )
 
         return JSONResponse(serialized)
 
@@ -227,10 +223,20 @@ class FilteredListView(APIBase):
             current_id = parent.get("parent_id")
         return " > ".join(reversed(parts))
 
+    def _get_parent_ids(self, item, item_map):
+        # Returns ancestor ids ordered root → immediate parent.
+        ids = []
+        current_id = item.get("parent_id")
+        while current_id and current_id in item_map:
+            ids.append(current_id)
+            current_id = item_map[current_id].get("parent_id")
+        return list(reversed(ids))
+
     def _walk(self, children_map, parent_id, depth, item_map, lang):
         for child in children_map[parent_id]:
             child["depth"] = depth
             child["parent_path"] = self._get_parent_path(child, item_map, lang)
+            child["parent_ids"] = self._get_parent_ids(child, item_map)
             yield child
             yield from self._walk(children_map, child["id"], depth + 1, item_map, lang)
 
@@ -270,6 +276,7 @@ class FilteredListView(APIBase):
         for root in roots:
             root["depth"] = 0
             root["parent_path"] = ""
+            root["parent_ids"] = []
             ordered.append(root)
             ordered.extend(self._walk(children_map, root["id"], 1, item_map, lang))
 
@@ -400,6 +407,83 @@ class ListItemView(APIBase):
         if not objs_deleted:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
         return JSONResponse(status=HTTPStatus.NO_CONTENT)
+
+
+class ListItemChildrenView(APIBase):
+    """Returns the immediate children of ``item_id`` as shallow-serialized
+    items (with ``has_children`` flags). Powers the lazy ``@node-expand``
+    flow in the controlled-list tree."""
+
+    def get(self, request, item_id):
+        if not ListItem.objects.filter(pk=item_id).exists():
+            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
+
+        children = (
+            ListItem.objects.filter(parent_id=item_id)
+            .prefetch_related(
+                "list_item_values",
+                "list_item_images",
+                "list_item_images__list_item_image_metadata",
+            )
+            .annotate_has_children()
+            .order_by("sortorder")
+        )
+        return JSONResponse(
+            {"children": [child.serialize_shallow() for child in children]}
+        )
+
+
+class ListItemAncestorPathView(APIBase):
+    """Returns the root → target path for ``item_id`` so the frontend can
+    lazy-load each ancestor's children in turn and reveal a deep-linked item.
+
+    Response shape mirrors arches-lingo's ``fetchConceptAncestorPaths`` even
+    though controlled lists are strict trees with a single parent path."""
+
+    def get(self, request, item_id):
+        try:
+            leaf = ListItem.objects.get(pk=item_id)
+        except ListItem.DoesNotExist:
+            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
+
+        # Walk parent links upward; depth is bounded by what the sortable UI
+        # supports, so a Python loop is fine here.
+        ancestors = []
+        current = leaf
+        seen = set()
+        while current is not None:
+            if current.pk in seen:
+                # Should never happen given DB constraints, but guard anyway.
+                break
+            seen.add(current.pk)
+            ancestors.append(current)
+            current = current.parent
+
+        ancestor_qs = (
+            ListItem.objects.filter(pk__in=[a.pk for a in ancestors])
+            .prefetch_related(
+                "list_item_values",
+                "list_item_images",
+                "list_item_images__list_item_image_metadata",
+            )
+            .annotate_has_children()
+        )
+        serialized_by_id = {
+            str(item.pk): item.serialize_shallow() for item in ancestor_qs
+        }
+        ordered_items = [
+            serialized_by_id[str(a.pk)]
+            for a in reversed(ancestors)
+            if str(a.pk) in serialized_by_id
+        ]
+
+        try:
+            lst = List.objects.get(pk=leaf.list_id)
+        except List.DoesNotExist:
+            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
+        list_dict = {"id": str(lst.pk), "name": lst.name}
+
+        return JSONResponse({"paths": [{"searchResults": [list_dict, *ordered_items]}]})
 
 
 @method_decorator(
