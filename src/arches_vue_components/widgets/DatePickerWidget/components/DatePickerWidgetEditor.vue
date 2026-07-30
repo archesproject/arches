@@ -18,7 +18,7 @@ import type {
     DateCardXNodeXWidgetData,
 } from "@/arches_vue_components/datatypes/date/types.ts";
 
-const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+const { cardXNodeXWidgetData = undefined, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData?: DateCardXNodeXWidgetData;
     aliasedNodeData: DateAliasedNodeData | null;
 }>();

@@ -9,7 +9,7 @@ import { buildLanguageAliasedNodeData } from "@/arches_vue_components/datatypes/
 import type { CardXNodeXWidgetData } from "@/arches_vue_components/types.ts";
 import type { LanguageAliasedNodeData } from "@/arches_vue_components/datatypes/language/types.ts";
 
-const { aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
+const { aliasedNodeData, cardXNodeXWidgetData = undefined } = defineProps<{
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
     aliasedNodeData: LanguageAliasedNodeData | null;
 }>();

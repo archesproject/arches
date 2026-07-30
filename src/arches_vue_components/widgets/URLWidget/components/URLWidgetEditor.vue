@@ -9,7 +9,7 @@ import { buildURLAliasedNodeData } from "@/arches_vue_components/datatypes/url/u
 import type { CardXNodeXWidgetData } from "@/arches_vue_components/types.ts";
 import type { URLAliasedNodeData } from "@/arches_vue_components/datatypes/url/types";
 
-const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+const { cardXNodeXWidgetData = undefined, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
     aliasedNodeData: URLAliasedNodeData | null;
 }>();

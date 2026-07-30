@@ -19,13 +19,17 @@ import type {
 } from "@/arches_vue_components/datatypes/concept/types.ts";
 import type { CardXNodeXWidgetData } from "@/arches_vue_components/types.ts";
 
-const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } =
-    defineProps<{
-        graphSlug?: string;
-        nodeAlias?: string;
-        aliasedNodeData?: ConceptAliasedNodeData | null;
-        cardXNodeXWidgetData?: CardXNodeXWidgetData;
-    }>();
+const {
+    graphSlug = undefined,
+    nodeAlias = undefined,
+    aliasedNodeData = null,
+    cardXNodeXWidgetData = undefined,
+} = defineProps<{
+    graphSlug?: string;
+    nodeAlias?: string;
+    aliasedNodeData?: ConceptAliasedNodeData | null;
+    cardXNodeXWidgetData?: CardXNodeXWidgetData;
+}>();
 
 const emit = defineEmits<{
     (event: "update:isLoading", isLoading: boolean): void;

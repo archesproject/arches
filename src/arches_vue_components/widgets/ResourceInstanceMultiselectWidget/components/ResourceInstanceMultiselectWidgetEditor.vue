@@ -26,13 +26,17 @@ import type { ResourceInstanceListAliasedNodeData } from "@/arches_vue_component
 
 const ITEM_SIZE = 36;
 
-const { cardXNodeXWidgetData, nodeAlias, graphSlug, aliasedNodeData } =
-    defineProps<{
-        cardXNodeXWidgetData?: ResourceInstanceListCardXNodeXWidgetData;
-        nodeAlias?: string;
-        graphSlug?: string;
-        aliasedNodeData?: ResourceInstanceListAliasedNodeData | null;
-    }>();
+const {
+    cardXNodeXWidgetData = undefined,
+    nodeAlias = undefined,
+    graphSlug = undefined,
+    aliasedNodeData = null,
+} = defineProps<{
+    cardXNodeXWidgetData?: ResourceInstanceListCardXNodeXWidgetData;
+    nodeAlias?: string;
+    graphSlug?: string;
+    aliasedNodeData?: ResourceInstanceListAliasedNodeData | null;
+}>();
 
 const emit = defineEmits<{
     (event: "update:isLoading", isLoading: boolean): void;

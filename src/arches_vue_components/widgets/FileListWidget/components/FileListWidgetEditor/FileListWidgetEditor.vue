@@ -18,7 +18,7 @@ import type {
     PrimeVueFile,
 } from "@/arches_vue_components/widgets/FileListWidget/types.ts";
 
-const { aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
+const { aliasedNodeData, cardXNodeXWidgetData = undefined } = defineProps<{
     aliasedNodeData: FileListAliasedNodeData | null;
     cardXNodeXWidgetData?: FileListCardXNodeXWidgetData;
 }>();

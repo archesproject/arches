@@ -5,7 +5,7 @@ import arches from "arches";
 
 import type { ResourceInstanceAliasedNodeData } from "@/arches_vue_components/datatypes/resource-instance/types";
 
-const { aliasedNodeData } = defineProps<{
+const { aliasedNodeData = null } = defineProps<{
     aliasedNodeData?: ResourceInstanceAliasedNodeData | null;
 }>();
 

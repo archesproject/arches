@@ -9,7 +9,11 @@ import type {
     CardXNodeXWidgetData,
 } from "@/arches_vue_components/types.ts";
 
-const { cardXNodeXWidgetData, graphSlug, tileData } = defineProps<{
+const {
+    cardXNodeXWidgetData,
+    graphSlug,
+    tileData = undefined,
+} = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData[];
     graphSlug: string;
     nodegroupAlias: string;

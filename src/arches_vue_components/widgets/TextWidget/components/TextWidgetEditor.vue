@@ -19,7 +19,11 @@ import type {
     StringAliasedNodeData,
 } from "@/arches_vue_components/datatypes/string/types.ts";
 
-const { cardXNodeXWidgetData, aliasedNodeData, renderContext } = defineProps<{
+const {
+    cardXNodeXWidgetData = undefined,
+    aliasedNodeData,
+    renderContext = undefined,
+} = defineProps<{
     cardXNodeXWidgetData?: StringCardXNodeXWidgetData;
     aliasedNodeData: StringAliasedNodeData | null;
     renderContext?: string;

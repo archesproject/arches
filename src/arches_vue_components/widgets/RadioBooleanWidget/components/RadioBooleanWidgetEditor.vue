@@ -8,7 +8,7 @@ import { buildBooleanAliasedNodeData } from "@/arches_vue_components/datatypes/b
 import type { BooleanCardXNodeXWidgetData } from "@/arches_vue_components/types.ts";
 import type { BooleanAliasedNodeData } from "@/arches_vue_components/datatypes/boolean/types.ts";
 
-const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+const { cardXNodeXWidgetData = undefined, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData?: BooleanCardXNodeXWidgetData;
     aliasedNodeData: BooleanAliasedNodeData | null;
 }>();
