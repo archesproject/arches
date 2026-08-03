@@ -317,9 +317,12 @@ class ListExportView(APIBase):
                 export_lists, export_list_items, format="pretty-xml"
             )
 
-            filename = (
-                f"{slugify(settings.APP_NAME, separator='_')}_controlled_lists.xml"
-            )
+            if len(export_lists) == 1:
+                filename = f"{slugify(export_lists[0].name, separator='_')}.xml"
+            else:
+                filename = (
+                    f"{slugify(settings.APP_NAME, separator='_')}_controlled_lists.xml"
+                )
             response = JSONResponse(rdf, status=HTTPStatus.OK)
             response["Content-Type"] = "application/xml"
             response["Content-Disposition"] = f'attachment; filename="{filename}"'

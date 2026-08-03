@@ -62,11 +62,12 @@ async function exportToSKOS() {
         );
         const download = document.createElement("a");
         download.href = url;
-        const inputFileName = sanitizeFilename(filename.value) + ".xml";
-        download.setAttribute(
-            "download",
-            `${filename.value ? inputFileName : file.filename}`,
-        );
+        const inputFileName = filename.value ? filename.value : file.filename;
+        let downloadFileName = sanitizeFilename(inputFileName);
+        if (!downloadFileName.endsWith(".xml")) {
+            downloadFileName = downloadFileName.concat(".xml");
+        }
+        download.setAttribute("download", downloadFileName);
         document.body.appendChild(download);
         download.click();
         document.body.removeChild(download);
