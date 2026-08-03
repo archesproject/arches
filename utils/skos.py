@@ -12,8 +12,11 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.skos import SKOSReader, SKOSWriter
 from arches_controlled_lists.models import List, ListItem, ListItemValue
 
-# define the ARCHES namespace
+# ARCHES namespace is used for project-specific URIs
 ARCHES = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
+
+# ARCHES_CONTROLLED_LISTS namespace used for searchable property
+ARCHES_CONTROLLED_LISTS = Namespace("https://archesproject.org/ns/controlled-lists#")
 
 
 class SKOSReader(SKOSReader):
@@ -74,6 +77,9 @@ class SKOSReader(SKOSReader):
 
                         val = self.unwrapJsonLiteral(object)
                         new_list.name = val["value"]
+
+                    elif predicate == ARCHES_CONTROLLED_LISTS.searchable:
+                        new_list.searchable = bool(object.toPython())
 
                 self.lists[scheme] = new_list
 
@@ -247,6 +253,7 @@ class SKOSWriter(SKOSWriter):
 
         # bind the namespaces
         rdf_graph.bind("arches", ARCHES)
+        rdf_graph.bind("arches_controlled_lists", ARCHES_CONTROLLED_LISTS)
         rdf_graph.bind("skos", SKOS)
         rdf_graph.bind("dcterms", DCTERMS)
 
@@ -254,6 +261,13 @@ class SKOSWriter(SKOSWriter):
             # Lists are stored as ConceptSchemes
             rdf_graph.add((ARCHES[str(lst.id)], RDF.type, SKOS.ConceptScheme))
             rdf_graph.add((ARCHES[str(lst.id)], DCTERMS.title, Literal(lst.name)))
+            rdf_graph.add(
+                (
+                    ARCHES[str(lst.id)],
+                    ARCHES_CONTROLLED_LISTS.searchable,
+                    Literal(lst.searchable),
+                )
+            )
 
         for lst_item in list_items:
             # ListItems are stored as Concepts
@@ -269,7 +283,7 @@ class SKOSWriter(SKOSWriter):
                 rdf_graph.add(
                     (
                         ARCHES[str(lst_item.id)],
-                        ARCHES["sortorder"],
+                        ARCHES.sortorder,
                         Literal(lst_item.sortorder),
                     )
                 )
