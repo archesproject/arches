@@ -23,6 +23,7 @@ const toast = useToast();
 
 const props = defineProps<{
     lists: TreeNode[];
+    initialSelectedListId?: string | null;
 }>();
 
 const emit = defineEmits<{
@@ -36,10 +37,20 @@ const selectedListIds = ref<string[]>([]);
 const filename = ref();
 
 function extractLists() {
-    return (listOptions.value = props.lists.map((node: TreeNode) => ({
-        id: node.data.id,
+    listOptions.value = props.lists.map((node: TreeNode) => ({
+        id: String(node.data.id),
         name: node.data.name,
-    })));
+    }));
+
+    if (
+        props.initialSelectedListId &&
+        listOptions.value.some(
+            (option: { id: string }) =>
+                option.id === props.initialSelectedListId,
+        )
+    ) {
+        selectedListIds.value = [props.initialSelectedListId];
+    }
 }
 
 async function exportToSKOS() {

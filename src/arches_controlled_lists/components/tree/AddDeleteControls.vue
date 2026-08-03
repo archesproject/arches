@@ -169,6 +169,18 @@ async function onImport() {
 const showExportList = ref(false);
 const exportDialogKey = ref(0);
 
+const selectedListIdForExport = computed(() => {
+    if (!displayedRow.value || !displayedRow.value.id) {
+        return null;
+    }
+
+    if (dataIsItem(displayedRow.value)) {
+        return String((displayedRow.value as ControlledListItem).list_id);
+    }
+
+    return String((displayedRow.value as ControlledList).id);
+});
+
 function openExportDialog() {
     exportDialogKey.value++;
     showExportList.value = true;
@@ -319,6 +331,7 @@ const confirmDelete = () => {
                 v-if="showExportList"
                 :key="exportDialogKey"
                 :lists="tree"
+                :initial-selected-list-id="selectedListIdForExport"
             />
             <SplitButton
                 class="list-button"
