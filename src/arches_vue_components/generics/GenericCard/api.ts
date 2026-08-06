@@ -1,9 +1,15 @@
 import arches from "arches";
 import Cookies from "js-cookie";
 
-import { extractFileEntriesFromAliasedData } from "@/arches_vue_components/generics/GenericCard/utils.ts";
+import {
+    buildFileUploadFormData,
+    extractFileEntriesFromAliasedData,
+} from "@/arches_vue_components/generics/GenericCard/utils.ts";
 
-import type { AliasedTileData } from "@/arches_vue_components/types.ts";
+import type {
+    AliasedTileData,
+    FileEntry,
+} from "@/arches_vue_components/types.ts";
 
 export async function fetchTileData(
     graphSlug: string,
@@ -99,7 +105,7 @@ export async function upsertTileWithFiles(
     graphSlug: string,
     nodegroupAlias: string,
     payload: AliasedTileData,
-    fileEntries: Array<{ file: File; nodeId: string }>,
+    fileEntries: FileEntry[],
     tileId?: string,
     resourceInstanceId?: string | null,
 ): Promise<AliasedTileData> {
@@ -114,13 +120,6 @@ export async function upsertTileWithFiles(
         endpointUrl = arches.urls.api_tile_list_create(...urlSegments);
     }
 
-    const formData = new FormData();
-    formData.append("json", JSON.stringify(payload));
-
-    for (const { file, nodeId } of fileEntries) {
-        formData.append(`file-list_${nodeId}`, file, file.name);
-    }
-
     const httpMethod = tileId ? "PATCH" : "POST";
     const response = await fetch(endpointUrl, {
         method: httpMethod,
@@ -129,7 +128,7 @@ export async function upsertTileWithFiles(
             // with the correct boundary for multipart/form-data.
             "X-CSRFTOKEN": Cookies.get("csrftoken"),
         },
-        body: formData,
+        body: buildFileUploadFormData(payload, fileEntries),
     });
 
     const parsedBody = await response.json();
