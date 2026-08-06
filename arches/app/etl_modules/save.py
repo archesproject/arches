@@ -15,12 +15,15 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def save_to_tiles(userid, loadid, multiprocessing=False, max_subprocesses=0):
+def save_to_tiles(
+    userid, loadid, multiprocessing=False, max_subprocesses=0, index=True
+):
     logger.debug(
-        "save_to_tiles started: loadid=%s userid=%s multiprocessing=%s",
+        "save_to_tiles started: loadid=%s userid=%s multiprocessing=%s index=%s",
         loadid,
         userid,
         multiprocessing,
+        index,
     )
     with connection.cursor() as cursor:
         disable_tile_triggers(cursor, loadid)
@@ -56,7 +59,7 @@ def save_to_tiles(userid, loadid, multiprocessing=False, max_subprocesses=0):
 
     logger.debug("save_to_tiles proceeding to post-save edit log for loadid=%s", loadid)
     return _post_save_edit_log(
-        userid, loadid, multiprocessing, max_subprocesses=max_subprocesses
+        userid, loadid, multiprocessing, max_subprocesses=max_subprocesses, index=index
     )
 
 
@@ -145,28 +148,34 @@ def _update_load_details(cursor, loadid):
     logger.debug("load_event marked completed for loadid=%s", loadid)
 
 
-def _post_save_edit_log(userid, loadid, multiprocessing=False, max_subprocesses=0):
+def _post_save_edit_log(
+    userid, loadid, multiprocessing=False, max_subprocesses=0, index=True
+):
     logger.debug(
-        "_post_save_edit_log started: loadid=%s userid=%s multiprocessing=%s",
+        "_post_save_edit_log started: loadid=%s userid=%s multiprocessing=%s index=%s",
         loadid,
         userid,
         multiprocessing,
+        index,
     )
     try:
-        with connection.cursor() as cursor:
-            log_event_details(cursor, loadid, "done|Indexing...")
+        if index:
+            with connection.cursor() as cursor:
+                log_event_details(cursor, loadid, "done|Indexing...")
 
-        logger.debug("Indexing resources by transaction for loadid=%s", loadid)
-        index_resources_by_transaction(
-            loadid,
-            use_multiprocessing=multiprocessing,
-            quiet=True,
-            recalculate_descriptors=True,
-            max_subprocesses=max_subprocesses,
-        )
-        logger.debug(
-            "Indexing complete for loadid=%s; fetching user id=%s", loadid, userid
-        )
+            logger.debug("Indexing resources by transaction for loadid=%s", loadid)
+            index_resources_by_transaction(
+                loadid,
+                use_multiprocessing=multiprocessing,
+                quiet=True,
+                recalculate_descriptors=True,
+                max_subprocesses=max_subprocesses,
+            )
+            logger.debug(
+                "Indexing complete for loadid=%s; fetching user id=%s", loadid, userid
+            )
+        else:
+            logger.debug("Skipping indexing for loadid=%s (index=False)", loadid)
 
         user = User.objects.get(id=userid)
         user_email = getattr(user, "email", "")
@@ -200,12 +209,15 @@ def _post_save_edit_log(userid, loadid, multiprocessing=False, max_subprocesses=
                 ),
             )
             log_event_details(cursor, loadid, "done")
+            final_status = "indexed" if index else "completed"
             cursor.execute(
                 """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
-                ("indexed", datetime.now(), True, True, loadid),
+                (final_status, datetime.now(), True, True, loadid),
             )
-        logger.debug("_post_save_edit_log complete: loadid=%s status=indexed", loadid)
-        return {"success": True, "data": "indexed"}
+        logger.debug(
+            "_post_save_edit_log complete: loadid=%s status=%s", loadid, final_status
+        )
+        return {"success": True, "data": final_status}
     except Exception as e:
         logger.exception(e)
         with connection.cursor() as cursor:

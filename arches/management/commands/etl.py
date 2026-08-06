@@ -66,6 +66,13 @@ class Command(BaseCommand):
             default=0,
             help="Sets the process pool size when using multiprocessing. Default is ceil(cpu_count()/2)",
         )
+        parser.add_argument(
+            "--no-index",
+            action="store_false",
+            dest="index",
+            default=True,
+            help="Skip indexing resources after loading",
+        )
 
     def handle(self, *args, **options):
         self.run(
@@ -74,15 +81,22 @@ class Command(BaseCommand):
             config=options["config"],
             use_multiprocessing=options["use_multiprocessing"],
             max_subprocesses=options["max_subprocesses"],
+            index=options["index"],
         )
 
     def run(
-        self, module, source, config, use_multiprocessing=False, max_subprocesses=0
+        self,
+        module,
+        source,
+        config,
+        use_multiprocessing=False,
+        max_subprocesses=0,
+        index=True,
     ):
         """
         Run the specified module
         Params --source(-s), --config(-c), --use_multiprocessing(-mp),
-        and --max_subprocesses(-mxp)
+        --max_subprocesses(-mxp), and --no-index
 
         """
         loadid = str(uuid.uuid4())
@@ -93,6 +107,7 @@ class Command(BaseCommand):
             config = {}
         config["multiprocessing"] = use_multiprocessing
         config["max_subprocesses"] = max_subprocesses
+        config["index"] = index
         try:
             etl_module = ETLModule.objects.get(componentname=module)
             config["module"] = etl_module.etlmoduleid
