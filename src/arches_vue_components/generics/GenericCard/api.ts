@@ -1,5 +1,6 @@
-import arches from "arches";
 import Cookies from "js-cookie";
+
+import { generateArchesURL } from "@/arches_vue_components/application/generate-arches-url.ts";
 
 import { extractFileEntriesFromAliasedData } from "@/arches_vue_components/generics/GenericCard/utils.ts";
 
@@ -13,9 +14,16 @@ export async function fetchTileData(
     let tileUrl;
 
     if (tileId) {
-        tileUrl = arches.urls.api_tile(graphSlug, nodegroupAlias, tileId);
+        tileUrl = generateArchesURL("arches_querysets:api-tile", {
+            graph: graphSlug,
+            nodegroup_alias: nodegroupAlias,
+            pk: tileId,
+        });
     } else {
-        tileUrl = arches.urls.api_tile_blank(graphSlug, nodegroupAlias);
+        tileUrl = generateArchesURL("arches_querysets:api-tile-blank", {
+            graph: graphSlug,
+            nodegroup_alias: nodegroupAlias,
+        });
     }
 
     const response = await fetch(tileUrl);
@@ -63,17 +71,31 @@ export async function upsertTileAsJson(
     tileId?: string,
     resourceInstanceId?: string | null | undefined,
 ): Promise<AliasedTileData> {
-    const urlSegments = [graphSlug, nodegroupAlias];
     let endpointUrl;
 
     if (tileId) {
-        urlSegments.push(tileId);
-        endpointUrl = arches.urls.api_tile(...urlSegments);
+        endpointUrl = generateArchesURL("arches_querysets:api-tile", {
+            graph: graphSlug,
+            nodegroup_alias: nodegroupAlias,
+            pk: tileId,
+        });
     } else if (resourceInstanceId) {
-        urlSegments.push(resourceInstanceId);
-        endpointUrl = arches.urls.api_tile_list_create(...urlSegments);
+        endpointUrl = generateArchesURL(
+            "arches_querysets:api-tile-list-create",
+            {
+                graph: graphSlug,
+                nodegroup_alias: nodegroupAlias,
+                pk: resourceInstanceId,
+            },
+        );
     } else {
-        endpointUrl = arches.urls.api_tile_new_resource(...urlSegments);
+        endpointUrl = generateArchesURL(
+            "arches_querysets:api-tile-new-resource",
+            {
+                graph: graphSlug,
+                nodegroup_alias: nodegroupAlias,
+            },
+        );
     }
 
     const httpMethod = tileId ? "PATCH" : "POST";
@@ -103,15 +125,31 @@ export async function upsertTileWithFiles(
     tileId?: string,
     resourceInstanceId?: string | null,
 ): Promise<AliasedTileData> {
-    const urlSegments = [graphSlug, nodegroupAlias];
     let endpointUrl;
 
     if (tileId) {
-        urlSegments.push(tileId);
-        endpointUrl = arches.urls.api_tile(...urlSegments);
+        endpointUrl = generateArchesURL("arches_querysets:api-tile", {
+            graph: graphSlug,
+            nodegroup_alias: nodegroupAlias,
+            pk: tileId,
+        });
     } else if (resourceInstanceId) {
-        urlSegments.push(resourceInstanceId);
-        endpointUrl = arches.urls.api_tile_list_create(...urlSegments);
+        endpointUrl = generateArchesURL(
+            "arches_querysets:api-tile-list-create",
+            {
+                graph: graphSlug,
+                nodegroup_alias: nodegroupAlias,
+                pk: resourceInstanceId,
+            },
+        );
+    } else {
+        endpointUrl = generateArchesURL(
+            "arches_querysets:api-tile-new-resource",
+            {
+                graph: graphSlug,
+                nodegroup_alias: nodegroupAlias,
+            },
+        );
     }
 
     const formData = new FormData();

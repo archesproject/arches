@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import arches from "arches";
+import { generateArchesURL } from "@/arches_vue_components/application/generate-arches-url.ts";
 
 import type { CardXNodeXWidgetData } from "@/arches_vue_components/types.ts";
 
@@ -9,9 +9,12 @@ async function requestNodegroupWidgetConfigs(
     nodegroupAlias: string,
 ): Promise<CardXNodeXWidgetData[]> {
     const response = await fetch(
-        arches.urls.api_card_x_node_x_widget_list_from_nodegroup(
-            graphSlug,
-            nodegroupAlias,
+        generateArchesURL(
+            "arches_vue_components:api-card-x-node-x-widget-list-from-nodegroup",
+            {
+                graph_slug: graphSlug,
+                nodegroup_alias: nodegroupAlias,
+            },
         ),
     );
 

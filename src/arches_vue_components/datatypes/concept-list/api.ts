@@ -1,4 +1,4 @@
-import arches from "arches";
+import { generateArchesURL } from "@/arches_vue_components/application/generate-arches-url.ts";
 
 import type { ConceptFetchResult } from "@/arches_vue_components/datatypes/concept/types.ts";
 /*
@@ -10,7 +10,10 @@ export const fetchConceptsTree = async (
     nodeAlias: string,
 ): Promise<ConceptFetchResult> => {
     const response = await fetch(
-        `${arches.urls.api_concepts_tree(graphSlug, nodeAlias)}`,
+        generateArchesURL("arches_vue_components:api-concepts-tree", {
+            graph_slug: graphSlug,
+            node_alias: nodeAlias,
+        }),
     );
 
     const parsed = await response.json();

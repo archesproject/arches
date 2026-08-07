@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 
-import arches from "arches";
 import Button from "primevue/button";
 import Skeleton from "primevue/skeleton";
 import { useGettext } from "vue3-gettext";
 
+import { generateArchesURL } from "@/arches_vue_components/application/generate-arches-url.ts";
 import { fetchResourceDescriptor } from "@/arches_vue_components/widgets/MapWidget/api.ts";
 
 import type { MapGeoJSONFeature } from "maplibre-gl";
@@ -133,7 +133,11 @@ function navigateToNextFeature() {
             <Button
                 v-if="resourceId"
                 as="a"
-                :href="arches.urls.resource_report + resourceId"
+                :href="
+                    generateArchesURL('arches:resource_report', {
+                        resourceid: resourceId,
+                    })
+                "
                 target="_blank"
                 icon="pi pi-book"
                 :label="$gettext('Report')"
