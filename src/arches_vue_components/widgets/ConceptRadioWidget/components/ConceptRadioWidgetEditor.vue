@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, watchEffect } from "vue";
+import { computed, ref, watch, watchEffect } from "vue";
 
 import RadioButton from "primevue/radiobutton";
 import RadioButtonGroup from "primevue/radiobuttongroup";
@@ -8,22 +8,28 @@ import { useConceptTreeStore } from "@/arches_vue_components/stores/useConceptTr
 import type {
     ConceptFetchResult,
     CollectionItem,
+    ConceptValueItem,
     ConceptAliasedNodeData,
 } from "@/arches_vue_components/datatypes/concept/types.ts";
 
 import {
     buildConceptAliasedNodeData,
     flattenCollectionItems,
+    getOption,
 } from "@/arches_vue_components/datatypes/concept/utils.ts";
 import type { ConceptCardXNodeXWidgetData } from "@/arches_vue_components/types.ts";
 
-const { graphSlug, nodeAlias, aliasedNodeData, cardXNodeXWidgetData } =
-    defineProps<{
-        graphSlug?: string;
-        nodeAlias?: string;
-        aliasedNodeData?: ConceptAliasedNodeData | null;
-        cardXNodeXWidgetData?: ConceptCardXNodeXWidgetData;
-    }>();
+const {
+    graphSlug = undefined,
+    nodeAlias = undefined,
+    aliasedNodeData = null,
+    cardXNodeXWidgetData = undefined,
+} = defineProps<{
+    graphSlug?: string;
+    nodeAlias?: string;
+    aliasedNodeData?: ConceptAliasedNodeData | null;
+    cardXNodeXWidgetData?: ConceptCardXNodeXWidgetData;
+}>();
 
 const emit = defineEmits<{
     (event: "update:isLoading", isLoading: boolean): void;
@@ -44,6 +50,34 @@ const isLoading = ref(false);
 const optionsLoaded = ref(false);
 const optionsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
+
+const initialValue = computed<string | null>(() => {
+    if (!aliasedNodeData?.node_value) return null;
+    if (options.value.length) {
+        const option = getOption(aliasedNodeData.node_value, options.value);
+        if (option) {
+            return option.key;
+        } else {
+            // the option was not found using the key(valueid),
+            // try to find it in the details array using valueid
+            // and then mathching on the concept_id of the detail
+            if (aliasedNodeData?.details?.length) {
+                const detail = aliasedNodeData.details.find(
+                    (detailItem: ConceptValueItem) =>
+                        detailItem.valueid === aliasedNodeData.node_value,
+                );
+                if (detail) {
+                    const option = getOption(detail.concept_id, options.value);
+                    if (option) {
+                        return option.key;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    return aliasedNodeData.node_value;
+});
 
 watch(isLoading, (newValue) => {
     emit("update:isLoading", newValue);
@@ -95,7 +129,7 @@ function onUpdateModelValue(updatedValue: string | null) {
 <template>
     <RadioButtonGroup
         :id="cardXNodeXWidgetData?.node.alias"
-        :model-value="aliasedNodeData?.node_value ?? null"
+        :model-value="initialValue"
         :class="['button-group', flexDirection]"
         tabindex="-1"
         @update:model-value="onUpdateModelValue"

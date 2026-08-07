@@ -1,6 +1,7 @@
 import type {
     CollectionItem,
     ConceptAliasedNodeData,
+    ConceptValueItem,
 } from "@/arches_vue_components/datatypes/concept/types.ts";
 
 export function getOption(
@@ -20,9 +21,9 @@ export function getOption(
         }
         return null;
     }
-    return findNode(
-        options as CollectionItem[],
-        (option: CollectionItem) => option.key == value,
+    return (
+        findNode(options, (option) => option.key === value) ??
+        findNode(options, (option) => option.conceptid === value)
     );
 }
 
@@ -32,10 +33,22 @@ export function buildConceptAliasedNodeData(
 ): ConceptAliasedNodeData {
     if (!nodeValue) return { node_value: null, display_value: "", details: [] };
     const option = getOption(nodeValue, options);
+    let detail: ConceptValueItem[] = [];
+    if (option) {
+        detail = [
+            {
+                concept_id: option.conceptid,
+                language_id: "",
+                value: option.label,
+                valueid: option.key,
+                valuetype_id: "",
+            },
+        ];
+    }
     return {
         node_value: nodeValue,
         display_value: option?.label ?? "",
-        details: option ? [option] : [],
+        details: detail,
     };
 }
 

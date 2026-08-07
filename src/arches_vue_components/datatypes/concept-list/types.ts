@@ -1,5 +1,5 @@
 import type { AliasedNodeData } from "@/arches_vue_components/types.ts";
-import type { CollectionItem } from "@/arches_vue_components/datatypes/concept/types.ts";
+import type { ConceptValueItem } from "@/arches_vue_components/datatypes/concept/types.ts";
 
 export type {
     ConceptFetchResult,
@@ -8,5 +8,5 @@ export type {
 
 export interface ConceptListAliasedNodeData extends AliasedNodeData {
     node_value: string[] | null;
-    details: CollectionItem[];
+    details: ConceptValueItem[] | [];
 }

@@ -13,7 +13,7 @@ const {
     map,
     items,
     position = "right",
-    defaultOpenIndex,
+    defaultOpenIndex = undefined,
 } = defineProps<{
     map: MaplibreMap;
     items: MapInteractionItem[];

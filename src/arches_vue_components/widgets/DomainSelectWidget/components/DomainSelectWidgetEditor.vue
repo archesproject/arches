@@ -9,7 +9,7 @@ import type {
     DomainCardXNodeXWidgetData,
 } from "@/arches_vue_components/datatypes/domain/types.ts";
 
-const { aliasedNodeData, cardXNodeXWidgetData } = defineProps<{
+const { aliasedNodeData, cardXNodeXWidgetData = undefined } = defineProps<{
     cardXNodeXWidgetData?: DomainCardXNodeXWidgetData;
     aliasedNodeData: DomainAliasedNodeData | null;
 }>();

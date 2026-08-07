@@ -9,7 +9,7 @@ import type {
     NumberCardXNodeXWidgetData,
 } from "@/arches_vue_components/datatypes/number/types.ts";
 
-const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+const { cardXNodeXWidgetData = undefined, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData?: NumberCardXNodeXWidgetData;
     aliasedNodeData: NumberAliasedNodeData | null;
 }>();

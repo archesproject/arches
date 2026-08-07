@@ -3,7 +3,7 @@ import { watch } from "vue";
 
 import type { LanguageAliasedNodeData } from "@/arches_vue_components/datatypes/language/types.ts";
 
-const { aliasedNodeData } = defineProps<{
+const { aliasedNodeData = null } = defineProps<{
     aliasedNodeData?: LanguageAliasedNodeData | null;
 }>();
 

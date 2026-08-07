@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { computed, ref, watch, watchEffect } from "vue";
 
-import TreeSelect from "primevue/treeselect";
+import Checkbox from "primevue/checkbox";
+import CheckboxGroup from "primevue/checkboxgroup";
 
 import { useConceptTreeStore } from "@/arches_vue_components/stores/useConceptTreeStore.ts";
 import { buildConceptListAliasedNodeData } from "@/arches_vue_components/datatypes/concept-list/utils.ts";
+import { flattenCollectionItems } from "@/arches_vue_components/datatypes/concept/utils.ts";
 import { getOption } from "@/arches_vue_components/datatypes/concept/utils.ts";
 
-import type { Ref } from "vue";
-import type { TreeNode } from "primevue/treenode";
-import type { CardXNodeXWidgetData } from "@/arches_vue_components/types.ts";
+import type { ConceptCardXNodeXWidgetData } from "@/arches_vue_components/types.ts";
 import type {
     CollectionItem,
     ConceptValueItem,
@@ -26,7 +26,7 @@ const {
     graphSlug?: string;
     nodeAlias?: string;
     aliasedNodeData?: ConceptListAliasedNodeData | null;
-    cardXNodeXWidgetData?: CardXNodeXWidgetData;
+    cardXNodeXWidgetData?: ConceptCardXNodeXWidgetData;
 }>();
 
 const emit = defineEmits<{
@@ -38,22 +38,25 @@ const emit = defineEmits<{
     (event: "initialized", updatedValue: ConceptListAliasedNodeData): void;
 }>();
 
-const options: Ref<CollectionItem[] | null> = ref<CollectionItem[] | null>(
-    null,
-);
+const flexDirection =
+    cardXNodeXWidgetData?.config?.groupDirection === "column"
+        ? "flex-column"
+        : "flex-row";
+
+const options = ref<CollectionItem[]>([]);
 const isLoading = ref(false);
 const optionsLoaded = ref(false);
 const optionsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 
-const initialValue = computed<Record<string, boolean> | null>(() => {
+const initialValue = computed<string[] | null>(() => {
     if (!aliasedNodeData?.node_value?.length) return null;
     if (!options.value) return null;
-    const result: Record<string, boolean> = {};
+    const result = [];
     for (const id of aliasedNodeData.node_value) {
         const option = getOption(id, options.value);
         if (option) {
-            result[option.key] = true;
+            result.push(option.key);
         } else {
             // the option was not found using the key(valueid),
             // try to find it in the details array using valueid
@@ -65,13 +68,13 @@ const initialValue = computed<Record<string, boolean> | null>(() => {
                 if (detail) {
                     const option = getOption(detail.concept_id, options.value);
                     if (option) {
-                        result[option.key] = true;
+                        result.push(option.key);
                     }
                 }
             }
         }
     }
-    return Object.keys(result).length ? result : null;
+    return result.length ? result : null;
 });
 
 watch(isLoading, (newValue) => {
@@ -95,7 +98,7 @@ async function getOptions() {
         const fetchedData: ConceptFetchResult =
             await useConceptTreeStore().fetchTree(graphSlug, nodeAlias);
 
-        options.value = fetchedData.results as CollectionItem[];
+        options.value = flattenCollectionItems(fetchedData.results);
         optionsTotalCount.value = options.value.length;
     } catch (error) {
         fetchError.value = (error as Error).message;
@@ -112,27 +115,63 @@ async function getOptions() {
     }
 }
 
-function onUpdateModelValue(selection: Record<string, boolean> | null) {
-    const nodeValues = selection ? Object.keys(selection) : null;
+function onUpdateModelValue(updatedValue: string[] | null) {
+    const nodeValues = updatedValue?.length ? updatedValue : null;
     emit(
         "update:aliasedNodeData",
-        buildConceptListAliasedNodeData(nodeValues, options.value ?? []),
+        buildConceptListAliasedNodeData(nodeValues, options.value),
     );
 }
 </script>
 
 <template>
-    <TreeSelect
-        :input-id="cardXNodeXWidgetData?.node.alias"
-        selection-mode="multiple"
-        :fluid="true"
-        filter
-        :show-clear="true"
-        :loading="isLoading"
+    <CheckboxGroup
+        :id="cardXNodeXWidgetData?.node.alias"
         :model-value="initialValue"
-        :options="options as TreeNode[]"
-        :placeholder="cardXNodeXWidgetData?.config.placeholder"
-        @update:model-value="onUpdateModelValue"
+        :class="['button-group', flexDirection]"
+        tabindex="-1"
+        @update:model-value="onUpdateModelValue($event)"
     >
-    </TreeSelect>
+        <div
+            v-for="option in options"
+            :key="option.key"
+            class="checkbox-options"
+        >
+            <Checkbox
+                :input-id="option.key"
+                :value="option.key"
+            />
+            <label :for="option.key">{{ option.label }}</label>
+        </div>
+    </CheckboxGroup>
 </template>
+
+<style scoped>
+.p-checkbox {
+    margin-right: 0.5rem;
+}
+
+label {
+    all: unset;
+}
+.button-group {
+    display: flex;
+    flex-direction: row;
+    column-gap: 1.5rem;
+    row-gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.checkbox-options {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+}
+.flex-column {
+    flex-direction: column;
+}
+.flex-row {
+    flex-direction: row;
+    align-items: center;
+}
+</style>

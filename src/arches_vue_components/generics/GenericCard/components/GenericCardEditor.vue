@@ -35,16 +35,16 @@ const {
     graphSlug,
     nodegroupAlias,
     resourceInstanceId,
-    selectedNodeAlias,
+    selectedNodeAlias = null,
     shouldShowFormButtons = true,
-    tileData,
+    tileData = undefined,
 } = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidgetData[];
     graphSlug: string;
     nodegroupAlias: string;
     resourceInstanceId: string | null | undefined;
     selectedNodeAlias?: string | null;
-    shouldShowFormButtons: boolean | undefined;
+    shouldShowFormButtons?: boolean;
     tileData?: AliasedTileData;
 }>();
 

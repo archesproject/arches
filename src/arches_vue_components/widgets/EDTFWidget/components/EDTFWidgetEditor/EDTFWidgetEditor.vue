@@ -11,7 +11,7 @@ import { buildEDTFAliasedNodeData } from "@/arches_vue_components/datatypes/edtf
 import type { CardXNodeXWidgetData } from "@/arches_vue_components/types.ts";
 import type { EDTFAliasedNodeData } from "@/arches_vue_components/datatypes/edtf/types.ts";
 
-const { cardXNodeXWidgetData, aliasedNodeData } = defineProps<{
+const { cardXNodeXWidgetData = undefined, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
     aliasedNodeData: EDTFAliasedNodeData | null;
 }>();
