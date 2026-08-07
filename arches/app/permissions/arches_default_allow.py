@@ -191,6 +191,18 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
 
         return (self.__class__.is_exclusive, allowed_instances)
 
+    def filter_resource_queryset(
+        self,
+        user: User,
+        queryset,
+        resourceinstance_field: str = "resourceinstanceid",
+        permission: str = "models.view_resourceinstance",
+    ):
+        """
+        Default allow is deprecated; return the queryset unchanged.
+        """
+        return queryset
+
     def get_restricted_instances(
         self,
         user: User,
