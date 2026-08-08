@@ -76,6 +76,11 @@ class Command(BaseCommand):  # pragma: no cover
             'python-version: ["3.12", "3.13", "3.14"]',
             content,
         )
+        content = re.sub(
+            "image: postgis/postgis:14-3.4",
+            "image: postgis/postgis:16-3.5",
+            content,
+        )
 
         with open(workflow_path, "w") as f:
             f.write(content)
