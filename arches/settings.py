@@ -219,14 +219,18 @@ RESOURCE_EDITOR_GROUPS = ("Resource Editor", "Crowdsource Editor")
 SESSION_COOKIE_NAME = "arches"
 SESSION_COOKIE_SAMESITE = "Strict"
 
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  #<-- Only need to uncomment this for testing without an actual email server
-# EMAIL_USE_TLS = True
-# EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = "xxxx@xxx.com"
-# EMAIL_HOST_PASSWORD = 'xxxxxxx'
-# EMAIL_PORT = 587
+MAILERS = {
+    "default": {
+        "OPTIONS": {
+            "use_tls": True,
+            # "host": "smtp.gmail.com",
+            "username": "xxxx@xxx.com",
+            # "password" = "xxxxxxx",
+        },
+    },
+}
 
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = MAILERS["default"]["OPTIONS"]["username"]
 
 # If True, allows for user self creation via the signup view. If False, users can only be created via the Django admin view.
 ENABLE_USER_SIGNUP = True
