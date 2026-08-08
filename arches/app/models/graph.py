@@ -24,7 +24,7 @@ from copy import deepcopy
 from django.core.cache import caches
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connection
-from django.db.models import Q, prefetch_related_objects
+from django.db.models import Q, FETCH_RAISE, prefetch_related_objects
 from django.db.utils import IntegrityError
 from arches.app.const import IntegrityCheck
 from arches.app.models import models
@@ -2039,9 +2039,10 @@ class Graph(models.GraphModel):
             else:
                 ret.pop("group_permissions", None)
 
-            ret["spatial_views"] = models.SpatialView.objects.select_related().filter(
-                geometrynode__graph__in=[self.source_identifier_id, self.graphid]
-            )
+            # Bark if any related fields are unintentionally fetched.
+            ret["spatial_views"] = models.SpatialView.objects.fetch_mode(
+                FETCH_RAISE
+            ).filter(geometrynode__graph__in=[self.source_identifier_id, self.graphid])
             ret["domain_connections"] = (
                 self.get_valid_domain_ontology_classes()
                 if "domain_connections" not in exclude

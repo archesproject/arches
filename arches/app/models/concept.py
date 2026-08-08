@@ -1668,7 +1668,7 @@ class ConceptValue(object):
 
 
 def get_preflabel_from_conceptid(conceptid, lang):
-    preflabels = models.Value.objects.select_related().filter(
+    preflabels = models.Value.objects.select_related("valuetype").filter(
         concept_id=conceptid, valuetype__valuetype="prefLabel"
     )
 
@@ -1685,7 +1685,7 @@ def get_preflabel_from_conceptid(conceptid, lang):
         preflabels,
         key=lambda prefLabel: rank_label(
             kind=prefLabel.valuetype,
-            source_lang=prefLabel.language.code,
+            source_lang=prefLabel.language_id,
             target_lang=lang,
         ),
         reverse=True,
