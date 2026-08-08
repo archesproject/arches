@@ -18,29 +18,24 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import base64
 import hashlib
-from arches.app.utils.external_oauth_backend import ExternalOauthAuthenticationBackend
+from unittest import mock
+
 from django.http import HttpRequest
-from tests.base_test import (
-    ArchesTestCase,
-    OAUTH_CLIENT_ID,
-    OAUTH_CLIENT_SECRET,
-    CREATE_TOKEN_SQL,
-    DELETE_TOKEN_SQL,
-)
-from django.db import connection
 from django.urls import reverse
 from django.contrib.auth import get_user
 from django.contrib.auth.models import User, Group, AnonymousUser
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory
 from django.test.client import Client
-from unittest import mock
+from oauth2_provider.models import AccessToken
 
 from arches.app.models.models import UserProfile
 from arches.app.models.system_settings import settings
 from arches.app.views.auth import LoginView
 from arches.app.views.concept import RDMView
+from arches.app.utils.external_oauth_backend import ExternalOauthAuthenticationBackend
 from arches.app.utils.middleware import SetAnonymousUser
+from tests.base_test import ArchesTestCase, OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET
 
 # these tests can be run from the command line via
 # python manage.py test tests.views.auth_tests --settings="tests.test_settings"
@@ -65,13 +60,14 @@ class AuthTests(ArchesTestCase):
         cls.oauth_client_id = OAUTH_CLIENT_ID
         cls.oauth_client_secret = OAUTH_CLIENT_SECRET
 
-        sql_str = CREATE_TOKEN_SQL.format(
+        AccessToken.objects.create(
             token=cls.token,
+            expires="2068-01-01",
+            scope="read write",
+            application_id=44,
             user_id=cls.user.pk,
             token_checksum=hashlib.sha256(cls.token.encode("utf-8")).hexdigest(),
         )
-        with connection.cursor() as cursor:
-            cursor.execute(sql_str)
 
     def tearDown(self):
         settings.ENABLE_TWO_FACTOR_AUTHENTICATION = False
