@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import random
 from uuid import UUID, uuid4
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from tests.base_test import ArchesTestCase
@@ -386,10 +387,13 @@ class TileTests(ArchesTestCase):
         provisional_tile.save(index=False, request=request)
         self.assertEqual(provisional_tile.sortorder, 0)
 
-        with self.assertWarns(FutureWarning):
-            obj, _ = TileModel.objects.update_or_create(
-                pk=provisional_tile.pk, nodegroup_id=provisional_tile.nodegroup_id
-            )
+        obj, _ = TileModel.objects.update_or_create(
+            pk=provisional_tile.pk,
+            nodegroup_id=provisional_tile.nodegroup_id,
+            # presence of "sortorder" in defaults signifies that the
+            # sortorder re-calculation in TileModel.save() is wanted.
+            defaults={"sortorder": random.randint(0, 100)},
+        )
         obj.refresh_from_db()  # give test opportunity to fail on Django 4.2+
 
         self.assertEqual(obj.sortorder, 1)
