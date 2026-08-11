@@ -8,6 +8,7 @@ from pathlib import Path
 
 from arches.app.etl_modules.jsonld_importer import JSONLDImporter
 from arches.app.models.models import (
+    Concept,
     EditLog,
     ETLModule,
     GraphModel,
@@ -53,15 +54,23 @@ class JSONLDImportTests(ArchesTransactionTestCase):
         ArchesTestCase.loadOntology()
         LanguageSynchronizer.synchronize_settings_with_db()
 
-        skos = SKOSReader()
-        rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/jsonld_test_thesaurus.xml")
-        skos.save_concepts_from_skos(rdf)
+        if not Concept.objects.filter(
+            pk="7c90899a-dbe9-4574-9175-e69481a80b3c"
+        ).exists():
+            skos = SKOSReader()
+            rdf = skos.read_file(
+                "tests/fixtures/jsonld_base/rdm/jsonld_test_thesaurus.xml"
+            )
+            skos.save_concepts_from_skos(rdf)
 
-        skos = SKOSReader()
-        rdf = skos.read_file(
-            "tests/fixtures/jsonld_base/rdm/jsonld_test_collections.xml"
-        )
-        skos.save_concepts_from_skos(rdf)
+        if not Concept.objects.filter(
+            pk="89ff530a-f350-44f0-ac88-bdd8904eb57e"
+        ).exists():
+            skos = SKOSReader()
+            rdf = skos.read_file(
+                "tests/fixtures/jsonld_base/rdm/jsonld_test_collections.xml"
+            )
+            skos.save_concepts_from_skos(rdf)
 
         with open(
             os.path.join("tests/fixtures/jsonld_base/models/test_1_basic_object.json"),
