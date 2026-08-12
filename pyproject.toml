@@ -30,7 +30,7 @@ dependencies = [
     "arcgis2geojson==2.0.0",
     "celery==5.5.0",
     "defusedxml==0.7.1",
-    "Django~=6.1",
+    "Django~=6.1.0",
     "django-celery-results==2.6.0",
     "django-cors-headers==4.9.0",
     "django-guardian==3.3.3",
