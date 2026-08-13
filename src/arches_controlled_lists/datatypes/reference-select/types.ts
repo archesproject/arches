@@ -49,5 +49,5 @@ export interface ReferenceSelectTreeNode extends TreeNode {
 
 export interface ReferenceSelectAliasedNodeData extends AliasedNodeData {
     node_value: ReferenceSelectNodeValue[] | null;
-    details: ReferenceSelectNodeValue[];
+    details: ReferenceSelectDetails[];
 }
