@@ -27,7 +27,6 @@ from arches.app.models.system_settings import settings as settings
 from arches_controlled_lists.models import List
 from arches_controlled_lists import tasks
 
-
 logger = logging.getLogger(__name__)
 
 details = {

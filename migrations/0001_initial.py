@@ -78,8 +78,7 @@ class Migration(migrations.Migration):
             object_pk=PLUGIN_ID,
         ).delete()
 
-    add_reference_datatype = textwrap.dedent(
-        """
+    add_reference_datatype = textwrap.dedent("""
         INSERT INTO d_data_types(
             datatype,
             iconclass,
@@ -118,16 +117,13 @@ class Migration(migrations.Migration):
             '{"placeholder": "Select an option", "i18n_properties": ["placeholder"]}'
         )
         ON CONFLICT DO NOTHING;
-        """
-    )
+        """)
 
-    create_index = textwrap.dedent(
-        """
+    create_index = textwrap.dedent("""
         CREATE INDEX "lists_reffed_by_node_idx" ON "nodes" (
             ((("config" ->> 'controlledList'))::uuid)
         );
-    """
-    )
+    """)
     remove_index = 'DROP INDEX IF EXISTS "lists_reffed_by_node_idx";'
 
     operations = [
