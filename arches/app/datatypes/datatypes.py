@@ -1006,13 +1006,15 @@ class EDTFDataType(BaseDataType):
         return value
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
+        nodegroup_id = str(tile.nodegroup_id)
+
         def add_date_to_doc(document, edtf):
             if edtf.lower == edtf.upper:
                 if edtf.lower is not None:
                     document["dates"].append(
                         {
                             "date": edtf.lower,
-                            "nodegroup_id": tile.nodegroup_id,
+                            "nodegroup_id": nodegroup_id,
                             "nodeid": nodeid,
                             "provisional": provisional,
                         }
@@ -1024,7 +1026,7 @@ class EDTFDataType(BaseDataType):
                     document["dates"].append(
                         {
                             "date": edtf.lower_fuzzy,
-                            "nodegroup_id": tile.nodegroup_id,
+                            "nodegroup_id": nodegroup_id,
                             "nodeid": nodeid,
                             "provisional": provisional,
                         }
@@ -1034,7 +1036,7 @@ class EDTFDataType(BaseDataType):
                     document["dates"].append(
                         {
                             "date": edtf.upper_fuzzy,
-                            "nodegroup_id": tile.nodegroup_id,
+                            "nodegroup_id": nodegroup_id,
                             "nodeid": nodeid,
                             "provisional": provisional,
                         }
@@ -1042,7 +1044,7 @@ class EDTFDataType(BaseDataType):
                 document["date_ranges"].append(
                     {
                         "date_range": dr,
-                        "nodegroup_id": tile.nodegroup_id,
+                        "nodegroup_id": nodegroup_id,
                         "nodeid": nodeid,
                         "provisional": provisional,
                     }
