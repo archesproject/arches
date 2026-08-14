@@ -60,14 +60,32 @@ const acceptedFileTypes = computed(() => {
 });
 
 watchEffect(() => {
-    if (aliasedNodeData?.node_value) {
-        savedFiles.value = aliasedNodeData.node_value.map((file) => ({
-            ...file,
-            node_id: cardXNodeXWidgetData?.node.nodeid ?? "",
-        }));
-    } else {
+    const nodeId = cardXNodeXWidgetData?.node.nodeid ?? "";
+
+    if (!aliasedNodeData?.node_value) {
         savedFiles.value = [];
+        pendingFiles.value = [];
+        return;
     }
+
+    // Entries still carrying a raw File aren't saved yet -- route to pendingFiles.
+    const nextSavedFiles: FileReference[] = [];
+    const nextPendingFiles: FileData[] = [];
+
+    for (const fileReference of aliasedNodeData.node_value) {
+        const fileReferenceWithNodeId = { ...fileReference, node_id: nodeId };
+
+        if ("file" in fileReference && fileReference.file instanceof File) {
+            nextPendingFiles.push(
+                fileReferenceWithNodeId as unknown as FileData,
+            );
+        } else {
+            nextSavedFiles.push(fileReferenceWithNodeId as FileReference);
+        }
+    }
+
+    savedFiles.value = nextSavedFiles;
+    pendingFiles.value = nextPendingFiles;
 });
 
 onMounted(() => {
