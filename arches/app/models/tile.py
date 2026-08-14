@@ -471,6 +471,7 @@ class Tile(models.TileModel):
             user_is_reviewer = user_is_resource_reviewer(user)
         except AttributeError:  # no user - probably importing data
             user = None
+        context["user"] = user
 
         with transaction.atomic():
             for nodeid in self.data.keys():
