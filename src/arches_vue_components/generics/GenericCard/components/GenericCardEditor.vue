@@ -9,6 +9,7 @@ import {
     computed,
 } from "vue";
 import { useGettext } from "vue3-gettext";
+import { cloneDeep } from "es-toolkit";
 
 import { Form } from "@primevue/forms";
 import Button from "primevue/button";
@@ -17,10 +18,7 @@ import Skeleton from "primevue/skeleton";
 
 import GenericWidget from "@/arches_vue_components/generics/GenericWidget/GenericWidget.vue";
 import { upsertTile } from "@/arches_vue_components/generics/GenericCard/api.ts";
-import {
-    deepClone,
-    extractAliasedNodeDataEntries,
-} from "@/arches_vue_components/generics/GenericCard/utils.ts";
+import { extractAliasedNodeDataEntries } from "@/arches_vue_components/generics/GenericCard/utils.ts";
 import { EDIT } from "@/arches_vue_components/widgets/constants.ts";
 
 import type {
@@ -68,13 +66,13 @@ const formKey = ref(0);
 const isSaving = ref(false);
 const saveError = ref<Error>();
 
-const originalAliasedNodeDataMap = deepClone(
+const originalAliasedNodeDataMap = cloneDeep(
     extractAliasedNodeDataEntries(
         (tileData?.aliased_data as Record<string, unknown>) || {},
     ),
 );
 const aliasedNodeDataMap = reactive<Record<string, AliasedNodeData>>(
-    deepClone(originalAliasedNodeDataMap),
+    cloneDeep(originalAliasedNodeDataMap),
 );
 
 const localWidgetDirtyStates = reactive(
@@ -161,7 +159,7 @@ function resetWidgetDirtyStates() {
 function resetForm() {
     resetWidgetDirtyStates();
 
-    const originalAliasedNodeDataMapClone = deepClone(
+    const originalAliasedNodeDataMapClone = cloneDeep(
         originalAliasedNodeDataMap,
     );
     Object.assign(aliasedNodeDataMap, originalAliasedNodeDataMapClone);
@@ -193,10 +191,10 @@ async function save() {
         const freshAliasedNodeDataMap = extractAliasedNodeDataEntries(
             updatedTileData.aliased_data as Record<string, unknown>,
         );
-        Object.assign(aliasedNodeDataMap, deepClone(freshAliasedNodeDataMap));
+        Object.assign(aliasedNodeDataMap, cloneDeep(freshAliasedNodeDataMap));
         Object.assign(
             originalAliasedNodeDataMap,
-            deepClone(freshAliasedNodeDataMap),
+            cloneDeep(freshAliasedNodeDataMap),
         );
 
         resetWidgetDirtyStates();
