@@ -455,7 +455,7 @@ class Tile(models.TileModel):
             "resource_proxy_instance", Resource.objects.get(pk=self.resourceinstance_id)
         )
         note = "resource creation" if resource_creation else None
-        context = kwargs.pop("context", None)
+        context = kwargs.pop("context", dict())
         transaction_id = kwargs.pop("transaction_id", None)
         provisional_edit_log_details = kwargs.pop("provisional_edit_log_details", None)
         creating_new_tile = True
