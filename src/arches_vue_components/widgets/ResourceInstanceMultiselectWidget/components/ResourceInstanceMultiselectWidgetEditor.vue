@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, watch, watchEffect } from "vue";
 
-import arches from "arches";
 import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
 import MultiSelect from "primevue/multiselect";
 
+import { generateArchesURL } from "@/arches_vue_components/application/generate-arches-url.ts";
 import ResourceInstanceCreation from "@/arches_vue_components/widgets/components/ResourceInstanceCreation.vue";
 
 import { fetchRelatableResources } from "@/arches_vue_components/datatypes/resource-instance-list/api.ts";
@@ -302,7 +302,11 @@ async function onResourceCreated(createdTile: AliasedTileData) {
                     variant="text"
                     size="small"
                     class="no-text-decoration"
-                    :href="`${arches.urls.resource_report}${slotProps.value}`"
+                    :href="
+                        generateArchesURL('arches:resource_report', {
+                            resourceid: slotProps.value,
+                        })
+                    "
                     @click.stop
                 />
                 <Button
@@ -312,7 +316,11 @@ async function onResourceCreated(createdTile: AliasedTileData) {
                     variant="text"
                     size="small"
                     class="no-text-decoration"
-                    :href="`${arches.urls.resource_editor}${slotProps.value}`"
+                    :href="
+                        generateArchesURL('arches:resource_editor', {
+                            resourceid: slotProps.value,
+                        })
+                    "
                     @click.stop
                 />
                 <Button

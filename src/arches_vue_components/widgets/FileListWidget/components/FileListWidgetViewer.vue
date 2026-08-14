@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 
-import arches from "arches";
 import { Image, Galleria } from "primevue";
+
+import { useSettingsStore } from "@/arches_vue_components/stores/useSettingsStore.ts";
 
 import type {
     FileListAliasedNodeData,
@@ -17,8 +18,12 @@ const emit = defineEmits<{
     initialized: [updatedValue: FileListAliasedNodeData];
 }>();
 
-onMounted(() => {
+const settingsStore = useSettingsStore();
+const forceScriptName = ref("");
+
+onMounted(async () => {
     emit("initialized", aliasedNodeData);
+    forceScriptName.value = await settingsStore.fetchForceScriptName();
 });
 
 const imageData = computed(() => {
@@ -41,11 +46,11 @@ function getFileUrl(originalUrl: string) {
     if (
         !originalUrl ||
         httpRegex.test(originalUrl) ||
-        originalUrl.startsWith(arches.urls.url_subpath)
+        originalUrl.startsWith(forceScriptName.value)
     ) {
         return originalUrl;
     }
-    return (arches.urls.url_subpath + originalUrl).replace("//", "/");
+    return (forceScriptName.value + originalUrl).replace("//", "/");
 }
 </script>
 

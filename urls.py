@@ -13,6 +13,7 @@ from arches_vue_components.views.api.card_x_node_x_widget import (
     CardXNodeXWidgetListFromNodegroupView,
 )
 from arches_vue_components.views.api.concept import ConceptsTreeView
+from arches_vue_components.views.api.settings_api import SettingsAPI
 
 from arches_querysets.rest_framework.generic_views import (
     ArchesTileBlankView,
@@ -24,6 +25,7 @@ app_name = ArchesVueComponentsConfig.name
 
 urlpatterns = [
     path("api/map-data", MapDataAPI.as_view(), name="api-map-data"),
+    path("api/settings", SettingsAPI.as_view(), name="api-settings"),
     path("api/feature-buffer", FeatureBufferAPI.as_view(), name="api-feature-buffer"),
     path("api/geojson-bounds", GeoJSONBoundsAPI.as_view(), name="api-geojson-bounds"),
     path(

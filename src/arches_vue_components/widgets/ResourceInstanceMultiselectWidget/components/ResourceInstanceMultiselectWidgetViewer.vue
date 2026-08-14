@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { watch } from "vue";
 
-import arches from "arches";
+import { generateArchesURL } from "@/arches_vue_components/application/generate-arches-url.ts";
 
 import type { ResourceInstanceListAliasedNodeData } from "@/arches_vue_components/datatypes/resource-instance-list/types";
 
@@ -30,7 +30,11 @@ watch(
         :key="item.resource_id"
     >
         <a
-            :href="`${arches.urls.resource_editor}${item.resource_id}`"
+            :href="
+                generateArchesURL('arches:resource_editor', {
+                    resourceid: item.resource_id,
+                })
+            "
             class="resource-instance-link"
         >
             {{ item.display_value }}

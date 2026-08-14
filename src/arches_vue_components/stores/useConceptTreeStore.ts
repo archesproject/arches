@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import arches from "arches";
+import { generateArchesURL } from "@/arches_vue_components/application/generate-arches-url.ts";
 
 import type { ConceptFetchResult } from "@/arches_vue_components/datatypes/concept/types.ts";
 
@@ -23,7 +23,13 @@ export const useConceptTreeStore = defineStore(
             if (!inner.has(nodeAlias)) {
                 const promise = (async () => {
                     const response = await fetch(
-                        arches.urls.api_concepts_tree(graphSlug, nodeAlias),
+                        generateArchesURL(
+                            "arches_vue_components:api-concepts-tree",
+                            {
+                                graph_slug: graphSlug,
+                                node_alias: nodeAlias,
+                            },
+                        ),
                     );
                     const parsed = await response.json();
                     if (!response.ok) {
