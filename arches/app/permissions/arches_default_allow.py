@@ -203,7 +203,7 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
             == "arches_default_allow.ArchesDefaultAllowPermissionFramework"
         ):
             raise Exception(
-                f"The default allow permission framework does not support this method. Use the default deny"
+                f"The default allow permission framework does not support this method. Use the default deny. Note that with default deny, you can mimic default allow by granting permissions by resource model. For details see: https://arches.readthedocs.io/en/stable/administering/managing-permissions/#default-resource-model-permissions-with-default-deny"
             )
 
     def get_restricted_instances(
