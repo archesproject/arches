@@ -198,10 +198,13 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
         resourceinstance_field: str = "resourceinstanceid",
         permission: str = "models.view_resourceinstance",
     ):
-        """
-        Default allow is deprecated; return the queryset unchanged.
-        """
-        return queryset
+        if (
+            settings.PERMISSION_FRAMEWORK
+            == "arches_default_allow.ArchesDefaultAllowPermissionFramework"
+        ):
+            raise Exception(
+                f"The default allow permission framework does not support this method. Use the default deny"
+            )
 
     def get_restricted_instances(
         self,
