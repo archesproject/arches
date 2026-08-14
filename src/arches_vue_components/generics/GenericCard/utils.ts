@@ -1,11 +1,8 @@
 import type {
     AliasedData,
     AliasedNodeData,
+    FileEntry,
 } from "@/arches_vue_components/types.ts";
-
-export function deepClone<T>(sourceObject: T): T {
-    return JSON.parse(JSON.stringify(sourceObject));
-}
 
 export function isAliasedNodeData(value: unknown): value is AliasedNodeData {
     return (
@@ -33,11 +30,21 @@ export function extractAliasedNodeDataEntries(
 
 export function extractFileEntriesFromAliasedData(
     payload: AliasedData,
-): { file: File; nodeId: string }[] {
-    const collectedEntries: { file: File; nodeId: string }[] = [];
+): FileEntry[] {
+    const collectedEntries: FileEntry[] = [];
 
-    function traverseObject(currentObject: AliasedData): void {
-        for (const [_key, value] of Object.entries(currentObject)) {
+    function traverseObject(
+        currentObject: AliasedData,
+        currentTileId: string | null,
+    ): void {
+        if (
+            "tileid" in currentObject &&
+            typeof currentObject.tileid === "string"
+        ) {
+            currentTileId = currentObject.tileid;
+        }
+
+        for (const value of Object.values(currentObject)) {
             if (value instanceof File) {
                 const nodeId = currentObject.node_id;
 
@@ -45,20 +52,42 @@ export function extractFileEntriesFromAliasedData(
                     collectedEntries.push({
                         file: value,
                         nodeId: nodeId,
+                        tileId: currentTileId,
                     });
                 }
             } else if (Array.isArray(value)) {
                 for (const arrayItem of value) {
                     if (arrayItem && typeof arrayItem === "object") {
-                        traverseObject(arrayItem as unknown as AliasedData);
+                        traverseObject(
+                            arrayItem as unknown as AliasedData,
+                            currentTileId,
+                        );
                     }
                 }
             } else if (value && typeof value === "object") {
-                traverseObject(value as unknown as AliasedData);
+                traverseObject(value as unknown as AliasedData, currentTileId);
             }
         }
     }
 
-    traverseObject(payload);
+    traverseObject(payload, null);
     return collectedEntries;
+}
+
+export function buildFileUploadFormData(
+    payload: unknown,
+    fileEntries: FileEntry[],
+): FormData {
+    const formData = new FormData();
+    formData.append("json", JSON.stringify(payload));
+
+    for (const { file, nodeId, tileId } of fileEntries) {
+        let fieldName = `file-list_${nodeId}`;
+        if (tileId) {
+            fieldName = `file-list_${tileId}-${nodeId}`;
+        }
+        formData.append(fieldName, file, file.name);
+    }
+
+    return formData;
 }

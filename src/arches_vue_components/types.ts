@@ -20,6 +20,12 @@ export interface AliasedTileData {
     tileid: string | null;
 }
 
+export interface FileEntry {
+    file: File;
+    nodeId: string;
+    tileId: string | null;
+}
+
 export interface Node {
     alias: string;
     isrequired: boolean;
