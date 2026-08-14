@@ -12,6 +12,26 @@ from arches.app.models.models import File
 class FileListDataType(datatypes.FileListDataType):
     localized_metadata_keys = {"altText", "attribution", "description", "title"}
 
+    def post_tile_save(self, tile, nodeid, request):
+        # Can't rely on core's db requery for the old value here, it's
+        # already been overwritten by the time bulk save calls this.
+        previously_saved_data = getattr(tile, "_existing_data", None) or {}
+        previous_file_ids = {
+            file_info["file_id"]
+            for file_info in previously_saved_data.get(nodeid) or []
+            if file_info.get("file_id")
+        }
+        current_file_ids = {
+            file_info["file_id"]
+            for file_info in tile.data.get(nodeid) or []
+            if file_info.get("file_id")
+        }
+        removed_file_ids = previous_file_ids - current_file_ids
+        if removed_file_ids:
+            File.objects.filter(fileid__in=removed_file_ids).delete()
+
+        super().post_tile_save(tile, nodeid, request)
+
     def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
         files = data[str(node.nodeid)]
@@ -29,9 +49,16 @@ class FileListDataType(datatypes.FileListDataType):
         if not languages:  # pragma: no cover
             languages = models.Language.objects.all()
         language = get_language()
+        original_value = value
+        reset_fabricated_ids = "bulk_import" not in kwargs
+        # Entries to undo the phantom file/file_id fabricated below for
+        # genuinely new entries (no file_id in the original payload), so
+        # post_tile_save can link the real upload.
+        fabricated_file_dicts = []
+        file_ids_to_delete = []
+
         # arches == 9.0.0 - remove the stringifieid_list in favor of the 8.1.0 logic
         if arches_version < Version("8.1"):
-            original_value = value
             if isinstance(value, str):
                 stringified_list = value
             elif isinstance(value, list) and all(
@@ -47,37 +74,67 @@ class FileListDataType(datatypes.FileListDataType):
             )
             new_value = []
             for file in value:
-                if not isinstance(original_value, str):
-                    matching_file_info = next(
-                        (
-                            file_dict
-                            for file_dict in original_value
-                            if file_dict.get("name") == file.get("name")
-                        ),
-                        None,
-                    )
-                    if matching_file_info:
-                        new_value.append({**matching_file_info, **file})
-                else:
+                if isinstance(original_value, str):
                     new_value.append(file)
+                    continue
+
+                matching_file_info = next(
+                    (
+                        file_dict
+                        for file_dict in original_value
+                        if file_dict.get("name") == file.get("name")
+                    ),
+                    None,
+                )
+                if not matching_file_info:
+                    continue
+
+                if matching_file_info.get("file_id"):
+                    merged_file_info = {**file, **matching_file_info}
+                    phantom_file_id = file.get("file_id")
+
+                    if (
+                        reset_fabricated_ids
+                        and phantom_file_id
+                        and phantom_file_id != matching_file_info["file_id"]
+                    ):
+                        file_ids_to_delete.append(phantom_file_id)
+                else:
+                    merged_file_info = {**matching_file_info, **file}
+
+                    if reset_fabricated_ids:
+                        fabricated_file_dicts.append(merged_file_info)
+                new_value.append(merged_file_info)
         else:
             new_value = super().transform_value_for_tile(
                 value, languages=languages, **kwargs
             )
 
-        # Remove file object created in transform_value_for_tile
-        # after discussion with chiatt, this behavior is only really needed
-        # for the bulk loader (and causes integrity problems/duplicity) -
-        # file will be recreated later in post_tile_save.  Skip this deletion
-        if "bulk_import" not in kwargs and (
-            "is_existing_tile" not in kwargs or not kwargs["is_existing_tile"]
-        ):
-            File.objects.filter(
-                fileid__in=[file["file_id"] for file in new_value]
-            ).delete()
-            for file_dict in new_value:
-                file_dict["file_id"] = None
-                file_dict["url"] = None
+            # If lengths ever diverge we can't align by position; skip the
+            # reset rather than risk deleting the wrong File row.
+            if (
+                reset_fabricated_ids
+                and isinstance(original_value, list)
+                and len(original_value) == len(new_value)
+            ):
+                fabricated_file_dicts = [
+                    file_dict
+                    for original_entry, file_dict in zip(original_value, new_value)
+                    if not (
+                        isinstance(original_entry, dict)
+                        and original_entry.get("file_id")
+                    )
+                ]
+
+        file_ids_to_delete.extend(
+            file_dict["file_id"] for file_dict in fabricated_file_dicts
+        )
+        if file_ids_to_delete:
+            File.objects.filter(fileid__in=file_ids_to_delete).delete()
+
+        for file_dict in fabricated_file_dicts:
+            file_dict["file_id"] = None
+            file_dict["url"] = None
 
         for file_info in new_value:
             for key, val in file_info.items():
