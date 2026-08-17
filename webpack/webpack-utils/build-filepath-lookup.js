@@ -33,9 +33,13 @@ function buildFilepathLookup(path, staticUrlPrefix) {
         }
         const extension = file.match(/[^.]+$/).toString();
         const extensionReplacementRegex = new RegExp(`\\.${extension}$`);
+        const relativePath = file.replace(path,'').replace(/\\/g, '/').replace(/^\//,'');
 
         if (extension === 'js') {
-            lookup[file.replace(path,'').replace(/\\/g, '/').replace(extensionReplacementRegex,'').replace(/^\//,'')] = {"import": file, "filename": `${prefix}/[name].${extension}`};
+            lookup[relativePath.replace(extensionReplacementRegex,'')] = {
+                "import": file, 
+                "filename": `${prefix}/[name].[contenthash:8].${extension}`
+            };
         }
         else if (extension === 'css' || extension === 'scss') {
             lookup[Path.join('css', file.replace(path,'')).replace(/\\/g, '/').replace(extensionReplacementRegex,'').replace(/^\//,'')] = { 'import': file };

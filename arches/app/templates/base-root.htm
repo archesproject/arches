@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% load static %}
 {% load webpack_static from webpack_loader %}
+{% load template_tags %}
 
 
 <!DOCTYPE html>
@@ -81,7 +82,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     {% endblock arches_modules %}
     
     {% if main_script %}
-        <script src="{% webpack_static '' %}build/js/{{main_script}}.js"></script>
+        {% with key=main_script|add:".js" %}
+            <script src="{% webpack_static '' %}build/{{webpack_asset_lookup|get:key}}"></script>
+        {% endwith %}
     {% endif %}
 {% endblock javascript %}
 

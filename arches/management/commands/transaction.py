@@ -20,6 +20,7 @@ import os
 import uuid
 from arches.management.commands import utils
 from arches.app.models import models
+from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 from django.db.utils import IntegrityError
 from arches.app.utils import transaction
@@ -40,4 +41,5 @@ class Command(BaseCommand):
             self.reverse(options["transaction_id"])
 
     def reverse(self, transaction_id):
-        print(transaction.reverse_edit_log_entries(transaction_id))
+        user = User.objects.get(username="admin")
+        print(transaction.reverse_edit_log_entries(transaction_id, user=user))

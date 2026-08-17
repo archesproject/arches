@@ -179,8 +179,13 @@ class SearchEngine(object):
 
     def create_index(self, **kwargs):
         kwargs = self._add_prefix(**kwargs)
-        self.es.options(ignore_status=400).indices.create(**kwargs)
+        resp = self.es.options(ignore_status=400).indices.create(**kwargs)
         print("creating index : %s" % kwargs.get("index", ""))
+        if resp.get("error", None):
+            self.logger.error(
+                "%s: WARNING: failed to create index: %s \nException detail: %s\n"
+                % (datetime.now(), kwargs.get("index"), resp["error"])
+            )
 
     def index_data(self, index=None, body=None, idfield=None, id=None, **kwargs):
         """
@@ -217,10 +222,15 @@ class SearchEngine(object):
         try:
             helpers.bulk(self.es, data, **kwargs)
         except Exception as detail:
+            errors = getattr(detail, "errors", [])
             self.logger.warning(
-                "%s: WARNING: failed to bulk index documents, \nException detail: %s\n"
-                % (datetime.now(), detail)
+                f"{datetime.now()}: WARNING: failed to bulk index documents, \nException detail: {detail}\n"
             )
+            for error in errors:
+                err = error["index"]
+                self.logger.warning(
+                    f"{err['error']['type']} for resourceid: {err['_id']}; {err['error']['reason']}\n"
+                )
 
     def create_bulk_item(self, op_type="index", index=None, id=None, data=None):
         return {

@@ -32,12 +32,16 @@ from arches.app.utils.data_management.resource_graphs.importer import (
 )
 from arches.app.models.tile import Tile, TileValidationError
 from arches.app.models.resource import Resource
-from arches.app.models.models import ResourceInstance
-from arches.app.models.models import FunctionXGraph
-from arches.app.models.models import NodeGroup
-from arches.app.models.models import GraphModel
+from arches.app.models.models import (
+    ResourceInstance,
+    FunctionXGraph,
+    NodeGroup,
+    GraphModel,
+    Node,
+)
 from arches.app.models.system_settings import settings
 from django.core.exceptions import ValidationError
+from django.forms.models import model_to_dict
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from .format import Writer
 from .format import Reader
@@ -47,11 +51,13 @@ from .format import ResourceImportReporter
 class ArchesFileWriter(Writer):
     def __init__(self, **kwargs):
         super(ArchesFileWriter, self).__init__(**kwargs)
+        self.node_name_lookup = {str(n.pk): n.name for n in Node.objects.all()}
 
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         super(ArchesFileWriter, self).write_resources(
             graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs
         )
+        nest_child_tiles = kwargs.get("nest_child_tiles", False)
 
         json_for_export = []
         resources = []
@@ -63,7 +69,61 @@ class ArchesFileWriter(Writer):
         for resourceinstanceid, tiles in self.resourceinstances.items():
             resourceinstanceid = uuid.UUID(str(resourceinstanceid))
             resource = {}
-            resource["tiles"] = tiles
+            if nest_child_tiles:
+                delete_later = []
+                # Organize tiles by tileid
+                tiles_by_id = {str(t.tileid): model_to_dict(t) for t in tiles}
+                for tileid, tile in tiles_by_id.items():
+                    del tile["provisionaledits"]
+                    del tile["sortorder"]
+                    if tile["parenttile"] is None:
+                        tile["childtiles"] = []
+
+                    if tile["parenttile"] is not None:
+                        parent_tile = tiles_by_id.get(str(tile["parenttile"]))
+                        if parent_tile:
+                            parent_tile_id = str(parent_tile["tileid"])
+                            if "childtiles" not in tiles_by_id[parent_tile_id]:
+                                tiles_by_id[parent_tile_id]["childtiles"] = []
+                            for nodeid in list(tile["data"].keys()):
+                                tile["data"][self.node_name_lookup[nodeid]] = tile[
+                                    "data"
+                                ].pop(nodeid)
+                            tiles_by_id[parent_tile_id]["childtiles"].append(tile)
+                            if (
+                                tiles_by_id[parent_tile_id]["parenttile"] is not None
+                            ):  # parent is an intermediate tile
+                                grandparent_tile_id = str(
+                                    tiles_by_id[parent_tile_id]["parenttile"]
+                                )
+                                if "childtiles" not in tiles_by_id[grandparent_tile_id]:
+                                    tiles_by_id[grandparent_tile_id]["childtiles"] = []
+                                tiles_by_id[grandparent_tile_id]["childtiles"].append(
+                                    (tiles_by_id[parent_tile_id])
+                                )
+                                delete_later.append(tileid)
+
+                for tileid, tile in tiles_by_id.items():
+                    if tile["parenttile"] is not None:
+                        tiles_by_id[str(tile["parenttile"])]["childtiles"].append(tile)
+                        delete_later.append(tileid)
+
+                for tileid in delete_later:
+                    try:
+                        del tiles_by_id[tileid]
+                    except KeyError:
+                        pass
+                for tileid, t in list(tiles_by_id.items()):
+                    for nodeid in list(t["data"].keys()):
+                        try:
+                            nodename = self.node_name_lookup[nodeid]
+                        except KeyError:
+                            # the nodeid has already been replaced with a nodename
+                            continue
+                        t["data"][nodename] = t["data"].pop(nodeid)
+                resource["tiles"] = list(tiles_by_id.values())
+            else:
+                resource["tiles"] = tiles
             resource["resourceinstance"] = ResourceInstance.objects.get(
                 resourceinstanceid=resourceinstanceid
             )
@@ -97,7 +157,7 @@ class ArchesFileWriter(Writer):
                     graph_id_to_publication_id.get(resource_instance_data["graph_id"])
                 )
 
-        json.dump(export, dest, indent=kwargs.get("indent", None))
+        json.dump(export, dest, indent=kwargs.get("indent", 2))
         json_for_export.append({"name": json_name, "outputfile": dest})
 
         return json_for_export

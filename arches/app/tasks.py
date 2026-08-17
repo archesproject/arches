@@ -416,7 +416,7 @@ def load_single_csv(
         load_event = models.LoadEvent.objects.get(loadid=loadid)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
     except Exception as e:
-        logger.error(e)
+        logger.exception(e)
         load_event = models.LoadEvent.objects.get(loadid=loadid)
         load_event.status = "failed"
         load_event.save()

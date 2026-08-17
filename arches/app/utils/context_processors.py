@@ -17,12 +17,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import json
+import logging
+import os
 from arches import __version__
 from arches.app.models.models import GroupMapSettings, Language
 from arches.app.models.system_settings import settings
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from django.utils.translation import get_language, get_language_bidi
+
+logger = logging.getLogger(__name__)
 
 
 def livereload(request):
@@ -109,3 +113,25 @@ def app_settings(request=None):
             "DEBUG": settings.DEBUG,
         }
     }
+
+
+def webpack_asset_lookup(request=None):
+    """
+    Looks up webpack asset path name (including file hash) from the webpack manifest.json
+    """
+    manifest = dict()
+    manifest_path = os.path.join(
+        os.path.realpath(settings.APP_ROOT), "media", "build", "manifest.json"
+    )
+
+    logger.info(f"Looking for manifest.json at: {manifest_path}")
+
+    if os.path.exists(manifest_path):
+        try:
+            with open(manifest_path, "r") as f:
+                manifest = json.load(f)
+        except json.JSONDecodeError:
+            raise Exception("Failed to decode manifest.json.")
+    else:
+        logger.warning(f"Manifest file not found at {manifest_path}.")
+    return {"webpack_asset_lookup": manifest}

@@ -8,7 +8,7 @@ from arches.app.search.mappings import (
     prepare_search_index,
     delete_search_index,
 )
-from arches.app.utils.context_processors import app_settings
+from arches.app.utils.context_processors import app_settings, webpack_asset_lookup
 
 
 class ArchesTestRunner(DiscoverRunner):
@@ -32,6 +32,7 @@ class ArchesTestRunner(DiscoverRunner):
             return ret
 
         app_settings()  # adds languages to system
+        webpack_asset_lookup()  # adds webpack assets to system
         prepare_terms_index(create=True)
         prepare_concepts_index(create=True)
         prepare_search_index(create=True)

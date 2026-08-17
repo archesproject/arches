@@ -182,7 +182,6 @@ def search_terms(request):
         boolquery.should(
             Match(field="displayname.value", query=searchString, fuzziness=2, boost=2)
         )
-
         if index == "terms":
             boolquery.filter(
                 Terms(
@@ -216,10 +215,9 @@ def search_terms(request):
         base_agg.add_aggregation(nodegroupid_agg)
         query.add_aggregation(base_agg)
 
-        queries[index] = query
-
-    results_dict = {}
-    for index, query in queries.items():
+        ret[index] = []
+        if len(permitted_nodegroups) == 0:
+            continue
         results = query.search(index=index)
         results_dict[index] = results
         if results is not None:
@@ -255,26 +253,28 @@ def search_terms(request):
                             )
                         i = i + 1
                 else:
-                    for nodegroup in result["nodegroupid"]["buckets"]:
-                        nodegroup_id = nodegroup["key"]
-                        graph_name, node_name = node_lookup.get(
-                            str(nodegroup_id), ("", "")
-                        )
-                        context_label = "{0} - {1}".format(graph_name, node_name)
+                    for ng in result["nodegroupid"]["buckets"]:
                         ret[index].append(
                             {
                                 "type": "term",
                                 "context": "",
-                                "context_label": context_label,
+                                "context_label": get_resource_model_label(ng),
                                 "id": i,
                                 "text": result["key"],
                                 "value": result["key"],
-                                "nodegroupid": nodegroup_id,
+                                "nodegroupid": ng["key"],
                             }
                         )
-                        i = i + 1
+                        i += 1
 
     return JSONResponse(ret)
+
+
+def get_resource_model_label(nodegroup):
+    nodegroup_id = nodegroup["key"]
+    node = Node.objects.get(nodeid=nodegroup_id)
+    graph = node.graph
+    return "{0} - {1}".format(graph.name, node.name)
 
 
 @group_required("Resource Exporter")

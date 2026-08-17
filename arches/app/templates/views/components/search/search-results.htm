@@ -2,7 +2,7 @@
 {% load template_tags %}
 {% load i18n %}
 
-<div id="search-results-list" data-bind="foreach: results, visible: true" style="display: none;">
+<div id="search-results-list" role="list" data-bind="foreach: results, visible: true" style="display: none;">
 
     <div class="search-listing" role="listitem" data-bind="event: { mouseover: mouseoverInstance, mouseout: mouseoverInstance('')}, css: {'selected': selected()}">
         <div style="display: flex">

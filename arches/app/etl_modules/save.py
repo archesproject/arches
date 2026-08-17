@@ -9,7 +9,10 @@ from django.http import HttpRequest
 from django.utils.translation import gettext as _
 from django.urls import reverse, resolve, get_script_prefix
 from arches.app.models.system_settings import settings
-from arches.app.utils.index_database import index_resources_by_transaction
+from arches.app.utils.index_database import (
+    index_resources_by_transaction,
+    index_custom_indexes_by_transaction,
+)
 import logging
 
 logger = logging.getLogger(__name__)
@@ -85,7 +88,7 @@ def _save_to_tiles(cursor, loadid):
             number_of_resources = {}
             for resource in resources:
                 graph = json.loads(resource[0])[settings.LANGUAGE_CODE]
-                number_of_resources.update({graph: {"total": resource[1]}})
+                number_of_resources.update({graph: {"total": resource[1], "tiles": []}})
             cursor.execute(
                 """SELECT g.name graph, n.name, COUNT(*)
                     FROM load_staging l, nodes n, graphs g
@@ -137,6 +140,9 @@ def _post_save_edit_log(cursor, userid, loadid, multiprocessing=False):
             use_multiprocessing=multiprocessing,
             quiet=True,
             recalculate_descriptors=True,
+        )
+        index_custom_indexes_by_transaction(
+            loadid, use_multiprocessing=multiprocessing, quiet=True
         )
         user = User.objects.get(id=userid)
         user_email = getattr(user, "email", "")

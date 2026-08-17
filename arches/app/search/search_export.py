@@ -395,6 +395,8 @@ class SearchResultsExporter(object):
                 if node.exportable:
                     datatype = datatype_factory.get_instance(node.datatype)
                     if self.export_system_values:
+                        if value is None:
+                            continue
                         node_value = datatype.transform_export_values(
                             value, **{"concept_export_value_type": "id"}
                         )

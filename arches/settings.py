@@ -630,6 +630,34 @@ SEARCH_DROPDOWN_LENGTH = 100
 # see "prefix_length" at https://www.elastic.co/guide/en/elasticsearch/reference/6.7/query-dsl-fuzzy-query.html#_parameters_7
 SEARCH_TERM_SENSITIVITY = 3
 
+SEARCH_TERM_ANALYZER = {
+    "analyzer": {
+        "folding": {"tokenizer": "whitespace", "filter": ["lowercase", "asciifolding"]},
+        "ngram_analyzer": {
+            "tokenizer": "ngram_tokenizer",
+            "filter": ["lowercase", "asciifolding"],
+        },
+    },
+    "tokenizer": {
+        "ngram_tokenizer": {
+            "type": "ngram",
+            "min_gram": 3,
+            "max_gram": 4,
+            "token_chars": ["letter", "digit", "punctuation", "symbol"],
+        }
+    },
+}
+
+SEARCH_TERM_ANALYZED_FIELDS = [
+    {"folded": {"analyzer": "folding", "type": "text"}},
+    # {
+    #     "ngram": {
+    #         "analyzer": "ngram_analyzer",
+    #         "type": "text",
+    #     }
+    # }
+]
+
 WORDS_PER_SEARCH_TERM = (
     10  # set to None for unlimited number of words allowed for search terms
 )

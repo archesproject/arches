@@ -142,7 +142,24 @@ class StandardSearchView(BaseSearchView):
         total = int(self.request.GET.get("total", "0"))
         resourceinstanceid = self.request.GET.get("id", None)
         dsl = search_query_object["query"]
-        if for_export or pages:
+        if for_export:
+            limit = 10000
+            results = search_query_object["query"].search(
+                index=RESOURCES_INDEX, limit=limit, scroll="1m"
+            )
+
+            scroll_id = results["_scroll_id"]
+            scroll_size = results["hits"]["total"]["value"]
+            total_results = results["hits"]["total"]["value"]
+
+            while scroll_size > 0:
+                page = search_query_object["query"].se.es.scroll(
+                    scroll_id=scroll_id, scroll="1m"
+                )
+                scroll_size = len(page["hits"]["hits"])
+                results["hits"]["hits"] += page["hits"]["hits"]
+
+        elif pages:
             results = dsl.search(index=RESOURCES_INDEX, scroll="1m")
             scroll_id = results["_scroll_id"]
             if not pages:

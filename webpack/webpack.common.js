@@ -6,6 +6,7 @@ const Path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const BundleTracker = require('webpack-bundle-tracker');
+const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { VueLoaderPlugin } = require("vue-loader");
@@ -277,7 +278,7 @@ module.exports = () => {
                 assetModuleFilename: 'img/[hash][ext][query]',
             },
             plugins: [
-                new CleanWebpackPlugin(),
+                new CleanWebpackPlugin({cleanOnceBeforeBuildPatterns: ['**/*', '!manifest.json'],}),
                 new webpack.DefinePlugin(universalConstants),
                 new webpack.DefinePlugin({
                     __VUE_OPTIONS_API__: 'true',
@@ -295,6 +296,17 @@ module.exports = () => {
                     filename: 'webpack-stats.json' 
                 }),
                 new VueLoaderPlugin(),
+                new WebpackManifestPlugin({
+                    fileName: 'manifest.json',
+                    publicPath: global.STATIC_URL,
+                    generate: (seed, files) => {
+                        const manifest = {};
+                        files.forEach(file => {
+                            manifest[file.name] = file.path;
+                        });
+                        return manifest;
+                    },
+                }),
             ],
             resolveLoader: {
                 alias: {

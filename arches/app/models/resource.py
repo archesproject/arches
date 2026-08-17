@@ -30,8 +30,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import gettext as _
 from django.utils.translation import get_language
 from arches.app.models import models
-from arches.app.models.models import EditLog
-from arches.app.models.models import TileModel
+from arches.app.models.models import TileModel, EditLog, Node, ResourceXResource
+from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.mappings import TERMS_INDEX, RESOURCES_INDEX
@@ -276,12 +276,15 @@ class Resource(models.ResourceInstance):
             tile.resourceinstance_id = self.resourceinstanceid
             tile.save(
                 request=request,
+                user=user,
                 index=False,
                 resource_creation=True,
                 transaction_id=transaction_id,
+                recalculate_descriptors=False,
                 context=context,
                 resource=self,
             )
+        self.save_descriptors()
 
         if index is True:
             self.index(context)
@@ -292,15 +295,19 @@ class Resource(models.ResourceInstance):
 
         """
 
-        self.tiles = list(models.TileModel.objects.filter(resourceinstance=self))
-        if user:
-            readable_nodegroups = get_nodegroups_by_perm(user, perm, any_perm=True)
-            self.tiles = [
-                tile
-                for tile in self.tiles
-                if tile.nodegroup is not None
-                and tile.nodegroup_id in readable_nodegroups
-            ]
+        if (
+            not len(self.tiles)
+            == models.TileModel.objects.filter(resourceinstance=self).count()
+        ):
+            self.tiles = list(models.TileModel.objects.filter(resourceinstance=self))
+            if user:
+                readable_nodegroups = get_nodegroups_by_perm(user, perm, any_perm=True)
+                self.tiles = [
+                    tile
+                    for tile in self.tiles
+                    if tile.nodegroup is not None
+                    and tile.nodegroup_id in readable_nodegroups
+                ]
 
     # # flatten out the nested tiles into a single array
     def get_flattened_tiles(self):
@@ -308,6 +315,44 @@ class Resource(models.ResourceInstance):
         for tile in self.tiles:
             tiles.extend(tile.get_flattened_tiles())
         return tiles
+
+    @staticmethod
+    def bulk_index(resources, **kwargs):
+        fetchTiles = kwargs.get("fetchTiles", True)
+        datatype_factory = DataTypeFactory()
+        node_datatypes = {
+            str(nodeid): datatype
+            for nodeid, datatype in models.Node.objects.values_list(
+                "nodeid", "datatype"
+            )
+        }
+        documents = []
+        term_list = []
+        for resource in resources:
+            start = time()
+            document, terms = resource.get_documents_to_index(
+                fetchTiles=fetchTiles,
+                datatype_factory=datatype_factory,
+                node_datatypes=node_datatypes,
+            )
+
+            documents.append(
+                se.create_bulk_item(
+                    index=RESOURCES_INDEX,
+                    id=document["resourceinstanceid"],
+                    data=document,
+                )
+            )
+
+            for term in terms:
+                term_list.append(
+                    se.create_bulk_item(
+                        index=TERMS_INDEX, id=term["_id"], data=term["_source"]
+                    )
+                )
+
+        se.bulk_index(documents)
+        se.bulk_index(term_list)
 
     @staticmethod
     def bulk_save(resources, transaction_id=None):
@@ -361,31 +406,7 @@ class Resource(models.ResourceInstance):
             % datetime.timedelta(seconds=time() - start)
         )
 
-        for resource in resources:
-            start = time()
-            document, terms = resource.get_documents_to_index(
-                fetchTiles=False,
-                datatype_factory=datatype_factory,
-                node_datatypes=node_datatypes,
-            )
-
-            documents.append(
-                se.create_bulk_item(
-                    index=RESOURCES_INDEX,
-                    id=document["resourceinstanceid"],
-                    data=document,
-                )
-            )
-
-            for term in terms:
-                term_list.append(
-                    se.create_bulk_item(
-                        index=TERMS_INDEX, id=term["_id"], data=term["_source"]
-                    )
-                )
-
-        se.bulk_index(documents)
-        se.bulk_index(term_list)
+        Resource.bulk_index(resources, fetchTiles=False)
 
     def index(self, context=None):
         """
@@ -417,7 +438,12 @@ class Resource(models.ResourceInstance):
                 se.index_data("terms", body=term["_source"], id=term["_id"])
 
             if len(settings.ELASTICSEARCH_CUSTOM_INDEXES) > 0:
-                celery_worker_running = task_management.check_if_celery_available()
+                celery_worker_running = False
+                if any(
+                    index.get("should_update_asynchronously")
+                    for index in settings.ELASTICSEARCH_CUSTOM_INDEXES
+                ):
+                    celery_worker_running = task_management.check_if_celery_available()
 
                 for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
                     if celery_worker_running and index.get(
@@ -438,13 +464,21 @@ class Resource(models.ResourceInstance):
                         doc, doc_id = es_index.get_documents_to_index(
                             self, document["tiles"]
                         )
-                        es_index.index_document(document=doc, id=doc_id)
+                        if isinstance(doc, list):
+                            for i in range(len(doc)):
+                                es_index.index_document(document=doc[i], id=doc_id[i])
+                        else:
+                            es_index.index_document(document=doc, id=doc_id)
 
             resource_indexed = django.dispatch.Signal()
             resource_indexed.send(sender=self.__class__, instance=self)
 
     def get_documents_to_index(
-        self, fetchTiles=True, datatype_factory=None, node_datatypes=None, context=None
+        self,
+        fetchTiles=True,
+        datatype_factory=None,
+        node_datatypes=None,
+        context=None,
     ):
         """
         Gets all the documents nessesary to index a single resource
@@ -470,6 +504,17 @@ class Resource(models.ResourceInstance):
         document["displayname"] = []
         document["displaydescription"] = []
         document["map_popup"] = []
+        document["date_created"] = self.createdtime
+        try:
+            document["date_last_edited"] = (
+                models.EditLog.objects.filter(
+                    resourceinstanceid=self.resourceinstanceid, timestamp__isnull=False
+                )
+                .latest("timestamp")
+                .timestamp
+            )
+        except ObjectDoesNotExist:
+            document["date_last_edited"] = None
         for lang in settings.LANGUAGES:
             if context is None:
                 context = {}
@@ -672,11 +717,6 @@ class Resource(models.ResourceInstance):
             permit_deletion = True
 
         if permit_deletion is True:
-            for related_resource in models.ResourceXResource.objects.filter(
-                Q(resourceinstanceidfrom=self.resourceinstanceid)
-                | Q(resourceinstanceidto=self.resourceinstanceid)
-            ):
-                related_resource.delete(deletedResourceId=self.resourceinstanceid)
 
             if index:
                 self.delete_index()

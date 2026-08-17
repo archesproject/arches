@@ -133,6 +133,7 @@ class Tile(models.TileModel):
         provisional_edit_log_details=None,
         transaction_id=None,
         new_resource_created=False,
+        displayname=None,
     ):
         if new_resource_created:
             timestamp = datetime.datetime.now()
@@ -170,9 +171,12 @@ class Tile(models.TileModel):
         edit.user_firstname = getattr(user, "first_name", "")
         edit.user_lastname = getattr(user, "last_name", "")
         edit.user_username = getattr(user, "username", "")
-        edit.resourcedisplayname = Resource.objects.get(
-            resourceinstanceid=self.resourceinstance.resourceinstanceid
-        ).displayname()
+        if not displayname:
+            edit.resourcedisplayname = Resource.objects.get(
+                resourceinstanceid=self.resourceinstance.resourceinstanceid
+            ).displayname()
+        else:
+            edit.resourcedisplayname = displayname
         edit.oldvalue = old_value
         edit.newvalue = new_value
         edit.timestamp = timestamp
@@ -443,11 +447,15 @@ class Tile(models.TileModel):
     def save(self, *args, **kwargs):
         request = kwargs.pop("request", None)
         index = kwargs.pop("index", True)
+        recalculate_descriptors = kwargs.pop("recalculate_descriptors", True)
         user = kwargs.pop("user", None)
         new_resource_created = kwargs.pop("new_resource_created", False)
         resource_creation = kwargs.pop("resource_creation", False)
+        resource_proxy_instance = kwargs.pop(
+            "resource_proxy_instance", Resource.objects.get(pk=self.resourceinstance_id)
+        )
         note = "resource creation" if resource_creation else None
-        context = kwargs.pop("context", None)
+        context = kwargs.pop("context", dict())
         resource = kwargs.pop("resource", None)
         transaction_id = kwargs.pop("transaction_id", None)
         provisional_edit_log_details = kwargs.pop("provisional_edit_log_details", None)
@@ -464,6 +472,7 @@ class Tile(models.TileModel):
             user_is_reviewer = user_is_resource_reviewer(user)
         except AttributeError:  # no user - probably importing data
             user = None
+        context["user"] = user
 
         with transaction.atomic():
             for nodeid in self.data.keys():
@@ -525,6 +534,28 @@ class Tile(models.TileModel):
             self.ensure_userprofile_exists(request)
             self.datatype_post_save_actions(request)
             self.__postSave(request, context=context)
+
+            for tile in self.tiles:
+                tile.resourceinstance = self.resourceinstance
+                tile.parenttile = self
+                tile.save(
+                    *args,
+                    request=request,
+                    user=user,
+                    resource_creation=resource_creation,
+                    index=False,
+                    recalculate_descriptors=recalculate_descriptors,
+                    transaction_id=transaction_id,
+                    resource_proxy_instance=resource_proxy_instance,
+                    **kwargs,
+                )
+
+            if recalculate_descriptors or index:
+                if recalculate_descriptors:
+                    resource_proxy_instance.save_descriptors()
+                if index:
+                    self.index(resource=resource_proxy_instance)
+
             if creating_new_tile is True:
                 self.save_edit(
                     user=user,
@@ -536,6 +567,7 @@ class Tile(models.TileModel):
                     transaction_id=transaction_id,
                     new_resource_created=new_resource_created,
                     note=note,
+                    displayname=resource_proxy_instance.displayname(),
                 )
             else:
                 self.save_edit(
@@ -547,6 +579,7 @@ class Tile(models.TileModel):
                     oldprovisionalvalue=oldprovisionalvalue,
                     provisional_edit_log_details=provisional_edit_log_details,
                     transaction_id=transaction_id,
+                    displayname=resource_proxy_instance.displayname(),
                 )
 
             for tile in self.tiles:
@@ -579,25 +612,35 @@ class Tile(models.TileModel):
     def delete(self, *args, **kwargs):
         se = SearchEngineFactory().create()
         request = kwargs.pop("request", None)
+        user = kwargs.pop("user", None)
         index = kwargs.pop("index", True)
+        recalculate_descriptors = kwargs.pop("recalculate_descriptors", True)
         transaction_id = kwargs.pop("transaction_id", None)
         provisional_edit_log_details = kwargs.pop("provisional_edit_log_details", None)
         for tile in self.tiles:
-            tile.delete(*args, request=request, **kwargs)
+            tile.delete(
+                *args,
+                request=request,
+                user=user,
+                index=index,
+                recalculate_descriptors=recalculate_descriptors,
+                transaction_id=transaction_id,
+                **kwargs,
+            )
         try:
-            user = request.user
+            if user is None and request is not None:
+                user = request.user
             user_is_reviewer = user_is_resource_reviewer(user)
         except AttributeError:  # no user
             user = None
-            user_is_reviewer = True
+            user_is_reviewer = False
 
         if user_is_reviewer is True or self.user_owns_provisional(user):
-            if index:
-                query = Query(se)
-                bool_query = Bool()
-                bool_query.filter(Terms(field="tileid", terms=[self.tileid]))
-                query.add_query(bool_query)
-                results = query.delete(index=TERMS_INDEX)
+            query = Query(se)
+            bool_query = Bool()
+            bool_query.filter(Terms(field="tileid", terms=[self.tileid]))
+            query.add_query(bool_query)
+            results = query.delete(index=TERMS_INDEX)
 
             self.__preDelete(request)
             self.save_edit(
@@ -627,11 +670,12 @@ class Tile(models.TileModel):
                     datatype = self.datatype_factory.get_instance(node.datatype)
                     datatype.post_tile_delete(self, nodeid, index=index)
 
-                resource = Resource.objects.get(pk=self.resourceinstance_id)
-                resource.save_descriptors()
-
-                if index:
-                    self.index(resource=resource)
+                if recalculate_descriptors or index:
+                    resource = Resource.objects.get(pk=self.resourceinstance_id)
+                    if recalculate_descriptors:
+                        resource.save_descriptors()
+                    if index:
+                        self.index(resource=resource)
             except IntegrityError as e:
                 logger.error(e)
 

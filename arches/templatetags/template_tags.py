@@ -9,6 +9,14 @@ import json
 register = template.Library()
 
 
+@register.filter
+def get(dictionary, key):
+    """
+    Get a dict value using a variable key
+    """
+    return dictionary.get(key)
+
+
 @register.filter(name="has_group")
 def has_group(user, group_names):
     if user.is_authenticated:
