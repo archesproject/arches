@@ -570,24 +570,26 @@ class ResourcePermissionDataView(View):
 
 @method_decorator(can_edit_resource_instance, name="dispatch")
 class ResourceEditLogView(BaseManagerView):
-    def getEditConceptValue(self, values):
-        if values is not None:
-            for k, v in values.items():
+    def getEditConceptValue(self, tiledata, datatype_factory=DataTypeFactory()):
+        if tiledata is not None:
+            for nodeid, v in tiledata.items():
+                if v is None:
+                    continue
                 try:
-                    uuid.UUID(v)
-                    v = models.Value.objects.get(pk=v).value
-                    values[k] = v
-                except Exception as e:
-                    pass
+                    node = models.Node.objects.get(pk=nodeid)
+                except models.Node.DoesNotExist:
+                    logger.warning(f"Node with id: {nodeid} does not exist")
+                    continue
+                datatype = datatype_factory.get_instance(node.datatype)
+                tile = models.TileModel(data=tiledata, nodegroup=node.nodegroup)
                 try:
-                    display_values = []
-                    for val in v:
-                        uuid.UUID(val)
-                        display_value = models.Value.objects.get(pk=val).value
-                        display_values.append(display_value)
-                    values[k] = display_values
-                except Exception as e:
-                    pass
+                    tiledata[nodeid] = datatype.get_display_value(
+                        tile, node, language="en"
+                    )
+                except TypeError:
+                    logger.warning(
+                        f"datatype: {datatype} had error getting value for node: {nodeid} with value: {v}"
+                    )
 
     def get(
         self, request, resourceid=None, view_template="views/resource/edit-log.htm"
@@ -613,6 +615,7 @@ class ResourceEditLogView(BaseManagerView):
                 "delete": _("Resource Deleted"),
                 "tile delete": _("Tile Deleted"),
                 "tile create": _("Tile Created"),
+                "append": _("Tile Updated"),
                 "tile edit": _("Tile Updated"),
                 "delete edit": _("Edit Deleted"),
                 "bulk_create": _("Resource Created"),
@@ -648,33 +651,55 @@ class ResourceEditLogView(BaseManagerView):
 
             return render(request, "views/edit-history.htm", context)
         else:
-            resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
             edits = models.EditLog.objects.filter(resourceinstanceid=resourceid)
+            try:
+                resource_instance = Resource.objects.get(pk=resourceid)
+                graph = resource_instance.graph
+                displayname = resource_instance.displayname()
+                displaydescription = resource_instance.displaydescription()
+            except Resource.DoesNotExist:
+                edit1 = edits.first()
+                graph = models.GraphModel.objects.get(pk=edit1.resourceclassid)
+                displayname_edit = edits.filter(
+                    resourcedisplayname__isnull=False
+                ).first()
+                displayname = (
+                    displayname_edit.resourcedisplayname
+                    if displayname_edit
+                    else edit1.resourcedisplayname or "undefined"
+                )
+                displaydescription = ""
             permitted_edits = []
+            datatype_factory = DataTypeFactory()
             for edit in edits:
                 if edit.nodegroupid is not None:
                     if request.user.has_perm("read_nodegroup", edit.nodegroupid):
                         if edit.newvalue is not None:
-                            self.getEditConceptValue(edit.newvalue)
+                            self.getEditConceptValue(
+                                edit.newvalue, datatype_factory=datatype_factory
+                            )
                         if edit.oldvalue is not None:
-                            self.getEditConceptValue(edit.oldvalue)
+                            self.getEditConceptValue(
+                                edit.oldvalue, datatype_factory=datatype_factory
+                            )
                         permitted_edits.append(edit)
+                    else:
+                        print(
+                            "User does not have permission to view edit for nodegroup: ",
+                            edit.nodegroupid,
+                        )
                 else:
                     permitted_edits.append(edit)
 
-            resource = Resource.objects.get(pk=resourceid)
-            displayname = resource.displayname()
-            cards = Card.objects.filter(
-                nodegroup__parentnodegroup=None, graph=resource_instance.graph
-            )
-            graph_name = resource_instance.graph.name
+            cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=graph)
+            graph_name = graph.name
 
             context = self.get_context_data(
                 main_script="views/resource/edit-log",
                 cards=JSONSerializer().serialize(cards),
                 resource_type=graph_name,
-                resource_description=resource.displaydescription(),
-                iconclass=resource_instance.graph.iconclass,
+                resource_description=displaydescription,
+                iconclass=graph.iconclass,
                 edits=JSONSerializer().serialize(
                     localize_complex_input(permitted_edits)
                 ),
@@ -685,7 +710,7 @@ class ResourceEditLogView(BaseManagerView):
             )
 
             context["nav"]["res_edit"] = True
-            context["nav"]["icon"] = resource_instance.graph.iconclass
+            context["nav"]["icon"] = graph.iconclass
             context["nav"]["title"] = graph_name
 
             return render(request, view_template, context)
