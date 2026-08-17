@@ -282,17 +282,6 @@ def prepare_search_index(create=False):
                 },
                 "date_created": {"type": "keyword"},
                 "date_last_edited": {"type": "keyword"},
-                "fromrelations": {
-                    "type": "nested",
-                    "properties": {
-                        "graphid": {"type": "keyword"},
-                        "nodeid": {"type": "keyword"},
-                        "resourceid": {"type": "keyword"},
-                    },
-                },
-                "torelations_graphids": {
-                    "type": "keyword",
-                },
             },
         },
     }

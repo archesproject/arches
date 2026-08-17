@@ -181,9 +181,7 @@ class BulkDataDeletion(BaseBulkEditor):
             if verbose is True:
                 bar = pyprind.ProgBar(deleted_count)
             for resource in optimize_resource_iteration(resources, chunk_size=2000):
-                resource.delete(
-                    user=user, index=False, transaction_id=loadid, fetch_relations=False
-                )
+                resource.delete(user=user, index=False, transaction_id=loadid)
                 if verbose is True:
                     bar.update()
 

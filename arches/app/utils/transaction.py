@@ -52,7 +52,6 @@ def reverse_edit_log_entries(transaction_id, user=None, chunk_size=2000):
         created_resources_query_set, chunk_size=chunk_size
     ):
         resource.delete(
-            fetch_relations=False,
             user=user,
             transaction_id=revserse_operation_transactionid,
         )

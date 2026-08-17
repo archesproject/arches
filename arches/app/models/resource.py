@@ -73,8 +73,6 @@ class Resource(models.ResourceInstance):
         # self.resourceinstancesecurity
         # end from models.ResourceInstance
         self.tiles = []
-        self.fromrelations = []
-        self.torelations = []
         self.descriptor_function = None
         self.serialized_graph = None
         self.node_datatypes = None
@@ -475,7 +473,6 @@ class Resource(models.ResourceInstance):
         datatype_factory=None,
         node_datatypes=None,
         context=None,
-        fetch_relations=True,
     ):
         """
         Gets all the documents nessesary to index a single resource
@@ -582,29 +579,6 @@ class Resource(models.ResourceInstance):
         document["numbers"] = []
         document["date_ranges"] = []
         document["ids"] = []
-        if fetch_relations:
-            self.fromrelations = ResourceXResource.objects.filter(
-                resourceinstanceidfrom=self
-            ).select_related("nodeid")
-            torelations_distinct_graphids = [
-                str(graphid)
-                for graphid in ResourceXResource.objects.filter(
-                    resourceinstanceidto=self,
-                ).distinct("resourceinstanceto_graphid_id")
-            ]
-        else:
-            torelations_distinct_graphids = list(
-                {str(rxr.resourceinstancefrom_graphid_id) for rxr in self.fromrelations}
-            )
-        document["fromrelations"] = [
-            {
-                "graphid": str(rxr.resourceinstanceto_graphid_id),
-                "nodeid": str(rxr.nodeid_id) if rxr.nodeid is not None else "",
-                "resourceid": str(rxr.resourceinstanceidto_id),
-            }
-            for rxr in self.fromrelations
-        ]
-        document["torelations_graphids"] = torelations_distinct_graphids
         tiles_have_authoritative_data = any(
             any(val is not None for val in t.data.values()) for t in tiles
         )
@@ -699,7 +673,7 @@ class Resource(models.ResourceInstance):
 
         return document, terms
 
-    def delete(self, user={}, index=True, transaction_id=None, fetch_relations=True):
+    def delete(self, user={}, index=True, transaction_id=None):
         """
         Deletes a single resource and any related indexed data
 
@@ -737,15 +711,6 @@ class Resource(models.ResourceInstance):
             permit_deletion = True
 
         if permit_deletion is True:
-            if fetch_relations:
-                for related_resource in models.ResourceXResource.objects.filter(
-                    Q(resourceinstanceidfrom=self.resourceinstanceid)
-                    | Q(resourceinstanceidto=self.resourceinstanceid)
-                ):
-                    related_resource.delete(deletedResourceId=self.resourceinstanceid)
-            else:
-                for related_resource in self.fromrelations + self.torelations:
-                    related_resource.delete(deletedResourceId=self.resourceinstanceid)
 
             if index:
                 self.delete_index()
