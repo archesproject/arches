@@ -21,6 +21,7 @@ from tests.base_test import ArchesTestCase
 from tests.utils.search_test_utils import sync_es, get_response_json
 from django.contrib.auth.models import User, Group
 from django.test.client import Client
+from django.test import override_settings
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
@@ -32,6 +33,7 @@ from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query
 from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX
+from arches.test.utils import sync_overridden_test_settings_to_arches
 
 # these tests can be run from the command line via
 # python manage.py test tests.search.spatial_search_tests --settings="tests.test_settings"
@@ -157,3 +159,32 @@ class SpatialSearchTests(ArchesTestCase):
         query = {"map-filter": spatial_filter}
         response_json = get_response_json(self.client, query=query)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 1)
+
+    @override_settings(ANALYSIS_COORDINATE_SYSTEM_SRID="Not an SRID")
+    def test_spatial_search_srid_not_number(self):
+        with sync_overridden_test_settings_to_arches():
+            spatial_filter = {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "inverted": False,
+                            "buffer": {"width": "100", "unit": "ft"},
+                        },
+                        "geometry": {
+                            "coordinates": [-118.22687435396205, 34.04498354472949],
+                            "type": "Point",
+                        },
+                    }
+                ],
+            }
+            query = {"map-filter": spatial_filter}
+            with (
+                self.assertLogs(
+                    "arches.app.search.components.standard_search_view", level="ERROR"
+                ),
+                self.assertLogs("django.request", level="ERROR"),
+            ):
+                response_json = get_response_json(self.client, query=query)
+            self.assertFalse(response_json["success"])

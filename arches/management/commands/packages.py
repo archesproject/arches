@@ -663,10 +663,12 @@ class Command(BaseCommand):
                 print("Could not save system settings")
             self.export_package_settings(dest_dir, "true")
 
-    @staticmethod
-    def update_resource_geojson_geometries():
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT * FROM refresh_geojson_geometries();")
+    def update_resource_geojson_geometries(self):
+        if not connection.in_atomic_block:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT * FROM refresh_geojson_geometries();")
+        else:
+            self.stdout.write("WARNING: Not refreshing geometries - transaction active")
 
     def load_package(
         self,

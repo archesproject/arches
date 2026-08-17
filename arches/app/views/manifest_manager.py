@@ -212,9 +212,6 @@ class ManifestManagerView(View):
         except TypeError:
             metadata = []
 
-        if not os.path.exists(settings.CANTALOUPE_DIR):
-            os.mkdir(settings.CANTALOUPE_DIR)
-
         if operation == "create":
             canvases = []
             for f in files:

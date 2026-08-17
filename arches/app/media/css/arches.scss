@@ -1164,9 +1164,6 @@ div.wf-multi-tile-card-info div {
     flex-direction: row;
     list-style-type: none;
     flex-wrap: wrap;
-}
-
-ul.tabbed-report-tab-list {
     margin: 0;
     padding: 0 20px;
 }
@@ -1183,6 +1180,7 @@ ul.tabbed-report-tab-list {
     align-items: center;
     justify-content: center;
     margin: 15px 25px;
+    position: relative;
 
     &:hover {
         cursor: pointer;
@@ -1206,6 +1204,48 @@ ul.tabbed-report-tab-list {
         background: #5fa2dd;
         i {
             color: white;
+        }
+    }
+
+    // CSS-only tooltip matching Bootstrap's dark tooltip style
+    &[data-tooltip] {
+        &::before {
+            border-color: transparent transparent rgba(0, 0, 0, 0.9) transparent;
+            border-style: solid;
+            border-width: 0 5px 5px;
+            content: '';
+            left: 50%;
+            margin-left: -5px;
+            opacity: 0;
+            pointer-events: none;
+            position: absolute;
+            top: calc(100% + 3px);
+            transition: opacity 0.15s;
+            z-index: 1071;
+        }
+        &::after {
+            background-color: rgba(0, 0, 0, 0.9);
+            border-radius: 4px;
+            color: #fff;
+            content: attr(data-tooltip);
+            font-size: 12px;
+            left: 50%;
+            line-height: 1.42857143;
+            opacity: 0;
+            padding: 6px 8px;
+            pointer-events: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            transform: translateX(-50%);
+            transition: opacity 0.15s;
+            white-space: nowrap;
+            z-index: 1070;
+        }
+        &:hover::before,
+        &:hover::after,
+        &:focus-visible::before,
+        &:focus-visible::after {
+            opacity: 1;
         }
     }
 }
@@ -4226,6 +4266,7 @@ div.dropdown-menu.open {
     flex-direction: column;
     width: 100%;
     height: calc(100vh - 50px);
+    max-width: calc(100vw - 50px);
     position: relative;
 }
 
@@ -5178,6 +5219,7 @@ div.card-grid-item.selected {
     background: #fff;
     border-bottom: 1px solid #ddd;
     z-index: 3000;
+    max-width: calc(100vw - 50px);
 }
 
 .ep-menu {
@@ -5202,6 +5244,12 @@ div.card-grid-item.selected {
     float: right;
     list-style-type: none;
     margin-bottom: 0;
+}
+
+.ep-toolbar .top-left-nav {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
 }
 
 .editor-tools {
@@ -5580,6 +5628,8 @@ div.card-grid-item.selected {
     font-size: 1.6rem;
     padding: 5px;
     align-items: center;
+    display: inline-block;
+    text-overflow: ellipsis;
 }
 
 .ep-graph-title-icon {
@@ -12419,6 +12469,7 @@ a.filter-tools:hover {
     .geocode-container,
     .geometry-tools-container,
     .geometry-editing-notifications,
+    .report-print-date  > .toggle-container,
     #map-widget-container>.map-widget-container {
         display: none;
     }
@@ -12500,6 +12551,14 @@ a.filter-tools:hover {
         display: none;
     }
 
+    #container {
+      height: auto !important;
+    }
+
+    .resource-component-abstract {
+      height: auto !important;
+      overflow: visible !important;
+    }
 }
 
 .report-toolbar-preview {
@@ -12903,4 +12962,8 @@ table.csv-mapping-table td {
     label.form-checkbox.form-normal span{
         width: auto;
     }
+}
+
+.cke_screen_reader_only {
+    position: fixed !important;
 }

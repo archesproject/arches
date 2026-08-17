@@ -23,14 +23,14 @@ import uuid
 import logging
 from django.db import transaction
 from django.shortcuts import redirect, render
-from django.db.models import F, Func, Q
+from django.db.models import Exists, F, Func, OuterRef, Q
 from django.utils.translation import gettext as _
 from django.utils.decorators import method_decorator
 from django.http import HttpResponseNotFound, HttpResponse
 from django.views.generic import View, TemplateView
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
@@ -262,18 +262,16 @@ class GraphDesignerView(GraphBaseView):
         if self.graph.ontology is not None:
             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
 
-        restricted_nodegroups = []
         if not settings.OVERRIDE_RESOURCE_MODEL_LOCK:
-            restricted_nodegroups = (
-                models.TileModel.objects.filter(
-                    nodegroup__pk__in=[
-                        nodegroup_dict["nodegroupid"]
-                        for nodegroup_dict in serialized_graph["nodegroups"]
-                    ]
-                )
-                .values_list("nodegroup_id", flat=True)
-                .distinct()
+            restricted_nodegroups = models.NodeGroup.objects.filter(
+                Exists(models.TileModel.objects.filter(nodegroup=OuterRef("pk"))),
+                pk__in=[
+                    nodegroup_dict["nodegroupid"]
+                    for nodegroup_dict in serialized_graph["nodegroups"]
+                ],
             )
+        else:
+            restricted_nodegroups = models.NodeGroup.objects.none()
 
         context = self.get_context_data(
             main_script="views/graph-designer",
@@ -311,7 +309,7 @@ class GraphDesignerView(GraphBaseView):
             geocoding_providers=models.Geocoder.objects.all(),
             report_templates=models.ReportTemplate.objects.all(),
             restricted_nodegroups=[
-                str(nodegroup) for nodegroup in restricted_nodegroups
+                str(nodegroup.pk) for nodegroup in restricted_nodegroups
             ],
             ontologies=JSONSerializer().serialize(
                 models.Ontology.objects.filter(parentontology=None),
@@ -557,7 +555,21 @@ class GraphDataView(View):
                                 for node in data["nodes"]:
                                     no = models.Node.objects.get(pk=node["nodeid"])
                                     no.sortorder = sortorder
-                                    no.save()
+                                    try:
+                                        if no.graph.publication_id == None:
+                                            no.save()
+                                        else:
+                                            ret = {
+                                                "title": _("Unable to Save Graph"),
+                                                "message": _(
+                                                    "You cannot edit a published graph.  Please unpublish the graph before editing."
+                                                ),
+                                            }
+                                            raise ValidationError(ret)
+                                    except ValidationError as e:
+                                        return JSONErrorResponse(
+                                            content=e.args[0], status=403
+                                        )
                                     sortorder = sortorder + 1
                             ret = data
 
@@ -680,16 +692,22 @@ class CardView(GraphBaseView):
         if self.action == "update_card":
             if data:
                 card = Card(data)
-                card.save()
-                return JSONResponse(card)
+                try:
+                    card.save()
+                    return JSONResponse(card)
+                except ValidationError as e:
+                    return JSONErrorResponse(content=e.args[0], status=403)
 
         if self.action == "reorder_cards":
             if "cards" in data and len(data["cards"]) > 0:
                 with transaction.atomic():
                     for card_data in data["cards"]:
-                        card = models.CardModel.objects.get(pk=card_data["id"])
+                        card = Card.objects.get(pk=card_data["id"])
                         card.sortorder = card_data["sortorder"]
-                        card.save()
+                        try:
+                            card.save()
+                        except ValidationError as e:
+                            return JSONErrorResponse(content=e.args[0], status=403)
                 return JSONResponse(data["cards"])
 
         return HttpResponseNotFound()

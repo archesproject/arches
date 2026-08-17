@@ -73,7 +73,7 @@
                 data: node.childNodes,
                 as: 'node',
                 beforeMove: graphTree.beforeMove,
-                afterMove: graphTree.reorderNodes
+                afterMove: graphTree.reorderNodes.bind(graphTree),
             }">
             </div>
         </ul>

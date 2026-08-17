@@ -1,0 +1,57 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "id": "899f8d17-19c0-40bd-b2a9-fef0c4e69bb2",
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -123.32422699999998,
+                            49.392922
+                        ],
+                        [
+                            -123.324688,
+                            49.392419
+                        ],
+                        [
+                            -123.32147,
+                            49.391951
+                        ],
+                        [
+                            -123.32090100000002,
+                            49.392978
+                        ],
+                        [
+                            -123.322596,
+                            49.393187
+                        ],
+                        [
+                            -123.32334699999998,
+                            49.393397
+                        ],
+                        [
+                            -123.32413000000001,
+                            49.393334
+                        ],
+                        [
+                            -123.32422699999998,
+                            49.392922
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "name": "Test with properties",
+                "end_dt": "None",
+                "nodeId": "9f2c9e28-dedb-11ed-ac5a-5254004d77d3",
+                "start_dt": "2024-11-14",
+                "area_desc": "None",
+                "proj_desc": "Testing a large geometry import",
+                "resourceid": "55fc5339-ac9f-4cd4-b611-d8dd85caec4e"
+            }
+        }
+    ]
+}

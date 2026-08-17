@@ -753,9 +753,9 @@ class ExternalOauth(View):
         request.session["user"] = username
         return redirect(authorization_url)
 
-    @method_decorator(
-        csrf_exempt, name="dispatch"
-    )  # exempt; returned from other oauth2 authorization server, handled by 'oauth_state' in session
+    # exempt; returned from other oauth2 authorization server
+    # handled by 'oauth_state' in session
+    @csrf_exempt
     def callback(request):
         next_url = (
             request.session["next"] if "next" in request.session else reverse("home")

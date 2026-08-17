@@ -39,6 +39,9 @@ from arches.app.views.resource import (
     RelatedResourcesView,
     get_resource_relationship_types,
 )
+from arches.app.utils.resource_relationship_utils import (
+    get_resource_relationship_type_label,
+)
 from arches.app.utils.skos import SKOSWriter
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.utils.decorators import group_required
@@ -1299,7 +1302,9 @@ class ResourceReport(APIBase):
             get_params.update({"paginate": "false"})
             request.GET = get_params
 
-            related_resources_response = RelatedResourcesView().get(request, resourceid)
+            related_resources_response = RelatedResourcesView().get(
+                request, resourceid, include_rr_count=False, graphs=resource_models
+            )
             related_resources = json.loads(related_resources_response.content)
 
             related_resources_summary = self._generate_related_resources_summary(
@@ -1358,14 +1363,20 @@ class ResourceReport(APIBase):
             }
             for resource_model in resource_models
         ]
-
-        resource_relationship_types = {
-            resource_relationship_type["id"]: resource_relationship_type["text"]
-            for resource_relationship_type in get_resource_relationship_types()[
-                "values"
-            ]
+        inverse_relationship = {
+            relation["inverserelationshiptype"]
+            for relation in resource_relationships
+            if relation["inverserelationshiptype"]
         }
-
+        forward_relationship = {
+            relation["relationshiptype"]
+            for relation in resource_relationships
+            if relation["relationshiptype"]
+        }
+        relationship_types = list(inverse_relationship | forward_relationship)
+        resource_relationship_types = get_resource_relationship_type_label(
+            relationship_types
+        )
         for related_resource in related_resources:
             for summary in related_resource_summary:
                 if related_resource["graph_id"] == summary["graphid"]:
@@ -1537,8 +1548,13 @@ class BulkDisambiguatedResourceInstance(APIBase):
         user = request.user
         perm = "read_nodegroup"
 
-        disambiguated_resource_instances = OrderedDict().fromkeys(resource_ids)
-        for resource in Resource.objects.filter(pk__in=resource_ids):
+        permitted_resource_ids = list(
+            filter(lambda id: user_can_read_resource(user, id), resource_ids)
+        )
+        disambiguated_resource_instances = OrderedDict().fromkeys(
+            permitted_resource_ids
+        )
+        for resource in Resource.objects.filter(pk__in=permitted_resource_ids):
             disambiguated_resource_instances[str(resource.pk)] = resource.to_json(
                 compact=compact,
                 version=version,
@@ -1562,12 +1578,24 @@ class Tile(APIBase):
         permitted_nodegroups = get_nodegroups_by_perm(
             request.user, "models.read_nodegroup"
         )
+        if not user_can_read_resource(request.user, tile.resourceinstance_id):
+            return JSONResponse(_("User not permitted to read resource"), status=403)
         if tile.nodegroup_id in permitted_nodegroups:
             return JSONResponse(tile, status=200)
         else:
             return JSONResponse(_("Tile not found."), status=404)
 
     def post(self, request, tileid):
+        data = request.POST.get("data") or request.body
+        resourceid = json.loads(data).get("resourceinstance_id")
+        # Important! The resource instance permission decorator on the TileView
+        # will not be called by the instance of TileView below.
+        # Resource edit perms must be checked here.
+        if resourceid and models.ResourceInstance.objects.filter(pk=resourceid):
+            if not user_can_edit_resource(request.user, resourceid):
+                return JSONResponse(
+                    _("User is not permitted to edit this resource"), status=403
+                )
         tileview = TileView()
         tileview.action = "update_tile"
         # check that no data is on POST or FILES before assigning body to POST (otherwise request fails)
@@ -1683,6 +1711,9 @@ class InstancePermission(APIBase):
 
 
 @method_decorator(csrf_exempt, name="dispatch")
+@method_decorator(
+    group_required("Resource Editor", raise_exception=True), name="dispatch"
+)
 class NodeValue(APIBase):
     def post(self, request):
         datatype_factory = DataTypeFactory()
@@ -1694,46 +1725,47 @@ class NodeValue(APIBase):
         operation = request.POST.get("operation")
         transaction_id = request.POST.get("transaction_id")
 
-        # get node model return error if not found
         try:
             node = models.Node.objects.get(nodeid=nodeid)
         except Exception as e:
-            return JSONResponse(e, status=404)
+            return JSONResponse(_("Node not found"), status=404)
 
-        # check if user has permissions to write to node
-        user_has_perms = request.user.has_perm("write_nodegroup", node.nodegroup)
-        if user_has_perms:
-            # get datatype of node
-            try:
-                datatype = datatype_factory.get_instance(node.datatype)
-            except Exception as e:
-                return JSONResponse(e, status=404)
-
-            # transform data to format expected by tile
-            data = datatype.transform_value_for_tile(data, format=format)
-
-            # get existing data and append new data if operation='append'
-            if operation == "append":
-                tile = models.TileModel.objects.get(tileid=tileid)
-                data = datatype.update(tile, data, nodeid, action=operation)
-
-            # update/create tile
-            new_tile = TileProxyModel.update_node_value(
-                nodeid,
-                data,
-                tileid,
-                request=request,
-                resourceinstanceid=resourceid,
-                transaction_id=transaction_id,
-            )
-
-            response = JSONResponse(new_tile, status=200)
-        else:
-            response = JSONResponse(
+        if not request.user.has_perm("write_nodegroup", node.nodegroup):
+            return JSONResponse(
                 _("User does not have permission to edit this node."), status=403
             )
 
-        return response
+        datatype = datatype_factory.get_instance(node.datatype)
+        data = datatype.transform_value_for_tile(data, format=format)
+
+        try:
+            tile = models.TileModel.objects.get(tileid=tileid)
+            if not user_can_edit_resource(request.user, tile.resourceinstance_id):
+                return JSONResponse(
+                    _("User is not permitted to edit this resource"), status=403
+                )
+            if operation == "append":
+                data = datatype.update(tile, data, nodeid, action=operation)
+        except (ObjectDoesNotExist, ValidationError):
+            if (
+                resourceid
+                and models.ResourceInstance.objects.filter(pk=resourceid).exists()
+            ):
+                if not user_can_edit_resource(request.user, resourceid):
+                    return JSONResponse(
+                        _("User is not permitted to edit this resource"), status=403
+                    )
+
+        new_tile = TileProxyModel.update_node_value(
+            nodeid,
+            data,
+            tileid,
+            request=request,
+            resourceinstanceid=resourceid,
+            transaction_id=transaction_id,
+        )
+
+        return JSONResponse(new_tile, status=200)
 
 
 class UserIncompleteWorkflows(APIBase):

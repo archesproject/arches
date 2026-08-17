@@ -18,11 +18,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
 import logging
+from collections import defaultdict
 from time import time
 from uuid import UUID
 from types import SimpleNamespace
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Count, F, Q
 from django.contrib.auth.models import User, Group
 from django.forms.models import model_to_dict
 from django.core.exceptions import ObjectDoesNotExist
@@ -54,6 +55,10 @@ from arches.app.utils.permission_backend import (
     get_filtered_instances,
     get_nodegroups_by_perm,
 )
+from arches.app.utils.resource_relationship_utils import (
+    get_resource_relationship_type_label,
+)
+
 import django.dispatch
 from arches.app.datatypes.datatypes import DataTypeFactory
 
@@ -277,6 +282,7 @@ class Resource(models.ResourceInstance):
                 transaction_id=transaction_id,
                 recalculate_descriptors=False,
                 context=context,
+                resource=self,
             )
         self.save_descriptors()
 
@@ -809,6 +815,7 @@ class Resource(models.ResourceInstance):
         user=None,
         resourceinstance_graphid=None,
         graphs=None,
+        include_rr_count=True,
     ):
         """
         Returns an object that lists the related resources, the relationship types, and a reference to the current resource
@@ -860,7 +867,6 @@ class Resource(models.ResourceInstance):
             start,
             limit,
             resourceinstance_graphid=None,
-            count_only=False,
         ):
             final_query = Q(resourceinstanceidfrom_id=resourceinstanceid) | Q(
                 resourceinstanceidto_id=resourceinstanceid
@@ -874,9 +880,6 @@ class Resource(models.ResourceInstance):
                     resourceinstancefrom_graphid_id=resourceinstance_graphid
                 ) & Q(resourceinstanceto_graphid_id=str(self.graph_id))
                 final_query = final_query & (to_graph_id_filter | from_graph_id_filter)
-
-            if count_only:
-                return models.ResourceXResource.objects.filter(final_query).count()
 
             return (
                 {  # resourceinstance_graphid = "00000000-886a-374a-94a5-984f10715e3a"
@@ -898,7 +901,6 @@ class Resource(models.ResourceInstance):
 
         ret["total"] = {"value": resource_relations["total"]}
         instanceids = set()
-        preflabel_lookup = dict()
 
         readable_graphids = set(
             permission_backend.get_resource_types_by_perm(
@@ -913,6 +915,7 @@ class Resource(models.ResourceInstance):
             user, se, resources=list(all_resource_ids)
         )
         filtered_instances = filtered_instances if user is not None else []
+        permitted_relation_dicts = []
 
         for relation in resource_relations["relations"]:
             relation = model_to_dict(relation)
@@ -934,30 +937,29 @@ class Resource(models.ResourceInstance):
                 and str(resourceinstanceto_graphid) in readable_graphids
                 and str(resourceinstancefrom_graphid) in readable_graphids
             ):
-                try:
-                    if f'{relation["relationshiptype"]}{lang}' in preflabel_lookup:
-                        preflabel = preflabel_lookup[
-                            f'{relation["relationshiptype"]}{lang}'
-                        ]
-                    else:
-                        preflabel = get_preflabel_from_valueid(
-                            relation["relationshiptype"], lang
-                        )
-                        preflabel_lookup[f'{relation["relationshiptype"]}{lang}'] = (
-                            preflabel
-                        )
-
-                    relation["relationshiptype_label"] = preflabel["value"] or ""
-                except:
-                    relation["relationshiptype_label"] = (
-                        relation["relationshiptype"] or ""
-                    )
-
-                ret["resource_relationships"].append(relation)
-                instanceids.add(str(resourceid_to))
-                instanceids.add(str(resourceid_from))
+                permitted_relation_dicts.append(relation)
             else:
                 ret["total"]["value"] -= 1
+
+        # Fetch pref labels for relationship types in bulk.
+        relationship_types = {
+            relation["relationshiptype"]
+            for relation in permitted_relation_dicts
+            if relation["relationshiptype"]
+        }
+
+        preflabel_lookup = get_resource_relationship_type_label(
+            relationship_types, lang
+        )
+
+        for relation in permitted_relation_dicts:
+            relation["relationshiptype_label"] = preflabel_lookup.get(
+                relation["relationshiptype"], relation["relationshiptype"] or ""
+            )
+
+            ret["resource_relationships"].append(relation)
+            instanceids.add(str(relation["resourceinstanceidto"]))
+            instanceids.add(str(relation["resourceinstanceidfrom"]))
 
         if str(self.resourceinstanceid) in instanceids:
             instanceids.remove(str(self.resourceinstanceid))
@@ -965,15 +967,50 @@ class Resource(models.ResourceInstance):
         if len(instanceids) > 0:
             related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
             if related_resources:
+                related_resource_ids = [
+                    resource["_id"]
+                    for resource in related_resources["docs"]
+                    if resource["found"]
+                ]
+
+                if include_rr_count:
+                    to_counts = (
+                        models.ResourceXResource.objects.filter(
+                            resourceinstanceidto__in=related_resource_ids
+                        )
+                        .values("resourceinstanceidto")
+                        .annotate(to_count=Count("resourceinstanceidto"))
+                        # ORDER BY NULLS LAST is necessary for "pipelined" GROUP BY, see
+                        # https://use-the-index-luke.com/sql/sorting-grouping/indexed-group-by
+                        .order_by(F("resourceinstanceidto").asc(nulls_last=True))
+                    )
+                    from_counts = (
+                        models.ResourceXResource.objects.filter(
+                            resourceinstanceidfrom__in=related_resource_ids
+                        )
+                        .values("resourceinstanceidfrom")
+                        .annotate(from_count=Count("resourceinstanceidfrom"))
+                        .order_by(F("resourceinstanceidfrom").asc(nulls_last=True))
+                    )
+
+                    total_relations_by_resource_id: dict[UUID:int] = defaultdict(int)
+                    for related_resource_count in to_counts:
+                        total_relations_by_resource_id[
+                            related_resource_count["resourceinstanceidto"]
+                        ] += related_resource_count["to_count"]
+                    for related_resource_count in from_counts:
+                        total_relations_by_resource_id[
+                            related_resource_count["resourceinstanceidfrom"]
+                        ] += related_resource_count["from_count"]
+
                 for resource in related_resources["docs"]:
                     if resource["found"]:
-                        rel_count = get_relations(
-                            resourceinstanceid=resource["_id"],
-                            start=0,
-                            limit=0,
-                            count_only=True,
-                        )
-                        resource["_source"]["total_relations"] = rel_count
+                        if include_rr_count:
+                            resource["_source"]["total_relations"] = {
+                                "value": total_relations_by_resource_id[
+                                    UUID(resource["_id"])
+                                ]
+                            }
                         for descriptor_type in ("displaydescription", "displayname"):
                             descriptor = get_localized_descriptor(
                                 resource, descriptor_type

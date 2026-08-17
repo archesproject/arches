@@ -270,7 +270,7 @@ define([
                                 point = result._source.points[0].point;
                             }
 
-                            const thumbnailUrl = `/thumbnail/${result._source.resourceinstanceid}`;
+                            const thumbnailUrl = arches.urls.thumbnail(result._source.resourceinstanceid);
                             const thumbnailResponse =
                                 arches.searchThumbnails == "True"
                                     ? await fetch(thumbnailUrl, {
@@ -319,6 +319,8 @@ define([
                                     result._source.graph_id,
                                 ),
                                 point: point,
+                                reportUrl:arches.urls.resource_report+result._source.resourceinstanceid,
+                                editUrl:arches.urls.resource_editor+result._source.resourceinstanceid,
                                 mapLinkClicked: function () {
                                     self.selectedResourceId(
                                         result._source.resourceinstanceid,

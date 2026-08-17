@@ -1,5 +1,6 @@
 {
   "extends": "./.tsconfig-paths.json",
+  "exclude": ["**/build/**", "**/staticfiles/**"],
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",

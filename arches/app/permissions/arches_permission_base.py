@@ -633,6 +633,9 @@ class PermissionBackend(ObjectPermissionBackend):  # type: ignore
                         "given obj has '%s'" % (app_label, obj._meta.app_label)
                     )
 
+            if user_obj.is_superuser:
+                return True
+
             obj_checker: ObjectPermissionChecker = CachedObjectPermissionChecker(
                 user_obj, obj
             )
@@ -753,6 +756,12 @@ def get_nodegroups_by_perm_for_user_or_group(
             else:
                 if set(formatted_perms) == set(explicit_perms):
                     permitted_nodegroups[nodegroup] = explicit_perms
+        elif isinstance(user_or_group, User) and user_or_group.username == "anonymous":
+            if "models.read_nodegroup" in perms or "read_nodegroup" in perms:
+                if len(perms) == 1:
+                    permitted_nodegroups[nodegroup] = set()
+                elif len(perms) > 1 and any_perm:
+                    permitted_nodegroups[nodegroup] = set()
         else:  # if no explicit permissions, object is considered accessible by all with group permissions
             permitted_nodegroups[nodegroup] = set()
 

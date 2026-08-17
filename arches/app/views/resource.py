@@ -51,6 +51,8 @@ from arches.app.utils.permission_backend import (
     user_is_resource_editor,
     user_is_resource_reviewer,
     user_can_delete_resource,
+    user_can_read_resource,
+    get_nodegroups_by_perm,
 )
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.utils.string_utils import str_to_bool
@@ -594,21 +596,36 @@ class ResourceEditLogView(BaseManagerView):
     def get(
         self, request, resourceid=None, view_template="views/resource/edit-log.htm"
     ):
+        permitted_nodegroupids = get_nodegroups_by_perm(
+            request.user, "models.read_nodegroup"
+        )
         transaction_id = request.GET.get("transactionid", None)
         if resourceid is None:
             if transaction_id:
                 recent_edits = models.EditLog.objects.filter(
-                    transactionid=transaction_id
+                    transactionid=transaction_id,
+                    nodegroupid__in=permitted_nodegroupids,
                 ).order_by("-timestamp")
             else:
                 recent_edits = (
-                    models.EditLog.objects.all()
-                    .exclude(resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+                    models.EditLog.objects.exclude(
+                        resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
+                    )
+                    .filter(nodegroupid__in=permitted_nodegroupids)
                     .order_by("-timestamp")[:100]
                 )
-            edited_ids = list({edit.resourceinstanceid for edit in recent_edits})
+            permitted_ids = {
+                resource_id
+                for resource_id in {edit.resourceinstanceid for edit in recent_edits}
+                if user_can_read_resource(request.user, resource_id)
+            }
+            recent_edits = [
+                edit
+                for edit in recent_edits
+                if edit.resourceinstanceid in permitted_ids
+            ]
             resources = Resource.objects.filter(
-                resourceinstanceid__in=edited_ids
+                resourceinstanceid__in=permitted_ids
             ).select_related("graph")
             edit_type_lookup = {
                 "create": _("Resource Created"),
@@ -627,7 +644,9 @@ class ResourceEditLogView(BaseManagerView):
                 str(r.resourceinstanceid): r.graph.name for r in resources
             }
             for edit in recent_edits:
-                edit.friendly_edittype = edit_type_lookup[edit.edittype]
+                edit.friendly_edittype = edit_type_lookup.get(
+                    edit.edittype, edit.edittype
+                )
                 edit.resource_model_name = None
                 edit.deleted = edit.resourceinstanceid in deleted_instances
                 if edit.resourceinstanceid in graph_name_lookup:
@@ -673,7 +692,10 @@ class ResourceEditLogView(BaseManagerView):
             datatype_factory = DataTypeFactory()
             for edit in edits:
                 if edit.nodegroupid is not None:
-                    if request.user.has_perm("read_nodegroup", edit.nodegroupid):
+                    edit_nodegroup = nodegroups_for_edits.get(
+                        uuid.UUID(edit.nodegroupid)
+                    )
+                    if request.user.has_perm("read_nodegroup", edit_nodegroup):
                         if edit.newvalue is not None:
                             self.getEditConceptValue(
                                 edit.newvalue, datatype_factory=datatype_factory
@@ -959,7 +981,10 @@ class ResourceDescriptors(View):
 @method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
-        resource = Resource.objects.only("graph_id").get(pk=resourceid)
+        try:
+            resource = Resource.objects.only("graph_id").get(pk=resourceid)
+        except Resource.DoesNotExist:
+            raise Http404(_("Resource does not exist"))
         graph = Graph.objects.get(graphid=resource.graph_id)
 
         try:
@@ -992,12 +1017,6 @@ class ResourceReportView(MapBaseManagerView):
 @method_decorator(can_read_resource_instance, name="dispatch")
 class RelatedResourcesView(BaseManagerView):
     action = None
-    graphs = (
-        models.GraphModel.objects.all()
-        .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-        .exclude(isresource=False)
-        .exclude(publication=None)
-    )
 
     def paginate_related_resources(self, related_resources, page, request):
         total = related_resources["total"]["value"]
@@ -1037,7 +1056,7 @@ class RelatedResourcesView(BaseManagerView):
 
         return ret
 
-    def get(self, request, resourceid=None):
+    def get(self, request, resourceid=None, include_rr_count=True, graphs=None):
         ret = {}
 
         if self.action == "get_candidates":
@@ -1083,7 +1102,8 @@ class RelatedResourcesView(BaseManagerView):
                     page=page,
                     user=request.user,
                     resourceinstance_graphid=resourceinstance_graphid,
-                    graphs=self.graphs,
+                    graphs=graphs,
+                    include_rr_count=include_rr_count,
                 )
 
                 ret = self.paginate_related_resources(
@@ -1094,7 +1114,8 @@ class RelatedResourcesView(BaseManagerView):
                     lang=lang,
                     user=request.user,
                     resourceinstance_graphid=resourceinstance_graphid,
-                    graphs=self.graphs,
+                    graphs=graphs,
+                    include_rr_count=include_rr_count,
                 )
 
         return JSONResponse(ret)

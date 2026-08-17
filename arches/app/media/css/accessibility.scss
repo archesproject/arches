@@ -66,7 +66,10 @@ a, button {
 
 .btn-primary,
 .library-icon .bg-primary,
-.select2-container-multi .select2-choices .select2-search-choice {
+.select2-container-multi .select2-choices .select2-search-choice,
+.select2-container--default .select2-selection--single .select2-selection__choice,
+.select2-container--default .select2-selection--multiple .select2-selection__choice,
+.select2-container--default .select2-results__option--highlighted[data-selected] {
     background-color: $btn-primary;
 }
 
@@ -186,6 +189,12 @@ embed:focus-visible,
 .overlay-listing,
 .legend-listing {
     color: $map-filter-inactive-option;
+}
+
+// Tabbed reports
+.report-tab.active,
+.tab-banner {
+    background: #1E5A8F;
 }
 
 ///////////// Index page specific styles /////////////

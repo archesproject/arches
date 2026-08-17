@@ -7,7 +7,9 @@ import StyleClass from 'primevue/styleclass';
 import ToastService from 'primevue/toastservice';
 import Tooltip from 'primevue/tooltip';
 
-import Aura from '@primevue/themes/aura';
+// eslint-disable-next-line
+// @ts-ignore: This is a workaround for PrimeVue theme import issues after v1.20
+import Aura from '@primeuix/themes/aura';
 
 import { createApp } from 'vue';
 import { createGettext } from "vue3-gettext";
@@ -25,7 +27,11 @@ const DEFAULT_THEME = {
     }
 };
 
-export default async function createVueApplication(vueComponent, themeConfiguration) {
+export default async function createVueApplication(
+    vueComponent, 
+    themeConfiguration,
+    initialProps = {},
+) {
     /**
      * This wrapper allows us to maintain a level of control inside arches-core
      * over Vue apps. For instance this allows us to abstract i18n setup/config
@@ -49,9 +55,10 @@ export default async function createVueApplication(vueComponent, themeConfigurat
             availableLanguages: respJSON['enabled_languages'],
             defaultLanguage: respJSON['language'],
             translations: respJSON['translations'],
+            silent: true,
         });
 
-        const app = createApp(vueComponent);
+        const app = createApp(vueComponent, initialProps);
 
         app.use(PrimeVue, themeConfiguration || DEFAULT_THEME);
         app.use(gettext);

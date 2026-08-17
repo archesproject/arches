@@ -151,8 +151,12 @@ def search_terms(request):
     permitted_nodegroups = get_permitted_nodegroups(request.user)
 
     i = 0
-    ret = {}
-    for index in ["terms", "concepts"]:
+    ret = {"terms": [], "concepts": []}
+    if len(permitted_nodegroups) == 0:
+        return JSONResponse(ret)
+    nodegroup_ids = set()
+    queries = {}
+    for index in list(ret.keys()):
         query = Query(se, start=0, limit=0)
         boolquery = Bool()
 
@@ -215,6 +219,19 @@ def search_terms(request):
         if len(permitted_nodegroups) == 0:
             continue
         results = query.search(index=index)
+        results_dict[index] = results
+        if results is not None:
+            for result in results["aggregations"]["value_agg"]["buckets"]:
+                if len(result["top_concept"]["buckets"]) == 0:
+                    for nodegroup in result["nodegroupid"]["buckets"]:
+                        nodegroup_ids.add(nodegroup["key"])
+
+    nodes = Node.objects.filter(nodeid__in=nodegroup_ids).select_related("graph")
+    node_lookup = {str(node.nodeid): (node.graph.name, node.name) for node in nodes}
+
+    i = 0
+    for index in ret.keys():
+        results = results_dict[index]
         if results is not None:
             for result in results["aggregations"]["value_agg"]["buckets"]:
                 if len(result["top_concept"]["buckets"]) > 0:

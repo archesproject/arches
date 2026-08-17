@@ -26,7 +26,7 @@ define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'
         
         save: function(){
             var self = this;
-            if (this.conceptsearch.searchbox.val() !== ''){
+            if (this.conceptsearch.searchbox.val()){
                 var parentConcept = new ConceptModel({
                     id: this.conceptsearch.searchbox.val(),
                     relationshiptype: this.relationshiptype.val()

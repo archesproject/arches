@@ -17,9 +17,9 @@ define([
             if (response.ok) {
                 const data = await response.json();
                 data.resources.forEach(function(res) {
-                    //if (res.isactive === true) { // TODO: Uncomment once active flag is re-added to graph model
-                    self.resourceModels.push(res);
-                    //}
+                    if (res.publication_id) {
+                        self.resourceModels.push(res);
+                    }
                 });
                 self.resourceModels.sort(function(a,b) {
                     return a.name.toLowerCase().localeCompare(b.name.toLowerCase());

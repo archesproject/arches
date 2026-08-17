@@ -378,6 +378,7 @@
         filter='{% trans "Filter" as filter %} "{{ filter|escapejs }}"'
         clear='{% trans "Clear" as clear %} "{{ clear|escapejs }}"'
         clear-filter='{% trans "Clear Filter" as clearFilter %} "{{ clearFilter|escapejs }}"'
+        clear-filters='{% trans "Clear Filters" as clearFilters %} "{{ clearFilters|escapejs }}"'
         buffer='{% trans "Buffer" as buffer %} "{{ buffer|escapejs }}"'
         distance='{% trans "Distance" as distance %} "{{ distance|escapejs }}"'
         buffer-distance='{% trans "Buffer Distance" as bufferDistance %} "{{ bufferDistance|escapejs }}"'
@@ -1059,6 +1060,7 @@
             "icon": "{{ resource.iconclass }}"
         },{% endfor %}]'
         user-email='{{ user.email }}'
+        user-name='{% if user.username == "" %}anonymous{% else %}{{ user.username }}{% endif %}'
         use-semantic-relationships="{{ app_settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS|lower }}"
         version="{{ app_settings.VERSION }}"
 

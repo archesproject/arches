@@ -18,9 +18,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import json
 import os
+import uuid
 
 from tests.base_test import ArchesTestCase
+from tests.utils.permission_test_utils import add_users
 from django.urls import reverse
+from django.contrib.auth.models import User
 from django.core import management
 from django.test.client import RequestFactory
 from django.test.utils import captured_stdout
@@ -38,10 +41,27 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 class ResourceAPITests(ArchesTestCase):
     graph_fixtures = ["Data_Type_Model"]
     data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
+    non_legacy_resource_instanceid = "eb817333-2010-4cf5-a6e9-88003bfa8b64"
 
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
+        add_users()
+
+        # add resource and tile not sourced from legacy_load_testing_package
+        cls.non_legacy_resource = Resource.objects.create(
+            pk=uuid.UUID(cls.non_legacy_resource_instanceid),
+            graph_id=cls.data_type_graphid,
+        )
+        models.TileModel.objects.create(
+            nodegroup_id=uuid.UUID("e7364d1e-95c4-11e8-9e7c-acde48001122"),
+            data={
+                "e7364d1e-95c4-11e8-9e7c-acde48001122": None,
+                "f08a3057-95c4-11e8-9761-acde48001122": 55,
+            },
+            resourceinstance=cls.non_legacy_resource,
+        )
+
         cls.legacy_load_testing_package()
         with open(
             os.path.join("tests/fixtures/resource_graphs/unique_graph_shape.json"), "r"
@@ -535,3 +555,181 @@ class ResourceAPITests(ArchesTestCase):
             if len(related_graph_set["resources"]) > 0:
                 detected_relations = len(related_graph_set["resources"])
         self.assertTrue(detected_relations == 1)
+
+    def test_related_resources_api_excludes_unpublished_graphs(self):
+        # Make two calls to ensure changes are not cached.
+        response = self.client.get(
+            reverse(
+                "related_resources",
+                args=(str(self.test_prj_user.pk),),
+            ),
+        )
+        resp = json.loads(response.content)
+        graph_count_before = len(resp["related_resources"]["node_config_lookup"])
+
+        self.data_type_graph.publication = None
+        self.data_type_graph.save()
+
+        response2 = self.client.get(
+            reverse(
+                "related_resources",
+                args=(str(self.test_prj_user.pk),),
+            ),
+        )
+        resp2 = json.loads(response2.content)
+        graph_count_after = len(resp2["related_resources"]["node_config_lookup"])
+        self.assertEqual(graph_count_after, graph_count_before - 1)
+
+    def test_bulk_disambiguated_resource_endpoint(self):
+        user = User.objects.get(username="ben")
+        self.client.force_login(user)
+        response = self.client.get(
+            reverse("api_bulk_disambiguated_resource_instance"),
+            QUERY_STRING=f"resource_ids={self.non_legacy_resource_instanceid}",
+        )
+        self.assertTrue(
+            response.json()[str(self.non_legacy_resource_instanceid)] is not None
+        )
+
+    def test_node_value_endpoint(self):
+        user = User.objects.get(username="ben")
+        self.client.force_login(user)
+        tile = models.TileModel.objects.filter(
+            resourceinstance_id=self.non_legacy_resource_instanceid
+        ).first()
+        nodeid = "f08a3057-95c4-11e8-9761-acde48001122"
+        payload = {
+            "tileid": (None, str(tile.tileid)),
+            "nodeid": (None, nodeid),
+            "data": (None, 42),
+            "operation": (None, "create"),
+        }
+        response = self.client.post(
+            reverse("api_node_value"),
+            payload,
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_tiles_endpoint_get(self):
+        user = User.objects.get(username="ben")
+        self.client.force_login(user)
+        tile = models.TileModel.objects.filter(
+            resourceinstance_id=self.non_legacy_resource_instanceid
+        ).first()
+        response = self.client.get(
+            reverse("api_tiles", kwargs={"tileid": str(tile.tileid)})
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_tiles_endpoint_post(self):
+        user = User.objects.get(username="admin")
+        self.client.force_login(user)
+        nodegroupid = "e7364d1e-95c4-11e8-9e7c-acde48001122"
+        nodeid = "f08a3057-95c4-11e8-9761-acde48001122"
+        resourceid = "a6421f96-0eba-11f1-87e3-469c1cc4c080"
+        tileid = "97310030-0eba-11f1-87e3-469c1cc4c080"
+        values = json.dumps(
+            {
+                "tileid": "",
+                "data": {
+                    nodegroupid: None,
+                    nodeid: 55.1,
+                },
+                "nodegroup_id": nodegroupid,
+                "parenttile_id": None,
+                "resourceinstance_id": resourceid,
+                "sortorder": 0,
+                "transaction_id": None,
+            }
+        )
+        payload = {
+            "data": values,
+        }
+
+        with self.subTest("resource does not exist before post"):
+            self.assertFalse(
+                models.ResourceInstance.objects.filter(pk=resourceid).exists()
+            )
+
+        self.client.post(
+            reverse("api_tiles", kwargs={"tileid": tileid}),
+            payload,
+        )
+
+        with self.subTest("resource is created after first post"):
+            self.assertTrue(
+                models.ResourceInstance.objects.filter(pk=resourceid).exists()
+            )
+
+        new_tileid = str(
+            models.ResourceInstance.objects.get(pk=resourceid).tilemodel_set.first().pk
+        )
+
+        values = json.dumps(
+            {
+                "tileid": new_tileid,
+                "data": {
+                    "e7364d1e-95c4-11e8-9e7c-acde48001122": None,
+                    "f08a3057-95c4-11e8-9761-acde48001122": 75,
+                },
+                "nodegroup_id": nodegroupid,
+                "parenttile_id": None,
+                "resourceinstance_id": resourceid,
+                "sortorder": 0,
+                "transaction_id": None,
+            }
+        )
+        payload = {
+            "data": values,
+        }
+
+        self.client.post(
+            reverse("api_tiles", kwargs={"tileid": new_tileid}),
+            payload,
+        )
+
+        with self.subTest("first related tile has expected nodeid value"):
+            self.assertEqual(
+                models.ResourceInstance.objects.get(pk=resourceid)
+                .tilemodel_set.first()
+                .data[nodeid],
+                75,
+            )
+
+    def test_tiles_endpoint_request_body(self):
+        user = User.objects.get(username="admin")
+        self.client.force_login(user)
+        nodegroupid = "e7364d1e-95c4-11e8-9e7c-acde48001122"
+        nodeid = "f08a3057-95c4-11e8-9761-acde48001122"
+        resourceid = "c11d5814-1746-11f1-bb2a-469c1cc4c080"
+        tileid = "869aaa14-1752-11f1-bb2a-469c1cc4c080"
+        values = json.dumps(
+            {
+                "tileid": "",
+                "data": {
+                    nodegroupid: None,
+                    nodeid: 55.1,
+                },
+                "nodegroup_id": nodegroupid,
+                "parenttile_id": None,
+                "resourceinstance_id": resourceid,
+                "sortorder": 0,
+                "transaction_id": None,
+            }
+        )
+
+        with self.subTest("resource does not exist before post"):
+            self.assertFalse(
+                models.ResourceInstance.objects.filter(pk=resourceid).exists()
+            )
+
+        self.client.post(
+            reverse("api_tiles", kwargs={"tileid": tileid}),
+            content_type="application/json",
+            data=values,
+        )
+
+        with self.subTest("resource is created after first post"):
+            self.assertTrue(
+                models.ResourceInstance.objects.filter(pk=resourceid).exists()
+            )

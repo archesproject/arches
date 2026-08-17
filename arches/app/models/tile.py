@@ -456,6 +456,7 @@ class Tile(models.TileModel):
         )
         note = "resource creation" if resource_creation else None
         context = kwargs.pop("context", dict())
+        resource = kwargs.pop("resource", None)
         transaction_id = kwargs.pop("transaction_id", None)
         provisional_edit_log_details = kwargs.pop("provisional_edit_log_details", None)
         creating_new_tile = True
@@ -580,6 +581,24 @@ class Tile(models.TileModel):
                     transaction_id=transaction_id,
                     displayname=resource_proxy_instance.displayname(),
                 )
+
+            for tile in self.tiles:
+                tile.resourceinstance = self.resourceinstance
+                tile.parenttile = self
+                tile.save(
+                    *args,
+                    request=request,
+                    resource_creation=resource_creation,
+                    index=False,
+                    **kwargs,
+                )
+
+            if resource is None:
+                resource = Resource.objects.get(pk=self.resourceinstance_id)
+            resource.save_descriptors(context={"tile": self})
+
+            if index:
+                self.index(resource=resource)
 
     def populate_missing_nodes(self):
         first_node = next(iter(self.data.items()), None)

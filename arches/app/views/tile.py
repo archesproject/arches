@@ -40,6 +40,7 @@ from django.views.generic import View
 from django.db import transaction
 from django.shortcuts import redirect
 from arches.app.models.resource import EditLog
+from arches.app.utils.decorators import group_required
 
 logger = logging.getLogger(__name__)
 
@@ -92,6 +93,7 @@ class TileData(View):
             _(title), _(str(message)), {"message": message, "title": title}
         )
 
+    @method_decorator(group_required("Resource Editor", raise_exception=True))
     def post(self, request):
         original_transaction_id = request.POST.get("transaction_id", None)
         transaction_id = request.POST.get("transaction_id", uuid.uuid1())
@@ -301,6 +303,7 @@ class TileData(View):
 
         return HttpResponseNotFound()
 
+    @method_decorator(group_required("Resource Editor", raise_exception=True))
     def delete(self, request):
         json = request.body
         if json is not None:

@@ -124,6 +124,7 @@ class ArchesDefaultAllowPermissionsTests(ArchesPermissionFrameworkTestCase):
             ):
                 mock = Mock()
                 mock.id = self.user.id
+                mock.is_superuser = False
                 result = self.framework.get_search_ui_permissions(
                     mock,
                     {

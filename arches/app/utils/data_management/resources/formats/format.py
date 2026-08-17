@@ -176,18 +176,21 @@ class Reader(object):
                     relation["datestarted"] = None
                 if relation["dateended"] == "" or relation["dateended"] == "None":
                     relation["dateended"] = None
+
                 if (
                     "nodeid" not in relation
                     or relation["nodeid"] == ""
                     or relation["nodeid"] == "None"
                 ):
                     relation["nodeid"] = None
+
                 if (
                     "tileid" not in relation
                     or relation["tileid"] == ""
                     or relation["tileid"] == "None"
                 ):
                     relation["tileid"] = None
+
                 relation = ResourceXResource(
                     resourceinstanceidfrom=Resource(resourceinstancefrom),
                     resourceinstanceidto=Resource(resourceinstanceto),
@@ -198,8 +201,8 @@ class Reader(object):
                         "resourceinstanceto_graphid"
                     ],
                     relationshiptype=str(relation["relationshiptype"]),
-                    nodeid=relation["nodeid"],
-                    tileid=relation["tileid"],
+                    nodeid_id=relation["nodeid"],
+                    tileid_id=relation["tileid"],
                     datestarted=relation["datestarted"],
                     dateended=relation["dateended"],
                     notes=relation["notes"],

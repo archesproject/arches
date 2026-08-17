@@ -176,7 +176,7 @@ define([
         clear: function() {
             this.filter.fromDate(null);
             this.filter.toDate(null);
-            this.filter.dateNodeId(null);
+            this.filter.dateNodeId();
             this.filter.inverted(false);
             this.dateRangeType('custom');
             this.getFilterByType('term-filter-type').removeTag(this.name);

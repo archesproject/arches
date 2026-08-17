@@ -239,10 +239,7 @@ class BaseDataType(object):
         else:
             return data
 
-    def get_display_value(self, tile, node, **kwargs):
-        """
-        Returns a list of concept values for a given node
-        """
+    def get_display_value(self, tile, node, **kwargs) -> str:
         data = self.get_tile_data(tile)
 
         if data:
@@ -250,6 +247,7 @@ class BaseDataType(object):
 
             if display_value:
                 return str(display_value)
+        return ""  # TODO (arches_version): configure this with a setting in 8.1
 
     def get_search_terms(self, nodevalue, nodeid=None):
         """
