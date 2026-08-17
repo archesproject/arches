@@ -12,12 +12,15 @@ require([
             var self = this;
             var cards = data.cards;
             var edits = data.edits;
-            var editTypeLookup = {
+            const editTypeLookup = {
                 'create': {icon: 'fa fa-chevron-circle-right fa-lg', color: 'bg-mint'},
+                'bulk_create': {icon: 'fa fa-chevron-circle-right fa-lg', color: 'bg-mint'},
                 'tile edit': {icon: 'fa fa-repeat fa-lg', color: 'bg-purple'},
+                'append': {icon: 'fa fa-repeat fa-lg', color: 'bg-purple'},
                 'tile create': {icon: 'fa fa-plus fa-lg', color: 'bg-dark'},
                 'tile delete': {icon: 'fa fa-minus fa-lg', color: 'bg-danger'},
-                'delete edit': {icon: 'fa fa-minus fa-lg', color: 'bg-danger'}
+                'delete edit': {icon: 'fa fa-minus fa-lg', color: 'bg-danger'},
+                'delete': {icon: 'fa fa-minus fa-lg', color: 'bg-danger'}
             };
 
             var handleChildCards = function(card) {
