@@ -19,6 +19,7 @@ class Command(BaseCommand):  # pragma: no cover
             "This will replace the following files in your project:\n"
             "  - .github/dependabot.yml\n"
             "  - eslint.config.mjs\n"
+            "  - vitest.config.mts\n"
             "This will also delete your project's entire webpack/ directory and recreate it "
             "from scratch, including:\n"
             "  - webpack/webpack-utils/build-filepath-lookup.js\n"
@@ -27,6 +28,10 @@ class Command(BaseCommand):  # pragma: no cover
             "  - webpack/webpack.config.dev.js\n"
             "  - webpack/webpack.config.prod.js\n"
             "Any other files you've added under webpack/ will be lost.\n"
+            "This will also delete your project's entire vitest-utils/ directory and "
+            "recreate it from scratch, including:\n"
+            "  - vitest-utils/project-node-modules-fallback.ts\n"
+            "Any other files you've added under vitest-utils/ will be lost.\n"
             "Continue? "
         )
 
@@ -56,9 +61,35 @@ class Command(BaseCommand):  # pragma: no cover
         )
         self.stdout.write("Done!")
 
+        self._update_vitest_configuration(project_root)
         self._update_ci_workflow(project_root)
 
         self.stdout.write("Project successfully updated to version 8.2")
+
+    def _update_vitest_configuration(self, project_root):
+        self.stdout.write("Updating vitest.config.mts...")
+        shutil.copy2(
+            os.path.join(
+                settings.ROOT_DIR, "install", "arches-templates", "vitest.config.mts"
+            ),
+            os.path.join(project_root, "vitest.config.mts"),
+        )
+        self.stdout.write("Done!")
+
+        vitest_utils_path = os.path.join(project_root, "vitest-utils")
+        if os.path.isdir(vitest_utils_path):
+            self.stdout.write("Removing previous vitest-utils directory...")
+            shutil.rmtree(vitest_utils_path, ignore_errors=True)
+            self.stdout.write("Done!")
+
+        self.stdout.write("Creating updated vitest-utils directory at project root...")
+        shutil.copytree(
+            os.path.join(
+                settings.ROOT_DIR, "install", "arches-templates", "vitest-utils"
+            ),
+            vitest_utils_path,
+        )
+        self.stdout.write("Done!")
 
     def _update_ci_workflow(self, project_root):
         workflow_path = os.path.join(project_root, ".github", "workflows", "main.yml")
