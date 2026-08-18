@@ -1,3 +1,5 @@
+import os
+import glob
 import uuid
 import csv
 import io
@@ -6,6 +8,7 @@ from base64 import b64encode
 from http import HTTPStatus
 from arches.app.models import models
 from arches.app.models.tile import Tile
+from arches.app.models.resource import Resource
 from arches.app.search.elasticsearch_dsl_builder import Query
 from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -89,6 +92,13 @@ class SearchExportTests(ArchesTestCase):
 
     @classmethod
     def tearDownClass(cls):
+        export_dir = "tests/fixtures/data/export_deliverables/"
+        for zip_file in glob.glob(os.path.join(export_dir, "*.zip")):
+            try:
+                os.remove(zip_file)
+            except OSError:
+                pass
+
         se = SearchEngineFactory().create()
         q = Query(se=se)
         for indexname in [TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX]:
@@ -236,6 +246,58 @@ class SearchExportTests(ArchesTestCase):
         request.user = self.user
         exporter = SearchResultsExporter(search_request=request)
         exporter.export(format="tilecsv", report_link="false")
+
+    def test_missing_node_value_tile(self):
+
+        target_tile_data = {
+            "81fd5456-9ae8-11f1-96bb-3d59943af363": {
+                "en": {"value": "Test Node", "direction": "ltr"}
+            }
+        }
+
+        link_tile_data = {
+            "fda12368-9ae7-11f1-96bb-3d59943af363": "694a67a9-52be-4e59-8c30-7c6855137a9d"
+        }
+
+        resource = Resource.objects.create(
+            resourceinstanceid="26ad70b1-dc07-4105-80a9-fc0a351e3b7d",
+            graph_id="d291a445-fa5f-11e6-afa8-14109fd34195",
+        )
+
+        target_tile = Tile.objects.create(
+            resourceinstance_id="26ad70b1-dc07-4105-80a9-fc0a351e3b7d",
+            data=target_tile_data,
+            nodegroup_id="81fd5456-9ae8-11f1-96bb-3d59943af363",
+            tileid="694a67a9-52be-4e59-8c30-7c6855137a9d",
+        )
+
+        Tile.objects.create(
+            resourceinstance_id="26ad70b1-dc07-4105-80a9-fc0a351e3b7d",
+            data=link_tile_data,
+            nodegroup_id="fda12368-9ae7-11f1-96bb-3d59943af363",
+        )
+
+        # synchronous
+        resource.index()
+        se = SearchEngineFactory().create()
+        sync_es(se)
+
+        target_tile.delete()
+
+        request = self.factory.get("/search?tiles=True&export=True&format=tilecsv")
+        request.user = self.user
+        exporter = SearchResultsExporter(search_request=request)
+        files, _ = exporter.export(format="tilecsv", report_link="false")
+
+        csv_content = files[0]["outputfile"].getvalue()
+        csv_reader = list(csv.DictReader(io.StringIO(csv_content)))
+
+        exported_value = [
+            record["Link Node"]
+            for record in csv_reader
+            if record["resourceid"] == "26ad70b1-dc07-4105-80a9-fc0a351e3b7d"
+        ]
+        self.assertEqual(exported_value[0], "Linked Tile Not Found")
 
 
 def is_valid_uuid(value, version=4):
