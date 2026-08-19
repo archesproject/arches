@@ -15,6 +15,14 @@ def field_names(instance_or_class):
     return {f.name for f in instance_or_class._meta.fields}
 
 
+def get_field_names_for_bulk_insert(instance_or_class):
+    return {
+        field.name
+        for field in instance_or_class._meta.get_fields()
+        if field.concrete and not field.primary_key
+    }
+
+
 def make_name_unique(name, names_to_check, suffix_delimiter="_"):
     """
     Makes a name unique among a list of names
