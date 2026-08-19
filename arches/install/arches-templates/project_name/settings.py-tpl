@@ -270,8 +270,9 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
 SESSION_COOKIE_NAME = '{{ project_name }}'
 
 # Sets the Referrer Policy header on all responses 
-# 'strict-origin-when-cross-origin' sends the referer header for cross-origin links. 
+# 'strict-origin-when-cross-origin' sends the referrer header for cross-origin links. 
 # See all options: https://docs.djangoproject.com/en/6.0/ref/middleware/#referrer-policy
+# For details on why, see [#12874](https://github.com/archesproject/arches/issues/12874)
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
 # For more info on configuring your cache: https://docs.djangoproject.com/en/2.2/topics/cache/
