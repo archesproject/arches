@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import random
 import os, uuid
-from django.test import TransactionTestCase
+
 from django.test.utils import captured_stdout
 from django.db import connection, connections, transaction
 from django.core import management
@@ -28,6 +28,7 @@ from arches.app.models.graph import Graph
 from arches.app.models.models import SpatialView
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
 from tests import test_settings
+from tests.base_test import ArchesTransactionTestCase
 
 # these tests can be run from the command line via
 # python manage.py test tests.models.spatialview_model_tests --settings="tests.test_settings"
@@ -300,7 +301,7 @@ class SpatialViewTests(ArchesTestCase):
             spatialview.full_clean()
 
 
-class SpatialViewTriggerTests(TransactionTestCase):
+class SpatialViewTriggerTests(ArchesTransactionTestCase):
 
     serialized_rollback = True
 
@@ -431,8 +432,7 @@ class SpatialViewTriggerTests(TransactionTestCase):
         )
 
         with connection.cursor() as cursor:
-            cursor.execute(
-                f"""
+            cursor.execute(f"""
                 SELECT
                     gid,
                     tileid,
@@ -454,8 +454,7 @@ class SpatialViewTriggerTests(TransactionTestCase):
                     domain_list,
                     other_spatialviews,
                     other_models_list
-                FROM public.{self.test_spatial_view.slug}_polygon"""
-            )
+                FROM public.{self.test_spatial_view.slug}_polygon""")
             rows = cursor.fetchall()
             self.assertTrue(len(rows) == 1)
             row = rows[0]

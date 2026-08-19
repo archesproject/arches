@@ -20,7 +20,7 @@ class SearchSortTests(ArchesTestCase):
         super().setUpTestData()
 
         cls.url = "/en/search?paging-filter=1&tiles=true&format=tilecsv&reportlink=false&precision=6&total=5&exportsystemvalues=false"
-        cls.user = User.objects.get(username="admin")
+        cls.user = cls.test_users["admin"]
 
         test_graph = Graph.objects.get(pk="cfc0d27d-b1f4-4939-a870-07d580be2b60")
 

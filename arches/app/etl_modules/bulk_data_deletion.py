@@ -34,14 +34,11 @@ class BulkDataDeletion(BaseBulkEditor):
         resourceids_query = (
             "AND resourceinstanceid IN %(resourceids)s" if resourceids else ""
         )
-        tile_deletion_count = (
-            """
+        tile_deletion_count = """
             SELECT COUNT(DISTINCT resourceinstanceid), COUNT(tileid)
             FROM tiles
             WHERE nodegroupid = %(nodegroup_id)s
-        """
-            + resourceids_query
-        )
+        """ + resourceids_query
 
         resource_deletion_count = """
             SELECT g.name ->> %(language_code)s, COUNT(r.resourceinstanceid)

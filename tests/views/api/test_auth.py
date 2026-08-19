@@ -7,7 +7,6 @@ from django.urls import reverse
 from arches.test.utils import sync_overridden_test_settings_to_arches
 from tests.base_test import ArchesTestCase
 
-
 # these tests can be run from the command line via
 # python manage.py test tests.views.api.test_auth --settings="tests.test_settings"
 
@@ -15,6 +14,7 @@ from tests.base_test import ArchesTestCase
 class AuthAPITests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
+        super().setUpTestData()
         cls.visitor = User.objects.create(
             username="visitor",
             first_name="Esperanza",

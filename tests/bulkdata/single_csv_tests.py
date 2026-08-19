@@ -27,17 +27,17 @@ from arches.app.utils.data_management.resource_graphs.importer import (
 from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.etl_modules.import_single_csv import ImportSingleCsv
 from arches.app.models.system_settings import settings
+from tests.base_test import ArchesTransactionTestCase
 from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
 from django.db import connection
 from django.http import HttpRequest
-from django.test import TransactionTestCase
 
 # these tests can be run from the command line via
 # python manage.py test tests.bulkdata.single_csv_tests --settings="tests.test_settings"
 
 
-class SingleCSVTests(TransactionTestCase):
+class SingleCSVTests(ArchesTransactionTestCase):
     serialized_rollback = True
 
     def setUp(self):
@@ -47,13 +47,12 @@ class SingleCSVTests(TransactionTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         resource_graph_importer(archesfile["graph"])
         graph = Graph.objects.get(graphid="1bc910b3-99dc-4a5c-8168-61c9e1975658")
-        admin = User.objects.get(username="admin")
-        graph.publish(user=admin)
+        graph.publish(user=self.test_users["admin"])
 
     def test_write(self):
         request = HttpRequest()
         request.method = "POST"
-        request.user = User.objects.get(username="admin")
+        request.user = self.test_users["admin"]
         load_id = "2d288e76-ebd3-11ee-85b8-0242ac120005"
         csv_file = "single-csv-test-data.csv"
 

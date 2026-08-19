@@ -21,9 +21,10 @@ import logging
 import uuid
 from contextlib import contextmanager
 from copy import deepcopy
+from django.core.cache import caches
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connection
-from django.db.models import Q, prefetch_related_objects
+from django.db.models import Q, FETCH_RAISE, prefetch_related_objects
 from django.db.utils import IntegrityError
 from arches.app.const import IntegrityCheck
 from arches.app.models import models
@@ -89,13 +90,6 @@ class Graph(models.GraphModel):
                         "spatial_views",
                     ):
                         setattr(self, key, value)
-
-                try:
-                    self.update_permissions_from_serialized_graph(args[0])
-                except (
-                    AttributeError
-                ):  # AttributeError happens if attempting to update permissions on a non-existent NodeGroup
-                    pass
 
                 nodegroups = dict(
                     (item["nodegroupid"], item) for item in args[0]["nodegroups"]
@@ -1005,10 +999,6 @@ class Graph(models.GraphModel):
         for node in copy_of_self.nodes.values():
             node.is_immutable = bool(node.is_immutable or self.is_copy_immutable)
 
-            if node.datatype == "geojson-feature-collection":
-                node.config["advancedStyle"] = ""
-                node.config["advancedStyling"] = False
-
         copy_of_self.pk = uuid.uuid4()
         node_map = {}
         card_map = {}
@@ -1757,13 +1747,15 @@ class Graph(models.GraphModel):
                                 group_permission["object_pk"]
                             ]
                         )
-                        user_permissions_to_create.append(
+                        group_permissions_to_create.append(
                             GroupObjectPermission(**group_permission)
                         )
 
                     GroupObjectPermission.objects.bulk_create(
                         group_permissions_to_create
                     )
+
+                transaction.on_commit(lambda: caches["user_permission"].clear())
 
     def get_user_permissions(self, force_recalculation=False):
         """
@@ -2047,9 +2039,10 @@ class Graph(models.GraphModel):
             else:
                 ret.pop("group_permissions", None)
 
-            ret["spatial_views"] = models.SpatialView.objects.select_related().filter(
-                geometrynode__graph__in=[self.source_identifier_id, self.graphid]
-            )
+            # Bark if any related fields are unintentionally fetched.
+            ret["spatial_views"] = models.SpatialView.objects.fetch_mode(
+                FETCH_RAISE
+            ).filter(geometrynode__graph__in=[self.source_identifier_id, self.graphid])
             ret["domain_connections"] = (
                 self.get_valid_domain_ontology_classes()
                 if "domain_connections" not in exclude
@@ -2217,10 +2210,8 @@ class Graph(models.GraphModel):
 
         if self.get_draft_graph():
             raise GraphValidationError(
-                _(
-                    "You cannot save a graph that has an active draft. \
-                        Please publish or delete the draft before saving this graph."
-                ),
+                _("You cannot save a graph that has an active draft. \
+                        Please publish or delete the draft before saving this graph."),
                 1019,
             )
 
@@ -2768,7 +2759,12 @@ class Graph(models.GraphModel):
             updated_graph.widgets = widget_dict
             updated_graph.is_active = self.is_active
 
-            updated_graph.update_permissions_from_serialized_graph(serialized_graph)
+            try:
+                updated_graph.update_permissions_from_serialized_graph(serialized_graph)
+            except (
+                AttributeError
+            ):  # AttributeError happens if attempting to update permissions on a non-existent NodeGroup
+                pass
 
             relatable_resource_model_nodes = models.Node.objects.filter(
                 graph_id__in=serialized_graph["relatable_resource_model_ids"],

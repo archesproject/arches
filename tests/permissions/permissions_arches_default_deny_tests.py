@@ -17,7 +17,7 @@ from unittest.mock import MagicMock, Mock, patch
 from tests.permissions.base_permissions_framework_test import (
     ArchesPermissionFrameworkTestCase,
 )
-from arches.app.models.models import Node
+from arches.app.models.models import Node, ResourceInstance
 from arches.app.permissions.arches_default_deny import (
     ArchesDefaultDenyPermissionFramework,
 )
@@ -121,3 +121,81 @@ class ArchesDefaultDenyPermissionTests(ArchesPermissionFrameworkTestCase):
                 )
                 self.assertTrue(result["can_read"])
                 self.assertFalse(result["can_edit"])
+
+    def test_filter_resource_queryset_requires_group_grant(self):
+        """
+        A resource is excluded from a filtered queryset until the user's
+        group is explicitly granted view_resourceinstance, then included.
+        """
+        queryset = ResourceInstance.objects.filter(graph_id=self.data_type_graphid)
+
+        filtered_before_grant = self.framework.filter_resource_queryset(
+            self.user, queryset
+        )
+        self.assertNotIn(
+            self.resource.resourceinstanceid,
+            filtered_before_grant.values_list("resourceinstanceid", flat=True),
+        )
+
+        self.framework.assign_perm("view_resourceinstance", self.group, self.resource)
+
+        filtered_after_grant = self.framework.filter_resource_queryset(
+            self.user, queryset
+        )
+        self.assertIn(
+            self.resource.resourceinstanceid,
+            filtered_after_grant.values_list("resourceinstanceid", flat=True),
+        )
+
+    def test_filter_resource_queryset_excludes_other_resources(self):
+        """
+        Granting access to one resource must not leak access to other,
+        ungranted resources present in the same queryset.
+        """
+        other_resource = (
+            ResourceInstance.objects.filter(graph_id=self.data_type_graphid)
+            .exclude(resourceinstanceid=self.resource.resourceinstanceid)
+            .first()
+        )
+        self.assertIsNotNone(other_resource)
+
+        self.framework.assign_perm("view_resourceinstance", self.group, self.resource)
+
+        queryset = ResourceInstance.objects.filter(graph_id=self.data_type_graphid)
+        filtered = self.framework.filter_resource_queryset(self.user, queryset)
+        filtered_ids = set(filtered.values_list("resourceinstanceid", flat=True))
+
+        self.assertIn(self.resource.resourceinstanceid, filtered_ids)
+        self.assertNotIn(other_resource.resourceinstanceid, filtered_ids)
+
+    def test_filter_resource_queryset_owner_bypass(self):
+        """
+        The resource owner (principaluser) can see their resource even
+        without an explicit group/user grant.
+        """
+        ResourceInstance.objects.filter(
+            resourceinstanceid=self.resource.resourceinstanceid
+        ).update(principaluser_id=self.user.id)
+
+        queryset = ResourceInstance.objects.filter(graph_id=self.data_type_graphid)
+        filtered = self.framework.filter_resource_queryset(self.user, queryset)
+
+        self.assertIn(
+            self.resource.resourceinstanceid,
+            filtered.values_list("resourceinstanceid", flat=True),
+        )
+
+    def test_filter_resource_queryset_superuser_bypass(self):
+        """
+        Superusers are not filtered at all.
+        """
+        superuser = Mock()
+        superuser.is_superuser = True
+
+        queryset = ResourceInstance.objects.filter(graph_id=self.data_type_graphid)
+        filtered = self.framework.filter_resource_queryset(superuser, queryset)
+
+        self.assertEqual(
+            set(queryset.values_list("resourceinstanceid", flat=True)),
+            set(filtered.values_list("resourceinstanceid", flat=True)),
+        )

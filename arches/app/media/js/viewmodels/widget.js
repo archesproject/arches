@@ -126,7 +126,7 @@ var WidgetViewModel = function(params) {
             this.value(defaultValue);
         }
 
-        if (!self.form) {
+        if (params.hasOwnProperty('graphDesignerHasDirtyWidget')) {
             if (ko.isObservable(self.value)) {
                 self.valueSubscription = self.value.subscribe(function(val){
                     if (self.defaultValue() != val) {

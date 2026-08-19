@@ -35,6 +35,13 @@ const ExcelFileExportViewModel = function(params) {
     this.alert = params.alert;
     this.filename = ko.observable();
 
+    this.exportFilename = ko.computed(function() {
+        if (!ko.unwrap(self.loadDetails)?.zipfile?.fileid)
+            return '';
+        const url = `${arches.urls.url_subpath}/temp_file/${ko.unwrap(self.loadDetails).zipfile.fileid}`;
+        return url.replace('//', '/');
+    });
+
     this.getGraphName = (selectedGraphId) => {
         if (self.graphs) {
             return self.graphs.find((graph) => graph.graphid === selectedGraphId).name;
@@ -76,7 +83,7 @@ const ExcelFileExportViewModel = function(params) {
         if (self.filename()) {
             self.formData.append('filename', self.filename());
         }
-        
+
         return fetch(arches.urls.etl_manager, {
             method: 'POST',
             body: self.formData,

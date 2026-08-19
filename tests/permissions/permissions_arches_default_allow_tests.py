@@ -14,6 +14,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from unittest.mock import MagicMock, Mock, patch
+from django.test import override_settings
 
 from arches.app.models.resource import Resource
 from tests.permissions.base_permissions_framework_test import (
@@ -244,3 +245,12 @@ class ArchesDefaultAllowPermissionsTests(ArchesPermissionFrameworkTestCase):
         filter_text = str(filter.dsl)
         self.assertIn("permissions.users_with_no_access", filter_text)
         self.assertIn(str(mock_User.id), filter_text)
+
+    @override_settings(
+        PERMISSION_FRAMEWORK="arches_default_allow.ArchesDefaultAllowPermissionFramework"
+    )
+    def test_filter_resource_queryset_rejects_default_allow_framework(self):
+        queryset = ResourceInstance.objects.filter(graph_id=self.data_type_graphid)
+
+        with self.assertRaises(Exception):
+            self.framework.filter_resource_queryset(self.user, queryset)

@@ -53,6 +53,8 @@ from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
     user_can_edit_resource,
     user_can_delete_resource,
+    user_can_read_resource,
+    get_nodegroups_by_perm,
 )
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.utils.string_utils import str_to_bool
@@ -397,9 +399,31 @@ class ResourceEditorView(MapBaseManagerView):
             return JSONErrorResponse(delete_error, delete_msg)
 
     def copy(self, request, resourceid=None):
-        resource_instance = Resource.objects.get(pk=resourceid)
-        resource = resource_instance.copy()
-        return JSONResponse({"resourceid": resource.resourceinstanceid})
+        transaction_id = uuid.uuid4()
+        original_resource = Resource.objects.get(pk=resourceid)
+        copied_resource = original_resource.copy()
+        original_resource.save_edit(
+            transaction_id=transaction_id,
+            user=request.user,
+            edit_type="copy",
+            note="Copied to",
+            newvalue={
+                "resourceinstanceid": str(copied_resource.pk),
+                "descriptors": copied_resource.descriptors,
+            },
+        )
+        copied_resource.save(
+            transaction_id=transaction_id,
+            request=request,
+            user=request.user,
+            edit_log_type="copy",
+            edit_log_note="Copied from",
+            edit_log_newvalue={
+                "resourceinstanceid": str(original_resource.resourceinstanceid),
+                "descriptors": original_resource.descriptors,
+            },
+        )
+        return JSONResponse({"resourceid": copied_resource.resourceinstanceid})
 
 
 @method_decorator(group_required("Resource Editor"), name="dispatch")
@@ -569,24 +593,40 @@ class ResourceEditLogView(BaseManagerView):
     def get(
         self, request, resourceid=None, view_template="views/resource/edit-log.htm"
     ):
+        permitted_nodegroupids = get_nodegroups_by_perm(
+            request.user, "models.read_nodegroup"
+        )
         transaction_id = request.GET.get("transactionid", None)
         if resourceid is None:
             if transaction_id:
                 recent_edits = models.EditLog.objects.filter(
-                    transactionid=transaction_id
+                    transactionid=transaction_id,
+                    nodegroupid__in=permitted_nodegroupids,
                 ).order_by("-timestamp")
             else:
                 recent_edits = (
-                    models.EditLog.objects.all()
-                    .exclude(resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+                    models.EditLog.objects.exclude(
+                        resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
+                    )
+                    .filter(nodegroupid__in=permitted_nodegroupids)
                     .order_by("-timestamp")[:100]
                 )
-            edited_ids = list({edit.resourceinstanceid for edit in recent_edits})
+            permitted_ids = {
+                resource_id
+                for resource_id in {edit.resourceinstanceid for edit in recent_edits}
+                if user_can_read_resource(request.user, resource_id)
+            }
+            recent_edits = [
+                edit
+                for edit in recent_edits
+                if edit.resourceinstanceid in permitted_ids
+            ]
             resources = Resource.objects.filter(
-                resourceinstanceid__in=edited_ids
+                resourceinstanceid__in=permitted_ids
             ).select_related("graph")
             edit_type_lookup = {
                 "create": _("Resource Created"),
+                "copy": _("Resource Copied"),
                 "delete": _("Resource Deleted"),
                 "tile delete": _("Tile Deleted"),
                 "tile create": _("Tile Created"),
@@ -653,6 +693,28 @@ class ResourceEditLogView(BaseManagerView):
                         permitted_edits.append(edit)
                 else:
                     permitted_edits.append(edit)
+
+            # Process copy edits to extract descriptor in requested language
+            language = translation.get_language()
+            for edit in permitted_edits:
+                if (
+                    edit.edittype == "copy"
+                    and edit.newvalue is not None
+                    and "descriptors" in edit.newvalue
+                    and "resourceinstanceid" in edit.newvalue
+                ):
+                    descriptors = edit.newvalue["descriptors"]
+                    # Try to get descriptor in current language, fall back to first available
+                    if language in descriptors and "name" in descriptors[language]:
+                        edit.newvalue["displayname"] = descriptors[language]["name"]
+                    elif descriptors:
+                        # Get first available language
+                        first_lang = next(iter(descriptors.keys()))
+                        if "name" in descriptors[first_lang]:
+                            edit.newvalue["displayname"] = descriptors[first_lang][
+                                "name"
+                            ]
+
             resource = Resource.objects.get(pk=resourceid)
             displayname = resource.displayname()
             cards = Card.objects.filter(

@@ -18,7 +18,6 @@ from arches.app.search.elasticsearch_dsl_builder import Bool, Ids, Terms, Nested
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.search.search import SearchEngine
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -81,13 +80,11 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
         )
 
         if not deny_read_exists or not deny_edit_exists:
-            logger.warning(
-                """
+            logger.warning("""
                 PROBLEM WITH INDEX - it appears that your index permissions are malformed.
                 This can happen when switching permission frameworks and may cause search
                 results to appear incorrectly or with invalid permissions.  You can correct it by reindexing arches.
-                """
-            )
+                """)
 
         result["can_read"] = (
             deny_read_exists
@@ -193,6 +190,23 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
         )
 
         return (self.__class__.is_exclusive, allowed_instances)
+
+    def filter_resource_queryset(
+        self,
+        user: User,
+        queryset,
+        resourceinstance_field: str = "resourceinstanceid",
+        permission: str = "models.view_resourceinstance",
+    ):
+        if (
+            settings.PERMISSION_FRAMEWORK
+            == "arches_default_allow.ArchesDefaultAllowPermissionFramework"
+        ):
+            raise Exception(f"""
+                The default allow permission framework does not support this method. Use the default deny. 
+                Note that with default deny, you can mimic default allow by granting permissions by resource model. 
+                For details see: https://arches.readthedocs.io/en/stable/administering/managing-permissions/#default-resource-model-permissions-with-default-deny
+                """)
 
     def get_restricted_instances(
         self,

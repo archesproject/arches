@@ -15,6 +15,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from typing import Iterable
 
+import guardian.shortcuts as guardian_shortcuts
 from django.contrib.auth.models import User
 
 from arches.app.models.models import ResourceInstance
@@ -111,6 +112,39 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
                 results["hits"]["hits"] += results_scrolled["hits"]["hits"]
         restricted_ids = [res["_id"] for res in results["hits"]["hits"]]
         return restricted_ids
+
+    def filter_resource_queryset(
+        self,
+        user: User,
+        queryset,
+        resourceinstance_field: str = "resourceinstanceid",
+        permission: str = "models.view_resourceinstance",
+    ):
+        """
+        Filters an arbitrary queryset down to rows the user is permitted (by
+        `permission`) to access.
+        """
+        if user.is_superuser:
+            return queryset
+
+        candidate_ids = queryset.values_list(resourceinstance_field, flat=True)
+        resourceinstances = ResourceInstance.objects.filter(
+            resourceinstanceid__in=candidate_ids
+        )
+
+        permitted = guardian_shortcuts.get_objects_for_user(
+            user,
+            permission,
+            klass=resourceinstances,
+            use_groups=True,
+            any_perm=True,
+            with_superuser=False,
+            accept_global_perms=False,
+        )
+        owned = resourceinstances.filter(principaluser_id=user.id)
+        permitted_ids = (permitted | owned).values_list("resourceinstanceid", flat=True)
+
+        return queryset.filter(**{f"{resourceinstance_field}__in": permitted_ids})
 
     def check_resource_instance_permissions(
         self,

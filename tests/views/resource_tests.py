@@ -24,6 +24,7 @@ from tests.base_test import ArchesTestCase
 from django.db import connection
 from django.urls import reverse
 from arches.app.models.models import EditLog, Graph
+from arches.app.models.models import ResourceInstance
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from tests.utils.search_test_utils import sync_es
@@ -361,3 +362,49 @@ class ResourceViewTests(ArchesTestCase):
             reverse("resource_report", kwargs={"resourceid": str(uuid.uuid4())})
         )
         self.assertEqual(response.status_code, 404)
+
+    def test_user_cannot_access_recent_edits_resource_with_no_access(self):
+        """
+        Test we cannot access a resource's recent edit without the 'view_resourceinstance' permission
+        """
+        self.client.login(username="ben", password="Test12345!")
+        edit = (
+            EditLog.objects.filter(resourceinstanceid=self.resource_instance_id)
+            .exclude(nodegroupid=None)
+            .order_by("timestamp")[0]
+        )
+        transactionid = str(edit.transactionid)
+        resource = ResourceInstance.objects.get(
+            resourceinstanceid=self.resource_instance_id
+        )
+        user = User.objects.get(username="ben")
+        assign_perm("no_access_to_resourceinstance", user, resource)
+
+        url = reverse("edit_history")
+        response = self.client.get(url, {"transactionid": transactionid})
+
+        # html response should not include resourceinstanceid (from table)
+        self.assertNotContains(response, self.resource_instance_id)
+
+    def test_user_cannot_access_recent_edits_resource_with_view_permissions(self):
+        """
+        Test we can access a resource's recent edit with the 'view_resourceinstance' permission
+        """
+        self.client.login(username="ben", password="Test12345!")
+        edit = (
+            EditLog.objects.filter(resourceinstanceid=self.resource_instance_id)
+            .exclude(nodegroupid=None)
+            .order_by("timestamp")[0]
+        )
+        transactionid = str(edit.transactionid)
+        resource = ResourceInstance.objects.get(
+            resourceinstanceid=self.resource_instance_id
+        )
+        user = User.objects.get(username="ben")
+        assign_perm("view_resourceinstance", user, resource)
+
+        url = reverse("edit_history")
+        response = self.client.get(url, {"transactionid": transactionid})
+
+        # html response should include resourceinstanceid (from table)
+        self.assertContains(response, self.resource_instance_id)

@@ -536,12 +536,8 @@ class Command(BaseCommand):
         packages_package_settings_file = os.path.join(dest_dir, "package_settings.py")
         if os.path.exists(projects_package_settings_file):
             if os.path.exists(packages_package_settings_file) and force is False:
-                resp = input(
-                    '"{0}" already exists in this directory.\
-                    Overwrite? (Y/N): '.format(
-                        "package_settings.py"
-                    )
-                )
+                resp = input('"{0}" already exists in this directory.\
+                    Overwrite? (Y/N): '.format("package_settings.py"))
                 if resp.lower() in ("t", "true", "y", "yes"):
                     overwrite = True
                 else:
@@ -750,7 +746,7 @@ class Command(BaseCommand):
                     with open(config_paths[0]) as f:
                         configs = json.load(f)
                         for relationship in configs["permitted_resource_relationships"]:
-                            (obj, created) = (
+                            obj, created = (
                                 models.Resource2ResourceConstraint.objects.update_or_create(
                                     resourceclassfrom_id=uuid.UUID(
                                         relationship["resourceclassfrom_id"]
@@ -1446,20 +1442,16 @@ class Command(BaseCommand):
 
         # messages about experimental multiprocessing and JSONL support.
         if data_source.endswith(".jsonl"):
-            print(
-                """
+            print("""
                 WARNING: Support for loading JSONL files is still experimental. Be aware that
-                the format of logging and console messages has not been updated."""
-            )
+                the format of logging and console messages has not been updated.""")
             if use_multiprocessing is True:
-                print(
-                    """
+                print("""
                     WARNING: Support for multiprocessing files is still experimental. While using
                     multiprocessing to import resources, you will not be able to use ctrl+c (etc.)
                     to cancel the operation. You will need to manually kill all of the processes
                     with or just close the terminal. Also, be aware that print statements
-                    will be very jumbled."""
-                )
+                    will be very jumbled.""")
                 if not force:
                     confirm = input("continue? Y/n ")
                     if len(confirm) > 0 and not confirm.lower().startswith("y"):

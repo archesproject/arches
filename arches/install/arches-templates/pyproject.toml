@@ -14,8 +14,9 @@ classifiers = [
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Framework :: Django",
-    "Framework :: Django :: 6.0",
+    "Framework :: Django :: 6.1",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Intended Audience :: Information Technology",
@@ -28,11 +29,11 @@ version = "0.0.1"
 
 [dependency-groups]
 dev = [
-    "black==24.4.2",
+    "black==26.3.1",
     "coverage",
-    "django-silk==5.1.0",
+    "django-silk==5.5.0",
     "livereload",
-    "pre-commit==3.8.0",
+    "pre-commit==4.6.1",
     "sst",
 ]
 

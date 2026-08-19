@@ -76,6 +76,15 @@ class PermissionFramework(metaclass=ABCMeta):
     ): ...
 
     @abstractmethod
+    def filter_resource_queryset(
+        self,
+        user,
+        queryset,
+        resourceinstance_field="resourceinstanceid",
+        permission="models.view_resourceinstance",
+    ): ...
+
+    @abstractmethod
     def get_groups_with_permission_for_object(self, perm, obj): ...
 
     @abstractmethod
@@ -218,6 +227,20 @@ def get_filtered_instances(
         search_engine=search_engine,
         allresources=allresources,
         resources=resources,
+    )
+
+
+def filter_resource_queryset(
+    user,
+    queryset,
+    resourceinstance_field="resourceinstanceid",
+    permission="models.view_resourceinstance",
+):
+    return _get_permission_framework().filter_resource_queryset(
+        user,
+        queryset,
+        resourceinstance_field=resourceinstance_field,
+        permission=permission,
     )
 
 

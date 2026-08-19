@@ -32,7 +32,6 @@ from psycopg2.extensions import AsIs
 
 import logging
 
-
 logger = logging.getLogger(__name__)
 
 CORE_CONCEPTS = (
@@ -1410,13 +1409,10 @@ class Concept(object):
         in_use = False
         cursor = connection.cursor()
         for value in self.values:
-            sql = (
-                """
+            sql = """
                 SELECT count(*) from tiles t, jsonb_each_text(t.tiledata) as json_data
                 WHERE json_data.value = '%s'
-            """
-                % value.id
-            )
+            """ % value.id
             cursor.execute(sql)
             rows = cursor.fetchall()
             if rows[0][0] > 0:
@@ -1672,7 +1668,7 @@ class ConceptValue(object):
 
 
 def get_preflabel_from_conceptid(conceptid, lang):
-    preflabels = models.Value.objects.select_related().filter(
+    preflabels = models.Value.objects.select_related("valuetype").filter(
         concept_id=conceptid, valuetype__valuetype="prefLabel"
     )
 
@@ -1689,7 +1685,7 @@ def get_preflabel_from_conceptid(conceptid, lang):
         preflabels,
         key=lambda prefLabel: rank_label(
             kind=prefLabel.valuetype,
-            source_lang=prefLabel.language.code,
+            source_lang=prefLabel.language_id,
             target_lang=lang,
         ),
         reverse=True,

@@ -4,7 +4,6 @@ import django.db.models.deletion
 from django.db import migrations, models
 from django.db.models import F, Max
 
-
 JSONLD_IMPORT_MODULE_PK = "1ae62c48-7e56-4df7-a433-2042c6acdf0c"
 
 

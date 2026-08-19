@@ -15,12 +15,15 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def save_to_tiles(userid, loadid, multiprocessing=False):
+def save_to_tiles(
+    userid, loadid, multiprocessing=False, max_subprocesses=0, index=True
+):
     logger.debug(
-        "save_to_tiles started: loadid=%s userid=%s multiprocessing=%s",
+        "save_to_tiles started: loadid=%s userid=%s multiprocessing=%s index=%s",
         loadid,
         userid,
         multiprocessing,
+        index,
     )
     with connection.cursor() as cursor:
         disable_tile_triggers(cursor, loadid)
@@ -53,10 +56,11 @@ def save_to_tiles(userid, loadid, multiprocessing=False):
                 "save_to_tiles returning error for loadid=%s: %s", loadid, error
             )
             return error
-        logger.debug(
-            "save_to_tiles proceeding to post-save edit log for loadid=%s", loadid
-        )
-        return _post_save_edit_log(cursor, userid, loadid, multiprocessing)
+
+    logger.debug("save_to_tiles proceeding to post-save edit log for loadid=%s", loadid)
+    return _post_save_edit_log(
+        userid, loadid, multiprocessing, max_subprocesses=max_subprocesses, index=index
+    )
 
 
 def log_event_details(cursor, loadid, details):
@@ -71,12 +75,10 @@ def disable_tile_triggers(cursor, loadid):
     log_event_details(
         cursor, loadid, "done|Disabling the triggers in the tile table..."
     )
-    cursor.execute(
-        """
+    cursor.execute("""
         ALTER TABLE TILES DISABLE TRIGGER __arches_check_excess_tiles_trigger;
         ALTER TABLE TILES DISABLE TRIGGER __arches_trg_update_spatial_attributes;
-    """
-    )
+    """)
 
 
 def reenable_tile_triggers(cursor, loadid):
@@ -84,13 +86,11 @@ def reenable_tile_triggers(cursor, loadid):
     log_event_details(
         cursor, loadid, "done|Reenabling the triggers in the tile table..."
     )
-    cursor.execute(
-        """
+    cursor.execute("""
         COMMIT;
         ALTER TABLE TILES ENABLE TRIGGER __arches_check_excess_tiles_trigger;
         ALTER TABLE TILES ENABLE TRIGGER __arches_trg_update_spatial_attributes;
-    """
-    )
+    """)
 
 
 def _update_load_details(cursor, loadid):
@@ -148,67 +148,83 @@ def _update_load_details(cursor, loadid):
     logger.debug("load_event marked completed for loadid=%s", loadid)
 
 
-def _post_save_edit_log(cursor, userid, loadid, multiprocessing=False):
+def _post_save_edit_log(
+    userid, loadid, multiprocessing=False, max_subprocesses=0, index=True
+):
     logger.debug(
-        "_post_save_edit_log started: loadid=%s userid=%s multiprocessing=%s",
+        "_post_save_edit_log started: loadid=%s userid=%s multiprocessing=%s index=%s",
         loadid,
         userid,
         multiprocessing,
+        index,
     )
     try:
-        log_event_details(cursor, loadid, "done|Indexing...")
-        logger.debug("Indexing resources by transaction for loadid=%s", loadid)
-        index_resources_by_transaction(
-            loadid,
-            use_multiprocessing=multiprocessing,
-            quiet=True,
-            recalculate_descriptors=True,
-        )
-        logger.debug(
-            "Indexing complete for loadid=%s; fetching user id=%s", loadid, userid
-        )
+        if index:
+            with connection.cursor() as cursor:
+                log_event_details(cursor, loadid, "done|Indexing...")
+
+            logger.debug("Indexing resources by transaction for loadid=%s", loadid)
+            index_resources_by_transaction(
+                loadid,
+                use_multiprocessing=multiprocessing,
+                quiet=True,
+                recalculate_descriptors=True,
+                max_subprocesses=max_subprocesses,
+            )
+            logger.debug(
+                "Indexing complete for loadid=%s; fetching user id=%s", loadid, userid
+            )
+        else:
+            logger.debug("Skipping indexing for loadid=%s (index=False)", loadid)
+
         user = User.objects.get(id=userid)
         user_email = getattr(user, "email", "")
         user_firstname = getattr(user, "first_name", "")
         user_lastname = getattr(user, "last_name", "")
         user_username = getattr(user, "username", "")
-        log_event_details(cursor, loadid, "done|Updating the edit log...")
         logger.debug(
             "Updating edit_log user fields for loadid=%s username=%s",
             loadid,
             user_username,
         )
-        cursor.execute(
-            """
-                UPDATE edit_log e
-                SET (resourcedisplayname, userid, user_firstname, user_lastname, user_email, user_username) = (r.name ->> %s, %s, %s, %s, %s, %s)
-                FROM resource_instances r
-                WHERE e.resourceinstanceid::uuid = r.resourceinstanceid
-                AND transactionid = %s
-            """,
-            (
-                settings.LANGUAGE_CODE,
-                userid,
-                user_firstname,
-                user_lastname,
-                user_email,
-                user_username,
-                loadid,
-            ),
+
+        with connection.cursor() as cursor:
+            log_event_details(cursor, loadid, "done|Updating the edit log...")
+            cursor.execute(
+                """
+                    UPDATE edit_log e
+                    SET (resourcedisplayname, userid, user_firstname, user_lastname, user_email, user_username) = (r.name ->> %s, %s, %s, %s, %s, %s)
+                    FROM resource_instances r
+                    WHERE e.resourceinstanceid::uuid = r.resourceinstanceid
+                    AND transactionid = %s
+                """,
+                (
+                    settings.LANGUAGE_CODE,
+                    userid,
+                    user_firstname,
+                    user_lastname,
+                    user_email,
+                    user_username,
+                    loadid,
+                ),
+            )
+            log_event_details(cursor, loadid, "done")
+            final_status = "indexed" if index else "completed"
+            cursor.execute(
+                """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
+                (final_status, datetime.now(), True, True, loadid),
+            )
+        logger.debug(
+            "_post_save_edit_log complete: loadid=%s status=%s", loadid, final_status
         )
-        log_event_details(cursor, loadid, "done")
-        cursor.execute(
-            """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
-            ("indexed", datetime.now(), True, True, loadid),
-        )
-        logger.debug("_post_save_edit_log complete: loadid=%s status=indexed", loadid)
-        return {"success": True, "data": "indexed"}
+        return {"success": True, "data": final_status}
     except Exception as e:
         logger.exception(e)
-        cursor.execute(
-            """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
-            ("unindexed", datetime.now(), loadid),
-        )
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
+                ("unindexed", datetime.now(), loadid),
+            )
         logger.debug(
             "_post_save_edit_log failed for loadid=%s; status=unindexed, data saved",
             loadid,

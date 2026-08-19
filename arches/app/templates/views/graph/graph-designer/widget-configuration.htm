@@ -40,7 +40,7 @@
                     data-bind="component: { 
                         name: 'views/components/simple-switch',
                         params: {
-                            value: visible, 
+                            value: $data.visible,
                             config: {
                                 label: {% quoted_trans _("Make Widget Visible") %}, 
                                 subtitle: {% quoted_trans _("Show this widget by default") %}

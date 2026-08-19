@@ -5,7 +5,6 @@ from arches.app.models import models
 from django.utils import translation
 from types import SimpleNamespace
 
-
 RESOURCE_ID_KEY = "@resource_id"
 NODE_ID_KEY = "@node_id"
 TILE_ID_KEY = "@tile_id"

@@ -18,9 +18,7 @@ class Migration(migrations.Migration):
         UPDATE public.cards SET helptitle=json_build_object('{0}', helptitle);
         UPDATE public.cards SET helptext=json_build_object('{0}', helptext);
         SET CONSTRAINTS ALL DEFERRED;
-    """.format(
-        settings.LANGUAGE_CODE
-    )
+    """.format(settings.LANGUAGE_CODE)
 
     reverse_sql = """
         UPDATE public.cards SET name=name::jsonb->>'{0}'::text;
@@ -28,9 +26,7 @@ class Migration(migrations.Migration):
         UPDATE public.cards SET instructions=instructions::jsonb->>'{0}'::text;
         UPDATE public.cards SET helptitle=helptitle::jsonb->>'{0}'::text;
         UPDATE public.cards SET helptext=helptext::jsonb->>'{0}'::text;
-    """.format(
-        settings.LANGUAGE_CODE
-    )
+    """.format(settings.LANGUAGE_CODE)
 
     operations = [
         migrations.RunSQL(sql, reverse_sql),

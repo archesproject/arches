@@ -7,6 +7,7 @@ from base64 import b64encode
 from http import HTTPStatus
 from pathlib import Path
 from arches.app.models import models
+from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile
 from arches.app.search.elasticsearch_dsl_builder import Query
 from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX
@@ -15,9 +16,10 @@ from arches.app.search.search_export import SearchResultsExporter
 from arches.app.utils.skos import SKOSReader
 
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.test.client import RequestFactory
 from django.urls import get_script_prefix, reverse, set_script_prefix
+from guardian.shortcuts import assign_perm
 
 from arches.app.views.api import SearchExport
 from tests.base_test import ArchesTestCase
@@ -198,6 +200,53 @@ class SearchExportTests(ArchesTestCase):
                 f"Expected non-UUID, got {cultural_period_value}",
             )
             break
+
+    def test_export_respects_no_access_to_nodegroup(self):
+        """Regression test: search export must not include tile data from a
+        nodegroup the requesting user's group has been denied access to. The
+        filtering happens upstream, in search_results.py's post_search_hook,
+        via the same get_nodegroups_by_perm mechanism affected by #12842.
+        """
+        cultural_period_column_name = self.search_model_cultural_period_nodename
+
+        def get_first_row_value():
+            request = self.factory.get("/search?tiles=True&export=True&format=tilecsv")
+            request.user = self.user
+            exporter = SearchResultsExporter(search_request=request)
+            result, _ = exporter.export(format="tilecsv", report_link="false")
+            csv_content = result[0]["outputfile"].getvalue()
+            csv_reader = csv.DictReader(io.StringIO(csv_content))
+            return next(csv_reader)[cultural_period_column_name]
+
+        self.assertTrue(
+            get_first_row_value(),
+            "Expected a non-empty value before any restriction is applied",
+        )
+
+        group = Group.objects.create(name="test group - export no access")
+        self.user.groups.add(group)
+        cultural_period_nodegroup = models.NodeGroup.objects.get(
+            pk=self.search_model_cultural_period_nodeid
+        )
+        assign_perm("no_access_to_nodegroup", group, cultural_period_nodegroup)
+
+        # simulate a report/resource-editor page load happening in between --
+        # this is exactly what silently corrupted this permission before the
+        # #12842 fix, so the test must reconstruct a Graph(dict) here to
+        # actually exercise that code path rather than just checking a
+        # freshly-assigned permission that was never at risk of corruption
+        graph = Graph.objects.get(pk=self.search_model_graphid)
+        graph.publish()
+        published_graph = models.PublishedGraph.objects.get(
+            publication=graph.publication, language="en"
+        )
+        Graph(published_graph.serialized_graph)
+
+        restricted_value = get_first_row_value()
+        self.assertFalse(
+            restricted_value,
+            f"Expected restricted nodegroup's value to be empty, got {restricted_value!r}",
+        )
 
     def test_login_via_basic_auth_good(self):
         auth_string = "Basic " + b64encode(b"admin:admin").decode("utf-8")

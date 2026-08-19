@@ -25,7 +25,6 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils import import_class_from_string
 from typing import Iterable
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -253,8 +252,8 @@ def index_resources_using_singleprocessing(
         for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")
     }
     all_users = User.objects.prefetch_related("groups")
-    with se.BulkIndexer(batch_size=batch_size, refresh=True) as doc_indexer:
-        with se.BulkIndexer(batch_size=batch_size, refresh=True) as term_indexer:
+    with se.BulkIndexer(batch_size=batch_size) as doc_indexer:
+        with se.BulkIndexer(batch_size=batch_size) as term_indexer:
             if quiet is False:
                 if isinstance(resources, QuerySet):
                     resource_count = resources.count()
@@ -298,6 +297,9 @@ def index_resources_using_singleprocessing(
                     term_indexer.add(
                         index=TERMS_INDEX, id=term["_id"], data=term["_source"]
                     )
+
+    se.refresh(index=RESOURCES_INDEX)
+    se.refresh(index=TERMS_INDEX)
 
     return os.getpid()
 
@@ -465,7 +467,7 @@ def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
         q = Query(se=se)
         q.delete(index=CONCEPTS_INDEX)
 
-    with se.BulkIndexer(batch_size=batch_size, refresh=True) as concept_indexer:
+    with se.BulkIndexer(batch_size=batch_size) as concept_indexer:
         indexed_values = []
         for conceptValue in models.Value.objects.filter(
             Q(concept__nodetype="Collection") | Q(concept__nodetype="ConceptScheme"),
@@ -514,9 +516,7 @@ def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
                         and v.valuetype in ({1})
                         and (d.relationtype = 'narrower' or d.relationtype = 'hasTopConcept')
                 ) SELECT valueid, value, conceptid, languageid, valuetype FROM children_inclusive ORDER BY depth;
-            """.format(
-                topConcept, valueTypes
-            )
+            """.format(topConcept, valueTypes)
 
             cursor.execute(sql)
             for conceptValue in cursor.fetchall():
@@ -546,6 +546,8 @@ def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
                 "top_concept": conceptValue.concept_id,
             }
             concept_indexer.add(index=CONCEPTS_INDEX, id=doc["id"], data=doc)
+
+    se.refresh(index=CONCEPTS_INDEX)
 
     cursor.execute(
         "SELECT count(*) from values WHERE valuetype in ({0})".format(valueTypes)

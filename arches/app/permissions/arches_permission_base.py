@@ -20,6 +20,7 @@ from typing import Iterable, Literal, NotRequired, TypedDict
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.gis.db.models import Model
 from django.core.cache import caches
+from django.db import transaction
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from guardian.backends import check_support, ObjectPermissionBackend
@@ -60,15 +61,19 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         obj: ResourceInstance | None = None,
     ) -> Permission:
         try:
-            return gsc.assign_perm(perm, user_or_group, obj=obj)
+            result = gsc.assign_perm(perm, user_or_group, obj=obj)
         except NotUserNorGroup:
             raise ArchesNotUserNorGroup()
+        transaction.on_commit(lambda: caches["user_permission"].clear())
+        return result
 
     def get_permission_backend(self):
         return PermissionBackend()
 
     def remove_perm(self, perm, user_or_group=None, obj=None):
-        return gsc.remove_perm(perm, user_or_group=user_or_group, obj=obj)
+        result = gsc.remove_perm(perm, user_or_group=user_or_group, obj=obj)
+        transaction.on_commit(lambda: caches["user_permission"].clear())
+        return result
 
     def process_new_user(self, instance: User, created: bool) -> None:
         pass
@@ -259,15 +264,15 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
 
     def update_groups_for_user(self, user: User) -> None:
         """Hook for spotting group updates on a user."""
-        ...
+        transaction.on_commit(lambda: caches["user_permission"].clear())
 
     def update_permissions_for_user(self, user: User) -> None:
         """Hook for spotting permission updates on a user."""
-        ...
+        transaction.on_commit(lambda: caches["user_permission"].clear())
 
     def update_permissions_for_group(self, group: Group) -> None:
         """Hook for spotting permission updates on a group."""
-        ...
+        transaction.on_commit(lambda: caches["user_permission"].clear())
 
     def user_has_resource_model_permissions(
         self,

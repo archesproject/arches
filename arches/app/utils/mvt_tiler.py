@@ -81,9 +81,7 @@ class MVTTiler:
                     ST_Intersects(geom, TileBBox(%s, %s, %s, 3857))
                     AND
                     nodeid = %s and {filter}
-                    """.format(
-                        filter=permission_framework_filter
-                    )
+                    """.format(filter=permission_framework_filter)
 
                     # get the count of matching geometries
                     cursor.execute(

@@ -10,6 +10,10 @@ const archesColors = Object.freeze({
     red: "#f75d3f",
 });
 
+/**
+ * @deprecated Use ArchesPreset from arches-vue-components instead.
+ * @see import { ArchesPreset } from '@/arches_vue_components/themes'
+ */
 export const ArchesPreset = definePreset(Aura, {
     primitive: {
         arches: {
@@ -48,6 +52,10 @@ export const ArchesPreset = definePreset(Aura, {
     },
 });
 
+/**
+ * @deprecated Use DEFAULT_THEME from arches-vue-components instead.
+ * @see import { DEFAULT_THEME } from '@/arches_vue_components/themes'
+ */
 export const DEFAULT_THEME = {
     theme: {
         preset: ArchesPreset,

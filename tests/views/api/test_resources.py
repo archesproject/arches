@@ -630,7 +630,7 @@ class ResourceAPITests(ArchesTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_tiles_endpoint_post(self):
-        user = User.objects.get(username="admin")
+        user = self.test_users["admin"]
         self.client.force_login(user)
         nodegroupid = "e7364d1e-95c4-11e8-9e7c-acde48001122"
         nodeid = "f08a3057-95c4-11e8-9761-acde48001122"
@@ -704,7 +704,7 @@ class ResourceAPITests(ArchesTestCase):
             )
 
     def test_tiles_endpoint_request_body(self):
-        user = User.objects.get(username="admin")
+        user = self.test_users["admin"]
         self.client.force_login(user)
         nodegroupid = "e7364d1e-95c4-11e8-9e7c-acde48001122"
         nodeid = "f08a3057-95c4-11e8-9761-acde48001122"

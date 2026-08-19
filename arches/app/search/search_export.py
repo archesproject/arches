@@ -466,7 +466,9 @@ class SearchResultsExporter(object):
             instance["resourceid"] for instance in instances if "resourceid" in instance
         ]
         html_exporter = ResourceExporter(format="html")
-        dest = html_exporter.export(resourceinstanceids=resourceinstanceids)
+        dest = html_exporter.export(
+            resourceinstanceids=resourceinstanceids, user=self.search_request.user
+        )
         return dest
 
     def get_geometry_fieldnames(

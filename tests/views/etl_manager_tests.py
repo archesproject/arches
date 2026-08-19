@@ -15,12 +15,13 @@ class ETLManagerTests(ArchesTestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         resource_editor_group = Group.objects.get(name="Resource Editor")
-        cls.admin = User.objects.get(username="admin")
         cls.anonymous = User.objects.get(username="anonymous")
         cls.full_name_user = User.objects.create(first_name="Full", last_name="Name")
         cls.full_name_user.groups.add(resource_editor_group)
         cls.csv_module = ETLModule.objects.get(name="Import Single CSV")
-        cls.admin_load_event = LoadEvent(user=cls.admin, etl_module=cls.csv_module)
+        cls.admin_load_event = LoadEvent(
+            user=cls.test_users["admin"], etl_module=cls.csv_module
+        )
         cls.admin_load_event.save()
         cls.full_name_load_event = LoadEvent(
             user=cls.full_name_user, etl_module=cls.csv_module
@@ -28,7 +29,7 @@ class ETLManagerTests(ArchesTestCase):
         cls.full_name_load_event.save()
 
     def test_user_model_not_serialized_on_load_event(self):
-        self.client.force_login(self.admin)
+        self.client.force_login(self.test_users["admin"])
         response = self.client.get(
             reverse("etl_manager"), QUERY_STRING="action=loadEvent"
         )
@@ -74,7 +75,7 @@ class ETLManagerTests(ArchesTestCase):
         self.assertContains(response, error.node_id)
 
     def test_no_loadid(self):
-        self.client.force_login(self.admin)
+        self.client.force_login(self.test_users["admin"])
         response = self.client.get(
             reverse("etl_manager"), QUERY_STRING="action=nodeError"
         )

@@ -1,6 +1,5 @@
 import logging
 import uuid
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from itertools import groupby
 
 from django.db import connection, transaction
@@ -72,6 +71,7 @@ def staging_to_tile(load_id, max_workers=4):
         for r in valid_meta
         if r["resourceid"]
     }
+    del valid_meta
 
     existing_ids = set(
         ResourceInstance.objects.filter(
@@ -115,6 +115,8 @@ def staging_to_tile(load_id, max_workers=4):
         settings.BULK_IMPORT_BATCH_SIZE,
     )
 
+    del resource_meta, existing_ids, new_ids, graph_to_lifecycle_state
+
     # Stream full ORM objects one chunk at a time — never holds all records in memory.
     for depth, group in groupby(
         valid_staged_tiles.iterator(chunk_size=2000), key=lambda r: r.nodegroup_depth
@@ -123,7 +125,6 @@ def staging_to_tile(load_id, max_workers=4):
         logger.debug(
             "Processing nodegroup depth %s: %d staged tiles", depth, len(staged_tiles)
         )
-        edit_logs = []
         inserts = [
             staged_tile
             for staged_tile in staged_tiles
@@ -137,11 +138,11 @@ def staging_to_tile(load_id, max_workers=4):
 
         if updates:
             update_tile_ids = {staged_tile.tileid for staged_tile in updates}
-            existing_tiles = {
-                tile.tileid: tile
-                for tile in TileModel.objects.filter(tileid__in=update_tile_ids)
-            }
-            existing_tile_ids = existing_tiles.keys()
+            existing_tile_ids = set(
+                TileModel.objects.filter(tileid__in=update_tile_ids).values_list(
+                    "tileid", flat=True
+                )
+            )
             inserts += [
                 staged_tile
                 for staged_tile in updates
@@ -154,72 +155,90 @@ def staging_to_tile(load_id, max_workers=4):
             ]
         else:
             real_updates = []
-            existing_tiles = {}
+
+        chunk_size = settings.BULK_IMPORT_BATCH_SIZE
 
         if inserts:
             logger.debug("Bulk inserting %d tiles at depth %s", len(inserts), depth)
-            tile_data_map = {r.tileid: _build_tile_data(r.value) for r in inserts}
-            TileModel.objects.bulk_create(
-                [
-                    TileModel(
-                        tileid=r.tileid,
-                        data=tile_data_map[r.tileid],
-                        nodegroup_id=r.nodegroup_id,
-                        parenttile_id=r.parenttileid,
-                        resourceinstance_id=r.resourceid,
-                        sortorder=r.sortorder,
-                    )
-                    for r in inserts
-                ],
-                settings.BULK_IMPORT_BATCH_SIZE,
-            )
-            edit_logs += [
-                EditLog(
-                    resourceclassid=nodegroup_to_graph.get(r.nodegroup_id),
-                    resourceinstanceid=str(r.resourceid),
-                    nodegroupid=str(r.nodegroup_id),
-                    tileinstanceid=str(r.tileid),
-                    edittype="tile create",
-                    newvalue=tile_data_map[r.tileid],
-                    timestamp=now,
-                    note="loaded from staging_table",
-                    transactionid=load_id,
+            for chunk_start in range(0, len(inserts), chunk_size):
+                chunk = inserts[chunk_start : chunk_start + chunk_size]
+                tile_data_map = {r.tileid: _build_tile_data(r.value) for r in chunk}
+                for staged_tile in chunk:
+                    staged_tile.value = None
+                TileModel.objects.bulk_create(
+                    [
+                        TileModel(
+                            tileid=r.tileid,
+                            data=tile_data_map[r.tileid],
+                            nodegroup_id=r.nodegroup_id,
+                            parenttile_id=r.parenttileid,
+                            resourceinstance_id=r.resourceid,
+                            sortorder=r.sortorder,
+                        )
+                        for r in chunk
+                    ],
+                    batch_size=chunk_size,
                 )
-                for r in inserts
-            ]
+                EditLog.objects.bulk_create(
+                    [
+                        EditLog(
+                            resourceclassid=nodegroup_to_graph.get(r.nodegroup_id),
+                            resourceinstanceid=str(r.resourceid),
+                            nodegroupid=str(r.nodegroup_id),
+                            tileinstanceid=str(r.tileid),
+                            edittype="tile create",
+                            newvalue=tile_data_map[r.tileid],
+                            timestamp=now,
+                            note="loaded from staging_table",
+                            transactionid=load_id,
+                        )
+                        for r in chunk
+                    ],
+                    batch_size=chunk_size,
+                )
+                del tile_data_map, chunk
 
         if real_updates:
             logger.debug("Bulk updating %d tiles at depth %s", len(real_updates), depth)
-            tiles_to_update = []
-            for r in real_updates:
-                tile = existing_tiles.get(r.tileid)
-                if not tile:
-                    continue
-                new_data = _build_tile_data(r.value)
-                edit_logs.append(
-                    EditLog(
-                        resourceclassid=nodegroup_to_graph.get(r.nodegroup_id),
-                        resourceinstanceid=str(r.resourceid),
-                        nodegroupid=str(r.nodegroup_id),
-                        tileinstanceid=str(r.tileid),
-                        edittype="tile edit",
-                        newvalue=new_data,
-                        oldvalue=tile.data,
-                        timestamp=now,
-                        note="loaded from staging_table",
-                        transactionid=load_id,
+            for chunk_start in range(0, len(real_updates), chunk_size):
+                chunk = real_updates[chunk_start : chunk_start + chunk_size]
+                chunk_ids = [r.tileid for r in chunk]
+                existing_tiles = {
+                    tile.tileid: tile
+                    for tile in TileModel.objects.filter(tileid__in=chunk_ids)
+                }
+                tiles_to_update = []
+                chunk_edit_logs = []
+                for staged_tile in chunk:
+                    tile = existing_tiles.get(staged_tile.tileid)
+                    if not tile:
+                        continue
+                    new_data = _build_tile_data(staged_tile.value)
+                    staged_tile.value = None
+                    chunk_edit_logs.append(
+                        EditLog(
+                            resourceclassid=nodegroup_to_graph.get(
+                                staged_tile.nodegroup_id
+                            ),
+                            resourceinstanceid=str(staged_tile.resourceid),
+                            nodegroupid=str(staged_tile.nodegroup_id),
+                            tileinstanceid=str(staged_tile.tileid),
+                            edittype="tile edit",
+                            newvalue=new_data,
+                            oldvalue=tile.data,
+                            timestamp=now,
+                            note="loaded from staging_table",
+                            transactionid=load_id,
+                        )
                     )
-                )
-                tile.data = new_data
-                tile.sortorder = r.sortorder
-                tiles_to_update.append(tile)
-            TileModel.objects.bulk_update(tiles_to_update, ["data", "sortorder"])
+                    tile.data = new_data
+                    tile.sortorder = staged_tile.sortorder
+                    tiles_to_update.append(tile)
+                TileModel.objects.bulk_update(tiles_to_update, ["data", "sortorder"])
+                EditLog.objects.bulk_create(chunk_edit_logs, batch_size=chunk_size)
+                del existing_tiles, tiles_to_update, chunk_edit_logs, chunk
 
-        if edit_logs:
-            logger.debug("Writing %d edit logs for depth %s", len(edit_logs), depth)
-            EditLog.objects.bulk_create(edit_logs, settings.BULK_IMPORT_BATCH_SIZE)
-
-    logger.debug("Tile processing complete")
+    logger.debug("Tile processing complete, entering post processing")
     _post_process_staging(
         LoadStaging.objects.filter(load_event_id=load_id).iterator(chunk_size=2000),
         max_workers=max_workers,
@@ -288,14 +307,8 @@ def _post_process_staging(staging_records, max_workers=4):
     logger.debug(
         "Refreshing resource relationships for %d tiles", len(resource_refresh_tile_ids)
     )
-    if resource_refresh_tile_ids:
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            futures = {
-                executor.submit(_refresh_resource_relationships, tid): tid
-                for tid in resource_refresh_tile_ids
-            }
-            for future in as_completed(futures):
-                future.result()  # re-raise any exceptions
+    for tile_id in resource_refresh_tile_ids:
+        _refresh_resource_relationships(tile_id)
 
 
 def _refresh_resource_relationships(tile_id):
