@@ -18,7 +18,9 @@
         "vitest": "vitest --run --coverage"
     },
     "dependencies": {
-        "arches": "archesproject/arches#{{ arches_version }}"
+        "arches": "archesproject/arches#{{ arches_version }}",
+        "arches-controlled-lists": "archesproject/arches-controlled-lists#dev/1.3.x",
+        "arches-vue-components": "archesproject/arches-vue-components#stable/2.0.2"
     },
     "nodeModulesPaths": {
     },
