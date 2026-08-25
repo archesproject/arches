@@ -199,7 +199,10 @@ def get_restricted_users(resource):
 
 
 def get_filtered_instances(
-    user, search_engine=None, allresources=False, resources=list[str]
+    user,
+    search_engine=None,
+    allresources=False,
+    resources: list[str] | None = None,
 ) -> tuple[bool, list[str]]:
     return _get_permission_framework().get_filtered_instances(
         user,

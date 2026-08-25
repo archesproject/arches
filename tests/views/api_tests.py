@@ -622,28 +622,11 @@ class ResourceAPITests(ArchesTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_tiles_endpoint_post(self):
-        user = User.objects.get(username="ben")
-        self.client.force_login(user)
-        response = self.client.get(
-            reverse("api_bulk_disambiguated_resource_instance"),
-            QUERY_STRING=f"resource_ids={self.non_legacy_resource_instanceid}",
-        )
-        self.assertTrue(
-            response.json()[str(self.non_legacy_resource_instanceid)] is not None
-        )
-
-    def test_tiles_endpoint_post(self):
         user = User.objects.get(username="admin")
         self.client.force_login(user)
         nodegroupid = "e7364d1e-95c4-11e8-9e7c-acde48001122"
         nodeid = "f08a3057-95c4-11e8-9761-acde48001122"
         resourceid = "a6421f96-0eba-11f1-87e3-469c1cc4c080"
-
-        with self.subTest("resource does not exist before post"):
-            self.assertFalse(
-                models.ResourceInstance.objects.filter(pk=resourceid).exists()
-            )
-
         tileid = "97310030-0eba-11f1-87e3-469c1cc4c080"
         values = json.dumps(
             {
@@ -663,6 +646,11 @@ class ResourceAPITests(ArchesTestCase):
             "data": values,
         }
 
+        with self.subTest("resource does not exist before post"):
+            self.assertFalse(
+                models.ResourceInstance.objects.filter(pk=resourceid).exists()
+            )
+
         self.client.post(
             reverse("api_tiles", kwargs={"tileid": tileid}),
             payload,
@@ -676,6 +664,7 @@ class ResourceAPITests(ArchesTestCase):
         new_tileid = str(
             models.ResourceInstance.objects.get(pk=resourceid).tilemodel_set.first().pk
         )
+
         values = json.dumps(
             {
                 "tileid": new_tileid,
@@ -705,4 +694,42 @@ class ResourceAPITests(ArchesTestCase):
                 .tilemodel_set.first()
                 .data[nodeid],
                 75,
+            )
+
+    def test_tiles_endpoint_request_body(self):
+        user = User.objects.get(username="admin")
+        self.client.force_login(user)
+        nodegroupid = "e7364d1e-95c4-11e8-9e7c-acde48001122"
+        nodeid = "f08a3057-95c4-11e8-9761-acde48001122"
+        resourceid = "c11d5814-1746-11f1-bb2a-469c1cc4c080"
+        tileid = "869aaa14-1752-11f1-bb2a-469c1cc4c080"
+        values = json.dumps(
+            {
+                "tileid": "",
+                "data": {
+                    nodegroupid: None,
+                    nodeid: 55.1,
+                },
+                "nodegroup_id": nodegroupid,
+                "parenttile_id": None,
+                "resourceinstance_id": resourceid,
+                "sortorder": 0,
+                "transaction_id": None,
+            }
+        )
+
+        with self.subTest("resource does not exist before post"):
+            self.assertFalse(
+                models.ResourceInstance.objects.filter(pk=resourceid).exists()
+            )
+
+        self.client.post(
+            reverse("api_tiles", kwargs={"tileid": tileid}),
+            content_type="application/json",
+            data=values,
+        )
+
+        with self.subTest("resource is created after first post"):
+            self.assertTrue(
+                models.ResourceInstance.objects.filter(pk=resourceid).exists()
             )

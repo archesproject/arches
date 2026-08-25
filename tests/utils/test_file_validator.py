@@ -1,5 +1,7 @@
+import io
 import os
 import shutil
+import zipfile
 from pathlib import Path
 
 from unittest.mock import Mock, patch
@@ -28,6 +30,15 @@ class MockFile:
 class MockFileType:
     def __init__(self, extension):
         self.extension = extension
+
+
+def _make_docx_bytes(include_document_xml=True):
+    """Return minimal in-memory docx (ZIP) bytes."""
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as zf:
+        if include_document_xml:
+            zf.writestr("word/document.xml", "<document/>")
+    return buf.getvalue()
 
 
 class FileValidatorTests(SimpleTestCase):
@@ -116,7 +127,22 @@ class FileValidatorTests(SimpleTestCase):
         self.assertEqual(errors, ["File type is not permitted: DS_Store"])
 
     @patch("filetype.guess", Mock(return_value=None))
-    @patch("arches.app.utils.file_validator.load_workbook", lambda noop: None)
+    def test_valid_docx(self):
+        with self.modify_settings(FILE_TYPES={"append": "docx"}):
+            file = io.BytesIO(_make_docx_bytes())
+            errors = self.validator.validate_file_type(file, extension="docx")
+        self.assertEqual(errors, [])
+
+    @patch("filetype.guess", Mock(return_value=None))
+    def test_docx_missing_document_xml(self):
+        with self.modify_settings(FILE_TYPES={"append": "docx"}):
+            file = io.BytesIO(_make_docx_bytes(include_document_xml=False))
+            with self.assertLogs("arches.app.utils.file_validator", level="ERROR"):
+                errors = self.validator.validate_file_type(file, extension="docx")
+        self.assertEqual(errors, ["Invalid docx file"])
+
+    @patch("filetype.guess", Mock(return_value=None))
+    @patch("arches.app.utils.file_validator.load_workbook", Mock(return_value=None))
     def test_valid_xlsx(self):
         errors = self.validator.validate_file_type(self.mock_file, extension="xlsx")
         self.assertEqual(errors, [])
