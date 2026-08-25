@@ -162,8 +162,30 @@ class ArchesFileReader(Reader):
         return tiles
 
     def import_business_data_without_mapping(
-        self, business_data, reporter, overwrite="append", prevent_indexing=False
+        self, business_data, reporter, overwrite="append", prevent_indexing=False,
+        bulk_size=100, skip_validation=False,
+        fire_functions=False, bulk_import_threshold=500,
     ):
+        num_resources = len([
+            r for r in business_data.get("resources", [])
+        ])
+        if num_resources > bulk_import_threshold:
+            from .bulk_archesfile import BulkArchesFileImporter
+            print(
+                f"  Large import ({num_resources} resources), "
+                f"using bulk import path..."
+            )
+            importer = BulkArchesFileImporter(
+                reporter,
+                overwrite=overwrite,
+                prevent_indexing=prevent_indexing,
+                bulk_size=bulk_size,
+                skip_validation=skip_validation,
+                fire_functions=fire_functions,
+            )
+            importer.import_resources(business_data)
+            return
+
         errors = []
         graph_uuids = GraphModel.objects.values_list("pk", flat=True)
         last_resource = None  # only set if prevent_indexing=False
@@ -295,6 +317,9 @@ class ArchesFileReader(Reader):
         overwrite="append",
         prevent_indexing=False,
         transaction_id=None,
+        skip_validation=False,
+        fire_functions=False,
+        bulk_import_threshold=500,
     ):
         reporter = ResourceImportReporter(business_data)
         try:
@@ -304,6 +329,9 @@ class ArchesFileReader(Reader):
                     reporter,
                     overwrite=overwrite,
                     prevent_indexing=prevent_indexing,
+                    skip_validation=skip_validation,
+                    fire_functions=fire_functions,
+                    bulk_import_threshold=bulk_import_threshold,
                 )
             else:
                 blanktilecache = {}
@@ -570,7 +598,8 @@ class ArchesFileReader(Reader):
                     reporter.update_resources_saved()
 
         except (KeyError, TypeError) as e:
-            print(e)
+            import traceback
+            traceback.print_exc()
 
         finally:
             reporter.report_results()
