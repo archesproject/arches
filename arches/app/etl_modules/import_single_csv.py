@@ -14,7 +14,7 @@ from django.db.models.functions import Lower
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import ETLModule, GraphModel, Node, NodeGroup
+from arches.app.models.models import ETLModule, GraphModel, Node, NodeGroup, LoadStaging
 from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -593,12 +593,32 @@ class ImportSingleCsv(BaseImportModule):
                     """CALL __arches_check_tile_cardinality_violation_for_load(%s)""",
                     [loadid],
                 )
+                excess_tile_erroneous_load_staging = LoadStaging.objects.filter(
+                    load_event_id=loadid, error_message="excess tile error"
+                )
+                for inst in excess_tile_erroneous_load_staging:
+                    cursor.execute(
+                        """
+                        INSERT INTO load_errors (type, value, source, error, message, nodeid, datatype, loadid, nodegroupid)
+                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                        (
+                            "tile",
+                            str(list(inst.value.values())[0]["value"]),
+                            csv_file_name,
+                            "Excess Tile Error",
+                            f"Excess Tile Error | ResourceID: {inst.resourceid} | LegacyID: {inst.legacyid}",
+                            list(inst.value.keys())[0],
+                            list(inst.value.values())[0]["datatype"],
+                            loadid,
+                            inst.nodegroup_id,
+                        ),
+                    )
                 cursor.execute(
                     """
                     INSERT INTO load_errors (type, source, error, loadid, nodegroupid)
                     SELECT 'tile', source_description, error_message, loadid, nodegroupid
                     FROM load_staging
-                    WHERE loadid = %s AND passes_validation = false AND error_message IS NOT null
+                    WHERE loadid = %s AND passes_validation = false AND error_message IS NOT null and error_message != 'excess tile error'
                     """,
                     [loadid],
                 )
