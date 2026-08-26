@@ -1,36 +1,31 @@
 <script setup lang="ts">
-import { inject, ref, watch } from "vue";
-import type { Ref } from "vue";
+import { ref, watch } from "vue";
 
-import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { useGettext } from "vue3-gettext";
 
 import InputNumber from "primevue/inputnumber";
 import Panel from "primevue/panel";
 import Select from "primevue/select";
 
-import type { Feature } from "geojson";
-import type { Map as MaplibreMap } from "maplibre-gl";
-
 import {
-    DRAW_UPDATE_EVENT,
     FEET,
     KILOMETERS,
     METERS,
     MILES,
     YARDS,
-} from "@/arches_vue_components/widgets/MapWidget/constants.ts";
+} from "@/arches_vue_components/components/MapComponent/constants.ts";
+import { useResolvedMapContext } from "@/arches_vue_components/components/MapComponent/composables/useMapContext.ts";
 
-const { map } = defineProps<{
-    map: MaplibreMap;
+import type { MapContext } from "@/arches_vue_components/components/MapComponent/types.ts";
+
+const { context = undefined } = defineProps<{
+    context?: MapContext;
 }>();
 
-const { $gettext } = useGettext();
+const { selectedDrawnFeature, setBufferForSelectedFeature } =
+    useResolvedMapContext(context, "BufferControls");
 
-const selectedDrawnFeature = inject<Ref<Feature | null>>(
-    "selectedDrawnFeature",
-    ref(null),
-);
+const { $gettext } = useGettext();
 
 const bufferDistance = ref(0);
 const selectedUnits = ref(METERS);
@@ -48,18 +43,9 @@ watch([bufferDistance, selectedUnits], () => {
         bufferDistance.value = 0;
     }
 
-    const feature = selectedDrawnFeature.value;
-    if (!feature) return;
+    if (!selectedDrawnFeature.value) return;
 
-    const draw = map._controls.find(
-        (control: unknown) => control instanceof MapboxDraw,
-    ) as InstanceType<typeof MapboxDraw>;
-
-    feature.properties!.buffer_distance = bufferDistance.value;
-    feature.properties!.buffer_units = selectedUnits.value;
-
-    draw.add(feature);
-    map.fire(DRAW_UPDATE_EVENT, { features: [feature] });
+    setBufferForSelectedFeature(bufferDistance.value, selectedUnits.value);
 });
 
 watch(
@@ -84,12 +70,16 @@ watch(
 
 <template>
     <Panel
-        class="buffer-controls-panel"
         :pt="{ title: { style: { 'font-weight': 500 } } }"
         :header="$gettext('Buffer Selected Feature')"
     >
         <div class="buffer-controls">
-            <label for="buff-distance">{{ $gettext("Distance") }}</label>
+            <label
+                class="buffer-controls-label"
+                for="buff-distance"
+            >
+                {{ $gettext("Distance") }}
+            </label>
             <InputNumber
                 id="buff-distance"
                 v-model="bufferDistance"
@@ -100,9 +90,9 @@ watch(
             <Select
                 id="buff-units"
                 v-model="selectedUnits"
-                :options="unitOptions"
                 option-value="code"
                 option-label="label"
+                :options="unitOptions"
                 :placeholder="$gettext('Units')"
                 :fluid="true"
             />
@@ -111,14 +101,15 @@ watch(
 </template>
 
 <style scoped>
-.buffer-controls-panel {
-    margin-block-start: 0.75rem;
-}
-
 .buffer-controls {
     align-items: baseline;
     display: flex;
     flex-direction: row;
     gap: 1rem;
+}
+
+.buffer-controls-label {
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 </style>

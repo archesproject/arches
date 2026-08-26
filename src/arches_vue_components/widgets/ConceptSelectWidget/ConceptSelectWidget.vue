@@ -12,7 +12,7 @@ import { EDIT, VIEW } from "@/arches_vue_components/widgets/constants.ts";
 import type { ConceptAliasedNodeData } from "@/arches_vue_components/datatypes/concept/types.ts";
 import type { ConceptSelectWidgetProps } from "@/arches_vue_components/widgets/ConceptSelectWidget/types.ts";
 
-const { aliasedNodeData, graphSlug, nodeAlias, value } =
+const { aliasedNodeData, graphSlug, nodeAlias, value, mode } =
     defineProps<ConceptSelectWidgetProps>();
 
 const emit = defineEmits<{
@@ -20,6 +20,7 @@ const emit = defineEmits<{
     "update:value": [updatedValue: string | null];
     "update:aliasedNodeData": [updatedValue: ConceptAliasedNodeData];
     initialized: [updatedValue: ConceptAliasedNodeData];
+    ready: [];
 }>();
 
 const isEditorLoading = ref(false);
@@ -53,6 +54,27 @@ watch([loading, isEditorLoading], ([resolverLoading, editorLoading]) =>
     emit("update:isLoading", resolverLoading || editorLoading),
 );
 
+if (resolvedAliasedNodeData.value) {
+    emit("initialized", resolvedAliasedNodeData.value);
+    if (mode === VIEW) {
+        emit("ready");
+    }
+} else {
+    watch(
+        resolvedAliasedNodeData,
+        (updatedAliasedNodeData) => {
+            if (!updatedAliasedNodeData) {
+                return;
+            }
+            emit("initialized", updatedAliasedNodeData);
+            if (mode === VIEW) {
+                emit("ready");
+            }
+        },
+        { once: true },
+    );
+}
+
 function onUpdateAliasedNodeData(
     updatedAliasedNodeData: ConceptAliasedNodeData,
 ) {
@@ -70,11 +92,10 @@ function onUpdateAliasedNodeData(
         :aliased-node-data="resolvedAliasedNodeData"
         @update:is-loading="isEditorLoading = $event"
         @update:aliased-node-data="onUpdateAliasedNodeData"
-        @initialized="emit('initialized', $event)"
+        @ready="emit('ready')"
     />
     <ConceptSelectWidgetViewer
         v-if="mode === VIEW"
         :aliased-node-data="resolvedAliasedNodeData"
-        @initialized="emit('initialized', $event)"
     />
 </template>

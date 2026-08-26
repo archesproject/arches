@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { inject, ref } from "vue";
-
 import ToggleSwitch from "primevue/toggleswitch";
 
-import type { Map } from "maplibre-gl";
-import type { Ref } from "vue";
+import { useResolvedMapContext } from "@/arches_vue_components/components/MapComponent/composables/useMapContext.ts";
 
-import type { MapLayer } from "@/arches_vue_components/widgets/MapWidget/types.ts";
+import type { MapContext } from "@/arches_vue_components/components/MapComponent/types.ts";
 
-defineProps<{ map: Map }>();
+const { context = undefined } = defineProps<{
+    context?: MapContext;
+}>();
 
-const overlays = inject<Ref<MapLayer[]>>("overlays", ref([]));
+const { overlays } = useResolvedMapContext(context, "OverlayPanel");
 </script>
 
 <template>

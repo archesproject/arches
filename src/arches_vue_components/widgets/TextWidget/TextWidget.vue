@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 
 import { useGettext } from "vue3-gettext";
 
@@ -15,18 +15,26 @@ import type {
 } from "@/arches_vue_components/datatypes/string/types.ts";
 import type { TextWidgetProps } from "@/arches_vue_components/widgets/TextWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps<TextWidgetProps>();
+const { aliasedNodeData, value, mode } = defineProps<TextWidgetProps>();
 
 const emit = defineEmits<{
     "update:value": [updatedValue: Record<string, LanguageValue> | null];
     "update:aliasedNodeData": [updatedValue: StringAliasedNodeData];
     initialized: [updatedValue: StringAliasedNodeData];
+    ready: [];
 }>();
 
 const { current } = useGettext();
 const resolvedAliasedNodeData = computed(
     () => aliasedNodeData ?? buildStringAliasedNodeData(value ?? null, current),
 );
+
+onMounted(() => {
+    emit("initialized", resolvedAliasedNodeData.value);
+    if (mode === VIEW) {
+        emit("ready");
+    }
+});
 
 function onUpdateAliasedNodeData(
     updatedAliasedNodeData: StringAliasedNodeData,
@@ -43,11 +51,10 @@ function onUpdateAliasedNodeData(
         :aliased-node-data="resolvedAliasedNodeData"
         :render-context="renderContext"
         @update:aliased-node-data="onUpdateAliasedNodeData"
-        @initialized="emit('initialized', $event)"
+        @ready="emit('ready')"
     />
     <TextWidgetViewer
         v-if="mode === VIEW"
         :aliased-node-data="resolvedAliasedNodeData"
-        @initialized="emit('initialized', $event)"
     />
 </template>

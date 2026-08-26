@@ -34,7 +34,12 @@ export type { DomainSelectWidgetProps } from "@/arches_vue_components/widgets/Do
 export type { EDTFWidgetProps } from "@/arches_vue_components/widgets/EDTFWidget/types.ts";
 export type { FileListWidgetProps } from "@/arches_vue_components/widgets/FileListWidget/types.ts";
 export type { LanguageSelectWidgetProps } from "@/arches_vue_components/widgets/LanguageSelectWidget/types.ts";
-export type { MapWidgetProps } from "@/arches_vue_components/widgets/MapWidget/types.ts";
+export type {
+    GeometryTypeConfig,
+    MapCardXNodeXWidgetData,
+    MapWidgetConfig,
+    MapWidgetProps,
+} from "@/arches_vue_components/widgets/MapWidget/types.ts";
 export type { NodeValueSelectWidgetProps } from "@/arches_vue_components/widgets/NodeValueSelectWidget/types.ts";
 export type { NonLocalizedTextWidgetProps } from "@/arches_vue_components/widgets/NonLocalizedTextWidget/types.ts";
 export type { NumberWidgetProps } from "@/arches_vue_components/widgets/NumberWidget/types.ts";
@@ -63,10 +68,3 @@ export type { FileListCardXNodeXWidgetData } from "@/arches_vue_components/datat
 export type { NumberCardXNodeXWidgetData } from "@/arches_vue_components/datatypes/number/types.ts";
 export type { ResourceInstanceCardXNodeXWidgetData } from "@/arches_vue_components/datatypes/resource-instance/types.ts";
 export type { ResourceInstanceListCardXNodeXWidgetData } from "@/arches_vue_components/datatypes/resource-instance-list/types.ts";
-export type {
-    Basemap,
-    MapCardXNodeXWidgetData,
-    MapLayer,
-    MapSource,
-    MapWidgetConfig,
-} from "@/arches_vue_components/widgets/MapWidget/types.ts";

@@ -6,7 +6,7 @@ export function buildGeoJSONFeatureCollectionAliasedNodeData(
 ): GeoJSONFeatureCollectionAliasedNodeData {
     return {
         node_value: nodeValue,
-        display_value: "",
+        display_value: nodeValue ? JSON.stringify(nodeValue) : "",
         details: [],
     };
 }

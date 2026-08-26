@@ -36,7 +36,7 @@ const emit = defineEmits<{
         event: "update:aliasedNodeData",
         updatedValue: StringAliasedNodeData,
     ): void;
-    (event: "initialized", updatedValue: StringAliasedNodeData): void;
+    (event: "ready"): void;
 }>();
 
 const { $gettext } = useGettext();
@@ -45,7 +45,6 @@ const languages = ref<Language[]>([]);
 const selectedLanguage = ref<Language>();
 const managedNodeValue = ref<Record<string, LanguageValue>>();
 const singleInputValue = ref<string>();
-const hasInitialized = ref(false);
 
 watchEffect(async () => {
     const response = (await fetchLanguages()) as {
@@ -70,19 +69,8 @@ watchEffect(async () => {
         response.languages.find((lang: Language) => lang.isdefault) ??
         response.languages[0];
 
-    if (!hasInitialized.value && selectedLanguage.value) {
-        hasInitialized.value = true;
-        emit(
-            "initialized",
-            aliasedNodeData ??
-                buildStringAliasedNodeData(
-                    (managedNodeValue.value ?? {}) as Record<
-                        string,
-                        LanguageValue
-                    >,
-                    selectedLanguage.value.code,
-                ),
-        );
+    if (selectedLanguage.value) {
+        emit("ready");
     }
 });
 

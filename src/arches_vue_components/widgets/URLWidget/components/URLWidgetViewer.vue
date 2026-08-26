@@ -1,23 +1,13 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
-
 import { useGettext } from "vue3-gettext";
 
 import type { URLAliasedNodeData } from "@/arches_vue_components/datatypes/url/types.ts";
 
-const { aliasedNodeData } = defineProps<{
+defineProps<{
     aliasedNodeData: URLAliasedNodeData;
 }>();
 
-const emit = defineEmits<{
-    initialized: [updatedValue: URLAliasedNodeData];
-}>();
-
 const { $gettext } = useGettext();
-
-onMounted(() => {
-    emit("initialized", aliasedNodeData);
-});
 </script>
 
 <template>

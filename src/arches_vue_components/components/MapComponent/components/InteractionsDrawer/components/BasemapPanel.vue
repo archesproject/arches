@@ -1,16 +1,20 @@
 <script setup lang="ts">
-import { inject, onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 
 import RadioButton from "primevue/radiobutton";
 
-import type { Map } from "maplibre-gl";
-import type { Ref } from "vue";
+import { useResolvedMapContext } from "@/arches_vue_components/components/MapComponent/composables/useMapContext.ts";
 
-import type { Basemap } from "@/arches_vue_components/widgets/MapWidget/types.ts";
+import type {
+    Basemap,
+    MapContext,
+} from "@/arches_vue_components/components/MapComponent/types.ts";
 
-defineProps<{ map: Map }>();
+const { context = undefined } = defineProps<{
+    context?: MapContext;
+}>();
 
-const basemaps = inject<Ref<Basemap[]>>("basemaps", ref([]));
+const { basemaps } = useResolvedMapContext(context, "BasemapPanel");
 const selectedBasemap = ref<Basemap | null>(null);
 
 watch(selectedBasemap, (newBasemap) => {

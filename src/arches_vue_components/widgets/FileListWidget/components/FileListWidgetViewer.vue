@@ -14,15 +14,10 @@ const { aliasedNodeData } = defineProps<{
     aliasedNodeData: FileListAliasedNodeData;
 }>();
 
-const emit = defineEmits<{
-    initialized: [updatedValue: FileListAliasedNodeData];
-}>();
-
 const settingsStore = useSettingsStore();
 const forceScriptName = ref("");
 
 onMounted(async () => {
-    emit("initialized", aliasedNodeData);
     forceScriptName.value = await settingsStore.fetchForceScriptName();
 });
 

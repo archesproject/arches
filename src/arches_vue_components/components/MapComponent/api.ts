@@ -4,7 +4,7 @@ import { generateArchesURL } from "@/arches_vue_components/application/generate-
 
 import type { FeatureCollection } from "geojson";
 
-import type { ResourceDescriptor } from "@/arches_vue_components/widgets/MapWidget/types.ts";
+import type { ResourceDescriptor } from "@/arches_vue_components/components/MapComponent/types.ts";
 
 export async function fetchMapData(): Promise<Record<string, unknown>> {
     const response = await fetch(

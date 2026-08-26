@@ -12,7 +12,7 @@ import { EDIT, VIEW } from "@/arches_vue_components/widgets/constants.ts";
 import type { ConceptListAliasedNodeData } from "@/arches_vue_components/datatypes/concept-list/types.ts";
 import type { ConceptMultiselectWidgetProps } from "@/arches_vue_components/widgets/ConceptMultiselectWidget/types.ts";
 
-const { aliasedNodeData, graphSlug, nodeAlias, value } =
+const { aliasedNodeData, graphSlug, nodeAlias, value, mode } =
     defineProps<ConceptMultiselectWidgetProps>();
 
 const emit = defineEmits<{
@@ -20,6 +20,7 @@ const emit = defineEmits<{
     "update:value": [updatedValue: string[] | null];
     "update:aliasedNodeData": [updatedValue: ConceptListAliasedNodeData];
     initialized: [updatedValue: ConceptListAliasedNodeData];
+    ready: [];
 }>();
 
 const { resolvedItems, loading } = useConceptLabelsResolver(
@@ -50,6 +51,27 @@ watch([loading, isEditorLoading], ([resolverLoading, editorLoading]) =>
     emit("update:isLoading", resolverLoading || editorLoading),
 );
 
+if (resolvedAliasedNodeData.value) {
+    emit("initialized", resolvedAliasedNodeData.value);
+    if (mode === VIEW) {
+        emit("ready");
+    }
+} else {
+    watch(
+        resolvedAliasedNodeData,
+        (updatedAliasedNodeData) => {
+            if (!updatedAliasedNodeData) {
+                return;
+            }
+            emit("initialized", updatedAliasedNodeData);
+            if (mode === VIEW) {
+                emit("ready");
+            }
+        },
+        { once: true },
+    );
+}
+
 function onUpdateAliasedNodeData(
     updatedAliasedNodeData: ConceptListAliasedNodeData,
 ) {
@@ -67,11 +89,10 @@ function onUpdateAliasedNodeData(
         :aliased-node-data="resolvedAliasedNodeData"
         @update:is-loading="isEditorLoading = $event"
         @update:aliased-node-data="onUpdateAliasedNodeData"
-        @initialized="emit('initialized', $event)"
+        @ready="emit('ready')"
     />
     <ConceptMultiSelectWidgetViewer
         v-if="mode === VIEW"
         :aliased-node-data="resolvedAliasedNodeData"
-        @initialized="emit('initialized', $event)"
     />
 </template>

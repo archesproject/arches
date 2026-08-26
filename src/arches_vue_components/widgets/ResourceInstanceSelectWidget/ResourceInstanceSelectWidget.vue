@@ -29,6 +29,7 @@ const emit = defineEmits<{
     "update:value": [updatedValue: ResourceInstanceReference | null];
     "update:aliasedNodeData": [updatedValue: ResourceInstanceAliasedNodeData];
     initialized: [updatedValue: ResourceInstanceAliasedNodeData];
+    ready: [];
 }>();
 
 const isEditorLoading = ref(false);
@@ -63,6 +64,27 @@ watch([loading, isEditorLoading], ([resolverLoading, editorLoading]) =>
     emit("update:isLoading", resolverLoading || editorLoading),
 );
 
+if (resolvedAliasedNodeData.value) {
+    emit("initialized", resolvedAliasedNodeData.value);
+    if (mode === VIEW) {
+        emit("ready");
+    }
+} else {
+    watch(
+        resolvedAliasedNodeData,
+        (updatedAliasedNodeData) => {
+            if (!updatedAliasedNodeData) {
+                return;
+            }
+            emit("initialized", updatedAliasedNodeData);
+            if (mode === VIEW) {
+                emit("ready");
+            }
+        },
+        { once: true },
+    );
+}
+
 function onUpdateAliasedNodeData(
     updatedAliasedNodeData: ResourceInstanceAliasedNodeData,
 ) {
@@ -81,11 +103,10 @@ function onUpdateAliasedNodeData(
         :default-term="defaultTerm"
         @update:is-loading="isEditorLoading = $event"
         @update:aliased-node-data="onUpdateAliasedNodeData"
-        @initialized="emit('initialized', $event)"
+        @ready="emit('ready')"
     />
     <ResourceInstanceSelectWidgetViewer
         v-if="mode === VIEW"
         :aliased-node-data="resolvedAliasedNodeData"
-        @initialized="emit('initialized', $event)"
     />
 </template>

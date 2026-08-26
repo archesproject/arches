@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
 import Select from "primevue/select";
 
 import { buildDomainAliasedNodeData } from "@/arches_vue_components/datatypes/domain/utils.ts";
@@ -21,15 +20,7 @@ const emit = defineEmits<{
         event: "update:aliasedNodeData",
         updatedValue: DomainAliasedNodeData,
     ): void;
-    (event: "initialized", updatedValue: DomainAliasedNodeData): void;
 }>();
-
-onMounted(() => {
-    emit(
-        "initialized",
-        aliasedNodeData ?? buildDomainAliasedNodeData(null, options),
-    );
-});
 
 function onUpdateModelValue(updatedValue: string | null) {
     emit(

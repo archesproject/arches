@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, useTemplateRef } from "vue";
+import { computed, onMounted, useTemplateRef } from "vue";
 
-import MapWidgetEditor from "@/arches_vue_components/widgets/MapWidget/components/MapWidgetEditor/MapWidgetEditor.vue";
+import MapWidgetEditor from "@/arches_vue_components/widgets/MapWidget/components/MapWidgetEditor.vue";
 import MapWidgetViewer from "@/arches_vue_components/widgets/MapWidget/components/MapWidgetViewer.vue";
 
 import { EDIT, VIEW } from "@/arches_vue_components/widgets/constants.ts";
@@ -22,6 +22,7 @@ const emit = defineEmits<{
         updatedValue: GeoJSONFeatureCollectionAliasedNodeData,
     ];
     initialized: [updatedValue: GeoJSONFeatureCollectionAliasedNodeData];
+    ready: [];
 }>();
 
 const resolvedAliasedNodeData = computed(
@@ -35,6 +36,11 @@ const editorRef =
 
 defineExpose({
     map: computed(() => editorRef.value?.map ?? null),
+    context: computed(() => editorRef.value?.context ?? null),
+});
+
+onMounted(() => {
+    emit("initialized", resolvedAliasedNodeData.value);
 });
 </script>
 
@@ -44,12 +50,13 @@ defineExpose({
         ref="editor"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :aliased-node-data="resolvedAliasedNodeData"
-        :render-context="renderContext"
+        :interaction-tools="interactionTools"
+        :feature-popup-component="featurePopupComponent"
         @update:is-loading="emit('update:isLoading', $event)"
         @update:value="emit('update:value', $event)"
         @update:aliased-node-data="emit('update:aliasedNodeData', $event)"
         @update:overlays="emit('update:overlays')"
-        @initialized="emit('initialized', $event)"
+        @ready="emit('ready')"
     />
     <MapWidgetViewer
         v-if="mode === VIEW"

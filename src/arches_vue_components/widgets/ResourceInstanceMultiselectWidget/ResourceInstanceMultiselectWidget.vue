@@ -14,7 +14,7 @@ import type {
 } from "@/arches_vue_components/datatypes/resource-instance-list/types.ts";
 import type { ResourceInstanceMultiselectWidgetProps } from "@/arches_vue_components/widgets/ResourceInstanceMultiselectWidget/types.ts";
 
-const { aliasedNodeData, graphSlug, nodeAlias, value } =
+const { aliasedNodeData, graphSlug, nodeAlias, value, mode } =
     defineProps<ResourceInstanceMultiselectWidgetProps>();
 
 const emit = defineEmits<{
@@ -24,6 +24,7 @@ const emit = defineEmits<{
         updatedValue: ResourceInstanceListAliasedNodeData,
     ];
     initialized: [updatedValue: ResourceInstanceListAliasedNodeData];
+    ready: [];
 }>();
 
 const isEditorLoading = ref(false);
@@ -57,6 +58,27 @@ watch([loading, isEditorLoading], ([resolverLoading, editorLoading]) =>
     emit("update:isLoading", resolverLoading || editorLoading),
 );
 
+if (resolvedAliasedNodeData.value) {
+    emit("initialized", resolvedAliasedNodeData.value);
+    if (mode === VIEW) {
+        emit("ready");
+    }
+} else {
+    watch(
+        resolvedAliasedNodeData,
+        (updatedAliasedNodeData) => {
+            if (!updatedAliasedNodeData) {
+                return;
+            }
+            emit("initialized", updatedAliasedNodeData);
+            if (mode === VIEW) {
+                emit("ready");
+            }
+        },
+        { once: true },
+    );
+}
+
 function onUpdateAliasedNodeData(
     updatedAliasedNodeData: ResourceInstanceListAliasedNodeData,
 ) {
@@ -74,11 +96,10 @@ function onUpdateAliasedNodeData(
         :aliased-node-data="resolvedAliasedNodeData"
         @update:is-loading="isEditorLoading = $event"
         @update:aliased-node-data="onUpdateAliasedNodeData"
-        @initialized="emit('initialized', $event)"
+        @ready="emit('ready')"
     />
     <ResourceInstanceMultiselectWidgetViewer
         v-if="mode === VIEW"
         :aliased-node-data="resolvedAliasedNodeData"
-        @initialized="emit('initialized', $event)"
     />
 </template>

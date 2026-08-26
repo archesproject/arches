@@ -1,38 +1,32 @@
 <script setup lang="ts">
-import { computed, inject, ref } from "vue";
-import type { Ref } from "vue";
+import { computed } from "vue";
 
 import { useGettext } from "vue3-gettext";
 
 import Listbox from "primevue/listbox";
 
-import type { Feature } from "geojson";
-import type { Map as MaplibreMap } from "maplibre-gl";
-
 import {
     GEOMETRY_TYPE_LINESTRING,
     GEOMETRY_TYPE_POINT,
     GEOMETRY_TYPE_POLYGON,
-    SIMPLE_SELECT,
-} from "@/arches_vue_components/widgets/MapWidget/constants.ts";
-import { getMapboxDraw } from "@/arches_vue_components/widgets/MapWidget/utils.ts";
+} from "@/arches_vue_components/components/MapComponent/constants.ts";
+import { useResolvedMapContext } from "@/arches_vue_components/components/MapComponent/composables/useMapContext.ts";
 
-const { map, features } = defineProps<{
-    map: MaplibreMap;
-    features: Feature[];
+import type { MapContext } from "@/arches_vue_components/components/MapComponent/types.ts";
+
+const { context = undefined } = defineProps<{
+    context?: MapContext;
 }>();
 
-const selectedDrawnFeature = inject<Ref<Feature | null>>(
-    "selectedDrawnFeature",
-    ref(null),
-);
+const { drawnFeatures, selectedDrawnFeature, selectDrawnFeature } =
+    useResolvedMapContext(context, "DrawnFeaturesList");
 
 const { $gettext } = useGettext();
 
 const labeledFeatures = computed(() => {
     const countByType: Record<string, number> = {};
 
-    return features.map((feature) => {
+    return drawnFeatures.value.map((feature) => {
         const type = feature.geometry.type;
 
         countByType[type] = (countByType[type] || 0) + 1;
@@ -71,24 +65,23 @@ const selectedFeatureId = computed(() =>
     selectedDrawnFeature.value ? String(selectedDrawnFeature.value.id) : null,
 );
 
-function onSelect(featureId: string) {
+function onSelect(featureId: string): void {
     const item = labeledFeatures.value.find(
         (item) => item.featureId === featureId,
     );
     if (!item) return;
-    selectedDrawnFeature.value = item.feature;
-    getMapboxDraw(map)?.changeMode(SIMPLE_SELECT, { featureIds: [featureId] });
+    selectDrawnFeature(item.feature);
 }
 </script>
 
 <template>
     <Listbox
-        v-if="features.length"
-        :model-value="selectedFeatureId"
-        :options="labeledFeatures"
+        v-if="drawnFeatures.length"
+        class="drawn-features-list"
         option-label="label"
         option-value="featureId"
-        class="drawn-features-list"
+        :model-value="selectedFeatureId"
+        :options="labeledFeatures"
         @update:model-value="onSelect"
     />
 </template>
@@ -96,6 +89,5 @@ function onSelect(featureId: string) {
 <style scoped>
 .drawn-features-list {
     border: none;
-    margin-block-end: 0.75rem;
 }
 </style>

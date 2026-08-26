@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import { useGettext } from "vue3-gettext";
 import InputText from "primevue/inputtext";
 import Button from "primevue/button";
@@ -18,16 +18,11 @@ const { cardXNodeXWidgetData = undefined, aliasedNodeData } = defineProps<{
 
 const emit = defineEmits<{
     (event: "update:aliasedNodeData", updatedValue: EDTFAliasedNodeData): void;
-    (event: "initialized", updatedValue: EDTFAliasedNodeData): void;
 }>();
 
 const { $gettext } = useGettext();
 
 const shouldShowHelpDrawer = ref(false);
-
-onMounted(() => {
-    emit("initialized", aliasedNodeData ?? buildEDTFAliasedNodeData(null));
-});
 
 function handleUpdateModelValue(updatedValue: string | undefined) {
     const newValue = updatedValue ?? "";

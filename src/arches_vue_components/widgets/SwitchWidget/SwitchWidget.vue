@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 
 import SwitchWidgetEditor from "@/arches_vue_components/widgets/SwitchWidget/components/SwitchWidgetEditor.vue";
 import SwitchWidgetViewer from "@/arches_vue_components/widgets/SwitchWidget/components/SwitchWidgetViewer.vue";
@@ -16,11 +16,17 @@ const emit = defineEmits<{
     "update:value": [updatedValue: boolean | null];
     "update:aliasedNodeData": [updatedValue: BooleanAliasedNodeData];
     initialized: [updatedValue: BooleanAliasedNodeData];
+    ready: [];
 }>();
 
 const resolvedAliasedNodeData = computed(
     () => aliasedNodeData ?? buildBooleanAliasedNodeData(value ?? null),
 );
+
+onMounted(() => {
+    emit("initialized", resolvedAliasedNodeData.value);
+    emit("ready");
+});
 
 function onUpdateAliasedNodeData(
     updatedAliasedNodeData: BooleanAliasedNodeData,
@@ -36,13 +42,11 @@ function onUpdateAliasedNodeData(
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :aliased-node-data="resolvedAliasedNodeData"
         @update:aliased-node-data="onUpdateAliasedNodeData"
-        @initialized="emit('initialized', $event)"
     />
     <SwitchWidgetViewer
         v-if="mode === VIEW"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :aliased-node-data="resolvedAliasedNodeData"
-        @initialized="emit('initialized', $event)"
     />
 </template>
 

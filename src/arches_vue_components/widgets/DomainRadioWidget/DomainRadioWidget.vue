@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 
 import DomainRadioWidgetEditor from "@/arches_vue_components/widgets/DomainRadioWidget/components/DomainRadioWidgetEditor.vue";
 import DomainRadioWidgetViewer from "@/arches_vue_components/widgets/DomainRadioWidget/components/DomainRadioWidgetViewer.vue";
@@ -17,6 +17,7 @@ const emit = defineEmits<{
     "update:value": [updatedValue: string | null];
     "update:aliasedNodeData": [updatedValue: DomainAliasedNodeData];
     initialized: [updatedValue: DomainAliasedNodeData];
+    ready: [];
 }>();
 
 const resolvedAliasedNodeData = computed(
@@ -27,6 +28,11 @@ const resolvedAliasedNodeData = computed(
             cardXNodeXWidgetData?.node.config.options ?? [],
         ),
 );
+
+onMounted(() => {
+    emit("initialized", resolvedAliasedNodeData.value);
+    emit("ready");
+});
 
 function onUpdateAliasedNodeData(
     updatedAliasedNodeData: DomainAliasedNodeData,
@@ -42,11 +48,9 @@ function onUpdateAliasedNodeData(
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :aliased-node-data="resolvedAliasedNodeData"
         @update:aliased-node-data="onUpdateAliasedNodeData"
-        @initialized="emit('initialized', $event)"
     />
     <DomainRadioWidgetViewer
         v-if="mode === VIEW"
         :aliased-node-data="resolvedAliasedNodeData"
-        @initialized="emit('initialized', $event)"
     />
 </template>

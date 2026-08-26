@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
 import InputNumber from "primevue/inputnumber";
 
 import { buildNumberAliasedNodeData } from "@/arches_vue_components/datatypes/number/utils.ts";
@@ -19,12 +18,7 @@ const emit = defineEmits<{
         event: "update:aliasedNodeData",
         updatedValue: NumberAliasedNodeData,
     ): void;
-    (event: "initialized", updatedValue: NumberAliasedNodeData): void;
 }>();
-
-onMounted(() => {
-    emit("initialized", aliasedNodeData ?? buildNumberAliasedNodeData(null));
-});
 
 function onUpdateModelValue(updatedValue: number | null) {
     emit("update:aliasedNodeData", buildNumberAliasedNodeData(updatedValue));

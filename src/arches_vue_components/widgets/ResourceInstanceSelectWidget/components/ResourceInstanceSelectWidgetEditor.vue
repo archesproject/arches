@@ -47,7 +47,7 @@ const emit = defineEmits<{
         event: "update:aliasedNodeData",
         updatedValue: ResourceInstanceAliasedNodeData,
     ): void;
-    (event: "initialized", updatedValue: ResourceInstanceAliasedNodeData): void;
+    (event: "ready"): void;
 }>();
 
 const { $gettext } = useGettext();
@@ -68,14 +68,17 @@ const selectedValue = ref<string | null>(
 );
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
-const hasInitialized = ref(false);
 
 watch(isLoading, (newValue) => {
     emit("update:isLoading", newValue);
 });
 
-watchEffect(() => {
-    getOptions(1);
+watchEffect(async () => {
+    if (!graphSlug || !nodeAlias) {
+        return;
+    }
+    await getOptions(1);
+    emit("ready");
 });
 
 async function getOptions(page: number, filterTerm?: string) {
@@ -121,18 +124,6 @@ async function getOptions(page: number, filterTerm?: string) {
         isLoading.value = false;
         if (options.value.length === 0) {
             emptyFilterMessage.value = $gettext("Search returned no results");
-        }
-        if (page === 1 && !hasInitialized.value) {
-            hasInitialized.value = true;
-            const displayName =
-                options.value.find(
-                    (option) => option.resource_id === selectedValue.value,
-                )?.display_value ?? "";
-            emit(
-                "initialized",
-                aliasedNodeData ??
-                    buildResourceInstanceAliasedNodeData(null, displayName),
-            );
         }
     }
 }

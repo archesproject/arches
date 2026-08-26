@@ -6,11 +6,11 @@ import Skeleton from "primevue/skeleton";
 import { useGettext } from "vue3-gettext";
 
 import { generateArchesURL } from "@/arches_vue_components/application/generate-arches-url.ts";
-import { fetchResourceDescriptor } from "@/arches_vue_components/widgets/MapWidget/api.ts";
+import { fetchResourceDescriptor } from "@/arches_vue_components/components/MapComponent/api.ts";
 
 import type { MapGeoJSONFeature } from "maplibre-gl";
 
-import type { ResourceDescriptor } from "@/arches_vue_components/widgets/MapWidget/types.ts";
+import type { ResourceDescriptor } from "@/arches_vue_components/components/MapComponent/types.ts";
 
 const { features } = defineProps<{ features: MapGeoJSONFeature[] }>();
 

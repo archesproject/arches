@@ -4,6 +4,7 @@ import {
     defineAsyncComponent,
     ref,
     shallowRef,
+    useTemplateRef,
     watch,
     watchEffect,
 } from "vue";
@@ -40,9 +41,14 @@ const emit = defineEmits<{
     "update:value": [value: unknown];
     "update:aliasedNodeData": [aliasedNodeData: AliasedNodeData];
     initialized: [aliasedNodeData: AliasedNodeData];
+    ready: [];
 }>();
 
 defineOptions({ inheritAttrs: false });
+
+const widgetInstanceRef = useTemplateRef("widgetInstance");
+
+defineExpose({ widget: widgetInstanceRef });
 
 const isLoading = ref(false);
 const isChildLoading = ref(false);
@@ -184,6 +190,7 @@ function onWidgetInitialized(aliasedNodeData: AliasedNodeData) {
                 >
                     <component
                         :is="widgetComponent"
+                        ref="widgetInstance"
                         v-bind="$attrs"
                         :key="resolvedCardXNodeXWidgetData!.id"
                         :aliased-node-data="aliasedNodeData"
@@ -203,6 +210,7 @@ function onWidgetInitialized(aliasedNodeData: AliasedNodeData) {
                             }
                         "
                         @initialized="onWidgetInitialized"
+                        @ready="emit('ready')"
                     />
                 </div>
             </GenericFormField>
@@ -210,6 +218,7 @@ function onWidgetInitialized(aliasedNodeData: AliasedNodeData) {
             <component
                 :is="widgetComponent"
                 v-else-if="mode === VIEW"
+                ref="widgetInstance"
                 v-bind="$attrs"
                 :key="resolvedCardXNodeXWidgetData!.id"
                 :aliased-node-data="aliasedNodeData"
@@ -223,6 +232,7 @@ function onWidgetInitialized(aliasedNodeData: AliasedNodeData) {
                     emit('update:aliasedNodeData', $event)
                 "
                 @initialized="emit('initialized', $event)"
+                @ready="emit('ready')"
             />
         </template>
     </div>

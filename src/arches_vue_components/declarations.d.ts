@@ -5,3 +5,4 @@ import("@/arches/declarations.d.ts");
 
 declare module "@mapbox/mapbox-gl-draw";
 declare module "@mapbox/geojson-extent";
+declare module "shpjs";

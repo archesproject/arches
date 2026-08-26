@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
 import InputText from "primevue/inputtext";
 import Textarea from "primevue/textarea";
 
@@ -25,15 +24,7 @@ const emit = defineEmits<{
         event: "update:aliasedNodeData",
         updatedValue: NonLocalizedTextAliasedNodeData,
     ): void;
-    (event: "initialized", updatedValue: NonLocalizedTextAliasedNodeData): void;
 }>();
-
-onMounted(() => {
-    emit(
-        "initialized",
-        aliasedNodeData ?? buildNonLocalizedTextAliasedNodeData(null),
-    );
-});
 
 function onUpdateModelValue(updatedValue: string | undefined) {
     const newValue = updatedValue ?? null;

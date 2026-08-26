@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watchEffect } from "vue";
+import { computed, ref, watchEffect } from "vue";
 
 import FileUpload from "primevue/fileupload";
 
@@ -28,7 +28,6 @@ const emit = defineEmits<{
         event: "update:aliasedNodeData",
         updatedValue: FileListAliasedNodeData,
     ): void;
-    (event: "initialized", updatedValue: FileListAliasedNodeData): void;
 }>();
 
 const fileUploadRef = ref<InstanceType<typeof FileUpload> | null>(null);
@@ -86,10 +85,6 @@ watchEffect(() => {
 
     savedFiles.value = nextSavedFiles;
     pendingFiles.value = nextPendingFiles;
-});
-
-onMounted(() => {
-    emit("initialized", aliasedNodeData ?? buildFileListAliasedNodeData(null));
 });
 
 function emitUpdatedValue() {

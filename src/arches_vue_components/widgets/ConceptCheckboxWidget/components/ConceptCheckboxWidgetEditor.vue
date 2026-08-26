@@ -35,7 +35,7 @@ const emit = defineEmits<{
         event: "update:aliasedNodeData",
         updatedValue: ConceptListAliasedNodeData,
     ): void;
-    (event: "initialized", updatedValue: ConceptListAliasedNodeData): void;
+    (event: "ready"): void;
 }>();
 
 const flexDirection =
@@ -105,11 +105,7 @@ async function getOptions() {
     } finally {
         isLoading.value = false;
         if (!optionsLoaded.value) {
-            emit(
-                "initialized",
-                aliasedNodeData ??
-                    buildConceptListAliasedNodeData(null, options.value ?? []),
-            );
+            emit("ready");
         }
         optionsLoaded.value = true;
     }

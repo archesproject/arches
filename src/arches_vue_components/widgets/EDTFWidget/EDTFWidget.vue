@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 
 import EDTFWidgetEditor from "@/arches_vue_components/widgets/EDTFWidget/components/EDTFWidgetEditor/EDTFWidgetEditor.vue";
 import EDTFWidgetViewer from "@/arches_vue_components/widgets/EDTFWidget/components/EDTFWidgetViewer.vue";
@@ -13,15 +13,20 @@ import type { EDTFWidgetProps } from "@/arches_vue_components/widgets/EDTFWidget
 const { aliasedNodeData, value } = defineProps<EDTFWidgetProps>();
 
 const emit = defineEmits<{
-    "update:isDirty": [isDirty: boolean];
     "update:value": [updatedValue: string | null];
     "update:aliasedNodeData": [updatedValue: EDTFAliasedNodeData];
     initialized: [updatedValue: EDTFAliasedNodeData];
+    ready: [];
 }>();
 
 const resolvedAliasedNodeData = computed(
     () => aliasedNodeData ?? buildEDTFAliasedNodeData(value ?? null),
 );
+
+onMounted(() => {
+    emit("initialized", resolvedAliasedNodeData.value);
+    emit("ready");
+});
 
 function onUpdateAliasedNodeData(updatedAliasedNodeData: EDTFAliasedNodeData) {
     emit("update:aliasedNodeData", updatedAliasedNodeData);
@@ -35,11 +40,9 @@ function onUpdateAliasedNodeData(updatedAliasedNodeData: EDTFAliasedNodeData) {
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :aliased-node-data="resolvedAliasedNodeData"
         @update:aliased-node-data="onUpdateAliasedNodeData"
-        @initialized="emit('initialized', $event)"
     />
     <EDTFWidgetViewer
         v-if="mode === VIEW"
         :aliased-node-data="resolvedAliasedNodeData"
-        @initialized="emit('initialized', $event)"
     />
 </template>

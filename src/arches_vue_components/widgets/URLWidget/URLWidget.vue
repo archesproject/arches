@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 
 import URLWidgetEditor from "@/arches_vue_components/widgets/URLWidget/components/URLWidgetEditor.vue";
 import URLWidgetViewer from "@/arches_vue_components/widgets/URLWidget/components/URLWidgetViewer.vue";
@@ -19,11 +19,17 @@ const emit = defineEmits<{
     "update:value": [updatedValue: URLNodeValue | null];
     "update:aliasedNodeData": [updatedValue: URLAliasedNodeData];
     initialized: [updatedValue: URLAliasedNodeData];
+    ready: [];
 }>();
 
 const resolvedAliasedNodeData = computed(
     () => aliasedNodeData ?? buildURLAliasedNodeData(value ?? null),
 );
+
+onMounted(() => {
+    emit("initialized", resolvedAliasedNodeData.value);
+    emit("ready");
+});
 
 function onUpdateAliasedNodeData(updatedAliasedNodeData: URLAliasedNodeData) {
     emit("update:aliasedNodeData", updatedAliasedNodeData);
@@ -37,11 +43,9 @@ function onUpdateAliasedNodeData(updatedAliasedNodeData: URLAliasedNodeData) {
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :aliased-node-data="resolvedAliasedNodeData"
         @update:aliased-node-data="onUpdateAliasedNodeData"
-        @initialized="emit('initialized', $event)"
     />
     <URLWidgetViewer
         v-if="mode === VIEW"
         :aliased-node-data="resolvedAliasedNodeData"
-        @initialized="emit('initialized', $event)"
     />
 </template>

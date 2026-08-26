@@ -1,27 +1,11 @@
 <script setup lang="ts">
-import { watch } from "vue";
-
 import { generateArchesURL } from "@/arches_vue_components/application/generate-arches-url.ts";
 
 import type { ResourceInstanceListAliasedNodeData } from "@/arches_vue_components/datatypes/resource-instance-list/types";
 
-const { aliasedNodeData = null } = defineProps<{
+defineProps<{
     aliasedNodeData?: ResourceInstanceListAliasedNodeData | null;
 }>();
-
-const emit = defineEmits<{
-    initialized: [updatedValue: ResourceInstanceListAliasedNodeData];
-}>();
-
-watch(
-    () => aliasedNodeData,
-    (newValue) => {
-        if (newValue) {
-            emit("initialized", newValue);
-        }
-    },
-    { immediate: true },
-);
 </script>
 
 <template>

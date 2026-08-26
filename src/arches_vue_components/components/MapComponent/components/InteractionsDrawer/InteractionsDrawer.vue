@@ -1,57 +1,33 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, shallowRef } from "vue";
-
 import Button from "primevue/button";
 import Divider from "primevue/divider";
 
-import type { Component } from "vue";
-import type { Map as MaplibreMap } from "maplibre-gl";
+import { useInteractionPanel } from "@/arches_vue_components/components/MapComponent/components/InteractionsDrawer/composables/useInteractionPanel.ts";
 
-import type { MapInteractionItem } from "@/arches_vue_components/widgets/MapWidget/types.ts";
+import type {
+    MapInteractionTool,
+    MapContext,
+} from "@/arches_vue_components/components/MapComponent/types.ts";
 
 const {
-    map,
+    context,
     items,
     position = "right",
     defaultOpenIndex = undefined,
 } = defineProps<{
-    map: MaplibreMap;
-    items: MapInteractionItem[];
+    context: MapContext;
+    items: MapInteractionTool[];
     position?: "left" | "right";
     defaultOpenIndex?: number;
 }>();
 
-const selectedComponent = shallowRef<Component | null>(null);
-const isOverlayVisible = ref(false);
-
-const headerContent = computed(
-    () =>
-        items.find((item) => item.component === selectedComponent.value)
-            ?.header ?? null,
-);
-
-function openDrawer(item: MapInteractionItem): void {
-    selectedComponent.value = item.component;
-    isOverlayVisible.value = true;
-}
-
-function onItemClick(item: MapInteractionItem): void {
-    if (selectedComponent.value === item.component) {
-        isOverlayVisible.value = !isOverlayVisible.value;
-    } else {
-        openDrawer(item);
-    }
-}
-
-onMounted(() => {
-    if (defaultOpenIndex !== undefined) {
-        const item = items[defaultOpenIndex];
-
-        if (item) {
-            openDrawer(item);
-        }
-    }
-});
+const {
+    selectedItem,
+    selectedComponent,
+    isOverlayVisible,
+    headerContent,
+    onItemClick,
+} = useInteractionPanel(items, defaultOpenIndex);
 </script>
 
 <template>
@@ -92,7 +68,8 @@ onMounted(() => {
 
             <component
                 :is="selectedComponent"
-                :map="map"
+                :context="context"
+                v-bind="selectedItem?.props"
             />
         </div>
     </div>

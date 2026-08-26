@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
-
 import Select from "primevue/select";
 
 import { useLanguageStore } from "@/arches_vue_components/stores/useLanguageStore.ts";
@@ -19,19 +17,10 @@ const emit = defineEmits<{
         event: "update:aliasedNodeData",
         updatedValue: LanguageAliasedNodeData,
     ): void;
-    (event: "initialized", updatedValue: LanguageAliasedNodeData): void;
 }>();
 
 const languageStore = useLanguageStore();
 languageStore.fetchAllLanguages();
-
-onMounted(() => {
-    emit(
-        "initialized",
-        aliasedNodeData ??
-            buildLanguageAliasedNodeData(null, languageStore.languages),
-    );
-});
 
 function onUpdateModelValue(updatedValue: string | null) {
     emit(

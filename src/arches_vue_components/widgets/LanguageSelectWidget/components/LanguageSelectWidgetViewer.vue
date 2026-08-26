@@ -1,25 +1,9 @@
 <script setup lang="ts">
-import { watch } from "vue";
-
 import type { LanguageAliasedNodeData } from "@/arches_vue_components/datatypes/language/types.ts";
 
-const { aliasedNodeData = null } = defineProps<{
+defineProps<{
     aliasedNodeData?: LanguageAliasedNodeData | null;
 }>();
-
-const emit = defineEmits<{
-    initialized: [updatedValue: LanguageAliasedNodeData];
-}>();
-
-watch(
-    () => aliasedNodeData,
-    (newValue) => {
-        if (newValue) {
-            emit("initialized", newValue);
-        }
-    },
-    { immediate: true },
-);
 </script>
 
 <template>

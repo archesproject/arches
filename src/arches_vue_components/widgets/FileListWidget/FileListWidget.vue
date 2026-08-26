@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 
 import FileListWidgetViewer from "@/arches_vue_components/widgets/FileListWidget/components/FileListWidgetViewer.vue";
 import FileListWidgetEditor from "@/arches_vue_components/widgets/FileListWidget/components/FileListWidgetEditor/FileListWidgetEditor.vue";
@@ -19,11 +19,17 @@ const emit = defineEmits<{
     "update:value": [updatedValue: FileReference[] | null];
     "update:aliasedNodeData": [updatedValue: FileListAliasedNodeData];
     initialized: [updatedValue: FileListAliasedNodeData];
+    ready: [];
 }>();
 
 const resolvedAliasedNodeData = computed(
     () => aliasedNodeData ?? buildFileListAliasedNodeData(value ?? null),
 );
+
+onMounted(() => {
+    emit("initialized", resolvedAliasedNodeData.value);
+    emit("ready");
+});
 
 function onUpdateAliasedNodeData(
     updatedAliasedNodeData: FileListAliasedNodeData,
@@ -39,11 +45,9 @@ function onUpdateAliasedNodeData(
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :aliased-node-data="resolvedAliasedNodeData"
         @update:aliased-node-data="onUpdateAliasedNodeData"
-        @initialized="emit('initialized', $event)"
     />
     <FileListWidgetViewer
         v-if="mode === VIEW"
         :aliased-node-data="resolvedAliasedNodeData"
-        @initialized="emit('initialized', $event)"
     />
 </template>

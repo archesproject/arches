@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 
 import NonLocalizedTextWidgetEditor from "@/arches_vue_components/widgets/NonLocalizedTextWidget/components/NonLocalizedTextWidgetEditor.vue";
 import NonLocalizedTextWidgetViewer from "@/arches_vue_components/widgets/NonLocalizedTextWidget/components/NonLocalizedTextWidgetViewer.vue";
@@ -16,12 +16,18 @@ const emit = defineEmits<{
     "update:value": [updatedValue: string | null];
     "update:aliasedNodeData": [updatedValue: NonLocalizedTextAliasedNodeData];
     initialized: [updatedValue: NonLocalizedTextAliasedNodeData];
+    ready: [];
 }>();
 
 const resolvedAliasedNodeData = computed(
     () =>
         aliasedNodeData ?? buildNonLocalizedTextAliasedNodeData(value ?? null),
 );
+
+onMounted(() => {
+    emit("initialized", resolvedAliasedNodeData.value);
+    emit("ready");
+});
 
 function onUpdateAliasedNodeData(
     updatedAliasedNodeData: NonLocalizedTextAliasedNodeData,
@@ -38,11 +44,9 @@ function onUpdateAliasedNodeData(
         :aliased-node-data="resolvedAliasedNodeData"
         :render-context="renderContext"
         @update:aliased-node-data="onUpdateAliasedNodeData"
-        @initialized="emit('initialized', $event)"
     />
     <NonLocalizedTextWidgetViewer
         v-if="mode === VIEW"
         :aliased-node-data="resolvedAliasedNodeData"
-        @initialized="emit('initialized', $event)"
     />
 </template>

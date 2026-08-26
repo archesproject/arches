@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import type { BooleanCardXNodeXWidgetData } from "@/arches_vue_components/types.ts";
@@ -10,15 +10,7 @@ const { cardXNodeXWidgetData = undefined, aliasedNodeData } = defineProps<{
     aliasedNodeData: BooleanAliasedNodeData;
 }>();
 
-const emit = defineEmits<{
-    initialized: [updatedValue: BooleanAliasedNodeData];
-}>();
-
 const { $gettext } = useGettext();
-
-onMounted(() => {
-    emit("initialized", aliasedNodeData);
-});
 
 const displayValue = computed(() => {
     if (aliasedNodeData?.node_value === true) {
