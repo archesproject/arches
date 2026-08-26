@@ -1526,7 +1526,7 @@ class FileListDataType(BaseDataType):
                 tile_data.append(tile_file)
                 continue
 
-            tile_file = {}
+            tile_file = {**file_info} if isinstance(file_info, dict) else {}
             try:
                 file_stats = os.stat(file_path)
                 tile_file["lastModified"] = file_stats.st_mtime
