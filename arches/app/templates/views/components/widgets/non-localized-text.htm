@@ -8,7 +8,7 @@
         <!-- ko if: node -->
         <i data-bind="
             css: {'ion-asterisk widget-label-required': node.isrequired},
-            attr: {'aria-label': $root.translations.required}        
+            attr: {'aria-label': $root.translations.required}
         "></i>
         <!-- /ko -->
         <div class="col-xs-12">
@@ -23,7 +23,7 @@
     <span data-bind="text: $root.translations.placeholder"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input class="form-control input-md widget-input" 
+    <input class="form-control input-md widget-input"
         data-bind="attr: {placeholder: $root.translations.placeholder, 'aria-label': $root.translations.placeholder}, textInput: placeholder"
     >
 </div>
@@ -43,30 +43,12 @@
     <span data-bind="text: $root.translations.defaultValue"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" placeholder="{% trans "Default Value" %}" class="form-control input-md widget-input" 
+    <input type="" placeholder="{% trans "Default Value" %}" class="form-control input-md widget-input"
         data-bind="
-            textInput: defaultValue, 
+            textInput: defaultValue,
             attr:{'placeholder': $root.translations.defaultValue, 'aria-label': $root.translations.placeholder}
         "
     >
 </div>
-<div class="node-config-item">
-    <div class="control-label">
-        <span data-bind="text: $root.translations.disabled"></span>
-    </div>
-    <div class="pad-no">
-        <div data-bind="
-            component: { 
-                name: 'views/components/simple-switch', 
-                params: {
-                    value: uneditable, 
-                    config:{
-                        label: $root.translations.disableEditing,
-                        subtitle: $root.translations.preventUsersFromEditingValue
-                    }
-                }
-            }">
-        </div>
-    </div>
-</div>
+{{ block.super }}
 {% endblock config_form %}

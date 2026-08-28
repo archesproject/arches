@@ -116,7 +116,8 @@
         <div class="col-xs-12">
             <input type="text" data-bind="
                 textInput: value,
-                attr: {placeholder: placeholder, disabled: disabled, 'aria-label': label}"
+                disable: disable,
+                attr: {placeholder: placeholder, disabled: disable, 'aria-label': label}"
                 class="form-control input-lg widget-input">
         </div>
         <div class="col-xs-12" data-bind="if: value">
@@ -156,4 +157,5 @@
         "
     >
 </div>
+{{ block.super }}
 {% endblock config_form %}

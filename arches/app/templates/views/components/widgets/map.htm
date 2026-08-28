@@ -63,9 +63,9 @@
     <span data-bind="text: $root.translations.mapCenterLongitude"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input 
-        type="number" 
-        class="form-control input-md widget-input" 
+    <input
+        type="number"
+        class="form-control input-md widget-input"
         data-bind="
             attr: {placeholder: $root.translations.longitudeXCoordinate, 'aria-label': $root.translations.longitudeXCoordinate},
             textInput: centerX
@@ -76,9 +76,9 @@
     <span data-bind="text: $root.translations.mapCenterLatitude"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input 
-        type="number" 
-        class="form-control input-md widget-input" 
+    <input
+        type="number"
+        class="form-control input-md widget-input"
         data-bind="
             attr: {placeholder: $root.translations.latitudeYCoordinate, 'aria-label': $root.translations.latitudeYCoordinate},
             textInput: centerY
@@ -89,17 +89,18 @@
     <span data-bind="text: $root.translations.defaultZoom"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input 
-        type="number" 
-        min=1 
-        max=20 
-        class="form-control input-md widget-input" 
+    <input
+        type="number"
+        min=1
+        max=20
+        class="form-control input-md widget-input"
         data-bind="
             attr: {placeholder: $root.translations.zoomLevel, 'aria-label': $root.translations.zoomLevel},
             textInput: zoom
         "
     >
 </div>
+{{ block.super }}
 {% endblock config_form %}
 
 {% block display_value %}

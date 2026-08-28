@@ -20,7 +20,7 @@
                             <span data-bind="text: $root.translations.dragAndDropFilesOnPanel"></span>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass, disable: disabled">
+                    <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass, disable: disable">
                         <i class="fa fa-file"></i>
                         <span data-bind="text: $root.translations.selectFiles"></span>
                     </button>
@@ -219,7 +219,7 @@
         "
     >
 </div>
-
+{{ block.super }}
 {% endblock config_form %}
 
 {% block report %}

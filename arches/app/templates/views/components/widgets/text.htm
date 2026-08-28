@@ -169,24 +169,7 @@
     </div>
     </div>
 </div>
-<div class="node-config-item">
-    <div class="control-label">
-        <span class="widget-input-label" data-bind="text: $root.translations.disabled"></span>
-    </div>
-    <div class="pad-no">
-        <div
-            data-bind="
-                component: {
-                    name: 'views/components/simple-switch',
-                    params: {
-                        value: uneditable,
-                        config:{label: $root.translations.disableEditing, subtitle: $root.translations.preventUsersFromEditingValue}
-                    }
-                }
-            "
-        ></div>
-    </div>
-</div>
+{{ block.super }}
 {% endblock config_form %}
 
 <!-- ko if: !configForm  && state === 'display_value' -->
