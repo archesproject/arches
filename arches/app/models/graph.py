@@ -2651,9 +2651,10 @@ class Graph(models.GraphModel):
 
         # update graph data
         serialized_draft_graph["graphid"] = serialized_source_graph["graphid"]
-        serialized_draft_graph["resource_instance_lifecycle_id"] = (
-            serialized_source_graph["resource_instance_lifecycle_id"]
-        )
+        if "resource_instance_lifecycle_id" in serialized_source_graph.keys():
+            serialized_draft_graph["resource_instance_lifecycle_id"] = (
+                serialized_source_graph["resource_instance_lifecycle_id"]
+            )
         serialized_draft_graph["source_identifier_id"] = None
 
         # update permissions
@@ -2757,7 +2758,7 @@ class Graph(models.GraphModel):
 
             updated_graph = Graph(serialized_graph)
             updated_graph.widgets = widget_dict
-            updated_graph.is_active = self.is_active
+            updated_graph.is_active = serialized_graph.get("is_active", self.is_active)
 
             try:
                 updated_graph.update_permissions_from_serialized_graph(serialized_graph)
@@ -2785,6 +2786,8 @@ class Graph(models.GraphModel):
             models.GraphModel.objects.filter(pk=updated_graph.pk).update(
                 has_unpublished_changes=False,
             )
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT * FROM refresh_geojson_geometries();")
 
             return Graph.objects.get(pk=updated_graph.pk)
 
