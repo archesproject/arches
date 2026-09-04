@@ -202,6 +202,15 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         as_representation:
             - True: calls to_json() datatype methods
             - False: calls to_python() datatype methods
+
+        nodes:
+            An explicit node queryset/sequence to use instead of querying every
+            node on the graph. Supplying it keeps this method lazy, and also
+            scopes decoding: only the given nodes are set on each tile's
+            aliased_data, so a caller asking for a subset does not pay to decode
+            every sibling node in the nodegroup. Tiles then have no attribute
+            for an unlisted node -- pass every node whose value you intend to
+            read.
         """
         from arches_querysets.models import GraphWithPrefetching
 
@@ -215,23 +224,22 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         if resource_ids:
             qs = qs.filter(resourceinstance_id__in=resource_ids)
 
-        if not nodes:
-            # Violates laziness of QuerySets, but can be made fully lazy
-            # by providing a `nodes` argument doing the same query.
+        resolved_nodes = nodes
+        if not resolved_nodes:
             filters = models.Q(graph__slug=graph_slug)
             # arches_version==9.0.0
             if arches_version >= Version("8.0"):
                 filters &= models.Q(source_identifier=None)
-            nodes = (
+            resolved_nodes = (
                 Node.objects.filter(filters)
                 .exclude(datatype="semantic")
                 .exclude(nodegroup=None)
                 .select_related("nodegroup__parentnodegroup")
             )
-            if not nodes:
+            if not resolved_nodes:
                 raise ValueError(f"No nodes found for graph with slug: {graph_slug}")
 
-        alias_expressions = generate_node_alias_expressions(self.model, nodes)
+        alias_expressions = generate_node_alias_expressions(self.model, resolved_nodes)
 
         # arches_version==9.0.0
         if arches_version < Version("8.0"):
@@ -248,6 +256,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
             as_representation=as_representation,
             graph_slug=graph_slug,
             graph_query=graph_query,
+            nodes=nodes,
         )
 
         # Future: see various solutions mentioned here for avoiding
@@ -259,7 +268,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
                 graph_slug=graph_slug,
                 as_representation=as_representation,
                 depth=depth - 1,
-                nodes=nodes,
+                nodes=resolved_nodes,
                 graph_query=graph_query,
             )
 
@@ -311,6 +320,9 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         """
         from arches_querysets.models import AliasedData
 
+        nodes = self._hints.get("nodes")
+        node_pks = {node.pk for node in nodes} if nodes is not None else None
+
         aliased_data_to_update = {}
         values_by_datatype = defaultdict(list)
         datatype_contexts = {}
@@ -320,7 +332,12 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
             else:
                 return  # already set
             tile.sync_private_attributes(self)
-            for node in tile.nodegroup.node_set.all():
+            nodegroup_nodes = tile.nodegroup.node_set.all()
+            if node_pks is not None:
+                nodegroup_nodes = [
+                    node for node in nodegroup_nodes if node.pk in node_pks
+                ]
+            for node in nodegroup_nodes:
                 if node.datatype == "semantic":
                     continue
                 datatype_instance = DataTypeFactory().get_instance(node.datatype)
@@ -480,7 +497,9 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
 
         if not nodes:
             # Violates laziness of QuerySets, but can be made fully lazy
-            # by providing a `nodes` argument doing the same query.
+            # by providing a `nodes` argument doing the same query. That
+            # argument is forwarded to TileTree.objects.get_tiles() below, so
+            # it also scopes which nodes are decoded onto each tile.
             filters = models.Q(graph__slug=graph_slug)
             # arches_version==9.0.0
             if arches_version >= Version("8.0"):
