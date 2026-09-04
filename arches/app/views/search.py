@@ -64,12 +64,7 @@ logger = logging.getLogger(__name__)
 class SearchView(MapBaseManagerView):
     def get(self, request):
         map_markers = MapMarker.objects.all()
-        resource_graphs = (
-            GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-            .exclude(isresource=False)
-            .exclude(is_active=False)
-            .exclude(source_identifier__isnull=False)
-        )
+        resource_graphs = GraphModel.objects.get_resource_models()
         geocoding_providers = Geocoder.objects.all()
         search_component_factory = SearchFilterFactory(request)
         searchview_instance = search_component_factory.get_searchview_instance()

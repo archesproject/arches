@@ -847,13 +847,7 @@ class Resource(models.ResourceInstance):
             return result["value"]
 
         if not graphs:
-            graphs = list(
-                models.GraphModel.objects.all()
-                .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-                .exclude(isresource=False)
-                .exclude(is_active=False)
-                .exclude(source_identifier__isnull=False)
-            )
+            graphs = list(models.GraphModel.objects.get_resource_models())
 
         graph_lookup = {
             str(graph.graphid): {

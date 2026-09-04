@@ -61,14 +61,7 @@ class ImportSingleCsv(BaseImportModule):
 
     def get_graphs(self, request):
         graph_name_i18n = "name__" + settings.LANGUAGE_CODE
-        graphs = (
-            GraphModel.objects.all()
-            .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-            .exclude(isresource=False)
-            .exclude(is_active=False)
-            .exclude(source_identifier__isnull=False)
-            .order_by(graph_name_i18n)
-        )
+        graphs = GraphModel.objects.get_resource_models().order_by(graph_name_i18n)
         return {"success": True, "data": graphs}
 
     def get_nodes(self, request):
