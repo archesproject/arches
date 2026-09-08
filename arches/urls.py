@@ -740,6 +740,11 @@ urlpatterns = [
         r"^iiifannotations$", api.IIIFAnnotations.as_view(), name="iiifannotations"
     ),
     re_path(
+        r"^iiifannotations/batch$",
+        api.IIIFAnnotationsBatch.as_view(),
+        name="iiifannotations_batch",
+    ),
+    re_path(
         r"^iiifannotationnodes$",
         api.IIIFAnnotationNodes.as_view(),
         name="iiifannotationnodes",
