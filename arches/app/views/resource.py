@@ -910,6 +910,7 @@ class ResourceCards(View):
         return JSONResponse({"success": True, "cards": cards})
 
 
+@method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceDescriptors(View):
     def get_localized_descriptor(self, document, descriptor_type):
         language_codes = (translation.get_language(), settings.LANGUAGE_CODE)
