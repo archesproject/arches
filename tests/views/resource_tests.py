@@ -400,7 +400,12 @@ class CommandLineTests(ArchesTestCase):
         Test we cannot access a resource's recent edit without the 'view_resourceinstance' permission
         """
         self.client.login(username="ben", password="Test12345!")
-        edit = EditLog.objects.filter(resourceinstanceid=self.resource_instance_id)[0]
+        edit = (
+            EditLog.objects.filter(resourceinstanceid=self.resource_instance_id)
+            .exclude(nodegroupid__isnull=True)
+            .order_by("timestamp", "editlogid")
+            .first()
+        )
         transactionid = str(edit.transactionid)
         resource = ResourceInstance.objects.get(
             resourceinstanceid=self.resource_instance_id
@@ -419,7 +424,12 @@ class CommandLineTests(ArchesTestCase):
         Test we can access a resource's recent edit with the 'view_resourceinstance' permission
         """
         self.client.login(username="ben", password="Test12345!")
-        edit = EditLog.objects.filter(resourceinstanceid=self.resource_instance_id)[0]
+        edit = (
+            EditLog.objects.filter(resourceinstanceid=self.resource_instance_id)
+            .exclude(nodegroupid__isnull=True)
+            .order_by("timestamp", "editlogid")
+            .first()
+        )
         transactionid = str(edit.transactionid)
         resource = ResourceInstance.objects.get(
             resourceinstanceid=self.resource_instance_id

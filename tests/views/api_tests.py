@@ -745,6 +745,46 @@ class ResourceAPITests(ArchesTestCase):
                 75,
             )
 
+    def test_tiles_endpoint_rejects_resource_reassignment(self):
+        user = User.objects.get(username="admin")
+        self.client.force_login(user)
+        tile = models.TileModel.objects.filter(
+            resourceinstance_id=self.non_legacy_resource_instanceid
+        ).first()
+        original_resource_id = tile.resourceinstance_id
+        original_data = tile.data
+        other_resource = Resource.objects.create(graph=self.data_type_graph)
+        values = json.dumps(
+            {
+                "tileid": str(tile.tileid),
+                "data": {
+                    "e7364d1e-95c4-11e8-9e7c-acde48001122": None,
+                    "f08a3057-95c4-11e8-9761-acde48001122": 75,
+                },
+                "nodegroup_id": str(tile.nodegroup_id),
+                "parenttile_id": None,
+                "resourceinstance_id": str(other_resource.pk),
+                "sortorder": tile.sortorder,
+                "transaction_id": None,
+            }
+        )
+
+        with self.assertLogs("arches.app.views.tile", level="ERROR"):
+            response = self.client.post(
+                reverse("api_tiles", kwargs={"tileid": str(tile.tileid)}),
+                {"data": values},
+            )
+
+        tile.refresh_from_db()
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(
+            json.loads(response.content)["title"],
+            "This tile is associated with a different resource",
+        )
+        self.assertEqual(tile.resourceinstance_id, original_resource_id)
+        self.assertEqual(tile.data, original_data)
+        self.assertFalse(other_resource.tilemodel_set.exists())
+
     def test_tiles_endpoint_request_body(self):
         user = User.objects.get(username="admin")
         self.client.force_login(user)
