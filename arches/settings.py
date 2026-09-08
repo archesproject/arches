@@ -756,6 +756,8 @@ ENABLE_TWO_FACTOR_AUTHENTICATION = False
 # If True, users cannot log in unless they have enabled two-factor authentication
 FORCE_TWO_FACTOR_AUTHENTICATION = False
 
+LOGIN_REDIRECT_URL = "home"
+
 # bounds for search results hex binning fabric (search grid).
 # a smaller bbox will give you less distortion in hexes and better performance
 DEFAULT_BOUNDS = {

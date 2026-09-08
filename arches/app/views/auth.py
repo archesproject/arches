@@ -68,7 +68,7 @@ logger = logging.getLogger(__name__)
 
 class LoginView(View):
     def get(self, request):
-        next = request.GET.get("next", reverse("home"))
+        next = request.GET.get("next", settings.LOGIN_REDIRECT_URL)
         registration_success = request.GET.get("registration_success")
 
         if request.GET.get("logout", None) is not None:
@@ -109,7 +109,7 @@ class LoginView(View):
     )
     def post(self, request):
         # POST request is taken to mean user is logging in
-        next = request.POST.get("next", reverse("home"))
+        next = request.POST.get("next", settings.LOGIN_REDIRECT_URL)
 
         if getattr(request, "limited", False):
             return render(
@@ -598,7 +598,7 @@ class TwoFactorAuthenticationLoginView(View):
         password = request.POST.get("password", None)
         user = authenticate(username=username, password=password)
 
-        next = request.POST.get("next", reverse("home"))
+        next = request.POST.get("next", settings.LOGIN_REDIRECT_URL)
         user_has_enabled_two_factor_authentication = request.POST.get(
             "user-has-enabled-two-factor-authentication", None
         )
@@ -757,7 +757,7 @@ class Token(View):
 
 class ExternalOauth(View):
     def start(request):
-        next = request.GET.get("next", reverse("home"))
+        next = request.GET.get("next", settings.LOGIN_REDIRECT_URL)
         username = request.GET.get("username", None)
 
         token, user = ExternalOauthAuthenticationBackend.get_token_for_username(
@@ -779,7 +779,9 @@ class ExternalOauth(View):
     @csrf_exempt
     def callback(request):
         next_url = (
-            request.session["next"] if "next" in request.session else reverse("home")
+            request.session["next"]
+            if "next" in request.session
+            else settings.LOGIN_REDIRECT_URL
         )
         user = authenticate(
             request, username=request.session["user"], sso_authentication=True
