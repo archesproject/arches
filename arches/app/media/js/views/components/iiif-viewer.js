@@ -3,6 +3,7 @@ import ko from 'knockout';
 import koMapping from 'knockout-mapping';
 import L from 'leaflet';
 import arches from 'arches';
+import Cookies from 'js-cookie';
 import WorkbenchViewmodel from 'views/components/workbench';
 import iiifPopup from 'templates/views/components/iiif-popup.htm';
 import iiifViewerTemplate from 'templates/views/components/iiif-viewer.htm';
@@ -152,6 +153,73 @@ var IIIFViewerViewmodel = function(params) {
     this.buildAnnotationNodes = params.buildAnnotationNodes || function(json) {
         const nodeProcessingStatus = {};
 
+        const buildAnnotationsUrl = function(canvasId, nodeId) {
+            return arches.urls.iiifannotations + '?canvas=' + canvasId + '&nodeid=' + nodeId;
+        };
+
+        // Fetch the annotations of every canvas of the manifest in a single
+        // request and cache them under the urls the per-canvas fetches use, so
+        // that those only have to read them back. Returns false when the batch
+        // is unavailable or fails, leaving the per-canvas fetches to do the work.
+        const fetchAnnotationsInBatch = async function(canvasIds, nodeIds) {
+            if (!arches.urls.iiifannotations_batch) return false;
+            // Stay under the number of canvases the endpoint accepts per request.
+            const MAX_CANVASES_PER_REQUEST = 200;
+            for (let i = 0; i < canvasIds.length; i += MAX_CANVASES_PER_REQUEST) {
+                const canvases = canvasIds.slice(i, i + MAX_CANVASES_PER_REQUEST);
+                let batch;
+                try {
+                    const response = await window.fetch(arches.urls.iiifannotations_batch, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': Cookies.get('csrftoken')
+                        },
+                        body: JSON.stringify({canvases: canvases})
+                    });
+                    if (!response.ok) return false;
+                    batch = await response.json();
+                } catch (error) {
+                    console.error('Error loading annotations in batch:', error);
+                    return false;
+                }
+                if (!batch.canvases) return false;
+                const featuresByUrl = {};
+                Object.keys(batch.canvases).forEach(function(canvasId) {
+                    batch.canvases[canvasId].features.forEach(function(feature) {
+                        const url = buildAnnotationsUrl(canvasId, feature.properties.nodeId);
+                        featuresByUrl[url] = featuresByUrl[url] || [];
+                        featuresByUrl[url].push(feature);
+                    });
+                });
+                // A canvas without annotations is absent from the response, so cache
+                // an empty collection for it rather than fetching it again per canvas.
+                canvases.forEach(function(canvasId) {
+                    nodeIds.forEach(function(nodeId) {
+                        const url = buildAnnotationsUrl(canvasId, nodeId);
+                        cachedAnnotations[url] = {
+                            type: 'FeatureCollection',
+                            features: featuresByUrl[url] || []
+                        };
+                    });
+                });
+            }
+            return true;
+        };
+
+        let batchPreload;
+        const preloadAnnotationsInBatch = function() {
+            const canvasIds = self.canvases()
+                .map(canvas => self.getCanvasService(canvas))
+                .filter(canvasId => !!canvasId);
+            // The manifest may not be loaded yet, in which case a later call retries.
+            if (canvasIds.length === 0) return Promise.resolve(false);
+            if (!batchPreload) {
+                batchPreload = fetchAnnotationsInBatch(canvasIds, json.map(node => node.nodeid));
+            }
+            return batchPreload;
+        };
+
         self.annotationNodes(
             json.map((node) => {
                 const annotations = ko.observableArray();
@@ -160,7 +228,7 @@ var IIIFViewerViewmodel = function(params) {
                 const updateAnnotations = async function() {
                     const canvas = self.canvas();
                     if (canvas) {
-                        const annotationsUrl = arches.urls.iiifannotations + '?canvas=' + canvas + '&nodeid=' + node.nodeid;
+                        const annotationsUrl = buildAnnotationsUrl(canvas, node.nodeid);
                         try {
                             if(!cachedAnnotations[annotationsUrl]){
                                 const response = await window.fetch(annotationsUrl);
@@ -175,7 +243,7 @@ var IIIFViewerViewmodel = function(params) {
                             annotations(annotation.features);
 
                             const counts = {...self.annotationCounts()};
-                            counts[canvas] = annotation.features.length;
+                            counts[canvas + '::' + node.nodeid] = annotation.features.length;
                             self.annotationCounts(counts);
                         } catch (error) {
                             console.error('Error loading annotations for current canvas:', error);
@@ -206,7 +274,7 @@ var IIIFViewerViewmodel = function(params) {
                                 const canvasId = self.getCanvasService(canvas);
 
                                 if (canvas && canvasId) {
-                                    const annotationsUrl = arches.urls.iiifannotations + '?canvas=' + canvasId + '&nodeid=' + node.nodeid;
+                                    const annotationsUrl = buildAnnotationsUrl(canvasId, node.nodeid);
 
                                     batchPromises.push((async () => {
                                         try {
@@ -218,10 +286,7 @@ var IIIFViewerViewmodel = function(params) {
                                             // get state before update
                                             const currentCounts = {...self.annotationCounts()};
 
-                                            if (!currentCounts[canvasId]) {
-                                                currentCounts[canvasId] = 0;
-                                            }
-                                            currentCounts[canvasId] += cachedAnnotations[annotationsUrl].features.length;
+                                            currentCounts[canvasId + '::' + node.nodeid] = cachedAnnotations[annotationsUrl].features.length;
                                             processedCount++;
 
                                             // update counts progress
@@ -252,8 +317,10 @@ var IIIFViewerViewmodel = function(params) {
                 };
 
                 const initializeAnnotationLoading = async function() {
+                    const preloading = preloadAnnotationsInBatch();
                     //priorize current canvas
                     await updateAnnotations();
+                    await preloading;
                     setTimeout(() => preloadAllAnnotations(), 100);
                 };
 
@@ -867,7 +934,11 @@ var IIIFViewerViewmodel = function(params) {
 
     this.getAnnotationCount = function(canvasId) {
         const counts = self.annotationCounts();
-        return counts && counts[canvasId] ? counts[canvasId] : 0;
+        if (!counts) return 0;
+        const prefix = canvasId + '::';
+        return Object.keys(counts)
+            .filter(key => key.startsWith(prefix))
+            .reduce((total, key) => total + counts[key], 0);
     };
 };
 ko.components.register('iiif-viewer', {
