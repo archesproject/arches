@@ -421,6 +421,8 @@ class Graphs(APIBase):
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Resources(APIBase):
+    se = SearchEngineFactory().create()
+
     # context = [{
     #     "@context": {
     #         "id": "@id",
@@ -594,6 +596,27 @@ class Resources(APIBase):
                 settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT,
                 reverse("resources", args=[""]).lstrip("/"),
             )
+
+            page_resource_ids = [
+                str(pk)
+                for pk in Resource.objects.values_list("pk", flat=True)
+                .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_ID)
+                .order_by("pk")[start:end]
+            ]
+
+            # Apply resource instance permissions.
+            exclusive_set, filtered_instance_ids = get_filtered_instances(
+                request.user, self.se, resources=page_resource_ids
+            )
+            readable_resource_ids = []
+            for page_resource_id in page_resource_ids:
+                resource_available = page_resource_id not in filtered_instance_ids
+                resource_available = (
+                    not resource_available if exclusive_set else resource_available
+                )
+                if resource_available:
+                    readable_resource_ids.append(page_resource_id)
+
             out = {
                 "@context": "https://www.w3.org/ns/ldp/",
                 "@id": "",
@@ -602,11 +625,7 @@ class Resources(APIBase):
                 # "label": str(model.name),
                 "ldp:contains": [
                     "%s%s" % (base_url, resourceid)
-                    for resourceid in list(
-                        Resource.objects.values_list("pk", flat=True)
-                        .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_ID)
-                        .order_by("pk")[start:end]
-                    )
+                    for resourceid in readable_resource_ids
                 ],
             }
 

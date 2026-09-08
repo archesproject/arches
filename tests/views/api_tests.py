@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import json
 import os
 import uuid
+from unittest.mock import patch
 
 from tests.base_test import ArchesTestCase
 from tests.utils.permission_test_utils import add_users
@@ -531,6 +532,37 @@ class ResourceAPITests(ArchesTestCase):
             )
 
         self.assertEqual(response.status_code, 400)
+
+    def test_resource_list_filters_instance_permissions(self):
+        user = User.objects.get(username="ben")
+        self.client.force_login(user)
+
+        for exclusive_set in (False, True):
+            listed_resource_ids = []
+
+            def filter_instances(user, search_engine, resources):
+                listed_resource_ids.extend(resources)
+                return exclusive_set, resources[:1]
+
+            with self.subTest(exclusive_set=exclusive_set), patch(
+                "arches.app.views.api.get_filtered_instances",
+                side_effect=filter_instances,
+            ):
+                response = self.client.get(reverse("resources", args=[""]))
+
+            self.assertEqual(response.status_code, 200)
+            expected_resource_ids = (
+                listed_resource_ids[:1]
+                if exclusive_set
+                else listed_resource_ids[1:]
+            )
+            self.assertEqual(
+                [
+                    value.rsplit("/", 1)[-1]
+                    for value in response.json()["ldp:contains"]
+                ],
+                expected_resource_ids,
+            )
 
     def test_resource_report_api(self):
         self.client.login(username="admin", password="admin")
