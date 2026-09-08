@@ -45,7 +45,7 @@ const { current: preferredLanguageCode } = useGettext();
 
 const options = ref<ReferenceSelectTreeNode[]>();
 const isLoading = ref(false);
-const hasEmittedReady = ref(false);
+const optionsLoaded = ref(false);
 const optionsError = ref<string | null>(null);
 const expandedKeys: Ref<TreeExpandedKeys> = ref({});
 
@@ -120,6 +120,9 @@ function optionsAsNodes(
 
 async function getOptions() {
     try {
+        if (optionsLoaded.value) {
+            return;
+        }
         if (!graphSlug || !nodeAlias) {
             return;
         }
@@ -137,11 +140,10 @@ async function getOptions() {
         optionsError.value = (error as Error).message;
     } finally {
         isLoading.value = false;
-
-        if (!hasEmittedReady.value) {
-            hasEmittedReady.value = true;
+        if (!optionsLoaded.value) {
             emit("ready");
         }
+        optionsLoaded.value = true;
     }
 }
 
