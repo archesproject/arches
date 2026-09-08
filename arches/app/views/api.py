@@ -1257,6 +1257,9 @@ class OntologyProperty(APIBase):
 
 class ResourceReport(APIBase):
     def get(self, request, resourceid):
+        if not user_can_read_resource(user=request.user, resourceid=resourceid):
+            return JSONResponse(status=403)
+
         exclude = request.GET.get("exclude", [])
         uncompacted_value = request.GET.get("uncompacted")
         version = request.GET.get("v")
