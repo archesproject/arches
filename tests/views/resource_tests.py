@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 from http import HTTPStatus
-
+from unittest.mock import patch
 from arches.app.views.resource import ResourcePermissionDataView
 from tests.base_test import ArchesTestCase
 from django.db import connection
