@@ -27,6 +27,7 @@ from django.contrib.auth.models import User
 from django.core import management
 from django.test.client import RequestFactory
 from django.test.utils import captured_stdout
+from guardian.shortcuts import assign_perm
 
 from arches.app.views.api import APIBase
 from arches.app.models import models
@@ -540,6 +541,22 @@ class ResourceAPITests(ArchesTestCase):
             ),
         )
         self.assertEqual(response.status_code, 200)
+
+    def test_resource_report_api_denies_resource_instance_access(self):
+        user = User.objects.get(username="ben")
+        self.client.force_login(user)
+        url = reverse(
+            "api_resource_report",
+            args=(str(self.test_prj_user.pk),),
+        )
+
+        self.assertEqual(self.client.get(url).status_code, 200)
+
+        assign_perm("no_access_to_resourceinstance", user, self.test_prj_user)
+        with self.assertLogs("django.request", level="WARNING"):
+            response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 403)
 
     def test_related_resources_in_resource_report_api(self):
         self.client.login(username="admin", password="admin")
