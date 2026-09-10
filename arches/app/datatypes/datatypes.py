@@ -2611,6 +2611,10 @@ class NodeValueDataType(BaseDataType):
                 datatype = datatype_factory.get_instance(value_node.datatype)
                 return datatype.get_display_value(value_tile, value_node)
             return ""
+
+        except models.TileModel.DoesNotExist:
+            return "Linked Tile Not Found"
+
         except:
             raise Exception(
                 f'Node with name "{node.name}" is not configured correctly.'
