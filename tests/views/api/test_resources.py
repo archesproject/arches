@@ -582,14 +582,19 @@ class ResourceAPITests(ArchesTestCase):
             ):
                 response = self.client.get(reverse("resources", args=[""]))
 
-            self.assertEqual(response.status_code, 200)
-            expected_resource_ids = (
-                listed_resource_ids[:1] if exclusive_set else listed_resource_ids[1:]
-            )
-            self.assertEqual(
-                [value.rsplit("/", 1)[-1] for value in response.json()["ldp:contains"]],
-                expected_resource_ids,
-            )
+                self.assertEqual(response.status_code, 200)
+                expected_resource_ids = (
+                    listed_resource_ids[:1]
+                    if exclusive_set
+                    else listed_resource_ids[1:]
+                )
+                self.assertEqual(
+                    [
+                        value.rsplit("/", 1)[-1]
+                        for value in response.json()["ldp:contains"]
+                    ],
+                    expected_resource_ids,
+                )
 
     def test_resource_report_api(self):
         """
