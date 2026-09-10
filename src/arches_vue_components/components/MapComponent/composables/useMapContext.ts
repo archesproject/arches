@@ -180,6 +180,12 @@ export function useMapContext(
         type: "FeatureCollection",
         features: [],
     };
+    // Each updateDrawnFeatures() call claims the next token; a call whose
+    // async buffer fetch resolves after a newer call has already started
+    // (e.g. a stale buffer request outliving a subsequent "clear all") is no
+    // longer the latest, so it must not clobber the buffer layer or re-emit
+    // its now-outdated feature collection.
+    let latestUpdateDrawnFeaturesToken = 0;
 
     const overlayLayerIds = computed(() =>
         overlays.value
@@ -513,6 +519,8 @@ export function useMapContext(
             shouldEmitValueChange: true,
         },
     ): Promise<void> {
+        const updateToken = ++latestUpdateDrawnFeaturesToken;
+
         const drawnFeatureCollection = draw.getAll() as FeatureCollection;
         drawnFeatures.value = drawnFeatureCollection.features as Feature[];
 
@@ -538,6 +546,10 @@ export function useMapContext(
                     await fetchDrawnFeaturesBuffer(featuresToBuffer);
             }
 
+            if (updateToken !== latestUpdateDrawnFeaturesToken) {
+                return;
+            }
+
             currentBufferData = bufferedFeatures;
             (map.value!.getSource(BUFFER_LAYER_ID) as GeoJSONSource)?.setData(
                 currentBufferData,
@@ -554,6 +566,11 @@ export function useMapContext(
 
                 const [west, south, east, north] =
                     await fetchGeoJSONBounds(allFeatures);
+
+                if (updateToken !== latestUpdateDrawnFeaturesToken) {
+                    return;
+                }
+
                 map.value!.fitBounds(
                     [
                         [west, south],
@@ -664,6 +681,11 @@ export function useMapContext(
         draw?.changeMode(SIMPLE_SELECT, { featureIds: [String(feature.id)] });
     }
 
+    function deselectDrawnFeature(): void {
+        selectedDrawnFeature.value = null;
+        draw?.changeMode(SIMPLE_SELECT);
+    }
+
     function deleteSelectedDrawnFeature(): void {
         if (!draw) return;
 
@@ -721,6 +743,7 @@ export function useMapContext(
         allowedGeometryTypes,
         setDrawMode,
         selectDrawnFeature,
+        deselectDrawnFeature,
         deleteSelectedDrawnFeature,
         deleteAllDrawnFeatures,
         setBufferForSelectedFeature,

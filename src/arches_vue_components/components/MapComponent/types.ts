@@ -66,6 +66,7 @@ export interface MapContext {
     allowedGeometryTypes: ComputedRef<string[] | null>;
     setDrawMode: (mode: DrawMode | null) => void;
     selectDrawnFeature: (feature: Feature) => void;
+    deselectDrawnFeature: () => void;
     deleteSelectedDrawnFeature: () => void;
     deleteAllDrawnFeatures: () => void;
     setBufferForSelectedFeature: (distance: number, units: string) => void;
