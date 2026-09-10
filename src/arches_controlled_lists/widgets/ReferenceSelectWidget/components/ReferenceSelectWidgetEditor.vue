@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch, watchEffect } from "vue";
+import { computed, ref, watch, watchEffect } from "vue";
 
 import { useGettext } from "vue3-gettext";
 import TreeSelect from "primevue/treeselect";
@@ -24,39 +24,28 @@ const {
     graphSlug,
     nodeAlias,
     systemLanguageCode,
-} = defineProps([
-    "aliasedNodeData",
-    "cardXNodeXWidgetData",
-    "graphSlug",
-    "nodeAlias",
-    "systemLanguageCode",
-]) as {
-    aliasedNodeData: ReferenceSelectAliasedNodeData | null;
+} = defineProps<{
+    aliasedNodeData?: ReferenceSelectAliasedNodeData | null;
     cardXNodeXWidgetData?: ReferenceSelectDatatypeCardXNodeXWidgetData;
     graphSlug?: string;
     nodeAlias?: string;
     systemLanguageCode: string;
-};
+}>();
 
-const emit = defineEmits([
-    "update:isLoading",
-    "update:value",
-    "update:aliasedNodeData",
-    "initialized",
-]) as {
-    (event: "update:isLoading", updatedValue: boolean): void;
-    (event: "update:value", updatedValue: ReferenceSelectNodeValue[]): void;
+const emit = defineEmits<{
+    (event: "update:isLoading", isLoading: boolean): void;
     (
         event: "update:aliasedNodeData",
         updatedValue: ReferenceSelectAliasedNodeData,
     ): void;
-    (event: "initialized", updatedValue: ReferenceSelectAliasedNodeData): void;
-};
+    (event: "ready"): void;
+}>();
 
 const { current: preferredLanguageCode } = useGettext();
 
 const options = ref<ReferenceSelectTreeNode[]>();
 const isLoading = ref(false);
+const optionsLoaded = ref(false);
 const optionsError = ref<string | null>(null);
 const expandedKeys: Ref<TreeExpandedKeys> = ref({});
 
@@ -99,18 +88,6 @@ const initialValueFromTileData = computed(() => {
     );
 });
 
-onMounted(() => {
-    emit(
-        "initialized",
-        aliasedNodeData ??
-            buildReferenceSelectAliasedNodeData(
-                null,
-                preferredLanguageCode,
-                systemLanguageCode,
-            ),
-    );
-});
-
 watchEffect(() => {
     getOptions();
 });
@@ -142,9 +119,16 @@ function optionsAsNodes(
 }
 
 async function getOptions() {
-    if (!graphSlug || !nodeAlias) return;
-    isLoading.value = true;
     try {
+        if (optionsLoaded.value) {
+            return;
+        }
+        if (!graphSlug || !nodeAlias) {
+            return;
+        }
+
+        isLoading.value = true;
+
         const widgetOptions =
             await useReferenceSelectOptionsStore().fetchWidgetOptions(
                 graphSlug,
@@ -156,6 +140,10 @@ async function getOptions() {
         optionsError.value = (error as Error).message;
     } finally {
         isLoading.value = false;
+        if (!optionsLoaded.value) {
+            emit("ready");
+        }
+        optionsLoaded.value = true;
     }
 }
 
@@ -163,7 +151,6 @@ function onUpdateModelValue(
     updatedValue: { [key: string]: boolean } | null,
 ): void {
     if (!updatedValue) {
-        emit("update:value", []);
         emit(
             "update:aliasedNodeData",
             buildReferenceSelectAliasedNodeData(
@@ -203,7 +190,6 @@ function onUpdateModelValue(
         });
     }
 
-    emit("update:value", nodeValue);
     emit(
         "update:aliasedNodeData",
         buildReferenceSelectAliasedNodeData(

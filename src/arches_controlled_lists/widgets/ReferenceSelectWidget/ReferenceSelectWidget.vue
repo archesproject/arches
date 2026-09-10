@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch, watchEffect } from "vue";
+import { computed, onMounted, ref, watch, watchEffect } from "vue";
 
 import { useGettext } from "vue3-gettext";
 
@@ -17,29 +17,16 @@ import type {
 } from "@/arches_controlled_lists/datatypes/reference-select/types";
 import type { ReferenceSelectWidgetProps } from "@/arches_controlled_lists/widgets/ReferenceSelectWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps([
-    "mode",
-    "nodeAlias",
-    "graphSlug",
-    "cardXNodeXWidgetData",
-    "aliasedNodeData",
-    "value",
-]) as ReferenceSelectWidgetProps;
+const { aliasedNodeData, mode, value } =
+    defineProps<ReferenceSelectWidgetProps>();
 
-const emit = defineEmits([
-    "update:isLoading",
-    "update:value",
-    "update:aliasedNodeData",
-    "initialized",
-]) as {
-    (event: "update:isLoading", isLoading: boolean): void;
-    (event: "update:value", updatedValue: ReferenceSelectNodeValue[]): void;
-    (
-        event: "update:aliasedNodeData",
-        updatedValue: ReferenceSelectAliasedNodeData,
-    ): void;
-    (event: "initialized", updatedValue: ReferenceSelectAliasedNodeData): void;
-};
+const emit = defineEmits<{
+    "update:isLoading": [isLoading: boolean];
+    "update:value": [updatedValue: ReferenceSelectNodeValue[]];
+    "update:aliasedNodeData": [updatedValue: ReferenceSelectAliasedNodeData];
+    initialized: [updatedValue: ReferenceSelectAliasedNodeData];
+    ready: [];
+}>();
 
 const { current: preferredLanguageCode } = useGettext();
 const languageStore = useLanguageStore();
@@ -69,6 +56,14 @@ watchEffect(() => {
 
 watch(isEditorLoading, (isLoading) => emit("update:isLoading", isLoading));
 
+onMounted(() => {
+    emit("initialized", resolvedAliasedNodeData.value);
+
+    if (mode === VIEW) {
+        emit("ready");
+    }
+});
+
 function onUpdateAliasedNodeData(
     updatedAliasedNodeData: ReferenceSelectAliasedNodeData,
 ) {
@@ -87,12 +82,10 @@ function onUpdateAliasedNodeData(
         :system-language-code="systemLanguageCode"
         @update:is-loading="isEditorLoading = $event"
         @update:aliased-node-data="onUpdateAliasedNodeData"
-        @initialized="emit('initialized', $event)"
+        @ready="emit('ready')"
     />
     <ReferenceSelectWidgetViewer
         v-if="mode === VIEW"
         :aliased-node-data="resolvedAliasedNodeData"
-        :system-language-code="systemLanguageCode"
-        @initialized="emit('initialized', $event)"
     />
 </template>
