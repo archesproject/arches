@@ -576,7 +576,7 @@ class ResourceAPITests(ArchesTestCase):
             with (
                 self.subTest(exclusive_set=exclusive_set),
                 patch(
-                    "arches.app.views.api.get_filtered_instances",
+                    "arches.app.views.api.resource.get_filtered_instances",
                     side_effect=filter_instances,
                 ),
             ):
