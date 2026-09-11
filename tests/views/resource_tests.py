@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 from http import HTTPStatus
-
+from unittest.mock import patch
 from arches.app.views.resource import ResourcePermissionDataView
 from tests.base_test import ArchesTestCase
 from django.db import connection
@@ -256,6 +256,27 @@ class ResourceViewTests(ArchesTestCase):
             and delete.status_code == 500
         )
 
+    def test_user_cannot_access_resource_descriptors_with_no_access(self):
+        user = User.objects.get(username="ben")
+        self.client.force_login(user)
+        resource = ResourceInstance.objects.get(
+            resourceinstanceid=self.resource_instance_id
+        )
+        assign_perm("no_access_to_resourceinstance", user, resource)
+        url = reverse(
+            "resource_descriptors",
+            kwargs={"resourceid": self.resource_instance_id},
+        )
+
+        with patch(
+            "arches.app.views.resource.SearchEngineFactory.create"
+        ) as create_search_engine:
+            with self.assertLogs("django.request", level="WARNING"):
+                response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 403)
+        create_search_engine.assert_not_called()
+
     def test_user_can_view_with_permission(self):
         """
         Test we can access a report with the 'view_resourceinstance' permission
@@ -371,7 +392,12 @@ class ResourceViewTests(ArchesTestCase):
         Test we cannot access a resource's recent edit without the 'view_resourceinstance' permission
         """
         self.client.login(username="ben", password="Test12345!")
-        edit = EditLog.objects.filter(resourceinstanceid=self.resource_instance_id)[0]
+        edit = (
+            EditLog.objects.filter(resourceinstanceid=self.resource_instance_id)
+            .exclude(nodegroupid__isnull=True)
+            .order_by("timestamp", "editlogid")
+            .first()
+        )
         transactionid = str(edit.transactionid)
         resource = ResourceInstance.objects.get(
             resourceinstanceid=self.resource_instance_id
@@ -390,7 +416,12 @@ class ResourceViewTests(ArchesTestCase):
         Test we can access a resource's recent edit with the 'view_resourceinstance' permission
         """
         self.client.login(username="ben", password="Test12345!")
-        edit = EditLog.objects.filter(resourceinstanceid=self.resource_instance_id)[0]
+        edit = (
+            EditLog.objects.filter(resourceinstanceid=self.resource_instance_id)
+            .exclude(nodegroupid__isnull=True)
+            .order_by("timestamp", "editlogid")
+            .first()
+        )
         transactionid = str(edit.transactionid)
         resource = ResourceInstance.objects.get(
             resourceinstanceid=self.resource_instance_id
