@@ -78,25 +78,28 @@ class Resources(APIBase):
     # }]
 
     def get(self, request, resourceid=None, slug=None, graphid=None):
-        try:
-            resource = (
-                Resource.objects.filter(pk=resourceid)
-                .select_related(
-                    "graph",
-                    "resource_instance_lifecycle_state",
+        if resourceid:
+            try:
+                resource = (
+                    Resource.objects.filter(pk=resourceid)
+                    .select_related(
+                        "graph",
+                        "resource_instance_lifecycle_state",
+                    )
+                    .get()
                 )
-                .get()
-            )
-        except Resource.DoesNotExist as dne:
-            logger.error(
-                _("The specified resource '{0}' does not exist. Export failed.").format(
-                    resourceid
+            except Resource.DoesNotExist as dne:
+                logger.error(
+                    _(
+                        "The specified resource '{0}' does not exist. Export failed."
+                    ).format(resourceid)
                 )
-            )
-            return JSONErrorResponse(message=dne.args[0], status=HTTPStatus.NOT_FOUND)
+                return JSONErrorResponse(
+                    message=dne.args[0], status=HTTPStatus.NOT_FOUND
+                )
 
-        if not user_can_read_resource(user=request.user, resource=resource):
-            return JSONResponse(status=403)
+            if not user_can_read_resource(user=request.user, resource=resource):
+                return JSONResponse(status=403)
 
         allowed_formats = ["json", "json-ld", "arches-json"]
         format = request.GET.get("format", "json-ld")
