@@ -17,6 +17,7 @@ from arches.app.models.card import Card as CardProxyModel
 from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
+from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
@@ -27,6 +28,7 @@ from arches.app.utils.permission_backend import (
     user_can_read_resource,
     user_can_edit_resource,
     user_can_delete_resource,
+    get_filtered_instances,
     get_nodegroups_by_perm,
 )
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
@@ -46,6 +48,7 @@ logger = logging.getLogger(__name__)
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Resources(APIBase):
+    se = SearchEngineFactory().create()
     # context = [{
     #     "@context": {
     #         "id": "@id",
@@ -75,25 +78,28 @@ class Resources(APIBase):
     # }]
 
     def get(self, request, resourceid=None, slug=None, graphid=None):
-        try:
-            resource = (
-                Resource.objects.filter(pk=resourceid)
-                .select_related(
-                    "graph",
-                    "resource_instance_lifecycle_state",
+        if resourceid:
+            try:
+                resource = (
+                    Resource.objects.filter(pk=resourceid)
+                    .select_related(
+                        "graph",
+                        "resource_instance_lifecycle_state",
+                    )
+                    .get()
                 )
-                .get()
-            )
-        except Resource.DoesNotExist as dne:
-            logger.error(
-                _("The specified resource '{0}' does not exist. Export failed.").format(
-                    resourceid
+            except Resource.DoesNotExist as dne:
+                logger.error(
+                    _(
+                        "The specified resource '{0}' does not exist. Export failed."
+                    ).format(resourceid)
                 )
-            )
-            return JSONErrorResponse(message=dne.args[0], status=HTTPStatus.NOT_FOUND)
+                return JSONErrorResponse(
+                    message=dne.args[0], status=HTTPStatus.NOT_FOUND
+                )
 
-        if not user_can_read_resource(user=request.user, resource=resource):
-            return JSONResponse(status=403)
+            if not user_can_read_resource(user=request.user, resource=resource):
+                return JSONResponse(status=403)
 
         allowed_formats = ["json", "json-ld", "arches-json"]
         format = request.GET.get("format", "json-ld")
@@ -222,6 +228,27 @@ class Resources(APIBase):
                 settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT,
                 reverse("resources", args=[""]).lstrip("/"),
             )
+
+            page_resource_ids = [
+                str(pk)
+                for pk in Resource.objects.values_list("pk", flat=True)
+                .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_ID)
+                .order_by("pk")[start:end]
+            ]
+
+            # Apply resource instance permissions.
+            exclusive_set, filtered_instance_ids = get_filtered_instances(
+                request.user, self.se, resources=page_resource_ids
+            )
+            readable_resource_ids = []
+            for page_resource_id in page_resource_ids:
+                resource_available = page_resource_id not in filtered_instance_ids
+                resource_available = (
+                    not resource_available if exclusive_set else resource_available
+                )
+                if resource_available:
+                    readable_resource_ids.append(page_resource_id)
+
             out = {
                 "@context": "https://www.w3.org/ns/ldp/",
                 "@id": "",
@@ -230,11 +257,7 @@ class Resources(APIBase):
                 # "label": str(model.name),
                 "ldp:contains": [
                     "%s%s" % (base_url, resourceid)
-                    for resourceid in list(
-                        Resource.objects.values_list("pk", flat=True)
-                        .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_ID)
-                        .order_by("pk")[start:end]
-                    )
+                    for resourceid in readable_resource_ids
                 ],
             }
 
@@ -641,6 +664,9 @@ class ResourceInstanceLifecycleState(APIBase):
 
 class ResourceReport(APIBase):
     def get(self, request, resourceid):
+        if not user_can_read_resource(user=request.user, resourceid=resourceid):
+            return JSONResponse(status=403)
+
         exclude = request.GET.get("exclude", [])
         uncompacted_value = request.GET.get("uncompacted")
         version = request.GET.get("v")

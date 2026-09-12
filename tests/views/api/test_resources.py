@@ -20,6 +20,7 @@ import json
 import os
 import uuid
 from http import HTTPStatus
+from unittest.mock import patch
 
 from tests.base_test import ArchesTestCase
 from django.urls import reverse
@@ -27,6 +28,7 @@ from django.contrib.auth.models import User
 from django.test.client import RequestFactory
 from django.test.utils import captured_stdout, override_settings
 from unittest.mock import patch, MagicMock
+from guardian.shortcuts import assign_perm
 
 from arches.app.views.api import APIBase
 from arches.app.models import models
@@ -549,6 +551,40 @@ class ResourceAPITests(ArchesTestCase):
         result = json.loads(response.content)
         self.assertIsNone(result["cards"][0]["sortorder"])
 
+    def test_resource_list_filters_instance_permissions(self):
+        user = User.objects.get(username="ben")
+        self.client.force_login(user)
+
+        for exclusive_set in (False, True):
+            listed_resource_ids = []
+
+            def filter_instances(user, search_engine, resources):
+                listed_resource_ids.extend(resources)
+                return exclusive_set, resources[:1]
+
+            with (
+                self.subTest(exclusive_set=exclusive_set),
+                patch(
+                    "arches.app.views.api.resource.get_filtered_instances",
+                    side_effect=filter_instances,
+                ),
+            ):
+                response = self.client.get(reverse("resources", args=[""]))
+
+                self.assertEqual(response.status_code, 200)
+                expected_resource_ids = (
+                    listed_resource_ids[:1]
+                    if exclusive_set
+                    else listed_resource_ids[1:]
+                )
+                self.assertEqual(
+                    [
+                        value.rsplit("/", 1)[-1]
+                        for value in response.json()["ldp:contains"]
+                    ],
+                    expected_resource_ids,
+                )
+
     def test_resource_report_api(self):
         """
         Ensure api_resource_report returns proper response
@@ -567,6 +603,22 @@ class ResourceAPITests(ArchesTestCase):
 
         with self.subTest(response):
             self.assertTrue(len(response.json()["cardwidgets"]) > 0)
+
+    def test_resource_report_api_denies_resource_instance_access(self):
+        user = User.objects.get(username="ben")
+        self.client.force_login(user)
+        url = reverse(
+            "api_resource_report",
+            args=(str(self.test_prj_user.pk),),
+        )
+
+        self.assertEqual(self.client.get(url).status_code, 200)
+
+        assign_perm("no_access_to_resourceinstance", user, self.test_prj_user)
+        with self.assertLogs("django.request", level="WARNING"):
+            response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 403)
 
     def test_related_resources_in_resource_report_api(self):
         self.client.login(username="admin", password="admin")
@@ -702,6 +754,46 @@ class ResourceAPITests(ArchesTestCase):
                 .data[nodeid],
                 75,
             )
+
+    def test_tiles_endpoint_rejects_resource_reassignment(self):
+        user = User.objects.get(username="admin")
+        self.client.force_login(user)
+        tile = models.TileModel.objects.filter(
+            resourceinstance_id=self.non_legacy_resource_instanceid
+        ).first()
+        original_resource_id = tile.resourceinstance_id
+        original_data = tile.data
+        other_resource = Resource.objects.create(graph=self.data_type_graph)
+        values = json.dumps(
+            {
+                "tileid": str(tile.tileid),
+                "data": {
+                    "e7364d1e-95c4-11e8-9e7c-acde48001122": None,
+                    "f08a3057-95c4-11e8-9761-acde48001122": 75,
+                },
+                "nodegroup_id": str(tile.nodegroup_id),
+                "parenttile_id": None,
+                "resourceinstance_id": str(other_resource.pk),
+                "sortorder": tile.sortorder,
+                "transaction_id": None,
+            }
+        )
+
+        with self.assertLogs("arches.app.views.tile", level="ERROR"):
+            response = self.client.post(
+                reverse("api_tiles", kwargs={"tileid": str(tile.tileid)}),
+                {"data": values},
+            )
+
+        tile.refresh_from_db()
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(
+            json.loads(response.content)["title"],
+            "This tile is associated with a different resource",
+        )
+        self.assertEqual(tile.resourceinstance_id, original_resource_id)
+        self.assertEqual(tile.data, original_data)
+        self.assertFalse(other_resource.tilemodel_set.exists())
 
     def test_tiles_endpoint_request_body(self):
         user = self.test_users["admin"]
