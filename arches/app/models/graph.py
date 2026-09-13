@@ -434,6 +434,7 @@ class Graph(models.GraphModel):
                 id=resource_instance_lifecycle["id"],
                 name=resource_instance_lifecycle["name"],
             )
+            self.resource_instance_lifecycle.save()
 
             resource_instance_lifecycle_states = []
             for resource_instance_lifecycle_state_json in resource_instance_lifecycle[
