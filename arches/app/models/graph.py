@@ -623,14 +623,14 @@ class Graph(models.GraphModel):
                     pk=self.resource_instance_lifecycle.pk
                 )
             ):
+                self.resource_instance_lifecycle.save()
+
                 for (
                     resource_instance_lifecycle_state
                 ) in (
                     self.resource_instance_lifecycle.resource_instance_lifecycle_states.all()
                 ):
                     resource_instance_lifecycle_state.save()
-
-                self.resource_instance_lifecycle.save()
 
             for nodegroup in self._nodegroups_to_delete:
                 nodegroup.delete()
