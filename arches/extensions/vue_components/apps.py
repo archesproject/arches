@@ -7,3 +7,4 @@ class ArchesVueComponentsConfig(AppConfig):
     # model references survive the move into arches.extensions.
     label = "arches_vue_components"
     is_arches_application = True
+    bundled_with_arches = True
