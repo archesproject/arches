@@ -347,3 +347,34 @@ class TriggerLockContentionTests(TestCase):
         event.refresh_from_db()
         self.assertEqual(event.status, "failed")
         self.assertTrue(event.error_message)
+
+
+# The parser's module choices come from the ETLModule table, so this also
+# confirms the migration registered the importer.
+class EtlCommandFlagTests(TestCase):
+    MODULE = "arches-json-importer"
+
+    def _parse(self, *argv):
+        from arches.management.commands.etl import Command
+
+        parser = Command().create_parser("manage.py", "etl")
+        return vars(parser.parse_args([self.MODULE, "-s", "export.jsonl", *argv]))
+
+    def test_overwrite_is_off_and_indexing_on_by_default(self):
+        options = self._parse()
+        self.assertFalse(options["overwrite"])
+        self.assertTrue(options["index"])
+
+    def test_overwrite_short_flag(self):
+        self.assertTrue(self._parse("-ow")["overwrite"])
+
+    def test_overwrite_long_flag(self):
+        self.assertTrue(self._parse("--overwrite")["overwrite"])
+
+    def test_no_index(self):
+        self.assertFalse(self._parse("--no-index")["index"])
+
+    def test_multiprocessing_flags(self):
+        options = self._parse("-mp", "-mxp", "8")
+        self.assertTrue(options["use_multiprocessing"])
+        self.assertEqual(options["max_subprocesses"], 8)
