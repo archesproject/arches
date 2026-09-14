@@ -45,7 +45,7 @@
 
     <!-- ko if: response() -->
     <div class="branch-xl-metadata-container">
-        <div style="display: grid; row-gap: 2px; height:100%; overflow:auto; padding:15px 20px;">
+        <div style="display: grid; row-gap: 2px; height:100%; min-height:0; overflow:auto; padding:15px 20px;">
             <h3 class="branch-xl-title">
                 <span data-bind="text: $root.translations.format + ': ' + $root.translations.archesJsonCap"></span>
             </h3>
@@ -65,11 +65,11 @@
                 </div>
             </div>
 
-            <div class="branch-xl-file-contents-container">
+            <div class="branch-xl-file-contents-container" style="min-height:0;">
                 <h4 class="branch-xl-title">
                     <span data-bind="text: $root.translations.fileContents"></span>
                 </h4>
-                <div style="display: inline-grid; grid-template-columns: auto auto; column-gap: 10px;">
+                <div style="display: grid; grid-template-columns: 1fr auto; column-gap: 10px; max-height: 260px; overflow-y: auto;">
                 <!--ko foreach: {data: Object.keys(response().result.summary.files), as: 'file'}-->
                     <div class="etl-loading-metadata-value" data-bind="text: file"></div>
                     <div class="etl-loading-metadata-key" data-bind="text: $parent.response().result.summary.files[file].size"></div>
