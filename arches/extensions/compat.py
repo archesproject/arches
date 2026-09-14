@@ -15,11 +15,11 @@ import warnings
 
 from django.core.checks import Tags, Warning as CheckWarning, register
 
-MOVED_MODULES = {
-    "arches_querysets": "arches.extensions.querysets",
-    "arches_vue_components": "arches.extensions.vue_components",
-    "arches_controlled_lists": "arches.extensions.controlled_lists",
-}
+from arches.extensions import BUNDLED_APPLICATIONS
+
+#: Former top-level module path -> current one. Identical to
+#: BUNDLED_APPLICATIONS because each application's label is its former name.
+MOVED_MODULES = dict(BUNDLED_APPLICATIONS)
 
 
 class _MovedModuleLoader(importlib.abc.Loader):
