@@ -20,7 +20,7 @@ from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
 from arches.app.utils.string_utils import str_to_bool
 from arches.app.views.api import APIBase
-from arches_controlled_lists.models import (
+from arches.extensions.controlled_lists.models import (
     List,
     ListItem,
     ListItemImage,
@@ -28,8 +28,8 @@ from arches_controlled_lists.models import (
     ListItemValue,
     NodeProxy,
 )
-from arches_controlled_lists.utils.skos import SKOSReader, SKOSWriter
-from arches_controlled_lists.utils.view_utils import (
+from arches.extensions.controlled_lists.utils.skos import SKOSReader, SKOSWriter
+from arches.extensions.controlled_lists.utils.view_utils import (
     _prefetch_terms,
     _shallow_list_items_prefetch,
 )

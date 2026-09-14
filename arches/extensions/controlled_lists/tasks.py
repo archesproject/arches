@@ -17,7 +17,7 @@ def migrate_to_reference_datatype(
     origin,
     language_code,
 ):
-    from arches_controlled_lists.etl_modules.migrate_to_reference_datatype import (
+    from arches.extensions.controlled_lists.etl_modules.migrate_to_reference_datatype import (
         MigrateToReferenceDatatype,
     )
 

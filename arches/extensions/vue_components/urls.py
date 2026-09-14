@@ -1,21 +1,25 @@
 from django.urls import path
 
-from arches_vue_components.apps import ArchesVueComponentsConfig
-from arches_vue_components.views.api.language import LanguageViewWithRequestLanguage
-from arches_vue_components.views.api.map import (
+from arches.extensions.vue_components.apps import ArchesVueComponentsConfig
+from arches.extensions.vue_components.views.api.language import (
+    LanguageViewWithRequestLanguage,
+)
+from arches.extensions.vue_components.views.api.map import (
     FeatureBufferAPI,
     GeoJSONBoundsAPI,
     MapDataAPI,
 )
-from arches_vue_components.views.api.relatable_resources import RelatableResourcesView
-from arches_vue_components.views.api.card_x_node_x_widget import (
+from arches.extensions.vue_components.views.api.relatable_resources import (
+    RelatableResourcesView,
+)
+from arches.extensions.vue_components.views.api.card_x_node_x_widget import (
     CardXNodeXWidgetView,
     CardXNodeXWidgetListFromNodegroupView,
 )
-from arches_vue_components.views.api.concept import ConceptsTreeView
-from arches_vue_components.views.api.settings_api import SettingsAPI
+from arches.extensions.vue_components.views.api.concept import ConceptsTreeView
+from arches.extensions.vue_components.views.api.settings_api import SettingsAPI
 
-from arches_querysets.rest_framework.generic_views import (
+from arches.extensions.querysets.rest_framework.generic_views import (
     ArchesTileBlankView,
     ArchesTileDetailView,
     ArchesTileListCreateView,

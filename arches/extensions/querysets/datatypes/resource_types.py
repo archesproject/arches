@@ -11,7 +11,7 @@ from arches.app.models import models
 
 from django.core.cache import caches
 
-from arches_querysets.conf import settings as qs_settings
+from arches.extensions.querysets.conf import settings as qs_settings
 from django.utils.translation import get_language
 from django.utils.translation import gettext as _
 

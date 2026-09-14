@@ -8,7 +8,7 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.permission_backend import user_can_read_map_layers
 from arches.app.utils.response import JSONResponse
 
-from arches_vue_components.utils.geo_utils import GeoUtils
+from arches.extensions.vue_components.utils.geo_utils import GeoUtils
 
 
 class MapDataAPI(View):

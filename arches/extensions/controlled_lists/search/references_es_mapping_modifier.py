@@ -6,7 +6,7 @@ from arches.app.search.elasticsearch_dsl_builder import (
 )
 from arches.app.search.es_mapping_modifier import EsMappingModifier
 
-from arches_controlled_lists.models import ListItem
+from arches.extensions.controlled_lists.models import ListItem
 
 REFERENCES_INDEX_PATH = "references"
 

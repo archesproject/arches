@@ -5,7 +5,7 @@ from django.core.cache import caches
 
 from arches.app.datatypes import concept_types
 
-from arches_querysets.conf import settings as qs_settings
+from arches.extensions.querysets.conf import settings as qs_settings
 from arches.app.models.models import Value
 from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
 

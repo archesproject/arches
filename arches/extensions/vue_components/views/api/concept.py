@@ -1,6 +1,8 @@
 from django.views.generic import View
 from arches.app.utils.response import JSONResponse
-from arches_vue_components.views.node_config_mixin import CardNodeWidgetConfigMixin
+from arches.extensions.vue_components.views.node_config_mixin import (
+    CardNodeWidgetConfigMixin,
+)
 from arches.app.models.concept import Concept
 
 

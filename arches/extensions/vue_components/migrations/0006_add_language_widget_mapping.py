@@ -1,6 +1,8 @@
 from django.db import migrations
 
-from arches_vue_components.utils.widget_synchronizer import WidgetSynchronizer
+from arches.extensions.vue_components.utils.widget_synchronizer import (
+    WidgetSynchronizer,
+)
 
 
 def add_language_widget_mapping(apps, schema_editor):

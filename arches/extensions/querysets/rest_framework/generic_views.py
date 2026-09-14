@@ -5,16 +5,23 @@ from rest_framework.generics import (
 )
 from rest_framework.parsers import JSONParser
 
-from arches_querysets.rest_framework.multipart_json_parser import MultiPartJSONParser
-from arches_querysets.rest_framework.pagination import ArchesLimitOffsetPagination
-from arches_querysets.rest_framework.permissions import ReadOnly, ResourceEditor
-from arches_querysets.rest_framework.serializers import (
+from arches.extensions.querysets.rest_framework.multipart_json_parser import (
+    MultiPartJSONParser,
+)
+from arches.extensions.querysets.rest_framework.pagination import (
+    ArchesLimitOffsetPagination,
+)
+from arches.extensions.querysets.rest_framework.permissions import (
+    ReadOnly,
+    ResourceEditor,
+)
+from arches.extensions.querysets.rest_framework.serializers import (
     ArchesResourceSerializer,
     ArchesResourceTopNodegroupsSerializer,
     ArchesSingleNodegroupSerializer,
     ArchesTileSerializer,
 )
-from arches_querysets.rest_framework.view_mixins import ArchesModelAPIMixin
+from arches.extensions.querysets.rest_framework.view_mixins import ArchesModelAPIMixin
 
 
 class ArchesResourceListCreateView(ArchesModelAPIMixin, ListCreateAPIView):

@@ -22,8 +22,8 @@ from arches.app.models.models import (
     TileModel,
 )
 
-from arches_querysets.datatypes.datatypes import DataTypeFactory
-from arches_querysets.models import GraphWithPrefetching, ResourceTileTree
+from arches.extensions.querysets.datatypes.datatypes import DataTypeFactory
+from arches.extensions.querysets.models import GraphWithPrefetching, ResourceTileTree
 
 
 class GraphTestCase(TestCase):

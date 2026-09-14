@@ -1,6 +1,6 @@
 from django.urls import path
 
-from arches_controlled_lists.views import (
+from arches.extensions.controlled_lists.views import (
     FilteredListView,
     ListsView,
     ListView,
