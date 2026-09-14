@@ -1,0 +1,32 @@
+{% load i18n %}
+<!-- {% block arches_json_importer_content %} -->
+
+<div class="ep-help-content">
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Import Arches JSON" %}</h4></a>
+        <div class="ep-help-topic-content">
+            <p>
+                {% blocktrans %}Bulk import of Arches JSON business data, built for large loads.
+                Upload a <strong>.json</strong> Arches business-data export, a <strong>.jsonl</strong>
+                file with one resource object per line, or a <strong>.zip</strong> of either.{% endblocktrans %}
+            </p>
+            <p>
+                {% blocktrans %}Prefer .jsonl for very large loads: it streams, whereas a .json file is
+                parsed whole. To convert an existing export:{% endblocktrans %}
+            </p>
+            <pre>jq -c '.business_data.resources[]' export.json &gt; export.jsonl</pre>
+            <p>
+                {% blocktrans %}The file is read twice: once to validate every resource, once to write.
+                Nothing is written if validation turns up any error, so a failed load leaves the
+                database untouched. Failures appear in the standard error report.{% endblocktrans %}
+            </p>
+            <p>
+                {% blocktrans %}Tick <strong>Overwrite resources that already exist</strong> to replace
+                resources whose ids are already in the database. Left unticked, importing a resource id
+                that is already present will fail the load.{% endblocktrans %}
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- {% endblock %} -->
