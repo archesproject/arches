@@ -21,8 +21,8 @@ from arches.app.utils.permission_backend import (
 )
 from arches.app.utils.string_utils import str_to_bool
 
-from arches_querysets.models import TileTree
-from arches_querysets.utils.models import ensure_request
+from arches.extensions.querysets.models import TileTree
+from arches.extensions.querysets.utils.models import ensure_request
 
 
 class MetadataWithWidgetConfig(SimpleMetadata):

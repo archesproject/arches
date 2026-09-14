@@ -21,7 +21,7 @@ from arches.app.search.elasticsearch_dsl_builder import Term, Query
 from arches.app.search.search_engine_factory import SearchEngineInstance
 from arches.app.utils.file_validator import FileValidator
 from arches.app.utils.i18n import rank_label
-from arches_controlled_lists.querysets import (
+from arches.extensions.controlled_lists.querysets import (
     ListQuerySet,
     ListItemQuerySet,
     ListItemImageManager,
@@ -30,7 +30,7 @@ from arches_controlled_lists.querysets import (
 )
 
 if TYPE_CHECKING:
-    from arches_controlled_lists.datatypes.datatypes import ReferenceLabel
+    from arches.extensions.controlled_lists.datatypes.datatypes import ReferenceLabel
 
 
 class List(models.Model):

@@ -25,8 +25,8 @@ from packaging.version import Version
 arches_version = Version(_arches_version_str)
 from arches.app.models.models import ResourceInstance, TileModel
 
-from arches_querysets.datatypes.datatypes import DataTypeFactory
-from arches_querysets.fields import (
+from arches.extensions.querysets.datatypes.datatypes import DataTypeFactory
+from arches.extensions.querysets.fields import (
     CardinalityNConceptListField,
     CardinalityNJSONField,
     CardinalityNResourceInstanceField,
@@ -245,7 +245,7 @@ def get_recursive_prefetches(lookup_str, *, recursive_part="children", depth):
 
 
 def append_tiles_recursively(resource_or_tile):
-    from arches_querysets.models import TileTree
+    from arches.extensions.querysets.models import TileTree
 
     if not vars(resource_or_tile.aliased_data):
         raise RuntimeError("aliased_data is empty")

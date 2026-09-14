@@ -8,7 +8,10 @@ _CACHE_SETTINGS = [
 
 
 class ArchesQuerySetsConfig(AppConfig):
-    name = "arches_querysets"
+    name = "arches.extensions.querysets"
+    # Pinned so that database tables, migration history and app_label-scoped
+    # model references survive the move into arches.extensions.
+    label = "arches_querysets"
     verbose_name = "Arches QuerySets"
     is_arches_application = True
 

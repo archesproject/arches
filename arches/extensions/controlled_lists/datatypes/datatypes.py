@@ -13,7 +13,7 @@ from arches.app.models.models import Node
 from arches.app.models.graph import GraphValidationError
 from arches.app.search.elasticsearch_dsl_builder import Bool, Exists, Term
 
-from arches_controlled_lists.models import ListItem
+from arches.extensions.controlled_lists.models import ListItem
 
 try:
     import rest_framework.fields

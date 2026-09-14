@@ -12,7 +12,7 @@ class ListQuerySet(models.QuerySet):
         return super(ListQuerySet, self).delete(*args, **kwargs)
 
     def annotate_node_fields(self, **kwargs):
-        from arches_controlled_lists.models import NodeProxy
+        from arches.extensions.controlled_lists.models import NodeProxy
 
         queryset = self
         for annotation_name, node_field in kwargs.items():
@@ -37,7 +37,7 @@ class ListItemQuerySet(models.QuerySet):
         return super(ListItemQuerySet, self).delete(*args, **kwargs)
 
     def with_list_item_labels(self):
-        from arches_controlled_lists.models import ListItemValue
+        from arches.extensions.controlled_lists.models import ListItemValue
 
         return self.prefetch_related(
             models.Prefetch(
@@ -48,7 +48,7 @@ class ListItemQuerySet(models.QuerySet):
         )
 
     def annotate_has_children(self):
-        from arches_controlled_lists.models import ListItem
+        from arches.extensions.controlled_lists.models import ListItem
 
         return self.annotate(
             has_children_annotated=Exists(

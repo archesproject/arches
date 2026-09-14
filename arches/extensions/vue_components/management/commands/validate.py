@@ -7,7 +7,9 @@ from arches.management.commands.validate import Command as BaseValidateCommand
 from arches.management.commands.validate import CommandModes
 from arches.app.models.models import Widget
 
-from arches_vue_components.utils.widget_synchronizer import WidgetSynchronizer
+from arches.extensions.vue_components.utils.widget_synchronizer import (
+    WidgetSynchronizer,
+)
 
 IntegrityCheckDescriptions = {
     2001: "Widgets without a mapping to an Arches Vue Components Vue component",

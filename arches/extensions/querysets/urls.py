@@ -1,7 +1,7 @@
 from django.urls import path
 
-from arches_querysets.apps import ArchesQuerySetsConfig
-from arches_querysets.rest_framework.generic_views import (
+from arches.extensions.querysets.apps import ArchesQuerySetsConfig
+from arches.extensions.querysets.rest_framework.generic_views import (
     ArchesResourceBlankView,
     ArchesResourceDetailView,
     ArchesResourceListCreateView,

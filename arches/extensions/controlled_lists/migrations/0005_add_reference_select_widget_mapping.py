@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     # ReferenceSelectWidget's mapping is registered by
     # 0011_add_reference_select_widget_mapping instead, against
-    # arches_vue_components.WidgetMapping. This migration's slot can't be
+    # arches.extensions.vue_components.WidgetMapping. This migration's slot can't be
     # removed since it's already applied on real projects, so it's kept
     # as a no-op.
     operations = [

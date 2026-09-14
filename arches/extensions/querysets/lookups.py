@@ -1,7 +1,7 @@
 from django.db.models.lookups import Lookup, PatternLookup, Transform
 from psycopg2.extensions import AsIs, QuotedString
 
-from arches_querysets.fields import (
+from arches.extensions.querysets.fields import (
     CardinalityNResourceInstanceField,
     CardinalityNResourceInstanceListField,
     CardinalityNLocalizedStringField,

@@ -6,7 +6,7 @@ from arches.app.models import models
 class NodeValueDataType(datatypes.NodeValueDataType):
     def get_display_value(self, tile, node, **kwargs):
         """Backport of Arches 8.1 version that moves value_node query under if gate."""
-        from arches_querysets.datatypes.datatypes import DataTypeFactory
+        from arches.extensions.querysets.datatypes.datatypes import DataTypeFactory
 
         datatype_factory = DataTypeFactory()
         try:

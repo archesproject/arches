@@ -10,7 +10,7 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.skos import SKOSReader, SKOSWriter
-from arches_controlled_lists.models import List, ListItem, ListItemValue
+from arches.extensions.controlled_lists.models import List, ListItem, ListItemValue
 
 # ARCHES namespace is used for project-specific URIs
 ARCHES = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)

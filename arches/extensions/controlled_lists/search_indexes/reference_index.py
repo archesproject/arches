@@ -10,7 +10,7 @@ from arches.app.search.elasticsearch_dsl_builder import (
 from arches.app.search.search_engine_factory import SearchEngineInstance
 from arches.app.models.system_settings import settings
 
-from arches_controlled_lists.models import List
+from arches.extensions.controlled_lists.models import List
 
 
 class ReferenceIndex(BaseIndex):

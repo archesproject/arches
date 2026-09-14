@@ -19,11 +19,11 @@ from arches.app.models.fields.i18n import I18n_JSON, I18n_String
 from arches.app.models.models import GraphModel, Node, NodeGroup
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
-from arches_querysets.datatypes.datatypes import DataTypeFactory
-from arches_querysets.models import AliasedData, ResourceTileTree, TileTree
-from arches_querysets.utils.models import ensure_request
-from arches_querysets.rest_framework.field_mixins import NodeValueMixin
-from arches_querysets.rest_framework.utils import get_nodegroup_alias_lookup
+from arches.extensions.querysets.datatypes.datatypes import DataTypeFactory
+from arches.extensions.querysets.models import AliasedData, ResourceTileTree, TileTree
+from arches.extensions.querysets.utils.models import ensure_request
+from arches.extensions.querysets.rest_framework.field_mixins import NodeValueMixin
+from arches.extensions.querysets.rest_framework.utils import get_nodegroup_alias_lookup
 
 
 def _make_tile_serializer(

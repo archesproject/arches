@@ -11,8 +11,8 @@ from django.core.management.base import CommandError
 
 from arches.management.commands.packages import Command as PackagesCommand
 from arches.app.models import models
-from arches_controlled_lists.models import List, ListItem, ListItemValue
-from arches_controlled_lists.utils.skos import SKOSReader, SKOSWriter
+from arches.extensions.controlled_lists.models import List, ListItem, ListItemValue
+from arches.extensions.controlled_lists.utils.skos import SKOSReader, SKOSWriter
 
 
 class Command(PackagesCommand):

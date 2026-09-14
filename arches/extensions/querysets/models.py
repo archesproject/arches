@@ -23,21 +23,21 @@ from arches.app.models.tile import Tile
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 
-from arches_querysets.bulk_operations.tiles import TileTreeOperation
-from arches_querysets.datatypes.datatypes import DataTypeFactory
-from arches_querysets.lookups import *  # registers lookups
-from arches_querysets.querysets import (
+from arches.extensions.querysets.bulk_operations.tiles import TileTreeOperation
+from arches.extensions.querysets.datatypes.datatypes import DataTypeFactory
+from arches.extensions.querysets.lookups import *  # registers lookups
+from arches.extensions.querysets.querysets import (
     GraphWithPrefetchingQuerySet,
     ResourceTileTreeQuerySet,
     TileTreeManager,
     TileTreeQuerySet,
 )
-from arches_querysets.utils.models import (
+from arches.extensions.querysets.utils.models import (
     append_tiles_recursively,
     ensure_request,
     pop_arches_model_kwargs,
 )
-from arches_querysets.tasks import index_resource
+from arches.extensions.querysets.tasks import index_resource
 import arches.app.utils.task_management as task_management
 
 logger = logging.getLogger(__name__)
@@ -204,7 +204,7 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         """Return a chainable QuerySet for a requested graph's instances,
         with tile data keyed by node and nodegroup aliases.
 
-        See `arches_querysets.querysets.ResourceTileTreeQuerySet.get_tiles`.
+        See `arches.extensions.querysets.querysets.ResourceTileTreeQuerySet.get_tiles`.
         """
         return cls.objects.get_tiles(
             graph_slug,
@@ -371,7 +371,7 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         This reduces the post-save work from O(all tiles) to O(changed tiles),
         which is a major win when editing a single tile in a large resource.
         """
-        from arches_querysets.querysets import reprocess_tiles_aliased_data
+        from arches.extensions.querysets.querysets import reprocess_tiles_aliased_data
 
         # Step 1: Refresh the resource's own scalar fields cheaply (1 DB query).
         # We use ResourceInstance directly (bypassing our overridden refresh_from_db)
@@ -640,7 +640,7 @@ class TileTree(TileModel, AliasedDataMixin):
         nodes=None,
         depth=20,
     ):
-        """See `arches_querysets.querysets.TileTreeQuerySet.get_tiles`."""
+        """See `arches.extensions.querysets.querysets.TileTreeQuerySet.get_tiles`."""
         return cls.objects.get_tiles(
             graph_slug=graph_slug,
             nodegroup_alias=nodegroup_alias,

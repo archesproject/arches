@@ -1,7 +1,7 @@
 from django.db.models import Prefetch
 
 from arches.app.utils.string_utils import str_to_bool
-from arches_controlled_lists.models import ListItem
+from arches.extensions.controlled_lists.models import ListItem
 
 
 def _prefetch_terms(request):

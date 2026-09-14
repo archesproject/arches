@@ -14,8 +14,8 @@ from packaging.version import Version
 arches_version = Version(_arches_version_str)
 from arches.app.models.models import Node
 
-from arches_querysets.datatypes.datatypes import DataTypeFactory
-from arches_querysets.utils.models import (
+from arches.extensions.querysets.datatypes.datatypes import DataTypeFactory
+from arches.extensions.querysets.utils.models import (
     generate_node_alias_expressions,
     get_recursive_prefetches,
 )
@@ -35,7 +35,7 @@ def reprocess_tiles_aliased_data(tiles, as_representation, grouping_node_lookup)
     grouping_node_lookup: {node_pk: grouping_node} for the graph (used to
     re-attach child tiles under the correct alias).
     """
-    from arches_querysets.models import AliasedData
+    from arches.extensions.querysets.models import AliasedData
 
     values_by_datatype = defaultdict(list)
     aliased_data_to_update = {}
@@ -212,7 +212,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
             for an unlisted node -- pass every node whose value you intend to
             read.
         """
-        from arches_querysets.models import GraphWithPrefetching
+        from arches.extensions.querysets.models import GraphWithPrefetching
 
         if nodegroup_alias:
             qs = self.filter(
@@ -318,7 +318,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         Fetch display values in bulk.
         Attach child tiles to parent tiles and vice versa.
         """
-        from arches_querysets.models import AliasedData
+        from arches.extensions.querysets.models import AliasedData
 
         nodes = self._hints.get("nodes")
         node_pks = {node.pk for node in nodes} if nodes is not None else None
@@ -489,7 +489,7 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
             - True: calls to_json() datatype methods
             - False: calls to_python() datatype methods
         """
-        from arches_querysets.models import GraphWithPrefetching, TileTree
+        from arches.extensions.querysets.models import GraphWithPrefetching, TileTree
 
         if graph_query is None:
             graph_query = GraphWithPrefetching.objects.prefetch(graph_slug)
@@ -567,7 +567,7 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         Attach resource instances to all fetched tiles.
         Memoize fetched grouping node aliases (and graph source nodes).
         """
-        from arches_querysets.models import AliasedData, GraphWithPrefetching
+        from arches.extensions.querysets.models import AliasedData, GraphWithPrefetching
 
         if not self._result_cache:
             return

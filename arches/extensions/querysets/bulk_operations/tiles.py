@@ -24,11 +24,11 @@ from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile, TileValidationError
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 
-from arches_querysets.datatypes.datatypes import (
+from arches.extensions.querysets.datatypes.datatypes import (
     DataTypeFactory,
     GeojsonFeatureCollectionDataType,
 )
-from arches_querysets.utils.models import (
+from arches.extensions.querysets.utils.models import (
     field_attnames,
     get_nodegroups_here_and_below,
     pop_arches_model_kwargs,
@@ -340,7 +340,7 @@ class TileTreeOperation:
             self.to_delete.discard(tile)
 
     def _extract_incoming_tiles(self, container, grouping_node):
-        from arches_querysets.models import TileTree
+        from arches.extensions.querysets.models import TileTree
 
         if container is None:
             aliased_data = self.entry.aliased_data
@@ -404,7 +404,7 @@ class TileTreeOperation:
         or the raw value differs from the stored value).  A False result just
         means we fall through to the normal validation path — never a data loss.
         """
-        from arches_querysets.models import AliasedData, TileTree
+        from arches.extensions.querysets.models import AliasedData, TileTree
 
         incoming = tile._incoming_tile
 
@@ -439,7 +439,7 @@ class TileTreeOperation:
     def _validate_and_patch_incoming_values(self, tile, *, nodes):
         """Validate data found on tile._incoming_tile and move it to tile.data.
         Update errors_by_node_alias in place."""
-        from arches_querysets.models import AliasedData, TileTree
+        from arches.extensions.querysets.models import AliasedData, TileTree
 
         for node in nodes:
             if node.datatype == "semantic":
@@ -555,7 +555,7 @@ class TileTreeOperation:
         This situation is a snapshot of an "arrested" refactor that was slowed
         down by the need to support multiple arches versions.
         """
-        from arches_querysets.models import ResourceTileTree
+        from arches.extensions.querysets.models import ResourceTileTree
 
         # Instantiate proxy models for now, but TODO: expose this
         # functionality on vanilla models, and in bulk.
@@ -730,7 +730,7 @@ class TileTreeOperation:
         error_names = [name.strip() for name in error.message.split(":")[1].split(", ")]
         aliases = []
 
-        from arches_querysets.models import TileTree
+        from arches.extensions.querysets.models import TileTree
 
         if isinstance(self.entry, TileTree):
             nodes = self.entry.resourceinstance.graph.node_set.all()

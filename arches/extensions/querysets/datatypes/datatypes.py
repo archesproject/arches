@@ -9,8 +9,8 @@ from arches.app.datatypes.datatypes import (
     GeojsonFeatureCollectionDataType,
 )
 
-from arches_querysets.datatypes import *
-from arches_querysets.fields import (
+from arches.extensions.querysets.datatypes import *
+from arches.extensions.querysets.fields import (
     ConceptListField,
     DomainListField,
     LocalizedStringField,

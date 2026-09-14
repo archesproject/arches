@@ -18,8 +18,8 @@ from arches.app.models.models import (
     User,
 )
 from arches.app.models.system_settings import settings as settings
-from arches_controlled_lists.models import List, ListItem, ListItemValue
-from arches_controlled_lists.etl_modules.migrate_to_reference_datatype import (
+from arches.extensions.controlled_lists.models import List, ListItem, ListItemValue
+from arches.extensions.controlled_lists.etl_modules.migrate_to_reference_datatype import (
     MigrateToReferenceDatatype,
 )
 
