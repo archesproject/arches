@@ -253,6 +253,9 @@ class BaseImportModule:
                 try:
                     self.stage_files(files, summary, cursor)
                 except Exception as e:
+                    # The generic message below replaces the original, so
+                    # without this a failed load reports no reason at all.
+                    logger.exception(e)
                     load_event = LoadEvent.objects.get(loadid=loadid)
                     load_event.status = "failed"
                     load_event.successful = False
