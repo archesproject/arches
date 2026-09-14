@@ -3,6 +3,8 @@ import uuid
 import os, sys
 from http import HTTPStatus
 
+from slugify import slugify
+from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -288,7 +290,8 @@ class ListTests(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK, response.content)
         self.assertEqual(
             response["Content-Disposition"],
-            'attachment; filename="arches_controlled_lists_controlled_lists.xml"',
+            f'attachment; filename="'
+            f'{slugify(settings.APP_NAME, separator="_")}_controlled_lists.xml"',
         )
         self.assertIn(b"<rdf:RDF", response.content)
         self.assertIn(b"<skos:ConceptScheme", response.content)

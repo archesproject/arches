@@ -27,7 +27,7 @@ from arches.extensions.controlled_lists.management.commands.controlled_lists imp
     Command as ControlledListsCommand,
 )
 
-from .constants import PROJECT_TEST_ROOT, TEST_PACKAGE_DIR
+from .constants import APP_ROOT, PROJECT_TEST_ROOT, TEST_PACKAGE_DIR
 
 # these tests can be run from the command line via
 # python manage.py test tests.extensions.controlled_lists.cli_tests --settings="tests.test_settings"
@@ -990,7 +990,7 @@ class MigrateTileDataToReferenceDatatypeTests(TestCase):
         from arches.management.commands.etl_module import Command as ETLModuleCommand
 
         cmd = ETLModuleCommand()
-        cmd.register(source=str(Path(settings.APP_ROOT) / "etl_modules" / module_name))
+        cmd.register(source=str(Path(APP_ROOT) / "etl_modules" / module_name))
 
     def setUp(cls):
         """setUpClass doesn't work because the rollback fixture is applied after that."""
