@@ -20,6 +20,7 @@ import uuid
 from unittest import mock
 
 from django.contrib.auth.models import Group, User
+from django.db import connection
 from guardian.models import GroupObjectPermission, UserObjectPermission
 from guardian.shortcuts import assign_perm, get_perms
 
@@ -1494,6 +1495,16 @@ class GraphTests(ArchesTestCase):
         )
         graph.delete_draft_graph()
         graph.add_resource_instance_lifecycle(resource_instance_lifecycle)
+
+        # The FK from resource_instance_lifecycle_states to resource_instance_lifecycles
+        # is DEFERRABLE INITIALLY DEFERRED, so an incorrect insert order (states saved
+        # before their parent lifecycle) isn't caught until the constraints are actually
+        # checked, which normally happens at COMMIT. TestCase only ever rolls back its
+        # wrapping transaction, so without forcing the check here (immediately after
+        # add_resource_instance_lifecycle, before graph.save() runs and could paper over
+        # an out-of-order save by saving the parent later on) this regression is invisible.
+        connection.check_constraints()
+
         graph.save()
 
         lifecycle = models.ResourceInstanceLifecycle.objects.get(
