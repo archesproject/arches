@@ -1,8 +1,8 @@
-import { definePreset, palette } from "@primeuix/themes";
+import { definePreset, palette } from "@openvue/themes";
 
 // eslint-disable-next-line
 // @ts-ignore: This is a workaround for PrimeVue theme import issues after v1.20
-import Aura from "@primeuix/themes/aura";
+import Aura from "@openvue/themes/aura";
 
 const archesColors = Object.freeze({
     blue: "#579ddb",
