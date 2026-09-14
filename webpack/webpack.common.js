@@ -47,7 +47,7 @@ module.exports = () => {
 
         let PROJECT_RELATIVE_NODE_MODULES_PATH;
         if (APP_ROOT.includes(ROOT_DIR)) {  // should only return truthy for running Arches-core without a project
-            PROJECT_RELATIVE_NODE_MODULES_PATH = Path.resolve(APP_ROOT, '..', 'node_modules');
+            PROJECT_RELATIVE_NODE_MODULES_PATH = Path.resolve(APP_ROOT, '..', '..', 'node_modules');
         }
         else {
             PROJECT_RELATIVE_NODE_MODULES_PATH = Path.resolve(APP_ROOT, '..', 'node_modules');
