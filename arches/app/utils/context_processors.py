@@ -68,8 +68,8 @@ def map_info(request):
             "hex_bin_size": (
                 settings.HEX_BIN_SIZE if settings.HEX_BIN_SIZE is not None else 100
             ),
-            "mapbox_sprites": settings.MAPBOX_SPRITES,
-            "mapbox_glyphs": settings.MAPBOX_GLYPHS,
+            "maplibre_sprites": settings.MAPLIBRE_SPRITES,
+            "maplibre_glyphs": settings.MAPLIBRE_GLYPHS,
             "hex_bin_bounds": json.dumps(hex_bin_bounds),
             "geocoder_default": settings.DEFAULT_GEOCODER,
             "preferred_coordinate_systems": JSONSerializer().serialize(

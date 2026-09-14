@@ -316,7 +316,7 @@ export default ko.components.register(componentName, {
                                 self.mapLinkData({
                                     properties: result._source,
                                 });
-                                self.shiftFocus("canvas.mapboxgl-canvas");
+                                self.shiftFocus("canvas.maplibregl-canvas");
                             },
                             selected: ko.computed(function () {
                                 return (
