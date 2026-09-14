@@ -14,6 +14,7 @@ class ArchesQuerySetsConfig(AppConfig):
     label = "arches_querysets"
     verbose_name = "Arches QuerySets"
     is_arches_application = True
+    bundled_with_arches = True
 
 
 @register(Tags.caches)
