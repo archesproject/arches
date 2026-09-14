@@ -2,7 +2,7 @@ import os
 
 from django.conf import settings
 
-from arches.settings_utils import list_arches_app_names, list_arches_app_paths
+from arches.settings_utils import list_arches_app_labels, list_arches_app_paths
 from arches.app.utils.frontend_configuration_utils.get_base_path import get_base_path
 
 
@@ -12,7 +12,7 @@ def generate_tsconfig_paths():
     project_path = os.path.join("..", os.path.basename(base_path), "src")
 
     path_lookup = dict(
-        zip(list_arches_app_names(), list_arches_app_paths(), strict=True)
+        zip(list_arches_app_labels(), list_arches_app_paths(), strict=True)
     )
 
     return {

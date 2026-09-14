@@ -10,7 +10,7 @@ from arches.extensions.querysets.rest_framework.generic_views import (
     ArchesTileListCreateView,
 )
 
-app_name = ArchesQuerySetsConfig.name
+app_name = ArchesQuerySetsConfig.label
 urlpatterns = [
     path(
         "api/resource/<slug:graph>",

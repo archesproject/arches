@@ -25,7 +25,7 @@ from arches.extensions.querysets.rest_framework.generic_views import (
     ArchesTileListCreateView,
 )
 
-app_name = ArchesVueComponentsConfig.name
+app_name = ArchesVueComponentsConfig.label
 
 urlpatterns = [
     path("api/map-data", MapDataAPI.as_view(), name="api-map-data"),

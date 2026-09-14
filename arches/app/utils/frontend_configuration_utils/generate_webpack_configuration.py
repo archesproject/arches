@@ -3,14 +3,14 @@ import sysconfig
 
 from django.conf import settings
 
-from arches.settings_utils import list_arches_app_names, list_arches_app_paths
+from arches.settings_utils import list_arches_app_labels, list_arches_app_paths
 
 
 def generate_webpack_configuration():
     app_root_path = os.path.realpath(settings.APP_ROOT)
     root_dir_path = os.path.realpath(settings.ROOT_DIR)
 
-    arches_app_names = list_arches_app_names()
+    arches_app_names = list_arches_app_labels()
     arches_app_paths = list_arches_app_paths()
 
     return {
