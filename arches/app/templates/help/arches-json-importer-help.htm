@@ -45,7 +45,7 @@
             <p>{% trans "Flags:" %}</p>
             <ul>
                 <li><code>-s</code>, <code>--source</code> — {% trans "the .json, .jsonl or .zip file to load. Required." %}</li>
-                <li><code>-o</code>, <code>--overwrite</code> — {% trans "replace resources that already exist instead of failing on them." %}</li>
+                <li><code>-ow</code>, <code>--overwrite</code> — {% trans "replace resources that already exist instead of failing on them." %}</li>
                 <li><code>--no-index</code> — {% trans "write the data but skip indexing; reindex later with index_database." %}</li>
                 <li><code>-mp</code>, <code>--use_multiprocessing</code> — {% trans "index across several processes after loading." %}</li>
                 <li><code>-mxp N</code>, <code>--max_subprocesses N</code> — {% trans "how many processes to index with. Defaults to half the CPU count." %}</li>
@@ -55,7 +55,7 @@
                 {% blocktrans %}A large overnight load, overwriting existing resources and indexing on
                 eight processes:{% endblocktrans %}
             </p>
-            <pre>python manage.py etl arches-json-importer -s export.jsonl -o -mp -mxp 8</pre>
+            <pre>python manage.py etl arches-json-importer -s export.jsonl -ow -mp -mxp 8</pre>
             <p>
                 {% blocktrans %}Multiprocessed indexing is deliberately not offered in the panel above.
                 A load larger than the module's size limit is handed to a Celery worker, whose processes

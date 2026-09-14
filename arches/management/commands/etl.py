@@ -50,7 +50,7 @@ class Command(BaseCommand):
             help="The configuration for the etl-module to run",
         )
         parser.add_argument(
-            "-o",
+            "-ow",
             "--overwrite",
             action="store_true",
             dest="overwrite",
@@ -112,7 +112,7 @@ class Command(BaseCommand):
     ):
         """
         Run the specified module
-        Params --source(-s), --config(-c), --overwrite(-o), --no-index,
+        Params --source(-s), --config(-c), --overwrite(-ow), --no-index,
         --use_multiprocessing(-mp), and --max_subprocesses(-mxp)
 
         """
