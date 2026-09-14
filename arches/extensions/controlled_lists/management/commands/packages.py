@@ -1,0 +1,392 @@
+import os
+import sys
+import glob
+import pyprind
+import uuid
+
+import openpyxl
+from django.db import transaction
+from django.db.models import Q
+from django.core.management.base import CommandError
+
+from arches.management.commands.packages import Command as PackagesCommand
+from arches.app.models import models
+from arches_controlled_lists.models import List, ListItem, ListItemValue
+from arches_controlled_lists.utils.skos import SKOSReader, SKOSWriter
+
+
+class Command(PackagesCommand):
+
+    def add_arguments(self, parser):
+        super().add_arguments(parser)
+
+        idx_of_operation_arg = [a.dest for a in parser._actions].index("operation")
+        parser._actions[idx_of_operation_arg].choices.extend(
+            ["import_controlled_lists", "export_controlled_lists"]
+        )
+
+        parser.add_argument(
+            "-fn",
+            "--file_name",
+            type=str,
+            dest="file_name",
+            help="The name of the file to export to. Default is the first (or only) controlled list that is being exported",
+        )
+
+        parser.add_argument(
+            "-cl",
+            "--controlled_lists",
+            type=str,
+            dest="controlled_lists",
+            help="A comma-separated list of controlled list names to export. "
+            "If not provided, all controlled lists will be exported. "
+            "For SKOS/RDF-XML, use the -single_file flag to export all controlled lists to a single file.",
+        )
+
+    def handle(self, *args, **options):
+        super().handle(self, *args, **options)
+
+        if options["operation"] == "import_controlled_lists":
+            self.import_controlled_lists(options["source"], options["overwrite"])
+
+        if options["operation"] == "export_controlled_lists":
+            file_name = options.get("file_name", None)
+            single_file = options.get("single_file", False)
+            parsed_lists = (
+                [lst.strip() for lst in options["controlled_lists"].split(",")]
+                if options["controlled_lists"]
+                else []
+            )
+
+            if (
+                options["file_name"]
+                and not options["single_file"]
+                and len(parsed_lists) > 1
+            ):
+                raise CommandError(
+                    "The file_name argument cannot be used when the single_file flag is set to false. \
+                    Please provide a file_name only when batch exporting controlled lists or a single list."
+                )
+
+            self.export_controlled_lists(
+                options["dest_dir"],
+                file_name,
+                parsed_lists,
+                options["format"],
+                single_file,
+            )
+
+    def load_package(
+        self,
+        source,
+        setup_db=False,
+        overwrite_concepts="ignore",
+        bulk_load=False,
+        stage_concepts="keep",
+        yes=False,
+        dev=False,
+        defer_indexing=True,
+        is_application=False,
+    ):
+
+        super().load_package(
+            source,
+            setup_db=setup_db,
+            overwrite_concepts=overwrite_concepts,
+            bulk_load=bulk_load,
+            stage_concepts=stage_concepts,
+            yes=yes,
+            dev=dev,
+            defer_indexing=defer_indexing,
+            is_application=is_application,
+        )
+
+    def load_concepts(self, package_dir, overwrite, stage, defer_indexing):
+        super().load_concepts(package_dir, overwrite, stage, defer_indexing)
+        print("Importing controlled lists...")
+        self._import_controlled_lists_from_dir(package_dir, overwrite or "overwrite")
+
+    def import_controlled_lists(self, source, overwrite_options):
+        if os.path.isdir(source):
+            self._import_controlled_lists_from_dir(source, overwrite_options)
+        elif os.path.isfile(source):
+            self._import_controlled_list_from_file(source, overwrite_options)
+            print('Successfully imported "{0}"'.format(source))
+        else:
+            self.stdout.write(
+                "The source file or directory does not exist. Please rerun this command with a valid source file or directory."
+            )
+            sys.exit()
+
+    def _import_controlled_lists_from_dir(self, dir, overwrite_options):
+        file_types = ["*.xml", "*.xlsx"]
+        reference_data_dir = os.path.join(dir, "reference_data", "controlled_lists")
+        search_dir = reference_data_dir if os.path.isdir(reference_data_dir) else dir
+        controlled_list_files = []
+        for file_type in file_types:
+            controlled_list_files.extend(glob.glob(os.path.join(search_dir, file_type)))
+
+        bar = (
+            pyprind.ProgBar(
+                len(controlled_list_files), bar_char="█", stream=self.stdout
+            )
+            if len(controlled_list_files) > 1
+            else None
+        )
+
+        for path in controlled_list_files:
+            if bar is None:
+                self.stdout.write(path)
+            self._import_controlled_list_from_file(path, overwrite_options)
+            if bar is not None:
+                head, tail = os.path.split(path)
+                bar.update(item_id=tail + (" " * 10))
+
+    def _import_controlled_list_from_file(self, source, overwrite_options):
+        if source.lower().endswith(".xml"):
+            skos = SKOSReader()
+            rdf = skos.read_file(source)
+            skos.save_controlled_lists_from_skos(
+                rdf, overwrite_options=overwrite_options
+            )
+
+        elif source.lower().endswith(".xlsx"):
+            created_instances_pks = []
+            if os.path.exists(source):
+                wb = openpyxl.load_workbook(source)
+                with transaction.atomic():
+                    for sheet in wb.sheetnames:
+                        if sheet == "List":
+                            created_instances_pks.extend(
+                                self.import_sheet_to_model(wb[sheet], List)
+                            )
+                        elif sheet == "ListItem":
+                            created_instances_pks.extend(
+                                self.import_sheet_to_model(wb[sheet], ListItem)
+                            )
+                        elif sheet == "ListItemValue":
+                            created_instances_pks.extend(
+                                self.import_sheet_to_model(wb[sheet], ListItemValue)
+                            )
+                    # validate all data
+                    for model in [
+                        List,
+                        ListItem,
+                        ListItemValue,
+                    ]:
+                        for instance in model.objects.filter(
+                            pk__in=created_instances_pks
+                        ):
+                            instance.full_clean()
+                    self.stdout.write(
+                        "Data imported successfully from {0}".format(source)
+                    )
+        else:
+            self.stdout.write(
+                "The source file does not exist or is not the correct format. Please rerun this command with a valid source file."
+            )
+
+    def import_sheet_to_model(self, sheet, model):
+        fields = [
+            {"name": field.name, "is_fk": field.get_internal_type() == "ForeignKey"}
+            for field in model._meta.fields
+        ]
+        field_names = [field["name"] for field in fields]
+
+        # Parse the sheet into a list of dictionaries
+        import_table = []
+        for imported_row in sheet.iter_rows(min_row=2, values_only=True):
+            working_row = {}
+            for field in field_names:
+                working_row[field] = imported_row[field_names.index(field)]
+            import_table.append(working_row)
+
+        # Process row data and create instances of the model
+        instances = []
+        instance_pks = []
+        list_items_with_parent = {}
+        for row in import_table:
+            instance = model()
+            for field in fields:
+                is_fk = field["is_fk"]
+                field_name = field["name"]
+                value = row[field_name] if row[field_name] else None  # might be ''
+                if value and is_fk and model is ListItem:
+                    if field_name == "list":
+                        related_list = List.objects.get(id=value)
+                        setattr(instance, field_name, related_list)
+                    elif field_name == "parent":
+                        # stash list items with parent relationships to create relationships after all list items have been created
+                        # stashed object in the form of {child_list_item_instance : parent_list_item_pk, ...}
+                        list_items_with_parent[instance] = value
+                elif value and is_fk and model is ListItemValue:
+                    if field_name == "valuetype":
+                        valuetype = models.DValueType.objects.get(valuetype=value)
+                        setattr(instance, field_name, valuetype)
+                    elif field_name == "language":
+                        try:
+                            related_language = models.Language.objects.get(code=value)
+                            setattr(instance, field_name, related_language)
+                        except models.Language.DoesNotExist:
+                            self.stderr.write(
+                                f"Language with code {value} does not exist. Please create this language before importing these data."
+                            )
+                            sys.exit()
+                    else:
+                        related_list_item = ListItem.objects.get(id=value)
+                        setattr(instance, field_name, related_list_item)
+                else:
+                    setattr(instance, field_name, value)
+
+            # run validation on all non-parent fields & gather for bulk create
+            instance.clean_fields(exclude={"parent"})
+            instances.append(instance)
+            instance_pks.append(instance.pk)
+
+        model.objects.bulk_create(instances)
+
+        if model is ListItem:
+            # Create list item relationships after all list items have been created
+            for child, parent in list_items_with_parent.items():
+                child.parent = ListItem.objects.get(id=parent)
+                child.clean_fields(
+                    exclude={
+                        field["name"] for field in fields if field["name"] != "parent"
+                    }
+                )
+                child.save()
+
+        return instance_pks
+
+    def _validate_controlled_lists(self, controlled_lists):
+        not_found = []
+        resolved_lists = []
+        for list_identifier in controlled_lists:
+            try:
+                list_uuid = uuid.UUID(list_identifier)
+                resolved_list = List.objects.filter(id=list_uuid).first()
+            except ValueError:
+                resolved_list = List.objects.filter(name=list_identifier).first()
+            if resolved_list is None:
+                not_found.append(list_identifier)
+            else:
+                resolved_lists.append(resolved_list)
+
+        if not_found:
+            raise CommandError(
+                "The following controlled lists were not found: " + ", ".join(not_found)
+            )
+
+        return resolved_lists
+
+    def export_controlled_lists(
+        self, data_dest, file_name, controlled_lists, format, single_file
+    ):
+        if format == "xlsx":
+            wb = openpyxl.Workbook()
+            ws = wb.active
+            ws.title = "List"
+            self.export_model_to_sheet(ws, List)
+            self.export_model_to_sheet(wb, ListItem)
+            self.export_model_to_sheet(wb, ListItemValue)
+
+            if data_dest != "" and data_dest != ".":
+                wb.save(os.path.join(data_dest, f"{file_name}.xlsx"))
+                self.stdout.write(f"Data exported successfully to {file_name}.xlsx")
+            else:
+                self.stdout.write(
+                    "No destination directory specified. Please rerun this command with the '-d' parameter populated."
+                )
+
+        elif format == "skos-rdf":
+            if controlled_lists and controlled_lists != [""]:
+                export_lists = self._validate_controlled_lists(controlled_lists)
+            else:
+                export_lists = list(List.objects.all())
+
+            if single_file:
+                export_list_items = ListItem.objects.filter(
+                    list__in=export_lists
+                ).prefetch_related("list_item_values", "parent", "children")
+
+                self._write_to_skos_file(
+                    export_lists,
+                    export_list_items,
+                    data_dest,
+                    file_name or self._slugify(export_lists[0].name),
+                )
+
+            elif not single_file:
+                for controlled_list in export_lists:
+                    export_list_items = ListItem.objects.filter(
+                        list=controlled_list
+                    ).prefetch_related("list_item_values", "parent", "children")
+
+                    self._write_to_skos_file(
+                        [controlled_list],
+                        export_list_items,
+                        data_dest,
+                        self._slugify(controlled_list.name),
+                    )
+
+        else:
+            self.stdout.write(
+                f"The specified format {format} is not supported. Please rerun this command with a supported format."
+            )
+
+    def _write_to_skos_file(
+        self, export_lists, export_list_items, data_dest, file_name
+    ):
+        skos = SKOSWriter()
+        skos_file = skos.write_controlled_lists(
+            export_lists, export_list_items, format="pretty-xml"
+        )
+
+        if data_dest != "" and data_dest != ".":
+            with open(
+                os.path.join(data_dest, f"{file_name}.xml"), "w", encoding="utf-8"
+            ) as file:
+                file.write(skos_file)
+            self.stdout.write(f"Data exported successfully to {file_name}.xml")
+
+    def _slugify(self, value):
+        return value.lower().replace(" ", "_").replace("/", "_")
+
+    def export_model_to_sheet(self, wb, model):
+        # For the first sheet (List), use blank sheet that is initiallized with workbook
+        # otherwise, append a new sheet
+        if isinstance(wb, openpyxl.worksheet.worksheet.Worksheet):
+            ws = wb
+        else:
+            ws = wb.create_sheet(title=model.__name__)
+        fields = [
+            {"name": field.name, "datatype": field.get_internal_type()}
+            for field in model._meta.fields
+        ]
+        ws.append(field["name"] for field in fields)
+        for instance in model.objects.all():
+            row_data = []
+            for field in fields:
+                value = getattr(instance, field["name"])
+                if isinstance(
+                    value,
+                    (
+                        List,
+                        ListItem,
+                        ListItemValue,
+                    ),
+                ):
+                    row_data.append(str(getattr(value, "id")) if value else "")
+                elif isinstance(value, models.Language):
+                    row_data.append(str(value.code))
+                elif isinstance(value, models.DValueType):
+                    row_data.append(str(value.valuetype))
+                elif field["datatype"] == "UUIDField":
+                    row_data.append(str(value) if value else "")
+                elif field["datatype"] == "BooleanField":
+                    row_data.append("1" if value else "0")
+                elif field["datatype"] == "IntegerField":
+                    row_data.append(str(value))
+                else:
+                    row_data.append(value if value else "")
+            ws.append(row_data)
