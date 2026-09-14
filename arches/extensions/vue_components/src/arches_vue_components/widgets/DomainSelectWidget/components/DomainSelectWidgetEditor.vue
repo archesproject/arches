@@ -1,0 +1,45 @@
+<script setup lang="ts">
+import Select from "primevue/select";
+
+import { buildDomainAliasedNodeData } from "@/arches_vue_components/datatypes/domain/utils.ts";
+
+import type {
+    DomainAliasedNodeData,
+    DomainCardXNodeXWidgetData,
+} from "@/arches_vue_components/datatypes/domain/types.ts";
+
+const { aliasedNodeData, cardXNodeXWidgetData = undefined } = defineProps<{
+    cardXNodeXWidgetData?: DomainCardXNodeXWidgetData;
+    aliasedNodeData: DomainAliasedNodeData | null;
+}>();
+
+const options = cardXNodeXWidgetData?.node.config.options ?? [];
+
+const emit = defineEmits<{
+    (
+        event: "update:aliasedNodeData",
+        updatedValue: DomainAliasedNodeData,
+    ): void;
+}>();
+
+function onUpdateModelValue(updatedValue: string | null) {
+    emit(
+        "update:aliasedNodeData",
+        buildDomainAliasedNodeData(updatedValue, options),
+    );
+}
+</script>
+
+<template>
+    <Select
+        option-value="id"
+        option-label="text"
+        :input-id="cardXNodeXWidgetData?.node.alias"
+        :options="options"
+        :placeholder="cardXNodeXWidgetData?.config.placeholder"
+        :fluid="true"
+        :show-clear="true"
+        :model-value="aliasedNodeData?.node_value ?? null"
+        @update:model-value="onUpdateModelValue($event)"
+    />
+</template>

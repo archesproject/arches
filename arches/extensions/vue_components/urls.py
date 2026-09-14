@@ -1,0 +1,76 @@
+from django.urls import path
+
+from arches_vue_components.apps import ArchesVueComponentsConfig
+from arches_vue_components.views.api.language import LanguageViewWithRequestLanguage
+from arches_vue_components.views.api.map import (
+    FeatureBufferAPI,
+    GeoJSONBoundsAPI,
+    MapDataAPI,
+)
+from arches_vue_components.views.api.relatable_resources import RelatableResourcesView
+from arches_vue_components.views.api.card_x_node_x_widget import (
+    CardXNodeXWidgetView,
+    CardXNodeXWidgetListFromNodegroupView,
+)
+from arches_vue_components.views.api.concept import ConceptsTreeView
+from arches_vue_components.views.api.settings_api import SettingsAPI
+
+from arches_querysets.rest_framework.generic_views import (
+    ArchesTileBlankView,
+    ArchesTileDetailView,
+    ArchesTileListCreateView,
+)
+
+app_name = ArchesVueComponentsConfig.name
+
+urlpatterns = [
+    path("api/map-data", MapDataAPI.as_view(), name="api-map-data"),
+    path("api/settings", SettingsAPI.as_view(), name="api-settings"),
+    path("api/feature-buffer", FeatureBufferAPI.as_view(), name="api-feature-buffer"),
+    path("api/geojson-bounds", GeoJSONBoundsAPI.as_view(), name="api-geojson-bounds"),
+    path(
+        "api/languages-with-request-language",
+        LanguageViewWithRequestLanguage.as_view(),
+        name="api-languages-with-request-language",
+    ),
+    path(
+        "api/relatable-resources/<slug:graph>/<slug:node_alias>",
+        RelatableResourcesView.as_view(),
+        name="api-relatable-resources",
+    ),
+    path(
+        "api/card-x-node-x-widget-data/<slug:graph_slug>/<slug:node_alias>",
+        CardXNodeXWidgetView.as_view(),
+        name="api-card-x-node-x-widget",
+    ),
+    path(
+        "api/card-x-node-x-widget-list-from-nodegroup/<slug:graph_slug>/<slug:nodegroup_alias>",
+        CardXNodeXWidgetListFromNodegroupView.as_view(),
+        name="api-card-x-node-x-widget-list-from-nodegroup",
+    ),
+    path(
+        "api/concepts/<slug:graph_slug>/<slug:node_alias>",
+        ConceptsTreeView.as_view(),
+        name="api-concepts-tree",
+    ),
+    path(
+        "api/tile/<slug:graph>/<slug:nodegroup_alias>/blank",
+        ArchesTileBlankView.as_view(),
+        name="api-tile-blank",
+    ),
+    path(
+        "api/tile/<slug:graph>/<slug:nodegroup_alias>/<uuid:pk>",
+        ArchesTileDetailView.as_view(),
+        name="api-tile",
+    ),
+    path(
+        "api/tile-list-create/<slug:graph>/<slug:nodegroup_alias>/<uuid:pk>",
+        ArchesTileListCreateView.as_view(),
+        name="api-tile-list-create",
+    ),
+    path(
+        "api/tile-new-resource/<slug:graph>/<slug:nodegroup_alias>",
+        ArchesTileListCreateView.as_view(),
+        name="api-tile-new-resource",
+    ),
+]
