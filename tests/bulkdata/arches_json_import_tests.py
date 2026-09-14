@@ -1,7 +1,10 @@
+import uuid
+from unittest.mock import patch
+
 from django.contrib.auth.models import User
 from django.test import SimpleTestCase, TestCase
 
-from arches.app.models.models import ETLModule, LoadEvent
+from arches.app.models.models import ETLModule, LoadEvent, NodeGroup
 from arches.app.etl_modules.arches_json_importer import (
     ArchesJsonImporter,
     DB_CHECK_BATCH_SIZE,
@@ -152,6 +155,38 @@ class TileNodegroupTests(SimpleTestCase):
         )
         self.assertEqual(errors, [])
 
+    def _collect(self, cardinality, parenttile_id=None):
+        keys = {}
+        graph = {
+            "graphid": self.GRAPH,
+            "cardinality": {self.NODEGROUP: cardinality},
+            "constraints": {},
+            "nodes": {},
+        }
+        tile = {"tileid": "t1", "nodegroup_id": self.NODEGROUP, "data": {}}
+        if parenttile_id:
+            tile["parenttile_id"] = parenttile_id
+        _bare_importer()._validate_tile(
+            tile, "resource-1", graph, "data.json", {}, keys
+        )
+        return keys
+
+    # Without this key nothing reaches _check_existing_cardinality, so a second
+    # tile on a single-value nodegroup would be written unnoticed.
+    def test_single_value_nodegroup_registers_a_cardinality_key(self):
+        keys = self._collect("1")
+        self.assertEqual(list(keys), [("resource-1", self.NODEGROUP, None)])
+        self.assertEqual(keys[("resource-1", self.NODEGROUP, None)], ["t1"])
+
+    def test_multi_value_nodegroup_registers_nothing(self):
+        self.assertEqual(self._collect("n"), {})
+
+    # Cardinality on a child nodegroup is per parent tile, so sibling tiles under
+    # different parents must not share a key.
+    def test_the_parent_tile_is_part_of_the_key(self):
+        keys = self._collect("1", parenttile_id="parent-1")
+        self.assertEqual(list(keys), [("resource-1", self.NODEGROUP, "parent-1")])
+
 
 class ValidationMemoTests(SimpleTestCase):
     NODE = "3f0f1a44-0000-4000-8000-00000000000a"
@@ -260,6 +295,36 @@ class UnknownReferenceTests(TestCase):
         failures = [self._failure(error="missing graph_id", message="missing graph_id")]
         ArchesJsonImporter._demote_unknown_references(failures)
         self.assertEqual(failures[0]["message"], "missing graph_id")
+
+    # The counterpart to the two above: a real id must reach load_errors, or the
+    # error report loses its node attribution for every genuine failure.
+    def test_a_known_nodegroup_keeps_its_foreign_key(self):
+        nodegroup = NodeGroup.objects.create(nodegroupid=uuid.uuid4())
+        failures = [self._failure(nodegroupid=str(nodegroup.nodegroupid))]
+        ArchesJsonImporter._demote_unknown_references(failures)
+
+        self.assertEqual(failures[0]["nodegroupid"], str(nodegroup.nodegroupid))
+        self.assertEqual(failures[0]["message"], "something was wrong")
+
+
+# _in_batches is only worth anything if the callers actually use it.
+class BatchedQueryTests(TestCase):
+    def test_the_legacyid_lookup_is_issued_one_batch_at_a_time(self):
+        importer = _bare_importer()
+        legacyids = {
+            "legacy-{}".format(i): (str(uuid.uuid4()), "data.json") for i in range(5)
+        }
+        with patch(
+            "arches.app.etl_modules.arches_json_importer.DB_CHECK_BATCH_SIZE", 2
+        ):
+            with self.assertNumQueries(3):
+                importer._check_existing_legacyids(legacyids)
+
+    def test_one_batch_is_one_query(self):
+        importer = _bare_importer()
+        legacyids = {"legacy-1": (str(uuid.uuid4()), "data.json")}
+        with self.assertNumQueries(1):
+            importer._check_existing_legacyids(legacyids)
 
 
 # Tile triggers are disabled database-wide, so a second concurrent load is
