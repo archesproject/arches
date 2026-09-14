@@ -48,6 +48,31 @@ def list_arches_app_paths():
     ]
 
 
+def list_arches_app_labels_and_paths():
+    """Label to source path for every Arches application, installed or bundled.
+
+    Bundled applications are included whether or not a project enables them.
+    Their source always ships with arches, so their frontend path aliases are
+    always resolvable, and arches' own type checking needs them even though no
+    project has put them in INSTALLED_APPS.
+
+    This is for path resolution only. Webpack entry points, templates and
+    static files still come from installed applications alone, so that a
+    disabled application contributes nothing to a build.
+    """
+    from arches.extensions import BUNDLED_APPLICATIONS
+
+    lookup = dict(zip(list_arches_app_labels(), list_arches_app_paths(), strict=True))
+    extensions_dir = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "extensions"
+    )
+    for label, dotted_path in BUNDLED_APPLICATIONS.items():
+        lookup.setdefault(
+            label, os.path.join(extensions_dir, dotted_path.rpartition(".")[2])
+        )
+    return lookup
+
+
 def build_staticfiles_dirs(*, app_root=None, additional_directories=None):
     """
     Builds a STATICFILES_DIRS tuple for this project (additional_directories,
