@@ -10,6 +10,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db.models import F, Q
 from django.http import HttpRequest
+from django.utils import timezone
 from django.utils.translation import gettext as _
 from arches.app.models import models
 from arches.app.utils import import_class_from_string
@@ -452,6 +453,51 @@ def load_json_ld(userid, files, summary, result, temp_dir, loadid, moduleid):
         status = _("Failed")
     finally:
         msg = _("JSON-LD Import: {} [{}]").format(summary["name"], status)
+        user = User.objects.get(id=userid)
+        notify_completion(msg, user)
+
+
+@shared_task
+def load_arches_json(userid, files, summary, result, temp_dir, loadid, moduleid):
+    from arches.app.etl_modules import arches_json_importer
+
+    logger = logging.getLogger(__name__)
+
+    # The finally clause reports this, so it must hold a value on every path out.
+    status = _("Failed")
+    try:
+        importer = arches_json_importer.ArchesJsonImporter(
+            loadid=loadid,
+            temp_dir=temp_dir,
+            userid=userid,
+            moduleid=moduleid,
+        )
+        # No multiprocessing here: a celery prefork worker's processes are
+        # daemonic, so multiprocessing.Pool raises and indexing never runs.
+        # Fan-out belongs to the CLI, where manage.py etl -mp passes it through.
+        importer.run_load_task(userid, files, summary, result, temp_dir, loadid)
+
+        load_event = models.LoadEvent.objects.get(loadid=loadid)
+        status = _("Completed") if load_event.status == "indexed" else _("Failed")
+    except Exception as e:
+        logger.error(e, exc_info=True)
+        # Nothing else records this, so without error_message an exception
+        # raised outside validation leaves the report saying "no errors found".
+        models.LoadEvent.objects.filter(loadid=loadid).update(
+            status="failed", error_message=str(e)
+        )
+        status = _("Failed")
+    except BaseException:
+        # revoke(terminate=True) raises outside the Exception hierarchy, which
+        # would leave the event on "running" -- the badge's "Validating".
+        logger.info("Arches JSON Import cancelled: loadid=%s", loadid)
+        models.LoadEvent.objects.filter(loadid=loadid).update(
+            status="cancelled", load_end_time=timezone.now()
+        )
+        status = _("Cancelled")
+        raise
+    finally:
+        msg = _("Arches JSON Import: {} [{}]").format(summary["name"], status)
         user = User.objects.get(id=userid)
         notify_completion(msg, user)
 
