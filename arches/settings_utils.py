@@ -25,6 +25,21 @@ def list_arches_app_names():
     ]
 
 
+def list_arches_app_labels():
+    """Stable public identifiers for Arches applications.
+
+    Used for URL namespaces and frontend asset paths, which must not change
+    when an application's Python module path does. For applications installed
+    as their own top-level package the label equals the module name; bundled
+    applications under arches.extensions pin it to their former name.
+    """
+    return [
+        config.label
+        for config in apps.get_app_configs()
+        if getattr(config, "is_arches_application", False)
+    ]
+
+
 def list_arches_app_paths():
     return [
         os.path.realpath(config.module.__path__[0])
