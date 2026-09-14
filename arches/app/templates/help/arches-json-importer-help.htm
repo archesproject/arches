@@ -56,6 +56,12 @@
                 eight processes:{% endblocktrans %}
             </p>
             <pre>python manage.py etl arches-json-importer -s export.jsonl -o -mp -mxp 8</pre>
+            <p>
+                {% blocktrans %}Multiprocessed indexing is deliberately not offered in the panel above.
+                A load larger than the module's size limit is handed to a Celery worker, whose processes
+                cannot themselves start child processes, so a pool there would leave the data written but
+                never indexed. Use the command line when you want indexing spread across cores.{% endblocktrans %}
+            </p>
         </div>
     </div>
 </div>
