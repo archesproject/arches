@@ -82,6 +82,13 @@
                     <input type="checkbox" data-bind="checked: overwrite" />
                     <span data-bind="text: $root.translations.overwriteExistingResources"></span>
                 </label>
+                <label>
+                    <input type="checkbox" data-bind="checked: index" />
+                    <span data-bind="text: $root.translations.indexAfterImport"></span>
+                </label>
+                <!-- ko ifnot: index -->
+                <div class="etl-loading-metadata-key" data-bind="text: $root.translations.reindexLater"></div>
+                <!-- /ko -->
             </div>
         </div>
     </div>
