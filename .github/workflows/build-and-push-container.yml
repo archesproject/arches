@@ -1,0 +1,275 @@
+# Build and Push Container Image
+#
+# Triggered by pushing to a deploy branch: deploy/<environment>
+# The branch suffix must match a GitHub Environment configured on this repo.
+#
+# Each GitHub Environment requires the following variables:
+#   ECR_REPOSITORY  - e.g. mysite-repository
+#   AWS_ROLE    - e.g. arn:aws:iam::123456789012:role/my-github-role
+#   AWS_REGION    - e.g. us-west-1
+#
+# The following must be set as repository-level variables (not environment-scoped),
+# unless the scaffolded defaults baked into the build-args below are correct:
+#   ARCHES_PROJECT      - e.g. arches-myproject
+#   ARCHES_PROJECT_PACKAGE  - e.g. arches_myproject
+#
+# Optional, and normally unset:
+#   ARCHES_DOCKER_REF   - overrides .runtime/arches-docker-ref, for changing the
+#                         pin without a commit. Shadows the file until removed.
+#
+# The arches-docker release is read from .runtime/arches-docker-ref. The bare
+# .arches-docker-ref at the project root is where the pin used to live and is
+# still read as a fallback, so moving the file is a standalone commit.
+# Two forms are accepted, and both name exactly one commit:
+#
+#   v1.2.3                    a release tag
+#   <40-char sha>             a commit
+#
+# Nothing that floats is accepted — not branches, and not release lines like v1
+# or v1.2. All of them break the property this pin exists for: the same project
+# commit must rebuild the same image. A floating pin also leaves nothing that
+# records what a given build actually compiled.
+#
+# The tag is resolved to its commit SHA in the setup job below, both arch builds
+# consume that same SHA, and it is stamped onto the image as
+# com.fargeo.arches-docker.{ref,sha} labels — so a retagged release cannot change
+# what a build compiled, and `docker inspect` answers "what did this image build
+# against?" without the Actions log.
+#
+# Local builds do not read this file. They build from the developer's own
+# arches-docker checkout; `make status` reports that tree next to this
+# pin so the difference is visible. CI is what builds the image that deploys.
+#
+# And a repository secret:
+#   FARGEO_PAT  - GitHub PAT with read access to fargeo/arches-docker
+
+name: Build and Push Container Image
+
+on:
+  push:
+    branches:
+      - "deploy/*"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.env.outputs.name }}
+      arches_docker_ref: ${{ steps.infra.outputs.ref }}
+      arches_docker_sha: ${{ steps.infra.outputs.sha }}
+    steps:
+      # Needed only for the pin file, so the default shallow fetch is enough.
+      - name: Check out project
+        uses: actions/checkout@v5
+
+      - name: Extract environment from branch
+        id: env
+        run: echo "name=${GITHUB_REF_NAME#deploy/}" >> $GITHUB_OUTPUT
+
+      # Resolve the arches-docker ref here, before any build job starts, so a
+      # missing or malformed ref fails once and fast rather than once per arch —
+      # and so both arch builds check out the same commit even if a release lands
+      # mid-run. An unset ref is especially dangerous to pass through:
+      # actions/checkout treats an empty `ref` as "use the default branch", which
+      # would silently restore the floating-on-main behaviour this step prevents.
+      - name: Resolve and validate arches-docker ref
+        id: infra
+        env:
+          # The committed .runtime/arches-docker-ref is the pin. The repository
+          # variable is an override for changing a pin without a commit; it is
+          # empty in the normal case, and the file is authoritative then.
+          ARCHES_DOCKER_REF_OVERRIDE: ${{ vars.ARCHES_DOCKER_REF }}
+          GH_TOKEN: ${{ secrets.FARGEO_PAT }}
+        run: |
+          set -euo pipefail
+
+          if [ -n "${ARCHES_DOCKER_REF_OVERRIDE}" ]; then
+            ARCHES_DOCKER_REF="${ARCHES_DOCKER_REF_OVERRIDE}"
+            echo "::notice::Using ARCHES_DOCKER_REF repository variable '${ARCHES_DOCKER_REF}', which overrides the committed .runtime/arches-docker-ref."
+          elif [ -f .runtime/arches-docker-ref ]; then
+            ARCHES_DOCKER_REF="$(tr -d '[:space:]' < .runtime/arches-docker-ref)"
+          elif [ -f .arches-docker-ref ]; then
+            # Legacy location: the pin used to live at the project root.
+            ARCHES_DOCKER_REF="$(tr -d '[:space:]' < .arches-docker-ref)"
+            echo "::notice::Read the pin from the legacy .arches-docker-ref at the project root. Re-run arches-docker's scaffold/init-project.sh to move it to .runtime/arches-docker-ref."
+          else
+            ARCHES_DOCKER_REF=""
+          fi
+
+          if [ -z "${ARCHES_DOCKER_REF}" ]; then
+            echo "::error::No arches-docker pin. Commit a .runtime/arches-docker-ref holding a release tag (v1.2.3) or a full 40-character commit SHA — re-running arches-docker's scaffold/init-project.sh writes one. See arches-docker scaffold/README.md."
+            exit 1
+          fi
+
+          # Resolve to a commit SHA in every case, including for an exact tag: a
+          # tag can be moved, a commit cannot, and checking out the SHA means a
+          # retagged release cannot change what this build compiled.
+          resolve_tag() {
+            # $1 is the tag to look up exactly.
+            gh api --paginate repos/fargeo/arches-docker/tags \
+              --jq ".[] | select(.name == \"$1\") | .commit.sha" | head -1
+          }
+
+          case "${ARCHES_DOCKER_REF}" in
+            v[0-9]*.[0-9]*.[0-9]*)
+              if [[ ! "${ARCHES_DOCKER_REF}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                echo "::error::arches-docker pin is '${ARCHES_DOCKER_REF}', which is not a valid release tag. Use vMAJOR.MINOR.PATCH."
+                exit 1
+              fi
+              VERSION="${ARCHES_DOCKER_REF}"
+              SHA=$(resolve_tag "${VERSION}")
+              if [ -z "${SHA}" ]; then
+                echo "::error::arches-docker has no tag ${VERSION}."
+                exit 1
+              fi
+              ;;
+            *)
+              if [[ ! "${ARCHES_DOCKER_REF}" =~ ^[0-9a-f]{40}$ ]]; then
+                echo "::error::arches-docker pin is '${ARCHES_DOCKER_REF}', which is neither a release tag (v1.2.3) nor a full 40-character commit SHA. Branch names and release lines (v1, v1.2) are not accepted — they do not name a fixed commit."
+                exit 1
+              fi
+              VERSION="${ARCHES_DOCKER_REF}"
+              SHA="${ARCHES_DOCKER_REF}"
+              ;;
+          esac
+
+          echo "Building against arches-docker ${VERSION} (${SHA})"
+          echo "ref=${VERSION}" >> $GITHUB_OUTPUT
+          echo "sha=${SHA}" >> $GITHUB_OUTPUT
+          echo "arches-docker \`${VERSION}\` (\`${SHA}\`)" >> $GITHUB_STEP_SUMMARY
+
+  build:
+    name: Build (${{ matrix.slug }})
+    needs: setup
+    runs-on: ${{ matrix.runner }}
+    environment: ${{ needs.setup.outputs.environment }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-latest
+            slug: amd64
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+            slug: arm64
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v5
+        with:
+          path: project
+
+      # The resolved commit, not the ref that selected it: a tag moved between
+      # the setup job and here cannot change what this build compiles.
+      - name: Checkout arches-docker
+        uses: actions/checkout@v5
+        with:
+          repository: fargeo/arches-docker
+          ref: ${{ needs.setup.outputs.arches_docker_sha }}
+          token: ${{ secrets.FARGEO_PAT }}
+          path: arches-docker
+
+      - name: Prepare build context
+        run: |
+          mkdir -p project/.runtime
+          cp arches-docker/entrypoint.sh project/.runtime/entrypoint.sh
+          cp arches-docker/restore-tables.sh project/.runtime/restore-tables.sh
+          cp arches-docker/supervisor.conf project/.runtime/supervisor.conf
+          cp arches-docker/settings_local.py project/.runtime/settings_local.py
+          cp -r arches-docker/conf.d project/.runtime/
+          cp -r arches-docker/nginx project/.runtime/
+          cp -r arches-docker/scaffold/templates/.runtime/internal project/.runtime/
+          # build_deps.sh is project-owned and required by the Dockerfile COPY —
+          # create it if this project hasn't scaffolded one yet, but never
+          # overwrite an existing (committed) one.
+          mkdir -p project/.runtime/hooks
+          [ -f project/.runtime/hooks/build_deps.sh ] || cp arches-docker/scaffold/templates/.runtime/hooks/build_deps.sh project/.runtime/hooks/build_deps.sh
+          chmod +x project/.runtime/hooks/build_deps.sh
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build and push by digest
+        id: build
+        uses: docker/build-push-action@v7
+        with:
+          context: ./project
+          file: arches-docker/production/Dockerfile.alpine
+          platforms: ${{ matrix.platform }}
+          outputs: type=image,name=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }},push-by-digest=true,name-canonical=true,push=true
+          cache-from: type=registry,ref=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}:cache-${{ matrix.slug }}
+          cache-to: type=registry,ref=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}:cache-${{ matrix.slug }},mode=max
+          build-args: |
+            ARCHES_PROJECT=${{ vars.ARCHES_PROJECT || 'arches' }}
+            ARCHES_PROJECT_PACKAGE=${{ vars.ARCHES_PROJECT_PACKAGE || 'arches' }}
+          # What this image built against, so `docker inspect` (or an ECR
+          # image-config read) answers it without the Actions log. The SHA is the
+          # authoritative half: a release can be retagged, a commit cannot.
+          labels: |
+            com.fargeo.arches-docker.ref=${{ needs.setup.outputs.arches_docker_ref }}
+            com.fargeo.arches-docker.sha=${{ needs.setup.outputs.arches_docker_sha }}
+
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v7
+        with:
+          name: digest-${{ matrix.slug }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  merge:
+    name: Merge manifests
+    runs-on: ubuntu-latest
+    needs: [setup, build]
+    environment: ${{ needs.setup.outputs.environment }}
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v8.0.1
+        with:
+          path: /tmp/digests
+          pattern: digest-*
+          merge-multiple: true
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Create and push manifest list
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ needs.setup.outputs.environment }}-${{ github.sha }}
+        run: |
+          REPO="${ECR_REGISTRY}/${{ vars.ECR_REPOSITORY }}"
+          docker buildx imagetools create \
+          -t "${REPO}:${IMAGE_TAG}" \
+          $(printf "${REPO}@sha256:%s " $(ls /tmp/digests/))

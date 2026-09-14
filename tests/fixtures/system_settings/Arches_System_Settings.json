@@ -101,8 +101,8 @@
                 "nodegroup_id": "0e8fe457-4148-11e7-9c10-c4b301baab9f",
                 "sortorder": 0,
                 "data": {
-                    "0e90031e-4148-11e7-a176-c4b301baab9f": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
-                    "0e900254-4148-11e7-9902-c4b301baab9f": "mapbox://sprites/mapbox/basic-v9",
+                    "0e90031e-4148-11e7-a176-c4b301baab9f": "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf",
+                    "0e900254-4148-11e7-9902-c4b301baab9f": "",
                     "0e9000b0-4148-11e7-bd19-c4b301baab9f": ""
                 },
                 "tileid": "f49e37b3-3686-4fbd-98c9-ab8241f72a60"
