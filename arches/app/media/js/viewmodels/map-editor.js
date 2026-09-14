@@ -9,7 +9,7 @@ import geojsonhint from "geojsonhint";
 import { kml } from "togeojson";
 import shp from "shpjsesm";
 import proj4 from "proj4";
-import MapboxDraw from "mapbox-gl-draw";
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import MapComponentViewModel from "views/components/map";
 import selectFeatureLayersFactory from "views/components/cards/select-feature-layers";
 import geojsonFeatureCollection from "views/components/datatypes/geojson-feature-collection";

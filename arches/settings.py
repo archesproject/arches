@@ -764,11 +764,13 @@ FILE_TYPES = [
 FILENAME_GENERATOR = "arches.app.utils.storage_filename_generator.generate_filename"
 UPLOADED_FILES_DIR = "uploadedfiles"
 
-MAPBOX_API_KEY = ""  # Put your Mapbox key here!
+MAPBOX_API_KEY = ""  # Put your Mapbox key here! Used by the built-in Mapbox geocoder.
 
-# links to sprites and glyphs for use on map
-MAPBOX_SPRITES = "mapbox://sprites/mapbox/basic-v9"
-MAPBOX_GLYPHS = "mapbox://fonts/mapbox/{fontstack}/{range}.pbf"
+# links to sprites and glyphs for use on map. MapLibre GL JS does not require
+# an API key; these default to Maptoolkit's free tile/font/sprite service,
+# which also backs the default "streets" basemap (see db_data.sql).
+MAPLIBRE_SPRITES = "https://icons.maptoolkit.org/sprite"
+MAPLIBRE_GLYPHS = "https://fonts.maptoolkit.org/{fontstack}/{range}.pbf"
 
 DEFAULT_MAP_ZOOM = 0
 MAP_MIN_ZOOM = 0
@@ -935,6 +937,8 @@ PERMISSION_DEFAULTS = {}
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
 ##########################################
+
+os.environ.setdefault("ARCHES_SITE_ID", APP_NAME)
 
 try:
     from .settings_local import *

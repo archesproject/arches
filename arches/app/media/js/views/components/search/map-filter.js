@@ -12,8 +12,8 @@ import geohash from 'geohash';
 import geojsonExtent from 'geojson-extent';
 import uuid from 'uuid';
 import geojsonhint from 'geojsonhint';
-import mapbox from 'mapbox-gl';
-import mbdraw from 'mapbox-gl-draw';
+import * as maplibre from 'maplibre-gl';
+import mbdraw from '@mapbox/mapbox-gl-draw';
 
 
 var componentName = 'map-filter';
@@ -30,7 +30,7 @@ const viewModel = BaseFilter.extend({
             }
         }
 
-        self.mapboxgl = mapbox;
+        self.maplibregl = maplibre;
         self.MapboxDraw = mbdraw;
         self.dependenciesLoaded(true);
 
@@ -145,7 +145,7 @@ const viewModel = BaseFilter.extend({
                 geoJSON.features = geoJSON.features.slice(0, 1);
                 if(geoJSON.features.length > 0){
                     var extent = geojsonExtent(geoJSON);
-                    var bounds = new this.mapboxgl.LngLatBounds(extent);
+                    var bounds = new this.maplibregl.LngLatBounds(extent);
                     this.mapFitBounds(bounds, {
                         padding: parseInt(this.buffer(), 10)
                     });
@@ -309,7 +309,7 @@ const viewModel = BaseFilter.extend({
             if (self.filter.feature_collection() && self.filter.feature_collection()['features'].length > 0) {
                 var geojsonFC = self.filter.feature_collection();
                 var extent = geojsonExtent(geojsonFC);
-                var bounds = new this.mapboxgl.LngLatBounds(extent);
+                var bounds = new this.maplibregl.LngLatBounds(extent);
                 self.mapFitBounds(bounds, {
                     padding: self.buffer()
                 });
@@ -512,7 +512,7 @@ const viewModel = BaseFilter.extend({
                 "features": []
             }
         });
-        var bounds = new this.mapboxgl.LngLatBounds(geojsonExtent(mapData.geom));
+        var bounds = new this.maplibregl.LngLatBounds(geojsonExtent(mapData.geom));
         var maxZoom = ko.unwrap(this.maxZoom);
         this.mapFitBounds(bounds, {
             maxZoom: maxZoom > 17 ? 17 : maxZoom

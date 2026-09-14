@@ -1843,7 +1843,7 @@
                     "sourcebranchpublication_id": null
                 },
                 {
-                    "alias": "mapbox_sprites",
+                    "alias": "maplibre_sprites",
                     "config": {},
                     "datatype": "string",
                     "description": "Represents a single node in a graph",
@@ -1856,7 +1856,7 @@
                     "isrequired": false,
                     "issearchable": false,
                     "istopnode": false,
-                    "name": "MAPBOX_SPRITES",
+                    "name": "MAPLIBRE_SPRITES",
                     "nodegroup_id": "0e8fe457-4148-11e7-9c10-c4b301baab9f",
                     "nodeid": "0e900254-4148-11e7-9902-c4b301baab9f",
                     "ontologyclass": null,
@@ -1866,7 +1866,7 @@
                     "sourcebranchpublication_id": null
                 },
                 {
-                    "alias": "mapbox_glyphs",
+                    "alias": "maplibre_glyphs",
                     "config": {},
                     "datatype": "string",
                     "description": "Represents a single node in a graph",
@@ -1879,7 +1879,7 @@
                     "isrequired": false,
                     "issearchable": false,
                     "istopnode": false,
-                    "name": "MAPBOX_GLYPHS",
+                    "name": "MAPLIBRE_GLYPHS",
                     "nodegroup_id": "0e8fe457-4148-11e7-9c10-c4b301baab9f",
                     "nodeid": "0e90031e-4148-11e7-a176-c4b301baab9f",
                     "ontologyclass": null,

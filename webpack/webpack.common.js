@@ -57,7 +57,11 @@ module.exports = () => {
         // BEGIN create entry point configurations
 
         const archesCoreEntryPointConfiguration = buildFilepathLookup(Path.resolve(__dirname, ROOT_DIR, 'app', 'media', 'js'));
-        const projectEntryPointConfiguration = buildFilepathLookup(Path.resolve(__dirname, APP_ROOT, 'media', 'js'));
+
+        const runningWithoutProject = APP_ROOT.includes(ROOT_DIR);
+        const projectEntryPointConfiguration = runningWithoutProject
+            ? {}
+            : buildFilepathLookup(Path.resolve(__dirname, APP_ROOT, 'media', 'js'));
 
         const archesApplicationsEntrypointConfiguration = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => {
             return {
@@ -418,8 +422,34 @@ module.exports = () => {
                         loader: Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'vue-loader'),
                     },
                     {
+                        // maplibre-gl loads its tile-parsing worker as a separate script at
+                        // runtime; emit it as a standalone static asset so `new URL(...)`
+                        // resolves to a real, fetchable file instead of being inlined.
+                        test: /maplibre-gl-worker(-dev)?\.mjs$/,
+                        type: 'asset/resource',
+                        generator: {
+                            filename: 'js/[name][ext]',
+                        },
+                    },
+                    {
+                        // the worker script above imports this module by relative path at
+                        // *runtime*, a path webpack can't see (it never parses inside an
+                        // asset/resource file), so it must be emitted alongside it as a real
+                        // file too. Bindings code triggers this explicitly with a `?asset`
+                        // suffix; the plain (no-query) import used by the main-thread bundle
+                        // still gets bundled normally by the rule below.
+                        test: /maplibre-gl-shared(-dev)?\.mjs$/,
+                        resourceQuery: /asset/,
+                        type: 'asset/resource',
+                        generator: {
+                            filename: 'js/[name][ext]',
+                        },
+                    },
+                    {
                         test: /\.mjs$/,
                         include: /node_modules/,
+                        exclude: /maplibre-gl-worker(-dev)?\.mjs$/,
+                        resourceQuery: { not: /asset/ },
                         type: 'javascript/auto',
                     },
                     {
