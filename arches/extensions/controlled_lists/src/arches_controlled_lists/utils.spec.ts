@@ -8,7 +8,7 @@ import {
     rankLabel,
     reorderItems,
 } from "@/arches_controlled_lists/utils.ts";
-import { controlled_lists } from "../../../tests/fixtures/data/sample_list_api_response.json";
+import { controlled_lists } from "./__fixtures__/sample_list_api_response.json";
 
 import type { Label } from "@/arches_controlled_lists/types";
 
