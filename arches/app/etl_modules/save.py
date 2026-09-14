@@ -163,7 +163,8 @@ def _post_save_edit_log(
             with connection.cursor() as cursor:
                 log_event_details(cursor, loadid, "done|Indexing...")
 
-            logger.debug("Indexing resources by transaction for loadid=%s", loadid)
+        logger.debug("Indexing resources by transaction for loadid=%s", loadid)
+        if index:
             index_resources_by_transaction(
                 loadid,
                 use_multiprocessing=multiprocessing,
@@ -171,11 +172,9 @@ def _post_save_edit_log(
                 recalculate_descriptors=True,
                 max_subprocesses=max_subprocesses,
             )
-            logger.debug(
-                "Indexing complete for loadid=%s; fetching user id=%s", loadid, userid
-            )
-        else:
-            logger.debug("Skipping indexing for loadid=%s (index=False)", loadid)
+        logger.debug(
+            "Indexing complete for loadid=%s; fetching user id=%s", loadid, userid
+        )
 
         user = User.objects.get(id=userid)
         user_email = getattr(user, "email", "")
@@ -209,7 +208,7 @@ def _post_save_edit_log(
                 ),
             )
             log_event_details(cursor, loadid, "done")
-            final_status = "indexed" if index else "completed"
+            final_status = "indexed" if index else "unindexed"
             cursor.execute(
                 """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
                 (final_status, datetime.now(), True, True, loadid),

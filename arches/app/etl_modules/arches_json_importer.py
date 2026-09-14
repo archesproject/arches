@@ -118,7 +118,8 @@ class ArchesJsonImporter(BaseImportModule):
     def start(self, request):
         self.temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         options = {
-            "overwrite": request.POST.get("overwrite") in ("true", "True", True),
+            "overwrite": self._flag(request, "overwrite"),
+            "index": self._flag(request, "index", default=True),
         }
         LoadEvent.objects.create(
             loadid=self.loadid,
@@ -130,6 +131,13 @@ class ArchesJsonImporter(BaseImportModule):
             load_details={"config": options},
         )
         return {"success": True, "data": {"started": True, "message": ""}}
+
+    @staticmethod
+    def _flag(request, name, default=False):
+        raw = request.POST.get(name)
+        if raw is None:
+            return default
+        return raw in ("true", "True", True)
 
     def _load_options(self):
         details = (
@@ -596,7 +604,9 @@ class ArchesJsonImporter(BaseImportModule):
     # Only the overwrite=False path reaches the checks below, and a 331k-resource
     # load asks them about ~4.2M tiles -- past Postgres' bind-parameter limit.
     @staticmethod
-    def _in_batches(items, size=DB_CHECK_BATCH_SIZE):
+    def _in_batches(items, size=None):
+        # Read at call time, not bound as a default, so a test can shrink it.
+        size = size or DB_CHECK_BATCH_SIZE
         items = list(items)
         for start in range(0, len(items), size):
             yield items[start : start + size]
@@ -877,7 +887,9 @@ class ArchesJsonImporter(BaseImportModule):
     def save_to_tiles(
         self, cursor, userid, loadid, multiprocessing=False, max_subprocesses=0
     ):
-        self._overwrite = bool(self._load_options().get("overwrite"))
+        options = self._load_options()
+        self._overwrite = bool(options.get("overwrite"))
+        index = options.get("index", True)
         chunk_size = settings.BULK_IMPORT_BATCH_SIZE
         # edit_log.newvalue duplicates the tile data (~0.9KB/tile; ~4GB on a
         # 4.5M-tile load).  Reversal never reads it -- reverse_edit_log_entries
@@ -941,7 +953,7 @@ class ArchesJsonImporter(BaseImportModule):
             status="completed", load_end_time=timezone.now()
         )
         response = _post_save_edit_log(
-            userid, loadid, multiprocessing, max_subprocesses
+            userid, loadid, multiprocessing, max_subprocesses, index=index
         )
 
         # _post_save_edit_log stamps its finish through raw SQL with a naive
