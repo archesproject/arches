@@ -1,7 +1,6 @@
 from django.db import migrations
 from django.db.models import F, Max
 
-
 ARCHES_JSON_IMPORT_MODULE_PK = "0a1c9d67-8b4e-4f2a-9d31-6c5b2e7a4f18"
 
 
@@ -34,7 +33,7 @@ class Migration(migrations.Migration):
                     "celeryByteSizeLimit": 100000,
                     "logTileValues": False,
                 },
-                "reversible": True,
+                "reversible": False,  # does not support un-overwriting a resource
                 "slug": "arches-json-importer",
                 "description": "Import Arches JSON business data in bulk",
                 "helptemplate": "arches-json-importer-help",
