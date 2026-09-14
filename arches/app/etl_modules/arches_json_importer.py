@@ -231,8 +231,6 @@ class ArchesJsonImporter(BaseImportModule):
 
     # -------------------------------------------------------------- streaming
 
-    # .jsonl streams a line at a time; .json is parsed whole, which is why very
-    # large loads should be supplied as .jsonl.
     def _iter_resources(self, filename):
         path = os.path.join(self.temp_dir, os.path.basename(filename))
         if filename.lower().endswith(".jsonl"):
@@ -500,7 +498,6 @@ class ArchesJsonImporter(BaseImportModule):
         if memo_key is not None:
             node_memo = self.validated_data.setdefault(nodeid, {})
             if len(node_memo) >= MEMO_MAX_VALUES_PER_NODE:
-                # High-cardinality node: the memo will never pay for itself.
                 self._memo_disabled_nodes.add(nodeid)
                 self.validated_data.pop(nodeid, None)
             else:
@@ -615,8 +612,6 @@ class ArchesJsonImporter(BaseImportModule):
             group = constraint_candidates.setdefault((nodegroupid, tuple(node_ids)), {})
             group.setdefault(json.dumps(values, sort_keys=True), []).append(resourceid)
 
-    # Bounded by the distinct candidate values in the import rather than by the
-    # size of the tiles table.
     def _check_global_constraints(self, constraint_candidates):
         failures = []
         for (nodegroupid, node_ids), group in constraint_candidates.items():
@@ -891,6 +886,13 @@ class ArchesJsonImporter(BaseImportModule):
         log_tile_values = bool(self.config.get("logTileValues", False))
 
         if not self._acquire_trigger_lock(cursor):
+            contention = _(
+                "Another bulk load is already running; only one may hold the "
+                "tile triggers at a time."
+            )
+            LoadEvent.objects.filter(loadid=loadid).update(
+                status="failed", load_end_time=timezone.now(), error_message=contention
+            )
             return {
                 "status": 409,
                 "success": False,
@@ -1045,8 +1047,6 @@ class ArchesJsonImporter(BaseImportModule):
 
     # ------------------------------------------------- set-based postprocess
 
-    # File links, resource relationships and geometries, all scoped by
-    # transaction rather than done per tile.
     def _post_process(self, loadid):
         with connection.cursor() as cursor:
             # Create any missing File rows and point them at their tile.  This
