@@ -1,5 +1,7 @@
+from django.contrib.auth.models import User
 from django.test import SimpleTestCase, TestCase
 
+from arches.app.models.models import ETLModule, LoadEvent
 from arches.app.etl_modules.arches_json_importer import (
     ArchesJsonImporter,
     DB_CHECK_BATCH_SIZE,
@@ -258,3 +260,25 @@ class UnknownReferenceTests(TestCase):
         failures = [self._failure(error="missing graph_id", message="missing graph_id")]
         ArchesJsonImporter._demote_unknown_references(failures)
         self.assertEqual(failures[0]["message"], "missing graph_id")
+
+
+# Tile triggers are disabled database-wide, so a second concurrent load is
+# refused. It must still be moved off "running", which the badge reads as
+# "Validating", and told why.
+class TriggerLockContentionTests(TestCase):
+    def test_a_refused_load_is_marked_failed_with_a_reason(self):
+        user = User.objects.create_user("lock-contention-tester")
+        module = ETLModule.objects.get(slug="arches-json-importer")
+        event = LoadEvent.objects.create(user=user, etl_module=module, status="running")
+
+        importer = _bare_importer()
+        importer.loadid = str(event.loadid)
+        importer.config = {}
+        importer._acquire_trigger_lock = lambda cursor: False
+
+        result = importer.save_to_tiles(None, user.id, event.loadid)
+
+        self.assertEqual(result["status"], 409)
+        event.refresh_from_db()
+        self.assertEqual(event.status, "failed")
+        self.assertTrue(event.error_message)
