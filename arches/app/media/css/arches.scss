@@ -9,7 +9,7 @@
 @import url(node_modules/lt-themify-icons/themify-icons.css);
 @import url(node_modules/chosen-js/chosen.css);
 @import url(node_modules/select-woo/dist/css/selectWoo.min.css);
-@import url(node_modules/mapbox-gl/dist/mapbox-gl.css);
+@import url(node_modules/maplibre-gl/dist/maplibre-gl.css);
 @import url(node_modules/nouislider/distribute/nouislider.min.css);
 @import url(node_modules/codemirror/lib/codemirror.css);
 @import url(node_modules/codemirror/theme/monokai.css);
@@ -19,7 +19,7 @@
 @import url(node_modules/leaflet/dist/leaflet.css);
 @import url(node_modules/leaflet-draw/dist/leaflet.draw.css);
 @import url(../css/tree/tree.css);
-@import url(node_modules/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
+@import url(node_modules/@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css);
 @import url(node_modules/leaflet.fullscreen/Control.FullScreen.css);
 @import url(../css/base-manager.css);
 @import "abstracts";
@@ -8694,7 +8694,7 @@ a.clear-geojson-button:hover {
     display: flex;
 }
 
-.mapboxgl-canvas:focus {
+.maplibregl-canvas:focus {
     outline: none;
 }
 
@@ -8707,28 +8707,28 @@ a.clear-geojson-button:hover {
     background: steelblue;
 }
 
-.mapboxgl-ctrl-top-left .mapboxgl-ctrl {
+.maplibregl-ctrl-top-left .maplibregl-ctrl {
     visibility: hidden;
 }
 
-.mapboxgl-ctrl-geocoder--input {
+.maplibregl-ctrl-geocoder--input {
     font-size: 1.3rem;
     @include break-at(mobile) {
         height: 30px;
     }
 }
 
-.mapboxgl-ctrl-geocoder--icon-search {
+.maplibregl-ctrl-geocoder--icon-search {
     @include break-at(mobile) {
         top: 5px;
     }
 }
 
-.workbench-card-wrapper .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
+.workbench-card-wrapper .maplibregl-ctrl-top-left .maplibregl-ctrl {
     visibility: visible;
 }
 
-.widget-wrapper .mapboxgl-map {
+.widget-wrapper .maplibregl-map {
     z-index: 10;
     margin-bottom: -10px;
 }
@@ -9114,12 +9114,12 @@ a.clear-geojson-button:hover {
     max-width: 311px;
 }
 
-.mapboxgl-popup-content .hover-feature-title-bar {
+.maplibregl-popup-content .hover-feature-title-bar {
     margin-bottom: 0px;
     padding: 0px;
 }
 
-.mapboxgl-popup-close-button {
+.maplibregl-popup-close-button {
     position: absolute;
     right: 0px;
     top: 0px;
@@ -9134,7 +9134,7 @@ a.clear-geojson-button:hover {
     font-weight: 600;
 }
 
-.mapboxgl-popup-close-button:hover {
+.maplibregl-popup-close-button:hover {
     cursor: pointer;
     background-color: #f4f4f4;
     color: #454545;
@@ -11085,12 +11085,12 @@ a.filter-tools:hover {
     padding-left: 10px;
 }
 
-.mapboxgl-popup-content {
+.maplibregl-popup-content {
     width: 350px;
     padding: 0px;
 }
 
-.mapboxgl-popup-content .hover-feature-footer {
+.maplibregl-popup-content .hover-feature-footer {
     padding: 10px 15px;
     height: auto;
 }
@@ -12597,7 +12597,7 @@ a.filter-tools:hover {
     aside,
     .print-btn,
     .ep-tools,
-    .mapboxgl-ctrl-geocoder,
+    .maplibregl-ctrl-geocoder,
     .workbench-card-sidebar,
     .geocode-container,
     .geometry-tools-container,
