@@ -3,7 +3,11 @@ import sysconfig
 
 from django.conf import settings
 
-from arches.settings_utils import list_arches_app_labels, list_arches_app_paths
+from arches.settings_utils import (
+    list_arches_app_labels,
+    list_arches_app_labels_and_paths,
+    list_arches_app_paths,
+)
 
 
 def generate_webpack_configuration():
@@ -21,6 +25,11 @@ def generate_webpack_configuration():
         "ARCHES_APPLICATIONS_PATHS": dict(
             zip(arches_app_names, arches_app_paths, strict=True)
         ),
+        # Every Arches application whose source is resolvable, including bundled
+        # ones a project has not enabled. Used for module aliasing -- tsconfig
+        # paths and vitest -- not for entry points, templates or static files,
+        # which must come from installed applications alone.
+        "RESOLVABLE_APPLICATION_PATHS": list_arches_app_labels_and_paths(),
         "SITE_PACKAGES_DIRECTORY": sysconfig.get_path("purelib"),
         "ROOT_DIR": root_dir_path,
         "STATIC_URL": settings.STATIC_URL,
