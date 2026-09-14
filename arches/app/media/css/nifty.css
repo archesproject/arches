@@ -5507,9 +5507,9 @@ a.list-group-item-dark:hover,a.list-group-item-dark:focus {
 
 .pager li>a:hover,.pager li>a:focus,.pagination>li a:hover,.pagination>li a:focus {
     background-color: #fff;
-    border-color: #54abd9;
-    color: #54abd9;
-    box-shadow: inset 0 0 1px #54abd9;
+    border-color: #1479A5;
+    color: #1479A5;
+    box-shadow: inset 0 0 1px #1479A5;
     z-index: 2;
     -webkit-transition: border-color,0.3s;
     transition: border-color,0.3s
@@ -5556,8 +5556,8 @@ a.list-group-item-dark:hover,a.list-group-item-dark:focus {
 }
 
 .pagination>.active>a,.pagination>.active>span,.pagination>.active>a:hover,.pagination>.active>span:hover,.pagination>.active>a:focus,.pagination>.active>span:focus {
-    background-color: #54abd9;
-    border-color: #54abd9
+    background-color: #1479A5;
+    border-color: #1479A5
 }
 
 .carousel-control.left,.carousel-control.right {

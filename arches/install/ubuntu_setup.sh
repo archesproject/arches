@@ -12,23 +12,23 @@ function install_postgres {
   sudo add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -sc)-pgdg main"
   wget --quiet -O - http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | sudo apt-key add -
   sudo apt-get update
-  sudo apt-get install postgresql-14 postgresql-contrib-14 -y
-  sudo apt-get install postgresql-14-postgis-3 -y
+  sudo apt-get install postgresql-16 postgresql-contrib-16 -y
+  sudo apt-get install postgresql-16-postgis-3 -y
   PGPASS=$(openssl rand -base64 14)
   sudo -u postgres psql -d postgres -c "ALTER USER postgres with encrypted password '$PGPASS';"
   sudo echo "*:*:*:postgres:$PGPASS" >> ~/.pgpass
   sudo chmod 600 ~/.pgpass
-  sudo chmod 666 /etc/postgresql/14/main/postgresql.conf
-  sudo chmod 666 /etc/postgresql/14/main/pg_hba.conf
-  sudo echo "standard_conforming_strings = off" >> /etc/postgresql/14/main/postgresql.conf
-  sudo echo "listen_addresses = '*'" >> /etc/postgresql/14/main/postgresql.conf
-  sudo echo "#TYPE   DATABASE  USER  CIDR-ADDRESS  METHOD" > /etc/postgresql/14/main/pg_hba.conf
-  sudo echo "local   all       all                 trust" >> /etc/postgresql/14/main/pg_hba.conf
-  sudo echo "host    all       all   127.0.0.1/32  trust" >> /etc/postgresql/14/main/pg_hba.conf
-  sudo echo "host    all       all   ::1/128       trust" >> /etc/postgresql/14/main/pg_hba.conf
-  sudo echo "host    all       all   0.0.0.0/0     md5" >> /etc/postgresql/14/main/pg_hba.conf
-  sudo chmod 664 /etc/postgresql/14/main/postgresql.conf
-  sudo chmod 664 /etc/postgresql/14/main/pg_hba.conf
+  sudo chmod 666 /etc/postgresql/16/main/postgresql.conf
+  sudo chmod 666 /etc/postgresql/16/main/pg_hba.conf
+  sudo echo "standard_conforming_strings = off" >> /etc/postgresql/16/main/postgresql.conf
+  sudo echo "listen_addresses = '*'" >> /etc/postgresql/16/main/postgresql.conf
+  sudo echo "#TYPE   DATABASE  USER  CIDR-ADDRESS  METHOD" > /etc/postgresql/16/main/pg_hba.conf
+  sudo echo "local   all       all                 trust" >> /etc/postgresql/16/main/pg_hba.conf
+  sudo echo "host    all       all   127.0.0.1/32  trust" >> /etc/postgresql/16/main/pg_hba.conf
+  sudo echo "host    all       all   ::1/128       trust" >> /etc/postgresql/16/main/pg_hba.conf
+  sudo echo "host    all       all   0.0.0.0/0     md5" >> /etc/postgresql/16/main/pg_hba.conf
+  sudo chmod 664 /etc/postgresql/16/main/postgresql.conf
+  sudo chmod 664 /etc/postgresql/16/main/pg_hba.conf
   sudo service postgresql restart
 
   sudo -u postgres createdb -E UTF8 -T template0 --locale=en_US.utf8 template_postgis
@@ -57,7 +57,7 @@ function install_elasticsearch {
   wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
   sudo sh -c 'echo "deb https://artifacts.elastic.co/packages/8.x/apt stable main" > /etc/apt/sources.list.d/elastic-8.x.list'
   sudo apt-get update
-  sudo apt-get install elasticsearch
+  sudo apt-get install elasticsearch=8.17.0
   sudo /bin/systemctl enable elasticsearch.service
   sudo systemctl enable elasticsearch.service
   sudo systemctl start elasticsearch.service
@@ -81,8 +81,8 @@ function main {
   sudo apt-get install -y libgdal-dev
   sudo apt-get install -y libpq-dev
 
-  sudo apt-get install -y python3-dev
-  sudo apt-get install -y python3-venv
+  # sudo apt-get install -y python3-dev
+  # sudo apt-get install -y python3-venv
 
   echo -n "Would you like to install elasticsearch? (y/N)? "
   read answer

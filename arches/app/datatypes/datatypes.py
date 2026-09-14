@@ -14,6 +14,8 @@ from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files import File
 from django.core.files.images import get_image_dimensions
+from django.db.models import fields
+from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
 from django.db import connection
 from django.utils.translation import get_language
@@ -196,6 +198,7 @@ class StringDataType(BaseDataType):
                     "string": nodevalue[key]["value"],
                     "language": key,
                     "nodegroup_id": tile.nodegroup_id,
+                    "nodeid": nodeid,
                     "provisional": provisional,
                 }
                 document["strings"].append(val)
@@ -519,6 +522,7 @@ class NumberDataType(BaseDataType):
         )
         document["strings"].append(
             {
+                "number": str(nodevalue),
                 "string": str(nodevalue),
                 "nodegroup_id": tile.nodegroup_id,
                 "provisional": provisional,
@@ -821,6 +825,14 @@ class DateDataType(BaseDataType):
                 "provisional": provisional,
             }
         )
+        document["strings"].append(
+            {
+                "string": str(nodevalue),
+                "nodegroup_id": tile.nodegroup_id,
+                "nodeid": nodeid,
+                "provisional": provisional,
+            }
+        )
 
     def append_search_filters(self, value, node, query, request):
         try:
@@ -990,6 +1002,17 @@ class EDTFDataType(BaseDataType):
                             "provisional": provisional,
                         }
                     )
+                    try:
+                        document["strings"].append(
+                            {
+                                "string": str(edtf.lower),
+                                "nodegroup_id": tile.nodegroup_id,
+                                "nodeid": nodeid,
+                                "provisional": provisional,
+                            }
+                        )
+                    except KeyError:
+                        pass
             else:
                 dr = {}
                 if edtf.lower_fuzzy is not None:
@@ -1002,6 +1025,17 @@ class EDTFDataType(BaseDataType):
                             "provisional": provisional,
                         }
                     )
+                    try:
+                        document["strings"].append(
+                            {
+                                "string": str(edtf.lower_fuzzy),
+                                "nodegroup_id": tile.nodegroup_id,
+                                "nodeid": nodeid,
+                                "provisional": provisional,
+                            }
+                        )
+                    except KeyError:
+                        pass
                 if edtf.upper_fuzzy is not None:
                     dr["lte"] = edtf.upper_fuzzy
                     document["dates"].append(
@@ -1012,6 +1046,18 @@ class EDTFDataType(BaseDataType):
                             "provisional": provisional,
                         }
                     )
+                    if not edtf.lower_fuzzy:
+                        try:
+                            document["strings"].append(
+                                {
+                                    "string": str(edtf.upper_fuzzy),
+                                    "nodegroup_id": tile.nodegroup_id,
+                                    "nodeid": nodeid,
+                                    "provisional": provisional,
+                                }
+                            )
+                        except KeyError:
+                            pass
                 document["date_ranges"].append(
                     {
                         "date_range": dr,
@@ -1035,7 +1081,7 @@ class EDTFDataType(BaseDataType):
             add_date_to_doc(tile.data[nodeid], edtf)
 
     def append_search_filters(self, value, node, query, request):
-        def add_date_to_doc(query, edtf):
+        def add_date_to_query(query, edtf):
             invalid_filter_exception = Exception(
                 _(
                     'Only dates that specify an exact year, month, \
@@ -1092,9 +1138,9 @@ class EDTFDataType(BaseDataType):
             edtf = ExtendedDateFormat(value["val"])
             if edtf.result_set:
                 for result in edtf.result_set:
-                    add_date_to_doc(query, result)
+                    add_date_to_query(query, result)
             else:
-                add_date_to_doc(query, edtf)
+                add_date_to_query(query, edtf)
 
     def default_es_mapping(self):
         mapping = {
@@ -1230,17 +1276,24 @@ class FileListDataType(BaseDataType):
                             {"type": "ERROR", "message": message, "title": title}
                         )
             if path:
-                for file in value:
-                    if not default_storage.exists(os.path.join(path, file["name"])):
-                        message = _(
-                            'The file "{0}" does not exist in "{1}"'.format(
-                                file["name"], path
+                if isinstance(value, str):
+                    message = _('The value "{0}" is a str'.format(value))
+                    title = _("Malformed datatype nodevalue")
+                    errors.append({"type": "ERROR", "message": message, "title": title})
+                else:
+                    for file in value:
+                        if file["status"] == "uploaded":
+                            continue
+                        if not default_storage.exists(os.path.join(path, file["name"])):
+                            message = _(
+                                'The file "{0}" does not exist in local storage "{1}"'.format(
+                                    file["name"], path
+                                )
                             )
-                        )
-                        title = _("File Not Found")
-                        errors.append(
-                            {"type": "ERROR", "message": message, "title": title}
-                        )
+                            title = _("File Not Found")
+                            errors.append(
+                                {"type": "ERROR", "message": message, "title": title}
+                            )
         except Exception as e:
             dt = self.datatype_model.datatype
             message = _("datatype: {0}, value: {1} - {2} .".format(dt, value, e))
@@ -1259,6 +1312,7 @@ class FileListDataType(BaseDataType):
                 val = {
                     "string": f["name"],
                     "nodegroup_id": tile.nodegroup_id,
+                    "nodeid": nodeid,
                     "provisional": provisional,
                 }
                 document["strings"].append(val)
@@ -1268,6 +1322,7 @@ class FileListDataType(BaseDataType):
                     val = {
                         "string": f["name"],
                         "nodegroup_id": tile.nodegroup_id,
+                        "nodeid": nodeid,
                         "provisional": provisional,
                     }
                     document["strings"].append(val)
@@ -1310,14 +1365,15 @@ class FileListDataType(BaseDataType):
         if data:
             return self.compile_json(tile, node, file_details=data[str(node.nodeid)])
 
-    def post_tile_save(self, tile, nodeid, request):
-        if request is not None:
+    def post_tile_save(self, tile, nodeid, request, **kwargs):
+        userid = kwargs.pop("userid", None)
+        if request is not None or userid is not None:
             # this does not get called when saving data from the mobile app
             previously_saved_tile = models.TileModel.objects.filter(pk=tile.tileid)
-            user = request.user
-            if hasattr(request.user, "userprofile") is not True:
-                models.UserProfile.objects.create(user=request.user)
-            user_is_reviewer = user_is_resource_reviewer(request.user)
+            user = request.user if request else User.objects.get(pk=userid)
+            if hasattr(user, "userprofile") is not True:
+                models.UserProfile.objects.create(user=user)
+            user_is_reviewer = user_is_resource_reviewer(user)
             current_tile_data = self.get_tile_data(tile)
             if previously_saved_tile.count() == 1:
                 previously_saved_tile_data = self.get_tile_data(
@@ -1423,6 +1479,10 @@ class FileListDataType(BaseDataType):
         tile_data = []
         source_path = kwargs.get("path")
         for file_path in [filename.strip() for filename in value.split(",")]:
+            filename = os.path.basename(file_path)
+            accessible_path = os.path.join(
+                settings.MEDIA_ROOT, settings.UPLOADED_FILES_DIR, filename
+            )
             tile_file = {}
             try:
                 file_stats = os.stat(file_path)
@@ -1432,12 +1492,23 @@ class FileListDataType(BaseDataType):
                 pass
             tile_file["status"] = "uploaded"
             tile_file["name"] = os.path.basename(file_path)
+            try:
+                file_stats = os.stat(accessible_path)
+                tile_file["lastModified"] = file_stats.st_mtime
+            except FileNotFoundError as e:
+                file_path = "%s/%s" % (
+                    settings.UPLOADED_FILES_DIR,
+                    str(tile_file["name"]),
+                )
+                file_stats = os.stat(file_path)
+
+            tile_file["size"] = file_stats.st_size
+            tile_file["status"] = "uploaded"
             tile_file["type"] = mime.guess_type(file_path)[0]
             tile_file["type"] = "" if tile_file["type"] is None else tile_file["type"]
-            file_path = "%s/%s" % (settings.UPLOADED_FILES_DIR, str(tile_file["name"]))
             tile_file["file_id"] = str(uuid.uuid4())
-            if source_path:
-                source_file = os.path.join(source_path, tile_file["name"])
+            source_file = os.path.join(source_path, tile_file["name"])
+            if source_path and default_storage.exists(source_file):
                 fs = default_storage
                 try:
                     with default_storage.open(source_file) as f:
@@ -1454,11 +1525,29 @@ class FileListDataType(BaseDataType):
                         current_file.save()
                         tile_file["size"] = current_file.path.size
                 except FileNotFoundError:
-                    logger.exception(_("File does not exist"))
+                    if os.path.exists(file_path):
+                        with open(file_path, "rb") as f:
+                            current_file, created = models.File.objects.get_or_create(
+                                fileid=tile_file["file_id"]
+                            )
+                            tile_file["size"] = current_file.path.size
+                    else:
+                        logger.exception(_(f"File: {source_file} does not exist"))
 
-            else:
+            elif os.path.exists(accessible_path):
                 models.File.objects.get_or_create(
-                    fileid=tile_file["file_id"], path=file_path
+                    fileid=tile_file["file_id"],
+                    path=os.path.join(
+                        settings.UPLOADED_FILES_DIR, os.path.basename(file_path)
+                    ),
+                )
+            else:
+                logger.exception(
+                    _(
+                        "File: {0} does not exist in the media root: {1}".format(
+                            file_path, settings.MEDIA_ROOT
+                        )
+                    )
                 )
 
             tile_file["url"] = settings.MEDIA_URL + tile_file["file_id"]
@@ -2082,11 +2171,47 @@ class ResourceInstanceDataType(BaseDataType):
     ):
         errors = []
         if value is not None:
-            resourceXresourceIds = self.get_nodevalues(value)
-            for resourceXresourceId in resourceXresourceIds:
+            from_resourceid = kwargs.get("resourceid", None)
+            if not len(value):
+                # message = _("No related resources were provided in the value.")
+                # title = _("Invalid Resource Instance Datatype")
+                # error_message = self.create_error_message(
+                #     value, source, row_number, message, title
+                # )
+                # errors.append(error_message)
+                error_str_list = self.transform_value_for_tile(source, validate=True)
+                errors.extend(
+                    [
+                        self.create_error_message(
+                            value,
+                            source,
+                            row_number,
+                            e,
+                            _("Invalid Resource Instance Datatype"),
+                        )
+                        for e in error_str_list
+                    ]
+                )
+
+            relations, value_type = self.test_for_subtype(value)
+            if relations is None:
+                message = _(
+                    "Invalid Value: Check that the value actually exists if it was a legacyid or uuid."
+                )
+                title = _("Invalid Resource Instance Datatype Value")
+                error_message = self.create_error_message(
+                    value, source, row_number, message, title
+                )
+                errors.append(error_message)
+                return errors
+            for rel in relations:
                 try:
-                    resourceid = resourceXresourceId["resourceId"]
-                    uuid.UUID(resourceid)
+                    if value_type == "uuid":
+                        resourceid = str(rel)
+                    elif value_type == "str":
+                        resourceid = rel
+                    elif value_type == "dict":
+                        resourceid = rel["resourceId"]
                     if strict:
                         try:
                             if not node:
@@ -2098,8 +2223,17 @@ class ResourceInstanceDataType(BaseDataType):
                                     bool_query = Bool()
                                     ri_query = Dsl(dsl)
                                     bool_query.must(ri_query)
-                                    ids_query = Dsl({"ids": {"values": [resourceid]}})
-                                    bool_query.must(ids_query)
+                                    if value_type in ("uuid", "dict"):
+                                        ids_query = Dsl(
+                                            {"ids": {"values": [resourceid]}}
+                                        )
+                                        bool_query.must(ids_query)
+                                    elif value_type == "str":
+                                        legacy_terms_query = Terms(
+                                            field="legacyid.keyword",
+                                            values=[resourceid],
+                                        )
+                                        bool_query.must(legacy_terms_query)
                                     query.add_query(bool_query)
                                     try:
                                         results = query.search(index=RESOURCES_INDEX)
@@ -2133,6 +2267,15 @@ class ResourceInstanceDataType(BaseDataType):
                         value, source, row_number, message, title
                     )
                     errors.append(error_message)
+        elif strict is True:
+            title = _("Invalid Resource Instance Datatype Value")
+            message = _(
+                "Invalid Value. Check that the value actually exists if it was a legacyid or uuid."
+            )
+            error_message = self.create_error_message(
+                value, source, row_number, message, title
+            )
+            errors.append(error_message)
 
         return errors
 
@@ -2142,10 +2285,17 @@ class ResourceInstanceDataType(BaseDataType):
             tile.data[nodeid] = None
 
     def pre_tile_save(self, tile, nodeid):
+        from arches.app.models.resource import Resource
+
         relationships = tile.data[nodeid]
         if relationships:
             for relationship in relationships:
-                relationship["resourceXresourceId"] = str(uuid.uuid4())
+                if not relationship.get("resourceXresourceId", ""):
+                    relationship["resourceXresourceId"] = str(uuid.uuid4())
+                if not relationship.get("resourceName", ""):
+                    relationship["resourceName"] = Resource.objects.get(
+                        pk=relationship["resourceId"]
+                    ).displayname()
 
     def post_tile_save(self, tile, nodeid, request):
         ret = False
@@ -2208,6 +2358,8 @@ class ResourceInstanceDataType(BaseDataType):
             return self.compile_json(tile, node)
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
+        from arches.app.models.resource import Resource
+
         nodevalue = self.get_nodevalues(nodevalue)
         for relatedResourceItem in nodevalue:
             relationship = None
@@ -2218,19 +2370,37 @@ class ResourceInstanceDataType(BaseDataType):
                     "provisional": provisional,
                 }
             )
-            if relatedResourceItem.get("resourceName", "") != "":
+            if relatedResourceItem.get("resourceName", ""):
                 document["strings"].append(
                     {
                         "string": relatedResourceItem["resourceName"],
                         "nodegroup_id": tile.nodegroup_id,
+                        "nodeid": nodeid,
                         "provisional": provisional,
                     }
                 )
+            else:
+                try:
+                    document["strings"].append(
+                        {
+                            "string": Resource.objects.get(
+                                pk=relatedResourceItem["resourceId"]
+                            ).displayname(),
+                            "nodegroup_id": tile.nodegroup_id,
+                            "nodeid": nodeid,
+                            "provisional": provisional,
+                        }
+                    )
+                except Resource.DoesNotExist as e:
+                    logger.error(
+                        f"Resource with id {relatedResourceItem['resourceId']} not found"
+                    )
+                    # raise e
             for ontology_property_item in [
                 relatedResourceItem.get("ontologyProperty", ""),
                 relatedResourceItem.get("inverseOntologyProperty", ""),
             ]:
-                if ontology_property_item != "":
+                if ontology_property_item:
                     try:
                         uuid.UUID(ontology_property_item)
                         relationship = (
@@ -2243,6 +2413,7 @@ class ResourceInstanceDataType(BaseDataType):
                         {
                             "string": relationship,
                             "nodegroup_id": tile.nodegroup_id,
+                            "nodeid": nodeid,
                             "provisional": provisional,
                         }
                     )
@@ -2251,7 +2422,7 @@ class ResourceInstanceDataType(BaseDataType):
         terms = []
         nodevalue = self.get_nodevalues(nodevalue)
         for relatedResourceItem in nodevalue:
-            if relatedResourceItem.get("resourceName", "") != "":
+            if relatedResourceItem.get("resourceName", ""):
                 terms.append(
                     SearchTerm(value=relatedResourceItem["resourceName"], lang="")
                 )
@@ -2259,7 +2430,7 @@ class ResourceInstanceDataType(BaseDataType):
                 relatedResourceItem.get("ontologyProperty", ""),
                 relatedResourceItem.get("inverseOntologyProperty", ""),
             ]:
-                if ontology_property_item != "":
+                if ontology_property_item:
                     try:
                         uuid.UUID(ontology_property_item)
                         relationship = (
@@ -2272,22 +2443,334 @@ class ResourceInstanceDataType(BaseDataType):
 
         return terms
 
+    def build_resource_instance_object(self, hit, graph_default_ontology_lookup):
+        from arches.app.models.resource import Resource
+
+        resourceName = (
+            Resource.objects.get(pk=hit["_id"]).displayname() if hit["_id"] else ""
+        )
+        return {
+            "resourceId": hit["_id"],
+            "resourceName": resourceName,
+            "ontologyProperty": (
+                graph_default_ontology_lookup[hit["_source"]["graph_id"]][
+                    "ontologyProperty"
+                ]
+            ),
+            "inverseOntologyProperty": (
+                graph_default_ontology_lookup[hit["_source"]["graph_id"]][
+                    "inverseOntologyProperty"
+                ]
+            ),
+            "resourceXresourceId": str(uuid.uuid4()),
+        }
+
+    def test_for_subtype(self, value):
+        subtypes_dict = {
+            "uuid": uuid.UUID,
+            "dict": dict,
+            "str": str,
+            # "int": int,
+            # "float": float,
+        }
+        test_dict = {"uuid": uuid.UUID, "json": json.loads, "ast": ast.literal_eval}
+        converted_value = None
+
+        if isinstance(value, str):
+            for label, test_method in test_dict.items():
+                try:
+                    converted_value = test_method(value)
+                    if label == "uuid":
+                        return [
+                            converted_value,
+                        ], label
+                    break
+                except:
+                    pass
+
+            if not converted_value and value:
+                converted_value = value.split(",")  # is a string, likely legacyid
+                converted_value = [val.strip() for val in converted_value if val]
+                try:
+                    converted_value = [uuid.UUID(val) for val in converted_value]
+                except:
+                    pass
+            elif converted_value:
+                pass
+            else:
+                logger.warning("ResourceInstanceDataType: value is empty")
+                # return []
+        else:
+            converted_value = value
+
+        value_type = None
+        if not converted_value:
+            return converted_value, value_type
+        if not isinstance(converted_value, list):
+            converted_value = [
+                converted_value,
+            ]
+        for value_subtype_label, value_subtype_class in list(subtypes_dict.items()):
+            if value_subtype_label == "uuid":
+                try:
+                    converted_value = [
+                        value_subtype_class(val) for val in converted_value
+                    ]
+                    value_type = value_subtype_label
+                    break
+                except ValueError:
+                    continue
+                except AttributeError:
+                    continue  # in case val is a bool
+
+            elif isinstance(
+                converted_value[0], value_subtype_class
+            ):  # this doesn't seem to work for uuid
+                value_type = value_subtype_label
+                break
+        return converted_value, value_type
+
     def transform_value_for_tile(self, value, **kwargs):
-        try:
-            return json.loads(value)
-        except ValueError:
-            # do this if json (invalid) is formatted with single quotes, re #6390
-            try:
-                return ast.literal_eval(value)
-            except:
-                return value
-        except TypeError:
-            # data should come in as json but python list is accepted as well
-            if isinstance(value, list):
-                return value
+        # kwargs config looks like this:
+        # {
+        #     "graphs": [
+        #         {
+        #             "name": "Person or Group",
+        #             "graphid": "ccbd1537-ac5e-11e6-84a5-026d961c88e6",
+        #             "relationshipConcept": "6f26aa04-52af-4b17-a656-674c547ade2a",
+        #             "relationshipCollection": "00000000-0000-0000-0000-000000000005",
+        #             "useOntologyRelationship": False,
+        #             "inverseRelationshipConcept": "6f26aa04-52af-4b17-a656-674c547ade2a"
+        #         }
+        #     ],
+        #     "searchDsl": "",
+        #     "searchString": ""
+        # }
+        from arches.app.search.search_engine_factory import SearchEngineFactory
+
+        relatable_graphs = kwargs.get("graphs", [])
+        from_resourceid = kwargs.get("resourceid", None)
+        validate = kwargs.get("validate", False)
+        errors = []
+        nodeid = kwargs.get("nodeid", None)
+        if value is None:
+            return
+        default_values_lookup = dict()
+        for graph in relatable_graphs:
+            if graph.get("useOntologyRelationship", False) or not graph.get(
+                "relationshipConcept", None
+            ):
+                default_values_lookup[graph["graphid"]] = {
+                    "ontologyProperty": "",
+                    "inverseOntologyProperty": "",
+                }
+            else:
+                default_values_lookup[graph["graphid"]] = {
+                    "ontologyProperty": graph["relationshipConcept"],
+                    "inverseOntologyProperty": graph["inverseRelationshipConcept"],
+                }
+
+        converted_value, value_type = self.test_for_subtype(value)
+        if not converted_value:
+            convert_error_msg = (
+                f"ResourceInstanceDataType: value could not be converted: {value}"
+            )
+            if validate:
+                errors.append(convert_error_msg)
+                return errors
+            else:
+                logger.error(convert_error_msg)
+                return
+
+        se = SearchEngineFactory().create()
+        query = Query(se)
+        query.include("graph_id")
+        boolquery = Bool()
+        transformed_value = []
+
+        match value_type:
+            case "uuid":
+                results = query.search(
+                    index=RESOURCES_INDEX, id=[str(val) for val in converted_value]
+                )
+                if not len(results["docs"]):
+                    uuid_hits_error_msg = f"ResourceInstanceDataType: [uuid case] no hits in Terms query for {converted_value}"
+                    if validate:
+                        errors.append(uuid_hits_error_msg)
+                    else:
+                        logger.warning(uuid_hits_error_msg)
+                for hit in results["docs"]:
+                    if from_resourceid:
+                        resource_x_resource_exists = (
+                            models.ResourceXResource.objects.filter(
+                                resourceinstanceidto_id=hit["_id"],
+                                resourceinstanceidfrom_id=from_resourceid,
+                                nodeid_id=nodeid,
+                            ).exists()
+                            if nodeid
+                            else (
+                                models.ResourceXResource.objects.filter(
+                                    resourceinstanceidto_id=hit["_id"],
+                                    resourceinstanceidfrom_id=from_resourceid,
+                                ).exists()
+                            )
+                        )
+                        if not resource_x_resource_exists:
+                            transformed_value.append(
+                                self.build_resource_instance_object(
+                                    hit, default_values_lookup
+                                )
+                            )
+                        else:
+                            exists_error_msg = f"ResourceInstanceDataType: resource {hit['_id']} already exists in ResourceXResource (nodeid: {nodeid}, from_resourceid: {from_resourceid})"
+                            if validate:
+                                errors.append(exists_error_msg)
+                            else:
+                                logger.error(exists_error_msg)
+                    else:
+                        transformed_value.append(
+                            self.build_resource_instance_object(
+                                hit, default_values_lookup
+                            )
+                        )
+
+            case "dict":  # assume data correctly parsed via ast.literal
+                for val in converted_value:
+                    try:
+                        uuid.UUID(val["resourceId"])
+                    except:
+                        continue
+                    if from_resourceid:
+                        resource_x_resource_exists = (
+                            models.ResourceXResource.objects.filter(
+                                resourceinstanceidto_id=val["resourceId"],
+                                resourceinstanceidfrom_id=from_resourceid,
+                                nodeid_id=nodeid,
+                            ).exists()
+                            if nodeid
+                            else (
+                                models.ResourceXResource.objects.filter(
+                                    resourceinstanceidto_id=val["resourceId"],
+                                    resourceinstanceidfrom_id=from_resourceid,
+                                ).exists()
+                            )
+                        )
+                        if not resource_x_resource_exists:
+                            transformed_value.append(val)
+                        else:
+                            exists_error_msg = f"ResourceInstanceDataType: resource {val['resourceId']} already exists in ResourceXResource (nodeid: {nodeid}, from_resourceid: {from_resourceid})"
+                            if validate:
+                                errors.append(exists_error_msg)
+                            else:
+                                logger.error(exists_error_msg)
+                    else:
+                        transformed_value.append(val)
+            case _:  # default case (handles str/legacyid and any other types)
+                if value_type != "str":
+                    converted_value = [str(val) for val in converted_value]
+                boolquery.filter(
+                    Terms(field="legacyid.keyword", terms=converted_value)
+                )  # exact match on keyword
+                query.add_query(boolquery)
+                results = query.search(index=RESOURCES_INDEX)
+                if not len(results["hits"]["hits"]):
+                    default_hits_error_msg = f"ResourceInstanceDataType: [default case] no hits in Terms query for {converted_value} (datatype: {value_type})"
+                    if validate:
+                        errors.append(default_hits_error_msg)
+                    else:
+                        logger.warning(default_hits_error_msg)
+                # print(f"{len(results['hits']['hits'])} hits")
+                for hit in results["hits"]["hits"]:
+                    if from_resourceid:
+                        resource_x_resource_exists = (
+                            models.ResourceXResource.objects.filter(
+                                resourceinstanceidto_id=hit["_id"],
+                                resourceinstanceidfrom_id=from_resourceid,
+                                nodeid_id=nodeid,
+                            ).exists()
+                            if nodeid
+                            else (
+                                models.ResourceXResource.objects.filter(
+                                    resourceinstanceidto_id=hit["_id"],
+                                    resourceinstanceidfrom_id=from_resourceid,
+                                ).exists()
+                            )
+                        )
+                        if not resource_x_resource_exists:
+                            transformed_value.append(
+                                self.build_resource_instance_object(
+                                    hit, default_values_lookup
+                                )
+                            )
+                        else:
+                            exists_error_msg = f"ResourceInstanceDataType: resource {hit['_id']} already exists in ResourceXResource (nodeid: {nodeid}, from_resourceid: {from_resourceid})"
+                            if validate:
+                                errors.append(exists_error_msg)
+                            else:
+                                logger.error(exists_error_msg)
+                    else:
+                        transformed_value.append(
+                            self.build_resource_instance_object(
+                                hit, default_values_lookup
+                            )
+                        )
+
+        if len(transformed_value) == 0:
+            logger.error(
+                f"ResourceInstanceDataType: no resources found for {converted_value}"
+            )
+            transformed_value = None
+
+        if validate:
+            return errors
+        return transformed_value
 
     def transform_export_values(self, value, *args, **kwargs):
         return json.dumps(value)
+
+    def append_in_list_search_filters(self, value, node, query):
+        mutated_query = False
+        values_list = value.get("val", [])
+        if isinstance(values_list, str):
+            values_list = [values_list]
+        if len(values_list):
+            field_name = f"tiles.data.{str(node.pk)}"
+            for val in values_list:
+                match_q = Term(
+                    field=f"tiles.data.{str(node.pk)}.resourceId.keyword",
+                    term=val,
+                )
+
+                match value["op"]:
+                    case "in_list_any":
+                        query.should(match_q)
+                        mutated_query = True
+                    case "in_list_all":
+                        query.must(match_q)
+                        mutated_query = True
+                    case "!" | "in_list_none":
+                        query.must_not(match_q)
+                        mutated_query = True
+                    case "~":
+                        query.must(
+                            Wildcard(
+                                field=f"tiles.data.{str(node.pk)}.resourceName.keyword",
+                                query=f"*{val}*",
+                                case_insensitive=True,
+                            )
+                        )
+                        mutated_query = True
+                    case "!~":
+                        query.must_not(
+                            Wildcard(
+                                field=f"tiles.data.{str(node.pk)}.resourceName.keyword",
+                                query=f"*{val}*",
+                                case_insensitive=True,
+                            )
+                        )
+                        mutated_query = True
+            if mutated_query:
+                query.filter(Exists(field=field_name))
 
     def append_search_filters(self, value, node, query, request):
         try:
@@ -2393,6 +2876,13 @@ class ResourceInstanceDataType(BaseDataType):
                 "resourceId": {
                     "type": "text",
                     "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}},
+                },
+                "resourceName": {
+                    "type": "text",
+                    "fields": {
+                        "keyword": {"ignore_above": 512, "type": "keyword"},
+                        # "ngram": {"type": "text", "analyzer": "ngram_analyzer"},
+                    },
                 },
                 "ontologyProperty": {
                     "type": "text",

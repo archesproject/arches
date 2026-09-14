@@ -5,6 +5,7 @@ const Webpack = require('webpack');
 const { merge } = require('webpack-merge');
 const StylelintPlugin = require('stylelint-webpack-plugin');
 
+const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const commonWebpackConfigPromise = require('./webpack.common.js');
 
 module.exports = () => {
@@ -15,6 +16,7 @@ module.exports = () => {
                 // devtool: 'inline-source-map',
                 output: {
                     chunkFilename: Path.join('js', '[name].chunk.js'),
+                    filename: Path.join('js', '[name].[chunkhash:8].js'),
                 },
                 devServer: {
                     historyApiFallback: true,
@@ -43,6 +45,17 @@ module.exports = () => {
                     }),
                     new StylelintPlugin({
                         files: Path.join('src', '**/*.s?(a|c)ss'),
+                    }),
+                    new WebpackManifestPlugin({
+                        fileName: 'manifest.json',
+                        publicPath: commonWebpackConfig.STATIC_URL,
+                        generate: (seed, files) => {
+                            const manifest = {};
+                            files.forEach(file => {
+                                manifest[file.name] = file.path;
+                            });
+                            return manifest;
+                        },
                     })
                 ],
             }));

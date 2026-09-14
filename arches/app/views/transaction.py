@@ -18,7 +18,9 @@ class ReverseTransaction(View):
         response = dict()
         success = False
         if transactionid is not None:
-            response["changes"] = reverse_edit_log_entries(transactionid)
+            response["changes"] = reverse_edit_log_entries(
+                transactionid, user=request.user
+            )
             response["changes"] += delete_manifests(transactionid)
             response["changes"] += delete_workflow_histories(transactionid)
             success = True

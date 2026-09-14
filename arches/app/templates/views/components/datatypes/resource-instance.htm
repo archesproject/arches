@@ -221,8 +221,11 @@
         select2Query: {
             select2Config:{
                 data: [
-                    { text: $root.translations.references, id: '' },
-                    { text: $root.translations.doesNotReference, id: '!' },
+                    { text: $root.translations.referencesAny, id: 'in_list_any' },
+                    { text: $root.translations.referencesAll, id: 'in_list_all' },
+                    { text: $root.translations.doesNotReference, id: 'in_list_none' },
+                    { text: $root.translations.nameContains, id: '~' },
+                    { text: $root.translations.nameDoesNotContain, id: '!~' },
                     { text: $root.translations.hasNoValue, id: 'null' },
                     { text: $root.translations.hasAnyValue, id: 'not_null' },
                 ],
@@ -230,7 +233,7 @@
         }}">
     </select>
 </div>
-<div class="col-md-8 col-lg-9 resource-instance-search" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
+<div class="col-md-8 col-lg-9 resource-instance-search" data-bind="visible: op() === 'in_list_any' || op() === 'in_list_all' || op() === 'in_list_none'">
     <!-- ko component: {
         name:  datatype.datatype.includes('list') ? 'resource-instance-multiselect-widget' : 'resource-instance-select-widget',
         params: {
@@ -247,5 +250,16 @@
         }
     } -->
     <!-- /ko -->
+</div>
+<div class="col-md-8 col-lg-9 resource-instance-search" data-bind="visible: op() === '~' || op() === '!~'">
+    <input 
+        type="text" 
+        class="form-control input-lg" 
+        style="height: 36px;" 
+        data-bind="
+            attr: {placeholder: $root.translations.value, 'aria-label': node.label},
+            textInput: searchValue
+        "
+    >
 </div>
 <!-- /ko -->

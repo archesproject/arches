@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+from arches.app.models.system_settings import settings
 from arches.app.models import models
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils import permission_backend
@@ -29,13 +30,6 @@ RESOURCES_INDEX = "resources"
 RESOURCE_RELATIONS_INDEX = "resource_relations"
 
 
-ANALYZER = {
-    "analyzer": {
-        "folding": {"tokenizer": "whitespace", "filter": ["lowercase", "asciifolding"]}
-    }
-}
-
-
 def prepare_terms_index(create=False):
     """
     Creates the settings and mappings in Elasticsearch to support term search
@@ -43,7 +37,7 @@ def prepare_terms_index(create=False):
     """
 
     index_settings = {
-        "settings": {"analysis": ANALYZER},
+        "settings": {"analysis": settings.SEARCH_TERM_ANALYZER},
         "mappings": {
             "properties": {
                 "nodegroupid": {"type": "keyword"},
@@ -57,12 +51,15 @@ def prepare_terms_index(create=False):
                     "type": "text",
                     "fields": {
                         "raw": {"type": "keyword"},
-                        "folded": {"analyzer": "folding", "type": "text"},
                     },
                 },
             }
         },
     }
+    for analyzed_field_dict in settings.SEARCH_TERM_ANALYZED_FIELDS:
+        index_settings["mappings"]["properties"]["value"]["fields"].update(
+            analyzed_field_dict
+        )
 
     if create:
         se = SearchEngineFactory().create()
@@ -78,7 +75,7 @@ def prepare_concepts_index(create=False):
     """
 
     index_settings = {
-        "settings": {"analysis": ANALYZER},
+        "settings": {"analysis": settings.SEARCH_TERM_ANALYZER},
         "mappings": {
             "properties": {
                 "top_concept": {"type": "keyword"},
@@ -93,12 +90,15 @@ def prepare_concepts_index(create=False):
                     "type": "text",
                     "fields": {
                         "raw": {"type": "keyword"},
-                        "folded": {"analyzer": "folding", "type": "text"},
                     },
                 },
             }
         },
     }
+    for analyzed_field_dict in settings.SEARCH_TERM_ANALYZED_FIELDS:
+        index_settings["mappings"]["properties"]["value"]["fields"].update(
+            analyzed_field_dict
+        )
 
     if create:
         se = SearchEngineFactory().create()
@@ -125,7 +125,7 @@ def prepare_search_index(create=False):
 
     index_settings = {
         "settings": {
-            "analysis": ANALYZER,
+            "analysis": settings.SEARCH_TERM_ANALYZER,
             "index.mapping.total_fields.limit": 50000,
             "index.mapping.nested_objects.limit": 50000,
         },
@@ -198,10 +198,10 @@ def prepare_search_index(create=False):
                             "type": "text",
                             "fields": {
                                 "raw": {"type": "keyword", "ignore_above": 256},
-                                "folded": {"type": "text", "analyzer": "folding"},
                             },
                         },
                         "nodegroup_id": {"type": "keyword"},
+                        "nodeid": {"type": "keyword"},
                         "language": {"type": "text"},
                         "provisional": {"type": "boolean"},
                     },
@@ -280,9 +280,15 @@ def prepare_search_index(create=False):
                         "provisional": {"type": "boolean"},
                     },
                 },
+                "date_created": {"type": "keyword"},
+                "date_last_edited": {"type": "keyword"},
             },
         },
     }
+    for analyzed_field_dict in settings.SEARCH_TERM_ANALYZED_FIELDS:
+        index_settings["mappings"]["properties"]["strings"]["properties"]["string"][
+            "fields"
+        ].update(analyzed_field_dict)
 
     for (
         custom_search_class

@@ -45,6 +45,7 @@ class ExtendedDateFormat(SortableDateRange):
         multiplier_if_uncertain=1,
         multiplier_if_approximate=1,
         multiplier_if_both=1,
+        **kwargs,
     ):
         super(ExtendedDateFormat, self).__init__()
         self.orig_date = None
