@@ -55,7 +55,22 @@ BUSINESS_DATA_FILES = (
 )
 
 # Class for custom ES document generator and search functionality
-ES_MAPPING_MODIFIER_CLASSES = ["tests.views.search_tests.TestEsMappingModifier"]
+ES_MAPPING_MODIFIER_CLASSES = [
+    "tests.views.search_tests.TestEsMappingModifier",
+    # Contributed by the bundled controlled lists application, exercised by
+    # tests/extensions/controlled_lists/test_reference_es_mapping_modifier.py
+    "arches.extensions.controlled_lists.search.references_es_mapping_modifier.ReferencesEsMappingModifier",
+]
+
+# Reference data index, so that the bundled controlled lists tests can build and
+# query it. REFERENCES_INDEX_NAME comes from arches.settings.
+ELASTICSEARCH_CUSTOM_INDEXES = [
+    {
+        "module": "arches.extensions.controlled_lists.search_indexes.reference_index.ReferenceIndex",
+        "name": REFERENCES_INDEX_NAME,
+        "should_update_asynchronously": True,
+    },
+]
 
 CACHES = {
     "default": {
@@ -65,7 +80,31 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.dummy.DummyCache",
         "LOCATION": "user_permission_cache",
     },
+    # Named by ARCHES_QUERYSETS_* in arches.settings. Omitting them raises
+    # arches_querysets.E001; dummy backends keep tests order-independent.
+    "querysets_concepts": {
+        "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+    },
+    "querysets_resource_instances": {
+        "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+    },
 }
+
+# Bundled applications are opt-in, so arches.settings does not install them.
+# Arches' own test suite covers them, so it does.
+INSTALLED_APPS = tuple(
+    app for app in INSTALLED_APPS if app not in ("arches.app", "django.contrib.admin")
+) + (
+    # Required by arches.extensions.controlled_lists, whose ListItem uses
+    # ExclusionConstraint.
+    "django.contrib.postgres",
+    "rest_framework",
+    "arches.extensions.querysets",
+    "arches.extensions.vue_components",
+    "arches.extensions.controlled_lists",
+    "arches.app",
+    "django.contrib.admin",
+)
 
 LOGGING["loggers"]["django.request"]["level"] = "ERROR"
 LOGGING["loggers"]["arches"]["level"] = "ERROR"
