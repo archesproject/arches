@@ -25,6 +25,37 @@
                 resources whose ids are already in the database. Left unticked, importing a resource id
                 that is already present will fail the load.{% endblocktrans %}
             </p>
+            <p>
+                {% blocktrans %}Untick <strong>Index the data after import</strong> to write the tiles
+                without indexing them. The data is saved but will not appear in search until you run
+                <code>python manage.py index_database</code>. Useful when loading several files in a
+                row: skip indexing on each and index once at the end.{% endblocktrans %}
+            </p>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Importing from the command line" %}</h4></a>
+        <div class="ep-help-topic-content">
+            <p>
+                {% blocktrans %}The same importer runs from the command line, which is the better route
+                for very large loads: it reports progress as it validates, and it is the only path that
+                can index across several processes.{% endblocktrans %}
+            </p>
+            <pre>python manage.py etl arches-json-importer -s /path/to/export.jsonl</pre>
+            <p>{% trans "Flags:" %}</p>
+            <ul>
+                <li><code>-s</code>, <code>--source</code> — {% trans "the .json, .jsonl or .zip file to load. Required." %}</li>
+                <li><code>-o</code>, <code>--overwrite</code> — {% trans "replace resources that already exist instead of failing on them." %}</li>
+                <li><code>--no-index</code> — {% trans "write the data but skip indexing; reindex later with index_database." %}</li>
+                <li><code>-mp</code>, <code>--use_multiprocessing</code> — {% trans "index across several processes after loading." %}</li>
+                <li><code>-mxp N</code>, <code>--max_subprocesses N</code> — {% trans "how many processes to index with. Defaults to half the CPU count." %}</li>
+                <li><code>-c</code>, <code>--config</code> — {% trans "a JSON file of options. The flags above win over it." %}</li>
+            </ul>
+            <p>
+                {% blocktrans %}A large overnight load, overwriting existing resources and indexing on
+                eight processes:{% endblocktrans %}
+            </p>
+            <pre>python manage.py etl arches-json-importer -s export.jsonl -o -mp -mxp 8</pre>
         </div>
     </div>
 </div>
