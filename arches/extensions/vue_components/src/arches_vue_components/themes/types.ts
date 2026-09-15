@@ -1,6 +1,6 @@
-import type { PrimeVueConfiguration } from "primevue/config";
+import type { PrimeVueConfiguration as OpenVueConfiguration } from "openvue/config";
 
-export type ArchesThemeConfiguration = PrimeVueConfiguration & {
+export type ArchesThemeConfiguration = OpenVueConfiguration & {
     theme: {
         options: {
             darkModeSelector: string;

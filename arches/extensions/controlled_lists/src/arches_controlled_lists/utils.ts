@@ -2,7 +2,7 @@ import arches from "arches";
 
 import { ALT_LABEL, PREF_LABEL } from "@/arches_controlled_lists/constants.ts";
 
-import type { TreeNode } from "primevue/treenode";
+import type { TreeNode } from "openvue/treenode";
 import type {
     ControlledList,
     ControlledListItem,
@@ -292,7 +292,7 @@ export const commandeerFocusFromDataTable = (element: HTMLElement) => {
     /*
     The editor (pencil) button from the DataTable hogs focus with a
     setTimeout of 1, so we'll queue behind it to set focus to the input.
-    This should be reported/clarified with PrimeVue with a MWE.
+    This should be reported/clarified with OpenVue with a MWE.
     */
     // @ts-expect-error focusVisible not yet in typeshed
     setTimeout(() => element && element.focus({ focusVisible: true }), 10);

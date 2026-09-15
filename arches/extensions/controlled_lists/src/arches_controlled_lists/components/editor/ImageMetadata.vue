@@ -3,12 +3,12 @@ import arches from "arches";
 import { computed, inject, ref, useTemplateRef } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import Button from "primevue/button";
-import Column from "primevue/column";
-import DataTable from "primevue/datatable";
-import InputText from "primevue/inputtext";
-import Select from "primevue/select";
-import { useToast } from "primevue/usetoast";
+import Button from "openvue/button";
+import Column from "openvue/column";
+import DataTable from "openvue/datatable";
+import InputText from "openvue/inputtext";
+import Select from "openvue/select";
+import { useToast } from "openvue/usetoast";
 
 import {
     deleteImage,
@@ -33,7 +33,7 @@ import {
 import AddMetadata from "@/arches_controlled_lists/components/editor/AddMetadata.vue";
 
 import type { Ref } from "vue";
-import type { DataTableRowEditInitEvent } from "primevue/datatable";
+import type { DataTableRowEditInitEvent } from "openvue/datatable";
 import type {
     ControlledListItem,
     ControlledListItemImage,

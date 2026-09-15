@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Drawer from "primevue/drawer";
+import Drawer from "openvue/drawer";
 
 import { useGettext } from "vue3-gettext";
 

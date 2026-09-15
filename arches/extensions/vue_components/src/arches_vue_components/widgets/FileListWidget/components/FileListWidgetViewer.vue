@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 
-import { Image, Galleria } from "primevue";
+import { Image, Galleria } from "openvue";
 
 import { useSettingsStore } from "@/arches_vue_components/stores/useSettingsStore.ts";
 

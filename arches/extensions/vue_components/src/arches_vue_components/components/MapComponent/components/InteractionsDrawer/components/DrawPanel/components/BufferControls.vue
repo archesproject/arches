@@ -3,9 +3,9 @@ import { ref, watch } from "vue";
 
 import { useGettext } from "vue3-gettext";
 
-import InputNumber from "primevue/inputnumber";
-import Panel from "primevue/panel";
-import Select from "primevue/select";
+import InputNumber from "openvue/inputnumber";
+import Panel from "openvue/panel";
+import Select from "openvue/select";
 
 import {
     FEET,

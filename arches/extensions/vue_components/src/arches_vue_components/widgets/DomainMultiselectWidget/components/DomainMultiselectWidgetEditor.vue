@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import MultiSelect from "primevue/multiselect";
+import MultiSelect from "openvue/multiselect";
 
 import { buildDomainListAliasedNodeData } from "@/arches_vue_components/datatypes/domain/utils.ts";
 

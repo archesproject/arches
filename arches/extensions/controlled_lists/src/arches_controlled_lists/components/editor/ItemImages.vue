@@ -4,8 +4,8 @@ import Cookies from "js-cookie";
 import { inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import FileUpload from "primevue/fileupload";
-import { useToast } from "primevue/usetoast";
+import FileUpload from "openvue/fileupload";
+import { useToast } from "openvue/usetoast";
 
 import {
     itemKey,
@@ -25,7 +25,7 @@ import type {
     FileUploadProps,
     FileUploadState,
     FileUploadUploadEvent,
-} from "primevue/fileupload";
+} from "openvue/fileupload";
 
 interface FileUploadInternals {
     props: FileUploadProps;
@@ -184,7 +184,7 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
 
 :deep(input[type="file"]) {
     /* override arches.css */
-    /* PrimeVue uses a hidden input for screen readers */
+    /* OpenVue uses a hidden input for screen readers */
     display: none;
 }
 

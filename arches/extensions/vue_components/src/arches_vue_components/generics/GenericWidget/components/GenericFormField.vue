@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useTemplateRef, watchEffect } from "vue";
 
-import { FormField, type FormFieldResolverOptions } from "@primevue/forms";
-import Message from "primevue/message";
+import { FormField, type FormFieldResolverOptions } from "@openvue/forms";
+import Message from "openvue/message";
 
 import type { AliasedNodeData } from "@/arches_vue_components/types.ts";
 

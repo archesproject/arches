@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useGettext } from "vue3-gettext";
 
-import Button from "primevue/button";
+import Button from "openvue/button";
 
 import BufferControls from "@/arches_vue_components/components/MapComponent/components/InteractionsDrawer/components/DrawPanel/components/BufferControls.vue";
 import DrawControls from "@/arches_vue_components/components/MapComponent/components/InteractionsDrawer/components/DrawPanel/components/DrawControls.vue";

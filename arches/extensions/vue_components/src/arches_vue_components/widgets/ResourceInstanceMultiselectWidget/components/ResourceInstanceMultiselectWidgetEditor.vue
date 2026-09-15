@@ -3,8 +3,8 @@ import { computed, ref, watch, watchEffect } from "vue";
 
 import { useGettext } from "vue3-gettext";
 
-import Button from "primevue/button";
-import MultiSelect from "primevue/multiselect";
+import Button from "openvue/button";
+import MultiSelect from "openvue/multiselect";
 
 import { generateArchesURL } from "@/arches_vue_components/application/generate-arches-url.ts";
 import ResourceInstanceCreation from "@/arches_vue_components/widgets/components/ResourceInstanceCreation.vue";
@@ -13,8 +13,8 @@ import { fetchRelatableResources } from "@/arches_vue_components/datatypes/resou
 import { buildResourceInstanceListAliasedNodeData } from "@/arches_vue_components/datatypes/resource-instance-list/utils.ts";
 import { debounce } from "@/arches_vue_components/utils.ts";
 
-import type { MultiSelectFilterEvent } from "primevue/multiselect";
-import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
+import type { MultiSelectFilterEvent } from "openvue/multiselect";
+import type { VirtualScrollerLazyEvent } from "openvue/virtualscroller";
 
 import type {
     ResourceInstanceDataItem,
