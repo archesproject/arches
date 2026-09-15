@@ -618,10 +618,11 @@ class Graph(models.GraphModel):
                     )
 
             # edge case for instantiating a serialized_graph that has a resource_instance_lifecycle not already in the system
-            if self.resource_instance_lifecycle and not len(
-                models.ResourceInstanceLifecycle.objects.filter(
+            if (
+                self.resource_instance_lifecycle
+                and not models.ResourceInstanceLifecycle.objects.filter(
                     pk=self.resource_instance_lifecycle.pk
-                )
+                ).exists()
             ):
                 self.resource_instance_lifecycle.save()
 
