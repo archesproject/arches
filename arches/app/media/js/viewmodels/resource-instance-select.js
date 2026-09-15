@@ -306,6 +306,7 @@ var ResourceInstanceSelectViewModel = function(params) {
     this.url = ko.observable(arches.urls.search_results);
     this.resourceToAdd = ko.observable(null);
 
+    // overrides widget.js's disable to also lock the widget while graphs download or the form is locked
     this.disable = ko.computed(function() {
         return ko.unwrap(self.waitingForGraphToDownload) || ko.unwrap(self.disabled) || !!ko.unwrap(params.form?.locked) || !!ko.unwrap(self.uneditable);
     });
