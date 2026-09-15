@@ -5,7 +5,11 @@ from .base import ArchesPackageMigration
 
 class CreateGraph(ArchesPackageMigration):
     reduces_to_sql = False
-    reversible = True
+    # Reversing a graph creation means deleting the graph, and ResourceInstance.graph
+    # is on_delete=CASCADE, so the delete takes every resource instance and tile with
+    # it.  ResourceInstance.graph_publication is on_delete=PROTECT specifically to stop
+    # that; nulling it to get past the ProtectedError removes the only guard.
+    reversible = False
 
     def __init__(self, graphid, graph_slug, name="", is_resource=False):
         self.graphid = graphid
@@ -22,12 +26,11 @@ class CreateGraph(ArchesPackageMigration):
         )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        from arches.app.models import models
-
-        models.ResourceInstance.objects.filter(graph_id=self.graphid).update(
-            graph_publication=None
+        raise NotImplementedError(
+            "CreateGraph is not reversible. Deleting a graph cascades to every "
+            "resource instance and tile on it; use a purpose-built, confirmed "
+            "operation if a graph genuinely needs to be removed."
         )
-        Graph.objects.filter(graphid=self.graphid).delete()
 
     def describe(self):
         return f"Creates a graph with id {self.graphid}"
