@@ -1757,7 +1757,7 @@ class Graph(models.GraphModel):
                                 group_permission["object_pk"]
                             ]
                         )
-                        user_permissions_to_create.append(
+                        group_permissions_to_create.append(
                             GroupObjectPermission(**group_permission)
                         )
 
