@@ -14,9 +14,17 @@ import * as tab from './tab.js';
  * Tooltips are not here: they are the CSS-only `[data-tooltip]` rule in
  * css/components/_tooltip.scss.
  *
- * The `$.fn.*` shims below keep the existing jQuery call sites working unchanged, and
- * are the only reason jQuery is imported.
+ * The `$.fn.*` shims below, and the event bridge, keep the existing jQuery call sites
+ * working unchanged. They are the only reason jQuery is imported.
  */
+
+/**
+ * The behaviours emit Bootstrap 3's event names as native CustomEvents, but jQuery reads
+ * the dots in `hidden.bs.modal` as namespaces, so such an event never reaches a
+ * `$(element).on('hidden.bs.modal')` handler — which is how RDM listens. Re-triggering
+ * through jQuery lets both styles of listener fire.
+ */
+const BRIDGED_EVENTS = ['shown.bs.modal', 'hidden.bs.modal', 'shown.bs.tab'];
 
 const installed = new WeakSet();
 
@@ -30,6 +38,12 @@ export function install(root = document) {
     dropdown.install(root);
     modal.install(root);
     tab.install(root);
+
+    for (const eventName of BRIDGED_EVENTS) {
+        root.addEventListener(eventName, function (event) {
+            $(event.target).trigger(eventName);
+        });
+    }
 }
 
 /**
