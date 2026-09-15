@@ -102,3 +102,45 @@ class PackageOperation(Operation):
     @property
     def migration_name_fragment(self):
         raise NotImplementedError
+
+
+class _AlterRowOperation(PackageOperation):
+    """Shared implementation for the Alter* family.
+
+    All six do the same thing: write a dict of field changes onto one row, and
+    reverse by reading the previous values back out of the replayed state. The
+    operation carries only the NEW values -- unapply() phase 1 replays state
+    forwards, so to_state still holds the old ones, exactly as Django's
+    AlterField recovers the previous field definition.
+
+    Subclasses set ``model``, ``state_collection`` and ``pk_attribute``.
+    """
+
+    reversible = True
+
+    model = None
+    state_collection = None  # "nodes", "cards", ...
+    pk_attribute = None  # the __init__ parameter holding the row's pk
+
+    def __init__(self, graphid, changes):
+        self.graphid = graphid
+        self.changes = changes
+
+    @property
+    def _pk(self):
+        return getattr(self, self.pk_attribute)
+
+    def _entry(self, state):
+        return state.graphs[str(self.graphid)][self.state_collection][str(self._pk)]
+
+    def state_forwards(self, app_label, state):
+        self._entry(state).update(self.changes)
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        self.qs(self.model, schema_editor).filter(pk=self._pk).update(**self.changes)
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        previous = self._entry(to_state)
+        self.qs(self.model, schema_editor).filter(pk=self._pk).update(
+            **{field: previous.get(field) for field in self.changes}
+        )

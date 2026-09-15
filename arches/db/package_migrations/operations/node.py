@@ -7,7 +7,10 @@ migration.
 """
 
 from arches.app.models import models
-from arches.db.package_migrations.operations.base import PackageOperation
+from arches.db.package_migrations.operations.base import (
+    PackageOperation,
+    _AlterRowOperation,
+)
 
 
 class CreateNode(PackageOperation):
@@ -151,3 +154,27 @@ class DeleteNode(PackageOperation):
     @property
     def migration_name_fragment(self):
         return "delete_node_%s" % str(self.nodeid).replace("-", "")[:8]
+
+
+class AlterNode(_AlterRowOperation):
+    """Datatype, config, alias, name, isrequired and friends.
+
+    A datatype change alters only the node row; converting the values already
+    stored in tiles is CoerceNodeData's job, and must be in the same migration --
+    arches_querysets casts tile JSONB straight to the node's declared datatype.
+    """
+
+    model = models.Node
+    state_collection = "nodes"
+    pk_attribute = "nodeid"
+
+    def __init__(self, graphid, nodeid, changes):
+        super().__init__(graphid, changes)
+        self.nodeid = nodeid
+
+    def describe(self):
+        return "Alter node %s (%s)" % (self.nodeid, ", ".join(sorted(self.changes)))
+
+    @property
+    def migration_name_fragment(self):
+        return "alter_node_%s" % str(self.nodeid).replace("-", "")[:8]
