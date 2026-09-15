@@ -55,7 +55,22 @@ BUSINESS_DATA_FILES = (
 )
 
 # Class for custom ES document generator and search functionality
-ES_MAPPING_MODIFIER_CLASSES = ["tests.views.search_tests.TestEsMappingModifier"]
+ES_MAPPING_MODIFIER_CLASSES = [
+    "tests.views.search_tests.TestEsMappingModifier",
+    # Contributed by the bundled controlled lists application, exercised by
+    # tests/extensions/controlled_lists/test_reference_es_mapping_modifier.py
+    "arches.extensions.controlled_lists.search.references_es_mapping_modifier.ReferencesEsMappingModifier",
+]
+
+# Reference data index, so that the bundled controlled lists tests can build and
+# query it. REFERENCES_INDEX_NAME comes from arches.settings.
+ELASTICSEARCH_CUSTOM_INDEXES = [
+    {
+        "module": "arches.extensions.controlled_lists.search_indexes.reference_index.ReferenceIndex",
+        "name": REFERENCES_INDEX_NAME,
+        "should_update_asynchronously": True,
+    },
+]
 
 CACHES = {
     "default": {
@@ -65,12 +80,58 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.dummy.DummyCache",
         "LOCATION": "user_permission_cache",
     },
+    # Named by ARCHES_QUERYSETS_* in arches.settings; omitting them raises
+    # arches_querysets.E001. Real backends rather than dummies: the querysets
+    # tests assert query counts that assume these caches actually cache.
+    "querysets_concepts": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "querysets_concepts_cache",
+    },
+    "querysets_resource_instances": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "querysets_resource_instances_cache",
+    },
 }
+
+# Bundled applications are opt-in, so arches.settings does not install them.
+# Arches' own test suite covers them, so it does.
+#
+# Order matters twice over. Django resolves management commands by iterating
+# app configs in reverse, so an application earlier in INSTALLED_APPS wins:
+# the bundled applications must precede "arches" for their command overrides
+# (vue_components ships its own validate) to take effect. Templates and static
+# files resolve the other way, so "arches.app" stays last. The project template
+# arrives at the same order by listing "arches" in its trailing block.
+_BUNDLED_APPS = (
+    # Required by arches.extensions.controlled_lists, whose ListItem uses
+    # ExclusionConstraint.
+    "django.contrib.postgres",
+    "rest_framework",
+    "arches.extensions.querysets",
+    "arches.extensions.vue_components",
+    "arches.extensions.controlled_lists",
+)
+_TRAILING = ("arches.app", "django.contrib.admin")
+_head = [app for app in INSTALLED_APPS if app not in _TRAILING]
+_arches_at = _head.index("arches")
+INSTALLED_APPS = (
+    tuple(_head[:_arches_at]) + _BUNDLED_APPS + tuple(_head[_arches_at:]) + _TRAILING
+)
 
 LOGGING["loggers"]["django.request"]["level"] = "ERROR"
 LOGGING["loggers"]["arches"]["level"] = "ERROR"
 
 ELASTICSEARCH_PREFIX = "test"
+
+# Fixtures the bundled controlled lists tests load by name.
+FIXTURE_DIRS = [
+    os.path.join(TEST_ROOT, "extensions", "controlled_lists", "fixtures", "data"),
+]
+
+ROOT_URLCONF = "tests.urls"
+# django_hosts overrides ROOT_URLCONF per request, so the host map has to
+# point at the same urlconf or requests bypass the bundled applications.
+ROOT_HOSTCONF = "tests.hosts"
 
 TEST_RUNNER = "arches.test.runner.ArchesTestRunner"
 SILENCED_SYSTEM_CHECKS.append(

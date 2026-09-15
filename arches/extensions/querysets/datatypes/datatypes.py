@@ -1,0 +1,81 @@
+import django.db.models
+
+from arches.app.datatypes.datatypes import (
+    BooleanDataType,
+    DateDataType,
+    DomainListDataType,
+    NonLocalizedStringDataType,
+    NumberDataType,
+    GeojsonFeatureCollectionDataType,
+)
+
+from arches.extensions.querysets.datatypes import *
+from arches.extensions.querysets.fields import (
+    ConceptListField,
+    DomainListField,
+    LocalizedStringField,
+    ResourceInstanceField,
+    ResourceInstanceListField,
+)
+
+
+def _no_op_get_details(value, *args, **kwargs):
+    return None
+
+
+def _no_op_bulk_context(*args, **kwargs):
+    return None
+
+
+class DataTypeFactory(datatypes.DataTypeFactory):
+    def get_instance(self, datatype):
+        """Ensure every datatype has our additional methods."""
+        instance = super().get_instance(datatype)
+
+        # datatype instances are cached on the shared base DataTypeFactory, so
+        # assigning lambdas here would make that cache (and anything pickling
+        # it, e.g. Tile.datatype_factory) unpicklable. Use picklable
+        # module-level functions instead.
+        if not hasattr(instance, "get_details"):
+            instance.get_details = _no_op_get_details
+        if not hasattr(instance, "get_display_value_context_in_bulk"):
+            instance.get_display_value_context_in_bulk = _no_op_bulk_context
+        if not hasattr(instance, "set_display_value_context_in_bulk"):
+            instance.set_display_value_context_in_bulk = _no_op_bulk_context
+
+        return instance
+
+    @staticmethod
+    def get_model_field(instance):
+        if model_field := getattr(instance, "model_field", None):
+            return model_field
+        match instance:
+            case NumberDataType():
+                return django.db.models.FloatField(null=True)
+            case DateDataType():
+                return django.db.models.DateTimeField(null=True)
+            case BooleanDataType():
+                return django.db.models.BooleanField(null=True)
+            case NonLocalizedStringDataType():
+                return django.db.models.TextField(null=True)
+            case StringDataType():
+                return LocalizedStringField(null=True)
+            case ResourceInstanceListDataType():
+                # must precede ResourceInstanceDataType
+                return ResourceInstanceListField(null=True)
+            case ResourceInstanceDataType():
+                return ResourceInstanceField(null=True)
+            case ConceptListDataType():
+                return ConceptListField(null=True)
+            case ConceptDataType(), NodeValueDataType():
+                return django.db.models.UUIDField(null=True)
+            case URLDataType():
+                return django.db.models.JSONField(null=True)
+            case DomainListDataType():
+                return DomainListField(null=True)
+            case FileListDataType():
+                return django.db.models.JSONField(default=list, null=True)
+            case GeojsonFeatureCollectionDataType():
+                return django.db.models.JSONField(default=list, null=True)
+            case _:
+                return django.db.models.TextField(null=True)

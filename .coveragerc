@@ -6,6 +6,7 @@ omit =
     */celery.py
     */hosts.py
     */models/migrations/*
+    arches/extensions/*/migrations/*
     */python?.?/*
     */settings*.py
     */urls.py

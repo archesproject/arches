@@ -1,8 +1,17 @@
 
 module.exports = {
     input: {
-      path: "./arches/app/src", // only files in this directory are considered for extraction
-      include: ["**/*.vue", "**/*.ts"], // glob patterns to select files for extraction
+      path: "./arches", // only files in this directory are considered for extraction
+      // Core plus the applications bundled under arches/extensions. They extract
+      // into arches/locale rather than per-application catalogs, so one release
+      // ships one set of translations.
+      include: [
+          "app/src/**/*.vue",
+          "app/src/**/*.ts",
+          "extensions/*/src/**/*.vue",
+          "extensions/*/src/**/*.ts",
+      ], // glob patterns to select files for extraction
+
       exclude: [], // glob patterns to exclude files from extraction
       jsExtractorOpts:[ // custom extractor keyword. default empty.
           {
