@@ -8,7 +8,6 @@ from django.db.models import Q
 from django.db import connection, transaction
 from django.core.exceptions import ObjectDoesNotExist
 
-
 # def delete_resources(load_id):
 #     """Takes the load id stored in the note column of the edit log and deletes each resource with that id"""
 #     resources_for_removal = archesmodels.EditLog.objects.filter( Q(note=load_id) )

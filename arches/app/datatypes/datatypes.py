@@ -881,12 +881,18 @@ class DateDataType(BaseDataType):
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
         if edge_info["range_tile_data"] is not None:
+            value = edge_info["range_tile_data"]
+            literal_datatype = XSD.dateTime
+            if isinstance(value, str):
+                valid_date_format, valid = self.get_valid_date_format(value)
+                if valid and valid_date_format == "%Y-%m-%d":
+                    literal_datatype = XSD.date
             g.add((edge_info["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass)))
             g.add(
                 (
                     edge_info["d_uri"],
                     URIRef(edge.ontologyproperty),
-                    Literal(edge_info["range_tile_data"], datatype=XSD.dateTime),
+                    Literal(value, datatype=literal_datatype),
                 )
             )
         return g
@@ -931,6 +937,43 @@ class EDTFDataType(BaseDataType):
     def pre_tile_save(self, tile, nodeid):
         tile.data[nodeid] = self.transform_value_for_tile(tile.data[nodeid])
 
+    def is_a_literal_in_rdf(self):
+        return True
+
+    def to_rdf(self, edge_info, edge):
+        g = Graph()
+        if edge_info["range_tile_data"] is not None:
+            g.add((edge_info["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+            g.add(
+                (
+                    edge_info["d_uri"],
+                    URIRef(edge.ontologyproperty),
+                    Literal(edge_info["range_tile_data"]),
+                )
+            )
+        return g
+
+    def from_rdf(self, json_ld_node):
+        # Legacy format: value was encoded as an entity node carrying rdf:value
+        if isinstance(json_ld_node, dict) and "@value" not in json_ld_node:
+            rdf_value_nodes = json_ld_node.get(
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#value", []
+            )
+            if rdf_value_nodes:
+                return rdf_value_nodes[0].get("@value")
+        value = get_value_from_jsonld(json_ld_node)
+        try:
+            return value[0]
+        except (AttributeError, KeyError):
+            pass
+
+    def ignore_keys(self):
+        # Prevents errors when the importer recurses into a legacy entity node and
+        # encounters the rdf:value property that EDTF now handles itself.
+        return [
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#value http://www.w3.org/2000/01/rdf-schema#Literal"
+        ]
+
     def validate(
         self,
         value,
@@ -963,13 +1006,15 @@ class EDTFDataType(BaseDataType):
         return value
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
+        nodegroup_id = str(tile.nodegroup_id)
+
         def add_date_to_doc(document, edtf):
             if edtf.lower == edtf.upper:
                 if edtf.lower is not None:
                     document["dates"].append(
                         {
                             "date": edtf.lower,
-                            "nodegroup_id": tile.nodegroup_id,
+                            "nodegroup_id": nodegroup_id,
                             "nodeid": nodeid,
                             "provisional": provisional,
                         }
@@ -981,7 +1026,7 @@ class EDTFDataType(BaseDataType):
                     document["dates"].append(
                         {
                             "date": edtf.lower_fuzzy,
-                            "nodegroup_id": tile.nodegroup_id,
+                            "nodegroup_id": nodegroup_id,
                             "nodeid": nodeid,
                             "provisional": provisional,
                         }
@@ -991,7 +1036,7 @@ class EDTFDataType(BaseDataType):
                     document["dates"].append(
                         {
                             "date": edtf.upper_fuzzy,
-                            "nodegroup_id": tile.nodegroup_id,
+                            "nodegroup_id": nodegroup_id,
                             "nodeid": nodeid,
                             "provisional": provisional,
                         }
@@ -999,7 +1044,7 @@ class EDTFDataType(BaseDataType):
                 document["date_ranges"].append(
                     {
                         "date_range": dr,
-                        "nodegroup_id": tile.nodegroup_id,
+                        "nodegroup_id": nodegroup_id,
                         "nodeid": nodeid,
                         "provisional": provisional,
                     }
@@ -1174,7 +1219,7 @@ class FileListDataType(BaseDataType):
                                 ).format(metadata["name"]),
                             }
                         )
-                files = self._get_files_from_request(request, node.nodeid)
+                files = self._get_files_from_request(request, str(node.nodeid))
                 for file in files:
                     width, height = get_image_dimensions(file.file)
                     if not width or not height:
@@ -1473,6 +1518,14 @@ class FileListDataType(BaseDataType):
                 file_info if isinstance(file_info, str) else file_info.get("name")
             )
             original_file_path = file_path
+
+            # If file_info is a dict with an existing file_id, the file is already
+            # stored on the server. Pass it through without creating a new File record.
+            if isinstance(file_info, dict) and file_info.get("file_id"):
+                tile_file = {**file_info}
+                tile_data.append(tile_file)
+                continue
+
             tile_file = {}
             try:
                 file_stats = os.stat(file_path)
@@ -1652,6 +1705,8 @@ class FileListDataType(BaseDataType):
 
             # range URI should be the file URL/URI, and the rest of the details should hang off that
             # FIXME - (Poor) assumption that file is on same host as Arches instance host config.
+            if not f_data.get("url"):
+                continue
             if f_data["url"].startswith("/"):
                 f_uri = URIRef(archesproject[f_data["url"][1:]])
             else:
@@ -1663,7 +1718,7 @@ class FileListDataType(BaseDataType):
 
             # FIXME - improve this ms in timestamp handling code in case of odd OS environments
             # FIXME - Use the timezone settings for export?
-            if f_data["lastModified"]:
+            if f_data.get("lastModified"):
                 lm = f_data["lastModified"]
                 if (
                     lm > 9999999999
@@ -1795,14 +1850,20 @@ class DomainDataType(BaseDomainDataType):
         if value is not None:
             try:
                 uuid.UUID(str(value))
-                found_option = (
-                    len(
-                        models.Node.objects.filter(
-                            config__contains={"options": [{"id": value}]}
-                        )
+                if node is not None:
+                    found_option = any(
+                        option["id"] == value
+                        for option in (node.config or {}).get("options", [])
                     )
-                    > 0
-                )
+                else:
+                    found_option = (
+                        len(
+                            models.Node.objects.filter(
+                                config__contains={"options": [{"id": value}]}
+                            )
+                        )
+                        > 0
+                    )
             except ValueError:
                 found_option = (
                     True if self.get_option_id_from_text(value) is not None else False
@@ -2020,7 +2081,7 @@ class DomainListDataType(BaseDomainDataType):
         errors = []
         if values is not None:
             for value in values:
-                errors = errors + domainDataType.validate(value, row_number)
+                errors = errors + domainDataType.validate(value, row_number, node=node)
         return errors
 
     def get_search_terms(self, nodevalue, nodeid=None):
@@ -2224,9 +2285,7 @@ class ResourceInstanceDataType(BaseDataType):
         ret = False
         sql = """
             SELECT * FROM __arches_create_resource_x_resource_relationships('%s') as t;
-        """ % (
-            tile.pk
-        )
+        """ % (tile.pk)
 
         with connection.cursor() as cursor:
             cursor.execute(sql)
@@ -2577,6 +2636,10 @@ class NodeValueDataType(BaseDataType):
                 datatype = datatype_factory.get_instance(value_node.datatype)
                 return datatype.get_display_value(value_tile, value_node)
             return ""
+
+        except models.TileModel.DoesNotExist:
+            return "Linked Tile Not Found"
+
         except:
             raise Exception(
                 f'Node with name "{node.name}" is not configured correctly.'

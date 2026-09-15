@@ -243,7 +243,7 @@ var vm = {
                     vm.alert(new AlertViewModel(
                         'ep-alert-blue',
                         arches.translations.resourceCopySuccess.title,
-                        "<a style='color: #fff; font-weight: 700;' target='_blank' href=" + arches.urls.resource_editor + data.resourceid + ">" + arches.translations.resourceCopySuccess.text + "</a>",
+                        "<a style='color: #fff; font-weight: 700;' target='_blank' href='" + arches.urls.resource_editor + data.resourceid + "'>" + arches.translations.resourceCopySuccess.text + "</a>",
                         null,
                         function () { }
                     ));

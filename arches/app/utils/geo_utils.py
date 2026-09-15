@@ -66,19 +66,42 @@ class GeoUtils(object):
         Takes a list of arcgisjson geometries and converts them to a GeoJSON feature collection. Example below:
         '{"x":-0.11515950499995142,"y":51.534958948000053,"spatialReference":{"wkid":4326,"latestWkid":4326}},
          {"x":-0.11337002699997356,"y":51.536050094000075,"spatialReference":{"wkid":4326,"latestWkid":4326}}'
+        Z and M coordinate components are stripped from the resulting GeoJSON.
         """
         payload = json.loads('{"geometries": [' + geom + "]}")
         features = []
         for geometry in payload["geometries"]:
+            geojson_geometry = arcgis2geojson(geometry)
+            if (
+                geometry.get("hasZ", False)
+                or geometry.get("hasM", False)
+                or "z" in geometry
+                or "m" in geometry
+            ):
+                self._strip_z_m(geojson_geometry)
             features.append(
                 {
                     "type": "Feature",
                     "properties": {},
-                    "geometry": arcgis2geojson(geometry),
+                    "geometry": geojson_geometry,
                 }
             )
         feature_collection = {"type": "FeatureCollection", "features": features}
         return feature_collection
+
+    def _strip_z_m(self, geometry):
+        if geometry is None:
+            return
+        elif isinstance(geometry, dict):
+            if geometry.get("type") == "GeometryCollection":
+                for geom in geometry.get("geometries", []):
+                    self._strip_z_m(geom)
+            elif coords := geometry.get("coordinates"):
+                geometry["coordinates"] = self._strip_z_m(coords)
+        elif isinstance(geometry[0], (int, float)):
+            return geometry[:2]
+        else:
+            return [self._strip_z_m(c) for c in geometry]
 
     def convert_geos_geom_collection_to_feature_collection(self, geometry):
         arches_geojson = {}

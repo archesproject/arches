@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block tabs %}
-<div tabindex="0" id="toggle-map-filter-panel" class="workbench-card-sidebar-tab" aria-controls="side-panel" 
+<div tabindex="0" id="toggle-map-filter-panel" class="workbench-card-sidebar-tab" aria-controls="side-panel" role="button" 
     data-bind="onEnterkeyClick, onSpaceClick, 
         click: function(data, event) { 
             toggleTab('filter');

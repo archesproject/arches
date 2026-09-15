@@ -44,8 +44,7 @@ class Migration(migrations.Migration):
         """
     )
 
-    reverse_sql = textwrap.dedent(
-        """
+    reverse_sql = textwrap.dedent("""
         DROP VIEW IF EXISTS vw_annotations;
 
         CREATE OR REPLACE VIEW vw_annotations AS
@@ -73,7 +72,6 @@ class Migration(migrations.Migration):
                 )
             ) > 0
         AND n.datatype = 'annotation'::text;
-        """
-    )
+        """)
 
     operations = [migrations.RunSQL(forward_sql, reverse_sql)]

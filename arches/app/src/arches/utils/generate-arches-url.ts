@@ -1,8 +1,18 @@
+/**
+ * @deprecated Use generateArchesURL from arches-vue-components instead.
+ * @see import { generateArchesURL } from '@/arches_vue_components/application'
+ */
 export function generateArchesURL(
     urlName: string,
     urlParameters: { [key: string]: string | number } = {},
     languageCode?: string,
 ) {
+    console.warn(
+        "[arches] generateArchesURL is deprecated. " +
+            "Import from arches-vue-components instead: " +
+            "import { generateArchesURL } from '@/arches_vue_components/application'",
+    );
+
     // @ts-expect-error ARCHES_URLS is defined globally
     const routes = ARCHES_URLS[urlName];
 

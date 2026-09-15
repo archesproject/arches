@@ -25,7 +25,6 @@ from arches.app.models.models import DDataType
 from arches.app.models.graph import Graph
 from django.db import connection
 
-
 # these tests can be run from the command line via
 # python manage.py test tests.models.relational_data_model_tests --settings="tests.test_settings"
 

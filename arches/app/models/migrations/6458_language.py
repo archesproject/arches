@@ -106,12 +106,10 @@ class Migration(migrations.Migration):
                     ],
                 )
             ],
-            reverse_sql=[("delete from languages")],
+            reverse_sql=["delete from languages"],
         ),
         migrations.RunSQL(
-            sql=[
-                (
-                    """
+            sql=["""
                 do
                 $$
                 declare
@@ -147,14 +145,8 @@ class Migration(migrations.Migration):
                     return;
                 end;
                 $$
-            """.format(
-                        settings.LANGUAGE_CODE
-                    )
-                )
-            ],
-            reverse_sql=[
-                (
-                    """
+            """.format(settings.LANGUAGE_CODE)],
+            reverse_sql=["""
                 do
                 $$
                 declare
@@ -183,11 +175,7 @@ class Migration(migrations.Migration):
                     return;
                 end;
                 $$
-            """.format(
-                        settings.LANGUAGE_CODE
-                    )
-                )
-            ],
+            """.format(settings.LANGUAGE_CODE)],
         ),
         migrations.AddField(
             "language", "isdefault", models.BooleanField(default=False, blank=True)

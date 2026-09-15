@@ -88,6 +88,16 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
             for feature in value["features"]:
                 try:
+                    feature["properties"]
+                    feature["type"]
+                except KeyError:
+                    message = _("Feature missing properties or type attribute")
+                    title = _("Invalid geojson feature")
+                    error_message = self.create_error_message(
+                        value, source, row_number, message, title
+                    )
+                    errors.append(error_message)
+                try:
                     geom = GEOSGeometry(JSONSerializer().serialize(feature["geometry"]))
                     if geom.valid:
                         validate_geom_bbox(geom)

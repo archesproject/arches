@@ -6,7 +6,6 @@ from django.test.utils import captured_stdout
 
 from tests.base_test import ArchesTestCase
 
-
 # these tests can be run from the command line via
 # python manage.py test tests.utils.test_checks.SystemCheckTests --settings="tests.test_settings"
 

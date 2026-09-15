@@ -3,9 +3,12 @@
 We'd love for you to contribute your time, experience or knowledge to help make Arches even better than it is
 today! Here are the guidelines we'd like you to follow:
 - [Logging Issues and Bugs](#issue)
-- [Contributing Code](#contribute-code)
-    - [Commit Message Guidelines](#commit)
-- [Contributing Documentation](#documentation)
+- [Contributing](#contribute)
+  - [Contributing Code](#contribute-code)
+      - [Commit Message Guidelines](#commit)
+  - [Contributing Documentation](#documentation)
+  - [Human Accountability](#human-accountability)
+  - [Acknowledging AI Assistance and Other Assistance](#acknowledging-assistance)
 - [CSS Styleguide](contributing/css-styleguide.md)
 - [Seeing What Others Are Working On](#tracking)
 - [Becoming an Arches Maintainer](#maintainership)
@@ -21,10 +24,12 @@ If your issue appears to be a bug that hasn't yet been reported, then open a new
 
 Please add the [appropriate labels](https://github.com/archesproject/arches/wiki/Issue-and-Pull-Request-Labels) to the issue (multiple labels are ok) to help us keep track of them.
 
-## <a name="contribute-code"></a> Contributing Code
+## <a name="contribute"></a> Contributing
+
+### <a name="contribute-code"></a> Contributing Code
 We strongly encourage code contributions. To begin, you should begin by **forking the Arches repo**. Then, follow our guide for [creating a development environment](https://arches.readthedocs.io/en/stable/developing/getting-started/creating-a-development-environment/) and clone your own fork, not the official archesproject repo. Once you have Arches fully installed locally using your own fork of the repo, you are ready to begin.
 
-### Submitting Code
+#### Submitting Code
 
 First, be sure that a ticket exists that addresses the code you are going to commit (see [Submitting an Issue](#submitting-an-issue) above). It is important to start with a ticket so that the community has a chance to become aware of the problem you intend to solve or the feature you'd like to add.
 
@@ -83,7 +88,7 @@ on code that were previously made by you and others in your commits.*
 
 That's it! Thank you for your contribution!
 
-### After your pull request is merged
+#### After your pull request is merged
 After your pull request is merged, you can safely delete your branch and pull the changes
 from the main (upstream) repository:
 * Delete the remote branch on GitHub either through the GitHub web UI or your local shell as follows:
@@ -103,23 +108,24 @@ from the main (upstream) repository:
    git pull --ff upstream dev/8.1.x
    ```
 
-### <a name="dev-branches"></a> Shared Development Branches
+#### <a name="dev-branches"></a> Shared Development Branches
 
 Active development takes place on a long-lived branch named for the next upcoming release.  For example, at the time of this writing, that branch is `dev/8.1.x`.  A separate long-lived branch usually also exists for the most recently available release, e.g., `dev/8.0.x`.  That way, important fixes, such as security fixes, can be backported and new interim releases made -- e.g., "8.0.1", "8.0.2", etc -- while work continues in parallel toward the "8.1.0" release.  (Unlike some projects, Arches does not maintain a permanent `main` or `master` branch.  Instead, the name of Arches' default branch changes periodically; just look at the [repository on GitHub](https://github.com/archesproject/arches) to see what it is at any given time.)
 
 Generally, your own individual development branches should be based on the latest `dev/A.B.x` branch.  In some cases a reviewer may ask you to rebase against `dev/A.B-1.x` or something else, depending on the specifics of the change.
 
-### <a name="commit"></a> Git Commit Guidelines
+#### <a name="commit"></a> Git Commit Guidelines
 We have a few guidelines about how our git commit messages should be formatted.  This leads to **more
 readable messages** that are easy to follow when looking through the **project history**.
 
-#### Commit Message Format
+##### Commit Message Format
 * Use the present tense ("Add feature" not "Added feature")
 * Use the imperative mood ("Move cursor to..." not "Moves cursor to...")
 * Limit the first line to 72 characters or less
 * Make sure every commit references an issue, for example "improve contributing guidelines docs #1926"
+* If you used AI assistance, [consider saying so](#acknowledging-assistance) in the commit message
 
-## <a name="documentation"></a> Contributing Documentation
+### <a name="documentation"></a> Contributing Documentation
 We greatly appreciate any help in adding to the Arches documentation. This could include creating example videos/workflows, to-do tasks, etc. We have two categories of documentation:
 - Official [Arches documentation](http://arches.readthedocs.io) - full and publically accessible documentation
    - Managed in the [archesproject/arches-docs](https://github.com/archesproject/arches-docs) repository. Please see that repo's [wiki](https://github.com/archesproject/arches-docs/wiki) for more information on contributing content.
@@ -127,7 +133,34 @@ We greatly appreciate any help in adding to the Arches documentation. This could
 - In-app help panels - accessible only from within the Arches interface, meant for quick user reference
    - This content is stored as HTML templates in `/arches/arches/app/templates/help`.
    - To contribute to this documentation, use the normal contributing procedures described above.
-   
+
+### <a name="human-accountability"></a> Human Accountability
+
+*The human contributor is fully responsible for each code commit and documentation contribution in the Arches Project.*
+
+Regardless of what sources or tools you use in the process of making your contribution, you are responsible for everything you submit.
+
+Your contribution is assumed to be your original work, and must not infringe anyone's copyright.  This will generally be true by default, unless you use an AI model that reproduces others' code verbatim, or unless you copy blocks of code unchanged from somewhere else.  (A contribution may include code from elsewhere as long as the original source is under a compatible open source license, and of course the contribution must keep the upstream provenance and copyright information intact.)
+
+We [encourage citation](#acknowledging-assistance) of AI assistance or of any other significant assistance in assembling a contribution; such citations can help others improve their own contribution processes.
+
+### <a name="acknowledging-assistance"></a> Acknowledging AI Assistance and Other Assistance
+
+While the Arches Project does not require acknowledgement of AI assistance, we strongly encourage it.  Acknowledgement is a good social practice, as other contributors may be interested to know what AI tools their colleagues are using.
+
+This principle is not limited to AI assistance.  For example, if another Arches community member helped with the contribution, thank them in the commit message.  Or if your contribution was aided by something you learned from a programmer help site (e.g., [Stack Overflow](https://stackoverflow.com/) or some place similar), consider citing the relevant page.
+
+The best place for acknowledging human assistance or AI assistance is almost always in the [commit message](#commit).  For other kinds of assistance, use your judgement: the best place might be the commit message, or it might be in a comment in the code at the place where the new technique is used.
+
+Note that some AI tools automatically insert their own byline in the commit message in a fairly generic way, for example:
+
+```
+🤖 Generated with https://claude.ai/code 
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
+If your AI tool inserts something like that, *please adjust the language* to accurately reflect the AI's role in this particular contribution.  Commit messages should be accurate, and that includes what they say about how the change was made.
+
 ## <a name="tracking"></a> Seeing What Others Are Working On
 
 Some ongoing work in Arches is tracked in [GitHub

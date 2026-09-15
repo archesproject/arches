@@ -41,7 +41,6 @@ from arches.app.utils.permission_backend import user_is_resource_reviewer
 
 import logging
 
-
 logger = logging.getLogger(__name__)
 
 

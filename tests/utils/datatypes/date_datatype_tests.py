@@ -6,7 +6,6 @@ from arches.app.datatypes.datatypes import DataTypeFactory, DateDataType
 from arches.app.models.system_settings import settings
 from unittest.mock import patch, MagicMock
 
-
 # these tests can be run from the command line via
 # python manage.py test tests.utils.datatypes.date_datatype_tests --settings="tests.test_settings"
 

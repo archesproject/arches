@@ -15,7 +15,6 @@ from arches.app.utils.label_based_graph_v2 import (
 
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
-
 # these tests can be run from the command line via
 # python manage.py test tests.utils.label_based_graph_test_v2 --settings="tests.test_settings"
 

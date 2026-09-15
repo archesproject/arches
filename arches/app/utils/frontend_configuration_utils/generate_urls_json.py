@@ -4,6 +4,8 @@ from django.conf import settings
 from django.urls import get_resolver, URLPattern, URLResolver
 from django.urls.resolvers import RegexPattern, RoutePattern, LocalePrefixPattern
 
+from arches.settings_utils import list_arches_app_names
+
 
 def _interpolate_route(resolver_pattern):
     if isinstance(resolver_pattern, RoutePattern):
@@ -187,6 +189,10 @@ def generate_urls_json():
         project_namespace + ":static_url": settings.STATIC_URL,
         project_namespace + ":media_url": settings.MEDIA_URL,
     }
+
+    for app_name in list_arches_app_names():
+        special_route_entries.setdefault(app_name + ":static_url", settings.STATIC_URL)
+        special_route_entries.setdefault(app_name + ":media_url", settings.MEDIA_URL)
 
     for special_route_name, special_url_value in special_route_entries.items():
         special_entry = {"url": special_url_value, "params": []}

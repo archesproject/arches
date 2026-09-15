@@ -52,6 +52,21 @@
                     <p>{% trans 'Record created by Arches with unique identifer' %}<span class="text-bold" data-bind="text: ' ' + resourceinstanceid"></span></p>
                 </div>
             <!--/ko-->
+            <!--ko if: edittype == 'copy' -->
+                <h4 class="mar-no pad-btm">{% trans 'Resource Copied' %}</h4>
+                <div class="eh-node-group">
+                    <p>{% trans 'Resource copied by' %} <span class="text-bold" data-bind="text: editor"></span></p>
+                    <!--ko if: copiedResourceUrl -->
+                    <p class="tile-node-value">
+                        <span data-bind="text: note"></span>
+                        <a data-bind="attr: { href: copiedResourceUrl }, text: newvalue.displayname"></a>
+                    </p>
+                    <!--/ko-->
+                    <!--ko if: !copiedResourceUrl && note -->
+                    <p data-bind="text: note"></p>
+                    <!--/ko-->
+                </div>
+            <!--/ko-->
             <!--ko if: edittype == 'tile create'-->
                 <!--ko if: cardContainerName -->
                 <h4 class="mar-no pad-btm"><span data-bind="text: cardContainerName + ': ' + card.name + ' '"></span>{% trans 'Created' %}</h4>
@@ -68,7 +83,13 @@
                         <ul class="tile-data-list">
                             <div data-bind="foreach: full_new_value">
                             <li class="tile-data-item">
-                                <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
+                                <span class="tile-node-name" data-bind="text: node.name"></span>
+                                <!--ko ifnot: is_array -->
+                                    <span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
+                                <!--/ko-->
+                                <!--ko if: is_array -->
+                                    <span class="tile-node-value" data-bind="text: JSON.stringify(new_value)"></span>
+                                <!--/ko-->
                             </li>
                             </div>
                         </ul>
@@ -80,7 +101,13 @@
                     <ul class="tile-data-list">
                         <div data-bind="foreach: full_new_provisional_value">
                             <li class="tile-data-item">
-                                <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
+                                <span class="tile-node-name" data-bind="text: node.name"></span>
+                                <!--ko ifnot: is_array -->
+                                    <span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
+                                <!--/ko-->
+                                <!--ko if: is_array -->
+                                    <span class="tile-node-value" data-bind="text: JSON.stringify(new_value)"></span>
+                                <!--/ko-->
                             </li>
                         </div>
                     </ul>
@@ -104,7 +131,7 @@
                         <ul class="tile-data-list">
                             <div data-bind="foreach: full_new_value">
                             <li class="tile-data-item">
-                                <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
+                                <span class="tile-node-name" data-bind="text: node.name"></span><!--ko ifnot: is_array --><span class="tile-node-value" data-bind="text: ' ' + new_value"></span><!--/ko--><!--ko if: is_array --><span class="tile-node-value" data-bind="text: JSON.stringify(new_value)"></span><!--/ko-->
                             </li>
                             </div>
                         </ul>
@@ -116,7 +143,13 @@
                     <ul class="tile-data-list">
                         <div data-bind="foreach: full_new_provisional_value">
                             <li class="tile-data-item">
-                                <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
+                                <span class="tile-node-name" data-bind="text: node.name"></span>
+                                <!--ko ifnot: is_array -->
+                                    <span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
+                                <!--/ko-->
+                                <!--ko if: is_array -->
+                                    <span class="tile-node-value" data-bind="text: JSON.stringify(new_value)"></span>
+                                <!--/ko-->
                             </li>
                         </div>
                     </ul>
@@ -133,7 +166,13 @@
                         <ul class="tile-data-list">
                             <div data-bind="foreach: full_old_value">
                             <li class="tile-data-item">
-                                <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
+                                <span class="tile-node-name" data-bind="text: node.name"></span>
+                                <!--ko ifnot: is_array -->
+                                    <span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
+                                <!--/ko-->
+                                <!--ko if: is_array -->
+                                    <span class="tile-node-value" data-bind="text: JSON.stringify(new_value)"></span>
+                                <!--/ko-->
                             </li>
                             </div>
                         </ul>
@@ -147,7 +186,13 @@
                         <ul class="tile-data-list">
                             <div data-bind="foreach: full_old_provisional_value">
                             <li class="tile-data-item">
-                                <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
+                                <span class="tile-node-name" data-bind="text: node.name"></span>
+                                <!--ko ifnot: is_array -->
+                                    <span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
+                                <!--/ko-->
+                                <!--ko if: is_array -->
+                                    <span class="tile-node-value" data-bind="text: JSON.stringify(new_value)"></span>
+                                <!--/ko-->
                             </li>
                             </div>
                         </ul>
@@ -171,7 +216,13 @@
                         <ul class="tile-data-list">
                             <div data-bind="foreach: full_old_value">
                             <li class="tile-data-item">
-                                <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
+                                <span class="tile-node-name" data-bind="text: node.name"></span>
+                                <!--ko ifnot: is_array -->
+                                    <span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
+                                <!--/ko-->
+                                <!--ko if: is_array -->
+                                    <span class="tile-node-value" data-bind="text: JSON.stringify(new_value)"></span>
+                                <!--/ko-->
                             </li>
                             </div>
                         </ul>

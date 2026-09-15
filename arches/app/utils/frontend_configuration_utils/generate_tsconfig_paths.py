@@ -9,6 +9,7 @@ from arches.app.utils.frontend_configuration_utils.get_base_path import get_base
 def generate_tsconfig_paths():
     base_path = get_base_path()
     root_dir_path = os.path.realpath(settings.ROOT_DIR)
+    project_path = os.path.join("..", os.path.basename(base_path), "src")
 
     path_lookup = dict(
         zip(list_arches_app_names(), list_arches_app_paths(), strict=True)
@@ -19,6 +20,7 @@ def generate_tsconfig_paths():
         "compilerOptions": {
             "paths": {
                 "@/arches/*": [
+                    os.path.join(project_path, "arches", "*"),
                     os.path.join(
                         "..",
                         os.path.relpath(
@@ -29,21 +31,22 @@ def generate_tsconfig_paths():
                         "src",
                         "arches",
                         "*",
-                    )
+                    ),
                 ],
                 **{
                     os.path.join("@", path_name, "*"): [
+                        os.path.join(project_path, path_name, "*"),
                         os.path.join(
                             "..",
                             os.path.relpath(path, os.path.join(base_path, "..")),
                             "src",
                             path_name,
                             "*",
-                        )
+                        ),
                     ]
                     for path_name, path in path_lookup.items()
                 },
-                "*": ["../node_modules/*"],
+                "*": ["../node_modules/@types/*", "../node_modules/*"],
             }
         },
     }

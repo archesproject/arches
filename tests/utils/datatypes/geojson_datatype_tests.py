@@ -55,6 +55,15 @@ class GeoJsonDataTypeTest(ArchesTestCase):
                 errors = geom_datatype.validate(geom)
                 self.assertEqual(len(errors), 0)
 
+    def test_validate_missing_properties(self):
+        geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
+        # feature has valid geometry but no "properties" key -> one error
+        geom = json.loads(
+            '{"type": "FeatureCollection","features": [{"type": "Feature","geometry": {"coordinates": [13.4,52.5],"type": "Point"}}]}'
+        )
+        errors = geom_datatype.validate(geom)
+        self.assertEqual(len(errors), 1)
+
     def test_get_map_source(self):
         geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
         node = models.Node.objects.get(pk="c9b37f96-17b3-11eb-a708-acde48001122")

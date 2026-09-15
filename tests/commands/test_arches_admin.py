@@ -1,57 +1,27 @@
+import argparse
 import os
-import sys
 import shutil
-import subprocess
 import tempfile
+from unittest.mock import patch
+
 from django.test import SimpleTestCase
+from django.test.utils import captured_stdout
+
+import arches
+from arches.install import arches_admin
 
 
-class ArchesAdminTestCase(SimpleTestCase):
-    def run_test(self, args, settings_file=None, umask=-1, cwd=None):
-        base_dir = os.path.dirname(self.test_dir)
-        tests_dir = os.path.dirname(os.path.dirname(__file__))
-        # The repo root (one level above the tests dir) must be on PYTHONPATH
-        # so that `import arches` resolves to the local source tree.
-        arches_dir = os.path.dirname(tests_dir)
-
-        test_environ = os.environ.copy()
-
-        if settings_file:
-            test_environ["DJANGO_SETTINGS_MODULE"] = settings_file
-        elif "DJANGO_SETTINGS_MODULE" in test_environ:
-            del test_environ["DJANGO_SETTINGS_MODULE"]
-
-        python_path = [base_dir, arches_dir, tests_dir]
-        test_environ["PYTHONPATH"] = os.pathsep.join(python_path)
-        test_environ["PYTHONWARNINGS"] = ""
-
-        process = subprocess.run(
-            [sys.executable, *args],
-            capture_output=True,
-            cwd=cwd or self.test_dir,
-            env=test_environ,
-            text=True,
-            umask=umask,
-        )
-        return process.stdout, process.stderr
-
-    def run_arches_admin(self, args, settings_file=None, umask=-1, cwd=None):
-        return self.run_test(
-            ["-m", "arches.install.arches_admin", *args],
-            settings_file,
-            umask=umask,
-            cwd=cwd,
-        )
-
-
-class ArchesAdminCommandTests(ArchesAdminTestCase):
-    test_dir = os.path.dirname(__file__)
-
+class ArchesAdminCommandTests(SimpleTestCase):
     def test_help(self):
-        stdout, stderr = self.run_arches_admin(["--help"])
-        self.assertIn("startproject", stdout)
+        with captured_stdout() as stdout:
+            try:
+                arches_admin.main(["--help"])
+            except SystemExit:
+                pass
+        self.assertIn("startproject", stdout.getvalue())
 
-    def test_startproject_uses_kebab_case_directory(self):
+    @patch("arches.install.arches_admin.subprocess.call")
+    def test_startproject_uses_kebab_case_directory(self, mock_npm):
         """
         When a project name contains underscores, `arches-admin startproject`
         should create the top-level project directory using the kebab-case
@@ -68,11 +38,25 @@ class ArchesAdminCommandTests(ArchesAdminTestCase):
 
         temp_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, temp_dir, ignore_errors=True)
+        self.addCleanup(os.chdir, os.getcwd())
 
-        self.run_arches_admin(
-            ["startproject", project_name, "--yes"],
-            cwd=temp_dir,
+        # mock command-line arguments for startproject, no defaults populated since
+        # we're directly calling the command function
+        args = argparse.Namespace(
+            name=project_name,
+            directory=None,
+            template=os.path.join(
+                os.path.dirname(arches.__file__), "install", "arches-templates"
+            ),
+            extensions=["py", "txt", "html", "js", "css", "log", "json", "gitignore"],
+            files="",
+            exclude=".git",
+            yes=True,
+            verbosity=1,
+            command="startproject",
         )
+        os.chdir(temp_dir)
+        arches_admin.command_startproject(args)
 
         top_level = os.path.join(temp_dir, expected_top_level_dir)
         self.assertTrue(
@@ -92,3 +76,5 @@ class ArchesAdminCommandTests(ArchesAdminTestCase):
             os.path.isdir(inner_package),
             msg=f"Expected inner Python package '{project_name}' was not found inside '{expected_top_level_dir}'.",
         )
+
+        mock_npm.assert_called_once_with("npm install", shell=True)

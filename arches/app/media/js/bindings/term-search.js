@@ -48,7 +48,7 @@ ko.bindingHandlers.termSearch = {
             ajax: {
                 url: arches.urls.search_terms,
                 dataType: 'json',
-                quietMillis: 500,
+                delay: 500,
                 data: function(requestParams) {
                     let term = requestParams.term || '';
                     return {
@@ -198,6 +198,16 @@ ko.bindingHandlers.termSearch = {
         });
 
         searchbox.tags = [];
+
+        // selectWoo gates its search-firing on _keyUpPrevented, so a fast edit can change
+        // the field without ever issuing a query, leaving the dropdown stuck on stale results.
+        // adding this trigger still gets debounced properly
+		var s2 = $(el).data('select2');
+        if (s2) {
+            s2.$container.on('input', '.select2-search__field', function() {
+                s2.trigger('query', { term: this.value });
+            });
+        }
     }
 };
 ko.bindingHandlers.termSearch.init = ko.bindingHandlers.termSearch.init.bind(ko.bindingHandlers.termSearch);

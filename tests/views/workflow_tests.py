@@ -4,7 +4,6 @@ from http import HTTPStatus
 
 from django.contrib.auth.models import Group, User
 from django.urls import reverse
-from django.test.client import Client
 
 from arches.app.models.models import WorkflowHistory
 from tests.base_test import ArchesTestCase
@@ -17,8 +16,6 @@ class WorkflowHistoryTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.client = Client()
-        cls.admin = User.objects.get(username="admin")
         cls.anonymous = User.objects.get(username="anonymous")
         cls.editor = User.objects.create_user(
             username="editor", email="editor@resources.com", password="Test12345!"
@@ -29,7 +26,7 @@ class WorkflowHistoryTests(ArchesTestCase):
         cls.history = WorkflowHistory.objects.create(
             workflowid=str(uuid.uuid4()),
             workflowname="test-name",
-            user=cls.admin,
+            user=cls.test_users["admin"],
             created=datetime.datetime.now(),
             completed=False,
             stepdata={
@@ -66,7 +63,7 @@ class WorkflowHistoryTests(ArchesTestCase):
         )
 
     def test_get_nonexistent_workflow_history(self):
-        self.client.force_login(self.admin)
+        self.client.force_login(self.test_users["admin"])
         response = self.client.get(
             reverse("workflow_history", kwargs={"workflowid": uuid.uuid4()})
         )
@@ -87,7 +84,7 @@ class WorkflowHistoryTests(ArchesTestCase):
             response, "Permission Denied", status_code=HTTPStatus.FORBIDDEN
         )
 
-        self.client.force_login(self.admin)
+        self.client.force_login(self.test_users["admin"])
         response = self.client.get(
             reverse(
                 "workflow_history", kwargs={"workflowid": str(self.history.workflowid)}
@@ -151,7 +148,7 @@ class WorkflowHistoryTests(ArchesTestCase):
             response, "Permission Denied", status_code=HTTPStatus.FORBIDDEN
         )
 
-        self.client.force_login(self.admin)
+        self.client.force_login(self.test_users["admin"])
         response = self.client.post(
             reverse(
                 "workflow_history", kwargs={"workflowid": str(self.history.workflowid)}
@@ -168,7 +165,7 @@ class WorkflowHistoryTests(ArchesTestCase):
         self.assertEqual(len(self.history.componentdata), 2)
 
     def test_complete_workflow_history(self):
-        self.client.force_login(self.admin)
+        self.client.force_login(self.test_users["admin"])
 
         response = self.client.post(
             reverse(
@@ -190,7 +187,7 @@ class WorkflowHistoryTests(ArchesTestCase):
     def test_no_edits_after_completed(self):
         self.history.completed = True
         self.history.save()
-        self.client.force_login(self.admin)
+        self.client.force_login(self.test_users["admin"])
 
         response = self.client.post(
             reverse(

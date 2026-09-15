@@ -117,7 +117,7 @@ class SKOSReader(object):
 
                 for predicate, object in graph.predicate_objects(subject=scheme):
                     if str(DCTERMS) in predicate and predicate.replace(
-                        DCTERMS, ""
+                        str(DCTERMS), ""
                     ) in dcterms_value_types.values_list("valuetype", flat=True):
                         if not self.language_exists(object, allowed_languages):
                             allowed_languages = models.Language.objects.values_list(
@@ -126,9 +126,9 @@ class SKOSReader(object):
 
                         try:
                             # first try and get any values associated with the concept_scheme
-                            # predicate.replace(SKOS, '') should yield something like 'prefLabel' or 'scopeNote', etc..
+                            # predicate.replace(str(SKOS), '') should yield something like 'prefLabel' or 'scopeNote', etc..
                             value_type = dcterms_value_types.get(
-                                valuetype=predicate.replace(DCTERMS, "")
+                                valuetype=predicate.replace(str(DCTERMS), "")
                             )
                             val = self.unwrapJsonLiteral(object)
                             if predicate == DCTERMS.title:
@@ -217,8 +217,8 @@ class SKOSReader(object):
                             # this is essentially the skos element type within a <skos:Concept>
                             # element (eg: prefLabel, broader, etc...)
                             relation_or_value_type = predicate.replace(
-                                SKOS, ""
-                            ).replace(ARCHES, "")
+                                str(SKOS), ""
+                            ).replace(str(ARCHES), "")
 
                             if relation_or_value_type in skos_value_types_list:
                                 value_type = skos_value_types[relation_or_value_type]
@@ -303,9 +303,9 @@ class SKOSReader(object):
 
                         # this is essentially the skos element type within a <skos:Concept>
                         # element (eg: prefLabel, broader, etc...)
-                        relation_or_value_type = predicate.replace(SKOS, "").replace(
-                            ARCHES, ""
-                        )
+                        relation_or_value_type = predicate.replace(
+                            str(SKOS), ""
+                        ).replace(str(ARCHES), "")
 
                         if relation_or_value_type in skos_value_types_list:
                             value_type = skos_value_types[relation_or_value_type]

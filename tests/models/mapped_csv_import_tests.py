@@ -27,7 +27,6 @@ from arches.app.utils.data_management.resource_graphs.importer import (
 )
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
 
-
 # these tests can be run from the command line via
 # python manage.py test tests.models.mapped_csv_import_tests --settings="tests.test_settings"
 

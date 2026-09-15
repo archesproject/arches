@@ -159,3 +159,22 @@ def warn_old_compatibility_settings(app_configs, **kwargs):
             )
         )
     return errors
+
+
+@register(Tags.compatibility)
+def warn_default_allow_permission_framework(app_configs, **kwargs):
+    errors = []
+
+    if (
+        getattr(settings, "PERMISSION_FRAMEWORK", None)
+        == "arches_default_allow.ArchesDefaultAllowPermissionFramework"
+    ):
+        errors.append(
+            Warning(
+                msg="Default Allow is deprecated and no longer supported. Please migrate to Default Deny",
+                hint="Set PERMISSION_FRAMEWORK to arches_default_deny.ArchesDefaultDenyPermissionFramework.",
+                obj=settings.APP_NAME,
+                id="arches.W003",
+            )
+        )
+    return errors

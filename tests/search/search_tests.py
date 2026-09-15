@@ -151,7 +151,7 @@ class SearchTests(ArchesTestCase):
 
         """
         se = SearchEngineFactory().create()
-        admin_user = User.objects.get(username="admin")
+        admin_user = self.test_users["admin"]
         nodeid = "c9b37b7c-17b3-11eb-a708-acde48001122"
         nodegroup = NodeGroup.objects.get(pk=nodeid)
         tileid = "bebffbea-daf6-414e-80c2-530ec88d2705"
@@ -194,7 +194,7 @@ class SearchTests(ArchesTestCase):
         Test search terms method with a permitted user
 
         """
-        admin_user = User.objects.get(username="admin")
+        admin_user = self.test_users["admin"]
         nodeid = uuid.UUID("c9b37b7c-17b3-11eb-a708-acde48001122")
         tileid = uuid.UUID("bebffbea-daf6-414e-80c2-530ec88d2705")
         resourceinstanceid = uuid.UUID("745f5e4a-d645-4c50-bafc-c677ea95f060")
@@ -233,7 +233,7 @@ class SearchTests(ArchesTestCase):
 
     def test_adv_search_on_non_null_geom_node(self):
         geojson_nodeid = "be25bdf0-c8bf-11ed-a172-0242ac130009"
-        user = User.objects.get(username="admin")
+        user = self.test_users["admin"]
         graphid = self.allDataTypeGraphId
 
         tileid = "aaaaaaaa-daf6-414e-80c2-530ec88d2705"
@@ -353,7 +353,7 @@ class SearchTests(ArchesTestCase):
         tileid = "bebffbea-daf6-414e-80c2-530ec88d2705"
         resourceinstanceid = "745f5e4a-d645-4c50-bafc-c677ea95f060"
         resource = Resource(uuid.UUID(resourceinstanceid))
-        user = User.objects.get(username="admin")
+        user = self.test_users["admin"]
         resource.graph_id = self.allDataTypeGraphId
         resource.graph.is_active = True
         resource.graph.save()
@@ -394,7 +394,7 @@ class SearchTests(ArchesTestCase):
 
     def test_adv_search_on_non_null_file_list_node(self):
         filelist_nodeid = "1d1bfbea-c8bf-11ed-bf64-0242ac130009"
-        user = User.objects.get(username="admin")
+        user = self.test_users["admin"]
         graphid = self.allDataTypeGraphId
 
         tileid = "aaaaaaaa-daf6-414e-80c2-530ec88d2705"
@@ -464,7 +464,7 @@ class SearchTests(ArchesTestCase):
         tileid = "bebffbea-daf6-414e-80c2-530ec88d2705"
         resourceinstanceid = "745f5e4a-d645-4c50-bafc-c677ea95f060"
         resource = Resource(uuid.UUID(resourceinstanceid))
-        user = User.objects.get(username="admin")
+        user = self.test_users["admin"]
         resource.graph_id = self.allDataTypeGraphId
         resource.graph.is_active = True
         resource.graph.save()
@@ -513,7 +513,7 @@ class SearchTests(ArchesTestCase):
         ri_dt_nodeid = "7f4406d0-c8c1-11ed-a172-0242ac130009"
         graphid = "d71a8f56-987f-4fd1-87b5-538378740f15"
         cardinality_graphid = "2f7f8e40-adbc-11e6-ac7f-14109fd34195"
-        user = User.objects.get(username="admin")
+        user = self.test_users["admin"]
         graph = Graph.objects.get(
             graphid=cardinality_graphid,
         )
@@ -640,7 +640,7 @@ class SearchTests(ArchesTestCase):
         # add delay to allow for indexes to be updated
         time.sleep(1)
 
-        user = User.objects.get(username="admin")
+        user = self.test_users["admin"]
 
         factory = RequestFactory()
         request = factory.get("/search")

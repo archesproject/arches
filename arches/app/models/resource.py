@@ -234,10 +234,16 @@ class Resource(models.ResourceInstance):
         user=None,
         should_update_resource_instance_lifecycle_state=False,
         current_resource_instance_lifecycle_state=None,
+        edit_log_type=None,
+        edit_log_note=None,
+        edit_log_newvalue=None,
+        edit_log_oldvalue=None,
         **kwargs,
     ):
         """
         Saves and indexes a single resource
+
+        edit_log_ args (type, note, newvalue, oldvalue) are passed through to the save_edit method
 
         Keyword Arguments:
         request -- the request object
@@ -259,6 +265,11 @@ class Resource(models.ResourceInstance):
             self.principaluser_id = user.id
             kwargs = add_to_update_fields(kwargs, "principaluser_id")
 
+        # set edit_log_type as create before base model instance is saved
+        edit_log_type = (
+            "create" if self._state.adding and not edit_log_type else edit_log_type
+        )
+
         super(Resource, self).save(
             context=context,
             index=index,
@@ -274,7 +285,15 @@ class Resource(models.ResourceInstance):
             # Saving tiles at the same time as updating lifecycle state is not supported.
             return
 
-        self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
+        if edit_log_type:
+            self.save_edit(
+                user=user,
+                edit_type=edit_log_type,
+                transaction_id=transaction_id,
+                note=edit_log_note,
+                newvalue=edit_log_newvalue,
+                oldvalue=edit_log_oldvalue,
+            )
 
         for tile in self.tiles:
             tile.resourceinstance_id = self.resourceinstanceid

@@ -14,6 +14,10 @@ import arches from 'arches';
 */
 
 const initialize = function (element, valueAccessor, allBindings) {
+    if (!element.isConnected) {
+        return;
+    }
+
     var modelValue = valueAccessor();
     var value = ko.utils.unwrapObservable(valueAccessor());
     const language = allBindings.get('language') || ko.observable(arches.activeLanguage);

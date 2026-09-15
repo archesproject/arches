@@ -25,7 +25,6 @@ from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
 from django.db import connection
 from django.http import HttpRequest
-from django.test import TransactionTestCase
 
 from arches.app.etl_modules.branch_excel_importer import BranchExcelImporter
 from arches.app.etl_modules.bulk_edit_concept import BulkConceptEditor
@@ -38,12 +37,13 @@ from arches.app.utils.data_management.resource_graphs.importer import (
 )
 from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.utils.skos import SKOSReader
+from tests.base_test import ArchesTransactionTestCase
 
 # these tests can be run from the command line via
 # python manage.py test tests.bulkdata.concept_edit_tests --settings="tests.test_settings"
 
 
-class ConceptEditTests(TransactionTestCase):
+class ConceptEditTests(ArchesTransactionTestCase):
     serialized_rollback = True
 
     def setUp(self):
@@ -64,12 +64,11 @@ class ConceptEditTests(TransactionTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         resource_graph_importer(archesfile["graph"])
         graph = Graph.objects.get(graphid="2f4b00d2-29fb-486f-8623-9fb8d25b6de1")
-        admin = User.objects.get(username="admin")
-        graph.publish(user=admin)
+        graph.publish(user=self.test_users["admin"])
 
         request = HttpRequest()
         request.method = "POST"
-        request.user = User.objects.get(username="admin")
+        request.user = self.test_users["admin"]
         load_id = "090bf2f0-ee96-4898-aab4-3aab97af0f7f"
         xls_file = "bulk_concept_test.xlsx"
         module_id = ETLModule.objects.get(slug="branch-excel-importer").pk
@@ -118,7 +117,7 @@ class ConceptEditTests(TransactionTestCase):
         }
         request = HttpRequest()
         request.method = "POST"
-        request.user = User.objects.get(username="admin")
+        request.user = self.test_users["admin"]
         for k, v in params.items():
             request.POST.__setitem__(k, v)
 
@@ -141,7 +140,7 @@ class ConceptEditTests(TransactionTestCase):
 
         request = HttpRequest()
         request.method = "POST"
-        request.user = User.objects.get(username="admin")
+        request.user = self.test_users["admin"]
         for k, v in params.items():
             request.POST.__setitem__(k, v)
 

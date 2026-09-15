@@ -2,6 +2,7 @@ import $ from 'jquery';
 import _ from 'underscore';
 import ko from 'knockout';
 import moment from 'moment';
+import arches from 'arches';
 import BaseManagerView from 'views/base-manager';
 import data from 'views/resource/resource-edit-history-data';
 import 'bindings/chosen';
@@ -15,6 +16,7 @@ var ResourceEditLogView = BaseManagerView.extend({
 
         var editTypeLookup = {
             'create': {icon: 'fa fa-chevron-circle-right fa-lg', color: 'bg-mint'},
+            'copy': {icon: 'fa fa-copy fa-lg', color: 'bg-info'},
             'tile edit': {icon: 'fa fa-repeat fa-lg', color: 'bg-purple'},
             'tile create': {icon: 'fa fa-plus fa-lg', color: 'bg-dark'},
             'tile delete': {icon: 'fa fa-minus fa-lg', color: 'bg-danger'},
@@ -48,20 +50,21 @@ var ResourceEditLogView = BaseManagerView.extend({
                 return value;
             }
 
-            _.each(value, function(v, k){
-                if (_.isObject(v) && v['features']) {
-                    v = _.map(v['features'], function(feature){return JSON.stringify(feature['geometry'], rounder, 4);});
+            _.each(value, function(val, nodeid){
+                var is_array = _.isArray(val);
+                if (_.isObject(val) && val['features']) {
+                    val = _.map(val['features'], function(feature){return JSON.stringify(feature['geometry'], rounder, 4);});
                 }
-                full_value[k] = {new_value: v};
+                full_value[nodeid] = {new_value: val, is_array: is_array};
                 if (edit.card) {
                     _.each(edit.card.nodes, function(node){
-                        if (k == node.nodeid) {
+                        if (nodeid == node.nodeid) {
                             full_value[node.nodeid].node = node;
                         }
                     }, this);
                 }
             });
-            return _.map(full_value, function(v,k){return v;});   // eslint-disable-line @typescript-eslint/no-unused-vars
+            return _.map(full_value, function(val,nodeid){return val;});   // eslint-disable-line @typescript-eslint/no-unused-vars
         };
 
         _.each(edits, function(edit){
@@ -70,6 +73,9 @@ var ResourceEditLogView = BaseManagerView.extend({
             edit.day = datetime.format('DD MMMM, YYYY');
             edit.editor = edit.user_email != '' ? edit.user_email : edit.user_username;
             edit.edit_type_icon = editTypeLookup[edit.edittype];
+            if (edit.edittype === 'copy' && edit.newvalue && edit.newvalue.resourceinstanceid) {
+                edit.copiedResourceUrl = arches.urls.resource_report + edit.newvalue.resourceinstanceid;
+            }
             if (edit.nodegroupid) {
                 edit.full_new_value = createFullValue(edit.newvalue, edit);
                 edit.full_old_value = createFullValue(edit.oldvalue, edit);

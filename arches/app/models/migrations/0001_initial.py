@@ -1252,12 +1252,10 @@ class Migration(migrations.Migration):
             name="functionxgraph",
             unique_together={("function", "graph")},
         ),
-        migrations.RunSQL(
-            """
+        migrations.RunSQL("""
                 ALTER TABLE nodes ADD CONSTRAINT nodes_ddatatypes_fk FOREIGN KEY (datatype)
                 REFERENCES public.d_data_types (datatype) MATCH SIMPLE
-                """
-        ),
+                """),
         migrations.RunSQL(
             get_sql_string_from_file(
                 os.path.join(settings.ROOT_DIR, "db", "dml", "db_data.sql")

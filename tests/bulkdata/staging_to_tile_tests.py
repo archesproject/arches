@@ -8,6 +8,7 @@ from arches.app.const import DefaultLifecycleStates
 from arches.app.etl_modules.staging_to_tile import (
     _build_tile_data,
     _post_process_staging,
+    _post_process_staging,
     staging_to_tile,
 )
 from arches.app.models.models import (

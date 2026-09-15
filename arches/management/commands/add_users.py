@@ -144,8 +144,7 @@ class Command(BaseCommand):
                 dev_group = Group.objects.create(name="Developer")
                 dev_perms = Permission.objects.all().values("id")
                 perm_ids = [int(perm["id"]) for perm in dev_perms]
-                for permission in perm_ids:
-                    dev_group.permissions.add(permission)
+                dev_group.permissions.add(*perm_ids)
             except:
                 self.stderr.write(traceback.format_exc())
 
@@ -163,21 +162,18 @@ class Command(BaseCommand):
                     user.is_staff = True
                     user.first_name = "Dev"
                     user.last_name = "User"
-                    for plugin in plugins:
-                        assign_perm("change_plugin", user, plugin)
-                        assign_perm("add_plugin", user, plugin)
-                        assign_perm("delete_plugin", user, plugin)
-                        assign_perm("view_plugin", user, plugin)
-                    for etl_module in etl_modules:
-                        assign_perm("view_etlmodule", user, etl_module)
+                    assign_perm("change_plugin", user, plugins)
+                    assign_perm("add_plugin", user, plugins)
+                    assign_perm("delete_plugin", user, plugins)
+                    assign_perm("view_plugin", user, plugins)
+                    assign_perm("view_etlmodule", user, etl_modules)
                 user.save()
                 self.stdout.write(
                     f"Added test user: {user.username}, password: {profile['password']}"
                 )
 
-                for group_name in profile["groups"]:
-                    group = groups_dict[group_name]
-                    group.user_set.add(user)
+                groups = [groups_dict[group_name] for group_name in profile["groups"]]
+                user.groups.add(*groups)
 
             except:
                 self.stderr.write(traceback.format_exc())
@@ -199,10 +195,10 @@ class Command(BaseCommand):
                         email=row.get("email"),
                         password=row.get("password", get_random_string(50, chars)),
                     )
-                    for group_name in row.get("groups", "").split(";"):
-                        group = Group.objects.filter(name=group_name).first()
-                        if group:
-                            group.user_set.add(user)
+                    groups = Group.objects.filter(
+                        name__in=row.get("groups", "").split(";")
+                    )
+                    user.groups.add(*groups)
                     user.save()
         except Exception as e:
             self.stderr.write(traceback.format_exc())

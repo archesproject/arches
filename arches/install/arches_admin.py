@@ -14,7 +14,6 @@ from django.utils.crypto import get_random_string
 from arches import __version__
 from packaging.version import Version
 
-
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arches.settings")
 here = os.path.abspath(os.path.dirname(__file__))
 COMMANDS = {}
@@ -180,7 +179,6 @@ class ArchesProjectCommand(TemplateCommand):
 def command_startproject(args):
     options = vars(args)
     name = options["name"]
-    make_directory = False
 
     project_name_kebab_case = name.replace("_", "-")
     options["project_name_kebab_case"] = project_name_kebab_case
@@ -199,18 +197,11 @@ def command_startproject(args):
             if response.lower() not in ["y", "yes"]:
                 print("Operation cancelled.")
                 sys.exit(0)
-
-        make_directory = True
         options["directory"] = project_name_kebab_case
 
     directory = options["directory"]
 
     project_path = os.path.join(os.getcwd(), directory if directory else name)
-
-    # TODO: remove manual directory creation when upgrading to Django 6+
-    # re. https://github.com/django/django/pull/18387
-    if make_directory and not os.path.exists(project_path):
-        os.mkdir(project_path)
 
     cmd = ArchesProjectCommand()
     cmd.handle(options)

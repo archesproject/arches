@@ -26,8 +26,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block graph_header_buttons %}
 <span style="display: flex">
-    <button 
-        class="btn btn-sm btn-danger btn-labeled fa fa-trash" 
+    <button
+        class="btn btn-sm btn-danger btn-labeled fa fa-trash"
         data-bind="
             attr: { disabled: graphPublicationId() === graphPublicationIdFromDatabase() },
             click: function() { graphPublicationId() !== graphPublicationIdFromDatabase() && showDeletePublicationAlert(); }
@@ -35,8 +35,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     >
         <span>{% trans "Delete Model Version" %}</span>
     </button>
-    <button 
-        class="btn btn-sm btn-primary btn-labeled fa fa-check" 
+    <button
+        class="btn btn-sm btn-primary btn-labeled fa fa-check"
         data-bind="
             attr: { disabled: graphPublicationId() === graphPublicationIdFromDatabase() },
             click: function() { graphPublicationId() !== graphPublicationIdFromDatabase() && showUpdatePublicationAlert(); }
@@ -49,17 +49,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock graph_header_buttons %}
 
 {% block content %}
-<div 
+<div
     style="
-        padding: 0 20px 20px 20px; 
+        padding: 0 20px 20px 20px;
         width: 100%;
-        height: calc(100vh - 105px); 
+        height: calc(100vh - 105px);
         overflow-y: scroll;
     "
 >
-    <fieldset>
+    <fieldset class="model-history-list">
         <!-- ko foreach: $data.publishedGraphs() -->
-            <div 
+            <div
                 style="border-bottom: 0px; border-top: 1px solid #ddd; padding-left: 20px;"
                 data-bind="
                     attr: { 'class': $data['publicationid'] === $parent.graphPublicationId() ? 'publication active-publication' : 'publication' },
@@ -68,16 +68,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             >
                 <div style="display: flex;">
                     <div style="display: flex; align-items: center;">
-                        <input 
-                            style="margin: 0px; cursor: pointer; pointer-events: none;" 
-                            type="radio" 
+                        <input
+                            style="margin: 0px; cursor: pointer; pointer-events: none;"
+                            type="radio"
                             data-bind="
-                                checkedValue: $data['publicationid'], 
+                                checkedValue: $data['publicationid'],
                                 checked: $parent.graphPublicationId(),
                             "
                         />
                     </div>
-    
+
                     <div style="width: 120px; padding-left: 20px;">
                         <!-- ko if: $data['publicationid'] === $parent.graphPublicationIdFromDatabase() -->
                             <span style="color: green;"><strong>{% trans 'Current' %}</strong></span>
@@ -125,19 +125,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div style='width: 60px; flex: none;'>
                             <strong>{% trans "Notes:" %}</strong>
                         </div>
-    
-                        <div 
+
+                        <div
                             style="
-                                overflow-y: hidden; 
+                                overflow-y: hidden;
                             "
                         >
-                            <div 
-                                style="    
+                            <div
+                                style="
                                     overflow: hidden;
                                     white-space: nowrap;
                                     text-overflow: ellipsis;
-                                " 
-                                data-bind="text: $data['notes'] || {% quoted_trans 'None' %}" 
+                                "
+                                data-bind="text: $data['notes'] || {% quoted_trans 'None' %}"
                                 readonly
                             ></div>
                         </div>
@@ -146,29 +146,29 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </div>
 
             <!-- ko if: $data['publicationid'] === $parent.graphPublicationId() -->
-                <div 
+                <div
                     style="
-                        display: flex; 
-                        background-color: #fff; 
-                        padding: 0px 60px 20px 154px; 
-                        border-left: 1px solid #ddd; 
-                        border-right: 1px solid #ddd; 
+                        display: flex;
+                        background-color: #fff;
+                        padding: 0px 60px 20px 154px;
+                        border-left: 1px solid #ddd;
+                        border-right: 1px solid #ddd;
                         cursor: pointer;
                     "
                 >
                     <div style="width: 60px; flex: none;">
                         <strong>{% trans "Notes:" %}</strong>
                     </div>
-                    <div 
+                    <div
                         style="
                             overflow-y: auto;
-                            min-height: 56px; 
+                            min-height: 56px;
                             max-height: 180px;
                         "
                     >
-                        <div 
-                            style="white-space: pre-wrap; cursor: default;" 
-                            data-bind="text: $data['notes'] || {% quoted_trans 'None' %}" 
+                        <div
+                            style="white-space: pre-wrap; cursor: default;"
+                            data-bind="text: $data['notes'] || {% quoted_trans 'None' %}"
                             readonly
                         ></div>
                     </div>
@@ -182,7 +182,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block pre_require_js %}
 {{block.super}}
-<div 
+<div
     id="graphPublicationData"
     style="display: none;"
     graphPublicationData='{

@@ -20,12 +20,11 @@ import json
 import os
 from io import StringIO
 from pathlib import Path
+from unittest.mock import patch
 
 from django.conf import settings
 from django.core.management import call_command
 from django.db import connection
-from django.http import HttpRequest
-from django.test import TransactionTestCase
 
 from arches.app.models.models import TileModel
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
@@ -42,11 +41,13 @@ from arches.app.etl_modules.base_import_module import FileValidationError
 
 from arches.app.models.models import ETLModule, LoadEvent
 
+from tests.base_test import ArchesTransactionTestCase
+
 # these tests can be run from the command line via
 # python manage.py test tests.bulkdata.tile_excel_tests --settings="tests.test_settings"
 
 
-class TileExcelTests(TransactionTestCase):
+class TileExcelTests(ArchesTransactionTestCase):
     serialized_rollback = True
 
     def setUp(self):
@@ -91,6 +92,29 @@ class TileExcelTests(TransactionTestCase):
         new_tiles = TileModel.objects.all()
         self.assertEqual(new_tiles.count(), 6)
         self.assertEqual(new_tiles.filter(sortorder=1).count(), 2)
+
+    def test_cli_no_index(self):
+        out = StringIO()
+        excel_file_path = str(
+            Path("tests", "fixtures", "data", "uploadedfiles", "tile_excel_test.xlsx")
+        )
+        with patch(
+            "arches.app.etl_modules.save.index_resources_by_transaction"
+        ) as mock_index:
+            call_command(
+                "etl",
+                "tile-excel-importer",
+                source=excel_file_path,
+                index=False,
+                stdout=out,
+            )
+            mock_index.assert_not_called()
+
+        self.assertIn("succeeded", out.getvalue())
+        self.assertEqual(TileModel.objects.all().count(), 6)
+
+        load_event = LoadEvent.objects.filter(status="completed").last()
+        self.assertIsNotNone(load_event)
 
     def test_export_with_orphaned_tile_node(self):
         """Export should not raise KeyError when tile tiledata contains a node

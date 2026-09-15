@@ -9,6 +9,13 @@ inputs:
     required: true
   secrets:
     description: 'Secrets from main.yml as JSON'
+  python-version:
+    description: 'Python version for matrix; used to control artifact uploads'
+    required: false
+  coverage-python-version:
+    description: 'Python version that uploads coverage artifacts'
+    required: false
+    default: '3.12'
 runs:
   using: 'composite'
   steps:
@@ -30,7 +37,7 @@ runs:
         pip install . --group dev
         echo Python packages installed
       shell: bash
-
+    
     - name: Ensure frontend configuration files exist
       run: |
           python manage.py check
@@ -74,7 +81,7 @@ runs:
     - name: Run frontend tests
       run: |
         npm run vitest
-        mv coverage/frontend/coverage.xml ${{ inputs.branch-type }}_branch_frontend_coverage.xml
+        mv coverage/frontend/coverage.xml ${{ inputs.branch-type }}_branch_frontend_coverage_py${{ inputs.python-version }}.xml
       shell: bash
 
     - name: Check for missing migrations
@@ -96,19 +103,21 @@ runs:
       run: |
         coverage report
         coverage json
-        mv coverage/python/coverage.json ${{ inputs.branch-type }}_branch_python_coverage.json
+        mv coverage/python/coverage.json ${{ inputs.branch-type }}_branch_python_coverage_py${{ inputs.python-version }}.json
       shell: bash
 
     - name: Upload frontend coverage report as artifact
+      if: ${{ inputs.python-version == inputs.coverage-python-version }}
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ inputs.branch-type }}-branch-frontend-coverage-report
-        path: ${{ inputs.branch-type }}_branch_frontend_coverage.xml
+        name: ${{ inputs.branch-type }}-branch-frontend-coverage-report-py${{ inputs.python-version }}
+        path: ${{ inputs.branch-type }}_branch_frontend_coverage_py${{ inputs.python-version }}.xml
         overwrite: true
 
     - name: Upload Python coverage report as artifact
+      if: ${{ inputs.python-version == inputs.coverage-python-version }}
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ inputs.branch-type }}-branch-python-coverage-report
-        path: ${{ inputs.branch-type }}_branch_python_coverage.json
+        name: ${{ inputs.branch-type }}-branch-python-coverage-report-py${{ inputs.python-version }}
+        path: ${{ inputs.branch-type }}_branch_python_coverage_py${{ inputs.python-version }}.json
         overwrite: true

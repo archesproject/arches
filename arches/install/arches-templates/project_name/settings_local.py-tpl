@@ -2,3 +2,10 @@ try:
     from .{{ project_name }}.settings import *
 except ImportError:
     pass
+
+# Sets the Referrer Policy header on all responses.
+# 'strict-origin-when-cross-origin' sends the referrer header for cross-origin links.
+# The Django default is `same-origin` (only sends full URL for same-origin links).
+# See all options: https://docs.djangoproject.com/en/6.0/ref/middleware/#referrer-policy
+# For details on why you might want to set it, see https://github.com/archesproject/arches/issues/12874
+# SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'

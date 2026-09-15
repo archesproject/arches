@@ -85,6 +85,11 @@ LOCAL_BROWSERS = []  # ['Firefox']
 ENABLE_USER_SIGNUP = True
 FORCE_USER_SIGNUP_EMAIL_AUTHENTICATION = True
 
+# https://docs.djangoproject.com/en/stable/topics/testing/overview/#password-hashing
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.MD5PasswordHasher",
+]
+
 ENABLE_TWO_FACTOR_AUTHENTICATION = False
 FORCE_TWO_FACTOR_AUTHENTICATION = False
 
