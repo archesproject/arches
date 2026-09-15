@@ -2795,10 +2795,17 @@ class Graph(models.GraphModel):
 
             return Graph.objects.get(pk=updated_graph.pk)
 
-    def publish(self, user=None, notes=None):
+    def publish(
+        self, user=None, notes=None, *, publication_id=None, published_time=None
+    ):
         """
         Adds a corresponding entry to the GraphXPublishedGraph table,
         and creates a PublishedGraph entry for every active language
+
+        publication_id and published_time let a caller supply the publication's
+        identity rather than minting a random one. A package migration ships the
+        same publication id to every install, so "which version is this site on"
+        is answerable across installs instead of being local to whoever published.
         """
         if self.source_identifier_id:
             raise RuntimeError("Publishing a draft_graph is prohibited.")
@@ -2810,8 +2817,13 @@ class Graph(models.GraphModel):
                 update_published_graphs=False
             )
 
+            publication_fields = {}
+            if publication_id is not None:
+                publication_fields["publicationid"] = publication_id
+            if published_time is not None:
+                publication_fields["published_time"] = published_time
             publication = models.GraphXPublishedGraph.objects.create(
-                graph=self, notes=notes, user=user
+                graph=self, notes=notes, user=user, **publication_fields
             )
 
             self.publication = publication
