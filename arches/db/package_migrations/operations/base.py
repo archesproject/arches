@@ -144,3 +144,126 @@ class _AlterRowOperation(PackageOperation):
         self.qs(self.model, schema_editor).filter(pk=self._pk).update(
             **{field: previous.get(field) for field in self.changes}
         )
+
+
+class _RowOperation(PackageOperation):
+    """Shared plumbing for the per-row operations.
+
+    Every one of them carries the row as a single ``fields`` dict rather than an
+    enumerated signature. That dict IS the canonical projection of the row, so it
+    cannot drift from the model the way a hand-maintained parameter list does,
+    and adding a column to a model never changes a public constructor signature.
+
+    (A ``**kwargs`` signature would not work: get_func_args excludes VAR_KEYWORD,
+    so OperationWriter silently drops every extra kwarg and writes an empty call.
+    A single dict parameter is the only shape that both stays open and
+    round-trips.)
+    """
+
+    model = None
+    state_collection = None
+    pk_field = None
+    # NodeGroup and CardXNodeXWidget rows carry no graph FK.
+    has_graph_fk = True
+
+    # Renders one key per line in generated migrations instead of one long dict.
+    serialization_expand_args = ["fields"]
+
+    def __init__(self, graphid, fields):
+        self.graphid = graphid
+        self.fields = fields
+
+    def _complete_fields(self):
+        """Fill any column the caller left out from the model's own default.
+
+        The canonical projection always supplies every field, but a hand-written
+        migration reasonably names only the ones it cares about. Defaults come
+        from the model rather than from a constructor signature, so they cannot
+        drift from it.
+        """
+        from arches.db.package_migrations.canonical import fields_for
+
+        completed = {}
+        missing_required = []
+        for name in fields_for(self.model):
+            if name in self.fields:
+                completed[name] = self.fields[name]
+                continue
+            field = self.model._meta.get_field(name.removesuffix("_id"))
+            if field.has_default():
+                completed[name] = field.get_default()
+            elif field.null or field.blank:
+                completed[name] = None
+            else:
+                # Guessing a value for a NOT NULL column with no default would be
+                # inventing package content. Say so here rather than surfacing an
+                # IntegrityError from deep inside the apply.
+                missing_required.append(name)
+        if missing_required:
+            raise ValueError(
+                "%s is missing required field(s) %s for %s. Supply them in fields."
+                % (
+                    type(self).__name__,
+                    ", ".join(sorted(missing_required)),
+                    self.model.__name__,
+                )
+            )
+        return completed
+
+    @property
+    def _pk(self):
+        return str(self.fields[self.pk_field])
+
+    def _collection(self, state):
+        return state.graphs[str(self.graphid)][self.state_collection]
+
+    def _row_kwargs(self):
+        kwargs = self._complete_fields()
+        if self.has_graph_fk:
+            kwargs["graph_id"] = self.graphid
+        return kwargs
+
+    def _create_row(self, schema_editor):
+        self.qs(self.model, schema_editor).create(**self._row_kwargs())
+
+    def _delete_row(self, schema_editor):
+        self.qs(self.model, schema_editor).filter(pk=self._pk).delete()
+
+
+class _CreateRowOperation(_RowOperation):
+    reversible = True
+
+    def state_forwards(self, app_label, state):
+        # Store the completed row, so replayed state and the database agree.
+        self._collection(state)[self._pk] = self._complete_fields()
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        self._create_row(schema_editor)
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        self._delete_row(schema_editor)
+
+
+class _DeleteRowOperation(_RowOperation):
+    """Reversible because unapply() phase 1 replays state forwards, so to_state
+    still holds the row's full definition to recreate from."""
+
+    reversible = True
+
+    def __init__(self, graphid, pk):
+        self.graphid = graphid
+        self.pk = pk
+
+    @property
+    def _pk(self):
+        return str(self.pk)
+
+    def state_forwards(self, app_label, state):
+        del self._collection(state)[self._pk]
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        self._delete_row(schema_editor)
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        self.fields = self._collection(to_state)[self._pk]
+        self._create_row(schema_editor)

@@ -19,6 +19,8 @@ from arches.db.package_migrations.operations.base import (
     _AlterRowOperation,
 )
 
+COLLECTIONS = ("nodes", "nodegroups", "edges", "cards", "widgets")
+
 
 class CreateGraph(PackageOperation):
     # Irreversible: deleting a graph CASCADEs through ResourceInstance to every
@@ -26,94 +28,53 @@ class CreateGraph(PackageOperation):
     # the reverse of a migration.
     reversible = False
 
-    def __init__(
-        self,
-        graphid,
-        name,
-        slug=None,
-        is_resource=True,
-        subtitle=None,
-        description=None,
-        author=None,
-        version=None,
-        iconclass=None,
-        ontology_id=None,
-        resource_instance_lifecycle_id=None,
-    ):
-        self.graphid = graphid
-        self.name = name
-        self.slug = slug
-        self.is_resource = is_resource
-        self.subtitle = subtitle
-        self.description = description
-        self.author = author
-        self.version = version
-        self.iconclass = iconclass
-        self.ontology_id = ontology_id
-        # graphs.resource_instance_lifecycle_conditional_null requires a non-null
-        # lifecycle on every non-draft resource graph.
-        self.resource_instance_lifecycle_id = resource_instance_lifecycle_id
+    serialization_expand_args = ["fields"]
+
+    def __init__(self, fields):
+        # The graph's own id lives in fields, like every other row's pk.
+        self.fields = fields
+
+    @property
+    def graphid(self):
+        return str(self.fields["graphid"])
 
     def state_forwards(self, app_label, state):
-        state.add_graph(
-            {
-                "graphid": str(self.graphid),
-                "slug": self.slug,
-                "name": self.name,
-                "is_resource": self.is_resource,
-                "subtitle": self.subtitle,
-                "description": self.description,
-                "author": self.author,
-                "version": self.version,
-                "iconclass": self.iconclass,
-                "ontology_id": self.ontology_id,
-                "nodes": {},
-                "nodegroups": {},
-                "edges": {},
-                "cards": {},
-                "widgets": {},
-            }
-        )
+        graph = dict(self.fields)
+        graph["graphid"] = self.graphid
+        graph.update({collection: {} for collection in COLLECTIONS})
+        state.add_graph(graph)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        lifecycle_id = self.resource_instance_lifecycle_id
-        if lifecycle_id is None and self.is_resource:
-            lifecycle_id = settings.DEFAULT_RESOURCE_INSTANCE_LIFECYCLE_ID
-        self.qs(models.GraphModel, schema_editor).create(
-            graphid=self.graphid,
-            name=self.name,
-            slug=self.slug,
-            isresource=self.is_resource,
-            subtitle=self.subtitle,
-            description=self.description,
-            author=self.author,
-            version=self.version,
-            iconclass=self.iconclass,
-            ontology_id=self.ontology_id,
-            resource_instance_lifecycle_id=lifecycle_id,
-        )
+        fields = dict(self.fields)
+        if fields.get("resource_instance_lifecycle_id") is None and fields.get(
+            "isresource"
+        ):
+            # graphs.resource_instance_lifecycle_conditional_null requires a
+            # non-null lifecycle on every non-draft resource graph.
+            fields["resource_instance_lifecycle_id"] = (
+                settings.DEFAULT_RESOURCE_INSTANCE_LIFECYCLE_ID
+            )
+        self.qs(models.GraphModel, schema_editor).create(**fields)
 
     def describe(self):
-        return "Create graph %s" % (self.slug or self.name)
+        return "Create graph %s" % (self.fields.get("slug") or self.graphid)
 
     @property
     def migration_name_fragment(self):
-        return "graph_%s" % (self.slug or str(self.graphid).replace("-", "")[:8])
+        return "graph_%s" % (
+            self.fields.get("slug") or self.graphid.replace("-", "")[:8]
+        )
 
 
 class AlterGraph(_AlterRowOperation):
     """Graph metadata and ontology.
 
-    Note slug: Graph.validate() raises code 1018 ("You cannot change the slug of a
-    published graph"), which is why this writes through a queryset update rather
-    than Graph.save().
+    Writes through a queryset update rather than Graph.save(): validate() raises
+    code 1018 ("You cannot change the slug of a published graph").
     """
 
     model = models.GraphModel
     state_collection = None  # the graph dict itself, not a collection on it
-
-    def __init__(self, graphid, changes):
-        super().__init__(graphid, changes)
 
     @property
     def _pk(self):

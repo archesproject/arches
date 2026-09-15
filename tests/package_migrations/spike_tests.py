@@ -122,11 +122,14 @@ class PackageMigrationOperationTests(ArchesTestCase):
         nodeid = uuid.uuid4()
         op = CreateNode(
             graphid=str(self.graph.graphid),
-            nodeid=str(nodeid),
-            name="Survey Date",
-            datatype="date",
-            alias="survey_date",
-            nodegroup_id=str(self.nodegroup_id),
+            fields={
+                "nodeid": str(nodeid),
+                "name": "Survey Date",
+                "datatype": "date",
+                "istopnode": False,
+                "alias": "survey_date",
+                "nodegroup_id": str(self.nodegroup_id),
+            },
         )
         state = self._state()
         op.state_forwards("arches", state)
@@ -144,11 +147,14 @@ class PackageMigrationOperationTests(ArchesTestCase):
         nodeid = uuid.uuid4()
         op = CreateNode(
             graphid=str(self.graph.graphid),
-            nodeid=str(nodeid),
-            name="Temp",
-            datatype="string",
-            alias="temp_node",
-            nodegroup_id=str(self.nodegroup_id),
+            fields={
+                "nodeid": str(nodeid),
+                "name": "Temp",
+                "datatype": "string",
+                "istopnode": False,
+                "alias": "temp_node",
+                "nodegroup_id": str(self.nodegroup_id),
+            },
         )
         op.database_forwards("arches", self.schema_editor, self._state(), self._state())
         self.assertTrue(models.Node.objects.filter(pk=nodeid).exists())
@@ -205,11 +211,14 @@ class PackageMigrationOperationTests(ArchesTestCase):
         nodeid = uuid.uuid4()
         CreateNode(
             graphid=str(self.graph.graphid),
-            nodeid=str(nodeid),
-            name="Ghost",
-            datatype="string",
-            alias="ghost_node",
-            nodegroup_id=str(self.nodegroup_id),
+            fields={
+                "nodeid": str(nodeid),
+                "name": "Ghost",
+                "datatype": "string",
+                "istopnode": False,
+                "alias": "ghost_node",
+                "nodegroup_id": str(self.nodegroup_id),
+            },
         ).database_forwards("arches", self.schema_editor, self._state(), self._state())
 
         models.TileModel.objects.filter(pk=tile.pk).update(
@@ -232,11 +241,14 @@ class PackageMigrationOperationTests(ArchesTestCase):
         nodeid = uuid.uuid4()
         CreateNode(
             graphid=str(self.graph.graphid),
-            nodeid=str(nodeid),
-            name="Survey Date",
-            datatype="date",
-            alias="survey_date_2",
-            nodegroup_id=str(self.nodegroup_id),
+            fields={
+                "nodeid": str(nodeid),
+                "name": "Survey Date",
+                "datatype": "date",
+                "istopnode": False,
+                "alias": "survey_date_2",
+                "nodegroup_id": str(self.nodegroup_id),
+            },
         ).database_forwards("arches", self.schema_editor, self._state(), self._state())
         self.assertTrue(models.Node.objects.filter(pk=nodeid).exists())
 

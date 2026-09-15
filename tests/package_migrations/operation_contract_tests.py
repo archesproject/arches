@@ -29,29 +29,40 @@ def _noop(value, tile):
 
 
 SAMPLES = [
-    ops.CreateGraph(graphid=GRAPH, name={"en": "G"}, slug="g"),
+    ops.CreateGraph(fields={"graphid": GRAPH, "name": {"en": "G"}, "slug": "g"}),
     ops.AlterGraph(graphid=GRAPH, changes={"subtitle": {"en": "s"}}),
-    ops.CreateNodeGroup(graphid=GRAPH, nodegroupid=NODEGROUP),
+    ops.CreateNodeGroup(graphid=GRAPH, fields={"nodegroupid": NODEGROUP}),
     ops.AlterNodeGroup(
         graphid=GRAPH, nodegroupid=NODEGROUP, changes={"cardinality": "n"}
     ),
-    ops.DeleteNodeGroup(graphid=GRAPH, nodegroupid=NODEGROUP),
+    ops.DeleteNodeGroup(graphid=GRAPH, pk=NODEGROUP),
     ops.CreateNode(
-        graphid=GRAPH, nodeid=NODE, name={"en": "N"}, datatype="string", alias="n"
+        graphid=GRAPH,
+        fields={
+            "nodeid": NODE,
+            "name": {"en": "N"},
+            "datatype": "string",
+            "istopnode": False,
+            "alias": "n",
+        },
     ),
     ops.AlterNode(graphid=GRAPH, nodeid=NODE, changes={"datatype": "concept"}),
-    ops.DeleteNode(graphid=GRAPH, nodeid=NODE),
-    ops.CreateEdge(graphid=GRAPH, edgeid=EDGE, domainnode_id=NODE, rangenode_id=NODE),
+    ops.DeleteNode(graphid=GRAPH, pk=NODE),
+    ops.CreateEdge(
+        graphid=GRAPH,
+        fields={"edgeid": EDGE, "domainnode_id": NODE, "rangenode_id": NODE},
+    ),
     ops.AlterEdge(graphid=GRAPH, edgeid=EDGE, changes={"ontologyproperty": "P1"}),
-    ops.DeleteEdge(graphid=GRAPH, edgeid=EDGE),
-    ops.CreateCard(graphid=GRAPH, cardid=CARD, nodegroup_id=NODEGROUP),
+    ops.DeleteEdge(graphid=GRAPH, pk=EDGE),
+    ops.CreateCard(graphid=GRAPH, fields={"cardid": CARD, "nodegroup_id": NODEGROUP}),
     ops.AlterCard(graphid=GRAPH, cardid=CARD, changes={"visible": False}),
-    ops.DeleteCard(graphid=GRAPH, cardid=CARD),
+    ops.DeleteCard(graphid=GRAPH, pk=CARD),
     ops.CreateCardXNodeXWidget(
-        graphid=GRAPH, id=WIDGET, card_id=CARD, node_id=NODE, widget_id=WIDGET
+        graphid=GRAPH,
+        fields={"id": WIDGET, "card_id": CARD, "node_id": NODE, "widget_id": WIDGET},
     ),
     ops.AlterCardXNodeXWidget(graphid=GRAPH, id=WIDGET, changes={"visible": False}),
-    ops.DeleteCardXNodeXWidget(graphid=GRAPH, id=WIDGET),
+    ops.DeleteCardXNodeXWidget(graphid=GRAPH, pk=WIDGET),
     ops.BackfillNodeData(nodegroup_id=NODEGROUP, nodeid=NODE),
     ops.RemoveNodeData(nodegroup_id=NODEGROUP, nodeid=NODE),
     ops.CoerceNodeData(nodegroup_id=NODEGROUP, nodeid=NODE, converter=_noop),

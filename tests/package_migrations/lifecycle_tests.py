@@ -71,20 +71,25 @@ class PublicationLifecycleTests(PackageMigrationOperationTests):
         nodeid = uuid.uuid4()
         CreateNode(
             graphid=str(self.graph.graphid),
-            nodeid=str(nodeid),
-            name="Survey Date",
-            datatype="date",
-            alias="survey_date_lifecycle",
-            nodegroup_id=str(self.nodegroup_id),
+            fields={
+                "nodeid": str(nodeid),
+                "name": "Survey Date",
+                "datatype": "date",
+                "istopnode": False,
+                "alias": "survey_date_lifecycle",
+                "nodegroup_id": str(self.nodegroup_id),
+            },
         ).database_forwards("arches", self.schema_editor, self._state(), self._state())
         # A non-collector node needs an edge joining it to the tree, or
         # populate_null_nodegroups() cannot reach it when the graph is copied.
         CreateEdge(
             graphid=str(self.graph.graphid),
-            edgeid=str(uuid.uuid4()),
-            domainnode_id=str(self.nodegroup_id),
-            rangenode_id=str(nodeid),
-            ontologyproperty="http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
+            fields={
+                "edgeid": str(uuid.uuid4()),
+                "domainnode_id": str(self.nodegroup_id),
+                "rangenode_id": str(nodeid),
+                "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
+            },
         ).database_forwards("arches", self.schema_editor, self._state(), self._state())
 
         RefreshDraftGraph(graphid=str(self.graph.graphid)).database_forwards(
