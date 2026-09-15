@@ -15,3 +15,11 @@ urlpatterns = [
 
 # Last, so that anything above supersedes the core routes.
 urlpatterns.append(path("", include("arches.urls")))
+
+# Django only consults handler400/403/404/500 on the root URLconf module
+# (this one), not on included ones, so these must be repeated from arches/urls.py
+# for arches' branded error pages to be used instead of Django's bare defaults.
+handler400 = "arches.app.views.main.custom_400"
+handler403 = "arches.app.views.main.custom_403"
+handler404 = "arches.app.views.main.custom_404"
+handler500 = "arches.app.views.main.custom_500"

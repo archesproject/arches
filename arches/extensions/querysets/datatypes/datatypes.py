@@ -19,17 +19,29 @@ from arches.extensions.querysets.fields import (
 )
 
 
+def _no_op_get_details(value, *args, **kwargs):
+    return None
+
+
+def _no_op_bulk_context(*args, **kwargs):
+    return None
+
+
 class DataTypeFactory(datatypes.DataTypeFactory):
     def get_instance(self, datatype):
         """Ensure every datatype has our additional methods."""
         instance = super().get_instance(datatype)
 
+        # datatype instances are cached on the shared base DataTypeFactory, so
+        # assigning lambdas here would make that cache (and anything pickling
+        # it, e.g. Tile.datatype_factory) unpicklable. Use picklable
+        # module-level functions instead.
         if not hasattr(instance, "get_details"):
-            instance.get_details = lambda value, *args, **kwargs: None
+            instance.get_details = _no_op_get_details
         if not hasattr(instance, "get_display_value_context_in_bulk"):
-            instance.get_display_value_context_in_bulk = lambda *args, **kwargs: None
+            instance.get_display_value_context_in_bulk = _no_op_bulk_context
         if not hasattr(instance, "set_display_value_context_in_bulk"):
-            instance.set_display_value_context_in_bulk = lambda *args, **kwargs: None
+            instance.set_display_value_context_in_bulk = _no_op_bulk_context
 
         return instance
 

@@ -15,7 +15,7 @@ from packaging.version import Version
 
 arches_version = Version(_arches_version_str)
 from arches.app.models.graph import Graph
-from arches.app.models.models import EditLog, File, Node, NodeGroup
+from arches.app.models.models import EditLog, File, Language, Node, NodeGroup
 
 from arches.extensions.querysets.rest_framework.serializers import (
     ArchesResourceSerializer,
@@ -27,6 +27,17 @@ from arches.extensions.querysets.utils.models import ensure_request
 from arches.extensions.querysets.utils.tests import GraphTestCase
 
 MUTABLE_PERMITTED_NODEGROUPS = set()
+
+
+def padded_string_node_value(value, *, language="en", direction="ltr"):
+    """StringDataType.pre_structure_tile_data() pads a blank entry for every
+    system Language, not just the one a value was supplied for."""
+    node_value = {
+        lang.code: {"value": "", "direction": lang.default_direction}
+        for lang in Language.objects.all()
+    }
+    node_value[language] = {"value": value, "direction": direction}
+    return node_value
 
 
 class RestFrameworkTests(GraphTestCase):
@@ -67,9 +78,7 @@ class RestFrameworkTests(GraphTestCase):
             response.json()["aliased_data"]["string_alias_n"],
             {
                 "display_value": "create_value",
-                "node_value": {
-                    "en": {"value": "create_value", "direction": "ltr"},
-                },
+                "node_value": padded_string_node_value("create_value"),
                 "details": [],
             },
         )
@@ -102,9 +111,7 @@ class RestFrameworkTests(GraphTestCase):
             response.json()["aliased_data"]["string_alias_n"],
             {
                 "display_value": "create_value",
-                "node_value": {
-                    "en": {"value": "create_value", "direction": "ltr"},
-                },
+                "node_value": padded_string_node_value("create_value"),
                 "details": [],
             },
         )
@@ -137,9 +144,7 @@ class RestFrameworkTests(GraphTestCase):
             parent_data["datatypes_1_child"]["aliased_data"]["string_alias_child"],
             {
                 "display_value": "child_create_value",
-                "node_value": {
-                    "en": {"value": "child_create_value", "direction": "ltr"},
-                },
+                "node_value": padded_string_node_value("child_create_value"),
                 "details": [],
             },
         )
@@ -184,9 +189,7 @@ class RestFrameworkTests(GraphTestCase):
             parent_data["datatypes_1_child"]["aliased_data"]["string_alias_child"],
             {
                 "display_value": "child_create_value",
-                "node_value": {
-                    "en": {"value": "child_create_value", "direction": "ltr"},
-                },
+                "node_value": padded_string_node_value("child_create_value"),
                 "details": [],
             },
         )
@@ -226,9 +229,7 @@ class RestFrameworkTests(GraphTestCase):
             response.json()["aliased_data"]["string_alias"],
             {
                 "display_value": "update_value",
-                "node_value": {
-                    "en": {"value": "update_value", "direction": "ltr"},
-                },
+                "node_value": padded_string_node_value("update_value"),
                 "details": [],
             },
         )

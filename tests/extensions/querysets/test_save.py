@@ -1,11 +1,13 @@
 import copy
+from types import SimpleNamespace
 from uuid import uuid4
-from arches.app.models.models import EditLog, TileModel
+from arches.app.models.models import EditLog, Language, TileModel
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.http.request import HttpRequest
 
+from arches.extensions.querysets.datatypes.datatypes import DataTypeFactory
 from arches.extensions.querysets.models import ResourceTileTree, TileTree
 from arches.extensions.querysets.utils.models import ensure_request
 from arches.extensions.querysets.utils.tests import GraphTestCase
@@ -32,11 +34,20 @@ class SaveTileTests(GraphTestCase):
         cls.datatype_n_none = cls.resource_none.aliased_data.datatypes_n
 
     def assert_default_values_present(self, resource):
+        languages = Language.objects.all()
         for node_id_str, value in resource.aliased_data.datatypes_1.data.items():
             node = [node for node in self.data_nodes if str(node.pk) == node_id_str][0]
             with self.subTest(alias=node.alias):
                 default_value = self.default_vals_by_nodeid[node_id_str]
                 expected = TileTree.get_cleaned_default_value(node, default_value)
+                # Saving also runs pre_structure_tile_data(), which pads a
+                # blank entry for every system Language (see StringDataType).
+                dt_instance = DataTypeFactory().get_instance(node.datatype)
+                mock_tile = SimpleNamespace(data={node_id_str: expected})
+                dt_instance.pre_structure_tile_data(
+                    mock_tile, node_id_str, languages=languages
+                )
+                expected = mock_tile.data[node_id_str]
                 self.assertEqual(value, expected)
 
     def test_blank_tile_save_with_defaults(self):

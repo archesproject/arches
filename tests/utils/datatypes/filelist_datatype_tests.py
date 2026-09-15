@@ -6,7 +6,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils.datastructures import MultiValueDict
 from django.utils.translation import get_language
 
-from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.datatypes.datatypes import DataTypeFactory, FileListDataType
 from django.test import TestCase
 from arches.app.models.models import File as FileModel
 from arches.app.models.system_settings import settings
@@ -121,8 +121,13 @@ class FileListDataTypeTests(TestCase):
     def test_transform_value_for_tile_mixed_existing_and_new_files(self):
         """A list mixing already-stored files (have file_id) and new files
         (no file_id) should preserve existing file_ids and only create a
-        new File record for the genuinely new file."""
-        datatype = DataTypeFactory().get_instance("file-list")
+        new File record for the genuinely new file.
+
+        Uses core's FileListDataType directly: the bundled arches_querysets
+        application (installed by default) overrides "file-list" with a
+        two-phase transform that defers real File creation to a later
+        upload-handling step, which this test is not exercising."""
+        datatype = FileListDataType()
         existing_file_id = str(uuid.uuid4())
         existing_url = f"/files/{existing_file_id}"
 
