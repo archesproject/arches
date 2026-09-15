@@ -24,11 +24,11 @@ def remove_uneditable_from_widgets(apps, schema_editor):
     CardXNodeXWidget = apps.get_model("models", "CardXNodeXWidget")
     Widget = apps.get_model("models", "Widget")
 
+    # these had uneditable before this migration (6839, 9191)
     widgets_to_remove = Widget.objects.exclude(
         name__in=[
             "non-localized-text-widget",
             "number-widget",
-            "rich-text-widget",
             "text-widget",
         ]
     ).all()
@@ -49,7 +49,7 @@ def remove_uneditable_from_widgets(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("models", "12587_move_default_value_to_node_config.py"),
+        ("models", "12779_add_multicard_resource_descriptor"),
     ]
 
     operations = [

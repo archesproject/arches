@@ -122,18 +122,6 @@ var WidgetViewModel = function(params) {
         this.defaultValue = ko.observable(null);
     }
 
-    if (ko.isObservable(self.uneditable)) {
-        var uneditableSub = self.uneditable.subscribe(function(val) {
-            if (ko.isWriteableObservable(self.disabled)) {
-                self.disabled(!!val);
-            }
-        });
-        self.disposables.push(uneditableSub);
-        if (ko.isWriteableObservable(self.disabled)) {
-            self.disabled(!!self.uneditable());
-        }
-    }
-
     this.disable = ko.computed(function() {
         return ko.unwrap(self.disabled) || (self.uneditable && ko.unwrap(self.uneditable)) || false;
     });
