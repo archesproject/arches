@@ -1,16 +1,6 @@
-/*
- * CSS-only tooltip, replacing Bootstrap 3's tooltip plugin.
- *
- * Bootstrap 3's tooltip was one of the two components its unfixable advisories concern
- * (GHSA-q58r-hwc8-rm9j, in the sanitizer), and it was the only one of the four plugins
- * arches used that needed positioning logic. Arches had already written this pattern
- * for `.report-tab` in 8.2; generalising it retires the plugin outright rather than
- * reimplementing it.
- *
- * Markup is `data-tooltip="text"` — Bootstrap 3 read the same string from
- * `data-original-title` — with `data-placement` honoured for top and bottom, the only
- * two placements arches' templates ask for.
- */
+// CSS-only tooltip, replacing Bootstrap 3's tooltip plugin. Markup is
+// `data-tooltip="text"`, where Bootstrap 3 read `data-original-title`, with
+// `data-placement="top"` flipping it above the element. Bottom is the default.
 
 $tooltip-background: rgba(0, 0, 0, 0.9);
 $tooltip-arrow-size: 0.5rem;

@@ -1,22 +1,13 @@
-/*
- * Colour picker controls, replacing bootstrap-colorpicker 2.5.3.
- *
- * The bound element stays a text input so a hex value can still be typed or
- * pasted. Every call site already renders an `.input-group-addon` holding an
- * `ion-stop` icon tinted to the current colour, so the native picker is overlaid
- * transparently on that addon: the swatch looks unchanged and clicking it opens
- * the platform colour picker.
- * See arches/app/media/js/bindings/color-picker.js.
- */
+// Styles the controls built by js/bindings/color-picker.js.
 
 .color-picker-swatch-host {
     position: relative;
 }
 
 .color-picker-swatch {
+    // Covers the `.input-group-addon` so the whole swatch is the click target, while
+    // the tinted ion-stop icon underneath remains what the user actually sees.
     &--overlay {
-        // Covers the addon so the whole swatch is the click target, while the
-        // tinted ion-stop icon underneath remains what the user actually sees.
         position: absolute;
         inset: 0;
         inline-size: 100%;

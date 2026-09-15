@@ -1,7 +1,7 @@
 import $ from "jquery";
 import _ from "underscore";
 import BaseFilter from "views/components/search/base-filter";
-import bootstrap from "bootstrap";
+import "bootstrap";
 import arches from "arches";
 import select2 from "select-woo";
 import ko from "knockout";

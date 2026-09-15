@@ -1,4 +1,3 @@
-import _ from 'underscore';
 import ko from 'knockout';
 import moment from 'moment';
 import { TempusDominus } from 'bootstrap-datetimepicker';
@@ -6,38 +5,27 @@ import { TempusDominus } from 'bootstrap-datetimepicker';
 import { componentsForFormat, VIEW_MODE_BY_LEGACY_NAME } from './datepicker-options.js';
 
 /**
- * Date picker binding, replacing eonasdan-bootstrap-datetimepicker 4.17.49.
- *
- * That package is Bootstrap 3-only and has had no release since 2017. Its successor
- * by the same author, Tempus Dominus 6, is a standalone rewrite with no Bootstrap
- * dependency at all — so this binding keeps working unchanged across the Bootstrap 5
- * upgrade.
- *
- * ## The contract this must not break
- *
- * `format` and `viewMode` are stored in graph node configs in adopters' databases:
- * `YYYY-MM-DD HH:mm:ssZ`, `YYYY-MM-DD`, `YYYY-MM`, `YYYY` for the former, and
- * `days` / `months` / `years` / `decades` for the latter. Those are moment tokens and
- * legacy view names, and they cannot be migrated away from without touching every
- * deployment's data. So the binding's public options stay exactly as they were and
- * are translated internally:
+ * Date picker binding, replacing eonasdan-bootstrap-datetimepicker 4.17.49 with Tempus
+ * Dominus 6, its successor by the same author, which has no Bootstrap dependency.
  *
  *     data-bind="datepicker: {format: dateFormat, viewMode: viewMode,
  *                             minDate: minDate, maxDate: maxDate}, value: value"
  *
- * ## Why moment still does the formatting
+ * `format` and `viewMode` are moment tokens and legacy view names stored in graph node
+ * configs in adopters' databases, so the binding's public options are unchanged and
+ * translated internally by datepicker-options.js.
  *
- * Tempus Dominus formats through `Intl.DateTimeFormat` and has no token for a UTC
- * offset, so it cannot render `YYYY-MM-DD HH:mm:ssZ` — one of the four formats a
- * modeller can pick. Rather than degrade that format, Tempus Dominus is used purely
- * as the calendar UI and moment remains the single authority for turning a date into
- * the stored string and back. moment is already a core dependency, and this keeps the
- * value written to the observable byte-identical to what the old binding wrote.
+ * moment, not Tempus Dominus, remains the authority for turning a date into the stored
+ * string and back: Tempus Dominus formats through `Intl.DateTimeFormat`, which has no
+ * token for the UTC offset in `YYYY-MM-DD HH:mm:ssZ`.
  */
 
-/** Parses a stored value with the format that produced it; null when unusable. */
+/**
+ * Parses a stored value with the format that produced it; null when unusable. An unset
+ * minDate or maxDate arrives as `false`, which the old binding's API used for "no bound".
+ */
 function parseStoredValue(value, format) {
-    if (value === null || value === undefined || value === '') {
+    if (value === null || value === undefined || value === '' || value === false) {
         return null;
     }
     if (value instanceof Date) {
@@ -45,13 +33,6 @@ function parseStoredValue(value, format) {
     }
     const parsed = moment(value, format);
     return parsed.isValid() ? parsed.toDate() : null;
-}
-
-function toDateOrNull(value, format) {
-    if (value === false || value === null || value === undefined || value === '') {
-        return null;
-    }
-    return parseStoredValue(value, format);
 }
 
 ko.bindingHandlers.datepicker = {
@@ -67,8 +48,8 @@ ko.bindingHandlers.datepicker = {
             const legacyViewMode = ko.unwrap(options.viewMode);
             const restrictions = {};
 
-            const minDate = toDateOrNull(ko.unwrap(options.minDate), format);
-            const maxDate = toDateOrNull(ko.unwrap(options.maxDate), format);
+            const minDate = parseStoredValue(ko.unwrap(options.minDate), format);
+            const maxDate = parseStoredValue(ko.unwrap(options.maxDate), format);
             if (minDate) {
                 restrictions.minDate = minDate;
             }
@@ -151,8 +132,8 @@ ko.bindingHandlers.datepicker = {
         }
 
         // minDate and maxDate are observables on the widget config forms, so the
-        // picker's restrictions have to follow them. The old binding also coerced one
-        // bound past the other; that is kept.
+        // restrictions have to follow them, coercing one bound past the other as the
+        // old binding did.
         const minDateObservable = ko.isObservable(options.minDate) ? options.minDate : null;
         const maxDateObservable = ko.isObservable(options.maxDate) ? options.maxDate : null;
 
@@ -174,15 +155,18 @@ ko.bindingHandlers.datepicker = {
             }
         }
 
-        _.each({ minDate: minDateObservable, maxDate: maxDateObservable }, function (observable, key) {
+        for (const [key, observable] of Object.entries({
+            minDate: minDateObservable,
+            maxDate: maxDateObservable,
+        })) {
             if (!observable) {
-                return;
+                continue;
             }
             subscriptions.push(observable.subscribe(function (newValue) {
                 reconcileBounds(key, newValue);
                 picker.updateOptions(buildPickerOptions());
             }));
-        });
+        }
 
         ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
             subscriptions.forEach(function (subscription) {

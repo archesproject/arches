@@ -45,9 +45,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <link rel="apple-touch-icon" sizes="180x180" href="{% webpack_static 'favicons/apple-touch-icon-180x180.png' %}" />
 
     {% block css %}
-        {# Served locally rather than from a CDN. The cdnjs links these replace carried no #}
-        {# integrity attribute and pinned Bootstrap 3.3.2 — a different build to the rest of #}
-        {# the application. Bootstrap is now vendored; see css/vendor/bootstrap-3.4.1.css. #}
+        {# Served locally: the cdnjs links these replace carried no integrity attribute. #}
         <link rel="stylesheet" type="text/css" href="{% webpack_static 'fonts/openSans.css' %}">
         <link rel="stylesheet" type="text/css" href="{% webpack_static 'css/vendor/bootstrap-3.4.1.css' %}">
         <link rel="stylesheet" type="text/css" href="{% webpack_static 'node_modules/font-awesome/css/font-awesome.min.css' %}">
@@ -545,8 +543,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <script src="{% webpack_static 'plugins/slick/slick.min.js' %}"></script>
 
     <!-- Custom Scripts -->
-    {# The landing page loads plain script tags rather than the admin bundle, so it needs #}
-    {# the collapse behaviour explicitly for its navbar toggle. #}
+    {# Not on the admin bundle, so the navbar toggle needs this loaded explicitly. #}
     {% render_bundle 'bootstrap-behaviors/index' %}
     {% render_bundle 'bindings/chosen' %}
     {% render_bundle 'bindings/key-events-click' %}

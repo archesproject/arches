@@ -1,44 +1,26 @@
 import ko from 'knockout';
 
 /**
- * Colour picker binding, replacing bootstrap-colorpicker 2.5.3.
+ * Colour picker binding, replacing bootstrap-colorpicker 2.5.3, which was Bootstrap
+ * 3-only and unmaintained since 2019. Usage is unchanged:
  *
- * That package is Bootstrap 3-only — it renders its popup with `.dropdown-menu`
- * and positions against BS3's box model — and has been unmaintained since 2019.
+ *     data-bind="colorPicker: {color: someObservable, format: 'rgba'}"
  *
- * bootstrap-colorpicker left the bound element as a text input showing the colour
- * string and opened a popup when the adjacent swatch was clicked, so both typing a
- * value and picking one worked. This keeps both.
- *
- * All eleven call sites already wrap the input in an `.input-group` ending with an
- * `.input-group-addon` holding an `ion-stop` icon tinted to the current colour. So
- * rather than adding a visible control — which would land inside the input-group and
- * break its layout — a native `<input type="color">` is overlaid transparently on
- * that existing addon. The swatch looks exactly as it did and now opens the platform
- * colour picker, which is what clicking it used to do. Where no addon is present the
- * swatch is appended to the group instead.
+ * The bound element stays a text input, so a value can still be typed. Every call site
+ * already ends its `.input-group` with an `.input-group-addon` holding an `ion-stop`
+ * icon tinted to the current colour, so a native `<input type="color">` is overlaid
+ * transparently on that addon rather than added beside it, which would break the
+ * group's layout. Where no addon is present the swatch is appended to the group.
  *
  * `type="color"` cannot express an alpha channel, so `format: 'rgba'` also gets an
  * opacity slider.
- *
- * Usage is unchanged:
- *     data-bind="colorPicker: {color: someObservable, format: 'rgba'}"
- *
- * The `container` option bootstrap-colorpicker used to position its popup is
- * accepted and ignored — an overlaid native swatch needs no positioning.
  */
 
 const SWATCH_CLASS = 'color-picker-swatch';
 const ALPHA_CLASS = 'color-picker-alpha';
 
 function hexToRgb(hex) {
-    let normalized = hex.replace(/^#/, '');
-    if (normalized.length === 3) {
-        normalized = normalized[0] + normalized[0]
-            + normalized[1] + normalized[1]
-            + normalized[2] + normalized[2];
-    }
-    const value = parseInt(normalized, 16);
+    const value = parseInt((hex.length === 4 ? expandShorthandHex(hex) : hex).slice(1), 16);
     return { red: (value >> 16) & 255, green: (value >> 8) & 255, blue: value & 255 };
 }
 
@@ -92,8 +74,8 @@ ko.bindingHandlers.colorPicker = {
 
         const initialColor = parseColor(ko.unwrap(colorObservable)) || { hex: '#000000', alpha: 1 };
 
-        // Guards the two-way sync: writing to the observable re-enters this
-        // binding through its own subscription.
+        // Guards the two-way sync: writing to the observable re-enters this binding
+        // through its own subscription.
         let synchronizing = false;
 
         const swatch = document.createElement('input');
@@ -101,8 +83,6 @@ ko.bindingHandlers.colorPicker = {
         swatch.value = initialColor.hex;
         swatch.setAttribute('aria-label', element.getAttribute('placeholder') || 'Select a color');
 
-        // Prefer the addon already in the markup: overlaying it keeps the control
-        // looking untouched and makes the existing swatch open the picker.
         const inputGroup = element.closest('.input-group');
         const existingAddon = inputGroup && inputGroup.querySelector('.input-group-addon');
 
@@ -142,35 +122,32 @@ ko.bindingHandlers.colorPicker = {
             synchronizing = false;
         }
 
-        function currentAlpha() {
-            return alphaSlider ? parseFloat(alphaSlider.value) : 1;
+        function showInControls(hex, alpha) {
+            swatch.value = hex;
+            if (alphaSlider) {
+                alphaSlider.value = String(alpha);
+            }
         }
 
-        swatch.addEventListener('input', function () {
-            const alpha = currentAlpha();
+        function publishFromControls() {
+            const alpha = alphaSlider ? parseFloat(alphaSlider.value) : 1;
             element.value = formatColor(swatch.value, alpha, format);
             writeToObservable(swatch.value, alpha);
-        });
-
-        if (alphaSlider) {
-            alphaSlider.addEventListener('input', function () {
-                const alpha = currentAlpha();
-                element.value = formatColor(swatch.value, alpha, format);
-                writeToObservable(swatch.value, alpha);
-            });
         }
 
-        // A value typed into the text input only propagates once it parses, so
-        // a half-typed "#ab" does not clobber the observable.
+        swatch.addEventListener('input', publishFromControls);
+        if (alphaSlider) {
+            alphaSlider.addEventListener('input', publishFromControls);
+        }
+
+        // Only propagate once the typed value parses, so a half-typed "#ab" does not
+        // clobber the observable.
         element.addEventListener('input', function () {
             const parsed = parseColor(element.value);
             if (!parsed) {
                 return;
             }
-            swatch.value = parsed.hex;
-            if (alphaSlider) {
-                alphaSlider.value = String(parsed.alpha);
-            }
+            showInControls(parsed.hex, parsed.alpha);
             writeToObservable(parsed.hex, parsed.alpha);
         });
 
@@ -184,10 +161,7 @@ ko.bindingHandlers.colorPicker = {
                     return;
                 }
                 element.value = formatColor(parsed.hex, parsed.alpha, format);
-                swatch.value = parsed.hex;
-                if (alphaSlider) {
-                    alphaSlider.value = String(parsed.alpha);
-                }
+                showInControls(parsed.hex, parsed.alpha);
             });
 
             ko.utils.domNodeDisposal.addDisposeCallback(element, function () {

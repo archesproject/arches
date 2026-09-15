@@ -1,10 +1,4 @@
-/*
- * Image carousel, replacing knockstrap 1.3.2 and Bootstrap 3's carousel plugin.
- *
- * Self-contained by design: the binding that drives this emits none of Bootstrap's
- * carousel markup, so the report renders the same before and after the Bootstrap 5
- * upgrade. See arches/app/media/js/bindings/carousel.js.
- */
+// Styles the markup built by js/bindings/carousel.js.
 
 .arches-carousel {
     position: relative;
@@ -18,7 +12,7 @@
 .arches-carousel-track {
     position: relative;
     inline-size: 100%;
-    // Tallest slide sets the height; without a floor an empty list collapses.
+    // Slides are absolutely positioned, so the track needs a height of its own.
     min-block-size: 20rem;
 }
 

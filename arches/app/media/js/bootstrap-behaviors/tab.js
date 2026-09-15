@@ -1,12 +1,7 @@
 /**
- * Tab behaviour, replacing Bootstrap 3's tab plugin.
- *
- * Bootstrap 3's markup puts `.active` on the `<li>` around the trigger and on the
- * matching `.tab-pane`. The vendored stylesheet still styles both, so this only has to
- * move the classes. Sixteen triggers across nine templates.
- *
- * Also emits Bootstrap 3's `shown.bs.tab`, which arches' own code listens for in a few
- * places to lazily size panels once they become visible.
+ * Tab behaviour, replacing Bootstrap 3's tab plugin. Moves `.active` between the `<li>`
+ * around the trigger and the matching `.tab-pane`, and emits `shown.bs.tab`, which
+ * arches listens for to lazily size panels once they become visible.
  */
 
 const TRIGGER_SELECTOR = '[data-toggle="tab"], [data-toggle="pill"]';

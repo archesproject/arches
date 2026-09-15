@@ -1,22 +1,15 @@
 /**
- * Collapse behaviour, replacing Bootstrap 3's collapse plugin.
- *
- * Bootstrap 3 toggled `.in` on the target and animated its height. The vendored
- * stylesheet still carries `.collapse`, `.collapse.in` and `.collapsing`, so this only
- * has to drive those classes and measure the height for the transition.
- *
- * Used by five triggers, including the public landing page's navbar toggle — the one
- * place a collapse failure is visible to anonymous visitors.
+ * Collapse behaviour, replacing Bootstrap 3's collapse plugin. The vendored stylesheet
+ * still carries `.collapse`, `.collapse.in` and `.collapsing`, so this only has to
+ * drive those classes and measure the height for the transition.
  */
 
 const TRIGGER_SELECTOR = '[data-toggle="collapse"]';
+const TRANSITION_MS = 350;
 
-/** Bootstrap 3 accepted the target as `data-target`, falling back to `href`. */
 function targetsOf(trigger) {
     const selector =
-        trigger.getAttribute('data-target') ||
-        trigger.getAttribute('href') ||
-        '';
+        trigger.getAttribute('data-target') || trigger.getAttribute('href') || '';
     if (!selector || selector === '#') {
         return [];
     }
@@ -39,7 +32,7 @@ export function show(element) {
     element.classList.add('collapsing');
     element.style.height = '0px';
 
-    // Forces layout so the transition has two distinct heights to run between.
+    // Force layout so the transition has two distinct heights to run between.
     void element.offsetHeight;
     element.style.height = `${element.scrollHeight}px`;
 
@@ -47,7 +40,7 @@ export function show(element) {
         element.classList.remove('collapsing');
         element.classList.add('collapse', 'in');
         element.style.height = '';
-    }, 350);
+    }, TRANSITION_MS);
 }
 
 export function hide(element) {
@@ -65,7 +58,7 @@ export function hide(element) {
         element.classList.remove('collapsing');
         element.classList.add('collapse');
         element.style.height = '';
-    }, 350);
+    }, TRANSITION_MS);
 }
 
 export function toggle(element) {
