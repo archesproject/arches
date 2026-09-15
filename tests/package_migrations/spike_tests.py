@@ -59,7 +59,7 @@ class PackageMigrationOperationTests(ArchesTestCase):
         models.CardModel.objects.create(
             graph_id=graph.graphid, nodegroup_id=collector_id, name="Spike Card"
         )
-        models.Node.objects.create(
+        string_node = models.Node.objects.create(
             nodeid=uuid.uuid4(),
             graph_id=graph.graphid,
             nodegroup_id=collector_id,
@@ -68,6 +68,24 @@ class PackageMigrationOperationTests(ArchesTestCase):
             alias="spike_string",
             hascustomalias=True,
             istopnode=False,
+        )
+        # Edges are not optional. Graph.copy() nulls every non-collector node's
+        # nodegroup and then rebuilds membership with populate_null_nodegroups(),
+        # which walks the EDGE tree -- so a graph whose nodes are not joined by
+        # edges cannot be copied, drafted or promoted.
+        models.Edge.objects.create(
+            edgeid=uuid.uuid4(),
+            graph_id=graph.graphid,
+            domainnode_id=graph.root.nodeid,
+            rangenode_id=collector_id,
+            ontologyproperty="http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
+        )
+        models.Edge.objects.create(
+            edgeid=uuid.uuid4(),
+            graph_id=graph.graphid,
+            domainnode_id=collector_id,
+            rangenode_id=string_node.nodeid,
+            ontologyproperty="http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
         )
         graph = Graph.objects.get(pk=graph.graphid)
         graph.publish()
