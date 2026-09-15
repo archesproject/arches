@@ -148,3 +148,119 @@ class RemoveNodeData(_ChunkedTileDataOperation):
     @property
     def migration_name_fragment(self):
         return "remove_data_%s" % str(self.nodeid).replace("-", "")[:8]
+
+
+class DeleteTilesForNodeGroup(_ChunkedTileDataOperation):
+    """Remove tiles belonging to a nodegroup that no longer exists.
+
+    TileModel.nodegroup is db_constraint=False, on_delete=DO_NOTHING, so deleting
+    a nodegroup leaves its tiles behind with nothing to reference.
+
+    Irreversible: the tiles and their data are gone.
+    """
+
+    reversible = False
+
+    def __init__(self, nodegroup_id, batch_size=DEFAULT_BATCH_SIZE):
+        self.nodegroup_id = nodegroup_id
+        self.batch_size = batch_size
+
+    def state_forwards(self, app_label, state):
+        pass
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        alias = schema_editor.connection.alias
+        total = 0
+        while True:
+            tileids = list(
+                models.TileModel.objects.using(alias)
+                .filter(nodegroup_id=self.nodegroup_id)
+                .order_by("tileid")
+                .values_list("tileid", flat=True)[: self.batch_size]
+            )
+            if not tileids:
+                break
+            models.TileModel.objects.using(alias).filter(tileid__in=tileids).delete()
+            total += len(tileids)
+        return total
+
+    def describe(self):
+        return "Delete tiles for nodegroup %s" % self.nodegroup_id
+
+    @property
+    def migration_name_fragment(self):
+        return "delete_tiles_%s" % str(self.nodegroup_id).replace("-", "")[:8]
+
+
+class CoerceNodeData(PackageOperation):
+    """Convert the values already stored for a node.
+
+    Unlike its siblings this is NOT set-based, and deliberately so: converting a
+    value requires knowing what the value means, which is datatype knowledge. It
+    therefore routes through the datatype layer one tile at a time rather than
+    branching on a datatype name here.
+
+    ``converter`` is a callable (value, tile) -> new value. Supply
+    ``reverse_converter`` only if the conversion genuinely has an inverse; most
+    do not, and claiming one that does not exist is worse than declaring the
+    operation irreversible.
+    """
+
+    def __init__(
+        self,
+        nodegroup_id,
+        nodeid,
+        converter,
+        reverse_converter=None,
+        batch_size=DEFAULT_BATCH_SIZE,
+    ):
+        self.nodegroup_id = nodegroup_id
+        self.nodeid = nodeid
+        self.converter = converter
+        self.reverse_converter = reverse_converter
+        self.batch_size = batch_size
+
+    @property
+    def reversible(self):
+        return self.reverse_converter is not None
+
+    def state_forwards(self, app_label, state):
+        pass
+
+    def _convert(self, schema_editor, converter):
+        if converter is None:
+            raise NotImplementedError(
+                "CoerceNodeData for node %s has no reverse converter." % self.nodeid
+            )
+        alias = schema_editor.connection.alias
+        nodeid = str(self.nodeid)
+        total = 0
+        last_tileid = None
+        while True:
+            queryset = models.TileModel.objects.using(alias).filter(
+                nodegroup_id=self.nodegroup_id, data__has_key=nodeid
+            )
+            if last_tileid is not None:
+                queryset = queryset.filter(tileid__gt=last_tileid)
+            tiles = list(queryset.order_by("tileid")[: self.batch_size])
+            if not tiles:
+                break
+            for tile in tiles:
+                tile.data[nodeid] = converter(tile.data[nodeid], tile)
+            models.TileModel.objects.using(alias).bulk_update(tiles, ["data"])
+            total += len(tiles)
+            last_tileid = tiles[-1].tileid
+        return total
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        return self._convert(schema_editor, self.converter)
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        return self._convert(schema_editor, self.reverse_converter)
+
+    def describe(self):
+        return "Coerce tile data for node %s" % self.nodeid
+
+    @property
+    def migration_name_fragment(self):
+        return "coerce_%s" % str(self.nodeid).replace("-", "")[:8]
