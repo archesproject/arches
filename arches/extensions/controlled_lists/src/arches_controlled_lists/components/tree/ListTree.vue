@@ -2,11 +2,11 @@
 import { computed, inject, onMounted, reactive, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useGettext } from "vue3-gettext";
-import { useToast } from "primevue/usetoast";
+import { useToast } from "openvue/usetoast";
 
-import InputText from "primevue/inputtext";
-import Message from "primevue/message";
-import Tree from "primevue/tree";
+import InputText from "openvue/inputtext";
+import Message from "openvue/message";
+import Tree from "openvue/tree";
 
 import {
     DEFAULT_ERROR_TOAST_LIFE,
@@ -28,9 +28,9 @@ import TreeRow from "@/arches_controlled_lists/components/tree/TreeRow.vue";
 
 import type { Ref } from "vue";
 import type { RouteLocationNormalizedLoadedGeneric } from "vue-router";
-import type { TreePassThroughMethodOptions } from "primevue/tree";
-import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree";
-import type { TreeNode } from "primevue/treenode";
+import type { TreePassThroughMethodOptions } from "openvue/tree";
+import type { TreeExpandedKeys, TreeSelectionKeys } from "openvue/tree";
+import type { TreeNode } from "openvue/treenode";
 import type {
     ControlledList,
     ControlledListItem,

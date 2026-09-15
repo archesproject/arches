@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ToggleSwitch from "primevue/toggleswitch";
+import ToggleSwitch from "openvue/toggleswitch";
 
 import { buildBooleanAliasedNodeData } from "@/arches_vue_components/datatypes/boolean/utils.ts";
 

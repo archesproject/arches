@@ -11,10 +11,10 @@ import {
 import { useGettext } from "vue3-gettext";
 import { cloneDeep } from "es-toolkit";
 
-import { Form } from "@primevue/forms";
-import Button from "primevue/button";
-import Message from "primevue/message";
-import Skeleton from "primevue/skeleton";
+import { Form } from "@openvue/forms";
+import Button from "openvue/button";
+import Message from "openvue/message";
+import Skeleton from "openvue/skeleton";
 
 import GenericWidget from "@/arches_vue_components/generics/GenericWidget/GenericWidget.vue";
 import { upsertTile } from "@/arches_vue_components/generics/GenericCard/api.ts";

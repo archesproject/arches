@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watchEffect } from "vue";
 
-import Dialog from "primevue/dialog";
+import Dialog from "openvue/dialog";
 
 import { fetchGraph } from "@/arches_vue_components/datatypes/resource-instance-list/api.ts";
 

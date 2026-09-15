@@ -14,7 +14,7 @@ export interface FileData {
     node_id: string;
 }
 
-export type PrimeVueFile = File & { objectURL: string };
+export type OpenVueFile = File & { objectURL: string };
 
 export interface FileListWidgetProps extends BaseWidgetProps {
     cardXNodeXWidgetData?: FileListCardXNodeXWidgetData;

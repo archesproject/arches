@@ -2,8 +2,8 @@
 import { computed, inject, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import InputText from "primevue/inputtext";
-import { useToast } from "primevue/usetoast";
+import InputText from "openvue/inputtext";
+import { useToast } from "openvue/usetoast";
 
 import { patchList } from "@/arches_controlled_lists/api.ts";
 import {

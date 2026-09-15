@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Select from "primevue/select";
+import Select from "openvue/select";
 
 import { useLanguageStore } from "@/arches_vue_components/stores/useLanguageStore.ts";
 import { buildLanguageAliasedNodeData } from "@/arches_vue_components/datatypes/language/utils.ts";

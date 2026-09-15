@@ -2,7 +2,7 @@
 import { computed, ref, watchEffect } from "vue";
 
 import { debounce } from "es-toolkit/function";
-import DatePicker from "primevue/datepicker";
+import DatePicker from "openvue/datepicker";
 
 import {
     convertISO8601DatetimeFormatToPrimevueDatetimeFormat,

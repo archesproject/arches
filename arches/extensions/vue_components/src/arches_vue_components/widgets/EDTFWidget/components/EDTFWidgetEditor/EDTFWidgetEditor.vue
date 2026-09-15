@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useGettext } from "vue3-gettext";
-import InputText from "primevue/inputtext";
-import Button from "primevue/button";
+import InputText from "openvue/inputtext";
+import Button from "openvue/button";
 
 import EDTFHelpDrawer from "@/arches_vue_components/widgets/EDTFWidget/components/EDTFWidgetEditor/components/EDTFHelpDrawer.vue";
 

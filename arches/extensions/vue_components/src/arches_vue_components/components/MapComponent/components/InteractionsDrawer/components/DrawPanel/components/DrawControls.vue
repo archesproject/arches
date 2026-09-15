@@ -3,7 +3,7 @@ import { computed, onMounted, onUnmounted, ref } from "vue";
 
 import { useGettext } from "vue3-gettext";
 
-import Select from "primevue/select";
+import Select from "openvue/select";
 
 import {
     DRAW_CREATE_EVENT,

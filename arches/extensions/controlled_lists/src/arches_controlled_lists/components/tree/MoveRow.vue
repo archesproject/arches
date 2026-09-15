@@ -2,8 +2,8 @@
 import { inject, ref, watch } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import Button from "primevue/button";
-import { useToast } from "primevue/usetoast";
+import Button from "openvue/button";
+import { useToast } from "openvue/usetoast";
 
 import { patchList } from "@/arches_controlled_lists/api.ts";
 import {
@@ -26,8 +26,8 @@ import {
 } from "@/arches_controlled_lists/utils.ts";
 
 import type { Ref } from "vue";
-import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree";
-import type { TreeNode } from "primevue/treenode";
+import type { TreeExpandedKeys, TreeSelectionKeys } from "openvue/tree";
+import type { TreeNode } from "openvue/treenode";
 import type {
     ControlledList,
     ControlledListItem,

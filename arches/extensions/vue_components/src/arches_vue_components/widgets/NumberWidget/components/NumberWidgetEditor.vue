@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import InputNumber from "primevue/inputnumber";
+import InputNumber from "openvue/inputnumber";
 
 import { buildNumberAliasedNodeData } from "@/arches_vue_components/datatypes/number/utils.ts";
 

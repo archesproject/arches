@@ -2,10 +2,10 @@
 import { computed, inject, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import { useConfirm } from "primevue/useconfirm";
-import { useToast } from "primevue/usetoast";
-import Button from "primevue/button";
-import SplitButton from "primevue/splitbutton";
+import { useConfirm } from "openvue/useconfirm";
+import { useToast } from "openvue/usetoast";
+import Button from "openvue/button";
+import SplitButton from "openvue/splitbutton";
 
 import ImportList from "@/arches_controlled_lists/components/misc/ImportList.vue";
 import ExportList from "@/arches_controlled_lists/components/misc/ExportList.vue";
@@ -28,8 +28,8 @@ import {
 import { useListStore } from "@/arches_controlled_lists/stores/useListStore.ts";
 
 import type { Ref } from "vue";
-import type { TreeSelectionKeys } from "primevue/tree";
-import type { TreeNode } from "primevue/treenode";
+import type { TreeSelectionKeys } from "openvue/tree";
+import type { TreeNode } from "openvue/treenode";
 import type {
     ControlledList,
     ControlledListItem,

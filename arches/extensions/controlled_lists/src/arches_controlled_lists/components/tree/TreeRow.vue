@@ -2,10 +2,10 @@
 import { computed, inject, ref, useTemplateRef, watch } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import Button from "primevue/button";
-import InputText from "primevue/inputtext";
-import ProgressSpinner from "primevue/progressspinner";
-import { useToast } from "primevue/usetoast";
+import Button from "openvue/button";
+import InputText from "openvue/inputtext";
+import ProgressSpinner from "openvue/progressspinner";
+import { useToast } from "openvue/usetoast";
 
 import {
     createItem,
@@ -36,8 +36,8 @@ import { useListStore } from "@/arches_controlled_lists/stores/useListStore.ts";
 import MoveRow from "@/arches_controlled_lists/components/tree/MoveRow.vue";
 
 import type { ComponentPublicInstance, Ref } from "vue";
-import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree";
-import type { TreeNode } from "primevue/treenode";
+import type { TreeExpandedKeys, TreeSelectionKeys } from "openvue/tree";
+import type { TreeNode } from "openvue/treenode";
 import type {
     ControlledList,
     ControlledListItem,
