@@ -89,6 +89,15 @@ def apply_graph_diff(initial_graph, updated_graph, using=DEFAULT_DB_ALIAS):
             if node_id not in updated_node_ids:
                 del tile.data[node_id]
 
+        # ...and from any pending provisional edit, which is keyed by the same
+        # nodeids. A stale key there is written back into data when a reviewer
+        # approves the edit, and Tile.save() then raises Node.DoesNotExist because
+        # the node is gone -- a record no curator can fix from the UI.
+        for provisional_edit in (tile.provisionaledits or {}).values():
+            for node_id in list(provisional_edit.get("value", {})):
+                if node_id not in updated_node_ids:
+                    del provisional_edit["value"][node_id]
+
         # add nodes that only exist in updated graph
         # or update nodes default value if changed
         for node_id in updated_node_ids:
@@ -112,6 +121,7 @@ def apply_graph_diff(initial_graph, updated_graph, using=DEFAULT_DB_ALIAS):
 
     return {
         "resource_instance_count": resource_instance_count,
+        "touched_graph_ids": {str(updated_graph["graphid"])},
         "orphaned_tiles_deleted": orphaned_tiles_deleted,
         "misparented_tiles_deleted": misparented_tiles_deleted,
         "tiles_updated": tiles_updated,
