@@ -1,0 +1,65 @@
+// Styles the controls built by js/bindings/color-picker.js.
+
+.color-picker-swatch-host {
+    position: relative;
+}
+
+.color-picker-swatch {
+    // Covers the `.input-group-addon` so the whole swatch is the click target, while
+    // the tinted ion-stop icon underneath remains what the user actually sees.
+    &--overlay {
+        position: absolute;
+        inset: 0;
+        inline-size: 100%;
+        block-size: 100%;
+        padding: 0;
+        margin: 0;
+        border: none;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    // Fallback rendering, used only where no addon is present to overlay.
+    &:not(&--overlay) {
+        inline-size: 2.6rem;
+        block-size: 2.6rem;
+        padding: 0.2rem;
+        margin-inline-start: 0.4rem;
+        vertical-align: middle;
+        border: 1px solid #ddd;
+        border-radius: 0.2rem;
+        background-color: #fff;
+        cursor: pointer;
+    }
+
+    &::-webkit-color-swatch-wrapper {
+        padding: 0;
+    }
+
+    &::-webkit-color-swatch,
+    &::-moz-color-swatch {
+        border: none;
+    }
+
+    // The overlay is transparent, so focus has to be shown on the addon behind it.
+    &--overlay:focus-visible {
+        outline: none;
+    }
+}
+
+.color-picker-swatch-host:focus-within {
+    outline: 2px solid steelblue;
+    outline-offset: 1px;
+}
+
+.color-picker-alpha {
+    display: block;
+    inline-size: 100%;
+    margin-block-start: 0.4rem;
+    cursor: pointer;
+
+    &:focus-visible {
+        outline: 2px solid steelblue;
+        outline-offset: 1px;
+    }
+}
