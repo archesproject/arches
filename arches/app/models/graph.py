@@ -438,6 +438,7 @@ class Graph(models.GraphModel):
             )
 
             resource_instance_lifecycle_states = []
+            pending_next_and_previous_states = []
             for resource_instance_lifecycle_state_json in resource_instance_lifecycle[
                 "resource_instance_lifecycle_states"
             ]:
@@ -458,20 +459,35 @@ class Graph(models.GraphModel):
                     )
                 )
 
+                resource_instance_lifecycle_states.append(
+                    resource_instance_lifecycle_state
+                )
+                pending_next_and_previous_states.append(
+                    (
+                        resource_instance_lifecycle_state,
+                        next_resource_instance_lifecycle_states,
+                        previous_resource_instance_lifecycle_states,
+                    )
+                )
+
+            # states must be saved before their next/previous M2M relations can
+            # be set, since those relations are inserted directly into the
+            # through table without a pre-check that the referenced rows exist
+            self.resource_instance_lifecycle.resource_instance_lifecycle_states.set(
+                resource_instance_lifecycle_states, bulk=False
+            )
+
+            for (
+                resource_instance_lifecycle_state,
+                next_resource_instance_lifecycle_states,
+                previous_resource_instance_lifecycle_states,
+            ) in pending_next_and_previous_states:
                 resource_instance_lifecycle_state.next_resource_instance_lifecycle_states.set(
                     next_resource_instance_lifecycle_states
                 )
                 resource_instance_lifecycle_state.previous_resource_instance_lifecycle_states.set(
                     previous_resource_instance_lifecycle_states
                 )
-
-                resource_instance_lifecycle_states.append(
-                    resource_instance_lifecycle_state
-                )
-
-            self.resource_instance_lifecycle.resource_instance_lifecycle_states.set(
-                resource_instance_lifecycle_states, bulk=False
-            )
 
         self.has_unpublished_changes = True
 
