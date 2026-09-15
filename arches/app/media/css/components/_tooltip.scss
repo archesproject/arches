@@ -1,75 +1,62 @@
 // CSS-only tooltip, replacing Bootstrap 3's tooltip plugin. Markup is
 // `data-tooltip="text"`, where Bootstrap 3 read `data-original-title`, with
 // `data-placement="top"` flipping it above the element. Bottom is the default.
+//
+// Everything is drawn on ::after. Several templates attach a tooltip directly to an
+// icon, and icon fonts render their glyph through ::before at the same specificity as
+// `[data-tooltip]::before`, so claiming ::before here would erase the icon. That rules
+// out drawing the arrow Bootstrap had.
 
 $tooltip-background: rgba(0, 0, 0, 0.9);
-$tooltip-arrow-size: 0.5rem;
-$tooltip-gap: 0.3rem;
+$tooltip-gap: 0.6rem;
+$tooltip-font-stack: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 
 [data-tooltip] {
     position: relative;
 
-    &::before,
-    &::after {
-        opacity: 0;
-        pointer-events: none;
-        position: absolute;
-        transition: opacity 0.15s;
-    }
-
-    // Arrow
-    &::before {
-        content: '';
-        border-style: solid;
-        border-color: transparent transparent $tooltip-background transparent;
-        border-width: 0 $tooltip-arrow-size $tooltip-arrow-size;
-        inset-block-start: calc(100% + #{$tooltip-gap});
-        inset-inline-start: 50%;
-        margin-inline-start: -$tooltip-arrow-size;
-        z-index: 1071;
-    }
-
-    // Bubble
+    // A pseudo-element inherits the host's typography, and tooltips sit on icons whose
+    // font carries no letters, so every inherited property is restated here. Bootstrap's
+    // own `.tooltip` reset the same set for the same reason.
     &::after {
         content: attr(data-tooltip);
         background-color: $tooltip-background;
         border-radius: 0.4rem;
         color: #fff;
+        font-family: $tooltip-font-stack;
         font-size: 1.2rem;
+        font-style: normal;
         font-weight: 400;
+        letter-spacing: normal;
         line-height: 1.42857143;
-        inset-block-start: calc(100% + #{$tooltip-gap} + #{$tooltip-arrow-size});
+        text-align: start;
+        text-decoration: none;
+        text-shadow: none;
+        text-transform: none;
+        word-spacing: normal;
+        inset-block-start: calc(100% + #{$tooltip-gap});
         inset-inline-start: 50%;
+        opacity: 0;
         padding: 0.6rem 0.8rem;
+        pointer-events: none;
+        position: absolute;
         transform: translateX(-50%);
+        transition: opacity 0.15s;
         white-space: nowrap;
         z-index: 1070;
     }
 
-    &:hover::before,
     &:hover::after,
-    &:focus-visible::before,
     &:focus-visible::after {
         opacity: 1;
     }
 
     // An empty attribute should not render an empty black box.
-    &[data-tooltip='']::before,
     &[data-tooltip='']::after {
         content: none;
     }
 
-    &[data-placement='top'] {
-        &::before {
-            border-color: $tooltip-background transparent transparent transparent;
-            border-width: $tooltip-arrow-size $tooltip-arrow-size 0;
-            inset-block-start: auto;
-            inset-block-end: calc(100% + #{$tooltip-gap});
-        }
-
-        &::after {
-            inset-block-start: auto;
-            inset-block-end: calc(100% + #{$tooltip-gap} + #{$tooltip-arrow-size});
-        }
+    &[data-placement='top']::after {
+        inset-block-start: auto;
+        inset-block-end: calc(100% + #{$tooltip-gap});
     }
 }
