@@ -14,7 +14,7 @@
                 data-bind="select2Query: {
                     select2Config: {
                         clickBubble: true,
-                        disabled: disabled,
+                        disabled: disable,
                         data: options,
                         value: value,
                         multiple: multiple,
@@ -64,4 +64,5 @@
         </div>
     </div>
 </div>
+{{ block.super }}
 {% endblock config_form %}

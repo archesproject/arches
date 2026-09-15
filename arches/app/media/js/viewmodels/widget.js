@@ -55,6 +55,7 @@ var WidgetViewModel = function(params) {
     });
     this.configKeys.push('label');
     this.configKeys.push('required');
+    this.configKeys.push('uneditable');
     this.valueProperties = params.valueProperties || [];
     if (this.node) {
         this.required = this.node.isrequired;
@@ -119,6 +120,12 @@ var WidgetViewModel = function(params) {
     } else {
         this.defaultValue = ko.observable(null);
     }
+
+    this.disable = ko.computed(function() {
+        return ko.unwrap(self.disabled) || (self.uneditable && ko.unwrap(self.uneditable)) || false;
+    });
+
+    this.disposables.push(this.disable);
 
     if (ko.isObservable(this.value) && ko.isObservable(this.defaultValue)) {
         var defaultValue = this.defaultValue();

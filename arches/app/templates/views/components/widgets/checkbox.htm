@@ -13,7 +13,7 @@
                 <label class="form-checkbox form-normal form-primary form-text"
                     data-bind="css: {
                         'active': $parent.isOptionSelected($data),
-                        'disabled': $parent.disabled
+                        'disabled': $parent.disable
                     },
                     onEnterkeyClick,
                     onSpaceClick,
@@ -22,7 +22,7 @@
                         'aria-checked': $parent.isOptionSelected($data)
                     }"
                     tabindex="0" role="checkbox">
-                    <input type="checkbox" data-bind="checked: $parent.isOptionSelected($data)">
+                    <input type="checkbox" data-bind="checked: $parent.isOptionSelected($data), disable: $parent.disable">
                     <span data-bind="text:text"></span>
                 </label>
             </div>
@@ -57,4 +57,5 @@
         </div>
     </div>
 </div>
+{{ block.super }}
 {% endblock config_form %}

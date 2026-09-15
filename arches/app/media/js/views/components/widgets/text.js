@@ -19,7 +19,7 @@ import 'bindings/chosen';
 */
 
 const viewModel = function(params) {
-    params.configKeys = ['placeholder', 'width', 'maxLength', 'defaultValue', 'uneditable'];
+    params.configKeys = ['placeholder', 'width', 'maxLength', 'defaultValue'];
 
     WidgetViewModel.apply(this, [params]);
     const self = this;
@@ -95,10 +95,6 @@ const viewModel = function(params) {
     };
 
     init();
-
-    self.disable = ko.computed(() => {
-        return ko.unwrap(self.disabled) || ko.unwrap(self.uneditable);
-    }, self);
 
     self.currentDefaultText.subscribe(newValue => {
         const currentLanguage = self.currentDefaultLanguage();

@@ -306,8 +306,9 @@ var ResourceInstanceSelectViewModel = function(params) {
     this.url = ko.observable(arches.urls.search_results);
     this.resourceToAdd = ko.observable(null);
 
-    this.disabled = ko.computed(function() {
-        return ko.unwrap(self.waitingForGraphToDownload) || ko.unwrap(params.disabled) || !!ko.unwrap(params.form?.locked);
+    // overrides widget.js's disable to also lock the widget while graphs download or the form is locked
+    this.disable = ko.computed(function() {
+        return ko.unwrap(self.waitingForGraphToDownload) || ko.unwrap(self.disabled) || !!ko.unwrap(params.form?.locked) || !!ko.unwrap(self.uneditable);
     });
 
     // this is a hack to get the dropdown to clear properly
@@ -320,7 +321,7 @@ var ResourceInstanceSelectViewModel = function(params) {
     this.select2Config = {
         value: self.onlyManageResourceIds ? self.value : self.resourceToAdd,
         clickBubble: true,
-        disabled: this.disabled,
+        disabled: this.disable,
         multiple: !self.displayOntologyTable ? params.multiple : false,
         placeholder: this.placeholder() || arches.translations.riSelectPlaceholder,
         closeOnSelect: true,

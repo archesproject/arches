@@ -24,5 +24,24 @@
 
 <!-- ko if: configForm -->
 {% block config_form %}
+<div class="node-config-item">
+    <div class="control-label">
+        <span data-bind="text: $root.translations.disabled"></span>
+    </div>
+    <div class="pad-no">
+        <div data-bind="
+            component: {
+                name: 'views/components/simple-switch',
+                params: {
+                    value: uneditable,
+                    config:{
+                        label: $root.translations.disableEditing,
+                        subtitle: $root.translations.preventUsersFromEditingValue
+                    }
+                }
+            }">
+        </div>
+    </div>
+</div>
 {% endblock config_form %}
 <!-- /ko -->
