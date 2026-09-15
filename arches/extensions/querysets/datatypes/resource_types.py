@@ -113,9 +113,14 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
             "Falling back to per-resource queries for %s uncached related resources",
             len(uncached_values),
         )
-        # No bulk cache — fall back to per-resource relation queries.
+        # No bulk cache — fall back to per-resource relation queries. If the
+        # source resource itself could not be resolved (e.g. its tile only
+        # carries a resourceinstance_id), skip straight to the per-target-id
+        # fallback below instead of dereferencing a None resource.
+        if resource is None:
+            relations = None
         # arches_version==9.0.0
-        if arches_version >= Version("8.0"):
+        elif arches_version >= Version("8.0"):
             relations = resource.from_resxres.all()
         else:
             relations = resource.resxres_resource_instance_ids_from.all()
@@ -177,8 +182,11 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
             if related := related_resources_by_id.get(
                 uuid.UUID(inner_val["resourceId"]), None
             ):
-                descriptor = related.descriptors.get(lang) or next(
-                    iter(related.descriptors.values()), None
+                # A self-referring resource may be fetched here before its own
+                # descriptors have ever been saved, in which case they are None.
+                related_descriptors = related.descriptors or {}
+                descriptor = related_descriptors.get(lang) or next(
+                    iter(related_descriptors.values()), None
                 )
                 ret.append(
                     {
