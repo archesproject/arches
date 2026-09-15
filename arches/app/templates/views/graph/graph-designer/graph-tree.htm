@@ -46,7 +46,7 @@
             <i data-bind="css: 'node.iconclass'" role="presentation"></i>
 
             <!-- ko if: node.exportable -->
-            <i class="jstree-leading-icon fa fa-download" role="presentation" data-toggle="tooltip" data-placement="top" data-container="body" data-original-title="{% trans 'Node is exportable in search' %}"></i>
+            <i class="jstree-leading-icon fa fa-download" role="presentation" data-placement="top" data-container="body" data-tooltip="{% trans 'Node is exportable in search' %}"></i>
             <!-- /ko -->
             <span class="" data-bind="{text: graphTree.getDisplayName(node)}"></span>
             <!-- ko if: graph.attributes.isresource && ( node.is_immutable || !graph.attributes.source_identifier_id ) -->
@@ -54,10 +54,9 @@
                 style="background-color: transparent; padding-left: 5px;"
                 class="fa fa-lock" 
                 role="presentation" 
-                data-toggle="tooltip" 
                 data-placement="auto" 
                 data-container="body" 
-                data-original-title="{% trans "Locked" %}"
+                data-tooltip="{% trans "Locked" %}"
             ></i>
             <!-- /ko -->
 
@@ -77,7 +76,6 @@
                         afterCopiedText: graphTree.translations.copiedNodeIdToClipboard
                     }
                 " 
-                data-toggle="tooltip" 
                 data-placement="auto" 
                 data-container="body"
             ></i>
@@ -86,19 +84,17 @@
                     class="jstree-node-action-icon fa fa-plus-circle" 
                     role="presentation" 
                     data-bind="click: graphTree.addChildNode.bind(graphTree)" 
-                    data-toggle="tooltip" 
                     data-placement="auto" 
                     data-container="body" 
-                    data-original-title="{% trans "Add Child Node" %}"
+                    data-tooltip="{% trans "Add Child Node" %}"
                 ></i>
                 <i 
                     class="jstree-node-action-icon ion-merge" 
                     role="presentation" 
                     data-bind="click: graphTree.toggleBranchList.bind(graphTree)" 
-                    data-toggle="tooltip" 
                     data-placement="auto" 
                     data-container="body" 
-                    data-original-title="{% trans "Add Branch" %}"
+                    data-tooltip="{% trans "Add Branch" %}"
                 ></i>
             <!-- /ko -->
 
@@ -110,10 +106,9 @@
                     click: graphTree.exportBranch.bind(graphTree), 
                     css: {'fa-arrow-right': graphTree.activeLanguageDir() != 'rtl', 'fa-arrow-left': graphTree.activeLanguageDir() == 'rtl'}
                 }" 
-                data-toggle="tooltip" 
                 data-placement="auto" 
                 data-container="body" 
-                data-original-title="{% trans "Export Branch" %}"
+                data-tooltip="{% trans "Export Branch" %}"
             ></i>
             <!-- /ko -->
 
@@ -123,10 +118,9 @@
                     class="jstree-node-action-icon fa fa-trash" 
                     role="presentation" 
                     data-bind="click: graphTree.deleteNode.bind(graphTree)" 
-                    data-toggle="tooltip" 
                     data-placement="auto"
                     data-container="body" 
-                    data-original-title="{% trans "Delete Node" %}"
+                    data-tooltip="{% trans "Delete Node" %}"
                 ></i>
                 <!-- /ko -->
             <!-- /ko -->

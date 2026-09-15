@@ -10,7 +10,6 @@ import GraphModel from "models/graph";
 import viewdata from "view-data";
 import searchResultsTemplate from "templates/views/components/search/search-results.htm";
 import ariaUtils from "utils/aria";
-import "bootstrap-datetimepicker";
 
 
 var componentName = "search-results";

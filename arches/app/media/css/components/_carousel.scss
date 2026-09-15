@@ -1,0 +1,127 @@
+/*
+ * Image carousel, replacing knockstrap 1.3.2 and Bootstrap 3's carousel plugin.
+ *
+ * Self-contained by design: the binding that drives this emits none of Bootstrap's
+ * carousel markup, so the report renders the same before and after the Bootstrap 5
+ * upgrade. See arches/app/media/js/bindings/carousel.js.
+ */
+
+.arches-carousel {
+    position: relative;
+    display: flex;
+    align-items: center;
+    inline-size: 100%;
+    overflow: hidden;
+    background-color: #f7f7f7;
+}
+
+.arches-carousel-track {
+    position: relative;
+    inline-size: 100%;
+    // Tallest slide sets the height; without a floor an empty list collapses.
+    min-block-size: 20rem;
+}
+
+.arches-carousel-slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.35s ease-in-out;
+
+    &.is-current {
+        position: relative;
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+.arches-carousel-image {
+    max-inline-size: 100%;
+    max-block-size: 40rem;
+    object-fit: contain;
+}
+
+.arches-carousel-caption {
+    position: absolute;
+    inset-block-end: 0;
+    inset-inline: 0;
+    padding: 1rem;
+    color: #fff;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.arches-carousel-control {
+    position: absolute;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 3.6rem;
+    block-size: 3.6rem;
+    padding: 0;
+    font-size: 2.8rem;
+    line-height: 1;
+    color: #fff;
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.35);
+    border: none;
+    border-radius: 50%;
+
+    &--previous {
+        inset-inline-start: 1rem;
+    }
+
+    &--next {
+        inset-inline-end: 1rem;
+    }
+
+    &:hover,
+    &:focus-visible {
+        background-color: rgba(0, 0, 0, 0.6);
+    }
+
+    &:focus-visible {
+        outline: 2px solid #fff;
+        outline-offset: 2px;
+    }
+}
+
+.arches-carousel-indicators {
+    position: absolute;
+    inset-block-end: 1rem;
+    inset-inline: 0;
+    z-index: 1;
+    display: flex;
+    gap: 0.6rem;
+    justify-content: center;
+}
+
+.arches-carousel-indicator {
+    inline-size: 1rem;
+    block-size: 1rem;
+    padding: 0;
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 50%;
+
+    &.is-current {
+        background-color: #fff;
+    }
+
+    &:focus-visible {
+        outline: 2px solid #fff;
+        outline-offset: 2px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .arches-carousel-slide {
+        transition: none;
+    }
+}
