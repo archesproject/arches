@@ -25,7 +25,7 @@ import 'bindings/key-events-click';
 
 const viewModel = function(params) {
     params.configKeys = ['trueLabel', 'falseLabel', 'defaultValue'];
-
+        
     WidgetViewModel.apply(this, [params]);
     var self = this;
     this.setValue = function(val) {
