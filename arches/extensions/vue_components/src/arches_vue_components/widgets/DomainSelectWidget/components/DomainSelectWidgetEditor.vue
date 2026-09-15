@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Select from "primevue/select";
+import Select from "openvue/select";
 
 import { buildDomainAliasedNodeData } from "@/arches_vue_components/datatypes/domain/utils.ts";
 

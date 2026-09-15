@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import RadioButton from "primevue/radiobutton";
-import RadioButtonGroup from "primevue/radiobuttongroup";
+import RadioButton from "openvue/radiobutton";
+import RadioButtonGroup from "openvue/radiobuttongroup";
 
 import { buildBooleanAliasedNodeData } from "@/arches_vue_components/datatypes/boolean/utils.ts";
 

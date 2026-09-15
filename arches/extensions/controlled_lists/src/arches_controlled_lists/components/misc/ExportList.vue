@@ -2,12 +2,12 @@
 import { onMounted, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import { useToast } from "primevue/usetoast";
-import Button from "primevue/button";
-import Dialog from "primevue/dialog";
-import InputText from "primevue/inputtext";
-import MultiSelect from "primevue/multiselect";
-import ProgressSpinner from "primevue/progressspinner";
+import { useToast } from "openvue/usetoast";
+import Button from "openvue/button";
+import Dialog from "openvue/dialog";
+import InputText from "openvue/inputtext";
+import MultiSelect from "openvue/multiselect";
+import ProgressSpinner from "openvue/progressspinner";
 
 import { sanitizeFilename } from "@/arches_controlled_lists/utils.ts";
 import { exportList } from "@/arches_controlled_lists/api.ts";
@@ -16,7 +16,7 @@ import {
     ERROR,
 } from "@/arches_controlled_lists/constants.ts";
 
-import type { TreeNode } from "primevue/treenode";
+import type { TreeNode } from "openvue/treenode";
 
 const { $gettext } = useGettext();
 const toast = useToast();

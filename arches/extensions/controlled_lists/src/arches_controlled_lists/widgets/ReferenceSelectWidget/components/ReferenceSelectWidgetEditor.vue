@@ -2,13 +2,13 @@
 import { computed, ref, watch, watchEffect } from "vue";
 
 import { useGettext } from "vue3-gettext";
-import TreeSelect from "primevue/treeselect";
+import TreeSelect from "openvue/treeselect";
 
 import { useReferenceSelectOptionsStore } from "@/arches_controlled_lists/stores/useReferenceSelectOptionsStore.ts";
 import { buildReferenceSelectAliasedNodeData } from "@/arches_controlled_lists/datatypes/reference-select/utils.ts";
 
 import type { Ref } from "vue";
-import type { TreeExpandedKeys } from "primevue/tree";
+import type { TreeExpandedKeys } from "openvue/tree";
 
 import type { ReferenceSelectAliasedNodeData } from "@/arches_controlled_lists/datatypes/reference-select/types.ts";
 import type {

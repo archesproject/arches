@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 
 import { useCappedTreeFilter } from "@/arches_controlled_lists/components/tree/utils/capped-filter.ts";
 
-import type { TreeExpandedKeys } from "primevue/tree";
-import type { TreeNode } from "primevue/treenode";
+import type { TreeExpandedKeys } from "openvue/tree";
+import type { TreeNode } from "openvue/treenode";
 
 const FLUSH_DEBOUNCE_MS = 5;
 

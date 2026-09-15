@@ -3,7 +3,7 @@ import { computed } from "vue";
 
 import { useGettext } from "vue3-gettext";
 
-import Listbox from "primevue/listbox";
+import Listbox from "openvue/listbox";
 
 import {
     GEOMETRY_TYPE_LINESTRING,

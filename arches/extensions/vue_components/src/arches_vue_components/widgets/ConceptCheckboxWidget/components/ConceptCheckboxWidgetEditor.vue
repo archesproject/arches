@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch, watchEffect } from "vue";
 
-import Checkbox from "primevue/checkbox";
-import CheckboxGroup from "primevue/checkboxgroup";
+import Checkbox from "openvue/checkbox";
+import CheckboxGroup from "openvue/checkboxgroup";
 
 import { useConceptTreeStore } from "@/arches_vue_components/stores/useConceptTreeStore.ts";
 import { buildConceptListAliasedNodeData } from "@/arches_vue_components/datatypes/concept-list/utils.ts";

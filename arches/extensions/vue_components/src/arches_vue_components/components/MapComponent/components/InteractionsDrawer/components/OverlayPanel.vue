@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ToggleSwitch from "primevue/toggleswitch";
+import ToggleSwitch from "openvue/toggleswitch";
 
 import { useResolvedMapContext } from "@/arches_vue_components/components/MapComponent/composables/useMapContext.ts";
 

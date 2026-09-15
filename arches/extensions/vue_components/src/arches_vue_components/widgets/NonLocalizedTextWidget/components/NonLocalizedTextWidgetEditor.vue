@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import InputText from "primevue/inputtext";
-import Textarea from "primevue/textarea";
+import InputText from "openvue/inputtext";
+import Textarea from "openvue/textarea";
 
 import { MULTILINE_RENDER_CONTEXT } from "@/arches_vue_components/widgets/NonLocalizedTextWidget/constants.ts";
 

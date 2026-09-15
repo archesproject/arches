@@ -14,7 +14,7 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { uniqBy } from "es-toolkit";
-import { useToast } from "primevue/usetoast";
+import { useToast } from "openvue/usetoast";
 import { useGettext } from "vue3-gettext";
 
 import {

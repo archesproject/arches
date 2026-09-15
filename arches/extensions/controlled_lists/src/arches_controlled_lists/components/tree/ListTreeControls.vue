@@ -5,8 +5,8 @@ import PresentationControls from "@/arches_controlled_lists/components/tree/Pres
 
 import { useListStore } from "@/arches_controlled_lists/stores/useListStore.ts";
 
-import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree";
-import type { TreeNode } from "primevue/treenode";
+import type { TreeExpandedKeys, TreeSelectionKeys } from "openvue/tree";
+import type { TreeNode } from "openvue/treenode";
 import type { ControlledList } from "@/arches_controlled_lists/types";
 
 const { tree } = defineProps<{ tree: TreeNode[] }>();

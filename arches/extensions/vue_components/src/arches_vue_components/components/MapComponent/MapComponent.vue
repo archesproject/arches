@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, provide, useTemplateRef } from "vue";
 
-import Skeleton from "primevue/skeleton";
-import Toast from "primevue/toast";
+import Skeleton from "openvue/skeleton";
+import Toast from "openvue/toast";
 
 import FeaturePopup from "@/arches_vue_components/components/MapComponent/components/FeaturePopup.vue";
 import InteractionsDrawer from "@/arches_vue_components/components/MapComponent/components/InteractionsDrawer/InteractionsDrawer.vue";

@@ -1,8 +1,8 @@
 import { onUnmounted, ref, watch } from "vue";
 
 import type { ComputedRef, Ref } from "vue";
-import type { TreeExpandedKeys } from "primevue/tree";
-import type { TreeNode } from "primevue/treenode";
+import type { TreeExpandedKeys } from "openvue/tree";
+import type { TreeNode } from "openvue/treenode";
 
 export function useCappedTreeFilter(
     tree: Ref<TreeNode[]> | ComputedRef<TreeNode[]>,

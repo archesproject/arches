@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Image from "primevue/image";
-import Button from "primevue/button";
+import Image from "openvue/image";
+import Button from "openvue/button";
 
 import { REMOVE } from "@/arches_vue_components/datatypes/file-list/constants.ts";
 

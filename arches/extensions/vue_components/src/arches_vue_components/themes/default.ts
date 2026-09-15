@@ -1,10 +1,10 @@
-import { definePreset, palette } from "@primeuix/themes";
+import { definePreset, palette } from "@openvue/themes";
 
 import type { ArchesThemeConfiguration } from "@/arches_vue_components/themes/types";
 
 // eslint-disable-next-line
-// @ts-ignore: This is a workaround for PrimeVue theme import issues after v1.20
-import Aura from "@primeuix/themes/aura";
+// @ts-ignore: This is a workaround for OpenVue theme import issues after v1.20
+import Aura from "@openvue/themes/aura";
 
 const archesColors = Object.freeze({
     blue: "#579ddb",
@@ -25,9 +25,9 @@ export const ArchesPreset = definePreset(Aura, {
         red: palette(archesColors.red),
     },
     semantic: {
-        // PrimeVue token override
+        // OpenVue token override
         primary: palette(archesColors.blue),
-        // PrimeVue token override
+        // OpenVue token override
         navigation: {
             list: {
                 padding: "0",

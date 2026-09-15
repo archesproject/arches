@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 
-import Button from "primevue/button";
-import Skeleton from "primevue/skeleton";
+import Button from "openvue/button";
+import Skeleton from "openvue/skeleton";
 import { useGettext } from "vue3-gettext";
 
 import { generateArchesURL } from "@/arches_vue_components/application/generate-arches-url.ts";

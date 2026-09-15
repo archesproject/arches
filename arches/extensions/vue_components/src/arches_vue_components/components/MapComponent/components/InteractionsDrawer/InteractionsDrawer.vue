@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Button from "primevue/button";
-import Divider from "primevue/divider";
+import Button from "openvue/button";
+import Divider from "openvue/divider";
 
 import { useInteractionPanel } from "@/arches_vue_components/components/MapComponent/components/InteractionsDrawer/composables/useInteractionPanel.ts";
 
