@@ -1,30 +1,15 @@
 import ko from 'knockout';
 
 /**
- * Image carousel binding, replacing knockstrap 1.3.2.
- *
- * knockstrap is Bootstrap 3-only: it emitted `.carousel-inner > .item` markup with
- * `data-slide` / `data-slide-to` attributes and depended on Bootstrap 3's carousel
- * plugin to drive them. Bootstrap 5 renames all of that (`.carousel-item`,
- * `data-bs-slide`), and knockstrap has been unmaintained since 2016.
- *
- * This implementation carries no Bootstrap dependency at all — its own markup, its
- * own styles, its own transition. That matters beyond removing the package: the
- * carousel was one of the components the Bootstrap 3 `data-*` XSS advisory
- * (GHSA-vxmc-5x29-h64v) applied to, and taking it out of Bootstrap's hands means
- * the Bootstrap 5 upgrade has one less moving part to reconcile.
- *
- * The binding signature is unchanged, so `views/report-templates/image.htm` needs
- * no edit:
+ * Image carousel binding, replacing knockstrap 1.3.2, which was Bootstrap 3-only and
+ * unmaintained since 2016. Carries no Bootstrap dependency: its own markup, styles and
+ * transition, styled by css/components/_carousel.scss.
  *
  *     data-bind="carousel: { content: { name: 'itemTemplate', data: images } }"
  *
  * Each item is `{ src, alt }`, matching what reports/image.js builds. `content.name`
- * names an optional template rendered into each slide's caption; arches ships it
- * empty, but it is honoured when it has content.
+ * names an optional template rendered into each slide's caption.
  */
-
-const AUTO_ADVANCE_DISABLED = 0;
 
 function readItems(content) {
     const data = ko.unwrap(content.data);
@@ -40,7 +25,7 @@ ko.bindingHandlers.carousel = {
             throw new Error('carousel binding requires content.data');
         }
 
-        const interval = ko.unwrap(options.interval) ?? AUTO_ADVANCE_DISABLED;
+        const interval = ko.unwrap(options.interval) ?? 0;
 
         element.classList.add('arches-carousel');
         element.setAttribute('role', 'region');
@@ -81,7 +66,6 @@ ko.bindingHandlers.carousel = {
             if (slideCount === 0) {
                 return;
             }
-            // Wrap in both directions so the controls never dead-end.
             currentIndex = ((index % slideCount) + slideCount) % slideCount;
             applySelection();
         }
@@ -90,7 +74,6 @@ ko.bindingHandlers.carousel = {
             Array.from(track.children).forEach(function (slide, index) {
                 const isCurrent = index === currentIndex;
                 slide.classList.toggle('is-current', isCurrent);
-                // Keeps offscreen slides out of the tab order and the a11y tree.
                 slide.setAttribute('aria-hidden', String(!isCurrent));
             });
             Array.from(indicators.children).forEach(function (indicator, index) {
@@ -135,8 +118,8 @@ ko.bindingHandlers.carousel = {
 
                 const image = document.createElement('img');
                 image.className = 'arches-carousel-image';
-                // Assigned as properties rather than interpolated into markup, so
-                // a filename can never be read as HTML.
+                // Assigned as properties, never interpolated into markup, so a
+                // filename can never be read as HTML.
                 image.src = ko.unwrap(item.src) || '';
                 image.alt = ko.unwrap(item.alt) || '';
                 slide.appendChild(image);

@@ -1,13 +1,7 @@
 /**
- * Translates the date picker options stored in graph node configs into the shape
- * Tempus Dominus 6 expects.
- *
- * Kept apart from the binding itself because these are pure functions over values
- * that live in adopters' databases — they are the part of the
- * eonasdan-bootstrap-datetimepicker replacement most worth testing, and importing
- * them should not drag in the picker.
- *
- * See arches/app/media/js/bindings/datepicker.js.
+ * Translates the date picker options stored in graph node configs into the shape Tempus
+ * Dominus 6 expects. Kept apart from bindings/datepicker.js so importing them does not
+ * drag in the picker.
  */
 
 /** Legacy view names mapped onto Tempus Dominus' own. Only `days` differs. */
@@ -20,8 +14,7 @@ export const VIEW_MODE_BY_LEGACY_NAME = {
 
 /**
  * Which pickers to show, derived from the moment format rather than configured
- * separately. A `YYYY` field should not offer a clock, and a `YYYY-MM` field should
- * not offer days.
+ * separately: a `YYYY` field should not offer a clock, nor a `YYYY-MM` field days.
  */
 export function componentsForFormat(format) {
     const pattern = String(format || '');

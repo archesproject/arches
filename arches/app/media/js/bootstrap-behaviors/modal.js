@@ -1,26 +1,17 @@
 /**
- * Modal behaviour, replacing Bootstrap 3's modal plugin.
+ * Modal behaviour, replacing Bootstrap 3's modal plugin. The vendored stylesheet still
+ * carries `.modal`, `.modal-backdrop` and `.modal-open`, so this drives the same
+ * classes.
  *
- * Twenty-nine call sites use it, all inside `arches/app/media/js/views/rdm/`, and all
- * through jQuery's `$(el).modal('show' | 'hide')`. That API is re-exposed in
- * `index.js` so none of those files change.
- *
- * Bootstrap 3 hid `.modal` with `display: none` in CSS and showed it by setting
- * `display: block` inline and adding `.in`, with a separate `.modal-backdrop` element
- * and `.modal-open` on the body. The vendored stylesheet still carries all of those,
- * so this drives the same classes.
- *
- * **Focus is deliberately not trapped.** Bootstrap 3 pulled focus back into the modal,
- * which broke the select2 and chosen dropdowns arches renders inside them — `rdm.js`
- * used to neutralise it with
- * `$.fn.modal.Constructor.prototype.enforceFocus = function () {}`. Not implementing it
- * preserves the behaviour arches actually wanted, and lets that override go away.
+ * Focus is deliberately not trapped: Bootstrap 3's focus enforcement broke the select2
+ * and chosen dropdowns arches renders inside modals, which is why `rdm.js` used to
+ * neutralise it by overriding `enforceFocus`.
  */
 
 const BACKDROP_CLASS = 'modal-backdrop';
 const TRANSITION_MS = 300;
 
-let openModals = [];
+const openModals = [];
 
 function hasFade(element) {
     return element.classList.contains('fade');
@@ -100,7 +91,6 @@ function topMost() {
 }
 
 export function install(root = document) {
-    // `data-dismiss="modal"` — 33 close buttons across the RDM forms.
     root.addEventListener('click', function (event) {
         const dismiss = event.target.closest('[data-dismiss="modal"]');
         if (dismiss) {
@@ -112,7 +102,7 @@ export function install(root = document) {
             return;
         }
 
-        // Clicking the backdrop area closes, matching Bootstrap 3's default.
+        // Clicking the backdrop closes, matching Bootstrap 3's default.
         const element = topMost();
         if (element && event.target === element) {
             hide(element);

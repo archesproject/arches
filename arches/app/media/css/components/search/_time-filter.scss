@@ -49,15 +49,6 @@
     }
 }
 
-/*
- * `.hide-datepicker-time-option` used to suppress eonasdan-bootstrap-datetimepicker's
- * time toggle with CSS. Tempus Dominus decides which pickers to render from options,
- * and the datepicker binding derives those from the format string — the time filter
- * uses 'YYYY-MM-DD', so no clock is built in the first place. The wrapper class is
- * kept in the markup as a hook but no longer needs a rule.
- * See arches/app/media/js/bindings/datepicker.js.
- */
-
 .datepicker-inline {
     background: #fff;
     border-width: 0px;

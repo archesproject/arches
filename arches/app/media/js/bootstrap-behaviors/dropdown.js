@@ -1,10 +1,6 @@
 /**
- * Dropdown behaviour, replacing Bootstrap 3's dropdown plugin.
- *
- * Drives the same markup the plugin did — a trigger carrying
- * `data-toggle="dropdown"` inside a `.dropdown` (or `.btn-group`), with a sibling
- * `.dropdown-menu` — by toggling `.open` on the parent, which is what the vendored
- * Bootstrap 3 stylesheet already styles. Twelve triggers across the templates.
+ * Dropdown behaviour, replacing Bootstrap 3's dropdown plugin. Toggles `.open` on the
+ * trigger's parent, which is what the vendored Bootstrap 3 stylesheet styles.
  */
 
 const TRIGGER_SELECTOR = '[data-toggle="dropdown"]';
@@ -15,21 +11,16 @@ function parentOf(trigger) {
     return trigger.closest(PARENT_SELECTOR) || trigger.parentElement;
 }
 
-function closeAll(except) {
+function closeAll(except = null) {
     for (const open of document.querySelectorAll(`.${OPEN_CLASS}`)) {
-        if (open === except) {
-            continue;
-        }
-        // Only close things that are actually dropdowns; `.open` is a generic enough
-        // class name that arches uses it elsewhere.
-        if (!open.querySelector(TRIGGER_SELECTOR)) {
+        // `.open` is a generic enough class name that arches uses it elsewhere, so
+        // only close elements that actually hold a dropdown trigger.
+        const trigger = open.querySelector(TRIGGER_SELECTOR);
+        if (open === except || !trigger) {
             continue;
         }
         open.classList.remove(OPEN_CLASS);
-        const trigger = open.querySelector(TRIGGER_SELECTOR);
-        if (trigger) {
-            trigger.setAttribute('aria-expanded', 'false');
-        }
+        trigger.setAttribute('aria-expanded', 'false');
     }
 }
 
@@ -45,7 +36,7 @@ export function toggle(trigger) {
 }
 
 export function hideAll() {
-    closeAll(null);
+    closeAll();
 }
 
 export function install(root = document) {
@@ -58,13 +49,13 @@ export function install(root = document) {
         }
         // A click inside an open menu should not close it; anywhere else should.
         if (!event.target.closest('.dropdown-menu')) {
-            closeAll(null);
+            closeAll();
         }
     });
 
     root.addEventListener('keydown', function (event) {
         if (event.key === 'Escape') {
-            closeAll(null);
+            closeAll();
         }
     });
 }
