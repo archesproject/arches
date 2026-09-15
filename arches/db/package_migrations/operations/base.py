@@ -131,7 +131,11 @@ class _AlterRowOperation(PackageOperation):
         return getattr(self, self.pk_attribute)
 
     def _entry(self, state):
-        return state.graphs[str(self.graphid)][self.state_collection][str(self._pk)]
+        return (
+            state.graph(self.graphid)
+            .setdefault(self.state_collection, {})
+            .setdefault(str(self._pk), {})
+        )
 
     def state_forwards(self, app_label, state):
         self._entry(state).update(self.changes)
@@ -215,7 +219,7 @@ class _RowOperation(PackageOperation):
         return str(self.fields[self.pk_field])
 
     def _collection(self, state):
-        return state.graphs[str(self.graphid)][self.state_collection]
+        return state.graph(self.graphid).setdefault(self.state_collection, {})
 
     def _row_kwargs(self):
         kwargs = self._complete_fields()

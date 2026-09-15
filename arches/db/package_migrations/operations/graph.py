@@ -81,7 +81,7 @@ class AlterGraph(_AlterRowOperation):
         return self.graphid
 
     def _entry(self, state):
-        return state.graphs[str(self.graphid)]
+        return state.graph(self.graphid)
 
     def describe(self):
         return "Alter graph %s (%s)" % (self.graphid, ", ".join(sorted(self.changes)))

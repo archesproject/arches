@@ -58,6 +58,30 @@ class PackageState:
     def add_graph(self, graph):
         self.graphs[str(graph["graphid"])] = graph
 
+    def graph(self, graphid):
+        """The state entry for a graph, seeded if the history never created it.
+
+        Unlike a Django model, an Arches graph can arrive outside migration
+        history -- `packages -o load_package` installs the graphs an application
+        ships. A migration that modifies such a graph is legitimate and must not
+        fail on replay just because no CreateGraph precedes it.
+
+        The corollary is that replayed state is incomplete for those graphs, so
+        the first package migration for an already-installed package has to be
+        stamped rather than replayed.
+        """
+        graphid = str(graphid)
+        if graphid not in self.graphs:
+            self.graphs[graphid] = {
+                "graphid": graphid,
+                "nodes": {},
+                "nodegroups": {},
+                "edges": {},
+                "cards": {},
+                "widgets": {},
+            }
+        return self.graphs[graphid]
+
     def remove_graph(self, graphid):
         del self.graphs[str(graphid)]
 
