@@ -2827,19 +2827,6 @@ class UserPreference(models.Model):
         ]
 
 
-class PackageMigration(models.Model):
-    id = models.BigAutoField(
-        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
-    )
-    app = models.TextField()
-    name = models.TextField()
-    applied = models.DateTimeField(auto_now_add=True, blank=True)
-
-    class Meta:
-        managed = True
-        db_table = "package_migrations"
-
-
 # Import proxy models to ensure they are always discovered.
 # For example, if the urls.py module is not imported because a management command
 # skips system checks, the coincidental importing of the Graph(Proxy)Model

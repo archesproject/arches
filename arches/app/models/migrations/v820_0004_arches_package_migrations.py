@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
     """
 
     dependencies = [
-        ("models", "v820_0003_add_package_migrations"),
+        ("models", "12779_add_multicard_resource_descriptor"),
     ]
 
     operations = [
