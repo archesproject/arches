@@ -259,6 +259,46 @@ class UpdateResourceInstanceDataTaskTests(ArchesTestCase):
         )
 
     @patch("arches.app.tasks.notify_completion")
+    def test_updates_publication_id_for_resources_with_tiles(self, mock_notify):
+        """The sibling test above covers only resources with no tiles.
+
+        `resource_instances` is a lazy queryset filtered on the OLD publication
+        id. The tile loop calls tile.save(), which cascades to
+        Resource.save_descriptors() -> ResourceInstance.save(), and that
+        unconditionally re-stamps graph_publication to the graph's CURRENT
+        publication. By the time the repoint loop re-evaluates the queryset, every
+        tile-bearing resource has already fallen out of it.
+        """
+        resource_instance = models.ResourceInstance.objects.create(
+            graph=self.test_graph
+        )
+        models.TileModel.objects.create(
+            resourceinstance=resource_instance,
+            data={str(self.concept_node_id): "DUMMY DATA"},
+            sortorder=0,
+        )
+
+        original_published_graph = models.PublishedGraph.objects.get(
+            publication=self.test_graph.publication, language="en"
+        )
+        self.test_graph.publish()
+        updated_published_graph = models.PublishedGraph.objects.get(
+            publication=self.test_graph.publication, language="en"
+        )
+
+        update_resource_instance_data_based_on_graph_diff(
+            initial_graph=original_published_graph.serialized_graph,
+            updated_graph=updated_published_graph.serialized_graph,
+            user_id=self.user.pk,
+        )
+
+        resource_instance.refresh_from_db()
+        self.assertEqual(
+            str(resource_instance.graph_publication_id),
+            updated_published_graph.serialized_graph["publication_id"],
+        )
+
+    @patch("arches.app.tasks.notify_completion")
     def test_prunes_deleted_nodes(self, mock_notify):
         original_published_graph = models.PublishedGraph.objects.get(
             publication=self.test_graph.publication,

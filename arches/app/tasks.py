@@ -8,11 +8,11 @@ from django.contrib.auth.models import User
 from django.core import management
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
-from django.db.models import F, Q
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
 from arches.app.models import models
 from arches.app.utils import import_class_from_string
+from arches.app.utils.graph_diff import apply_graph_diff
 from arches.app.utils.message_contexts import return_message_context
 from tempfile import NamedTemporaryFile
 
@@ -643,80 +643,12 @@ def update_resource_instance_data_based_on_graph_diff(
     )
 
     try:
-        # delete tiles whose nodegroups are no longer in the updated graph
-        updated_nodegroup_ids = {
-            nodegroup["nodegroupid"] for nodegroup in updated_graph["nodegroups"]
-        }
-        orphaned_nodegroup_ids = {
-            nodegroup["nodegroupid"]
-            for nodegroup in initial_graph["nodegroups"]
-            if nodegroup["nodegroupid"] not in updated_nodegroup_ids
-        }
-        models.TileModel.objects.filter(
-            nodegroup_id__in=orphaned_nodegroup_ids,
-            resourceinstance__graph_publication_id=initial_graph["publication_id"],
-        ).delete()
-
-        # delete tiles whose parent tile's nodegroup_id does not match the expected parent nodegroup_id
-        models.TileModel.objects.filter(
-            parenttile__isnull=False,
-            resourceinstance__graph_publication_id=initial_graph["publication_id"],
-        ).filter(
-            ~Q(parenttile__nodegroup_id=F("nodegroup__parentnodegroup_id"))
-        ).delete()
-
-        # add/remove nodes and change default values
-        resource_instances = models.ResourceInstance.objects.filter(
-            graph_publication_id=initial_graph["publication_id"]
-        )
-        resource_instance_count = resource_instances.count()
-
-        initial_node_ids_to_default_values = {
-            node["nodeid"]: (node.get("config") or {}).get("defaultValue")
-            for node in initial_graph["nodes"]
-        }
-
-        updated_node_ids_to_default_values = {
-            node["nodeid"]: (node.get("config") or {}).get("defaultValue")
-            for node in updated_graph["nodes"]
-        }
-
-        for tile in models.TileModel.objects.filter(
-            resourceinstance__in=resource_instances
-        ):
-            updated_node_ids = [
-                node["nodeid"]
-                for node in updated_graph["nodes"]
-                if node["nodegroup_id"] == str(tile.nodegroup_id)
-            ]
-
-            # delete nodes not in updated graph
-            for node_id in list(tile.data.keys()):
-                if node_id not in updated_node_ids:
-                    del tile.data[node_id]
-
-            # add nodes that only exist in updated graph
-            # or update nodes default value if changed
-            for node_id in updated_node_ids:
-                initial_default_value = initial_node_ids_to_default_values.get(node_id)
-
-                if (
-                    node_id not in tile.data.keys()
-                    or tile.data[node_id] == initial_default_value
-                ):
-                    tile.data[node_id] = updated_node_ids_to_default_values.get(node_id)
-
-            tile.save()
-
-        # update resource_instance publication_id
-        for resource_instance in resource_instances:
-            resource_instance.graph_publication_id = updated_graph["publication_id"]
-            resource_instance.save()
+        result = apply_graph_diff(initial_graph, updated_graph)
 
         notify_completion(
             _(
                 "Business has been updated in concurrence with publishing the latest model. {} Resource Instances updated.".format(
-                    resource_instance_count
+                    result["resource_instance_count"]
                 )
             ),
             user,
