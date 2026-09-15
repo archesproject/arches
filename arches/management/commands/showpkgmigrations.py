@@ -15,7 +15,6 @@ from django.db import DEFAULT_DB_ALIAS, connections
 
 from arches.app.models.models import PackageMigration as PackageMigrationRecord
 from arches.db.package_migration_registry import (
-    APPLIED_SENTINEL,
     PackageMigrationRecorder,
     discover_package_migrations,
 )
@@ -90,8 +89,7 @@ class Command(BaseCommand):
     def _applied_datetimes(self):
         """Return {(app, name): applied_datetime} for all applied package migrations."""
         return {
-            (r.app, r.name): r.applied
-            for r in PackageMigrationRecord.objects.filter(operation=APPLIED_SENTINEL)
+            (r.app, r.name): r.applied for r in PackageMigrationRecord.objects.all()
         }
 
     def _show_list(self, all_migrations, applied):

@@ -14,14 +14,7 @@ from django.db import DEFAULT_DB_ALIAS, connections
 
 from arches.app.models.models import PackageMigration as PackageMigrationRecord
 
-
 PACKAGE_MIGRATIONS_SUBMODULE = "package_migrations"
-
-# Sentinel value stored in PackageMigration.operation to mark migration-level
-# tracking records (one per applied migration file).  Distinct from the
-# per-operation records written by the operations themselves (e.g.
-# "UpdateResourceInstancesPublicationId").
-APPLIED_SENTINEL = "__applied__"
 
 
 class PackageMigrationRecorder:
