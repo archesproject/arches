@@ -87,7 +87,14 @@ def canonical_graph(serialized_graph):
     canonical = _project(serialized_graph, fields_for(models.GraphModel))
     canonical["graphid"] = str(canonical["graphid"])
     for state_key, serialized_key, model, pk_field in COLLECTIONS:
-        entries = serialized_graph.get(serialized_key) or []
+        # Accept either shape: a serialized graph stores collections as lists,
+        # a canonical one as keyed maps. Taking both makes this idempotent, so
+        # committed JSON can be re-projected without special-casing.
+        entries = serialized_graph.get(serialized_key)
+        if entries is None:
+            entries = serialized_graph.get(state_key) or []
+        if isinstance(entries, dict):
+            entries = list(entries.values())
         canonical[state_key] = {
             str(entry[pk_field]): _project(entry, fields_for(model))
             for entry in entries
