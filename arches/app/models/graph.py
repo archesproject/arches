@@ -430,11 +430,12 @@ class Graph(models.GraphModel):
         self.resource_instance_lifecycle = resource_instance_lifecycle_query.first()
 
         if not self.resource_instance_lifecycle:
-            self.resource_instance_lifecycle = models.ResourceInstanceLifecycle(
-                id=resource_instance_lifecycle["id"],
-                name=resource_instance_lifecycle["name"],
+            self.resource_instance_lifecycle = (
+                models.ResourceInstanceLifecycle.objects.create(
+                    id=resource_instance_lifecycle["id"],
+                    name=resource_instance_lifecycle["name"],
+                )
             )
-            self.resource_instance_lifecycle.save()
 
             resource_instance_lifecycle_states = []
             for resource_instance_lifecycle_state_json in resource_instance_lifecycle[
