@@ -45,11 +45,7 @@ var NumberWidget = function(params) {
     }, self).extend({throttle: 600});
 
     if (!this.preview && !ko.unwrap(this.disable)) {
-        var initialVal = this.updateVal();
-        // Number(null) is 0, which would populate an empty widget and dirty the tile
-        if (initialVal !== null && initialVal !== undefined) {
-            this.value(Number(initialVal));
-        }
+        this.value(Number(this.updateVal()));
     }
 
     this.displayValue = ko.pureComputed(function() {
