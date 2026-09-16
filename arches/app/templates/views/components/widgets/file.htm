@@ -10,7 +10,7 @@
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
         <div class="col-xs-12 dropzone" data-bind="dropzone: dropzoneOptions">
-            <div class="file-select-window" data-bind="visible: filesJSON().length === 0">
+            <div class="file-select-window" data-bind="visible: filesJSON().length === 0, css: {'state-disabled': disable}">
                 <div class="bord-top pad-ver file-select">
                     <div style="padding: 5px">
                         <div class="file-select-h2 h2">
@@ -76,7 +76,7 @@
                             <!-- /ko -->
                         </div>
                     </div>
-                    <div >
+                    <div data-bind="css: {'state-disabled': disable}">
                         <button type="button" class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" data-bind="css: uniqueidClass, disable: disable">
                             <span data-bind="text: $root.translations.addMoreFiles"></span>
                         </button>
