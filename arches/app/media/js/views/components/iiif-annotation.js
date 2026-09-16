@@ -251,7 +251,7 @@ var viewModel = function(params) {
     }
 
     this.disableDrawing = ko.computed(function() {
-        return !self.canvas();
+        return !self.canvas() || !!ko.unwrap(self.disable);
     });
 
     this.showFeature = function(feature) {
