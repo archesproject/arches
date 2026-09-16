@@ -77,10 +77,10 @@
                         </div>
                     </div>
                     <div >
-                        <button type="button" class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" data-bind="css: uniqueidClass">
+                        <button type="button" class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" data-bind="css: uniqueidClass, disable: disable">
                             <span data-bind="text: $root.translations.addMoreFiles"></span>
                         </button>
-                        <button type="button" class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" data-bind="click: reset">
+                        <button type="button" class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" data-bind="click: reset, disable: disable">
                             <span data-bind="text: $root.translations.deleteAllFiles"></span>
                         </button>
                     </div>
@@ -107,7 +107,7 @@
                                     </span>
                                 </div>
                                 <div class="file-upload-card-detail-right">
-                                    <div class="media-right" data-bind="click: $parent.removeFile">
+                                    <div class="media-right" data-bind="click: $parent.removeFile, css: {'state-disabled': $parent.disable}">
                                         <button class="btn btn-xs btn-danger btn-file-cancel" data-bind="attr: {'aria-label': ($root.translations.delete).concat(' ', name)}"><i class="ion ion-close"></i></button>
                                     </div>
                                     <div class="file-size-label">
