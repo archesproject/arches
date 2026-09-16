@@ -52,10 +52,6 @@ ko.bindingHandlers.select2Query = {
             select2Config.disabled = select2Config.disabled();
         }
 
-        if (ko.unwrap(disabled)) {
-            select2Config.allowClear = false;
-        }
-
         var data = select2Config.data;
         if (ko.isObservable(data)) {
             const dataSubscription = data.subscribe(function (data) {
