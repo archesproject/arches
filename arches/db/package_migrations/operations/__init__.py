@@ -26,7 +26,6 @@ from arches.db.package_migrations.operations.graph import (
     AlterGraph,
     CreateGraph,
     PublishGraph,
-    RefreshDraftGraph,
 )
 from arches.db.package_migrations.operations.node import (
     AlterNode,
@@ -69,6 +68,5 @@ __all__ = [
     "SetResourcePublication",
     "DeleteTilesForNodeGroup",
     "PublishGraph",
-    "RefreshDraftGraph",
     "RunPackagePython",
 ]

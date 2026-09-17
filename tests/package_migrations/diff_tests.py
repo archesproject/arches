@@ -39,7 +39,7 @@ def _node(nodeid=NODE, **overrides):
     return node
 
 
-PUBLICATION = ("PublishGraph", "SetResourcePublication", "RefreshDraftGraph")
+PUBLICATION = ("PublishGraph", "SetResourcePublication")
 
 
 def _names(operations):
@@ -153,7 +153,7 @@ class DiffGraphTests(SimpleTestCase):
 
 
 class PublicationTailTests(SimpleTestCase):
-    def test_every_non_empty_diff_publishes_and_refreshes_the_draft(self):
+    def test_every_non_empty_diff_publishes_and_moves_resources(self):
         """Without this tail a migration mutates rows and nothing the application
         reads changes: the published snapshot keeps the old graph, resources stay
         pinned to the old publication, and the stale draft reverts the migration on
@@ -161,7 +161,4 @@ class PublicationTailTests(SimpleTestCase):
         before = _graph()
         after = _graph(nodes=[_node()], nodegroups=[{"nodegroupid": NODEGROUP}])
         names = _names(diff_graph(before, after))
-        self.assertEqual(
-            names[-3:],
-            ["PublishGraph", "SetResourcePublication", "RefreshDraftGraph"],
-        )
+        self.assertEqual(names[-2:], ["PublishGraph", "SetResourcePublication"])

@@ -45,7 +45,6 @@ from arches.db.package_migrations.operations.graph import (
     AlterGraph,
     CreateGraph,
     PublishGraph,
-    RefreshDraftGraph,
 )
 from arches.db.package_migrations.operations.node import (
     AlterNode,
@@ -185,7 +184,7 @@ def _data_operations(from_graph, to_graph):
 
 
 def _publication_operations(from_graph, to_graph):
-    """Publish, then refresh the draft -- always last.
+    """Publish, then move resources onto the publication -- always last.
 
     Without these a migration mutates node/card/edge rows and nothing the
     application reads ever changes: the published snapshot still holds the old
@@ -206,7 +205,6 @@ def _publication_operations(from_graph, to_graph):
             publication_id=publication_id,
             previous_publication_id=previous_publication_id,
         ),
-        RefreshDraftGraph(graphid=graphid),
     ]
 
 

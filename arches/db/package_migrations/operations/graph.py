@@ -1,4 +1,6 @@
-"""Graph operations: the graph row, its publication, and its draft copy.
+"""Graph operations: the graph row and its publication.
+
+The draft copy is derived state, reconciled once per run -- see db/package_migrations/drafts.py.
 
 CreateGraph uses models.GraphModel.objects.create(), NOT
 Graph.objects.create_graph(). The latter mints a random root nodeid, publishes
@@ -140,35 +142,3 @@ class PublishGraph(PackageOperation):
     @property
     def migration_name_fragment(self):
         return "publish_%s" % str(self.publication_id).replace("-", "")[:8]
-
-
-class RefreshDraftGraph(PackageOperation):
-    """Regenerate the graph's draft from its current (migrated) state.
-
-    Safe to delete the old draft: copy(set_source=True) mints new ids for the
-    draft's own nodegroups, so no tile references them, and TileModel.nodegroup is
-    db_constraint=False / on_delete=DO_NOTHING regardless. A draft holds structure
-    only, never business data.
-    """
-
-    reversible = False
-    scope = "graph"
-
-    def __init__(self, graphid):
-        self.graphid = graphid
-
-    def state_forwards(self, app_label, state):
-        pass
-
-    def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        graph = Graph.objects.using(schema_editor.connection.alias).get(pk=self.graphid)
-        if graph.get_draft_graph():
-            graph.delete_draft_graph()
-        graph.create_draft_graph()
-
-    def describe(self):
-        return "Refresh draft graph for %s" % self.graphid
-
-    @property
-    def migration_name_fragment(self):
-        return "refresh_draft_%s" % str(self.graphid).replace("-", "")[:8]

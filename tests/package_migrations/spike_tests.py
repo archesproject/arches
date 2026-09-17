@@ -1,7 +1,7 @@
 """Stage 0.5 spike: exercise real package-migration operations against a real
 Arches graph, so stage 4's per-operation estimate rests on something measured.
 
-Also pins the draft-graph behaviour that makes RefreshDraftGraph mandatory.
+Also pins the draft-graph behaviour that makes draft reconciliation mandatory.
 """
 
 import uuid
@@ -269,7 +269,7 @@ class PackageMigrationOperationTests(ArchesTestCase):
         self.assertIn(str(nodeid), tile.data)
 
     def test_package_migration_is_reverted_by_promoting_a_stale_draft(self):
-        """The finding that makes RefreshDraftGraph mandatory.
+        """The finding that makes draft reconciliation mandatory.
 
         A package migration mutates the live graph. The draft copy is untouched,
         so the next Graph Designer publish promotes the stale draft and the

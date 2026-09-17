@@ -68,7 +68,6 @@ SAMPLES = [
     ops.DeleteTilesForNodeGroup(nodegroup_id=NODEGROUP),
     ops.PublishGraph(graphid=GRAPH, publication_id=PUB),
     ops.SetResourcePublication(graphid=GRAPH, publication_id=PUB),
-    ops.RefreshDraftGraph(graphid=GRAPH),
     ops.RunPackagePython(code=_noop),
 ]
 

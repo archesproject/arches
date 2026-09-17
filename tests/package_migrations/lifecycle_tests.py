@@ -2,7 +2,7 @@
 
 The inverse of spike_tests.test_package_migration_is_reverted_by_promoting_a_stale_draft:
 there, a migration was silently undone by the next Graph Designer publish. Here,
-RefreshDraftGraph closes that loop.
+Reconciling the draft after a run closes that loop.
 """
 
 import uuid
@@ -15,10 +15,8 @@ from arches.db.package_migrations.operations.edge import CreateEdge
 from arches.db.package_migrations.operations.node import CreateNode
 from arches.db.package_migrations.operations.nodegroup import CreateNodeGroup
 from arches.db.package_migrations.operations.resource import SetResourcePublication
-from arches.db.package_migrations.operations.graph import (
-    PublishGraph,
-    RefreshDraftGraph,
-)
+from arches.db.package_migrations import drafts
+from arches.db.package_migrations.operations.graph import PublishGraph
 
 from tests.package_migrations.spike_tests import (
     PackageMigrationOperationTests,
@@ -104,12 +102,13 @@ class PublicationLifecycleTests(PackageMigrationOperationTests):
             nodegroupid,
         )
 
-    def test_refresh_draft_graph_prevents_the_migration_being_reverted(self):
+    def test_reconciling_the_draft_stops_a_later_publish_reverting_the_migration(self):
         """The fix for the fatal finding.
 
-        Without RefreshDraftGraph the next promote_draft_graph_to_active_graph()
-        rebuilds the live graph from a draft that predates the migration, silently
-        undoing it. With it, the draft already contains the migration's changes.
+        Without it the next promote_draft_graph_to_active_graph() rebuilds the live
+        graph from a draft that predates the migration, silently undoing it. The
+        draft is derived state, so migratepkg reconciles it once per run rather
+        than carrying an operation that could never be reversed.
         """
         nodeid = uuid.uuid4()
         CreateNode(
@@ -135,9 +134,7 @@ class PublicationLifecycleTests(PackageMigrationOperationTests):
             },
         ).database_forwards("arches", self.schema_editor, self._state(), self._state())
 
-        RefreshDraftGraph(graphid=str(self.graph.graphid)).database_forwards(
-            "arches", self.schema_editor, self._state(), self._state()
-        )
+        drafts.reconcile([str(self.graph.graphid)], "default")
 
         graph = Graph.objects.get(pk=self.graph.graphid)
         graph.promote_draft_graph_to_active_graph()
@@ -146,6 +143,6 @@ class PublicationLifecycleTests(PackageMigrationOperationTests):
             models.Node.objects.filter(
                 graph_id=self.graph.graphid, alias="survey_date_lifecycle"
             ).exists(),
-            "RefreshDraftGraph must keep the draft in step so a later publish "
-            "does not revert the migration",
+            "reconciling the draft must keep it in step so a later publish does "
+            "not revert the migration",
         )
