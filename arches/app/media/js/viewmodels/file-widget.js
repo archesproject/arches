@@ -269,6 +269,7 @@ var FileWidgetViewModel = function(params) {
     this.selectFile = function(sFile) { self.selectedFile(sFile); };
 
     this.removeFile = function(file) {
+        if (ko.unwrap(self.disable)) { return; }
         var filePosition;
         self.filesJSON().forEach(function(f, i) { if (f.file_id === file.file_id) { filePosition = i; } });
         self.shiftMetadata(filePosition);
@@ -369,6 +370,8 @@ var FileWidgetViewModel = function(params) {
             self.dropzone = this;
 
             this.on("addedfile", function(file) {
+                // catches every entry path (drag/drop, file picker, paste), not just the buttons
+                if (ko.unwrap(self.disable)) { this.removeFile(file); return; }
                 self.filesForUpload.push(file);
             });
 
@@ -384,6 +387,7 @@ var FileWidgetViewModel = function(params) {
     };
 
     this.reset = function() {
+        if (ko.unwrap(self.disable)) { return; }
         if (self.dropzone) {
             self.dropzone.removeAllFiles(true);
             self.uploadedFiles.removeAll();

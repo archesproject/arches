@@ -47,7 +47,7 @@ var DomainWidgetViewModel = function(params) {
     };
 
     this.setOptionSelection = function(opt, selected) {
-        if (ko.unwrap(self.disabled) === false) {
+        if (ko.unwrap(self.disable) === false) {
             var optid = ko.unwrap(opt.id);
             if (self.multiple) {
                 var val = value();

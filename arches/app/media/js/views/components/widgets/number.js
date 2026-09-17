@@ -18,16 +18,12 @@ import 'bindings/formattedNumber';
 */
 
 var NumberWidget = function(params) {
-    params.configKeys = ['placeholder', 'width', 'min', 'max', 'step', 'precision', 'prefix', 'suffix', 'defaultValue', 'format', 'uneditable'];
+    params.configKeys = ['placeholder', 'width', 'min', 'max', 'step', 'precision', 'prefix', 'suffix', 'defaultValue', 'format'];
     this.preview = arches.graphs.length > 0;
 
     WidgetViewModel.apply(this, [params]);
 
     var self = this;
-
-    this.disable = ko.computed(() => {
-        return ko.unwrap(self.disabled) || ko.unwrap(self.uneditable);
-    }, self);
 
     this.updateVal = ko.computed(function(){
         if (self.value() !== null && self.value() !== undefined) { //allow a value of 0 to pass
@@ -48,7 +44,7 @@ var NumberWidget = function(params) {
         return val || self.value() || null;
     }, self).extend({throttle: 600});
 
-    if (!this.preview) {
+    if (!this.preview && !ko.unwrap(this.disable)) {
         this.value(Number(this.updateVal()));
     }
 

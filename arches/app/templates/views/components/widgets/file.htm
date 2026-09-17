@@ -10,7 +10,7 @@
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
         <div class="col-xs-12 dropzone" data-bind="dropzone: dropzoneOptions">
-            <div class="file-select-window" data-bind="visible: filesJSON().length === 0">
+            <div class="file-select-window" data-bind="visible: filesJSON().length === 0, css: {'state-disabled': disable}">
                 <div class="bord-top pad-ver file-select">
                     <div style="padding: 5px">
                         <div class="file-select-h2 h2">
@@ -20,7 +20,7 @@
                             <span data-bind="text: $root.translations.dragAndDropFilesOnPanel"></span>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass, disable: disabled">
+                    <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass, disable: disable">
                         <i class="fa fa-file"></i>
                         <span data-bind="text: $root.translations.selectFiles"></span>
                     </button>
@@ -76,11 +76,11 @@
                             <!-- /ko -->
                         </div>
                     </div>
-                    <div >
-                        <button type="button" class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" data-bind="css: uniqueidClass">
+                    <div data-bind="css: {'state-disabled': disable}">
+                        <button type="button" class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" data-bind="css: uniqueidClass, disable: disable">
                             <span data-bind="text: $root.translations.addMoreFiles"></span>
                         </button>
-                        <button type="button" class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" data-bind="click: reset">
+                        <button type="button" class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" data-bind="click: reset, disable: disable">
                             <span data-bind="text: $root.translations.deleteAllFiles"></span>
                         </button>
                     </div>
@@ -107,7 +107,7 @@
                                     </span>
                                 </div>
                                 <div class="file-upload-card-detail-right">
-                                    <div class="media-right" data-bind="click: $parent.removeFile">
+                                    <div class="media-right" data-bind="click: $parent.removeFile, css: {'state-disabled': $parent.disable}">
                                         <button class="btn btn-xs btn-danger btn-file-cancel" data-bind="attr: {'aria-label': ($root.translations.delete).concat(' ', name)}"><i class="ion ion-close"></i></button>
                                     </div>
                                     <div class="file-size-label">
@@ -127,7 +127,7 @@
                             <input
                                 type="text"
                                 class="form-control"
-                                data-bind="textInput: $data.altText[$parent.activeLanguage].value, attr: {'aria-label': $root.translations.alternativeText}"
+                                data-bind="textInput: $data.altText[$parent.activeLanguage].value, disable: $parent.disable, attr: {'aria-label': $root.translations.alternativeText}"
                             />
                         </div>
                     </div>
@@ -148,7 +148,7 @@
                             <input
                                 type="text"
                                 class="form-control"
-                                data-bind="textInput: $data.title[$parent.activeLanguage].value, attr: {'aria-label': $root.translations.title}"
+                                data-bind="textInput: $data.title[$parent.activeLanguage].value, disable: $parent.disable, attr: {'aria-label': $root.translations.title}"
                             />
                         </div>
                         <div class="file-metadata col-sm-6">
@@ -156,7 +156,7 @@
                             <input
                                 type="text"
                                 class="form-control"
-                                data-bind="textInput: $data.attribution[$parent.activeLanguage].value, attr: {'aria-label': $root.translations.attribution}"
+                                data-bind="textInput: $data.attribution[$parent.activeLanguage].value, disable: $parent.disable, attr: {'aria-label': $root.translations.attribution}"
                             />
                         </div>
                         <div class="file-metadata">
@@ -164,7 +164,7 @@
                             <input
                                 type="text"
                                 class="form-control"
-                                data-bind="textInput: $data.description[$parent.activeLanguage].value, attr: {'aria-label': $root.translations.description}"
+                                data-bind="textInput: $data.description[$parent.activeLanguage].value, disable: $parent.disable, attr: {'aria-label': $root.translations.description}"
                                 style="resize: vertical;"
                             />
                         </div>

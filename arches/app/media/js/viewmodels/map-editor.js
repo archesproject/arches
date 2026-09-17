@@ -311,6 +311,7 @@ var viewModel = function (params) {
     MapComponentViewModel.apply(this, [params]);
 
     this.deleteFeature = function (feature) {
+        if (ko.unwrap(self.disable)) { return; }
         if (self.draw) {
             self.draw.delete(feature.id);
             self.selectedFeatureIds(
@@ -323,6 +324,7 @@ var viewModel = function (params) {
     };
 
     this.editFeature = function (feature) {
+        if (ko.unwrap(self.disable)) { return; }
         if (self.draw) {
             self.draw.changeMode("simple_select", {
                 featureIds: [feature.id],
