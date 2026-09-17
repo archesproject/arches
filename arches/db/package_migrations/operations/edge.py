@@ -17,40 +17,21 @@ class CreateEdge(_CreateRowOperation):
     model = models.Edge
     state_collection = "edges"
     pk_field = "edgeid"
-
-    def describe(self):
-        return "Create edge %s on graph %s" % (self._pk, self.graphid)
-
-    @property
-    def migration_name_fragment(self):
-        return "edge_%s" % self._pk.replace("-", "")[:8]
+    verbose_name = "edge"
 
 
 class AlterEdge(_AlterRowOperation):
     model = models.Edge
     state_collection = "edges"
     pk_attribute = "edgeid"
+    verbose_name = "edge"
 
     def __init__(self, graphid, edgeid, changes):
         super().__init__(graphid, changes)
         self.edgeid = edgeid
 
-    def describe(self):
-        return "Alter edge %s (%s)" % (self.edgeid, ", ".join(sorted(self.changes)))
-
-    @property
-    def migration_name_fragment(self):
-        return "alter_edge_%s" % str(self.edgeid).replace("-", "")[:8]
-
 
 class DeleteEdge(_DeleteRowOperation):
     model = models.Edge
     state_collection = "edges"
-    pk_field = "edgeid"
-
-    def describe(self):
-        return "Delete edge %s from graph %s" % (self.pk, self.graphid)
-
-    @property
-    def migration_name_fragment(self):
-        return "delete_edge_%s" % str(self.pk).replace("-", "")[:8]
+    verbose_name = "edge"

@@ -6,23 +6,28 @@ must have defaults, and removing one requires a two-release deprecation.
 """
 
 from arches.db.package_migrations.operations.base import PackageOperation
+from arches.db.package_migrations.operations.resource import SetResourcePublication
+from arches.db.package_migrations.operations.tile import (
+    AddNodeToTiles,
+    DeleteTilesForNodeGroup,
+    RemoveNodeFromTiles,
+)
 from arches.db.package_migrations.operations.card import (
     AlterCard,
     CreateCard,
     DeleteCard,
-)
-from arches.db.package_migrations.operations.data import (
-    BackfillNodeData,
-    CoerceNodeData,
-    DeleteTilesForNodeGroup,
-    RemoveNodeData,
 )
 from arches.db.package_migrations.operations.edge import (
     AlterEdge,
     CreateEdge,
     DeleteEdge,
 )
-from arches.db.package_migrations.operations.graph import AlterGraph, CreateGraph
+from arches.db.package_migrations.operations.graph import (
+    AlterGraph,
+    CreateGraph,
+    PublishGraph,
+    RefreshDraftGraph,
+)
 from arches.db.package_migrations.operations.node import (
     AlterNode,
     CreateNode,
@@ -33,17 +38,12 @@ from arches.db.package_migrations.operations.nodegroup import (
     CreateNodeGroup,
     DeleteNodeGroup,
 )
-from arches.db.package_migrations.operations.publish import (
-    PublishGraph,
-    RefreshDraftGraph,
-    RepointResourceInstances,
-)
-from arches.db.package_migrations.operations.special import RunPackagePython
 from arches.db.package_migrations.operations.widget import (
     AlterCardXNodeXWidget,
     CreateCardXNodeXWidget,
     DeleteCardXNodeXWidget,
 )
+from arches.db.package_migrations.operations.python import RunPackagePython
 
 __all__ = [
     "PackageOperation",
@@ -64,12 +64,11 @@ __all__ = [
     "CreateCardXNodeXWidget",
     "AlterCardXNodeXWidget",
     "DeleteCardXNodeXWidget",
-    "BackfillNodeData",
-    "RemoveNodeData",
-    "CoerceNodeData",
+    "AddNodeToTiles",
+    "RemoveNodeFromTiles",
+    "SetResourcePublication",
     "DeleteTilesForNodeGroup",
     "PublishGraph",
-    "RepointResourceInstances",
     "RefreshDraftGraph",
     "RunPackagePython",
 ]

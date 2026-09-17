@@ -7,6 +7,34 @@ and ship inside third-party wheels, so constructor signatures are additive-only.
 import inspect
 
 from django.db.migrations.operations.base import Operation
+from django.utils.inspect import get_func_args
+
+
+def keyset_batches(queryset, pk_field, batch_size):
+    """Yield lists of primary keys in pk order, resuming after the last one seen.
+
+    Operations that run outside a transaction walk their work this way: each
+    batch commits on its own, so locks are released and a killed run resumes.
+    The cursor is what bounds the work -- without it the database re-scans from
+    the start of the table on every batch.
+    """
+    last = None
+    while True:
+        batch = queryset
+        if last is not None:
+            batch = batch.filter(**{"%s__gt" % pk_field: last})
+        keys = list(
+            batch.order_by(pk_field).values_list(pk_field, flat=True)[:batch_size]
+        )
+        if not keys:
+            return
+        yield keys
+        last = keys[-1]
+
+
+def _short(value):
+    """Migration file names carry a readable slice of a uuid, not the whole thing."""
+    return str(value).replace("-", "")[:8]
 
 
 class PackageOperation(Operation):
@@ -42,6 +70,11 @@ class PackageOperation(Operation):
                 "reversible = False." % cls.__name__
             )
 
+        if cls.scope not in ("graph", "data"):
+            raise TypeError(
+                '%s must set scope to "graph" or "data" -- it decides which '
+                "migration the operation is written into." % cls.__name__
+            )
         for name in ("describe", "migration_name_fragment"):
             if getattr(cls, name, None) is getattr(PackageOperation, name, None):
                 raise TypeError("%s must define %s." % (cls.__name__, name))
@@ -59,20 +92,11 @@ class PackageOperation(Operation):
         surfaces here as AttributeError rather than as a quietly empty call in a
         generated file.
         """
-        kwargs = {}
-        for name in self._constructor_parameters():
-            kwargs[name] = getattr(self, name)
+        # get_func_args is the helper OperationWriter itself uses to decide which
+        # kwargs survive, so reading the parameter list with anything else risks
+        # emitting kwargs the writer then silently drops.
+        kwargs = {name: getattr(self, name) for name in get_func_args(self.__init__)}
         return (self.__class__.__name__, [], kwargs)
-
-    @classmethod
-    def _constructor_parameters(cls):
-        signature = inspect.signature(cls.__init__)
-        return [
-            name
-            for name, parameter in signature.parameters.items()
-            if name != "self"
-            and parameter.kind not in (parameter.VAR_POSITIONAL, parameter.VAR_KEYWORD)
-        ]
 
     def qs(self, model, schema_editor):
         """Every query must be bound to the migration's connection.
@@ -82,26 +106,6 @@ class PackageOperation(Operation):
         that transaction.
         """
         return model.objects.using(schema_editor.connection.alias)
-
-    def state_forwards(self, app_label, state):
-        raise NotImplementedError(
-            "%s must implement state_forwards()." % self.__class__.__name__
-        )
-
-    def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        raise NotImplementedError(
-            "%s must implement database_forwards()." % self.__class__.__name__
-        )
-
-    def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        raise NotImplementedError("%s is not reversible." % self.__class__.__name__)
-
-    def describe(self):
-        raise NotImplementedError
-
-    @property
-    def migration_name_fragment(self):
-        raise NotImplementedError
 
 
 class _AlterRowOperation(PackageOperation):
@@ -117,10 +121,11 @@ class _AlterRowOperation(PackageOperation):
     """
 
     reversible = True
-
+    scope = "graph"
     model = None
     state_collection = None  # "nodes", "cards", ...
     pk_attribute = None  # the __init__ parameter holding the row's pk
+    verbose_name = None  # "node", "card", ... drives describe() and the file name
 
     def __init__(self, graphid, changes):
         self.graphid = graphid
@@ -145,9 +150,23 @@ class _AlterRowOperation(PackageOperation):
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         previous = self._entry(to_state)
+        # _entry() seeds an empty dict for a row the history never created, so
+        # index rather than .get(): a KeyError beats writing NULL into every
+        # column this operation changed.
         self.qs(self.model, schema_editor).filter(pk=self._pk).update(
-            **{field: previous.get(field) for field in self.changes}
+            **{field: previous[field] for field in self.changes}
         )
+
+    def describe(self):
+        return "Alter %s %s (%s)" % (
+            self.verbose_name,
+            self._pk,
+            ", ".join(sorted(self.changes)),
+        )
+
+    @property
+    def migration_name_fragment(self):
+        return "alter_%s_%s" % (self.verbose_name, _short(self._pk))
 
 
 class _RowOperation(PackageOperation):
@@ -164,9 +183,11 @@ class _RowOperation(PackageOperation):
     round-trips.)
     """
 
+    scope = "graph"
     model = None
     state_collection = None
     pk_field = None
+    verbose_name = None  # "node", "card", ... drives describe() and the file name
     # NodeGroup and CardXNodeXWidget rows carry no graph FK.
     has_graph_fk = True
 
@@ -218,6 +239,15 @@ class _RowOperation(PackageOperation):
     def _pk(self):
         return str(self.fields[self.pk_field])
 
+    @property
+    def _label(self):
+        """What describe() calls this row; overridden where a human name exists."""
+        return self._pk
+
+    @property
+    def _fragment(self):
+        return _short(self._pk)
+
     def _collection(self, state):
         return state.graph(self.graphid).setdefault(self.state_collection, {})
 
@@ -236,6 +266,17 @@ class _RowOperation(PackageOperation):
 
 class _CreateRowOperation(_RowOperation):
     reversible = True
+
+    def describe(self):
+        return "Create %s %s on graph %s" % (
+            self.verbose_name,
+            self._label,
+            self.graphid,
+        )
+
+    @property
+    def migration_name_fragment(self):
+        return "%s_%s" % (self.verbose_name, self._fragment)
 
     def state_forwards(self, app_label, state):
         # Store the completed row, so replayed state and the database agree.
@@ -271,3 +312,14 @@ class _DeleteRowOperation(_RowOperation):
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         self.fields = self._collection(to_state)[self._pk]
         self._create_row(schema_editor)
+
+    def describe(self):
+        return "Delete %s %s from graph %s" % (
+            self.verbose_name,
+            self._pk,
+            self.graphid,
+        )
+
+    @property
+    def migration_name_fragment(self):
+        return "delete_%s_%s" % (self.verbose_name, _short(self._pk))

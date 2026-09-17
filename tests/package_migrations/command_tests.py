@@ -51,7 +51,7 @@ def _write_fixture_app(root, graphid, nodegroup_id, nodeid):
             """
             from django.db import migrations
 
-            from arches.db.package_migrations.operations.data import BackfillNodeData
+            from arches.db.package_migrations.operations.tile import AddNodeToTiles
             from arches.db.package_migrations.operations.edge import CreateEdge
             from arches.db.package_migrations.operations.node import CreateNode
 
@@ -79,7 +79,7 @@ def _write_fixture_app(root, graphid, nodegroup_id, nodeid):
                             "rangenode_id": "%(nodeid)s",
                         },
                     ),
-                    BackfillNodeData(
+                    AddNodeToTiles(
                         nodegroup_id="%(nodegroup_id)s",
                         nodeid="%(nodeid)s",
                         value=None,
@@ -168,5 +168,5 @@ class MigratePkgCommandTests(PackageMigrationOperationTests):
             call_command("migratepkg", APP_NAME, plan=True, stdout=out)
             output = out.getvalue()
             self.assertIn("Create node survey_date_cmd (date)", output)
-            self.assertIn("Backfill tile data for node", output)
+            self.assertIn("to tiles in nodegroup", output)
             self.assertFalse(models.Node.objects.filter(pk=self.nodeid).exists())

@@ -7,14 +7,17 @@ RefreshDraftGraph closes that loop.
 
 import uuid
 
+from django.db import connection
+
 from arches.app.models import models
 from arches.app.models.graph import Graph
 from arches.db.package_migrations.operations.edge import CreateEdge
 from arches.db.package_migrations.operations.node import CreateNode
-from arches.db.package_migrations.operations.publish import (
+from arches.db.package_migrations.operations.nodegroup import CreateNodeGroup
+from arches.db.package_migrations.operations.resource import SetResourcePublication
+from arches.db.package_migrations.operations.graph import (
     PublishGraph,
     RefreshDraftGraph,
-    RepointResourceInstances,
 )
 
 from tests.package_migrations.spike_tests import (
@@ -39,27 +42,67 @@ class PublicationLifecycleTests(PackageMigrationOperationTests):
             models.GraphXPublishedGraph.objects.filter(pk=publication_id).exists()
         )
 
-    def test_repoint_moves_resources_between_publications(self):
+    def test_resources_move_onto_the_publication_and_back(self):
+        """Publishing and stamping resources are two operations. Reverse order is
+        load-bearing: unapply() reverses operation order, so resources come off the
+        publication (PROTECT) before PublishGraph deletes it."""
         resource = models.ResourceInstance.objects.create(graph=self.graph)
         old_publication_id = self.graph.publication_id
-        new_publication_id = uuid.uuid4()
+        publication_id = str(uuid.uuid4())
+        publish = PublishGraph(
+            graphid=str(self.graph.graphid),
+            publication_id=publication_id,
+            previous_publication_id=str(old_publication_id),
+        )
+        stamp = SetResourcePublication(
+            graphid=str(self.graph.graphid),
+            publication_id=publication_id,
+            previous_publication_id=str(old_publication_id),
+        )
 
-        PublishGraph(
-            graphid=str(self.graph.graphid), publication_id=str(new_publication_id)
-        ).database_forwards("arches", self.schema_editor, self._state(), self._state())
+        for operation in (publish, stamp):
+            operation.database_forwards(
+                "arches", self.schema_editor, self._state(), self._state()
+            )
+        resource.refresh_from_db()
+        self.assertEqual(str(resource.graph_publication_id), publication_id)
 
+        for operation in (stamp, publish):
+            operation.database_backwards(
+                "arches", self.schema_editor, self._state(), self._state()
+            )
         resource.refresh_from_db()
         self.assertEqual(resource.graph_publication_id, old_publication_id)
+        self.assertFalse(
+            models.GraphXPublishedGraph.objects.filter(pk=publication_id).exists()
+        )
 
-        affected = RepointResourceInstances(
-            graphid=str(self.graph.graphid),
-            from_publication_id=str(old_publication_id),
-            to_publication_id=str(new_publication_id),
+    def test_nodegroup_can_be_created_before_its_grouping_node(self):
+        nodegroupid = str(uuid.uuid4())
+        graphid = str(self.graph.graphid)
+        CreateNodeGroup(
+            graphid=graphid,
+            fields={"nodegroupid": nodegroupid, "grouping_node_id": nodegroupid},
+        ).database_forwards("arches", self.schema_editor, self._state(), self._state())
+        CreateNode(
+            graphid=graphid,
+            fields={
+                "nodeid": nodegroupid,
+                "name": "Survey",
+                "datatype": "semantic",
+                "istopnode": False,
+                "alias": "survey_grouping",
+                "nodegroup_id": nodegroupid,
+            },
         ).database_forwards("arches", self.schema_editor, self._state(), self._state())
 
-        self.assertEqual(affected, 1)
-        resource.refresh_from_db()
-        self.assertEqual(resource.graph_publication_id, new_publication_id)
+        with connection.cursor() as cursor:
+            # TestCase never commits, so run the deferred FK checks now.
+            cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
+        self.assertEqual(
+            str(models.NodeGroup.objects.get(pk=nodegroupid).grouping_node_id),
+            nodegroupid,
+        )
 
     def test_refresh_draft_graph_prevents_the_migration_being_reverted(self):
         """The fix for the fatal finding.

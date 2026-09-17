@@ -8,7 +8,10 @@ import uuid
 
 from arches.app.models import models
 from arches.app.models.graph import Graph
-from arches.db.package_migrations.operations.data import BackfillNodeData
+from arches.db.package_migrations.operations.tile import (
+    AddNodeToTiles,
+    RemoveNodeFromTiles,
+)
 from arches.db.package_migrations.operations.node import CreateNode, DeleteNode
 from arches.db.package_migrations.state import PackageState
 
@@ -167,7 +170,7 @@ class PackageMigrationOperationTests(ArchesTestCase):
         tile = self._make_tile()
         new_nodeid = str(uuid.uuid4())
 
-        op = BackfillNodeData(
+        op = AddNodeToTiles(
             nodegroup_id=str(self.nodegroup_id), nodeid=new_nodeid, value=None
         )
         affected = op.database_forwards(
@@ -187,10 +190,44 @@ class PackageMigrationOperationTests(ArchesTestCase):
             0,
         )
 
+    def test_removing_a_node_also_clears_it_from_provisional_edits(self):
+        """A pending provisional edit is keyed by the same nodeids as tiledata. A
+        stale key there is written back into data when a reviewer approves the
+        edit, and Tile.save() then raises Node.DoesNotExist -- a record no curator
+        can fix from the UI."""
+        doomed = str(uuid.uuid4())
+        keeper = str(uuid.uuid4())
+        tile = self._make_tile()
+        tile.data[doomed] = "gone soon"
+        tile.provisionaledits = {
+            "7f3b4e2a-0000-4000-8000-00000000000a": {
+                "status": "pending",
+                "value": {doomed: "pending value", keeper: "keep me"},
+            },
+            # An edit with no "value" key must survive untouched.
+            "7f3b4e2a-0000-4000-8000-00000000000b": {"status": "pending"},
+        }
+        models.TileModel.objects.filter(pk=tile.pk).update(
+            data=tile.data, provisionaledits=tile.provisionaledits
+        )
+
+        RemoveNodeFromTiles(
+            nodegroup_id=str(self.nodegroup_id), nodeid=doomed
+        ).database_forwards("arches", self.schema_editor, self._state(), self._state())
+
+        tile.refresh_from_db()
+        self.assertNotIn(doomed, tile.data)
+        edits = tile.provisionaledits
+        self.assertNotIn(doomed, edits["7f3b4e2a-0000-4000-8000-00000000000a"]["value"])
+        self.assertIn(keeper, edits["7f3b4e2a-0000-4000-8000-00000000000a"]["value"])
+        self.assertEqual(
+            edits["7f3b4e2a-0000-4000-8000-00000000000b"], {"status": "pending"}
+        )
+
     def test_backfill_reverses(self):
         tile = self._make_tile()
         new_nodeid = str(uuid.uuid4())
-        op = BackfillNodeData(
+        op = AddNodeToTiles(
             nodegroup_id=str(self.nodegroup_id), nodeid=new_nodeid, value=None
         )
         op.database_forwards("arches", self.schema_editor, self._state(), self._state())
@@ -201,7 +238,7 @@ class PackageMigrationOperationTests(ArchesTestCase):
         self.assertNotIn(new_nodeid, tile.data)
 
     def test_tile_save_readds_keys_for_live_nodes(self):
-        """Pins why RemoveNodeData must run AFTER DeleteNode.
+        """Pins why RemoveNodeFromTiles must run AFTER DeleteNode.
 
         TileModel.save() -> set_missing_keys_to_none() reads live Node rows and
         re-adds any missing key, so stripping data while the node still exists is

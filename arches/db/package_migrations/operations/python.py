@@ -1,4 +1,7 @@
-"""Escape hatch for changes no operation expresses.
+"""Run arbitrary Python against package data.
+
+The escape hatch for changes no other operation expresses -- a datatype
+conversion, for instance, where the new value has to be computed from the old.
 
 Mirrors django.db.migrations.RunPython, with one documented difference: there is
 no historical model registry for package data, so the callable receives live
@@ -11,10 +14,13 @@ from arches.db.package_migrations.operations.base import PackageOperation
 
 
 class RunPackagePython(PackageOperation):
-    def __init__(self, code, reverse_code=None, hints=None):
+    # The escape hatch exists for data work; a hand-written migration that needs
+    # to touch graph tables should use the graph operations.
+    scope = "data"
+
+    def __init__(self, code, reverse_code=None):
         self.code = code
         self.reverse_code = reverse_code
-        self.hints = hints
 
     @property
     def reversible(self):

@@ -19,45 +19,23 @@ class CreateCardXNodeXWidget(_CreateRowOperation):
     model = models.CardXNodeXWidget
     state_collection = "widgets"
     pk_field = "id"
+    verbose_name = "widget"
     has_graph_fk = False
-
-    def describe(self):
-        return "Create widget assignment %s" % self._pk
-
-    @property
-    def migration_name_fragment(self):
-        return "widget_%s" % self._pk.replace("-", "")[:8]
 
 
 class AlterCardXNodeXWidget(_AlterRowOperation):
     model = models.CardXNodeXWidget
     state_collection = "widgets"
     pk_attribute = "id"
+    verbose_name = "widget"
 
     def __init__(self, graphid, id, changes):
         super().__init__(graphid, changes)
         self.id = id
 
-    def describe(self):
-        return "Alter widget assignment %s (%s)" % (
-            self.id,
-            ", ".join(sorted(self.changes)),
-        )
-
-    @property
-    def migration_name_fragment(self):
-        return "alter_widget_%s" % str(self.id).replace("-", "")[:8]
-
 
 class DeleteCardXNodeXWidget(_DeleteRowOperation):
     model = models.CardXNodeXWidget
     state_collection = "widgets"
-    pk_field = "id"
+    verbose_name = "widget"
     has_graph_fk = False
-
-    def describe(self):
-        return "Delete widget assignment %s" % self.pk
-
-    @property
-    def migration_name_fragment(self):
-        return "delete_widget_%s" % str(self.pk).replace("-", "")[:8]

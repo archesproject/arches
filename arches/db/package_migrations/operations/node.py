@@ -16,6 +16,7 @@ from arches.db.package_migrations.operations.base import (
     _AlterRowOperation,
     _CreateRowOperation,
     _DeleteRowOperation,
+    _short,
 )
 
 
@@ -23,51 +24,37 @@ class CreateNode(_CreateRowOperation):
     model = models.Node
     state_collection = "nodes"
     pk_field = "nodeid"
-
-    def describe(self):
-        return "Create node %s (%s) on graph %s" % (
-            self.fields.get("alias"),
-            self.fields.get("datatype"),
-            self.graphid,
-        )
+    verbose_name = "node"
 
     @property
-    def migration_name_fragment(self):
-        return "node_%s" % (self.fields.get("alias") or self._pk.replace("-", "")[:8])
+    def _label(self):
+        return "%s (%s)" % (self.fields.get("alias"), self.fields.get("datatype"))
+
+    @property
+    def _fragment(self):
+        return self.fields.get("alias") or _short(self._pk)
 
 
 class AlterNode(_AlterRowOperation):
     """Datatype, config, alias, name, isrequired and friends.
 
     A datatype change alters only the node row; converting the values already
-    stored in tiles is CoerceNodeData's job, and must be in the same migration --
-    arches_querysets casts tile JSONB straight to the node's declared datatype.
+    stored in tiles needs a hand-written RunPackagePython migration in the same
+    release -- arches_querysets casts tile JSONB straight to the node's declared
+    datatype.
     """
 
     model = models.Node
     state_collection = "nodes"
     pk_attribute = "nodeid"
+    verbose_name = "node"
 
     def __init__(self, graphid, nodeid, changes):
         super().__init__(graphid, changes)
         self.nodeid = nodeid
 
-    def describe(self):
-        return "Alter node %s (%s)" % (self.nodeid, ", ".join(sorted(self.changes)))
-
-    @property
-    def migration_name_fragment(self):
-        return "alter_node_%s" % str(self.nodeid).replace("-", "")[:8]
-
 
 class DeleteNode(_DeleteRowOperation):
     model = models.Node
     state_collection = "nodes"
-    pk_field = "nodeid"
-
-    def describe(self):
-        return "Delete node %s from graph %s" % (self.pk, self.graphid)
-
-    @property
-    def migration_name_fragment(self):
-        return "delete_node_%s" % str(self.pk).replace("-", "")[:8]
+    verbose_name = "node"

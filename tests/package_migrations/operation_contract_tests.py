@@ -63,14 +63,11 @@ SAMPLES = [
     ),
     ops.AlterCardXNodeXWidget(graphid=GRAPH, id=WIDGET, changes={"visible": False}),
     ops.DeleteCardXNodeXWidget(graphid=GRAPH, pk=WIDGET),
-    ops.BackfillNodeData(nodegroup_id=NODEGROUP, nodeid=NODE),
-    ops.RemoveNodeData(nodegroup_id=NODEGROUP, nodeid=NODE),
-    ops.CoerceNodeData(nodegroup_id=NODEGROUP, nodeid=NODE, converter=_noop),
+    ops.AddNodeToTiles(nodegroup_id=NODEGROUP, nodeid=NODE),
+    ops.RemoveNodeFromTiles(nodegroup_id=NODEGROUP, nodeid=NODE),
     ops.DeleteTilesForNodeGroup(nodegroup_id=NODEGROUP),
     ops.PublishGraph(graphid=GRAPH, publication_id=PUB),
-    ops.RepointResourceInstances(
-        graphid=GRAPH, from_publication_id=PUB, to_publication_id=PUB
-    ),
+    ops.SetResourcePublication(graphid=GRAPH, publication_id=PUB),
     ops.RefreshDraftGraph(graphid=GRAPH),
     ops.RunPackagePython(code=_noop),
 ]
