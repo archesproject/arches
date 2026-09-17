@@ -44,11 +44,8 @@ class Command(BaseCommand):
         else:
             self._show_list(loader, app_labels)
 
-    def _applied(self, loader):
-        return {key: record for key, record in loader.applied_migrations.items()}
-
     def _show_list(self, loader, app_labels):
-        applied = self._applied(loader)
+        applied = loader.applied_migrations
         nodes = sorted(loader.graph.nodes)
         if app_labels:
             nodes = [node for node in nodes if node[0] in app_labels]
@@ -68,7 +65,7 @@ class Command(BaseCommand):
                 self.stdout.write(line)
 
     def _show_plan(self, loader, app_labels):
-        applied = self._applied(loader)
+        applied = loader.applied_migrations
         targets = loader.graph.leaf_nodes()
         seen, plan = set(), []
         for target in targets:

@@ -6,6 +6,7 @@ A thin wrapper over PackageMigrationExecutor, deliberately shaped like
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
+from django.db.migrations.exceptions import AmbiguityError
 
 from arches.db.package_migrations.executor import PackageMigrationExecutor
 
@@ -88,24 +89,23 @@ class Command(BaseCommand):
         if migration_name == "zero":
             return [(app_label, None)]
 
-        # Prefix matching, like Django's migrate, but scoped to the named app so a
-        # shared prefix cannot silently select another app's migration.
-        matches = [
-            name
-            for app, name in graph.nodes
-            if app == app_label and name.startswith(migration_name)
-        ]
-        if not matches:
+        # MigrationLoader already does prefix resolution, and raises
+        # AmbiguityError when a prefix matches more than one migration.
+        try:
+            migration = executor.loader.get_migration_by_prefix(
+                app_label, migration_name
+            )
+        except AmbiguityError:
+            raise CommandError(
+                "More than one package migration matches '%s' in app '%s'. "
+                "Give a more specific prefix." % (migration_name, app_label)
+            )
+        except KeyError:
             raise CommandError(
                 "Cannot find a package migration matching '%s' for app '%s'."
                 % (migration_name, app_label)
             )
-        if len(matches) > 1:
-            raise CommandError(
-                "More than one package migration matches '%s' in app '%s': %s"
-                % (migration_name, app_label, ", ".join(sorted(matches)))
-            )
-        return [(app_label, matches[0])]
+        return [(app_label, migration.name)]
 
     def _print_plan(self, plan):
         if not plan:

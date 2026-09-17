@@ -37,11 +37,6 @@ class PackageMigrationLoader(MigrationLoader):
         # rather than raising.
         return "%s.%s" % (app_config.name, PACKAGE_MIGRATIONS_MODULE_NAME), False
 
-    def project_state(self, nodes=None, at_end=True):
-        return self.graph.make_state(
-            nodes=nodes, at_end=at_end, real_apps=self.unmigrated_apps
-        )
-
     def build_graph(self):
         """Mirrors MigrationLoader.build_graph, substituting the package
         recorder (django loader.py:287) and graph (loader.py:292).
