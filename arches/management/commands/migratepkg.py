@@ -8,6 +8,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.exceptions import AmbiguityError
 
+from arches.db.package_migrations import drafts, drift
 from arches.db.package_migrations.executor import PackageMigrationExecutor
 
 
@@ -32,6 +33,11 @@ class Command(BaseCommand):
             "--fake",
             action="store_true",
             help="Record migrations as applied without running them.",
+        )
+        parser.add_argument(
+            "--force",
+            action="store_true",
+            help="Apply even if this database has diverged from migration history.",
         )
         parser.add_argument(
             "--plan",
@@ -71,7 +77,16 @@ class Command(BaseCommand):
                 self.stdout.write("No package migrations to apply.")
             return
 
+        if not options["fake"]:
+            self._refuse_drifted_database(plan, connection, options["force"])
+
         executor.migrate(targets, plan=plan, fake=options["fake"])
+
+        if not options["fake"]:
+            # The draft is derived from the graph, so it is rebuilt once here
+            # rather than by an operation -- which is also what lets a graph be
+            # stepped backwards through its versions.
+            drafts.reconcile(drafts.graphs_in(plan), connection.alias)
 
     def _targets(self, executor, options):
         graph = executor.loader.graph
@@ -107,6 +122,24 @@ class Command(BaseCommand):
                 % (migration_name, app_label)
             )
         return [(app_label, migration.name)]
+
+    def _refuse_drifted_database(self, plan, connection, force):
+        """These migrations were generated against migration history, not against
+        this database. If a curator has edited the graph since, an alter updates
+        zero rows and reports success."""
+        problems = drift.problems(plan, connection.alias)
+        if not problems:
+            return
+        message = (
+            "This database has diverged from the migration history these package "
+            "migrations were generated against:\n  %s" % "\n  ".join(problems)
+        )
+        if force:
+            self.stderr.write(self.style.WARNING(message))
+            return
+        raise CommandError(
+            "%s\nReconcile the graph, or re-run with --force to apply anyway." % message
+        )
 
     def _refuse_half_reversals(self, plan):
         """Django unapplies migration by migration and only raises when it reaches
