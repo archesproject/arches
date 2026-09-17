@@ -39,8 +39,16 @@ def _node(nodeid=NODE, **overrides):
     return node
 
 
+PUBLICATION = ("PublishGraph", "SetResourcePublication", "RefreshDraftGraph")
+
+
 def _names(operations):
     return [type(op).__name__ for op in operations]
+
+
+def _structural(operations):
+    """Names minus the publication tail every non-empty diff appends."""
+    return [n for n in _names(operations) if n not in PUBLICATION]
 
 
 class DiffGraphTests(SimpleTestCase):
@@ -57,7 +65,7 @@ class DiffGraphTests(SimpleTestCase):
         before = _graph(nodegroups=[{"nodegroupid": NODEGROUP}])
         after = _graph(nodes=[_node()], nodegroups=[{"nodegroupid": NODEGROUP}])
         operations = diff_graph(before, after)
-        self.assertEqual(_names(operations), ["CreateNode"])
+        self.assertEqual(_structural(operations), ["CreateNode", "AddNodeToTiles"])
         self.assertEqual(operations[0].fields["alias"], "survey_date")
         self.assertEqual(operations[0].fields["datatype"], "date")
 
@@ -65,32 +73,35 @@ class DiffGraphTests(SimpleTestCase):
         before = _graph(nodes=[_node()])
         after = _graph(nodes=[_node(datatype="concept")])
         operations = diff_graph(before, after)
-        self.assertEqual(_names(operations), ["AlterNode"])
+        self.assertEqual(_structural(operations), ["AlterNode"])
         self.assertEqual(operations[0].changes, {"datatype": "concept"})
 
     def test_removed_node_emits_delete(self):
         before = _graph(nodes=[_node()])
         after = _graph()
-        self.assertEqual(_names(diff_graph(before, after)), ["DeleteNode"])
+        self.assertEqual(
+            _structural(diff_graph(before, after)),
+            ["DeleteNode", "RemoveNodeFromTiles"],
+        )
 
     def test_graph_metadata_change_emits_alter_graph(self):
         before = _graph()
         after = _graph(subtitle={"en": "new"})
         operations = diff_graph(before, after)
-        self.assertEqual(_names(operations), ["AlterGraph"])
+        self.assertEqual(_structural(operations), ["AlterGraph"])
         self.assertNotIn("graphid", operations[0].changes)
 
     def test_creates_run_nodegroup_before_node(self):
         """A node references its nodegroup, so the nodegroup must exist first."""
         after = _graph(nodes=[_node()], nodegroups=[{"nodegroupid": NODEGROUP}])
-        names = _names(diff_graph(_graph(), after))
+        names = _structural(diff_graph(_graph(), after))
         self.assertLess(names.index("CreateNodeGroup"), names.index("CreateNode"))
 
     def test_deletes_run_before_creates_and_in_reverse_order(self):
         other_node = str(uuid.uuid4())
         before = _graph(nodes=[_node()], nodegroups=[{"nodegroupid": NODEGROUP}])
         after = _graph(nodes=[_node(nodeid=other_node)])
-        names = _names(diff_graph(before, after))
+        names = _structural(diff_graph(before, after))
         self.assertLess(names.index("DeleteNode"), names.index("CreateNode"))
         self.assertLess(names.index("DeleteNode"), names.index("DeleteNodeGroup"))
 
@@ -107,4 +118,23 @@ class DiffGraphTests(SimpleTestCase):
         state.add_graph(before)
         for operation in diff_graph(before, after):
             operation.state_forwards("arches", state)
-        self.assertEqual(state.graphs[GRAPH], after)
+        replayed = dict(state.graphs[GRAPH])
+        # PublishGraph records the new publication in state; the committed JSON
+        # never carries one, so drop it before comparing.
+        replayed.pop("publication_id", None)
+        self.assertEqual(replayed, after)
+
+
+class PublicationTailTests(SimpleTestCase):
+    def test_every_non_empty_diff_publishes_and_refreshes_the_draft(self):
+        """Without this tail a migration mutates rows and nothing the application
+        reads changes: the published snapshot keeps the old graph, resources stay
+        pinned to the old publication, and the stale draft reverts the migration on
+        the next Graph Designer publish."""
+        before = _graph()
+        after = _graph(nodes=[_node()], nodegroups=[{"nodegroupid": NODEGROUP}])
+        names = _names(diff_graph(before, after))
+        self.assertEqual(
+            names[-3:],
+            ["PublishGraph", "SetResourcePublication", "RefreshDraftGraph"],
+        )

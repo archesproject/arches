@@ -4,28 +4,16 @@ Turns a serialized graph into exactly the shape ``PackageState.graphs`` holds, s
 that "what the migrations say the graph looks like" and "what the graph actually
 looks like" are directly comparable dicts.
 
-The field set is derived from the Django models rather than listed here. That is
-not just DRY -- it is also correct by construction, because everything a
-serialized graph carries that is NOT package content happens to be a serializer
-addition rather than a column:
+The field set comes from the models rather than a list here, which is also
+correct by construction: everything a serialized graph carries that is NOT
+package content (is_collector, parentproperty, card constraints, spatial_views,
+permissions, relatable_resource_model_ids) is a serializer addition rather than a
+column, so none of it survives the projection and nobody has to remember to
+exclude the next one.
 
-* ``is_collector`` and ``parentproperty`` on nodes, and ``constraints`` /
-  ``is_editable`` on cards, are derived and are stripped by
-  ``restore_state_from_serialized_graph`` before it rebuilds anything.
-* ``spatial_views``, ``functions_x_graphs``, ``domain_connections``,
-  ``relatable_resource_model_ids`` and the guardian ``user_permissions`` /
-  ``group_permissions`` blocks are install-local.
-
-None of those are concrete fields, so none of them survive the projection, and
-nobody has to remember to exclude them when Arches adds another.
-
-Collections are keyed maps rather than lists because ``Graph.serialize()``
-assembles them from querysets with no guaranteed ordering, so list position is
-not identity.
+Collections become keyed maps because Graph.serialize() assembles them from
+querysets with no guaranteed ordering, so list position is not identity.
 """
-
-import hashlib
-import json
 
 from arches.app.models import models
 
@@ -51,6 +39,9 @@ COLLECTIONS = (
 )
 
 
+STATE_COLLECTIONS = tuple(entry[0] for entry in COLLECTIONS)
+
+
 def fields_for(model):
     """The package-content columns of a model, in declaration order."""
     return tuple(
@@ -71,8 +62,6 @@ def _normalize(value):
         return {str(key): _normalize(inner) for key, inner in value.items()}
     if isinstance(value, (list, tuple)):
         return [_normalize(item) for item in value]
-    if isinstance(value, (set, frozenset)):
-        return sorted(_normalize(item) for item in value)
     if value is None or isinstance(value, (str, bool, int, float)):
         return value
     return str(value)
@@ -87,28 +76,10 @@ def canonical_graph(serialized_graph):
     canonical = _project(serialized_graph, fields_for(models.GraphModel))
     canonical["graphid"] = str(canonical["graphid"])
     for state_key, serialized_key, model, pk_field in COLLECTIONS:
-        # Accept either shape: a serialized graph stores collections as lists,
-        # a canonical one as keyed maps. Taking both makes this idempotent, so
-        # committed JSON can be re-projected without special-casing.
-        entries = serialized_graph.get(serialized_key)
-        if entries is None:
-            entries = serialized_graph.get(state_key) or []
-        if isinstance(entries, dict):
-            entries = list(entries.values())
+        entries = serialized_graph.get(serialized_key) or []
         canonical[state_key] = {
             str(entry[pk_field]): _project(entry, fields_for(model))
             for entry in entries
             if entry.get(pk_field) is not None
         }
     return canonical
-
-
-def graph_hash(canonical):
-    """Stable digest of a canonical graph.
-
-    Distinguishes "this site never touched the package's graph" from "this site
-    customized it", which is the difference between a safe upgrade and clobbering
-    someone's work.
-    """
-    encoded = json.dumps(canonical, sort_keys=True, separators=(",", ":"))
-    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()

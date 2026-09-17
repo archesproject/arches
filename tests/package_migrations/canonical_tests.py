@@ -11,7 +11,6 @@ from arches.app.models import models
 from arches.db.package_migrations.canonical import (
     canonical_graph,
     fields_for,
-    graph_hash,
 )
 from arches.db.package_migrations.state import PackageState
 from arches.db.package_migrations.operations.card import CreateCard
@@ -113,30 +112,14 @@ class CanonicalProjectionTests(SimpleTestCase):
         for key in ("constraints", "is_editable", "graph_id"):
             self.assertNotIn(key, card, key)
 
-    def test_hash_is_stable_across_key_and_list_ordering(self):
-        """A projection that hashed differently per ordering would make
-        --check churn forever."""
-        first = _serialized_graph()
-        second = _serialized_graph()
-        second["nodes"] = list(reversed(second["nodes"]))
-        second["name"] = {"en": "Heritage Asset"}
-        self.assertEqual(
-            graph_hash(canonical_graph(first)), graph_hash(canonical_graph(second))
-        )
-
-    def test_hash_changes_when_content_changes(self):
-        changed = _serialized_graph()
-        changed["nodes"][0]["datatype"] = "concept"
-        self.assertNotEqual(
-            graph_hash(canonical_graph(_serialized_graph())),
-            graph_hash(canonical_graph(changed)),
-        )
-
-    def test_sets_and_tuples_normalize(self):
+    def test_tuples_normalize(self):
+        """A tuple and a list compare unequal, so config that round-trips through
+        Python must land as a list. (Sets cannot reach here -- config comes from
+        JSONB.)"""
         graph = _serialized_graph()
-        graph["nodes"][0]["config"] = {"options": ("b", "a"), "ids": {2, 1}}
+        graph["nodes"][0]["config"] = {"options": ("b", "a")}
         node = canonical_graph(graph)["nodes"][NODE]
-        self.assertEqual(node["config"], {"options": ["b", "a"], "ids": [1, 2]})
+        self.assertEqual(node["config"], {"options": ["b", "a"]})
 
 
 class OperationStateMatchesProjectionTests(SimpleTestCase):

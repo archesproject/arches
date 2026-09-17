@@ -21,6 +21,16 @@ Emission order matters and is fixed here rather than left to the caller:
   stranded node makes the graph uncopyable.
 """
 
+import uuid
+
+from arches.db.package_migrations.canonical import STATE_COLLECTIONS
+
+from arches.db.package_migrations.operations.resource import SetResourcePublication
+from arches.db.package_migrations.operations.tile import (
+    AddNodeToTiles,
+    DeleteTilesForNodeGroup,
+    RemoveNodeFromTiles,
+)
 from arches.db.package_migrations.operations.card import (
     AlterCard,
     CreateCard,
@@ -31,7 +41,12 @@ from arches.db.package_migrations.operations.edge import (
     CreateEdge,
     DeleteEdge,
 )
-from arches.db.package_migrations.operations.graph import AlterGraph, CreateGraph
+from arches.db.package_migrations.operations.graph import (
+    AlterGraph,
+    CreateGraph,
+    PublishGraph,
+    RefreshDraftGraph,
+)
 from arches.db.package_migrations.operations.node import (
     AlterNode,
     CreateNode,
@@ -47,6 +62,7 @@ from arches.db.package_migrations.operations.widget import (
     CreateCardXNodeXWidget,
     DeleteCardXNodeXWidget,
 )
+
 
 # state key -> (pk field, Create, Alter, Delete). Creation order; deletion is the
 # reverse.
@@ -64,11 +80,9 @@ COLLECTION_OPERATIONS = (
     ),
 )
 
-COLLECTION_KEYS = tuple(entry[0] for entry in COLLECTION_OPERATIONS)
-
 
 def _scalar_fields(graph):
-    return {key: value for key, value in graph.items() if key not in COLLECTION_KEYS}
+    return {key: value for key, value in graph.items() if key not in STATE_COLLECTIONS}
 
 
 def _changed_fields(before, after):
@@ -88,7 +102,7 @@ def diff_graph(from_graph, to_graph):
     if from_graph is None:
         operations.append(CreateGraph(fields=_scalar_fields(to_graph)))
         from_graph = {"graphid": to_graph["graphid"]}
-        from_graph.update({key: {} for key in COLLECTION_KEYS})
+        from_graph.update({key: {} for key in STATE_COLLECTIONS})
     else:
         changes = _changed_fields(_scalar_fields(from_graph), _scalar_fields(to_graph))
         changes.pop("graphid", None)
@@ -117,7 +131,77 @@ def diff_graph(from_graph, to_graph):
             if changes:
                 operations.append(alter(graphid=graphid, changes=changes, **{pk: key}))
 
+    if not operations:
+        return []
+
+    operations.extend(_data_operations(from_graph, to_graph))
+    operations.extend(_publication_operations(from_graph, to_graph))
     return operations
+
+
+def _data_operations(from_graph, to_graph):
+    """Tile data that a structural change leaves inconsistent.
+
+    Ordering is load-bearing in one direction: RemoveNodeFromTiles must follow
+    DeleteNode, because TileModel.save() -> set_missing_keys_to_none() re-adds a
+    key for any Node still in the nodegroup. makepkgmigrations puts these in their
+    own migration, which runs after the structural one.
+    """
+    operations = []
+
+    before_nodes = from_graph.get("nodes") or {}
+    after_nodes = to_graph.get("nodes") or {}
+    for nodeid in sorted(set(after_nodes) - set(before_nodes)):
+        node = after_nodes[nodeid]
+        if node.get("nodegroup_id"):
+            operations.append(
+                AddNodeToTiles(
+                    nodegroup_id=node["nodegroup_id"],
+                    nodeid=nodeid,
+                    value=(node.get("config") or {}).get("defaultValue"),
+                )
+            )
+    for nodeid in sorted(set(before_nodes) - set(after_nodes)):
+        node = before_nodes[nodeid]
+        if node.get("nodegroup_id"):
+            operations.append(
+                RemoveNodeFromTiles(nodegroup_id=node["nodegroup_id"], nodeid=nodeid)
+            )
+
+    before_nodegroups = from_graph.get("nodegroups") or {}
+    after_nodegroups = to_graph.get("nodegroups") or {}
+    for nodegroupid in sorted(set(before_nodegroups) - set(after_nodegroups)):
+        # TileModel.nodegroup is db_constraint=False / on_delete=DO_NOTHING, so a
+        # deleted nodegroup leaves its tiles behind with nothing to reference.
+        operations.append(DeleteTilesForNodeGroup(nodegroup_id=nodegroupid))
+
+    return operations
+
+
+def _publication_operations(from_graph, to_graph):
+    """Publish, then refresh the draft -- always last.
+
+    Without these a migration mutates node/card/edge rows and nothing the
+    application reads ever changes: the published snapshot still holds the old
+    graph, resources stay on the old publication and go read-only, and the stale
+    draft reverts the whole migration on the next Graph Designer publish.
+    """
+    graphid = to_graph["graphid"]
+    publication_id = str(uuid.uuid4())
+    previous_publication_id = from_graph.get("publication_id")
+    return [
+        PublishGraph(
+            graphid=graphid,
+            publication_id=publication_id,
+            previous_publication_id=previous_publication_id,
+        ),
+        SetResourcePublication(
+            graphid=graphid,
+            publication_id=publication_id,
+            previous_publication_id=previous_publication_id,
+        ),
+        RefreshDraftGraph(graphid=graphid),
+    ]
 
 
 def diff_package(from_state_graphs, to_state_graphs):

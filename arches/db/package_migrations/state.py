@@ -19,6 +19,8 @@ import copy
 
 from django.utils.functional import cached_property
 
+from arches.db.package_migrations.canonical import STATE_COLLECTIONS
+
 
 class _RenderedPackageApps:
     """Inert stand-in for StateApps. See PackageState.apps."""
@@ -53,7 +55,6 @@ class PackageState:
     def __init__(self, graphs=None, real_apps=None):
         self.graphs = graphs if graphs is not None else {}
         self.real_apps = set(real_apps) if real_apps else set()
-        self.is_delayed = False
 
     def add_graph(self, graph):
         self.graphs[str(graph["graphid"])] = graph
@@ -72,18 +73,11 @@ class PackageState:
         """
         graphid = str(graphid)
         if graphid not in self.graphs:
-            self.graphs[graphid] = {
-                "graphid": graphid,
-                "nodes": {},
-                "nodegroups": {},
-                "edges": {},
-                "cards": {},
-                "widgets": {},
-            }
+            self.graphs[graphid] = dict(
+                {collection: {} for collection in STATE_COLLECTIONS},
+                graphid=graphid,
+            )
         return self.graphs[graphid]
-
-    def remove_graph(self, graphid):
-        del self.graphs[str(graphid)]
 
     @cached_property
     def apps(self):
@@ -106,7 +100,6 @@ class PackageState:
         )
         if "apps" in self.__dict__:
             new_state.apps = self.apps.clone()
-        new_state.is_delayed = self.is_delayed
         return new_state
 
     def __eq__(self, other):
