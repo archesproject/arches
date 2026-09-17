@@ -68,7 +68,16 @@ def _normalize(value):
 
 
 def _project(source, fields):
-    return {field: _normalize(source.get(field)) for field in fields}
+    """Only the fields the source actually carries.
+
+    An absent key is not the same as null. A package exported by an older Arches
+    has no `alias`, `hascustomalias` or `grouping_node_id`; projecting those to
+    None would make every diff emit AlterNode(alias=None), which is written to
+    disk, shipped, and only fails on the customer's database -- alias is NOT NULL.
+    Absent keys simply produce no change, and the create path fills them from the
+    model's own defaults.
+    """
+    return {field: _normalize(source[field]) for field in fields if field in source}
 
 
 def canonical_graph(serialized_graph):

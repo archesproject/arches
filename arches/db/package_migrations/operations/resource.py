@@ -34,7 +34,6 @@ class SetResourcePublication(PackageOperation):
     can do.
     """
 
-    reversible = True
     scope = "data"
 
     def __init__(
@@ -48,6 +47,11 @@ class SetResourcePublication(PackageOperation):
         self.publication_id = publication_id
         self.previous_publication_id = previous_publication_id
         self.batch_size = batch_size
+
+    @property
+    def reversible(self):
+        # Nowhere to move resources back to without the previous publication.
+        return self.previous_publication_id is not None
 
     def state_forwards(self, app_label, state):
         pass  # data only, like RunPython

@@ -65,6 +65,7 @@ class Command(BaseCommand):
             self._print_plan(plan)
             return
 
+        self._refuse_half_reversals(plan)
         if not plan:
             if self.verbosity >= 1:
                 self.stdout.write("No package migrations to apply.")
@@ -106,6 +107,32 @@ class Command(BaseCommand):
                 % (migration_name, app_label)
             )
         return [(app_label, migration.name)]
+
+    def _refuse_half_reversals(self, plan):
+        """Django unapplies migration by migration and only raises when it reaches
+        the irreversible one, so a `zero` that cannot finish still unapplies
+        everything before it -- leaving the graph on the new publication and its
+        resources on the old, which is the read-only state. Refuse up front.
+        """
+        for migration, backwards in plan:
+            if not backwards:
+                continue
+            irreversible = [
+                operation
+                for operation in migration.operations
+                if not operation.reversible
+            ]
+            if irreversible:
+                raise CommandError(
+                    "%s.%s cannot be unapplied: %s is irreversible. Unapplying the "
+                    "migrations after it would leave the graph and its resources on "
+                    "different publications."
+                    % (
+                        migration.app_label,
+                        migration.name,
+                        type(irreversible[0]).__name__,
+                    )
+                )
 
     def _print_plan(self, plan):
         if not plan:

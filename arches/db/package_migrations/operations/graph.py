@@ -95,7 +95,6 @@ class PublishGraph(PackageOperation):
     order, so the resources come off this publication before it is deleted.
     """
 
-    reversible = True
     scope = "graph"
 
     def __init__(
@@ -105,6 +104,11 @@ class PublishGraph(PackageOperation):
         self.publication_id = publication_id
         self.previous_publication_id = previous_publication_id
         self.notes = notes
+
+    @property
+    def reversible(self):
+        # Nothing to restore without the publication this one replaced.
+        return self.previous_publication_id is not None
 
     def state_forwards(self, app_label, state):
         state.graph(self.graphid)["publication_id"] = str(self.publication_id)

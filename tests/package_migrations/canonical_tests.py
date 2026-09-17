@@ -147,7 +147,7 @@ class OperationStateMatchesProjectionTests(SimpleTestCase):
                 projected = set(fields_for(model))
                 self.assertEqual(projected, declared - EXCLUDED_FIELDS)
 
-    def test_create_operations_store_the_canonical_row_verbatim(self):
+    def test_create_operations_store_the_committed_row_plus_model_defaults(self):
         canonical = canonical_graph(_serialized_graph())
         state = PackageState()
         CreateGraph(
@@ -166,9 +166,16 @@ class OperationStateMatchesProjectionTests(SimpleTestCase):
             (CreateCardXNodeXWidget, "widgets", WIDGET),
         ):
             with self.subTest(op=operation.__name__):
-                operation(
-                    graphid=GRAPH, fields=canonical[collection][key]
-                ).state_forwards("arches", state)
-                self.assertEqual(
-                    state.graphs[GRAPH][collection][key], canonical[collection][key]
+                committed = canonical[collection][key]
+                operation(graphid=GRAPH, fields=committed).state_forwards(
+                    "arches", state
                 )
+                stored = state.graphs[GRAPH][collection][key]
+                # State holds every column, because that is what the row will hold
+                # once created -- absent keys come from the model's own defaults.
+                # Wherever the committed file speaks, state must agree with it, or
+                # the next diff invents a change nobody made.
+                self.assertEqual(
+                    {field: stored[field] for field in committed}, committed
+                )
+                self.assertEqual(set(stored), set(fields_for(operation.model)))

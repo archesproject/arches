@@ -149,6 +149,10 @@ def _data_operations(from_graph, to_graph):
     """
     operations = []
 
+    before_nodegroups = from_graph.get("nodegroups") or {}
+    after_nodegroups = to_graph.get("nodegroups") or {}
+    deleted_nodegroups = set(before_nodegroups) - set(after_nodegroups)
+
     before_nodes = from_graph.get("nodes") or {}
     after_nodes = to_graph.get("nodes") or {}
     for nodeid in sorted(set(after_nodes) - set(before_nodes)):
@@ -163,14 +167,16 @@ def _data_operations(from_graph, to_graph):
             )
     for nodeid in sorted(set(before_nodes) - set(after_nodes)):
         node = before_nodes[nodeid]
+        # A node in a nodegroup that is going away needs no key removal: every
+        # tile holding it is deleted below.
+        if str(node.get("nodegroup_id")) in deleted_nodegroups:
+            continue
         if node.get("nodegroup_id"):
             operations.append(
                 RemoveNodeFromTiles(nodegroup_id=node["nodegroup_id"], nodeid=nodeid)
             )
 
-    before_nodegroups = from_graph.get("nodegroups") or {}
-    after_nodegroups = to_graph.get("nodegroups") or {}
-    for nodegroupid in sorted(set(before_nodegroups) - set(after_nodegroups)):
+    for nodegroupid in sorted(deleted_nodegroups):
         # TileModel.nodegroup is db_constraint=False / on_delete=DO_NOTHING, so a
         # deleted nodegroup leaves its tiles behind with nothing to reference.
         operations.append(DeleteTilesForNodeGroup(nodegroup_id=nodegroupid))

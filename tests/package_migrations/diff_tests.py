@@ -105,6 +105,22 @@ class DiffGraphTests(SimpleTestCase):
         self.assertLess(names.index("DeleteNode"), names.index("CreateNode"))
         self.assertLess(names.index("DeleteNode"), names.index("DeleteNodeGroup"))
 
+    def test_a_key_the_committed_file_omits_is_not_a_change(self):
+        """Packages exported by an older Arches carry no alias or hascustomalias.
+        Reading an absent key as null emitted AlterNode(alias=None), which is
+        written to disk, shipped, and only fails on the customer's database --
+        Node.alias is NOT NULL."""
+        complete = _node(alias="survey_date", hascustomalias=True)
+        partial = {
+            key: value
+            for key, value in complete.items()
+            if key not in ("alias", "hascustomalias")
+        }
+        nodegroups = [{"nodegroupid": NODEGROUP}]
+        before = _graph(nodes=[complete], nodegroups=nodegroups)
+        after = _graph(nodes=[partial], nodegroups=nodegroups)
+        self.assertEqual(diff_graph(before, after), [])
+
     def test_diff_is_the_inverse_of_replaying_its_own_operations(self):
         """The property that makes the autodetector trustworthy: applying the
         emitted operations to the from-state must produce the to-state."""
@@ -118,11 +134,22 @@ class DiffGraphTests(SimpleTestCase):
         state.add_graph(before)
         for operation in diff_graph(before, after):
             operation.state_forwards("arches", state)
-        replayed = dict(state.graphs[GRAPH])
-        # PublishGraph records the new publication in state; the committed JSON
-        # never carries one, so drop it before comparing.
-        replayed.pop("publication_id", None)
-        self.assertEqual(replayed, after)
+        replayed = state.graphs[GRAPH]
+        # Replayed state holds every column, because that is what the rows hold
+        # once created; the committed graph holds only what its author wrote, and
+        # PublishGraph adds a publication the file never carries. The property
+        # that matters is that the two agree wherever the file speaks -- anywhere
+        # they disagree, the next diff invents a change nobody made.
+        for key, expected in after.items():
+            if key in ("nodes", "nodegroups", "edges", "cards", "widgets"):
+                self.assertEqual(set(replayed[key]), set(expected), key)
+                for pk, row in expected.items():
+                    stored = replayed[key][pk]
+                    self.assertEqual(
+                        {field: stored[field] for field in row}, row, (key, pk)
+                    )
+            else:
+                self.assertEqual(replayed[key], expected, key)
 
 
 class PublicationTailTests(SimpleTestCase):
