@@ -16,7 +16,7 @@ import os
 
 from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError
-from django.db import DEFAULT_DB_ALIAS, connections, migrations
+from django.db import migrations
 from django.db.migrations.autodetector import MigrationAutodetector
 
 from arches.db.package_migrations.canonical import canonical_graph
@@ -42,7 +42,6 @@ class Command(BaseCommand):
             action="store_true",
             help="Exit non-zero if changes are missing a migration. Writes nothing.",
         )
-        parser.add_argument("--database", default=DEFAULT_DB_ALIAS)
 
     def handle(self, *args, **options):
         self.verbosity = options["verbosity"]
@@ -51,7 +50,10 @@ class Command(BaseCommand):
         if not getattr(app_config, "is_arches_application", False):
             raise CommandError("'%s' is not an Arches application." % app_label)
 
-        loader = PackageMigrationLoader(connections[options["database"]])
+        # No connection: generation reads the committed migrations and the
+        # committed JSON, never the database, so the same repo produces the same
+        # migration on every machine and --check can run in CI with no database.
+        loader = PackageMigrationLoader(None)
         leaf = self._leaf(loader, app_label)
         # Replay only this app's history: the default replays every app's leaves,
         # which would diff this app's JSON against other apps' graphs.
@@ -99,7 +101,7 @@ class Command(BaseCommand):
         # and moved them.
         dependency = leaf
         number = (MigrationAutodetector.parse_number(leaf[1]) if leaf else None) or 0
-        for offset, scope in enumerate(("graph", "data"), start=1):
+        for scope in ("graph", "data"):
             group = [operation for operation in operations if operation.scope == scope]
             if not group:
                 continue
@@ -152,17 +154,36 @@ class Command(BaseCommand):
     def _committed_graphs(self, app_config):
         root = os.path.join(app_config.path, "pkg", "graphs")
         graphs = {}
+        exported_by = {}
         for directory, _subdirs, filenames in os.walk(root):
             for filename in sorted(filenames):
                 if not filename.endswith(".json"):
                     continue
-                with open(os.path.join(directory, filename)) as source:
-                    archesfile = json.load(source)
-                # The committed file is in the shape `packages -o load_package`
-                # reads; the canonical projection happens here, in memory.
-                for serialized_graph in archesfile["graph"]:
+                path = os.path.join(directory, filename)
+                with open(path) as source:
+                    try:
+                        # The committed file is in the shape `load_package` reads;
+                        # the canonical projection happens here, in memory.
+                        serialized_graphs = json.load(source)["graph"]
+                    except (ValueError, KeyError, TypeError):
+                        raise CommandError(
+                            "%s is not an Arches graph export. Files under "
+                            'pkg/graphs must hold {"graph": [...]}, which is what '
+                            "exportgraph writes." % path
+                        )
+                for serialized_graph in serialized_graphs:
                     graph = canonical_graph(serialized_graph)
-                    graphs[graph["graphid"]] = graph
+                    graphid = graph["graphid"]
+                    if graphid in exported_by:
+                        # Exporting after a slug change writes a second file rather
+                        # than replacing the first, and the loser is decided by
+                        # filename order.
+                        raise CommandError(
+                            "Graph %s is exported twice, in %s and %s. Delete the "
+                            "stale file." % (graphid, exported_by[graphid], path)
+                        )
+                    exported_by[graphid] = path
+                    graphs[graphid] = graph
         return graphs
 
     def _leaf(self, loader, app_label):
