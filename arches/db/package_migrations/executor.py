@@ -46,6 +46,6 @@ class PackageMigrationExecutor(MigrationExecutor):
         CreateModel/AddField operations. Package operations are never either, so
         it always reports False while handing back a mutated state, which then
         gets migrated on top of. Adoption of an already-loaded package is handled
-        by `migratepkg --stamp`, not by soft-apply detection.
+        by `migratepkg --fake`, not by soft-apply detection.
         """
         return False, project_state

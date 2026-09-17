@@ -1,15 +1,18 @@
 """Reshape existing business data to match a graph change.
 
 Extracted verbatim from ``arches.app.tasks.update_resource_instance_data_based_on_graph_diff``
-so the interactive publish path and package migrations run the same code rather
-than two implementations that drift.
+so the Celery task is a thin wrapper rather than the only home of this logic.
+
+This is the INTERACTIVE publish path: it converts resources one at a time, from
+one publication to the next. Package migrations do not call it -- they convert
+tiles with set-based SQL selected on tile content, because a migration runs at
+deploy time over every tile of a graph, not over the resources on one publication.
 
 Two deliberate differences from the original task body:
 
-* It RAISES. The task swallowed every exception and notified the user, which is
-  correct for a background job but would let a failed package migration be
-  recorded as applied. Only the Celery wrapper may catch.
-* It takes no user and sends no notifications. Migrations have no user.
+* It RAISES rather than swallowing every exception and notifying the user. Only
+  the Celery wrapper may catch.
+* It takes no user and sends no notifications.
 """
 
 from django.db import DEFAULT_DB_ALIAS
