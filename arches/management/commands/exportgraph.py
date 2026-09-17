@@ -1,4 +1,4 @@
-"""Write a graph's canonical JSON into the package that owns it.
+"""Write a graph's JSON into the package that owns it.
 
 This is the analogue of editing models.py. You author a graph in the Graph
 Designer, export it here, and the committed JSON becomes the desired state that
@@ -13,7 +13,6 @@ from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError
 
 from arches.app.models import models
-from arches.db.package_migrations.canonical import canonical_graph
 
 
 class Command(BaseCommand):
@@ -44,11 +43,13 @@ class Command(BaseCommand):
                 "Graph '%s' has never been published." % options["graph"]
             )
 
-        canonical = canonical_graph(published.serialized_graph)
+        # Same shape `packages -o load_package` reads, so exporting keeps the
+        # package installable. makepkgmigrations projects it in memory.
+        archesfile = {"graph": [published.serialized_graph]}
         path = self._path(app_config, graph)
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "w") as destination:
-            json.dump(canonical, destination, indent=4, sort_keys=True)
+            json.dump(archesfile, destination, indent=4, sort_keys=True)
             destination.write("\n")
 
         if options["verbosity"] >= 1:
