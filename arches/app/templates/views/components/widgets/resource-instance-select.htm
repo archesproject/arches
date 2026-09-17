@@ -105,7 +105,7 @@
                         </div>
                         <!-- /ko -->
                     </div>
-                    <!-- Ontology Properties Accordion -->
+                    <!-- Relationship Accordion -->
                     <div class="rr-table-row-panel" 
                         data-bind="visible: self.selectedResourceRelationship() === $data, if: self.selectedResourceRelationship() === $data, css: { 'rr-table-border': self.selectedResourceRelationship() === $data} ">
 
@@ -123,10 +123,38 @@
                                         data-bind="text: self.resourceInstanceDisplayName + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'">
                                     </span>
 
-                                    <!-- Property -->
+                                    <!-- Relationship -->
                                     <span class="col-xs-12">
-                                        <select 
-                                            style="max-width:100%; display:inline-block; margin: 3px 0px;" 
+                                        <!-- ko if: $data.relationshipSource() === 'concept' -->
+                                        <div data-bind="component: {
+                                                name: 'concept-select-widget',
+                                                params: {
+                                                    node: {'config': {'rdmCollection': $data.relationshipCollection() }},
+                                                    value: $data.ontologyProperty,
+                                                }
+                                            },
+                                            attr: {'aria-labeledby': resourceToRRLabel}
+                                        "></div>
+                                        <!-- /ko -->
+                                        <!-- ko if: $data.relationshipSource() === 'reference' -->
+                                        <select
+                                            style="max-width:100%; display:inline-block; margin: 3px 0px;"
+                                            data-bind="
+                                                select2Query: {
+                                                    select2Config: self.getSelect2ConfigForControlledListItems(
+                                                        $data.ontologyProperty,
+                                                        $data.relationshipControlledList,
+                                                        $root.translations.selectAReference,
+                                                        true
+                                                    )
+                                                },
+                                                attr: {'aria-labeledby': resourceToRRLabel},
+                                            "
+                                        ></select>
+                                        <!-- /ko -->
+                                        <!-- ko ifnot: ['concept', 'reference'].includes($data.relationshipSource()) -->
+                                        <select
+                                            style="max-width:100%; display:inline-block; margin: 3px 0px;"
                                             data-bind="
                                                 select2Query: {
                                                     select2Config: self.getSelect2ConfigForOntologyProperties(
@@ -139,6 +167,7 @@
                                                 attr: {'aria-labeledby': resourceToRRLabel},
                                             "
                                         ></select>
+                                        <!-- /ko -->
                                     </span>
 
                                     <!-- rr name -->
@@ -159,10 +188,38 @@
                                         data-bind="text: $data.resourceName() + ' (' + self.makeFriendly($data.ontologyClass()) + ')'">
                                     </span>
 
-                                    <!-- Property -->
+                                    <!-- Relationship -->
                                     <span class="col-xs-12">
-                                        <select 
-                                            style="width:100%; display:inline-block; margin: 3px 0px;" 
+                                        <!-- ko if: $data.relationshipSource() === 'concept' -->
+                                        <div data-bind="component: {
+                                                name: 'concept-select-widget',
+                                                params: {
+                                                    node: {'config': {'rdmCollection': $data.relationshipCollection() }},
+                                                    value: $data.inverseOntologyProperty,
+                                                }
+                                            },
+                                            attr: {'aria-labeledby': rrToResourceLabel}
+                                        "></div>
+                                        <!-- /ko -->
+                                        <!-- ko if: $data.relationshipSource() === 'reference' -->
+                                        <select
+                                            style="width:100%; display:inline-block; margin: 3px 0px;"
+                                            data-bind="
+                                                select2Query: {
+                                                    select2Config: self.getSelect2ConfigForControlledListItems(
+                                                        $data.inverseOntologyProperty,
+                                                        $data.relationshipControlledList,
+                                                        $root.translations.selectAReference,
+                                                        true
+                                                    )
+                                                },
+                                                attr: {'aria-labeledby': rrToResourceLabel},
+                                            "
+                                        ></select>
+                                        <!-- /ko -->
+                                        <!-- ko ifnot: ['concept', 'reference'].includes($data.relationshipSource()) -->
+                                        <select
+                                            style="width:100%; display:inline-block; margin: 3px 0px;"
                                             data-bind="
                                                 select2Query: {
                                                     select2Config: self.getSelect2ConfigForOntologyProperties(
@@ -175,6 +232,7 @@
                                                 attr: {'aria-labeledby': rrToResourceLabel},
                                             "
                                         ></select>
+                                        <!-- /ko -->
                                     </span>
 
                                     <!-- Instance name -->
@@ -337,7 +395,7 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Ontology Properties Accordion -->
+                        <!-- Relationship Accordion -->
                         <div class="rr-table-row-panel"
                             data-bind="visible: self.selectedResourceRelationship() === $data, if: self.selectedResourceRelationship() === $data, css: { 'rr-table-border': self.selectedResourceRelationship() === $data} ">
                             <div class="row" data-bind="let: {resourceToRRLabel: Math.random().toString(), rrToResourceLabel: Math.random().toString()} ">
@@ -354,9 +412,36 @@
                                             data-bind="text: self.resourceInstanceDisplayName + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'">
                                         </span>
 
-                                        <!-- Property -->
+                                        <!-- Relationship -->
                                         <span class="col-xs-12">
-                                            <select 
+                                            <!-- ko if: $data.relationshipSource() === 'concept' -->
+                                            <div data-bind="component: {
+                                                    name: 'concept-select-widget',
+                                                    params: {
+                                                        node: {'config': {'rdmCollection': $data.relationshipCollection() }},
+                                                        value: $data.ontologyProperty,
+                                                    }
+                                                },
+                                                attr: {'aria-labeledby': resourceToRRLabel}
+                                            "></div>
+                                            <!-- /ko -->
+                                            <!-- ko if: $data.relationshipSource() === 'reference' -->
+                                            <select
+                                                style="max-width:100%; display:inline-block; margin: 3px 0px;"
+                                                data-bind="
+                                                    select2Query: {
+                                                        select2Config: self.getSelect2ConfigForControlledListItems(
+                                                            $data.ontologyProperty,
+                                                            $data.relationshipControlledList,
+                                                            $root.translations.selectAReference,
+                                                            true
+                                                        )
+                                                    },
+                                                    attr: {'aria-labeledby': resourceToRRLabel} ">
+                                            </select>
+                                            <!-- /ko -->
+                                            <!-- ko ifnot: ['concept', 'reference'].includes($data.relationshipSource()) -->
+                                            <select
                                                 style="max-width:100%; display:inline-block; margin: 3px 0px;"
                                                 data-bind="
                                                     select2Query: {
@@ -369,6 +454,7 @@
                                                     },
                                                     attr: {'aria-labeledby': resourceToRRLabel} ">
                                             </select>
+                                            <!-- /ko -->
                                         </span>
 
                                         <!-- rr name -->
@@ -390,9 +476,36 @@
                                             data-bind="text: $data.resourceName() + ' (' + self.makeFriendly($data.ontologyClass()) + ')'">
                                         </span>
 
-                                        <!-- Property -->
+                                        <!-- Relationship -->
                                         <span class="col-xs-12">
-                                            <select 
+                                            <!-- ko if: $data.relationshipSource() === 'concept' -->
+                                            <div data-bind="component: {
+                                                    name: 'concept-select-widget',
+                                                    params: {
+                                                        node: {'config': {'rdmCollection': $data.relationshipCollection() }},
+                                                        value: $data.inverseOntologyProperty,
+                                                    }
+                                                },
+                                                attr: {'aria-labeledby': rrToResourceLabel}
+                                            "></div>
+                                            <!-- /ko -->
+                                            <!-- ko if: $data.relationshipSource() === 'reference' -->
+                                            <select
+                                                style="width:100%; display:inline-block; margin: 3px 0px;"
+                                                data-bind="
+                                                    select2Query: {
+                                                        select2Config: self.getSelect2ConfigForControlledListItems(
+                                                            $data.inverseOntologyProperty,
+                                                            $data.relationshipControlledList,
+                                                            $root.translations.selectAReference,
+                                                            true
+                                                        )
+                                                    },
+                                                    attr: {'aria-labeledby': rrToResourceLabel}">
+                                            </select>
+                                            <!-- /ko -->
+                                            <!-- ko ifnot: ['concept', 'reference'].includes($data.relationshipSource()) -->
+                                            <select
                                                 style="width:100%; display:inline-block; margin: 3px 0px;"
                                                 data-bind="
                                                     select2Query: {
@@ -405,6 +518,7 @@
                                                     },
                                                     attr: {'aria-labeledby': rrToResourceLabel}">
                                             </select>
+                                            <!-- /ko -->
                                         </span>
 
                                         <!-- Instance name -->
