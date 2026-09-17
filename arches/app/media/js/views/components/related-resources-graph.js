@@ -62,7 +62,7 @@ const viewModel = function(params) {
             if (element.isNode()) {
                 var data = element.data();
                 if (!data.shownRelationsCount) data.shownRelationsCount = ko.observable();
-                if (data.displayname.toLowerCase().indexOf(filter) !== -1) {
+                if ((data.displayname || '').toLowerCase().indexOf(filter) !== -1) {
                     data.graph = resourceTypeLookup[data.graph_id];
                     // excludes target relationships back to node, to prevent duplicates
                     data.shownRelationsCount(viz.edges('[source = "' + data.id + '"]').length +
