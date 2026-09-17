@@ -3,6 +3,7 @@ import _ from 'underscore';
 import arches from 'arches';
 import data from 'view-data';
 import ontologyUtils from 'utils/ontology';
+import controlledListUtils from 'utils/controlled-list';
 import resourceInstanceDatatypeTemplate from 'templates/views/components/datatypes/resource-instance.htm';
 import 'views/components/widgets/resource-instance-select';
 import 'bindings/key-events-click';
@@ -27,6 +28,7 @@ const viewModel = function(params) {
     if (!this.search) {
         this.makeFriendly = ontologyUtils.makeFriendly;
         this.getSelect2ConfigForOntologyProperties = ontologyUtils.getSelect2ConfigForOntologyProperties;
+        this.getSelect2ConfigForControlledListItems = controlledListUtils.getSelect2ConfigForControlledListItems;
         this.graphIsSemantic = !!params.graph.get('ontology_id');
         this.rootOntologyClass = params.graph.get('root').ontologyclass();
         this.graphName = params.graph.get('root').name();
@@ -45,6 +47,36 @@ const viewModel = function(params) {
             }
         });
 
+        this.controlledListsAvailable = controlledListUtils.isAvailable();
+        this.controlledLists = ko.observableArray();
+        if (this.controlledListsAvailable) {
+            controlledListUtils.getControlledLists()
+                .then(function(lists) {
+                    self.controlledLists(lists);
+                })
+                .catch(function() {
+                    self.controlledLists([]);
+                });
+        }
+
+        this.relationshipSources = [];
+        if (this.graphIsSemantic) {
+            this.relationshipSources.push({
+                id: 'ontology-property',
+                text: arches.translations.ontologyPropertySource
+            });
+        }
+        this.relationshipSources.push({
+            id: 'concept',
+            text: arches.translations.conceptSource
+        });
+        if (this.controlledListsAvailable) {
+            this.relationshipSources.push({
+                id: 'reference',
+                text: arches.translations.referenceSource
+            });
+        }
+
         this.selectedResourceType = ko.observable(null);
         this.toggleSelectedResource = function(resourceRelationship) {
             if (self.selectedResourceType() === resourceRelationship) {
@@ -54,24 +86,50 @@ const viewModel = function(params) {
             }
         };
 
+        const defaultRelationship = function(graph) {
+            return graph.relationshipSource() === 'concept' ? defaultRelationshipConceptValue : null;
+        };
+
+        const clearRelationships = function(graph) {
+            return function() {
+                graph.relationship(null);
+                graph.inverseRelationship(null);
+            };
+        };
+
         var preventSetup = false;
         var setupConfig = function(graph) {
             var model = _.find(self.resourceModels, function(model){
                 return graph.graphid === model.graphid;
             });
-            graph.ontologyProperty = ko.observable(ko.unwrap(graph.ontologyProperty));
-            graph.inverseOntologyProperty = ko.observable(ko.unwrap(graph.inverseOntologyProperty));
+            // configs saved before relationshipSource was introduced still carry the
+            // legacy keys; read them once, then drop them so they aren't saved again
+            const useOntologyRelationship = ko.unwrap(graph.useOntologyRelationship);
+            const legacyRelationship = useOntologyRelationship ? graph.ontologyProperty : graph.relationshipConcept;
+            const legacyInverseRelationship = useOntologyRelationship ? graph.inverseOntologyProperty : graph.inverseRelationshipConcept;
+
+            graph.relationshipSource = ko.observable(
+                ko.unwrap(graph.relationshipSource) || (useOntologyRelationship ? 'ontology-property' : 'concept')
+            );
             graph.relationshipCollection = ko.observable(ko.unwrap(graph.relationshipCollection) || defaultRelationshipCollection);
-            graph.relationshipConcept = ko.observable(ko.unwrap(graph.relationshipConcept) || defaultRelationshipConceptValue);
-            graph.inverseRelationshipConcept = ko.observable(ko.unwrap(graph.inverseRelationshipConcept || defaultRelationshipConceptValue));
-            graph.useOntologyRelationship = ko.observable(ko.unwrap(graph.useOntologyRelationship || false));
+            graph.relationshipControlledList = ko.observable(ko.unwrap(graph.relationshipControlledList) || null);
+            graph.relationship = ko.observable(ko.unwrap(graph.relationship) ?? ko.unwrap(legacyRelationship) ?? defaultRelationship(graph));
+            graph.inverseRelationship = ko.observable(ko.unwrap(graph.inverseRelationship) ?? ko.unwrap(legacyInverseRelationship) ?? defaultRelationship(graph));
+
+            delete graph.useOntologyRelationship;
+            delete graph.ontologyProperty;
+            delete graph.inverseOntologyProperty;
+            delete graph.relationshipConcept;
+            delete graph.inverseRelationshipConcept;
+
             graph.removeRelationship = function(graph){
                 self.config.graphs.remove(graph);
             };
-            graph.relationshipCollection.subscribe(()=>{
-                graph.relationshipConcept(null);
-                graph.inverseRelationshipConcept(null);
-            });
+            // the available relationships depend on the source and on the collection or
+            // list they are drawn from, so clear the selections whenever those change
+            graph.relationshipSource.subscribe(clearRelationships(graph));
+            graph.relationshipCollection.subscribe(clearRelationships(graph));
+            graph.relationshipControlledList.subscribe(clearRelationships(graph));
             if(!!model){
                 // use this so that graph.name won't get saved back to the node config
                 Object.defineProperty(graph, 'name', {
@@ -101,11 +159,11 @@ const viewModel = function(params) {
                     self.config.graphs(self.config.graphs());
                     preventSetup = false;
                 };
-                graph.ontologyProperty.subscribe(triggerDirtyState);
-                graph.inverseOntologyProperty.subscribe(triggerDirtyState);
-                graph.relationshipConcept.subscribe(triggerDirtyState);
-                graph.inverseRelationshipConcept.subscribe(triggerDirtyState);
-                graph.useOntologyRelationship.subscribe(triggerDirtyState);
+                graph.relationship.subscribe(triggerDirtyState);
+                graph.inverseRelationship.subscribe(triggerDirtyState);
+                graph.relationshipSource.subscribe(triggerDirtyState);
+                graph.relationshipCollection.subscribe(triggerDirtyState);
+                graph.relationshipControlledList.subscribe(triggerDirtyState);
             }else{
                 Object.defineProperty(graph, 'name', {
                     value: arches.translations.modelDoesNotExist

@@ -4,6 +4,9 @@ import arches from 'arches';
 import WidgetViewModel from 'viewmodels/widget';
 
 var NAME_LOOKUP = {};
+// concept values are always identified by uuid; anything else (eg. a relationship type
+// drawn from a controlled list) cannot be resolved by the concept api
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 var ConceptSelectViewModel = function(params) {
     var self = this;
 
@@ -54,7 +57,7 @@ var ConceptSelectViewModel = function(params) {
     this.setNames = function() {
         var names = [];
         self.valueList().forEach(function(val) {
-            if (ko.unwrap(val)) {
+            if (ko.unwrap(val) && UUID_PATTERN.test(ko.unwrap(val))) {
                 if (NAME_LOOKUP[val]) {
                     names.push(NAME_LOOKUP[val]);
                     self.displayName(names.join(', '));
