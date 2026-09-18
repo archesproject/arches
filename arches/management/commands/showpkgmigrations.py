@@ -36,7 +36,7 @@ class Command(BaseCommand):
         for app_label in app_labels:
             if app_label not in loader.migrated_apps:
                 raise CommandError(
-                    "App '%s' does not have package migrations." % app_label
+                    f"App '{app_label}' does not have package migrations."
                 )
 
         if options["format"] == "plan":
@@ -55,7 +55,7 @@ class Command(BaseCommand):
         for app_label, group in groupby(nodes, key=lambda node: node[0]):
             self.stdout.write(app_label, self.style.MIGRATE_LABEL)
             for node in group:
-                line = " [X] %s" % node[1] if node in applied else " [ ] %s" % node[1]
+                line = f" [X] {node[1]}" if node in applied else f" [ ] {node[1]}"
                 if self.verbosity >= 2 and node in applied:
                     record = applied[node]
                     if getattr(record, "applied", None):
@@ -80,4 +80,4 @@ class Command(BaseCommand):
             return
         for node in plan:
             marker = "[X]" if node in applied else "[ ]"
-            self.stdout.write("%s  %s.%s" % (marker, node[0], node[1]))
+            self.stdout.write(f"{marker}  {node[0]}.{node[1]}")

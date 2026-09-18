@@ -35,7 +35,7 @@ class PackageMigrationLoader(MigrationLoader):
             return None, False
         # explicit=False so load_disk treats a missing package as "unmigrated"
         # rather than raising.
-        return "%s.%s" % (app_config.name, PACKAGE_MIGRATIONS_MODULE_NAME), False
+        return f"{app_config.name}.{PACKAGE_MIGRATIONS_MODULE_NAME}", False
 
     def build_graph(self):
         """Mirrors MigrationLoader.build_graph, substituting the package
@@ -74,7 +74,7 @@ class PackageMigrationLoader(MigrationLoader):
                     candidate in self.graph.nodes for candidate in candidates
                 )
                 if not is_replaced:
-                    tries = ", ".join("%s.%s" % candidate for candidate in candidates)
+                    tries = ", ".join(f"{app}.{name}" for app, name in candidates)
                     raise NodeNotFoundError(
                         "Package migration {0} depends on nonexistent node "
                         "('{1}', '{2}'). Tried [{3}].".format(

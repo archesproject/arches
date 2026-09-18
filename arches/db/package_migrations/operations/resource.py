@@ -69,7 +69,7 @@ class SetResourcePublication(PackageOperation):
         )
         if publication_id is None:
             raise ValueError(
-                "Graph %s has no publication to move its resources onto." % self.graphid
+                f"Graph {self.graphid} has no publication to move its resources onto."
             )
         return self._move(
             self.qs(models.ResourceInstance, schema_editor)
@@ -81,8 +81,8 @@ class SetResourcePublication(PackageOperation):
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         if self.previous_publication_id is None:
             raise NotImplementedError(
-                "SetResourcePublication for graph %s has no previous publication "
-                "to move resources back to." % self.graphid
+                f"SetResourcePublication for graph {self.graphid} has no previous "
+                "publication to move resources back to."
             )
         return self._move(
             self.qs(models.ResourceInstance, schema_editor).filter(
@@ -103,8 +103,8 @@ class SetResourcePublication(PackageOperation):
         return total
 
     def describe(self):
-        return "Set resources on graph %s to its current publication" % self.graphid
+        return f"Set resources on graph {self.graphid} to its current publication"
 
     @property
     def migration_name_fragment(self):
-        return "resource_publication_%s" % str(self.publication_id).replace("-", "")[:8]
+        return f"resource_publication_{str(self.publication_id).replace('-', '')[:8]}"

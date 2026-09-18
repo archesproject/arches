@@ -17,7 +17,7 @@ from django.db.migrations.writer import MigrationWriter
 from arches.db.package_migrations.loader import PACKAGE_MIGRATIONS_MODULE_NAME
 
 PACKAGE = "arches.db.package_migrations"
-OPERATIONS_MODULE = "%s.operations" % PACKAGE
+OPERATIONS_MODULE = f"{PACKAGE}.operations"
 
 
 class PackageMigrationWriter(MigrationWriter):
@@ -31,15 +31,13 @@ class PackageMigrationWriter(MigrationWriter):
         used = sorted(
             set(
                 re.findall(
-                    r"\b%s\.[a-z_]+\.(\w+)\(" % re.escape(OPERATIONS_MODULE), rendered
+                    rf"\b{re.escape(OPERATIONS_MODULE)}\.[a-z_]+\.(\w+)\(", rendered
                 )
             )
         )
+        rendered = re.sub(rf"\b{re.escape(OPERATIONS_MODULE)}\.[a-z_]+\.", "", rendered)
         rendered = re.sub(
-            r"\b%s\.[a-z_]+\." % re.escape(OPERATIONS_MODULE), "", rendered
-        )
-        rendered = re.sub(
-            r"^import %s\.[a-z_]+\n" % re.escape(OPERATIONS_MODULE),
+            rf"^import {re.escape(OPERATIONS_MODULE)}\.[a-z_]+\n",
             "",
             rendered,
             flags=re.MULTILINE,
@@ -48,8 +46,8 @@ class PackageMigrationWriter(MigrationWriter):
             return rendered
         return rendered.replace(
             "from django.db import migrations",
-            "from django.db import migrations\n\nfrom %s import (\n    %s,\n)"
-            % (OPERATIONS_MODULE, ",\n    ".join(used)),
+            f"from django.db import migrations\n\n"
+            f"from {OPERATIONS_MODULE} import (\n    " + ",\n    ".join(used) + ",\n)",
             1,
         )
 
@@ -58,7 +56,7 @@ class PackageMigrationWriter(MigrationWriter):
         app_config = apps.get_app_config(self.migration.app_label)
         if not getattr(app_config, "is_arches_application", False):
             raise ValueError(
-                "App '%s' is not an Arches application, so it cannot hold package "
-                "migrations." % self.migration.app_label
+                f"App '{self.migration.app_label}' is not an Arches application, "
+                "so it cannot hold package migrations."
             )
         return os.path.join(app_config.path, *PACKAGE_MIGRATIONS_MODULE_NAME.split("."))

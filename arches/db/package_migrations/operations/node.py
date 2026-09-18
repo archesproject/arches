@@ -26,7 +26,7 @@ class CreateNode(_CreateRowOperation):
 
     @property
     def _label(self):
-        return "%s (%s)" % (self.fields.get("alias"), self.fields.get("datatype"))
+        return f"{self.fields.get('alias')} ({self.fields.get('datatype')})"
 
     @property
     def _fragment(self):

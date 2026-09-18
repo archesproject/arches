@@ -34,7 +34,7 @@ class PackageMigrationRecorder(MigrationRecorder):
                     db_table = "arches_package_migrations"
 
                 def __str__(self):
-                    return "Package migration %s for %s" % (self.name, self.app)
+                    return f"Package migration {self.name} for {self.app}"
 
             cls._migration_class = Migration
         return cls._migration_class

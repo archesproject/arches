@@ -97,14 +97,11 @@ class AddNodeToTiles(_ChunkedTileOperation):
         return self._drop_key(schema_editor)
 
     def describe(self):
-        return "Add node %s to tiles in nodegroup %s" % (
-            self.nodeid,
-            self.nodegroup_id,
-        )
+        return f"Add node {self.nodeid} to tiles in nodegroup {self.nodegroup_id}"
 
     @property
     def migration_name_fragment(self):
-        return "add_node_to_tiles_%s" % str(self.nodeid).replace("-", "")[:8]
+        return f"add_node_to_tiles_{str(self.nodeid).replace('-', '')[:8]}"
 
 
 class RemoveNodeFromTiles(_ChunkedTileOperation):
@@ -167,14 +164,11 @@ class RemoveNodeFromTiles(_ChunkedTileOperation):
             pending.filter(tileid__in=tileids).update(provisionaledits=expression)
 
     def describe(self):
-        return "Remove node %s from tiles in nodegroup %s" % (
-            self.nodeid,
-            self.nodegroup_id,
-        )
+        return f"Remove node {self.nodeid} from tiles in nodegroup {self.nodegroup_id}"
 
     @property
     def migration_name_fragment(self):
-        return "remove_node_from_tiles_%s" % str(self.nodeid).replace("-", "")[:8]
+        return f"remove_node_from_tiles_{str(self.nodeid).replace('-', '')[:8]}"
 
 
 class DeleteTilesForNodeGroup(_ChunkedTileOperation):
@@ -205,8 +199,8 @@ class DeleteTilesForNodeGroup(_ChunkedTileOperation):
         return total
 
     def describe(self):
-        return "Delete tiles for nodegroup %s" % self.nodegroup_id
+        return f"Delete tiles for nodegroup {self.nodegroup_id}"
 
     @property
     def migration_name_fragment(self):
-        return "delete_tiles_%s" % str(self.nodegroup_id).replace("-", "")[:8]
+        return f"delete_tiles_{str(self.nodegroup_id).replace('-', '')[:8]}"

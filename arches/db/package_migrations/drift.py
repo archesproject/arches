@@ -50,8 +50,10 @@ def problems(plan, using):
             if problem:
                 found.append(
                     problem._replace(
-                        message="%s.%s: %s"
-                        % (migration.app_label, migration.name, problem.message)
+                        message=(
+                            f"{migration.app_label}.{migration.name}: "
+                            f"{problem.message}"
+                        )
                     )
                 )
     return found
@@ -101,7 +103,7 @@ def _missing_references(plan, using):
             found.append(
                 Problem(
                     "reference",
-                    "%s %s, which these graphs point at" % (model.__name__, pk),
+                    f"{model.__name__} {pk}, which these graphs point at",
                 )
             )
     return found
@@ -112,8 +114,8 @@ def _reverse_problem(operation, using):
     not hold in reverse. What does matter is what a reversal destroys."""
     if isinstance(operation, CreateGraph) and operation.has_resources(using):
         return (
-            "reversing would delete graph %s, and it has resource instances; "
-            "they and their tiles would go with it" % operation.graphid
+            f"reversing would delete graph {operation.graphid}, and it has "
+            "resource instances; they and their tiles would go with it"
         )
     return None
 
@@ -121,7 +123,7 @@ def _reverse_problem(operation, using):
 def _problem(operation, using):
     if isinstance(operation, CreateGraph):
         if _exists(models.GraphModel, operation.graphid, using):
-            return Problem("present", "graph %s already exists" % operation.graphid)
+            return Problem("present", f"graph {operation.graphid} already exists")
         return None
 
     model = getattr(operation, "model", None)
@@ -131,13 +133,11 @@ def _problem(operation, using):
     if isinstance(operation, _CreateRowOperation):
         if _exists(model, operation._pk, using):
             return Problem(
-                "present", "%s %s already exists" % (model.__name__, operation._pk)
+                "present", f"{model.__name__} {operation._pk} already exists"
             )
     elif isinstance(operation, (_AlterRowOperation, _DeleteRowOperation)):
         if not _exists(model, operation._pk, using):
-            return Problem(
-                "missing", "%s %s is missing" % (model.__name__, operation._pk)
-            )
+            return Problem("missing", f"{model.__name__} {operation._pk} is missing")
     return None
 
 

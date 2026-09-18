@@ -49,7 +49,7 @@ class Command(BaseCommand):
         app_label = options["app_label"]
         app_config = apps.get_app_config(app_label)
         if not getattr(app_config, "is_arches_application", False):
-            raise CommandError("'%s' is not an Arches application." % app_label)
+            raise CommandError(f"'{app_label}' is not an Arches application.")
 
         # No connection: generation reads the committed migrations and the
         # committed JSON, never the database, so the same repo produces the same
@@ -71,9 +71,7 @@ class Command(BaseCommand):
         for graphid in sorted(set(from_state.graphs) - set(to_graphs)):
             self.stderr.write(
                 self.style.WARNING(
-                    "Graph %s is in migration history but not in the committed "
-                    "package JSON. Package migrations will not delete a graph, "
-                    "because that removes every resource instance on it." % graphid
+                    f"Graph {graphid} is in migration history but not in the committed package JSON. Package migrations will not delete a graph, because that removes every resource instance on it."
                 )
             )
 
@@ -117,10 +115,10 @@ class Command(BaseCommand):
             path = self._write(migration)
             dependency = (app_label, migration.name)
             if self.verbosity >= 1:
-                self.stdout.write("  %s" % os.path.relpath(path))
+                self.stdout.write(f"  {os.path.relpath(path)}")
                 for operation in group:
                     self.stdout.write(
-                        "    - %s" % labels.humanize(operation.describe(), self.names)
+                        f"    - {labels.humanize(operation.describe(), self.names)}"
                     )
 
     def _warn_about_data_the_generator_cannot_convert(self, operations, to_graphs):
@@ -170,8 +168,7 @@ class Command(BaseCommand):
                 # Exporting after a slug change writes a second file rather than
                 # replacing the first, and the loser is decided by filename order.
                 raise CommandError(
-                    "Graph %s is exported twice, in %s and %s. Delete the stale "
-                    "file." % (graphid, exported_by[graphid], path)
+                    f"Graph {graphid} is exported twice, in {exported_by[graphid]} and {path}. Delete the stale file."
                 )
             exported_by[graphid] = path
             graphs[graphid] = graph
@@ -191,9 +188,7 @@ class Command(BaseCommand):
                         serialized_graphs = json.load(source)["graph"]
                     except (ValueError, KeyError, TypeError):
                         raise CommandError(
-                            "%s is not an Arches graph export. Files under "
-                            'pkg/graphs must hold {"graph": [...]}, which is what '
-                            "`packages -o export_graphs` writes." % path
+                            f'{path} is not an Arches graph export. Files under pkg/graphs must hold {{"graph": [...]}}, which is what `packages -o export_graphs` writes.'
                         )
                 for serialized_graph in serialized_graphs:
                     yield path, serialized_graph
@@ -235,5 +230,5 @@ class Command(BaseCommand):
         self.stdout.write("Changes detected:")
         for operation in operations:
             self.stdout.write(
-                "  - %s" % labels.humanize(operation.describe(), self.names)
+                f"  - {labels.humanize(operation.describe(), self.names)}"
             )

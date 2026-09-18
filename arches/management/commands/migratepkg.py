@@ -61,11 +61,10 @@ class Command(BaseCommand):
         conflicts = executor.loader.detect_conflicts()
         if conflicts:
             described = "; ".join(
-                "%s: %s" % (app, ", ".join(names)) for app, names in conflicts.items()
+                f"{app}: {', '.join(names)}" for app, names in conflicts.items()
             )
             raise CommandError(
-                "Conflicting package migrations detected; multiple leaf nodes in "
-                "the migration graph (%s). Resolve them before migrating." % described
+                f"Conflicting package migrations detected; multiple leaf nodes in the migration graph ({described}). Resolve them before migrating."
             )
 
         targets = self._targets(executor, options)
@@ -100,7 +99,7 @@ class Command(BaseCommand):
             return graph.leaf_nodes()
 
         if app_label not in executor.loader.migrated_apps:
-            raise CommandError("App '%s' does not have package migrations." % app_label)
+            raise CommandError(f"App '{app_label}' does not have package migrations.")
 
         if migration_name is None:
             return graph.leaf_nodes(app_label)
@@ -116,13 +115,11 @@ class Command(BaseCommand):
             )
         except AmbiguityError:
             raise CommandError(
-                "More than one package migration matches '%s' in app '%s'. "
-                "Give a more specific prefix." % (migration_name, app_label)
+                f"More than one package migration matches '{migration_name}' in app '{app_label}'. Give a more specific prefix."
             )
         except KeyError:
             raise CommandError(
-                "Cannot find a package migration matching '%s' for app '%s'."
-                % (migration_name, app_label)
+                f"Cannot find a package migration matching '{migration_name}' for app '{app_label}'."
             )
         return [(app_label, migration.name)]
 
@@ -162,7 +159,7 @@ class Command(BaseCommand):
             "  python manage.py migratepkg %s <last graph migration> --fake\n"
             "  python manage.py migratepkg %s"
             % (
-                "\n  ".join("%s.%s" % (m.app_label, m.name) for m in faked),
+                "\n  ".join(f"{m.app_label}.{m.name}" for m in faked),
                 faked[0].app_label,
                 faked[0].app_label,
             )
@@ -170,7 +167,7 @@ class Command(BaseCommand):
         if force:
             self.stderr.write(self.style.WARNING(message))
             return
-        raise CommandError("%s\nRe-run with --force to record them anyway." % message)
+        raise CommandError(f"{message}\nRe-run with --force to record them anyway.")
 
     def _refuse_drifted_database(self, plan, connection, force):
         """These migrations were generated against migration history, not against
@@ -214,7 +211,7 @@ class Command(BaseCommand):
             # --force would only move the failure deeper, into Graph.publish().
             raise CommandError(message)
         raise CommandError(
-            "%s\nReconcile the graph, or re-run with --force to apply anyway." % message
+            f"{message}\nReconcile the graph, or re-run with --force to apply anyway."
         )
 
     def _refuse_half_reversals(self, plan):
@@ -233,14 +230,7 @@ class Command(BaseCommand):
             ]
             if irreversible:
                 raise CommandError(
-                    "%s.%s cannot be unapplied: %s is irreversible. Unapplying the "
-                    "migrations after it would leave the graph and its resources on "
-                    "different publications."
-                    % (
-                        migration.app_label,
-                        migration.name,
-                        type(irreversible[0]).__name__,
-                    )
+                    f"{migration.app_label}.{migration.name} cannot be unapplied: {type(irreversible[0]).__name__} is irreversible. Unapplying the migrations after it would leave the graph and its resources on different publications."
                 )
 
     def _print_plan(self, plan):
@@ -267,7 +257,7 @@ class Command(BaseCommand):
         if self.verbosity >= 2 or len(operations) <= self.PLAN_DETAIL_LIMIT:
             names = labels.from_database("\n".join(described), self.database)
             for description in described:
-                self.stdout.write("      %s" % labels.humanize(description, names))
+                self.stdout.write(f"      {labels.humanize(description, names)}")
             return
 
         counts = {}
@@ -276,19 +266,19 @@ class Command(BaseCommand):
                 counts.get(type(operation).__name__, 0) + 1
             )
         for name in sorted(counts):
-            self.stdout.write("      %s x%d" % (name, counts[name]))
-        self.stdout.write("      (%d operations; -v 2 lists them)" % len(operations))
+            self.stdout.write(f"      {name} x{counts[name]}")
+        self.stdout.write(f"      ({len(operations)} operations; -v 2 lists them)")
 
     def _progress(self, action, migration=None, fake=False):
         if self.verbosity < 1:
             return
         if action == "apply_start":
-            self.stdout.write("  Applying %s..." % migration, ending="")
+            self.stdout.write(f"  Applying {migration}...", ending="")
             self.stdout.flush()
         elif action == "apply_success":
             self.stdout.write(self.style.SUCCESS(" FAKED" if fake else " OK"))
         elif action == "unapply_start":
-            self.stdout.write("  Unapplying %s..." % migration, ending="")
+            self.stdout.write(f"  Unapplying {migration}...", ending="")
             self.stdout.flush()
         elif action == "unapply_success":
             self.stdout.write(self.style.SUCCESS(" FAKED" if fake else " OK"))

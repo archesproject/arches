@@ -27,7 +27,7 @@ def keyset_batches(queryset, pk_field, batch_size):
     while True:
         batch = queryset
         if last is not None:
-            batch = batch.filter(**{"%s__gt" % pk_field: last})
+            batch = batch.filter(**{f"{pk_field}__gt": last})
         keys = list(
             batch.order_by(pk_field).values_list(pk_field, flat=True)[:batch_size]
         )
@@ -70,19 +70,19 @@ class PackageOperation(Operation):
         )
         if cls.reversible and not implements_backwards:
             raise TypeError(
-                "%s sets reversible = True but does not implement "
+                f"{cls.__name__} sets reversible = True but does not implement "
                 "database_backwards(). Implement it, or declare "
-                "reversible = False." % cls.__name__
+                "reversible = False."
             )
 
         if cls.scope not in ("graph", "data"):
             raise TypeError(
-                '%s must set scope to "graph" or "data"; it decides which '
-                "migration the operation is written into." % cls.__name__
+                f'{cls.__name__} must set scope to "graph" or "data"; it decides '
+                "which migration the operation is written into."
             )
         for name in ("describe", "migration_name_fragment"):
             if getattr(cls, name, None) is getattr(PackageOperation, name, None):
-                raise TypeError("%s must define %s." % (cls.__name__, name))
+                raise TypeError(f"{cls.__name__} must define {name}.")
 
     def deconstruct(self):
         """Emit every constructor parameter explicitly.
@@ -177,15 +177,12 @@ class _AlterRowOperation(PackageOperation):
         )
 
     def describe(self):
-        return "Alter %s %s (%s)" % (
-            self.verbose_name,
-            self._pk,
-            ", ".join(sorted(self.changes)),
-        )
+        changed = ", ".join(sorted(self.changes))
+        return f"Alter {self.verbose_name} {self._pk} ({changed})"
 
     @property
     def migration_name_fragment(self):
-        return "alter_%s_%s" % (self.verbose_name, _short(self._pk))
+        return f"alter_{self.verbose_name}_{_short(self._pk)}"
 
 
 class _RowOperation(PackageOperation):
@@ -254,12 +251,9 @@ class _RowOperation(PackageOperation):
                 missing_required.append(name)
         if missing_required:
             raise ValueError(
-                "%s is missing required field(s) %s for %s. Supply them in fields."
-                % (
-                    type(self).__name__,
-                    ", ".join(sorted(missing_required)),
-                    self.model.__name__,
-                )
+                f"{type(self).__name__} is missing required field(s) "
+                f"{', '.join(sorted(missing_required))} for "
+                f"{self.model.__name__}. Supply them in fields."
             )
         return completed
 
@@ -299,15 +293,11 @@ class _CreateRowOperation(_RowOperation):
     reversible = True
 
     def describe(self):
-        return "Create %s %s on graph %s" % (
-            self.verbose_name,
-            self._label,
-            self.graphid,
-        )
+        return f"Create {self.verbose_name} {self._label} on graph {self.graphid}"
 
     @property
     def migration_name_fragment(self):
-        return "%s_%s" % (self.verbose_name, self._fragment)
+        return f"{self.verbose_name}_{self._fragment}"
 
     def state_forwards(self, app_label, state):
         # Store the completed row, so replayed state and the database agree.
@@ -345,12 +335,8 @@ class _DeleteRowOperation(_RowOperation):
         self._create_row(schema_editor)
 
     def describe(self):
-        return "Delete %s %s from graph %s" % (
-            self.verbose_name,
-            self._pk,
-            self.graphid,
-        )
+        return f"Delete {self.verbose_name} {self._pk} from graph {self.graphid}"
 
     @property
     def migration_name_fragment(self):
-        return "delete_%s_%s" % (self.verbose_name, _short(self._pk))
+        return f"delete_{self.verbose_name}_{_short(self._pk)}"

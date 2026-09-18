@@ -54,7 +54,7 @@ def collection_for(model):
     for state_key, _serialized_key, collection_model in COLLECTIONS:
         if collection_model is model:
             return state_key, collection_model._meta.pk.attname
-    raise KeyError("%s holds no package content" % model.__name__)
+    raise KeyError(f"{model.__name__} holds no package content")
 
 
 def fields_for(model):
@@ -223,4 +223,4 @@ class PackageState:
         return isinstance(other, PackageState) and self.graphs == other.graphs
 
     def __repr__(self):
-        return "<PackageState graphs=%r>" % sorted(self.graphs)
+        return f"<PackageState graphs={sorted(self.graphs)!r}>"

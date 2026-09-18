@@ -69,8 +69,8 @@ class CreateGraph(PackageOperation):
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         if self.has_resources(schema_editor.connection.alias):
             raise ValueError(
-                "Graph %s has resource instances. Deleting it would delete them "
-                "and their tiles." % self.graphid
+                f"Graph {self.graphid} has resource instances. Deleting it would "
+                "delete them and their tiles."
             )
         self.qs(models.GraphModel, schema_editor).filter(pk=self.graphid).delete()
 
@@ -82,11 +82,11 @@ class CreateGraph(PackageOperation):
         )
 
     def describe(self):
-        return "Create graph %s" % (self.fields.get("slug") or self.graphid)
+        return f"Create graph {self.fields.get('slug') or self.graphid}"
 
     @property
     def migration_name_fragment(self):
-        return "graph_%s" % (self.fields.get("slug") or _short(self.graphid))
+        return f"graph_{self.fields.get('slug') or _short(self.graphid)}"
 
 
 class AlterGraph(_AlterRowOperation):
@@ -144,8 +144,8 @@ class PublishGraph(PackageOperation):
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         if self.previous_publication_id is None:
             raise NotImplementedError(
-                "PublishGraph for graph %s has no previous publication to restore."
-                % self.graphid
+                f"PublishGraph for graph {self.graphid} has no previous "
+                "publication to restore."
             )
         # graphs.publicationid references the publication this operation minted,
         # so the graph moves back before it is deleted. Resources are already off
@@ -158,8 +158,8 @@ class PublishGraph(PackageOperation):
         ).delete()
 
     def describe(self):
-        return "Publish graph %s as %s" % (self.graphid, self.publication_id)
+        return f"Publish graph {self.graphid} as {self.publication_id}"
 
     @property
     def migration_name_fragment(self):
-        return "publish_%s" % str(self.publication_id).replace("-", "")[:8]
+        return f"publish_{str(self.publication_id).replace('-', '')[:8]}"
