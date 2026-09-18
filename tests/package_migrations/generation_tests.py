@@ -140,7 +140,7 @@ class MakePkgMigrationsTests(PackageMigrationOperationTests):
 
     def test_generated_migration_changes_what_the_application_reads(self):
         """Generating a file that imports is not enough: apply it and check the
-        rows, the publication, the resources, the draft and the tiles."""
+        rows, the publication, the resources, the stale draft and the tiles."""
         from arches.app.models import models
         from arches.app.models.graph import Graph
 
@@ -208,8 +208,9 @@ class MakePkgMigrationsTests(PackageMigrationOperationTests):
             resource.refresh_from_db()
             self.assertEqual(resource.graph_publication_id, graph.publication_id)
 
-            # 4. the draft was refreshed, so the next Designer publish does not revert
-            self.assertIsNotNone(Graph.objects.get(pk=graph.graphid).get_draft_graph())
+            # 4. no stale draft survives, so the next Designer publish cannot
+            #    rebuild the live graph from a copy that predates this migration
+            self.assertIsNone(Graph.objects.get(pk=graph.graphid).get_draft_graph())
 
             # 5. existing tiles carry the new node key
             tile = models.TileModel.objects.filter(

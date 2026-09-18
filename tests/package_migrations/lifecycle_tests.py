@@ -15,7 +15,6 @@ from arches.db.package_migrations.operations.edge import CreateEdge
 from arches.db.package_migrations.operations.node import CreateNode
 from arches.db.package_migrations.operations.nodegroup import CreateNodeGroup
 from arches.db.package_migrations.operations.resource import SetResourcePublication
-from arches.db.package_migrations import drafts
 from arches.db.package_migrations.operations.graph import CreateGraph, PublishGraph
 
 from tests.package_migrations.spike_tests import (
@@ -102,7 +101,7 @@ class PublicationLifecycleTests(PackageMigrationOperationTests):
             nodegroupid,
         )
 
-    def test_reconciling_the_draft_stops_a_later_publish_reverting_the_migration(self):
+    def test_discarding_the_draft_stops_a_later_publish_reverting_the_migration(self):
         """The fix for the fatal finding.
 
         Without it the next promote_draft_graph_to_active_graph() rebuilds the live
@@ -134,7 +133,13 @@ class PublicationLifecycleTests(PackageMigrationOperationTests):
             },
         ).database_forwards("arches", self.schema_editor, self._state(), self._state())
 
-        drafts.reconcile([str(self.graph.graphid)], "default")
+        # What migratepkg does after a run: drop the draft that predates it.
+        graph = Graph.objects.get(pk=self.graph.graphid)
+        graph.delete_draft_graph()
+
+        # The Designer then starts from the migrated graph.
+        graph = Graph.objects.get(pk=self.graph.graphid)
+        graph.create_draft_graph()
 
         graph = Graph.objects.get(pk=self.graph.graphid)
         graph.promote_draft_graph_to_active_graph()
