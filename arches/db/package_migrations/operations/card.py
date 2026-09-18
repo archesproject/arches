@@ -10,7 +10,7 @@ card automatically outside Graph.append_node(), so the diff must always pair
 CreateNodeGroup with CreateCard.
 
 I18n note: name, description, instructions, helptitle and helptext are
-I18n_TextFields. Values for them must be explicit {lang: value} dicts -- a bare
+I18n_TextFields. Values for them must be explicit {lang: value} dicts; a bare
 string is stored under whichever language happens to be active on the target.
 """
 
@@ -24,23 +24,14 @@ from arches.db.package_migrations.operations.base import (
 
 class CreateCard(_CreateRowOperation):
     model = models.CardModel
-    state_collection = "cards"
-    pk_field = "cardid"
     verbose_name = "card"
 
 
 class AlterCard(_AlterRowOperation):
     model = models.CardModel
-    state_collection = "cards"
-    pk_attribute = "cardid"
     verbose_name = "card"
-
-    def __init__(self, graphid, cardid, changes):
-        super().__init__(graphid, changes)
-        self.cardid = cardid
 
 
 class DeleteCard(_DeleteRowOperation):
     model = models.CardModel
-    state_collection = "cards"
     verbose_name = "card"

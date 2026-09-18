@@ -32,9 +32,7 @@ SAMPLES = [
     ops.CreateGraph(fields={"graphid": GRAPH, "name": {"en": "G"}, "slug": "g"}),
     ops.AlterGraph(graphid=GRAPH, changes={"subtitle": {"en": "s"}}),
     ops.CreateNodeGroup(graphid=GRAPH, fields={"nodegroupid": NODEGROUP}),
-    ops.AlterNodeGroup(
-        graphid=GRAPH, nodegroupid=NODEGROUP, changes={"cardinality": "n"}
-    ),
+    ops.AlterNodeGroup(graphid=GRAPH, pk=NODEGROUP, changes={"cardinality": "n"}),
     ops.DeleteNodeGroup(graphid=GRAPH, pk=NODEGROUP),
     ops.CreateNode(
         graphid=GRAPH,
@@ -46,22 +44,22 @@ SAMPLES = [
             "alias": "n",
         },
     ),
-    ops.AlterNode(graphid=GRAPH, nodeid=NODE, changes={"datatype": "concept"}),
+    ops.AlterNode(graphid=GRAPH, pk=NODE, changes={"datatype": "concept"}),
     ops.DeleteNode(graphid=GRAPH, pk=NODE),
     ops.CreateEdge(
         graphid=GRAPH,
         fields={"edgeid": EDGE, "domainnode_id": NODE, "rangenode_id": NODE},
     ),
-    ops.AlterEdge(graphid=GRAPH, edgeid=EDGE, changes={"ontologyproperty": "P1"}),
+    ops.AlterEdge(graphid=GRAPH, pk=EDGE, changes={"ontologyproperty": "P1"}),
     ops.DeleteEdge(graphid=GRAPH, pk=EDGE),
     ops.CreateCard(graphid=GRAPH, fields={"cardid": CARD, "nodegroup_id": NODEGROUP}),
-    ops.AlterCard(graphid=GRAPH, cardid=CARD, changes={"visible": False}),
+    ops.AlterCard(graphid=GRAPH, pk=CARD, changes={"visible": False}),
     ops.DeleteCard(graphid=GRAPH, pk=CARD),
     ops.CreateCardXNodeXWidget(
         graphid=GRAPH,
         fields={"id": WIDGET, "card_id": CARD, "node_id": NODE, "widget_id": WIDGET},
     ),
-    ops.AlterCardXNodeXWidget(graphid=GRAPH, id=WIDGET, changes={"visible": False}),
+    ops.AlterCardXNodeXWidget(graphid=GRAPH, pk=WIDGET, changes={"visible": False}),
     ops.DeleteCardXNodeXWidget(graphid=GRAPH, pk=WIDGET),
     ops.AddNodeToTiles(nodegroup_id=NODEGROUP, nodeid=NODE),
     ops.RemoveNodeFromTiles(nodegroup_id=NODEGROUP, nodeid=NODE),

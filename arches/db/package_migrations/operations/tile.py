@@ -3,7 +3,7 @@
 These are set-based BECAUSE the transformations here are datatype-agnostic:
 adding or removing a JSON key with a literal value carries no datatype meaning,
 creates no relationships and no geometries. Anything that does need datatype
-semantics -- converting stored values, for instance -- must go through the
+semantics (converting stored values, for instance) must go through the
 datatype layer instead, per tile. No operation in this module may branch on a
 node's datatype; that knowledge belongs to DDataType and the datatype factory.
 
@@ -28,11 +28,10 @@ from django.db.models.expressions import RawSQL
 
 from arches.app.models import models
 from arches.db.package_migrations.operations.base import (
+    DEFAULT_BATCH_SIZE,
     PackageOperation,
     keyset_batches,
 )
-
-DEFAULT_BATCH_SIZE = 5000
 
 
 class _ChunkedTileOperation(PackageOperation):
@@ -116,7 +115,7 @@ class RemoveNodeFromTiles(_ChunkedTileOperation):
     nodegroup, so removing data while the node still exists is undone by the next
     ordinary save.
 
-    Irreversible -- the values are discarded and nothing captures them.
+    Irreversible: the values are discarded and nothing captures them.
     """
 
     reversible = False
@@ -139,7 +138,7 @@ class RemoveNodeFromTiles(_ChunkedTileOperation):
 
         A stale key there is written back into data when a reviewer approves the
         edit, and Tile.save() then raises Node.DoesNotExist because the node is
-        gone -- a record no curator can fix from the UI. Arches' own graph-diff
+        gone, leaving a record no curator can fix from the UI. Arches' own graph-diff
         path prunes them for the same reason.
         """
         alias = schema_editor.connection.alias

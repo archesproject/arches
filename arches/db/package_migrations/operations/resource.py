@@ -8,11 +8,10 @@ after them.
 
 from arches.app.models import models
 from arches.db.package_migrations.operations.base import (
+    DEFAULT_BATCH_SIZE,
     PackageOperation,
     keyset_batches,
 )
-
-DEFAULT_BATCH_SIZE = 5000
 
 
 class SetResourcePublication(PackageOperation):
@@ -25,7 +24,7 @@ class SetResourcePublication(PackageOperation):
     read-only report.
 
     That is only true because the operations before it have already brought every
-    tile of the graph in line -- the stamp says "this resource matches the
+    tile of the graph in line: the stamp says "this resource matches the
     published graph", so it must run last.
 
     Set-based rather than save(): ResourceInstance.save() would re-stamp

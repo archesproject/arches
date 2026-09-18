@@ -74,7 +74,7 @@ class PackageMigrationOperationTests(ArchesTestCase):
         )
         # Edges are not optional. Graph.copy() nulls every non-collector node's
         # nodegroup and then rebuilds membership with populate_null_nodegroups(),
-        # which walks the EDGE tree -- so a graph whose nodes are not joined by
+        # which walks the EDGE tree, so a graph whose nodes are not joined by
         # edges cannot be copied, drafted or promoted.
         models.Edge.objects.create(
             edgeid=uuid.uuid4(),
@@ -193,7 +193,7 @@ class PackageMigrationOperationTests(ArchesTestCase):
     def test_removing_a_node_also_clears_it_from_provisional_edits(self):
         """A pending provisional edit is keyed by the same nodeids as tiledata. A
         stale key there is written back into data when a reviewer approves the
-        edit, and Tile.save() then raises Node.DoesNotExist -- a record no curator
+        edit, and Tile.save() then raises Node.DoesNotExist, leaving a record no curator
         can fix from the UI."""
         doomed = str(uuid.uuid4())
         keeper = str(uuid.uuid4())

@@ -1,8 +1,8 @@
-"""Diff two canonical graphs into package migration operations.
+"""Work out what changed between two graph states, as package migration operations.
 
 The original GraphPublicationComparator had eight hand-written ``check_*``
 methods, one per kind of change, and could only detect what someone had
-remembered to write a check for -- it saw 2 of ~20 top-level keys and was blind
+remembered to write a check for: it saw 2 of ~20 top-level keys and was blind
 to all 97 edges of a real resource model.
 
 None of that is needed once both sides are canonical projections of the same
@@ -23,7 +23,7 @@ Emission order matters and is fixed here rather than left to the caller:
 
 import uuid
 
-from arches.db.package_migrations.canonical import STATE_COLLECTIONS
+from arches.db.package_migrations.state import STATE_COLLECTIONS
 
 from arches.db.package_migrations.operations.resource import SetResourcePublication
 from arches.db.package_migrations.operations.tile import (
@@ -90,7 +90,7 @@ def _changed_fields(before, after):
     }
 
 
-def diff_graph(from_graph, to_graph):
+def changes_for_graph(from_graph, to_graph):
     """Operations that turn ``from_graph`` into ``to_graph``.
 
     Both are canonical projections. ``from_graph`` may be None, meaning the graph
@@ -128,7 +128,7 @@ def diff_graph(from_graph, to_graph):
             changes = _changed_fields(before[key], after[key])
             changes.pop(pk, None)
             if changes:
-                operations.append(alter(graphid=graphid, changes=changes, **{pk: key}))
+                operations.append(alter(graphid=graphid, pk=key, changes=changes))
 
     if not operations:
         return []
@@ -184,7 +184,7 @@ def _data_operations(from_graph, to_graph):
 
 
 def _publication_operations(from_graph, to_graph):
-    """Publish, then move resources onto the publication -- always last.
+    """Publish, then move resources onto the publication. Always last.
 
     Without these a migration mutates node/card/edge rows and nothing the
     application reads ever changes: the published snapshot still holds the old
@@ -208,11 +208,11 @@ def _publication_operations(from_graph, to_graph):
     ]
 
 
-def diff_package(from_state_graphs, to_state_graphs):
+def changes_for_package(from_state_graphs, to_state_graphs):
     """Operations for every graph in a package, keyed by graphid."""
     operations = []
     for graphid in sorted(to_state_graphs):
         operations.extend(
-            diff_graph(from_state_graphs.get(graphid), to_state_graphs[graphid])
+            changes_for_graph(from_state_graphs.get(graphid), to_state_graphs[graphid])
         )
     return operations

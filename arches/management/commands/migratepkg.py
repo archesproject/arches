@@ -84,7 +84,7 @@ class Command(BaseCommand):
 
         if not options["fake"]:
             # The draft is derived from the graph, so it is rebuilt once here
-            # rather than by an operation -- which is also what lets a graph be
+            # rather than by an operation, which is also what lets a graph be
             # stepped backwards through its versions.
             drafts.reconcile(drafts.graphs_in(plan), connection.alias)
 
@@ -144,7 +144,7 @@ class Command(BaseCommand):
     def _refuse_half_reversals(self, plan):
         """Django unapplies migration by migration and only raises when it reaches
         the irreversible one, so a `zero` that cannot finish still unapplies
-        everything before it -- leaving the graph on the new publication and its
+        everything before it, leaving the graph on the new publication and its
         resources on the old, which is the read-only state. Refuse up front.
         """
         for migration, backwards in plan:

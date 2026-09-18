@@ -1,14 +1,14 @@
-"""Tests for arches.app.utils.graph_diff.apply_graph_diff."""
+"""Tests for arches.app.utils.graph_change.apply_graph_change."""
 
 from unittest.mock import patch
 
 from arches.app.models import models
-from arches.app.utils.graph_diff import apply_graph_diff
+from arches.app.utils.graph_change import apply_graph_change
 
 from tests.tasks_tests import UpdateResourceInstanceDataTaskTests
 
 
-class ApplyGraphDiffTests(UpdateResourceInstanceDataTaskTests):
+class ApplyGraphChangeTests(UpdateResourceInstanceDataTaskTests):
     def _publish_with_node_deleted(self):
         """Delete the concept node and republish, returning (initial, updated)."""
         initial = models.PublishedGraph.objects.get(
@@ -28,7 +28,7 @@ class ApplyGraphDiffTests(UpdateResourceInstanceDataTaskTests):
         return initial, updated
 
     @patch("arches.app.tasks.notify_completion")
-    def test_reports_touched_resources_and_graphs(self, mock_notify):
+    def test_moves_resources_onto_the_new_publication(self, mock_notify):
         resource_instance = models.ResourceInstance.objects.create(
             graph=self.test_graph
         )
@@ -39,10 +39,13 @@ class ApplyGraphDiffTests(UpdateResourceInstanceDataTaskTests):
         )
         initial, updated = self._publish_with_node_deleted()
 
-        result = apply_graph_diff(initial, updated)
+        moved = apply_graph_change(initial, updated)
 
-        self.assertIn(resource_instance.pk, result["touched_resource_instance_ids"])
-        self.assertIn(str(self.test_graph.graphid), result["touched_graph_ids"])
+        self.assertEqual(moved, 1)
+        resource_instance.refresh_from_db()
+        self.assertEqual(
+            str(resource_instance.graph_publication_id), updated["publication_id"]
+        )
 
     @patch("arches.app.tasks.notify_completion")
     def test_prunes_deleted_node_from_provisionaledits(self, mock_notify):
@@ -50,7 +53,7 @@ class ApplyGraphDiffTests(UpdateResourceInstanceDataTaskTests):
 
         If a deleted node's key survives there, approving the pending edit later
         writes it back into data, and Tile.save() then raises Node.DoesNotExist
-        because the node is gone -- leaving a record no curator can fix from the UI.
+        because the node is gone, leaving a record no curator can fix from the UI.
         """
         resource_instance = models.ResourceInstance.objects.create(
             graph=self.test_graph
@@ -72,7 +75,7 @@ class ApplyGraphDiffTests(UpdateResourceInstanceDataTaskTests):
         )
         initial, updated = self._publish_with_node_deleted()
 
-        apply_graph_diff(initial, updated)
+        apply_graph_change(initial, updated)
 
         tile.refresh_from_db()
         self.assertNotIn(str(self.concept_node_id), tile.data)

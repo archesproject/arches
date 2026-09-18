@@ -7,7 +7,7 @@ produces the same migration on every machine and the result is reproducible in C
 
 Structural operations and chunked data operations are written into separate
 migrations. Graph foreign keys are DEFERRABLE INITIALLY DEFERRED, which lets
-structural operations run in any order inside one transaction -- a guarantee that
+structural operations run in any order inside one transaction, a guarantee that
 disappears under `atomic = False`, which the chunked data operations require.
 """
 
@@ -19,8 +19,8 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import migrations
 from django.db.migrations.autodetector import MigrationAutodetector
 
-from arches.db.package_migrations.canonical import canonical_graph
-from arches.db.package_migrations.diff import diff_package
+from arches.db.package_migrations.autodetector import changes_for_package
+from arches.db.package_migrations.state import canonical_graph
 from arches.db.package_migrations.loader import PackageMigrationLoader
 from arches.db.package_migrations.operations.node import AlterNode
 from arches.db.package_migrations.writer import PackageMigrationWriter
@@ -75,8 +75,8 @@ class Command(BaseCommand):
                 )
             )
 
-        operations = diff_package(from_state.graphs, to_graphs)
-        self._warn_about_stranded_data(operations, to_graphs)
+        operations = changes_for_package(from_state.graphs, to_graphs)
+        self._warn_about_data_the_generator_cannot_convert(operations, to_graphs)
         if not operations:
             if self.verbosity >= 1:
                 self.stdout.write("No changes detected.")
@@ -97,7 +97,7 @@ class Command(BaseCommand):
         # records, chunk their own work, and must not. Keeping them in separate
         # files is what makes the ordering true rather than conventional: the
         # graph is published first, and resources stay on the old publication --
-        # read-only -- until the data migration has brought their tiles in line
+        # read-only, until the data migration has brought their tiles in line
         # and moved them.
         dependency = leaf
         number = (MigrationAutodetector.parse_number(leaf[1]) if leaf else None) or 0
@@ -118,38 +118,41 @@ class Command(BaseCommand):
                 for operation in group:
                     self.stdout.write("    - %s" % operation.describe())
 
-    def _warn_about_stranded_data(self, operations, to_graphs):
-        """A node that changes nodegroup leaves its stored values behind.
-
-        A tile belongs to exactly one nodegroup, so moving a node's values means
-        moving them between tiles -- which needs a decision about cardinality that
-        no generator can make. The structural change is emitted either way; saying
-        nothing would leave the data unreadable with no warning.
-        """
+    def _warn_about_data_the_generator_cannot_convert(self, operations, to_graphs):
+        """Two node changes leave stored values behind, and neither can be fixed
+        automatically: the conversion needs a decision a diff cannot make."""
         for operation in operations:
             if not isinstance(operation, AlterNode):
-                continue
-            if "nodegroup_id" not in operation.changes:
                 continue
             node = (
                 to_graphs.get(str(operation.graphid), {})
                 .get("nodes", {})
-                .get(str(operation.nodeid), {})
+                .get(str(operation.pk), {})
             )
-            self.stderr.write(
-                self.style.WARNING(
+            name = node.get("alias") or operation.pk
+
+            if "nodegroup_id" in operation.changes:
+                self._warn(
                     "Node %s (%s) is moving to nodegroup %s. Values already stored "
                     "for it stay in the old nodegroup's tiles, where nothing reads "
                     "them. Moving them means moving values between tiles, which "
                     "depends on cardinality: write a RunPackagePython migration to "
                     "do it, or accept that the existing values are stranded."
-                    % (
-                        node.get("alias") or operation.nodeid,
-                        operation.nodeid,
-                        operation.changes["nodegroup_id"],
-                    )
+                    % (name, operation.pk, operation.changes["nodegroup_id"])
                 )
-            )
+
+            if "datatype" in operation.changes:
+                self._warn(
+                    "Node %s (%s) is changing datatype to '%s'. Values already "
+                    "stored for it keep the old shape, and tile JSONB is cast "
+                    "straight to the node's declared datatype when it is read: "
+                    "write a RunPackagePython migration in the same release to "
+                    "convert them."
+                    % (name, operation.pk, operation.changes["datatype"])
+                )
+
+    def _warn(self, message):
+        self.stderr.write(self.style.WARNING(message))
 
     def _committed_graphs(self, app_config):
         root = os.path.join(app_config.path, "pkg", "graphs")

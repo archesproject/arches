@@ -3,7 +3,7 @@
 MigrationWriter.basedir calls MigrationLoader.migrations_module on the BASE class
 (django writer.py:220), not on ``self``, so overriding that classmethod on
 PackageMigrationLoader has no effect on where files land. Left alone, generated
-package migrations are written into <app>/migrations/ -- where Django's own
+package migrations are written into <app>/migrations/, where Django's own
 loader picks them up and `manage.py migrate` executes them against a real
 ProjectState.
 """
@@ -12,6 +12,8 @@ import os
 
 from django.apps import apps
 from django.db.migrations.writer import MigrationWriter
+
+from arches.db.package_migrations.loader import PACKAGE_MIGRATIONS_MODULE_NAME
 
 
 class PackageMigrationWriter(MigrationWriter):
@@ -23,4 +25,4 @@ class PackageMigrationWriter(MigrationWriter):
                 "App '%s' is not an Arches application, so it cannot hold package "
                 "migrations." % self.migration.app_label
             )
-        return os.path.join(app_config.path, "migrations", "package_migrations")
+        return os.path.join(app_config.path, *PACKAGE_MIGRATIONS_MODULE_NAME.split("."))

@@ -1,7 +1,7 @@
 """End-to-end: a real package migration, applied and reversed by migratepkg.
 
 The fixture app is built in a temp directory rather than under tests/, because
-ArchesTestRunner rewrites test discovery from test*.py to *.py -- a migration
+ArchesTestRunner rewrites test discovery from test*.py to *.py: a migration
 module living here would be imported as a test module.
 """
 

@@ -9,13 +9,18 @@ import inspect
 from django.db.migrations.operations.base import Operation
 from django.utils.inspect import get_func_args
 
+from arches.db.package_migrations.state import collection_for, fields_for
+
+
+DEFAULT_BATCH_SIZE = 5000
+
 
 def keyset_batches(queryset, pk_field, batch_size):
     """Yield lists of primary keys in pk order, resuming after the last one seen.
 
     Operations that run outside a transaction walk their work this way: each
     batch commits on its own, so locks are released and a killed run resumes.
-    The cursor is what bounds the work -- without it the database re-scans from
+    The cursor is what bounds the work: without it the database re-scans from
     the start of the table on every batch.
     """
     last = None
@@ -72,7 +77,7 @@ class PackageOperation(Operation):
 
         if cls.scope not in ("graph", "data"):
             raise TypeError(
-                '%s must set scope to "graph" or "data" -- it decides which '
+                '%s must set scope to "graph" or "data"; it decides which '
                 "migration the operation is written into." % cls.__name__
             )
         for name in ("describe", "migration_name_fragment"):
@@ -88,7 +93,7 @@ class PackageOperation(Operation):
         generated migration files fully self-describing.
 
         OperationWriter silently drops any kwarg whose name is not an __init__
-        parameter, so attribute names must match parameter names -- a mismatch
+        parameter, so attribute names must match parameter names, so a mismatch
         surfaces here as AttributeError rather than as a quietly empty call in a
         generated file.
         """
@@ -113,7 +118,7 @@ class _AlterRowOperation(PackageOperation):
 
     All six do the same thing: write a dict of field changes onto one row, and
     reverse by reading the previous values back out of the replayed state. The
-    operation carries only the NEW values -- unapply() phase 1 replays state
+    operation carries only the NEW values, because unapply() phase 1 replays state
     forwards, so to_state still holds the old ones, exactly as Django's
     AlterField recovers the previous field definition.
 
@@ -123,17 +128,20 @@ class _AlterRowOperation(PackageOperation):
     reversible = True
     scope = "graph"
     model = None
-    state_collection = None  # "nodes", "cards", ...
-    pk_attribute = None  # the __init__ parameter holding the row's pk
     verbose_name = None  # "node", "card", ... drives describe() and the file name
 
-    def __init__(self, graphid, changes):
-        self.graphid = graphid
-        self.changes = changes
+    @property
+    def state_collection(self):
+        return collection_for(self.model)[0]
 
     @property
     def _pk(self):
-        return getattr(self, self.pk_attribute)
+        return str(self.pk)
+
+    def __init__(self, graphid, pk, changes):
+        self.graphid = graphid
+        self.pk = pk
+        self.changes = changes
 
     def _entry(self, state):
         return (
@@ -185,11 +193,22 @@ class _RowOperation(PackageOperation):
 
     scope = "graph"
     model = None
-    state_collection = None
-    pk_field = None
     verbose_name = None  # "node", "card", ... drives describe() and the file name
-    # NodeGroup and CardXNodeXWidget rows carry no graph FK.
-    has_graph_fk = True
+
+    @property
+    def state_collection(self):
+        return collection_for(self.model)[0]
+
+    @property
+    def pk_field(self):
+        return collection_for(self.model)[1]
+
+    @property
+    def has_graph_fk(self):
+        # NodeGroup and CardXNodeXWidget rows carry no graph FK.
+        return "graph_id" in {
+            field.attname for field in self.model._meta.concrete_fields
+        }
 
     # Renders one key per line in generated migrations instead of one long dict.
     serialization_expand_args = ["fields"]
@@ -206,8 +225,6 @@ class _RowOperation(PackageOperation):
         from the model rather than from a constructor signature, so they cannot
         drift from it.
         """
-        from arches.db.package_migrations.canonical import fields_for
-
         completed = {}
         missing_required = []
         for name in fields_for(self.model):

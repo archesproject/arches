@@ -1,4 +1,4 @@
-"""Canonical projection: shape, stability, and agreement with the operations.
+"""The projection into state: shape, stability, and agreement with the operations.
 
 No database.
 """
@@ -8,11 +8,11 @@ import uuid
 from django.test import SimpleTestCase
 
 from arches.app.models import models
-from arches.db.package_migrations.canonical import (
+from arches.db.package_migrations.state import (
+    PackageState,
     canonical_graph,
     fields_for,
 )
-from arches.db.package_migrations.state import PackageState
 from arches.db.package_migrations.operations.card import CreateCard
 from arches.db.package_migrations.operations.edge import CreateEdge
 from arches.db.package_migrations.operations.graph import CreateGraph
@@ -114,7 +114,7 @@ class CanonicalProjectionTests(SimpleTestCase):
 
     def test_tuples_normalize(self):
         """A tuple and a list compare unequal, so config that round-trips through
-        Python must land as a list. (Sets cannot reach here -- config comes from
+        Python must land as a list. (Sets cannot reach here; config comes from
         JSONB.)"""
         graph = _serialized_graph()
         graph["nodes"][0]["config"] = {"options": ("b", "a")}
@@ -132,7 +132,7 @@ class OperationStateMatchesProjectionTests(SimpleTestCase):
     """
 
     def test_projection_covers_every_package_content_column(self):
-        from arches.db.package_migrations.canonical import EXCLUDED_FIELDS
+        from arches.db.package_migrations.state import EXCLUDED_FIELDS
 
         for model in (
             models.GraphModel,
@@ -172,7 +172,7 @@ class OperationStateMatchesProjectionTests(SimpleTestCase):
                 )
                 stored = state.graphs[GRAPH][collection][key]
                 # State holds every column, because that is what the row will hold
-                # once created -- absent keys come from the model's own defaults.
+                # once created; absent keys come from the model's own defaults.
                 # Wherever the committed file speaks, state must agree with it, or
                 # the next diff invents a change nobody made.
                 self.assertEqual(

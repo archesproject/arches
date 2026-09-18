@@ -1,7 +1,7 @@
 """makepkgmigrations: generate from committed JSON, then apply what was generated.
 
-Generation reads only the repo -- committed graph JSON on one side, replayed
-migration state on the other -- so these assertions hold regardless of what is in
+Generation reads only the repo (committed graph JSON on one side, replayed
+migration state on the other), so these assertions hold regardless of what is in
 the database.
 """
 
@@ -83,7 +83,7 @@ class MakePkgMigrationsTests(PackageMigrationOperationTests):
 
     def test_no_changes_when_json_matches_replayed_state(self):
         """The graph exists in the database but not in migration history, so the
-        diff is against an empty replayed state -- everything in the JSON is new."""
+        diff is against an empty replayed state: everything in the JSON is new."""
         self._commit_graph()
         with self._installed():
             out = StringIO()
@@ -250,3 +250,18 @@ class MakePkgMigrationsTests(PackageMigrationOperationTests):
             call_command("makepkgmigrations", APP_NAME, verbosity=0, stderr=err)
             self.assertIn("stranded", err.getvalue())
             self.assertIn(str(self.string_node.nodeid), err.getvalue())
+
+    def test_changing_a_datatype_warns_that_stored_values_are_not_converted(self):
+        serialized = self._commit_graph()
+        with self._installed():
+            call_command("makepkgmigrations", APP_NAME, verbosity=0)
+
+            for node in serialized["nodes"]:
+                if str(node["nodeid"]) == str(self.string_node.nodeid):
+                    node["datatype"] = "concept"
+            self._write_graph(serialized)
+
+            err = StringIO()
+            call_command("makepkgmigrations", APP_NAME, verbosity=0, stderr=err)
+            self.assertIn("changing datatype to 'concept'", err.getvalue())
+            self.assertIn("RunPackagePython", err.getvalue())

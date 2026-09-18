@@ -12,7 +12,7 @@ from django.http import HttpRequest
 from django.utils.translation import gettext as _
 from arches.app.models import models
 from arches.app.utils import import_class_from_string
-from arches.app.utils.graph_diff import apply_graph_diff
+from arches.app.utils.graph_change import apply_graph_change
 from arches.app.utils.message_contexts import return_message_context
 from tempfile import NamedTemporaryFile
 
@@ -643,12 +643,12 @@ def update_resource_instance_data_based_on_graph_diff(
     )
 
     try:
-        result = apply_graph_diff(initial_graph, updated_graph)
+        resource_instance_count = apply_graph_change(initial_graph, updated_graph)
 
         notify_completion(
             _(
                 "Business has been updated in concurrence with publishing the latest model. {} Resource Instances updated.".format(
-                    result["resource_instance_count"]
+                    resource_instance_count
                 )
             ),
             user,

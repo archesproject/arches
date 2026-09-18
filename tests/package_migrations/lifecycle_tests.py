@@ -16,7 +16,7 @@ from arches.db.package_migrations.operations.node import CreateNode
 from arches.db.package_migrations.operations.nodegroup import CreateNodeGroup
 from arches.db.package_migrations.operations.resource import SetResourcePublication
 from arches.db.package_migrations import drafts
-from arches.db.package_migrations.operations.graph import PublishGraph
+from arches.db.package_migrations.operations.graph import CreateGraph, PublishGraph
 
 from tests.package_migrations.spike_tests import (
     PackageMigrationOperationTests,
@@ -146,3 +146,34 @@ class PublicationLifecycleTests(PackageMigrationOperationTests):
             "reconciling the draft must keep it in step so a later publish does "
             "not revert the migration",
         )
+
+    def test_creating_a_graph_reverses_only_while_it_holds_no_resources(self):
+        """Reversing a CreateGraph deletes the graph, and ResourceInstance.graph is
+        CASCADE, so on a fresh install it is ordinary, and on a site with data it
+        is the destruction of every resource on that model."""
+        graphid = str(uuid.uuid4())
+        operation = CreateGraph(
+            fields={
+                "graphid": graphid,
+                "name": "Throwaway",
+                "slug": "throwaway_%s" % graphid[:8],
+                "isresource": True,
+            }
+        )
+        operation.database_forwards(
+            "arches", self.schema_editor, self._state(), self._state()
+        )
+        self.assertTrue(models.GraphModel.objects.filter(pk=graphid).exists())
+
+        resource = models.ResourceInstance.objects.create(graph_id=graphid)
+        with self.assertRaises(ValueError):
+            operation.database_backwards(
+                "arches", self.schema_editor, self._state(), self._state()
+            )
+        self.assertTrue(models.GraphModel.objects.filter(pk=graphid).exists())
+
+        resource.delete()
+        operation.database_backwards(
+            "arches", self.schema_editor, self._state(), self._state()
+        )
+        self.assertFalse(models.GraphModel.objects.filter(pk=graphid).exists())

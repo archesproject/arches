@@ -1,11 +1,11 @@
 """Graph operations: the graph row and its publication.
 
-The draft copy is derived state, reconciled once per run -- see db/package_migrations/drafts.py.
+The draft copy is derived state, reconciled once per run; see db/package_migrations/drafts.py.
 
 CreateGraph uses models.GraphModel.objects.create(), NOT
 Graph.objects.create_graph(). The latter mints a random root nodeid, publishes
 with a random publicationid and creates a second GraphModel row (a draft), none
-of which a migration can predict or reproduce on another install -- and the
+of which a migration can predict or reproduce on another install, and the
 leftover draft then makes Graph.validate() raise code 1019 for every later
 operation in the same migration.
 
@@ -17,7 +17,7 @@ from django.conf import settings
 
 from arches.app.models import models
 from arches.app.models.graph import Graph
-from arches.db.package_migrations.canonical import STATE_COLLECTIONS
+from arches.db.package_migrations.state import STATE_COLLECTIONS
 from arches.db.package_migrations.operations.base import (
     PackageOperation,
     _AlterRowOperation,
@@ -26,12 +26,16 @@ from arches.db.package_migrations.operations.base import (
 
 
 class CreateGraph(PackageOperation):
-    """Irreversible: deleting a graph CASCADEs through ResourceInstance to every
-    tile on it. Removing a graph is a deliberate, separately-confirmed act, not
-    the reverse of a migration.
+    """Reversible only while the graph holds no resources.
+
+    ResourceInstance.graph is on_delete=CASCADE, so deleting a graph destroys
+    every resource on it and every tile under them. Rolling back a package on a
+    dev machine, in CI, or on a fresh install is ordinary and safe; rolling one
+    back on a site with data is not the same act at all, and migratepkg refuses
+    it before anything runs rather than discovering it halfway through.
     """
 
-    reversible = False
+    reversible = True
     scope = "graph"
     serialization_expand_args = ["fields"]
 
@@ -61,6 +65,21 @@ class CreateGraph(PackageOperation):
             )
         self.qs(models.GraphModel, schema_editor).create(**fields)
 
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        if self.has_resources(schema_editor.connection.alias):
+            raise ValueError(
+                "Graph %s has resource instances. Deleting it would delete them "
+                "and their tiles." % self.graphid
+            )
+        self.qs(models.GraphModel, schema_editor).filter(pk=self.graphid).delete()
+
+    def has_resources(self, using):
+        return (
+            models.ResourceInstance.objects.using(using)
+            .filter(graph_id=self.graphid)
+            .exists()
+        )
+
     def describe(self):
         return "Create graph %s" % (self.fields.get("slug") or self.graphid)
 
@@ -77,12 +96,10 @@ class AlterGraph(_AlterRowOperation):
     """
 
     model = models.GraphModel
-    state_collection = None  # the graph dict itself, not a collection on it
     verbose_name = "graph"
 
-    @property
-    def _pk(self):
-        return self.graphid
+    def __init__(self, graphid, changes):
+        super().__init__(graphid, graphid, changes)
 
     def _entry(self, state):
         return state.graph(self.graphid)
@@ -92,7 +109,7 @@ class PublishGraph(PackageOperation):
     """Mint a publication with a portable id.
 
     Graph rows only. Moving resources onto the publication is SetResourcePublication's
-    job, in the data operations -- these two run in the same migration but they are
+    job, in the data operations. These two run in the same migration, but they are
     not the same change, and the reverse order matters: unapply() reverses operation
     order, so the resources come off this publication before it is deleted.
     """

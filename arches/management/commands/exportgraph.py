@@ -2,7 +2,7 @@
 
 This is the analogue of editing models.py. You author a graph in the Graph
 Designer, export it here, and the committed JSON becomes the desired state that
-makepkgmigrations diffs against -- which is what lets generation run without a
+makepkgmigrations diffs against, which is what lets generation run without a
 database and produce the same migration on every machine.
 """
 

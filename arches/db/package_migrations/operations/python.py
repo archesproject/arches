@@ -1,12 +1,12 @@
 """Run arbitrary Python against package data.
 
-The escape hatch for changes no other operation expresses -- a datatype
+The escape hatch for changes no other operation expresses: a datatype
 conversion, for instance, where the new value has to be computed from the old.
 
 Mirrors django.db.migrations.RunPython, with one documented difference: there is
 no historical model registry for package data, so the callable receives live
 models. A package migration written against today's models may need revisiting
-when those models change -- which is the honest trade for having an escape hatch
+when those models change, which is the honest trade for having an escape hatch
 at all.
 """
 

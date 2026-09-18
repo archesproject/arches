@@ -1,5 +1,3 @@
-"""Nodegroup operations."""
-
 from arches.app.models import models
 from arches.db.package_migrations.operations.base import (
     _AlterRowOperation,
@@ -13,26 +11,18 @@ class CreateNodeGroup(_CreateRowOperation):
     FK is DEFERRABLE INITIALLY DEFERRED, so this relies on an atomic migration."""
 
     model = models.NodeGroup
-    state_collection = "nodegroups"
-    pk_field = "nodegroupid"
     verbose_name = "nodegroup"
-    has_graph_fk = False
 
 
 class AlterNodeGroup(_AlterRowOperation):
     model = models.NodeGroup
-    state_collection = "nodegroups"
-    pk_attribute = "nodegroupid"
     verbose_name = "nodegroup"
-
-    def __init__(self, graphid, nodegroupid, changes):
-        super().__init__(graphid, changes)
-        self.nodegroupid = nodegroupid
 
 
 class DeleteNodeGroup(_DeleteRowOperation):
-    """ORM-cascades to the nodegroup's Nodes, Cards and (via Card) its
-    CardXNodeXWidgets, so the state removal has to follow.
+    """Deleting the row ORM-cascades to the nodegroup's nodes and cards, to the
+    widgets on those cards, and to the edges joining those nodes, so state has
+    to lose them too, or a later diff emits deletes for rows already gone.
 
     It does NOT remove tiles: TileModel.nodegroup is db_constraint=False,
     on_delete=DO_NOTHING, so orphaned tiles need DeleteTilesForNodeGroup.
@@ -41,15 +31,25 @@ class DeleteNodeGroup(_DeleteRowOperation):
     """
 
     model = models.NodeGroup
-    state_collection = "nodegroups"
     verbose_name = "nodegroup"
-    has_graph_fk = False
     reversible = False
 
     def state_forwards(self, app_label, state):
         graph = state.graph(self.graphid)
         graph["nodegroups"].pop(self._pk, None)
-        for collection in ("nodes", "cards"):
+
+        gone = {"nodes": set(), "cards": set()}
+        for collection in gone:
             for key, entry in list(graph.get(collection, {}).items()):
                 if str(entry.get("nodegroup_id")) == self._pk:
+                    gone[collection].add(key)
                     del graph[collection][key]
+
+        for key, widget in list(graph.get("widgets", {}).items()):
+            if str(widget.get("card_id")) in gone["cards"]:
+                del graph["widgets"][key]
+
+        for key, edge in list(graph.get("edges", {}).items()):
+            ends = {str(edge.get("domainnode_id")), str(edge.get("rangenode_id"))}
+            if ends & gone["nodes"]:
+                del graph["edges"][key]

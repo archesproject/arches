@@ -17,25 +17,14 @@ from arches.db.package_migrations.operations.base import (
 
 class CreateCardXNodeXWidget(_CreateRowOperation):
     model = models.CardXNodeXWidget
-    state_collection = "widgets"
-    pk_field = "id"
     verbose_name = "widget"
-    has_graph_fk = False
 
 
 class AlterCardXNodeXWidget(_AlterRowOperation):
     model = models.CardXNodeXWidget
-    state_collection = "widgets"
-    pk_attribute = "id"
     verbose_name = "widget"
-
-    def __init__(self, graphid, id, changes):
-        super().__init__(graphid, changes)
-        self.id = id
 
 
 class DeleteCardXNodeXWidget(_DeleteRowOperation):
     model = models.CardXNodeXWidget
-    state_collection = "widgets"
     verbose_name = "widget"
-    has_graph_fk = False
