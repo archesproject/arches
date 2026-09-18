@@ -56,11 +56,26 @@ class SetResourcePublication(PackageOperation):
         pass  # data only, like RunPython
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        # The graph's CURRENT publication, not the one recorded here. They are the
+        # same on any install that ran the graph migration, and they differ on the
+        # machine the change was authored on, where the Designer published under
+        # its own id and the graph migration was recorded rather than run. Reading
+        # it makes this operation say what it means: resources match the graph.
+        publication_id = (
+            self.qs(models.GraphModel, schema_editor)
+            .filter(pk=self.graphid)
+            .values_list("publication_id", flat=True)
+            .first()
+        )
+        if publication_id is None:
+            raise ValueError(
+                "Graph %s has no publication to move its resources onto." % self.graphid
+            )
         return self._move(
             self.qs(models.ResourceInstance, schema_editor)
             .filter(graph_id=self.graphid)
-            .exclude(graph_publication_id=self.publication_id),
-            self.publication_id,
+            .exclude(graph_publication_id=publication_id),
+            publication_id,
         )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
@@ -88,10 +103,7 @@ class SetResourcePublication(PackageOperation):
         return total
 
     def describe(self):
-        return "Set resources on graph %s to publication %s" % (
-            self.graphid,
-            self.publication_id,
-        )
+        return "Set resources on graph %s to its current publication" % self.graphid
 
     @property
     def migration_name_fragment(self):
