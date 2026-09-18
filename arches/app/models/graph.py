@@ -21,9 +21,10 @@ import logging
 import uuid
 from contextlib import contextmanager
 from copy import deepcopy
+from django.core.cache import caches
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connection
-from django.db.models import Q, prefetch_related_objects
+from django.db.models import Q, FETCH_RAISE, prefetch_related_objects
 from django.db.utils import IntegrityError
 from arches.app.const import IntegrityCheck
 from arches.app.models import models
@@ -89,13 +90,6 @@ class Graph(models.GraphModel):
                         "spatial_views",
                     ):
                         setattr(self, key, value)
-
-                try:
-                    self.update_permissions_from_serialized_graph(args[0])
-                except (
-                    AttributeError
-                ):  # AttributeError happens if attempting to update permissions on a non-existent NodeGroup
-                    pass
 
                 nodegroups = dict(
                     (item["nodegroupid"], item) for item in args[0]["nodegroups"]
@@ -436,12 +430,15 @@ class Graph(models.GraphModel):
         self.resource_instance_lifecycle = resource_instance_lifecycle_query.first()
 
         if not self.resource_instance_lifecycle:
-            self.resource_instance_lifecycle = models.ResourceInstanceLifecycle(
-                id=resource_instance_lifecycle["id"],
-                name=resource_instance_lifecycle["name"],
+            self.resource_instance_lifecycle = (
+                models.ResourceInstanceLifecycle.objects.create(
+                    id=resource_instance_lifecycle["id"],
+                    name=resource_instance_lifecycle["name"],
+                )
             )
 
             resource_instance_lifecycle_states = []
+            pending_next_and_previous_states = []
             for resource_instance_lifecycle_state_json in resource_instance_lifecycle[
                 "resource_instance_lifecycle_states"
             ]:
@@ -462,20 +459,35 @@ class Graph(models.GraphModel):
                     )
                 )
 
+                resource_instance_lifecycle_states.append(
+                    resource_instance_lifecycle_state
+                )
+                pending_next_and_previous_states.append(
+                    (
+                        resource_instance_lifecycle_state,
+                        next_resource_instance_lifecycle_states,
+                        previous_resource_instance_lifecycle_states,
+                    )
+                )
+
+            # states must be saved before their next/previous M2M relations can
+            # be set, since those relations are inserted directly into the
+            # through table without a pre-check that the referenced rows exist
+            self.resource_instance_lifecycle.resource_instance_lifecycle_states.set(
+                resource_instance_lifecycle_states, bulk=False
+            )
+
+            for (
+                resource_instance_lifecycle_state,
+                next_resource_instance_lifecycle_states,
+                previous_resource_instance_lifecycle_states,
+            ) in pending_next_and_previous_states:
                 resource_instance_lifecycle_state.next_resource_instance_lifecycle_states.set(
                     next_resource_instance_lifecycle_states
                 )
                 resource_instance_lifecycle_state.previous_resource_instance_lifecycle_states.set(
                     previous_resource_instance_lifecycle_states
                 )
-
-                resource_instance_lifecycle_states.append(
-                    resource_instance_lifecycle_state
-                )
-
-            self.resource_instance_lifecycle.resource_instance_lifecycle_states.set(
-                resource_instance_lifecycle_states, bulk=False
-            )
 
         self.has_unpublished_changes = True
 
@@ -623,19 +635,20 @@ class Graph(models.GraphModel):
                     )
 
             # edge case for instantiating a serialized_graph that has a resource_instance_lifecycle not already in the system
-            if self.resource_instance_lifecycle and not len(
-                models.ResourceInstanceLifecycle.objects.filter(
+            if (
+                self.resource_instance_lifecycle
+                and not models.ResourceInstanceLifecycle.objects.filter(
                     pk=self.resource_instance_lifecycle.pk
-                )
+                ).exists()
             ):
+                self.resource_instance_lifecycle.save()
+
                 for (
                     resource_instance_lifecycle_state
                 ) in (
                     self.resource_instance_lifecycle.resource_instance_lifecycle_states.all()
                 ):
                     resource_instance_lifecycle_state.save()
-
-                self.resource_instance_lifecycle.save()
 
             for nodegroup in self._nodegroups_to_delete:
                 nodegroup.delete()
@@ -1004,10 +1017,6 @@ class Graph(models.GraphModel):
 
         for node in copy_of_self.nodes.values():
             node.is_immutable = bool(node.is_immutable or self.is_copy_immutable)
-
-            if node.datatype == "geojson-feature-collection":
-                node.config["advancedStyle"] = ""
-                node.config["advancedStyling"] = False
 
         copy_of_self.pk = uuid.uuid4()
         node_map = {}
@@ -1765,6 +1774,8 @@ class Graph(models.GraphModel):
                         group_permissions_to_create
                     )
 
+                transaction.on_commit(lambda: caches["user_permission"].clear())
+
     def get_user_permissions(self, force_recalculation=False):
         """
         get the user permissions associated with this graph
@@ -2047,9 +2058,10 @@ class Graph(models.GraphModel):
             else:
                 ret.pop("group_permissions", None)
 
-            ret["spatial_views"] = models.SpatialView.objects.select_related().filter(
-                geometrynode__graph__in=[self.source_identifier_id, self.graphid]
-            )
+            # Bark if any related fields are unintentionally fetched.
+            ret["spatial_views"] = models.SpatialView.objects.fetch_mode(
+                FETCH_RAISE
+            ).filter(geometrynode__graph__in=[self.source_identifier_id, self.graphid])
             ret["domain_connections"] = (
                 self.get_valid_domain_ontology_classes()
                 if "domain_connections" not in exclude
@@ -2217,10 +2229,8 @@ class Graph(models.GraphModel):
 
         if self.get_draft_graph():
             raise GraphValidationError(
-                _(
-                    "You cannot save a graph that has an active draft. \
-                        Please publish or delete the draft before saving this graph."
-                ),
+                _("You cannot save a graph that has an active draft. \
+                        Please publish or delete the draft before saving this graph."),
                 1019,
             )
 
@@ -2769,7 +2779,12 @@ class Graph(models.GraphModel):
             updated_graph.widgets = widget_dict
             updated_graph.is_active = serialized_graph.get("is_active", self.is_active)
 
-            updated_graph.update_permissions_from_serialized_graph(serialized_graph)
+            try:
+                updated_graph.update_permissions_from_serialized_graph(serialized_graph)
+            except (
+                AttributeError
+            ):  # AttributeError happens if attempting to update permissions on a non-existent NodeGroup
+                pass
 
             relatable_resource_model_nodes = models.Node.objects.filter(
                 graph_id__in=serialized_graph["relatable_resource_model_ids"],

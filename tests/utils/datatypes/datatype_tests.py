@@ -36,7 +36,6 @@ from arches.app.models.models import (
 from arches.app.models.tile import Tile
 from tests.base_test import ArchesTestCase
 
-
 # these tests can be run from the command line via
 # python manage.py test tests.utils.datatypes.datatype_tests --settings="tests.test_settings"
 

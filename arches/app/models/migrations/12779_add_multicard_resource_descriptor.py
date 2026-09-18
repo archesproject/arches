@@ -1,6 +1,5 @@
 from django.db import migrations
 
-
 FUNCTION_ID = "00b2d15a-fda0-4578-b79a-784e4138664b"
 
 

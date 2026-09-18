@@ -36,7 +36,6 @@ from arches.app.utils.data_management.resource_graphs.importer import (
     import_graph as ResourceGraphImporter,
 )
 
-
 # these tests can be run from the command line via
 # python manage.py test tests.exporter.resource_export_tests --settings="tests.test_settings"
 

@@ -7,8 +7,9 @@ from django.core import management
 from django.test.client import RequestFactory, Client
 from django.test.utils import captured_stdout
 from django.urls import reverse
-from django.db import connection
-from tests.base_test import ArchesTestCase, CREATE_TOKEN_SQL, DELETE_TOKEN_SQL
+from oauth2_provider.models import AccessToken
+
+from tests.base_test import ArchesTestCase
 from arches.app.utils.skos import SKOSReader
 from arches.app.models.graph import Graph
 from arches.app.models.models import TileModel
@@ -37,13 +38,14 @@ class JsonLDImportTests(ArchesTestCase):
         cls.token = "abc123"
         cls.client = Client(HTTP_AUTHORIZATION="Bearer %s" % cls.token)
 
-        sql_str = CREATE_TOKEN_SQL.format(
+        AccessToken.objects.create(
             token=cls.token,
+            expires="2068-01-01",
+            scope="read write",
+            application_id=44,
             user_id=1,
             token_checksum=hashlib.sha256(cls.token.encode("utf-8")).hexdigest(),
         )
-        with connection.cursor() as cursor:
-            cursor.execute(sql_str)
 
         skos = SKOSReader()
         rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/jsonld_test_thesaurus.xml")
@@ -209,19 +211,6 @@ class JsonLDImportTests(ArchesTestCase):
                 graph.create_draft_graph()
 
             graph.publish(user=User.objects.get(pk=1))
-
-    @classmethod
-    def tearDownClass(cls):
-        with connection.cursor() as cursor:
-            cursor.execute(DELETE_TOKEN_SQL)
-
-        super().tearDownClass()
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
 
     def _create_url(self, graph_id, resource_id):
         base_url = reverse(

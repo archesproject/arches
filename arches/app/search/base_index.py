@@ -94,7 +94,7 @@ class BaseIndex(object):
                 if len(resources) > 1
                 else None
             )
-        with self.se.BulkIndexer(batch_size=batch_size, refresh=True) as indexer:
+        with self.se.BulkIndexer(batch_size=batch_size) as indexer:
             for resource in resources:
                 if quiet is False and bar is not None:
                     bar.update(item_id=resource)

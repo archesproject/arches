@@ -163,6 +163,23 @@ class TileData(View):
                             _("This tile is no longer available"),
                             _("It was likely deleted by another user"),
                         )
+                    # Don't allow an existing tile to be reassigned to a
+                    # different resource instance (GHSA-38g3-wx5w-9fqg).
+                    try:
+                        posted_resourceinstance_id = uuid.UUID(
+                            str(data["resourceinstance_id"])
+                        )
+                    except (ValueError, TypeError):
+                        posted_resourceinstance_id = None
+                    if old_tile.resourceinstance_id != posted_resourceinstance_id:
+                        return self.handle_save_error(
+                            None,
+                            tile_id,
+                            title=_(
+                                "This tile is associated with a different resource"
+                            ),
+                            message=_("It cannot be reassigned to a new resource"),
+                        )
 
                 tile = Tile(data)
 

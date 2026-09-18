@@ -1182,6 +1182,7 @@ div.wf-multi-tile-card-info div {
     align-items: center;
     justify-content: center;
     margin: 15px 25px;
+    position: relative;
 
     &:hover {
         cursor: pointer;
@@ -1205,6 +1206,48 @@ div.wf-multi-tile-card-info div {
         background: #5fa2dd;
         i {
             color: white;
+        }
+    }
+
+    // CSS-only tooltip matching Bootstrap's dark tooltip style
+    &[data-tooltip] {
+        &::before {
+            border-color: transparent transparent rgba(0, 0, 0, 0.9) transparent;
+            border-style: solid;
+            border-width: 0 5px 5px;
+            content: '';
+            left: 50%;
+            margin-left: -5px;
+            opacity: 0;
+            pointer-events: none;
+            position: absolute;
+            top: calc(100% + 3px);
+            transition: opacity 0.15s;
+            z-index: 1071;
+        }
+        &::after {
+            background-color: rgba(0, 0, 0, 0.9);
+            border-radius: 4px;
+            color: #fff;
+            content: attr(data-tooltip);
+            font-size: 12px;
+            left: 50%;
+            line-height: 1.42857143;
+            opacity: 0;
+            padding: 6px 8px;
+            pointer-events: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            transform: translateX(-50%);
+            transition: opacity 0.15s;
+            white-space: nowrap;
+            z-index: 1070;
+        }
+        &:hover::before,
+        &:hover::after,
+        &:focus-visible::before,
+        &:focus-visible::after {
+            opacity: 1;
         }
     }
 }

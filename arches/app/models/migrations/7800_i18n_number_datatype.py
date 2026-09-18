@@ -28,9 +28,7 @@ class Migration(migrations.Migration):
         '{{"i18n_properties": ["placeholder", "prefix", "suffix"]}}'
         WHERE datatype = 'number';
 
-    """.format(
-        settings.LANGUAGE_CODE
-    )
+    """.format(settings.LANGUAGE_CODE)
 
     reverse_sql = """
         UPDATE public.cards_x_nodes_x_widgets
@@ -43,9 +41,7 @@ class Migration(migrations.Migration):
         UPDATE public.widgets
         SET defaultconfig = defaultconfig - 'i18n_properties'
         WHERE datatype = 'number';
-    """.format(
-        settings.LANGUAGE_CODE
-    )
+    """.format(settings.LANGUAGE_CODE)
 
     operations = [
         migrations.RunSQL(sql, reverse_sql),

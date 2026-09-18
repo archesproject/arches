@@ -19,12 +19,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import os
 from pathlib import Path
 
-from django.db import connection
 from django.core import management
 from django.test import TestCase, TransactionTestCase
 from django.test.utils import captured_stdout
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
+from oauth2_provider.models import Application
 
 from arches.app.models.graph import Graph
 from arches.app.models.models import Ontology
@@ -43,14 +43,6 @@ from tests import test_settings
 OAUTH_CLIENT_ID = "AAac4uRQSqybRiO6hu7sHT50C4wmDp9fAmsPlCj9"
 OAUTH_CLIENT_SECRET = "7fos0s7qIhFqUmalDI1QiiYj0rAtEdVMY4hYQDQjOxltbRCBW3dIydOeMD4MytDM9ogCPiYFiMBW6o6ye5bMh5dkeU7pg1cH86wF6B\
         ap9Ke2aaAZaeMPejzafPSj96ID"
-CREATE_TOKEN_SQL = """
-        INSERT INTO public.oauth2_provider_accesstoken(
-            token, expires, scope, application_id, user_id, created, updated, token_checksum)
-            VALUES ('{token}', '1-1-2068', 'read write', 44, {user_id}, '1-1-2018', '1-1-2018', '{token_checksum}');
-    """
-DELETE_TOKEN_SQL = (
-    "DELETE FROM public.oauth2_provider_accesstoken WHERE application_id = 44;"
-)
 SYSTEM_SETINGS_GRAPH_ID = "ff623370-fa12-11e6-b98b-6c4008b05c4c"
 
 
@@ -103,32 +95,19 @@ class ArchesTestCase(TestCase):
             )
 
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        sql = """
-            INSERT INTO public.oauth2_provider_application(
-                id, client_id, redirect_uris, client_type, authorization_grant_type,
-                client_secret,
-                name, user_id, skip_authorization, created, updated, algorithm, post_logout_redirect_uris, hash_client_secret, allowed_origins)
-            VALUES (
-                44, '{oauth_client_id}', 'http://localhost:8000/test', 'public', 'client-credentials',
-                '{oauth_client_secret}',
-                'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000', '{jwt_algorithm}', '', true, '*')
-            ON CONFLICT DO NOTHING;
-        """
-
-        sql = sql.format(
-            user_id=1,
-            oauth_client_id=OAUTH_CLIENT_ID,
-            oauth_client_secret=OAUTH_CLIENT_SECRET,
-            jwt_algorithm=test_settings.JWT_ALGORITHM,
-        )
-
-        with connection.cursor() as cursor:
-            cursor.execute(sql)
-
-    @classmethod
     def setUpTestData(cls):
+        Application.objects.filter(id=44).update_or_create(
+            id=44,
+            client_id=OAUTH_CLIENT_ID,
+            redirect_uris="http://localhost:8000/test",
+            client_type="public",
+            authorization_grant_type="client-credentials",
+            client_secret=OAUTH_CLIENT_SECRET,
+            name="TEST APP",
+            user_id=1,
+            algorithm=test_settings.JWT_ALGORITHM,
+            allowed_origins="*",
+        )
         LanguageSynchronizer.synchronize_settings_with_db(update_published_graphs=False)
         for user in User.objects.all():
             cls.test_users[user.username] = user
@@ -217,13 +196,6 @@ class ArchesTestCase(TestCase):
 
         path_to_cheesy_image = Path(settings.MEDIA_ROOT) / "uploadedfiles" / "test.png"
         cls.addClassCleanup(os.unlink, path_to_cheesy_image)
-
-    @classmethod
-    def tearDownClass(cls):
-        sql = "DELETE FROM public.oauth2_provider_application WHERE id = 44;"
-        with connection.cursor() as cursor:
-            cursor.execute(sql)
-        super().tearDownClass()
 
     @classmethod
     def add_users(cls):

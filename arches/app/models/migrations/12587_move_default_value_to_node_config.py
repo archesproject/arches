@@ -79,8 +79,7 @@ class Migration(migrations.Migration):
     ]
 
     def forward(apps, schema_editor):
-        schema_editor.execute(
-            """
+        schema_editor.execute("""
             UPDATE nodes
                         SET config = COALESCE(nodes.config, '{}'::jsonb)
                          || jsonb_build_object('defaultValue', w.config->'defaultValue')
@@ -89,22 +88,18 @@ class Migration(migrations.Migration):
               AND w.source_identifier IS NULL
               AND w.config ? 'defaultValue'
               AND w.config->'defaultValue' != 'null'::jsonb;
-        """
-        )
+        """)
 
-        schema_editor.execute(
-            """
+        schema_editor.execute("""
             UPDATE cards_x_nodes_x_widgets
             SET config = config - 'defaultValue'
             WHERE config ? 'defaultValue';
-        """
-        )
+        """)
 
         _update_published_graphs(apps, _move_default_value_from_widgets_to_nodes)
 
     def reverse(apps, schema_editor):
-        schema_editor.execute(
-            """
+        schema_editor.execute("""
             UPDATE cards_x_nodes_x_widgets
                         SET config = COALESCE(cards_x_nodes_x_widgets.config, '{}'::jsonb)
                          || jsonb_build_object('defaultValue', n.config->'defaultValue')
@@ -113,16 +108,13 @@ class Migration(migrations.Migration):
               AND cards_x_nodes_x_widgets.source_identifier IS NULL
               AND n.config ? 'defaultValue'
               AND n.config->'defaultValue' != 'null'::jsonb;
-        """
-        )
+        """)
 
-        schema_editor.execute(
-            """
+        schema_editor.execute("""
             UPDATE nodes
             SET config = config - 'defaultValue'
             WHERE config ? 'defaultValue';
-        """
-        )
+        """)
 
         _update_published_graphs(apps, _move_default_value_from_nodes_to_widgets)
 

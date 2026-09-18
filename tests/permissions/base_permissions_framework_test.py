@@ -18,7 +18,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from arches.app.models.resource import Resource
 
-
 # these tests can be run from the command line via
 # python manage.py test tests.permissions --settings="tests.test_settings"
 

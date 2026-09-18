@@ -134,9 +134,7 @@ class Migration(migrations.Migration):
         SET config=__arches_i18n_update_jsonb_array('options.text'::text, config, '{{}}'::jsonb, '{0}'::text) || 
         '{{"i18n_config": {{"fn":"arches.app.datatypes.datatypes.DomainDataType"}}}}'
         WHERE datatype = 'domain-value' OR datatype = 'domain-value-list';
-    """.format(
-        settings.LANGUAGE_CODE
-    )
+    """.format(settings.LANGUAGE_CODE)
 
     reverse_sql = """
         UPDATE public.cards_x_nodes_x_widgets
@@ -159,9 +157,7 @@ class Migration(migrations.Migration):
 
         DROP FUNCTION IF EXISTS __arches_i18n_update_jsonb_array;
         DROP FUNCTION IF EXISTS __arches_i18n_strip_jsonb_array;
-    """.format(
-        settings.LANGUAGE_CODE
-    )
+    """.format(settings.LANGUAGE_CODE)
 
     operations = [
         migrations.RunSQL(sql, reverse_sql),

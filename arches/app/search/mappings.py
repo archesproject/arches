@@ -22,7 +22,6 @@ from arches.app.utils import permission_backend
 from django.db.utils import ProgrammingError
 from arches.app.search.es_mapping_modifier import EsMappingModifierFactory
 
-
 CONCEPTS_INDEX = "concepts"
 TERMS_INDEX = "terms"
 RESOURCES_INDEX = "resources"

@@ -27,16 +27,14 @@ class Migration(migrations.Migration):
             cursor.execute(
                 "DELETE FROM cards_x_nodes_x_widgets WHERE source_identifier IS NOT NULL;"
             )
-            cursor.execute(
-                """
+            cursor.execute("""
                 DELETE FROM node_groups
                 WHERE NOT EXISTS (
                     SELECT 1
                     FROM nodes
                     WHERE nodes.nodegroupid = node_groups.nodegroupid
                 );
-            """
-            )
+            """)
 
             cursor.execute("ALTER TABLE graphs ENABLE TRIGGER ALL;")
 

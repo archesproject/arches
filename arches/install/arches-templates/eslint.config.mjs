@@ -1,4 +1,5 @@
 
+import globals from "globals";
 import js from "@eslint/js";
 import pluginVue from 'eslint-plugin-vue';
 import tseslint from 'typescript-eslint';
@@ -14,17 +15,7 @@ export default [
     {
         "languageOptions": {
             "globals": {
-                "define": false,
-                "require": false,
-                "window": false,
-                "console": false,
-                "history": false,
-                "location": false,
-                "Promise": false,
-                "setTimeout": false,
-                "URL": false,
-                "URLSearchParams": false,
-                "fetch": false
+                ...globals.browser,
             },
             "parser": vueESLintParser,
             "parserOptions": {

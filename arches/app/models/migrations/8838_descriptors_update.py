@@ -12,8 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL(
             sql=[
-                (
-                    """
+                ("""
                 do
                 $$
                 declare
@@ -29,13 +28,10 @@ class Migration(migrations.Migration):
                                 true)::text;
                 end;
                 $$
-            """.format(
-                        settings.LANGUAGE_CODE
-                    )
-                ),
+            """.format(settings.LANGUAGE_CODE)),
             ],
             reverse_sql=[
-                ("update resource_instances set name = replace(name, '\"', '')")
+                "update resource_instances set name = replace(name, '\"', '')"
             ],
         ),
         migrations.AlterField(
@@ -44,10 +40,8 @@ class Migration(migrations.Migration):
             field=I18n_TextField(blank=True, null=True),
         ),
         migrations.RunSQL(
-            sql=[("select * from resource_instances limit 1")],
-            reverse_sql=[
-                (
-                    """
+            sql=["select * from resource_instances limit 1"],
+            reverse_sql=["""
                 do
                 $$
                 declare
@@ -58,10 +52,6 @@ class Migration(migrations.Migration):
                         set name = name->l.code;
                 end;
                 $$
-            """.format(
-                        settings.LANGUAGE_CODE
-                    )
-                )
-            ],
+            """.format(settings.LANGUAGE_CODE)],
         ),
     ]

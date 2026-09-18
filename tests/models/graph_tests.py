@@ -19,13 +19,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 from unittest import mock
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
+from django.db import connection
 from guardian.models import GroupObjectPermission, UserObjectPermission
+from guardian.shortcuts import assign_perm, get_perms
 
 from arches.app.const import IntegrityCheck
 from arches.app.models import models
 from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from tests.base_test import ArchesTestCase
 
 # these tests can be run from the command line via
@@ -1492,6 +1495,16 @@ class GraphTests(ArchesTestCase):
         )
         graph.delete_draft_graph()
         graph.add_resource_instance_lifecycle(resource_instance_lifecycle)
+
+        # The FK from resource_instance_lifecycle_states to resource_instance_lifecycles
+        # is DEFERRABLE INITIALLY DEFERRED, so an incorrect insert order (states saved
+        # before their parent lifecycle) isn't caught until the constraints are actually
+        # checked, which normally happens at COMMIT. TestCase only ever rolls back its
+        # wrapping transaction, so without forcing the check here (immediately after
+        # add_resource_instance_lifecycle, before graph.save() runs and could paper over
+        # an out-of-order save by saving the parent later on) this regression is invisible.
+        connection.check_constraints()
+
         graph.save()
 
         lifecycle = models.ResourceInstanceLifecycle.objects.get(
@@ -2275,6 +2288,129 @@ class DraftGraphTests(ArchesTestCase):
 
         self.assertTrue(len(serialized_updated_source_graph["user_permissions"]) > 0)
         self.assertTrue(len(serialized_updated_source_graph["group_permissions"]) > 0)
+
+    def test_update_permissions_from_serialized_graph_recreates_group_permissions(self):
+        source_graph = Graph.objects.create_graph(
+            name="TEST GROUP PERMISSIONS RECREATED",
+            is_resource=True,
+        )
+        draft_graph = source_graph.get_draft_graph()
+        draft_graph.append_branch(
+            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
+            graphid=self.NODE_NODETYPE_GRAPHID,
+        )
+        draft_graph.save()
+        updated_source_graph = source_graph.promote_draft_graph_to_active_graph()
+
+        nodegroup = updated_source_graph.get_nodegroups()[:1][0]
+        group = Group.objects.create(name="test group - no access to nodegroup")
+        assign_perm("no_access_to_nodegroup", group, nodegroup)
+
+        serialized_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(updated_source_graph)
+        )
+        self.assertEqual(get_perms(group, nodegroup), ["no_access_to_nodegroup"])
+
+        updated_source_graph.update_permissions_from_serialized_graph(serialized_graph)
+
+        self.assertEqual(get_perms(group, nodegroup), ["no_access_to_nodegroup"])
+
+    def test_permissions_survive_second_promote_and_publish(self):
+        source_graph = Graph.objects.create_graph(
+            name="TEST PERMS SURVIVE REPUBLISH",
+            is_resource=True,
+        )
+        draft_graph = source_graph.get_draft_graph()
+        draft_graph.append_branch(
+            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
+            graphid=self.NODE_NODETYPE_GRAPHID,
+        )
+        draft_graph.save()
+        updated_source_graph = source_graph.promote_draft_graph_to_active_graph()
+
+        nodegroup = updated_source_graph.get_nodegroups()[:1][0]
+        group = Group.objects.create(name="test group - survive republish")
+        assign_perm("no_access_to_nodegroup", group, nodegroup)
+        updated_source_graph.publish()
+
+        # promote again ("publish a new version") with no further node changes
+        second_draft = updated_source_graph.create_draft_graph()
+        second_draft.save()
+        newer_graph = updated_source_graph.promote_draft_graph_to_active_graph()
+        newer_graph.publish()
+
+        surviving_nodegroup = models.NodeGroup.objects.get(pk=nodegroup.pk)
+        self.assertEqual(
+            get_perms(group, surviving_nodegroup), ["no_access_to_nodegroup"]
+        )
+
+    def test_guest_group_no_access_restricts_real_anonymous_user(self):
+        source_graph = Graph.objects.create_graph(
+            name="TEST GUEST GROUP RESTRICTS ANONYMOUS",
+            is_resource=True,
+        )
+        draft_graph = source_graph.get_draft_graph()
+        draft_graph.append_branch(
+            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
+            graphid=self.NODE_NODETYPE_GRAPHID,
+        )
+        draft_graph.save()
+        updated_source_graph = source_graph.promote_draft_graph_to_active_graph()
+        nodegroup = updated_source_graph.get_nodegroups()[:1][0]
+
+        guest_group = Group.objects.get(name="Guest")
+        anonymous_user = User.objects.get(username="anonymous")
+        self.assertIn(guest_group, anonymous_user.groups.all())
+
+        assign_perm("no_access_to_nodegroup", guest_group, nodegroup)
+        updated_source_graph.publish()
+
+        published_graph = models.PublishedGraph.objects.get(
+            publication=updated_source_graph.publication,
+            language="en",
+        )
+
+        # simulate report/resource-editor page loads, which is exactly what
+        # silently corrupted this permission before the #12842 fix
+        Graph(published_graph.serialized_graph)
+        Graph(published_graph.serialized_graph)
+
+        self.assertNotIn(
+            nodegroup.pk,
+            get_nodegroups_by_perm(anonymous_user, "read_nodegroup"),
+        )
+
+    def test_graph_construction_from_serialized_graph_does_not_mutate_permissions(self):
+        source_graph = Graph.objects.create_graph(
+            name="TEST PERMISSIONS UNTOUCHED BY REPORT LOAD",
+            is_resource=True,
+        )
+        draft_graph = source_graph.get_draft_graph()
+        draft_graph.append_branch(
+            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
+            graphid=self.NODE_NODETYPE_GRAPHID,
+        )
+        draft_graph.save()
+        updated_source_graph = source_graph.promote_draft_graph_to_active_graph()
+
+        nodegroup = updated_source_graph.get_nodegroups()[:1][0]
+        group = Group.objects.create(name="test group - no access on report load")
+        assign_perm("no_access_to_nodegroup", group, nodegroup)
+
+        updated_source_graph.has_unpublished_changes = True
+        updated_source_graph.publish()
+        published_graph = models.PublishedGraph.objects.get(
+            publication=updated_source_graph.publication,
+            language="en",
+        )
+
+        with mock.patch.object(
+            Graph, "update_permissions_from_serialized_graph"
+        ) as mock_update_permissions:
+            Graph(published_graph.serialized_graph)
+
+        mock_update_permissions.assert_not_called()
+        self.assertEqual(get_perms(group, nodegroup), ["no_access_to_nodegroup"])
 
     def test_update_graph_with_relatable_resources(self):
         source_graph = Graph.objects.create_graph(

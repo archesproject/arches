@@ -7,7 +7,9 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const BundleTracker = require('webpack-bundle-tracker');
 
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const { VueLoaderPlugin } = require("vue-loader");
+
+const { requireVueLoaderWithTypeResolutionPatch } = require('./webpack-utils/patch-vue-compiler-sfc-type-resolution');
+const { VueLoaderPlugin } = requireVueLoaderWithTypeResolutionPatch();
 
 const { buildFilepathLookup } = require('./webpack-utils/build-filepath-lookup');
 
@@ -338,6 +340,7 @@ module.exports = () => {
                 new VueLoaderPlugin(),
             ],
             resolve: {
+                extensions: ['.ts', '.tsx', '.wasm', '.mjs', '.js', '.json'],
                 modules: [Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH)],
                 alias: {
                     ...javascriptRelativeFilepathToAbsoluteFilepathLookup,

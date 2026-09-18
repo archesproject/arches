@@ -12,7 +12,6 @@ from arches.app.models import models
 from tests import test_settings
 from tests.base_test import ArchesTransactionTestCase
 
-
 # these tests can be run from the command line via
 # python manage.py test tests.views.spatialview_api_tests --settings="tests.test_settings"
 

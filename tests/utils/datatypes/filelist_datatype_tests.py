@@ -8,6 +8,7 @@ from django.utils.translation import get_language
 
 from arches.app.datatypes.datatypes import DataTypeFactory
 from django.test import TestCase
+from arches.app.models.models import File as FileModel
 from arches.app.models.system_settings import settings
 
 # these tests can be run from the command line via
@@ -82,6 +83,82 @@ class FileListDataTypeTests(TestCase):
                 tile_value[1]["description"][language]["value"], "A File for Testing"
             )
             self.assertEqual(tile_value[1]["title"][language]["value"], "Test File 4")
+
+    def test_transform_value_for_tile_preserves_existing_file_id(self):
+        """Files that already have a file_id should pass through unchanged
+        without creating a new File record in the database."""
+        datatype = DataTypeFactory().get_instance("file-list")
+        existing_file_id = str(uuid.uuid4())
+        existing_url = f"/files/{existing_file_id}"
+
+        value = [
+            {
+                "file_id": existing_file_id,
+                "url": existing_url,
+                "name": "existing_photo.jpg",
+                "type": "image/jpeg",
+                "status": "uploaded",
+                "size": 12345,
+            }
+        ]
+
+        file_count_before = FileModel.objects.count()
+        tile_value = datatype.transform_value_for_tile(value)
+        file_count_after = FileModel.objects.count()
+
+        with self.subTest("file_id is preserved unchanged"):
+            self.assertEqual(tile_value[0]["file_id"], existing_file_id)
+
+        with self.subTest("url is preserved unchanged"):
+            self.assertEqual(tile_value[0]["url"], existing_url)
+
+        with self.subTest("name is preserved"):
+            self.assertEqual(tile_value[0]["name"], "existing_photo.jpg")
+
+        with self.subTest("no new File record is created in the database"):
+            self.assertEqual(file_count_before, file_count_after)
+
+    def test_transform_value_for_tile_mixed_existing_and_new_files(self):
+        """A list mixing already-stored files (have file_id) and new files
+        (no file_id) should preserve existing file_ids and only create a
+        new File record for the genuinely new file."""
+        datatype = DataTypeFactory().get_instance("file-list")
+        existing_file_id = str(uuid.uuid4())
+        existing_url = f"/files/{existing_file_id}"
+
+        value = [
+            {
+                "file_id": existing_file_id,
+                "url": existing_url,
+                "name": "existing_photo.jpg",
+                "type": "image/jpeg",
+                "status": "uploaded",
+            },
+            {
+                "name": "new_photo.jpg",
+                "type": "image/jpeg",
+            },
+        ]
+
+        file_count_before = FileModel.objects.count()
+        tile_value = datatype.transform_value_for_tile(value)
+        file_count_after = FileModel.objects.count()
+
+        with self.subTest("existing file_id is preserved"):
+            self.assertEqual(tile_value[0]["file_id"], existing_file_id)
+
+        with self.subTest("existing url is preserved"):
+            self.assertEqual(tile_value[0]["url"], existing_url)
+
+        with self.subTest("new file receives a generated file_id"):
+            self.assertIsNotNone(tile_value[1].get("file_id"))
+            self.assertNotEqual(tile_value[1]["file_id"], existing_file_id)
+
+        with self.subTest("exactly one new File record is created (for the new file)"):
+            self.assertEqual(file_count_after - file_count_before, 1)
+
+        with self.subTest("no File record is created for the existing file"):
+            self.assertFalse(FileModel.objects.filter(fileid=existing_file_id).exists())
 
     def test_get_files_from_request(self):
         datatype = DataTypeFactory().get_instance("file-list")

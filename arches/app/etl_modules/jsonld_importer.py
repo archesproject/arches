@@ -333,7 +333,13 @@ class JSONLDImporter(BaseImportModule):
         return None
 
     def save_to_tiles(
-        self, cursor, userid, loadid, multiprocessing=False, max_subprocesses=0
+        self,
+        cursor,
+        userid,
+        loadid,
+        multiprocessing=False,
+        max_subprocesses=0,
+        index=True,
     ):
         error_saving_tiles = None
         error_response = {

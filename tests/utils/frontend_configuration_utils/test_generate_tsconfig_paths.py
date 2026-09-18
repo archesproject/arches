@@ -45,10 +45,19 @@ class TestGenerateTsconfigPaths(TestCase):
             "_comment": "This is a generated file. Do not edit directly.",
             "compilerOptions": {
                 "paths": {
-                    "@/arches/*": ["../arches/app/src/arches/*"],
-                    "@/app_one/*": ["../arches_apps/app_one/src/app_one/*"],
-                    "@/app_two/*": ["../arches_apps/app_two/src/app_two/*"],
-                    "*": ["../node_modules/*"],
+                    "@/arches/*": [
+                        "../arches/src/arches/*",
+                        "../arches/app/src/arches/*",
+                    ],
+                    "@/app_one/*": [
+                        "../arches/src/app_one/*",
+                        "../arches_apps/app_one/src/app_one/*",
+                    ],
+                    "@/app_two/*": [
+                        "../arches/src/app_two/*",
+                        "../arches_apps/app_two/src/app_two/*",
+                    ],
+                    "*": ["../node_modules/@types/*", "../node_modules/*"],
                 }
             },
         }
@@ -78,11 +87,16 @@ class TestGenerateTsconfigPaths(TestCase):
         self.assertIn("_comment", result)
         self.assertIn("compilerOptions", result)
         paths_mapping = result["compilerOptions"]["paths"]
-        self.assertEqual(paths_mapping["@/arches/*"], ["../arches/app/src/arches/*"])
+        self.assertEqual(
+            paths_mapping["@/arches/*"],
+            ["../arches/src/arches/*", "../arches/app/src/arches/*"],
+        )
         self.assertEqual(
             sorted(k for k in paths_mapping.keys() if k not in {"@/arches/*", "*"}), []
         )
-        self.assertEqual(paths_mapping["*"], ["../node_modules/*"])
+        self.assertEqual(
+            paths_mapping["*"], ["../node_modules/@types/*", "../node_modules/*"]
+        )
 
     def test_generate_tsconfig_paths_raises_error_when_application_names_and_paths_do_not_match(
         self,
@@ -137,6 +151,14 @@ class TestGenerateTsconfigPaths(TestCase):
                 result = self.generate_tsconfig_paths_function()
 
         paths_mapping = result["compilerOptions"]["paths"]
-        self.assertEqual(paths_mapping["@/arches/*"], [".././app/src/arches/*"])
-        self.assertEqual(paths_mapping["@/alpha/*"], ["../apps/alpha/src/alpha/*"])
-        self.assertEqual(paths_mapping["*"], ["../node_modules/*"])
+        self.assertEqual(
+            paths_mapping["@/arches/*"],
+            ["../arches/src/arches/*", ".././app/src/arches/*"],
+        )
+        self.assertEqual(
+            paths_mapping["@/alpha/*"],
+            ["../arches/src/alpha/*", "../apps/alpha/src/alpha/*"],
+        )
+        self.assertEqual(
+            paths_mapping["*"], ["../node_modules/@types/*", "../node_modules/*"]
+        )

@@ -37,7 +37,6 @@ from django.core.management import call_command
 from django.db import connection
 from django.http import HttpRequest
 
-
 # these tests can be run from the command line via
 # python manage.py test tests.bulkdata.branch_excel_tests --settings="tests.test_settings"
 

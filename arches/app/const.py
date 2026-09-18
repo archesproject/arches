@@ -1,7 +1,6 @@
 from enum import Enum, unique
 from uuid import UUID
 
-
 IntegrityCheckDescriptions = {
     1005: "Nodes with ontologies found in graphs without ontologies",
     1012: "Node Groups without contained nodes",

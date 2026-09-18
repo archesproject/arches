@@ -13,7 +13,6 @@ from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from tests.base_test import ArchesTestCase
 
-
 PRIMARY_DESCRIPTORS_FUNCTION_ID = "60000000-0000-0000-0000-000000000001"
 
 

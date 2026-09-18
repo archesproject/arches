@@ -61,9 +61,7 @@ class Migration(migrations.Migration):
             "defaultValue": ""
         }}'
         WHERE datatype = 'string';
-    """.format(
-        settings.LANGUAGE_CODE
-    )
+    """.format(settings.LANGUAGE_CODE)
 
     operations = [
         migrations.RunSQL(sql, reverse_sql),

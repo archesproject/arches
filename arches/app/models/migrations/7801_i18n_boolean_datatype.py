@@ -29,9 +29,7 @@ class Migration(migrations.Migration):
             json_build_object('{0}', defaultconfig->>'falseLabel')::jsonb, true) ||
             '{{"i18n_properties": ["trueLabel", "falseLabel"]}}'
         WHERE datatype = 'boolean';
-    """.format(
-        settings.LANGUAGE_CODE
-    )
+    """.format(settings.LANGUAGE_CODE)
 
     reverse_sql = """
         UPDATE nodes
@@ -51,9 +49,7 @@ class Migration(migrations.Migration):
             json_build_object('falseLabel', jsonb_extract_path(defaultconfig, 'falseLabel', '{0}'))::jsonb
         WHERE datatype = 'boolean';
 
-    """.format(
-        settings.LANGUAGE_CODE
-    )
+    """.format(settings.LANGUAGE_CODE)
 
     operations = [
         migrations.RunSQL(sql, reverse_sql),

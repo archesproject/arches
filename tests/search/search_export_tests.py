@@ -1,3 +1,5 @@
+import os
+import glob
 import uuid
 import csv
 import io
@@ -7,7 +9,9 @@ from base64 import b64encode
 from http import HTTPStatus
 from pathlib import Path
 from arches.app.models import models
+from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile
+from arches.app.models.resource import Resource
 from arches.app.search.elasticsearch_dsl_builder import Query
 from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -15,9 +19,10 @@ from arches.app.search.search_export import SearchResultsExporter
 from arches.app.utils.skos import SKOSReader
 
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.test.client import RequestFactory
 from django.urls import get_script_prefix, reverse, set_script_prefix
+from guardian.shortcuts import assign_perm
 
 from arches.app.views.api import SearchExport
 from tests.base_test import ArchesTestCase
@@ -94,6 +99,13 @@ class SearchExportTests(ArchesTestCase):
 
     @classmethod
     def tearDownClass(cls):
+        export_dir = "tests/fixtures/data/export_deliverables/"
+        for zip_file in glob.glob(os.path.join(export_dir, "*.zip")):
+            try:
+                os.remove(zip_file)
+            except OSError:
+                pass
+
         se = SearchEngineFactory().create()
         q = Query(se=se)
         for indexname in [TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX]:
@@ -199,6 +211,53 @@ class SearchExportTests(ArchesTestCase):
             )
             break
 
+    def test_export_respects_no_access_to_nodegroup(self):
+        """Regression test: search export must not include tile data from a
+        nodegroup the requesting user's group has been denied access to. The
+        filtering happens upstream, in search_results.py's post_search_hook,
+        via the same get_nodegroups_by_perm mechanism affected by #12842.
+        """
+        cultural_period_column_name = self.search_model_cultural_period_nodename
+
+        def get_first_row_value():
+            request = self.factory.get("/search?tiles=True&export=True&format=tilecsv")
+            request.user = self.user
+            exporter = SearchResultsExporter(search_request=request)
+            result, _ = exporter.export(format="tilecsv", report_link="false")
+            csv_content = result[0]["outputfile"].getvalue()
+            csv_reader = csv.DictReader(io.StringIO(csv_content))
+            return next(csv_reader)[cultural_period_column_name]
+
+        self.assertTrue(
+            get_first_row_value(),
+            "Expected a non-empty value before any restriction is applied",
+        )
+
+        group = Group.objects.create(name="test group - export no access")
+        self.user.groups.add(group)
+        cultural_period_nodegroup = models.NodeGroup.objects.get(
+            pk=self.search_model_cultural_period_nodeid
+        )
+        assign_perm("no_access_to_nodegroup", group, cultural_period_nodegroup)
+
+        # simulate a report/resource-editor page load happening in between --
+        # this is exactly what silently corrupted this permission before the
+        # #12842 fix, so the test must reconstruct a Graph(dict) here to
+        # actually exercise that code path rather than just checking a
+        # freshly-assigned permission that was never at risk of corruption
+        graph = Graph.objects.get(pk=self.search_model_graphid)
+        graph.publish()
+        published_graph = models.PublishedGraph.objects.get(
+            publication=graph.publication, language="en"
+        )
+        Graph(published_graph.serialized_graph)
+
+        restricted_value = get_first_row_value()
+        self.assertFalse(
+            restricted_value,
+            f"Expected restricted nodegroup's value to be empty, got {restricted_value!r}",
+        )
+
     def test_login_via_basic_auth_good(self):
         auth_string = "Basic " + b64encode(b"admin:admin").decode("utf-8")
         request = RequestFactory().get(
@@ -243,6 +302,58 @@ class SearchExportTests(ArchesTestCase):
         request.user = self.user
         exporter = SearchResultsExporter(search_request=request)
         exporter.export(format="tilecsv", report_link="false")
+
+    def test_missing_node_value_tile(self):
+
+        target_tile_data = {
+            "81fd5456-9ae8-11f1-96bb-3d59943af363": {
+                "en": {"value": "Test Node", "direction": "ltr"}
+            }
+        }
+
+        link_tile_data = {
+            "fda12368-9ae7-11f1-96bb-3d59943af363": "694a67a9-52be-4e59-8c30-7c6855137a9d"
+        }
+
+        resource = Resource.objects.create(
+            resourceinstanceid="26ad70b1-dc07-4105-80a9-fc0a351e3b7d",
+            graph_id="d291a445-fa5f-11e6-afa8-14109fd34195",
+        )
+
+        target_tile = Tile.objects.create(
+            resourceinstance_id="26ad70b1-dc07-4105-80a9-fc0a351e3b7d",
+            data=target_tile_data,
+            nodegroup_id="81fd5456-9ae8-11f1-96bb-3d59943af363",
+            tileid="694a67a9-52be-4e59-8c30-7c6855137a9d",
+        )
+
+        Tile.objects.create(
+            resourceinstance_id="26ad70b1-dc07-4105-80a9-fc0a351e3b7d",
+            data=link_tile_data,
+            nodegroup_id="fda12368-9ae7-11f1-96bb-3d59943af363",
+        )
+
+        # synchronous
+        resource.index()
+        se = SearchEngineFactory().create()
+        sync_es(se)
+
+        target_tile.delete()
+
+        request = self.factory.get("/search?tiles=True&export=True&format=tilecsv")
+        request.user = self.user
+        exporter = SearchResultsExporter(search_request=request)
+        files, _ = exporter.export(format="tilecsv", report_link="false")
+
+        csv_content = files[0]["outputfile"].getvalue()
+        csv_reader = list(csv.DictReader(io.StringIO(csv_content)))
+
+        exported_value = [
+            record["Link Node"]
+            for record in csv_reader
+            if record["resourceid"] == "26ad70b1-dc07-4105-80a9-fc0a351e3b7d"
+        ]
+        self.assertEqual(exported_value[0], "Linked Tile Not Found")
 
 
 def is_valid_uuid(value, version=4):

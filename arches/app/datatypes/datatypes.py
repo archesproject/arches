@@ -1006,13 +1006,15 @@ class EDTFDataType(BaseDataType):
         return value
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
+        nodegroup_id = str(tile.nodegroup_id)
+
         def add_date_to_doc(document, edtf):
             if edtf.lower == edtf.upper:
                 if edtf.lower is not None:
                     document["dates"].append(
                         {
                             "date": edtf.lower,
-                            "nodegroup_id": tile.nodegroup_id,
+                            "nodegroup_id": nodegroup_id,
                             "nodeid": nodeid,
                             "provisional": provisional,
                         }
@@ -1024,7 +1026,7 @@ class EDTFDataType(BaseDataType):
                     document["dates"].append(
                         {
                             "date": edtf.lower_fuzzy,
-                            "nodegroup_id": tile.nodegroup_id,
+                            "nodegroup_id": nodegroup_id,
                             "nodeid": nodeid,
                             "provisional": provisional,
                         }
@@ -1034,7 +1036,7 @@ class EDTFDataType(BaseDataType):
                     document["dates"].append(
                         {
                             "date": edtf.upper_fuzzy,
-                            "nodegroup_id": tile.nodegroup_id,
+                            "nodegroup_id": nodegroup_id,
                             "nodeid": nodeid,
                             "provisional": provisional,
                         }
@@ -1042,7 +1044,7 @@ class EDTFDataType(BaseDataType):
                 document["date_ranges"].append(
                     {
                         "date_range": dr,
-                        "nodegroup_id": tile.nodegroup_id,
+                        "nodegroup_id": nodegroup_id,
                         "nodeid": nodeid,
                         "provisional": provisional,
                     }
@@ -1516,6 +1518,14 @@ class FileListDataType(BaseDataType):
                 file_info if isinstance(file_info, str) else file_info.get("name")
             )
             original_file_path = file_path
+
+            # If file_info is a dict with an existing file_id, the file is already
+            # stored on the server. Pass it through without creating a new File record.
+            if isinstance(file_info, dict) and file_info.get("file_id"):
+                tile_file = {**file_info}
+                tile_data.append(tile_file)
+                continue
+
             tile_file = {}
             try:
                 file_stats = os.stat(file_path)
@@ -2275,9 +2285,7 @@ class ResourceInstanceDataType(BaseDataType):
         ret = False
         sql = """
             SELECT * FROM __arches_create_resource_x_resource_relationships('%s') as t;
-        """ % (
-            tile.pk
-        )
+        """ % (tile.pk)
 
         with connection.cursor() as cursor:
             cursor.execute(sql)
@@ -2628,6 +2636,10 @@ class NodeValueDataType(BaseDataType):
                 datatype = datatype_factory.get_instance(value_node.datatype)
                 return datatype.get_display_value(value_tile, value_node)
             return ""
+
+        except models.TileModel.DoesNotExist:
+            return "Linked Tile Not Found"
+
         except:
             raise Exception(
                 f'Node with name "{node.name}" is not configured correctly.'
