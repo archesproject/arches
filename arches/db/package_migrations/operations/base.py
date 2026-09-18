@@ -11,7 +11,6 @@ from django.utils.inspect import get_func_args
 
 from arches.db.package_migrations.state import collection_for, fields_for
 
-
 DEFAULT_BATCH_SIZE = 5000
 
 

@@ -19,7 +19,6 @@ from django.utils.functional import cached_property
 
 from arches.app.models import models
 
-
 # Real columns that are still not package content. Every entry needs a reason.
 EXCLUDED_FIELDS = {
     # Implied by the graph that contains the row, and identical for every row in it.

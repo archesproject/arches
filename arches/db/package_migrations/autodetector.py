@@ -62,7 +62,6 @@ from arches.db.package_migrations.operations.widget import (
     DeleteCardXNodeXWidget,
 )
 
-
 # state key -> (pk field, Create, Alter, Delete). Creation order; deletion is the
 # reverse.
 COLLECTION_OPERATIONS = (

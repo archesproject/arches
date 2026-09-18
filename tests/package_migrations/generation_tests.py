@@ -30,19 +30,14 @@ class MakePkgMigrationsTests(PackageMigrationOperationTests):
         self.package = Path(self.tmpdir) / APP_NAME
         (self.package / "pkg" / "graphs" / "resource_models").mkdir(parents=True)
         (self.package / "__init__.py").write_text("")
-        (self.package / "apps.py").write_text(
-            textwrap.dedent(
-                """
+        (self.package / "apps.py").write_text(textwrap.dedent("""
                 from django.apps import AppConfig
 
 
                 class FixtureConfig(AppConfig):
                     name = "%s"
                     is_arches_application = True
-                """
-                % APP_NAME
-            )
-        )
+                """ % APP_NAME))
         sys.path.insert(0, self.tmpdir)
 
     def tearDown(self):

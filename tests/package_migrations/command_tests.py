@@ -33,19 +33,14 @@ def _write_fixture_app(root, graphid, nodegroup_id, nodeid):
     (package / "__init__.py").write_text("")
     (package / "migrations" / "__init__.py").write_text("")
     (migrations / "__init__.py").write_text("")
-    (package / "apps.py").write_text(
-        textwrap.dedent(
-            """
+    (package / "apps.py").write_text(textwrap.dedent("""
             from django.apps import AppConfig
 
 
             class FixtureConfig(AppConfig):
                 name = "%s"
                 is_arches_application = True
-            """
-            % APP_NAME
-        )
-    )
+            """ % APP_NAME))
     (migrations / "0001_add_survey_date.py").write_text(
         textwrap.dedent(
             """
