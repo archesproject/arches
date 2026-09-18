@@ -1,11 +1,18 @@
-"""Reshape existing business data after a graph is republished.
+"""Bring existing business data into line with a republished graph.
 
-Tiles on the old publication gain keys for nodes the new graph adds, lose keys
-for nodes it removes, and are deleted when their nodegroup is gone; the resources
-then move onto the new publication.
+Two separate changes, in this order:
 
-Raises rather than swallowing: only the Celery wrapper in arches.app.tasks may
-catch, or a failure here would be reported as success.
+* ``reshape_tiles`` rewrites the tiles of resources still on the old publication,
+  so their data matches the new graph.
+* ``move_resources_to_publication`` then points those resources at the new
+  publication, which is what marks them current.
+
+The order is the point. A resource's publication says "this record matches the
+published graph", so moving it before its tiles are reshaped would claim
+something untrue.
+
+Both raise rather than swallowing: only the Celery wrapper in arches.app.tasks
+may catch, or a failure here would be reported as success.
 """
 
 from django.db import DEFAULT_DB_ALIAS
@@ -14,10 +21,13 @@ from django.db.models import F, Q
 from arches.app.models import models
 
 
-def apply_graph_change(initial_graph, updated_graph, using=DEFAULT_DB_ALIAS):
-    """Both arguments are serialized graphs (``PublishedGraph.serialized_graph``).
+def reshape_tiles(initial_graph, updated_graph, using=DEFAULT_DB_ALIAS):
+    """Rewrite the tiles of resources on ``initial_graph``'s publication.
 
-    Returns the number of resource instances moved onto the new publication.
+    Tiles gain keys for nodes the new graph adds, lose keys for nodes it removes,
+    and are deleted when their nodegroup is gone. Both arguments are serialized
+    graphs (``PublishedGraph.serialized_graph``). Returns the number of tiles
+    deleted or rewritten.
     """
     updated_nodegroup_ids = {
         nodegroup["nodegroupid"] for nodegroup in updated_graph["nodegroups"]
@@ -29,23 +39,26 @@ def apply_graph_change(initial_graph, updated_graph, using=DEFAULT_DB_ALIAS):
     }
 
     # delete tiles whose nodegroups are no longer in the updated graph
-    models.TileModel.objects.using(using).filter(
-        nodegroup_id__in=orphaned_nodegroup_ids,
-        resourceinstance__graph_publication_id=initial_graph["publication_id"],
-    ).delete()
+    orphaned, _ = (
+        models.TileModel.objects.using(using)
+        .filter(
+            nodegroup_id__in=orphaned_nodegroup_ids,
+            resourceinstance__graph_publication_id=initial_graph["publication_id"],
+        )
+        .delete()
+    )
 
     # delete tiles whose parent tile's nodegroup_id does not match the expected
     # parent nodegroup_id
-    models.TileModel.objects.using(using).filter(
-        parenttile__isnull=False,
-        resourceinstance__graph_publication_id=initial_graph["publication_id"],
-    ).filter(~Q(parenttile__nodegroup_id=F("nodegroup__parentnodegroup_id"))).delete()
-
-    # add/remove nodes and change default values
-    resource_instances = models.ResourceInstance.objects.using(using).filter(
-        graph_publication_id=initial_graph["publication_id"]
+    misparented, _ = (
+        models.TileModel.objects.using(using)
+        .filter(
+            parenttile__isnull=False,
+            resourceinstance__graph_publication_id=initial_graph["publication_id"],
+        )
+        .filter(~Q(parenttile__nodegroup_id=F("nodegroup__parentnodegroup_id")))
+        .delete()
     )
-    resource_instance_count = resource_instances.count()
 
     initial_node_ids_to_default_values = {
         node["nodeid"]: (node.get("config") or {}).get("defaultValue")
@@ -55,15 +68,15 @@ def apply_graph_change(initial_graph, updated_graph, using=DEFAULT_DB_ALIAS):
         node["nodeid"]: (node.get("config") or {}).get("defaultValue")
         for node in updated_graph["nodes"]
     }
-
     updated_node_ids_by_nodegroup = {}
     for node in updated_graph["nodes"]:
         updated_node_ids_by_nodegroup.setdefault(node["nodegroup_id"], []).append(
             node["nodeid"]
         )
 
+    rewritten = 0
     tiles = models.TileModel.objects.using(using).filter(
-        resourceinstance__in=resource_instances
+        resourceinstance__graph_publication_id=initial_graph["publication_id"]
     )
     for tile in tiles.iterator():
         updated_node_ids = updated_node_ids_by_nodegroup.get(str(tile.nodegroup_id), [])
@@ -94,10 +107,23 @@ def apply_graph_change(initial_graph, updated_graph, using=DEFAULT_DB_ALIAS):
                 tile.data[node_id] = updated_node_ids_to_default_values.get(node_id)
 
         tile.save()
+        rewritten += 1
 
-    # update resource_instance publication_id
+    return orphaned + misparented + rewritten
+
+
+def move_resources_to_publication(initial_graph, updated_graph, using=DEFAULT_DB_ALIAS):
+    """Point resources on ``initial_graph``'s publication at ``updated_graph``'s.
+
+    Run this after reshape_tiles: the publication is what says a resource matches
+    the published graph. Returns the number of resources moved.
+    """
+    resource_instances = models.ResourceInstance.objects.using(using).filter(
+        graph_publication_id=initial_graph["publication_id"]
+    )
+    moved = 0
     for resource_instance in resource_instances.iterator():
         resource_instance.graph_publication_id = updated_graph["publication_id"]
         resource_instance.save()
-
-    return resource_instance_count
+        moved += 1
+    return moved

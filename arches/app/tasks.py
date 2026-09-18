@@ -12,7 +12,10 @@ from django.http import HttpRequest
 from django.utils.translation import gettext as _
 from arches.app.models import models
 from arches.app.utils import import_class_from_string
-from arches.app.utils.graph_change import apply_graph_change
+from arches.app.utils.resource_instance_data import (
+    move_resources_to_publication,
+    reshape_tiles,
+)
 from arches.app.utils.message_contexts import return_message_context
 from tempfile import NamedTemporaryFile
 
@@ -643,7 +646,10 @@ def update_resource_instance_data_based_on_graph_diff(
     )
 
     try:
-        resource_instance_count = apply_graph_change(initial_graph, updated_graph)
+        reshape_tiles(initial_graph, updated_graph)
+        resource_instance_count = move_resources_to_publication(
+            initial_graph, updated_graph
+        )
 
         notify_completion(
             _(

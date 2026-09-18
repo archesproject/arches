@@ -1,14 +1,17 @@
-"""Tests for arches.app.utils.graph_change.apply_graph_change."""
+"""Tests for arches.app.utils.resource_instance_data."""
 
 from unittest.mock import patch
 
 from arches.app.models import models
-from arches.app.utils.graph_change import apply_graph_change
+from arches.app.utils.resource_instance_data import (
+    move_resources_to_publication,
+    reshape_tiles,
+)
 
 from tests.tasks_tests import UpdateResourceInstanceDataTaskTests
 
 
-class ApplyGraphChangeTests(UpdateResourceInstanceDataTaskTests):
+class ResourceInstanceDataTests(UpdateResourceInstanceDataTaskTests):
     def _publish_with_node_deleted(self):
         """Delete the concept node and republish, returning (initial, updated)."""
         initial = models.PublishedGraph.objects.get(
@@ -39,7 +42,8 @@ class ApplyGraphChangeTests(UpdateResourceInstanceDataTaskTests):
         )
         initial, updated = self._publish_with_node_deleted()
 
-        moved = apply_graph_change(initial, updated)
+        reshape_tiles(initial, updated)
+        moved = move_resources_to_publication(initial, updated)
 
         self.assertEqual(moved, 1)
         resource_instance.refresh_from_db()
@@ -75,7 +79,7 @@ class ApplyGraphChangeTests(UpdateResourceInstanceDataTaskTests):
         )
         initial, updated = self._publish_with_node_deleted()
 
-        apply_graph_change(initial, updated)
+        reshape_tiles(initial, updated)
 
         tile.refresh_from_db()
         self.assertNotIn(str(self.concept_node_id), tile.data)
