@@ -1,0 +1,594 @@
+{
+    "graph": [
+        {
+            "author": "",
+            "cards": [
+                {
+                    "active": true,
+                    "cardid": "95a39807-ef1d-4947-9f4c-39aeb28f66c5",
+                    "component_id": "f05e4d3a-53c1-11e8-b0ea-784f435179ea",
+                    "config": null,
+                    "constraints": [],
+                    "cssclass": null,
+                    "description": "{\"en\": \"\"}",
+                    "graph_id": "c86c9176-b41d-4a57-aeaa-d37928f7989b",
+                    "helpenabled": false,
+                    "helptext": {
+                        "en": ""
+                    },
+                    "helptitle": {
+                        "en": ""
+                    },
+                    "instructions": {
+                        "en": ""
+                    },
+                    "name": {
+                        "en": "domain"
+                    },
+                    "nodegroup_id": "19da2f83-ddaa-442e-b7b6-caee0eb3ab7e",
+                    "sortorder": 6,
+                    "source_identifier_id": null,
+                    "visible": true
+                },
+                {
+                    "active": true,
+                    "cardid": "ca4c78cb-f87c-4e73-8bf1-0c54271b17d4",
+                    "component_id": "f05e4d3a-53c1-11e8-b0ea-784f435179ea",
+                    "config": null,
+                    "constraints": [],
+                    "cssclass": null,
+                    "description": "{\"en\": \"\"}",
+                    "graph_id": "c86c9176-b41d-4a57-aeaa-d37928f7989b",
+                    "helpenabled": false,
+                    "helptext": {
+                        "en": ""
+                    },
+                    "helptitle": {
+                        "en": ""
+                    },
+                    "instructions": {
+                        "en": ""
+                    },
+                    "name": {
+                        "en": "domain_list"
+                    },
+                    "nodegroup_id": "1341e31d-2fe4-4e89-960d-143049315f3f",
+                    "sortorder": 7,
+                    "source_identifier_id": null,
+                    "visible": true
+                }
+            ],
+            "cards_x_nodes_x_widgets": [
+                {
+                    "card_id": "ca4c78cb-f87c-4e73-8bf1-0c54271b17d4",
+                    "config": {
+                        "defaultValue": "",
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
+                        "label": "Domain-checkbox",
+                        "placeholder": {
+                            "en": "Select an option"
+                        }
+                    },
+                    "id": "4b182c32-340a-4d3e-845d-d03f42d69b09",
+                    "label": {
+                        "en": "Domain-checkbox"
+                    },
+                    "node_id": "504f3271-ac1e-48bb-aba6-df3220405046",
+                    "sortorder": 1,
+                    "source_identifier_id": null,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000018"
+                },
+                {
+                    "card_id": "95a39807-ef1d-4947-9f4c-39aeb28f66c5",
+                    "config": {
+                        "defaultValue": "cba2cbab-7e49-4248-985e-053f24fdf8eb",
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
+                        "label": "Domain",
+                        "placeholder": {
+                            "en": "Select an option"
+                        }
+                    },
+                    "id": "668e6845-764c-4e69-a4f7-a21eeef11e1c",
+                    "label": {
+                        "en": "Domain"
+                    },
+                    "node_id": "19da2f83-ddaa-442e-b7b6-caee0eb3ab7e",
+                    "sortorder": 0,
+                    "source_identifier_id": null,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000015"
+                },
+                {
+                    "card_id": "ca4c78cb-f87c-4e73-8bf1-0c54271b17d4",
+                    "config": {
+                        "defaultValue": [
+                            "2e440bf6-4f0c-465c-8348-99d9be3cc148",
+                            "2f53ffee-f7a2-48cd-850c-804cfd916e37"
+                        ],
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
+                        "label": "Domain-list",
+                        "placeholder": {
+                            "en": "Select an option"
+                        }
+                    },
+                    "id": "a151b371-7447-4354-b3da-bea17dbed9a9",
+                    "label": {
+                        "en": "Domain-list"
+                    },
+                    "node_id": "1341e31d-2fe4-4e89-960d-143049315f3f",
+                    "sortorder": 0,
+                    "source_identifier_id": null,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000016"
+                },
+                {
+                    "card_id": "95a39807-ef1d-4947-9f4c-39aeb28f66c5",
+                    "config": {
+                        "defaultValue": "",
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
+                        "label": "Domain-radio",
+                        "placeholder": {
+                            "en": "Select an option"
+                        }
+                    },
+                    "id": "d59c6df9-41b7-435c-830c-c8f58786b733",
+                    "label": {
+                        "en": "Domain-radio"
+                    },
+                    "node_id": "937fec95-81f6-4396-871e-d99b9249579b",
+                    "sortorder": 1,
+                    "source_identifier_id": null,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000017"
+                }
+            ],
+            "color": null,
+            "config": {},
+            "deploymentdate": null,
+            "deploymentfile": null,
+            "description": {
+                "en": ""
+            },
+            "edges": [
+                {
+                    "description": null,
+                    "domainnode_id": "1341e31d-2fe4-4e89-960d-143049315f3f",
+                    "edgeid": "6fb98dd9-6e0d-4087-bbb2-82cce3b93ea6",
+                    "graph_id": "c86c9176-b41d-4a57-aeaa-d37928f7989b",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "504f3271-ac1e-48bb-aba6-df3220405046",
+                    "source_identifier_id": null
+                },
+                {
+                    "description": null,
+                    "domainnode_id": "cb3974b4-9550-47d3-859d-0844ef2b02e8",
+                    "edgeid": "89bce683-b3f9-484a-9879-f4e0d9337774",
+                    "graph_id": "c86c9176-b41d-4a57-aeaa-d37928f7989b",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "1341e31d-2fe4-4e89-960d-143049315f3f",
+                    "source_identifier_id": null
+                },
+                {
+                    "description": null,
+                    "domainnode_id": "cb3974b4-9550-47d3-859d-0844ef2b02e8",
+                    "edgeid": "e0fa4581-faf6-4a7a-b530-9205a5386690",
+                    "graph_id": "c86c9176-b41d-4a57-aeaa-d37928f7989b",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "19da2f83-ddaa-442e-b7b6-caee0eb3ab7e",
+                    "source_identifier_id": null
+                },
+                {
+                    "description": null,
+                    "domainnode_id": "19da2f83-ddaa-442e-b7b6-caee0eb3ab7e",
+                    "edgeid": "f991a705-781c-491e-8140-ae0166da41fc",
+                    "graph_id": "c86c9176-b41d-4a57-aeaa-d37928f7989b",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "937fec95-81f6-4396-871e-d99b9249579b",
+                    "source_identifier_id": null
+                }
+            ],
+            "functions_x_graphs": [],
+            "graphid": "c86c9176-b41d-4a57-aeaa-d37928f7989b",
+            "group_permissions": {},
+            "has_unpublished_changes": true,
+            "iconclass": "",
+            "is_active": true,
+            "is_copy_immutable": false,
+            "isresource": true,
+            "jsonldcontext": null,
+            "name": {
+                "en": "Domain Node Migration Test"
+            },
+            "nodegroups": [
+                {
+                    "cardinality": "1",
+                    "grouping_node_id": "1341e31d-2fe4-4e89-960d-143049315f3f",
+                    "legacygroupid": null,
+                    "nodegroupid": "1341e31d-2fe4-4e89-960d-143049315f3f",
+                    "parentnodegroup_id": null
+                },
+                {
+                    "cardinality": "1",
+                    "grouping_node_id": "19da2f83-ddaa-442e-b7b6-caee0eb3ab7e",
+                    "legacygroupid": null,
+                    "nodegroupid": "19da2f83-ddaa-442e-b7b6-caee0eb3ab7e",
+                    "parentnodegroup_id": null
+                }
+            ],
+            "nodes": [
+                {
+                    "alias": "domain_list",
+                    "config": {
+                        "i18n_config": {
+                            "fn": "arches.app.datatypes.datatypes.DomainDataType"
+                        },
+                        "options": [
+                            {
+                                "id": "2e440bf6-4f0c-465c-8348-99d9be3cc148",
+                                "selected": false,
+                                "text": {
+                                    "en": "A"
+                                }
+                            },
+                            {
+                                "id": "2f53ffee-f7a2-48cd-850c-804cfd916e37",
+                                "selected": false,
+                                "text": {
+                                    "en": "B"
+                                }
+                            },
+                            {
+                                "id": "3d955540-8d06-4f3d-aad0-75b008549d3c",
+                                "selected": false,
+                                "text": {
+                                    "en": "C"
+                                }
+                            },
+                            {
+                                "id": "d249178e-c146-4adc-9eaf-dc0d6c9cf032",
+                                "selected": false,
+                                "text": {
+                                    "en": "D"
+                                }
+                            }
+                        ]
+                    },
+                    "datatype": "domain-value-list",
+                    "description": "{\"en\": \"\"}",
+                    "exportable": true,
+                    "fieldname": null,
+                    "graph_id": "c86c9176-b41d-4a57-aeaa-d37928f7989b",
+                    "hascustomalias": false,
+                    "is_collector": true,
+                    "is_immutable": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "domain_list",
+                    "nodegroup_id": "1341e31d-2fe4-4e89-960d-143049315f3f",
+                    "nodeid": "1341e31d-2fe4-4e89-960d-143049315f3f",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 0,
+                    "source_identifier_id": null,
+                    "sourcebranchpublication_id": null
+                },
+                {
+                    "alias": "domain",
+                    "config": {
+                        "i18n_config": {
+                            "fn": "arches.app.datatypes.datatypes.DomainDataType"
+                        },
+                        "options": [
+                            {
+                                "id": "77f312cb-5b17-4a02-8d1f-37def9599938",
+                                "selected": false,
+                                "text": {
+                                    "en": "4"
+                                }
+                            },
+                            {
+                                "id": "a7556098-28bf-4eff-93df-542dc746a45e",
+                                "selected": false,
+                                "text": {
+                                    "en": "3"
+                                }
+                            },
+                            {
+                                "id": "cba2cbab-7e49-4248-985e-053f24fdf8eb",
+                                "selected": false,
+                                "text": {
+                                    "en": "1"
+                                }
+                            },
+                            {
+                                "id": "ce55a9d7-2ec6-45e2-b8b8-0314ebe80109",
+                                "selected": false,
+                                "text": {
+                                    "en": "2"
+                                }
+                            }
+                        ]
+                    },
+                    "datatype": "domain-value",
+                    "description": "{\"en\": \"\"}",
+                    "exportable": true,
+                    "fieldname": null,
+                    "graph_id": "c86c9176-b41d-4a57-aeaa-d37928f7989b",
+                    "hascustomalias": false,
+                    "is_collector": true,
+                    "is_immutable": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "domain",
+                    "nodegroup_id": "19da2f83-ddaa-442e-b7b6-caee0eb3ab7e",
+                    "nodeid": "19da2f83-ddaa-442e-b7b6-caee0eb3ab7e",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 0,
+                    "source_identifier_id": null,
+                    "sourcebranchpublication_id": null
+                },
+                {
+                    "alias": "domain_checkbox",
+                    "config": {
+                        "i18n_config": {
+                            "fn": "arches.app.datatypes.datatypes.DomainDataType"
+                        },
+                        "options": [
+                            {
+                                "id": "2e440bf6-4f0c-465c-8348-99d9be3cc148",
+                                "selected": false,
+                                "text": {
+                                    "en": "A"
+                                }
+                            },
+                            {
+                                "id": "2f53ffee-f7a2-48cd-850c-804cfd916e37",
+                                "selected": false,
+                                "text": {
+                                    "en": "B"
+                                }
+                            },
+                            {
+                                "id": "3d955540-8d06-4f3d-aad0-75b008549d3c",
+                                "selected": false,
+                                "text": {
+                                    "en": "C"
+                                }
+                            },
+                            {
+                                "id": "d249178e-c146-4adc-9eaf-dc0d6c9cf032",
+                                "selected": false,
+                                "text": {
+                                    "en": "D"
+                                }
+                            }
+                        ]
+                    },
+                    "datatype": "domain-value-list",
+                    "description": null,
+                    "exportable": true,
+                    "fieldname": null,
+                    "graph_id": "c86c9176-b41d-4a57-aeaa-d37928f7989b",
+                    "hascustomalias": false,
+                    "is_collector": false,
+                    "is_immutable": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "domain_checkbox",
+                    "nodegroup_id": "1341e31d-2fe4-4e89-960d-143049315f3f",
+                    "nodeid": "504f3271-ac1e-48bb-aba6-df3220405046",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 0,
+                    "source_identifier_id": null,
+                    "sourcebranchpublication_id": null
+                },
+                {
+                    "alias": "domain_radio",
+                    "config": {
+                        "i18n_config": {
+                            "fn": "arches.app.datatypes.datatypes.DomainDataType"
+                        },
+                        "options": [
+                            {
+                                "id": "77f312cb-5b17-4a02-8d1f-37def9599938",
+                                "selected": false,
+                                "text": {
+                                    "en": "4"
+                                }
+                            },
+                            {
+                                "id": "a7556098-28bf-4eff-93df-542dc746a45e",
+                                "selected": false,
+                                "text": {
+                                    "en": "3"
+                                }
+                            },
+                            {
+                                "id": "cba2cbab-7e49-4248-985e-053f24fdf8eb",
+                                "selected": false,
+                                "text": {
+                                    "en": "1"
+                                }
+                            },
+                            {
+                                "id": "ce55a9d7-2ec6-45e2-b8b8-0314ebe80109",
+                                "selected": false,
+                                "text": {
+                                    "en": "2"
+                                }
+                            }
+                        ]
+                    },
+                    "datatype": "domain-value",
+                    "description": null,
+                    "exportable": true,
+                    "fieldname": null,
+                    "graph_id": "c86c9176-b41d-4a57-aeaa-d37928f7989b",
+                    "hascustomalias": false,
+                    "is_collector": false,
+                    "is_immutable": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "domain_radio",
+                    "nodegroup_id": "19da2f83-ddaa-442e-b7b6-caee0eb3ab7e",
+                    "nodeid": "937fec95-81f6-4396-871e-d99b9249579b",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 0,
+                    "source_identifier_id": null,
+                    "sourcebranchpublication_id": null
+                },
+                {
+                    "alias": "new_resource_model",
+                    "config": {},
+                    "datatype": "semantic",
+                    "description": "",
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "c86c9176-b41d-4a57-aeaa-d37928f7989b",
+                    "hascustomalias": false,
+                    "is_collector": false,
+                    "is_immutable": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": true,
+                    "name": "Domain Node Migration Test",
+                    "nodegroup_id": null,
+                    "nodeid": "cb3974b4-9550-47d3-859d-0844ef2b02e8",
+                    "ontologyclass": null,
+                    "parentproperty": "",
+                    "sortorder": 0,
+                    "source_identifier_id": null,
+                    "sourcebranchpublication_id": null
+                }
+            ],
+            "ontology_id": null,
+            "publication": {
+                "graph_id": "c86c9176-b41d-4a57-aeaa-d37928f7989b",
+                "most_recent_edit_id": null,
+                "notes": null,
+                "publicationid": "53fbad79-f3a4-4865-8632-526328beb137",
+                "published_time": "2026-07-06T15:05:05.106"
+            },
+            "relatable_resource_model_ids": [],
+            "resource_2_resource_constraints": [],
+            "resource_instance_lifecycle": {
+                "id": "7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75",
+                "name": {
+                    "en": "Standard"
+                },
+                "resource_instance_lifecycle_states": [
+                    {
+                        "action_label": {
+                            "en": "Revert to Draft"
+                        },
+                        "can_delete_resource_instances": true,
+                        "can_edit_resource_instances": true,
+                        "id": "9375c9a7-dad2-4f14-a5c1-d7e329fdde4f",
+                        "is_initial_state": true,
+                        "name": {
+                            "en": "Draft"
+                        },
+                        "next_resource_instance_lifecycle_states": [
+                            "f75bb034-36e3-4ab4-8167-f520cf0b4c58"
+                        ],
+                        "previous_resource_instance_lifecycle_states": [],
+                        "resource_instance_lifecycle_id": "7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"
+                    },
+                    {
+                        "action_label": {
+                            "en": "Make Active"
+                        },
+                        "can_delete_resource_instances": false,
+                        "can_edit_resource_instances": true,
+                        "id": "f75bb034-36e3-4ab4-8167-f520cf0b4c58",
+                        "is_initial_state": false,
+                        "name": {
+                            "en": "Active"
+                        },
+                        "next_resource_instance_lifecycle_states": [
+                            "d95d9c0e-0e2c-4450-93a3-d788b91abcc8"
+                        ],
+                        "previous_resource_instance_lifecycle_states": [
+                            "9375c9a7-dad2-4f14-a5c1-d7e329fdde4f"
+                        ],
+                        "resource_instance_lifecycle_id": "7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"
+                    },
+                    {
+                        "action_label": {
+                            "en": "Retire"
+                        },
+                        "can_delete_resource_instances": false,
+                        "can_edit_resource_instances": false,
+                        "id": "d95d9c0e-0e2c-4450-93a3-d788b91abcc8",
+                        "is_initial_state": false,
+                        "name": {
+                            "en": "Retired"
+                        },
+                        "next_resource_instance_lifecycle_states": [],
+                        "previous_resource_instance_lifecycle_states": [
+                            "f75bb034-36e3-4ab4-8167-f520cf0b4c58"
+                        ],
+                        "resource_instance_lifecycle_id": "7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"
+                    }
+                ]
+            },
+            "root": {
+                "alias": "new_resource_model",
+                "config": {},
+                "datatype": "semantic",
+                "description": "",
+                "exportable": false,
+                "fieldname": null,
+                "graph_id": "c86c9176-b41d-4a57-aeaa-d37928f7989b",
+                "hascustomalias": false,
+                "is_collector": false,
+                "is_immutable": false,
+                "isrequired": false,
+                "issearchable": true,
+                "istopnode": true,
+                "name": "Domain Node Migration Test",
+                "nodegroup_id": null,
+                "nodeid": "cb3974b4-9550-47d3-859d-0844ef2b02e8",
+                "ontologyclass": null,
+                "sortorder": 0,
+                "source_identifier_id": null,
+                "sourcebranchpublication_id": null
+            },
+            "slug": "domain-node-migration-test",
+            "source_identifier_id": null,
+            "spatial_views": [],
+            "subtitle": {
+                "en": ""
+            },
+            "template_id": "50000000-0000-0000-0000-000000000001",
+            "user_permissions": {},
+            "version": ""
+        }
+    ],
+    "metadata": {
+        "db": "PostgreSQL 17.9 (Postgres.app) on aarch64-apple-darwin23.6.0, compiled by Apple clang version 15.0.0 (clang-1500.3.9.4), 64-bit",
+        "git hash": "",
+        "os": "Darwin",
+        "os version": "25.5.0"
+    }
+}
