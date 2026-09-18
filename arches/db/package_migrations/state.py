@@ -15,8 +15,6 @@ So a graph's state IS its canonical dict, keyed by graphid. Operations mutate
 those dicts, and diffing two states is dict comparison.
 """
 
-import copy
-
 from django.utils.functional import cached_property
 
 from arches.app.models import models
@@ -145,9 +143,14 @@ class PackageState:
     def __init__(self, graphs=None, real_apps=None):
         self.graphs = graphs if graphs is not None else {}
         self.real_apps = set(real_apps) if real_apps else set()
+        # Which graphs this state may change in place. The rest are shared with
+        # the states it was cloned from until graph_for_write() copies them.
+        self._owned = set(self.graphs)
 
     def add_graph(self, graph):
-        self.graphs[str(graph["graphid"])] = graph
+        graphid = str(graph["graphid"])
+        self.graphs[graphid] = graph
+        self._owned.add(graphid)
 
     def graph(self, graphid):
         """The state entry for a graph, seeded if the history never created it.
@@ -167,7 +170,28 @@ class PackageState:
                 {collection: {} for collection in STATE_COLLECTIONS},
                 graphid=graphid,
             )
+            self._owned.add(graphid)
         return self.graphs[graphid]
+
+    def graph_for_write(self, graphid):
+        """The graph, safe for this state to change.
+
+        Every operation that changes state goes through here, including
+        hand-written ones. clone() shares graphs, so the copy happens on first
+        write: this graph and its collection maps become this state's own. The
+        row dicts inside them stay shared, so an operation must REPLACE a row
+        rather than mutate it, or it rewrites history the reverse path reads.
+        """
+        graphid = str(graphid)
+        graph = self.graph(graphid)
+        if graphid not in self._owned:
+            graph = {
+                key: dict(value) if isinstance(value, dict) else value
+                for key, value in graph.items()
+            }
+            self.graphs[graphid] = graph
+            self._owned.add(graphid)
+        return graph
 
     @cached_property
     def apps(self):
@@ -180,14 +204,17 @@ class PackageState:
         return _RenderedPackageApps(self)
 
     def clone(self):
-        # deepcopy because node/card dicts nest arbitrary `config` JSON that an
-        # operation could otherwise mutate through a shared reference. unapply()
-        # clones twice per operation, so if this ever shows up in a profile the
-        # answer is structural sharing, not a shallower copy.
+        """Share the graphs; copy one only when an operation writes to it.
+
+        Django clones the state before every operation (migration.py:117), so a
+        deep copy here costs the square of the migration size: adopting a package
+        of 36 graphs spent a minute copying state that nothing had changed.
+        """
         new_state = PackageState(
-            graphs=copy.deepcopy(self.graphs),
+            graphs=dict(self.graphs),
             real_apps=self.real_apps,
         )
+        new_state._owned = set()
         if "apps" in self.__dict__:
             new_state.apps = self.apps.clone()
         return new_state

@@ -144,14 +144,25 @@ class _AlterRowOperation(PackageOperation):
         self.changes = changes
 
     def _entry(self, state):
+        """Read-only view of the row, for recovering previous values on reverse."""
         return (
             state.graph(self.graphid)
-            .setdefault(self.state_collection, {})
-            .setdefault(str(self._pk), {})
+            .get(self.state_collection, {})
+            .get(str(self._pk), {})
         )
 
+    def _entry_for_write(self, state):
+        collection = state.graph_for_write(self.graphid).setdefault(
+            self.state_collection, {}
+        )
+        # Replace rather than mutate: the row may still be shared with the state
+        # this one was cloned from, which reverse reads to restore old values.
+        row = dict(collection.get(str(self._pk), {}))
+        collection[str(self._pk)] = row
+        return row
+
     def state_forwards(self, app_label, state):
-        self._entry(state).update(self.changes)
+        self._entry_for_write(state).update(self.changes)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         self.qs(self.model, schema_editor).filter(pk=self._pk).update(**self.changes)
@@ -266,7 +277,10 @@ class _RowOperation(PackageOperation):
         return _short(self._pk)
 
     def _collection(self, state):
-        return state.graph(self.graphid).setdefault(self.state_collection, {})
+        return state.graph(self.graphid).get(self.state_collection, {})
+
+    def _collection_for_write(self, state):
+        return state.graph_for_write(self.graphid).setdefault(self.state_collection, {})
 
     def _row_kwargs(self):
         kwargs = self._complete_fields()
@@ -297,7 +311,7 @@ class _CreateRowOperation(_RowOperation):
 
     def state_forwards(self, app_label, state):
         # Store the completed row, so replayed state and the database agree.
-        self._collection(state)[self._pk] = self._complete_fields()
+        self._collection_for_write(state)[self._pk] = self._complete_fields()
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         self._create_row(schema_editor)
@@ -321,7 +335,7 @@ class _DeleteRowOperation(_RowOperation):
         return str(self.pk)
 
     def state_forwards(self, app_label, state):
-        del self._collection(state)[self._pk]
+        del self._collection_for_write(state)[self._pk]
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         self._delete_row(schema_editor)

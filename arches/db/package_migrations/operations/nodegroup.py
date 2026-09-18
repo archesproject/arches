@@ -35,7 +35,7 @@ class DeleteNodeGroup(_DeleteRowOperation):
     reversible = False
 
     def state_forwards(self, app_label, state):
-        graph = state.graph(self.graphid)
+        graph = state.graph_for_write(self.graphid)
         graph["nodegroups"].pop(self._pk, None)
 
         gone = {"nodes": set(), "cards": set()}
