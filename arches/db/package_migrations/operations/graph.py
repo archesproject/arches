@@ -1,6 +1,6 @@
 """Graph operations: the graph row and its publication.
 
-The draft copy is derived state, reconciled once per run; see db/package_migrations/drafts.py.
+The draft copy is derived state: migratepkg drops a stale one after a run.
 
 CreateGraph uses models.GraphModel.objects.create(), NOT
 Graph.objects.create_graph(). The latter mints a random root nodeid, publishes
@@ -37,6 +37,7 @@ class CreateGraph(PackageOperation):
 
     reversible = True
     scope = "graph"
+    model = models.GraphModel
     serialization_expand_args = ["fields"]
 
     def __init__(self, fields):
@@ -104,6 +105,9 @@ class AlterGraph(_AlterRowOperation):
     def _entry(self, state):
         return state.graph(self.graphid)
 
+    def _entry_for_write(self, state):
+        return state.graph_for_write(self.graphid)
+
 
 class PublishGraph(PackageOperation):
     """Mint a publication with a portable id.
@@ -130,7 +134,7 @@ class PublishGraph(PackageOperation):
         return self.previous_publication_id is not None
 
     def state_forwards(self, app_label, state):
-        state.graph(self.graphid)["publication_id"] = str(self.publication_id)
+        state.graph_for_write(self.graphid)["publication_id"] = str(self.publication_id)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         Graph.objects.using(schema_editor.connection.alias).get(

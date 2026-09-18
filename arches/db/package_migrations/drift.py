@@ -16,6 +16,8 @@ there, not what they contain. Field-level comparison is deliberately out of scop
 would report false conflicts for i18n fields, which serialize per active language.
 """
 
+import collections
+
 from arches.app.models import models
 from arches.db.package_migrations.operations.base import (
     _AlterRowOperation,
@@ -23,21 +25,85 @@ from arches.db.package_migrations.operations.base import (
     _DeleteRowOperation,
 )
 from arches.db.package_migrations.operations.graph import CreateGraph
+from arches.db.package_migrations.state import COLLECTIONS
+
+# Rows the migrations create themselves; anything else a row points at has to be
+# installed already.
+GRAPH_ROW_MODELS = {entry[2] for entry in COLLECTIONS} | {models.GraphModel}
+
+
+# kind is "present" (the row is already there), "missing" (it is not) or
+# "reference" (something outside the graph that a row points at is not installed).
+# Which one it is decides what the operator should do next.
+Problem = collections.namedtuple("Problem", "kind message")
 
 
 def problems(plan, using):
-    """Human-readable reasons this plan does not fit this database."""
-    found = []
+    """Reasons this plan does not fit this database."""
+    found = _missing_references(plan, using)
     for migration, backwards in plan:
         for operation in migration.operations:
             if backwards:
-                reason = _reverse_problem(operation, using)
+                problem = _reverse_problem(operation, using)
             else:
-                reason = _problem(operation, using)
-            if reason:
+                problem = _problem(operation, using)
+            if problem:
                 found.append(
-                    "%s.%s: %s" % (migration.app_label, migration.name, reason)
+                    problem._replace(
+                        message="%s.%s: %s"
+                        % (migration.app_label, migration.name, problem.message)
+                    )
                 )
+    return found
+
+
+def _references(operation):
+    """(model, pk) a create operation points at outside the graph's own rows."""
+    model = getattr(operation, "model", None)
+    fields = getattr(operation, "fields", None)
+    if model is None or not fields:
+        return
+    for name, value in fields.items():
+        if value is None or not name.endswith("_id"):
+            continue
+        try:
+            field = model._meta.get_field(name[: -len("_id")])
+        except Exception:
+            continue
+        if not field.is_relation or field.related_model in GRAPH_ROW_MODELS:
+            continue
+        yield field.related_model, str(value)
+
+
+def _missing_references(plan, using):
+    """A graph is not self-contained: it points at an ontology, a template, card
+    components and widgets, which a package installs through load_package rather
+    than through graph rows. Without this the first sign of trouble is a
+    DoesNotExist raised deep inside Graph.publish().
+    """
+    wanted = collections.defaultdict(set)
+    for migration, backwards in plan:
+        if backwards:
+            continue
+        for operation in migration.operations:
+            for model, pk in _references(operation):
+                wanted[model].add(pk)
+
+    found = []
+    for model, pks in wanted.items():
+        present = {
+            str(pk)
+            for pk in model.objects.using(using)
+            .filter(pk__in=pks)
+            .values_list("pk", flat=True)
+        }
+        for pk in sorted(pks - present):
+            found.append(
+                Problem(
+                    "reference",
+                    "%s %s, which these graphs point at" % (model.__name__, pk),
+                )
+            )
     return found
 
 
@@ -55,7 +121,7 @@ def _reverse_problem(operation, using):
 def _problem(operation, using):
     if isinstance(operation, CreateGraph):
         if _exists(models.GraphModel, operation.graphid, using):
-            return "graph %s already exists" % operation.graphid
+            return Problem("present", "graph %s already exists" % operation.graphid)
         return None
 
     model = getattr(operation, "model", None)
@@ -64,10 +130,14 @@ def _problem(operation, using):
 
     if isinstance(operation, _CreateRowOperation):
         if _exists(model, operation._pk, using):
-            return "%s %s already exists" % (model.__name__, operation._pk)
+            return Problem(
+                "present", "%s %s already exists" % (model.__name__, operation._pk)
+            )
     elif isinstance(operation, (_AlterRowOperation, _DeleteRowOperation)):
         if not _exists(model, operation._pk, using):
-            return "%s %s is missing" % (model.__name__, operation._pk)
+            return Problem(
+                "missing", "%s %s is missing" % (model.__name__, operation._pk)
+            )
     return None
 
 

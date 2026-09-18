@@ -8,12 +8,15 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.exceptions import AmbiguityError
 
-from arches.db.package_migrations import drafts, drift
+from arches.app.models.graph import Graph
+from arches.db.package_migrations import drift, labels
 from arches.db.package_migrations.executor import PackageMigrationExecutor
 
 
 class Command(BaseCommand):
     help = "Applies package data migrations for Arches applications."
+
+    PLAN_DETAIL_LIMIT = 25
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -47,7 +50,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.verbosity = options["verbosity"]
-        connection = connections[options["database"]]
+        self.database = options["database"]
+        connection = connections[self.database]
 
         executor = PackageMigrationExecutor(
             connection, progress_callback=self._progress
@@ -77,16 +81,15 @@ class Command(BaseCommand):
                 self.stdout.write("No package migrations to apply.")
             return
 
-        if not options["fake"]:
+        if options["fake"]:
+            self._refuse_faking_data(plan, options["force"])
+        else:
             self._refuse_drifted_database(plan, connection, options["force"])
 
         executor.migrate(targets, plan=plan, fake=options["fake"])
 
         if not options["fake"]:
-            # The draft is derived from the graph, so it is rebuilt once here
-            # rather than by an operation, which is also what lets a graph be
-            # stepped backwards through its versions.
-            drafts.reconcile(drafts.graphs_in(plan), connection.alias)
+            self._discard_stale_drafts(plan, connection.alias)
 
     def _targets(self, executor, options):
         graph = executor.loader.graph
@@ -123,6 +126,52 @@ class Command(BaseCommand):
             )
         return [(app_label, migration.name)]
 
+    def _discard_stale_drafts(self, plan, using):
+        """A draft copied before this run would undo it on the next Designer
+        publish, which rebuilds the live graph entirely from the draft. Dropping
+        it is the whole fix: Arches builds a fresh one from the migrated graph
+        when someone opens it.
+        """
+        graphids = {
+            str(getattr(operation, "graphid", "") or "")
+            for migration, _backwards in plan
+            for operation in migration.operations
+        } - {""}
+        for graphid in sorted(graphids):
+            graph = Graph.objects.using(using).filter(pk=graphid).first()
+            if graph is not None and graph.get_draft_graph():
+                graph.delete_draft_graph()
+
+    def _refuse_faking_data(self, plan, force):
+        """Faking structural work is safe when the rows already exist: the end
+        state matches. Faking data work is not. Nothing else adds a key to a
+        tile, and once the migration is recorded its content-addressed predicate
+        is never consulted again, so the work is skipped in silence.
+        """
+        faked = [
+            migration
+            for migration, _backwards in plan
+            if any(operation.scope == "data" for operation in migration.operations)
+        ]
+        if not faked:
+            return
+        message = (
+            "These package migrations change business data, which nothing else "
+            "will do if they are recorded rather than run:\n  %s\nFake the graph "
+            "migrations only, by naming the last of them, then apply the rest:\n"
+            "  python manage.py migratepkg %s <last graph migration> --fake\n"
+            "  python manage.py migratepkg %s"
+            % (
+                "\n  ".join("%s.%s" % (m.app_label, m.name) for m in faked),
+                faked[0].app_label,
+                faked[0].app_label,
+            )
+        )
+        if force:
+            self.stderr.write(self.style.WARNING(message))
+            return
+        raise CommandError("%s\nRe-run with --force to record them anyway." % message)
+
     def _refuse_drifted_database(self, plan, connection, force):
         """These migrations were generated against migration history, not against
         this database. If a curator has edited the graph since, an alter updates
@@ -130,13 +179,40 @@ class Command(BaseCommand):
         problems = drift.problems(plan, connection.alias)
         if not problems:
             return
-        message = (
-            "This database has diverged from the migration history these package "
-            "migrations were generated against:\n  %s" % "\n  ".join(problems)
+
+        if all(problem.kind == "reference" for problem in problems):
+            # A graph points at an ontology, a template, widgets and card
+            # components. Those come from the package, not from graph rows.
+            headline = (
+                "These package migrations need reference data this database does "
+                "not have. Install the package first, then migrate:\n"
+                "  python manage.py packages -o load_package -s <app>/pkg -y\n"
+                "Missing:"
+            )
+        elif all(problem.kind == "present" for problem in problems):
+            # The machine the change was authored on already has the rows: the
+            # Graph Designer wrote them before the migration existed.
+            headline = (
+                "Everything these package migrations create is already here, which "
+                "is what the machine they were authored on looks like. Record them "
+                "instead of applying them:\n  python manage.py migratepkg %s --fake"
+                % (plan[0][0].app_label if plan else "<app>")
+            )
+        else:
+            headline = (
+                "This database has diverged from the migration history these "
+                "package migrations were generated against"
+            )
+        message = "%s\n  %s" % (
+            headline,
+            "\n  ".join(problem.message for problem in problems),
         )
         if force:
             self.stderr.write(self.style.WARNING(message))
             return
+        if all(problem.kind == "reference" for problem in problems):
+            # --force would only move the failure deeper, into Graph.publish().
+            raise CommandError(message)
         raise CommandError(
             "%s\nReconcile the graph, or re-run with --force to apply anyway." % message
         )
@@ -181,8 +257,27 @@ class Command(BaseCommand):
                     migration.name,
                 )
             )
-            for operation in migration.operations:
-                self.stdout.write("      %s" % operation.describe())
+            self._print_operations(migration.operations)
+
+    def _print_operations(self, operations):
+        """A migration that adopts an existing package describes every row of
+        every graph, which is thousands of lines nobody reads. Summarise by kind
+        unless asked for the whole thing."""
+        described = [operation.describe() for operation in operations]
+        if self.verbosity >= 2 or len(operations) <= self.PLAN_DETAIL_LIMIT:
+            names = labels.from_database("\n".join(described), self.database)
+            for description in described:
+                self.stdout.write("      %s" % labels.humanize(description, names))
+            return
+
+        counts = {}
+        for operation in operations:
+            counts[type(operation).__name__] = (
+                counts.get(type(operation).__name__, 0) + 1
+            )
+        for name in sorted(counts):
+            self.stdout.write("      %s x%d" % (name, counts[name]))
+        self.stdout.write("      (%d operations; -v 2 lists them)" % len(operations))
 
     def _progress(self, action, migration=None, fake=False):
         if self.verbosity < 1:
