@@ -81,8 +81,8 @@
                     {
                         "data": {
                             "0e9000b0-4148-11e7-bd19-c4b301baab9f": "pk.eyJ1IjoiY2hpYXR0IiwiYSI6ImZRLTZDbVkifQ.2ZLLC1kInvxJ7isk_0_OMw", 
-                            "0e900254-4148-11e7-9902-c4b301baab9f": "mapbox://sprites/mapbox/basic-v9", 
-                            "0e90031e-4148-11e7-a176-c4b301baab9f": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf"
+                            "0e900254-4148-11e7-9902-c4b301baab9f": "", 
+                            "0e90031e-4148-11e7-a176-c4b301baab9f": "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf"
                         }, 
                         "parenttile_id": "3442b7e7-9bee-4c54-8d37-eca3a236ef8f", 
                         "nodegroup_id": "0e8fe457-4148-11e7-9c10-c4b301baab9f", 

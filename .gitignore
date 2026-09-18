@@ -44,3 +44,21 @@ webpack-stats.json
 .DS_STORE
 CACHE
 frontend_configuration
+
+# Runtime scaffolding — generated from arches-docker, do not edit here
+.runtime/entrypoint.sh
+.runtime/restore-tables.sh
+.runtime/supervisor.conf
+.runtime/test_settings.py
+**/settings_local.py
+.runtime/conf.d/
+.runtime/nginx/
+.runtime/internal/
+docker-compose.yml
+docker-compose.dev.yml
+docker-compose.override.yml
+docker-compose.dev.override.yml
+docker-compose.dev.override.yml.example
+Makefile
+.runtime/development/env_file.env
+.runtime/development/env_file.env.sample

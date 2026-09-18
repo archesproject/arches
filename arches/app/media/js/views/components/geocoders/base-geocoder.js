@@ -1,6 +1,6 @@
 import ko from 'knockout';
 import arches from 'arches';
-import mapbox from 'mapbox-gl';
+import { LngLat } from 'maplibre-gl';
 
 
 /**
@@ -14,10 +14,7 @@ import mapbox from 'mapbox-gl';
 
 var BaseGeocoderViewModel = function(params) {
     var self = this;
-    let mapboxgl;
 
-    mapboxgl = mapbox;
-    
     this.placeholder = params.placeholder || ko.observable('Locate a Place or Address');
     this.anchorLayerId = params.anchorLayerId;
     this.apiKey = params.api_key || arches.mapboxApiKey;
@@ -99,7 +96,7 @@ var BaseGeocoderViewModel = function(params) {
             var coords = item.geometry.coordinates;
             self.map.getSource('geocode-point').setData(item.geometry);
             self.redrawLayer();
-            var centerPoint = new self.mapboxgl.LngLat(coords[0], coords[1]);
+            var centerPoint = new LngLat(coords[0], coords[1]);
             self.map.flyTo({
                 center: centerPoint
             });
