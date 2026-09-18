@@ -62,7 +62,7 @@ class MakePkgMigrationsTests(PackageMigrationOperationTests):
         )
 
     def _commit_graph(self, **overrides):
-        """Commit the graph in the shape load_package reads, as exportgraph does."""
+        """Commit the graph in the shape `packages -o export_graphs` writes."""
         serialized = dict(self.graph.get_published_graph().serialized_graph)
         serialized.update(overrides)
         self._write_graph(serialized)
@@ -95,18 +95,18 @@ class MakePkgMigrationsTests(PackageMigrationOperationTests):
         with self._installed():
             call_command("makepkgmigrations", APP_NAME, verbosity=0)
             files = self._migration_files()
-            # one migration per kind of change: graph, then data
-            self.assertEqual(len(files), 2, files)
+            # A graph created here has no tiles and no resources, so there is
+            # nothing for a data migration to do.
+            self.assertEqual(len(files), 1, files)
             self.assertIn("_graph_", files[0])
-            self.assertIn("_data_", files[1])
             self.assertTrue(files[0].startswith("0001_"))
 
             # The generated file must be importable and runnable, not just written.
             source = (
                 self.package / "migrations" / "package_migrations" / files[0]
             ).read_text()
-            self.assertIn("import arches.db.package_migrations.operations", source)
-            self.assertIn("CreateGraph", source)
+            self.assertIn("from arches.db.package_migrations.operations import", source)
+            self.assertIn("CreateGraph(", source)
 
             out = StringIO()
             call_command("migratepkg", APP_NAME, plan=True, stdout=out)
@@ -119,7 +119,7 @@ class MakePkgMigrationsTests(PackageMigrationOperationTests):
             out = StringIO()
             call_command("makepkgmigrations", APP_NAME, stdout=out)
             self.assertIn("No changes detected", out.getvalue())
-            self.assertEqual(len(self._migration_files()), 2)
+            self.assertEqual(len(self._migration_files()), 1)
 
     def test_check_exits_non_zero_when_a_migration_is_missing(self):
         self._commit_graph()
@@ -161,7 +161,7 @@ class MakePkgMigrationsTests(PackageMigrationOperationTests):
             # A real change: a new node, with the edge that joins it to the tree.
             new_nodeid = str(uuid.uuid4())
             new_edgeid = str(uuid.uuid4())
-            # Rows are written whole, the way exportgraph writes them: the
+            # Rows are written whole, the way an export writes them: the
             # projection fills absent keys with None, not with model defaults.
             existing_node = [
                 node
@@ -221,12 +221,34 @@ class MakePkgMigrationsTests(PackageMigrationOperationTests):
         """The file boundary is what makes the ordering true: the graph is
         published first, and resources stay on the old publication until the data
         migration has brought their tiles in line and moved them."""
-        self._commit_graph()
+        serialized = self._commit_graph()
         with self._installed():
             call_command("makepkgmigrations", APP_NAME, verbosity=0)
-            directory = self.package / "migrations" / "package_migrations"
+            adopted = set(self._migration_files())
+
+            # A change to an existing graph is what implies tile work.
+            new_nodeid = str(uuid.uuid4())
+            existing = [
+                node
+                for node in serialized["nodes"]
+                if str(node["nodeid"]) == str(self.string_node.nodeid)
+            ][0]
+            serialized["nodes"].append(
+                dict(existing, nodeid=new_nodeid, alias="separation", name="Separation")
+            )
+            serialized["edges"].append(
+                dict(
+                    serialized["edges"][0],
+                    edgeid=str(uuid.uuid4()),
+                    domainnode_id=str(self.nodegroup_id),
+                    rangenode_id=new_nodeid,
+                )
+            )
+            self._write_graph(serialized)
+            call_command("makepkgmigrations", APP_NAME, verbosity=0)
+
             scopes = []
-            for name in self._migration_files():
+            for name in sorted(set(self._migration_files()) - adopted):
                 module = __import__(
                     "%s.migrations.package_migrations.%s" % (APP_NAME, name[:-3]),
                     fromlist=["Migration"],
@@ -265,3 +287,35 @@ class MakePkgMigrationsTests(PackageMigrationOperationTests):
             call_command("makepkgmigrations", APP_NAME, verbosity=0, stderr=err)
             self.assertIn("changing datatype to 'concept'", err.getvalue())
             self.assertIn("RunPackagePython", err.getvalue())
+
+    def test_faking_a_data_migration_is_refused(self):
+        """Faking structural work is safe when the rows are already there. Faking
+        tile work skips the only thing that would ever do it, and the ledger then
+        says it happened."""
+        serialized = self._commit_graph()
+        with self._installed():
+            self._adopt()
+
+            new_nodeid = str(uuid.uuid4())
+            existing = [
+                node
+                for node in serialized["nodes"]
+                if str(node["nodeid"]) == str(self.string_node.nodeid)
+            ][0]
+            serialized["nodes"].append(
+                dict(existing, nodeid=new_nodeid, alias="faked", name="Faked")
+            )
+            serialized["edges"].append(
+                dict(
+                    serialized["edges"][0],
+                    edgeid=str(uuid.uuid4()),
+                    domainnode_id=str(self.nodegroup_id),
+                    rangenode_id=new_nodeid,
+                )
+            )
+            self._write_graph(serialized)
+            call_command("makepkgmigrations", APP_NAME, verbosity=0)
+
+            with self.assertRaises(CommandError) as refusal:
+                call_command("migratepkg", APP_NAME, fake=True, verbosity=0)
+            self.assertIn("change business data", str(refusal.exception))

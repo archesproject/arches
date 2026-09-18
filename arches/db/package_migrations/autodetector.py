@@ -98,7 +98,8 @@ def changes_for_graph(from_graph, to_graph):
     """
     operations = []
 
-    if from_graph is None:
+    creating = from_graph is None
+    if creating:
         operations.append(CreateGraph(fields=_scalar_fields(to_graph)))
         from_graph = {"graphid": to_graph["graphid"]}
         from_graph.update({key: {} for key in STATE_COLLECTIONS})
@@ -133,8 +134,13 @@ def changes_for_graph(from_graph, to_graph):
     if not operations:
         return []
 
-    operations.extend(_data_operations(from_graph, to_graph))
-    operations.extend(_publication_operations(from_graph, to_graph))
+    # A graph being created here has no tiles to backfill and no resources to
+    # move: everything in it is new. Emitting them anyway wrote one operation per
+    # node that could only ever match zero rows, and left the data migration
+    # irreversible for want of a previous publication.
+    if not creating:
+        operations.extend(_data_operations(from_graph, to_graph))
+    operations.extend(_publication_operations(from_graph, to_graph, creating))
     return operations
 
 
@@ -183,7 +189,7 @@ def _data_operations(from_graph, to_graph):
     return operations
 
 
-def _publication_operations(from_graph, to_graph):
+def _publication_operations(from_graph, to_graph, creating=False):
     """Publish, then move resources onto the publication. Always last.
 
     Without these a migration mutates node/card/edge rows and nothing the
@@ -194,18 +200,23 @@ def _publication_operations(from_graph, to_graph):
     graphid = to_graph["graphid"]
     publication_id = str(uuid.uuid4())
     previous_publication_id = from_graph.get("publication_id")
-    return [
+    operations = [
         PublishGraph(
             graphid=graphid,
             publication_id=publication_id,
             previous_publication_id=previous_publication_id,
-        ),
-        SetResourcePublication(
-            graphid=graphid,
-            publication_id=publication_id,
-            previous_publication_id=previous_publication_id,
-        ),
+        )
     ]
+    # Nothing to move onto a publication for a graph created in this same diff.
+    if not creating:
+        operations.append(
+            SetResourcePublication(
+                graphid=graphid,
+                publication_id=publication_id,
+                previous_publication_id=previous_publication_id,
+            )
+        )
+    return operations
 
 
 def changes_for_package(from_state_graphs, to_state_graphs):
