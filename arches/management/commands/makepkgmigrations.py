@@ -19,6 +19,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import migrations
 from django.db.migrations.autodetector import MigrationAutodetector
 
+from arches.db.package_migrations import labels
 from arches.db.package_migrations.autodetector import changes_for_package
 from arches.db.package_migrations.state import canonical_graph
 from arches.db.package_migrations.loader import PackageMigrationLoader
@@ -62,7 +63,8 @@ class Command(BaseCommand):
 
         if not to_graphs:
             raise CommandError(
-                "No graphs found under %s. Run exportgraph first."
+                "No graphs found under %s. Export them there first with "
+                "`packages -o export_graphs -d <that directory> -g <graphid>`."
                 % os.path.join(app_config.path, "pkg", "graphs")
             )
 
@@ -75,6 +77,7 @@ class Command(BaseCommand):
                 )
             )
 
+        self.names = labels.from_graphs(to_graphs)
         operations = changes_for_package(from_state.graphs, to_graphs)
         self._warn_about_data_the_generator_cannot_convert(operations, to_graphs)
         if not operations:
@@ -116,7 +119,9 @@ class Command(BaseCommand):
             if self.verbosity >= 1:
                 self.stdout.write("  %s" % os.path.relpath(path))
                 for operation in group:
-                    self.stdout.write("    - %s" % operation.describe())
+                    self.stdout.write(
+                        "    - %s" % labels.humanize(operation.describe(), self.names)
+                    )
 
     def _warn_about_data_the_generator_cannot_convert(self, operations, to_graphs):
         """Two node changes leave stored values behind, and neither can be fixed
@@ -155,9 +160,25 @@ class Command(BaseCommand):
         self.stderr.write(self.style.WARNING(message))
 
     def _committed_graphs(self, app_config):
-        root = os.path.join(app_config.path, "pkg", "graphs")
+        """The same graphs, projected into the shape state holds."""
         graphs = {}
         exported_by = {}
+        for path, serialized_graph in self._read_committed(app_config):
+            graph = canonical_graph(serialized_graph)
+            graphid = graph["graphid"]
+            if graphid in exported_by:
+                # Exporting after a slug change writes a second file rather than
+                # replacing the first, and the loser is decided by filename order.
+                raise CommandError(
+                    "Graph %s is exported twice, in %s and %s. Delete the stale "
+                    "file." % (graphid, exported_by[graphid], path)
+                )
+            exported_by[graphid] = path
+            graphs[graphid] = graph
+        return graphs
+
+    def _read_committed(self, app_config):
+        root = os.path.join(app_config.path, "pkg", "graphs")
         for directory, _subdirs, filenames in os.walk(root):
             for filename in sorted(filenames):
                 if not filename.endswith(".json"):
@@ -166,28 +187,16 @@ class Command(BaseCommand):
                 with open(path) as source:
                     try:
                         # The committed file is in the shape `load_package` reads;
-                        # the canonical projection happens here, in memory.
+                        # the canonical projection happens in memory.
                         serialized_graphs = json.load(source)["graph"]
                     except (ValueError, KeyError, TypeError):
                         raise CommandError(
                             "%s is not an Arches graph export. Files under "
                             'pkg/graphs must hold {"graph": [...]}, which is what '
-                            "exportgraph writes." % path
+                            "`packages -o export_graphs` writes." % path
                         )
                 for serialized_graph in serialized_graphs:
-                    graph = canonical_graph(serialized_graph)
-                    graphid = graph["graphid"]
-                    if graphid in exported_by:
-                        # Exporting after a slug change writes a second file rather
-                        # than replacing the first, and the loser is decided by
-                        # filename order.
-                        raise CommandError(
-                            "Graph %s is exported twice, in %s and %s. Delete the "
-                            "stale file." % (graphid, exported_by[graphid], path)
-                        )
-                    exported_by[graphid] = path
-                    graphs[graphid] = graph
-        return graphs
+                    yield path, serialized_graph
 
     def _leaf(self, loader, app_label):
         leaves = loader.graph.leaf_nodes(app_label)
@@ -225,4 +234,6 @@ class Command(BaseCommand):
     def _describe(self, operations):
         self.stdout.write("Changes detected:")
         for operation in operations:
-            self.stdout.write("  - %s" % operation.describe())
+            self.stdout.write(
+                "  - %s" % labels.humanize(operation.describe(), self.names)
+            )
