@@ -39,50 +39,61 @@ const ArchesJsonImportViewModel = function(params) {
         ));
     };
 
+    // finally: a rejected fetch, or an error page that response.json() cannot
+    // parse, would otherwise leave the spinner up with no way back.
     this.addFile = async function(file){
         self.loading(true);
-        self.fileInfo({name: file.name, size: file.size});
-        const formData = new window.FormData();
-        formData.append('file', file, file.name);
-        const response = await self.submit('read', formData);
-        const data = await response.json();
-        self.loading(false);
-        if (response.ok) {
-            self.response(data);
-            self.loadDetails(data);
-        } else {
-            self.showAlert(data);
+        try {
+            self.fileInfo({name: file.name, size: file.size});
+            const formData = new window.FormData();
+            formData.append('file', file, file.name);
+            const response = await self.submit('read', formData);
+            const data = await response.json();
+            if (response.ok) {
+                self.response(data);
+                self.loadDetails(data);
+            } else {
+                self.showAlert(data);
+            }
+        } finally {
+            self.loading(false);
         }
     };
 
     this.start = async function(){
         self.loading(true);
-        // Posted on 'start' because read/write/celery are separate requests;
-        // the server persists this onto the load event.
-        const formData = new window.FormData();
-        formData.append('overwrite', self.overwrite());
-        formData.append('index', self.index());
-        const response = await self.submit('start', formData);
-        self.loading(false);
-        params.activeTab("import");
-        if (response.ok) {
-            const data = await response.json();
-            self.response(data);
-            self.write();
+        try {
+            // Posted on 'start' because read/write/celery are separate requests;
+            // the server persists this onto the load event.
+            const formData = new window.FormData();
+            formData.append('overwrite', self.overwrite());
+            formData.append('index', self.index());
+            const response = await self.submit('start', formData);
+            params.activeTab("import");
+            if (response.ok) {
+                const data = await response.json();
+                self.response(data);
+                self.write();
+            }
+        } finally {
+            self.loading(false);
         }
     };
 
     this.write = async function(){
         self.loading(true);
-        const formData = new window.FormData();
-        formData.append('load_details', JSON.stringify(self.loadDetails()));
-        const response = await self.submit('write', formData);
-        const data = await response.json();
-        self.loading(false);
-        if (response.ok) {
-            self.response(data);
-        } else {
-            self.showAlert(data);
+        try {
+            const formData = new window.FormData();
+            formData.append('load_details', JSON.stringify(self.loadDetails()));
+            const response = await self.submit('write', formData);
+            const data = await response.json();
+            if (response.ok) {
+                self.response(data);
+            } else {
+                self.showAlert(data);
+            }
+        } finally {
+            self.loading(false);
         }
     };
 };
