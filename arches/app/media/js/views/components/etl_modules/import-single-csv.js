@@ -11,6 +11,7 @@ import "views/components/simple-switch";
 import "bindings/datatable";
 import "bindings/dropzone";
 import "bindings/resizable-sidepanel";
+import 'bindings/chosen';
 
 
 const viewModel = function(params) {

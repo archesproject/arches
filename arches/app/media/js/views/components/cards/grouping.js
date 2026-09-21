@@ -6,6 +6,8 @@ import CardComponentViewModel from 'viewmodels/card-component';
 import AlertViewModel from 'viewmodels/alert';
 import groupingCardTemplate from 'templates/views/components/cards/grouping.htm';
 import 'chosen';
+import 'bindings/sortable';
+import 'bindings/chosen';
 
 
 var flattenTree = function(parents, flatList) {

@@ -13,6 +13,7 @@ import 'bindings/fadeVisible';
 import 'bindings/mapbox-gl';
 import 'bindings/color-picker';
 import 'bindings/key-events-click';
+import 'bindings/select2-query';
 
 
 var viewModel = function(params) {

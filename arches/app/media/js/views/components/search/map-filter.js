@@ -14,6 +14,8 @@ import uuid from 'uuid';
 import geojsonhint from 'geojsonhint';
 import mapbox from 'mapbox-gl';
 import mbdraw from 'mapbox-gl-draw';
+import 'bindings/codemirror';
+import 'bindings/select2-query';
 
 
 var componentName = 'map-filter';

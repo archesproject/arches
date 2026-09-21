@@ -1,5 +1,6 @@
 import ko from 'knockout';
 import urlDatatypeTemplate from 'templates/views/components/datatypes/url.htm';
+import 'bindings/select2-query';
 
 
 var name = 'url-datatype-config';

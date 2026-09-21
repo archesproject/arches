@@ -6,6 +6,7 @@ import JsonErrorAlertViewModel from 'viewmodels/alert-json';
 import baseStringEditorTemplate from 'templates/views/components/etl_modules/bulk_edit_concept.htm';
 import 'views/components/widgets/concept-select';
 import 'select-woo';
+import 'bindings/chosen';
 
 
 const ViewModel = function(params) {

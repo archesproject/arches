@@ -10,6 +10,7 @@ import 'bindings/key-events-click';
 import 'codemirror/mode/javascript/javascript';
 import 'bindings/ckeditor';
 import 'views/components/icon-selector';
+import 'bindings/select2-query';
 
 
 var name = 'geojson-feature-collection-datatype-config';

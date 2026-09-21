@@ -7,6 +7,7 @@ import BaseFilter from 'views/components/search/base-filter';
 import timeFilterTemplate from 'templates/views/components/search/time-filter.htm';
 import 'bindings/datepicker';
 import 'bindings/time-wheel';
+import 'bindings/select2-query';
 
 
 var componentName = 'time-filter';

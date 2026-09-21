@@ -7,6 +7,7 @@ import uuid from 'uuid';
 import geojsonExtent from 'geojson-extent';
 import IIIFViewerViewmodel from 'views/components/iiif-viewer';
 import 'leaflet-draw';
+import 'bindings/color-picker';
 
 
 var viewModel = function(params) {
