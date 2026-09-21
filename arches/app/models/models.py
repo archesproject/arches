@@ -1631,7 +1631,10 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
         """
         from arches.app.datatypes.datatypes import DataTypeFactory
 
-        original_tiles = self.tilemodel_set.prefetch_related("nodegroup__node_set")
+        # order deterministically; sortorder can be null so tileid breaks ties
+        original_tiles = self.tilemodel_set.order_by(
+            "sortorder", "tileid"
+        ).prefetch_related("nodegroup__node_set")
         datatype_factory = DataTypeFactory()
 
         new_resource = copy.copy(self)
