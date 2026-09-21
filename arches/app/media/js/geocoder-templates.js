@@ -1,4 +1,4 @@
-import { loadComponentDependencies } from "utils/load-component-dependencies";
+import { registerComponentPaths } from "utils/load-component-dependencies";
 
 function removeTrailingCommaFromObject(string) {
     return string.replace(/,\s*}*$/, "}");
@@ -10,7 +10,7 @@ try {
     const geocoderTemplateData = geocoderTemplateDataHTML.getAttribute('geocoderTemplates');
     geocoderTemplates = JSON.parse(removeTrailingCommaFromObject(geocoderTemplateData));
 
-    loadComponentDependencies(Object.values(geocoderTemplates).map(value => value['component']));
+    registerComponentPaths(geocoderTemplates, 'component', 'component');
 } catch (error) {
     console.error(error);
 }
