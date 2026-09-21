@@ -18,6 +18,16 @@ OLD_MAPBOX_STREETS_SOURCE = json.loads(
     '{"url":"mapbox://mapbox.mapbox-streets-v8","type":"vector"}'
 )
 
+# The "satellite" basemap also used mapbox:// tiles, leaving an empty basemap
+# in the picker under MapLibre. It is removed rather than replaced.
+OLD_MAPBOX_SATELLITE_SOURCE = json.loads(
+    '{"url":"mapbox://mapbox.satellite","type":"raster","tileSize":256}'
+)
+
+OLD_SATELLITE_LAYERDEFS = json.loads(
+    '[{"id":"satellite","type":"raster","source":"mapbox-satellite","source-layer":"mapbox_satellite_full"}]'
+)
+
 NEW_MAP_SOURCES = json.loads(
     '{"mtk":{"type":"vector","url":"https://tiles.maptoolkit.org/mtk.json","maxzoom":15,"attribution":"\\u00a9 <a href=\\"https://www.maptoolkit.com/copyright/\\" target=\\"_blank\\">Maptoolkit</a> \\u00a9 <a href=\\"https://www.openstreetmap.org/copyright\\" target=\\"_blank\\">OpenStreetMap</a> contributors"},"naturalearth":{"type":"raster","url":"https://tiles.maptoolkit.org/naturalearth.json"},"bathymetry_vector":{"type":"vector","url":"https://tiles.maptoolkit.org/bathymetry.json","maxzoom":12},"rgb-tiles-blur-min":{"type":"raster-dem","url":"https://tiles.maptoolkit.org/terrainrgb.json","maxzoom":15,"encoding":"terrarium","tileSize":2048},"rgb-tiles-blur-med":{"type":"raster-dem","url":"https://tiles.maptoolkit.org/terrainrgb.json","maxzoom":15,"encoding":"terrarium","tileSize":4096},"rgb-tiles-blur-max":{"type":"raster-dem","url":"https://tiles.maptoolkit.org/terrainrgb.json","maxzoom":15,"encoding":"terrarium","tileSize":8192}}'
 )
@@ -80,6 +90,16 @@ def forward(apps, schema_editor):
         streets_layer.layerdefinitions = NEW_STREETS_LAYERDEFS
         streets_layer.save()
 
+    satellite_layer = MapLayer.objects.filter(name="satellite").first()
+    if satellite_layer and _references_source(
+        satellite_layer.layerdefinitions, "mapbox-satellite"
+    ):
+        satellite_layer.delete()
+
+    satellite_source = MapSource.objects.filter(name="mapbox-satellite").first()
+    if satellite_source and satellite_source.source == OLD_MAPBOX_SATELLITE_SOURCE:
+        satellite_source.delete()
+
     update_tile_value(
         TileModel, SPRITES_NODE_ID, OLD_SPRITES_DEFAULT, NEW_SPRITES_DEFAULT
     )
@@ -98,7 +118,21 @@ def reverse(apps, schema_editor):
     MapSource.objects.get_or_create(
         name="mapbox-streets", defaults={"source": OLD_MAPBOX_STREETS_SOURCE}
     )
+    MapSource.objects.get_or_create(
+        name="mapbox-satellite", defaults={"source": OLD_MAPBOX_SATELLITE_SOURCE}
+    )
     MapSource.objects.filter(name__in=NEW_MAP_SOURCES.keys()).delete()
+
+    MapLayer.objects.get_or_create(
+        name="satellite",
+        defaults={
+            "layerdefinitions": OLD_SATELLITE_LAYERDEFS,
+            "isoverlay": False,
+            "icon": "",
+            "activated": True,
+            "addtomap": False,
+        },
+    )
 
     streets_layer = MapLayer.objects.filter(name="streets").first()
     if streets_layer and _references_source(streets_layer.layerdefinitions, "mtk"):
