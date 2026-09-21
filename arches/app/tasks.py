@@ -478,7 +478,8 @@ def load_arches_json(userid, files, summary, result, temp_dir, loadid, moduleid)
         importer.run_load_task(userid, files, summary, result, temp_dir, loadid)
 
         load_event = models.LoadEvent.objects.get(loadid=loadid)
-        status = _("Completed") if load_event.status == "indexed" else _("Failed")
+        succeeded = load_event.status in ("indexed", "completed")
+        status = _("Completed") if succeeded else _("Failed")
     except Exception as e:
         logger.error(e, exc_info=True)
         # Nothing else records this, so without error_message an exception
