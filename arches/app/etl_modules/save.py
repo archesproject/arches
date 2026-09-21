@@ -163,8 +163,7 @@ def _post_save_edit_log(
             with connection.cursor() as cursor:
                 log_event_details(cursor, loadid, "done|Indexing...")
 
-        logger.debug("Indexing resources by transaction for loadid=%s", loadid)
-        if index:
+            logger.debug("Indexing resources by transaction for loadid=%s", loadid)
             index_resources_by_transaction(
                 loadid,
                 use_multiprocessing=multiprocessing,
@@ -172,9 +171,11 @@ def _post_save_edit_log(
                 recalculate_descriptors=True,
                 max_subprocesses=max_subprocesses,
             )
-        logger.debug(
-            "Indexing complete for loadid=%s; fetching user id=%s", loadid, userid
-        )
+            logger.debug(
+                "Indexing complete for loadid=%s; fetching user id=%s", loadid, userid
+            )
+        else:
+            logger.debug("Skipping indexing for loadid=%s (index=False)", loadid)
 
         user = User.objects.get(id=userid)
         user_email = getattr(user, "email", "")
