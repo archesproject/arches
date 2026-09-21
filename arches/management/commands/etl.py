@@ -58,13 +58,6 @@ class Command(BaseCommand):
             help="Replace resources that already exist instead of failing on them",
         )
         parser.add_argument(
-            "--no-index",
-            action="store_false",
-            dest="index",
-            default=True,
-            help="Write the data but skip indexing; reindex later with index_database",
-        )
-        parser.add_argument(
             "-mp",
             "--use_multiprocessing",
             action="store_true",
@@ -124,12 +117,8 @@ class Command(BaseCommand):
             config = {}
         config["multiprocessing"] = use_multiprocessing
         config["max_subprocesses"] = max_subprocesses
-        # Flags win over the config file, so a --config can hold the rest and the
-        # switches a run actually varies stay on the command line.
-        if overwrite:
-            config["overwrite"] = True
-        if not index:
-            config["index"] = False
+        config["overwrite"] = overwrite
+        config["index"] = index
         try:
             etl_module = ETLModule.objects.get(componentname=module)
             config["module"] = etl_module.etlmoduleid
