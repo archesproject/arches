@@ -78,11 +78,11 @@
             </div>
 
             <div class="etl-module-component">
-                <label>
+                <label style="display: block;">
                     <input type="checkbox" data-bind="checked: overwrite" />
                     <span data-bind="text: $root.translations.overwriteExistingResources"></span>
                 </label>
-                <label>
+                <label style="display: block;">
                     <input type="checkbox" data-bind="checked: index" />
                     <span data-bind="text: $root.translations.indexAfterImport"></span>
                 </label>
@@ -104,6 +104,12 @@
     <!-- /ko -->
 </div>
 <!--/ko-->
+<!-- ko if: loading() -->
+<div class="branch-csv-etl" style="display: flex; align-items: center; justify-content: center; padding: 40px; gap: 10px;">
+    <i class="fa fa-spin fa-spinner fa-2x"></i>
+    <span data-bind="text: $root.translations.loadingData"></span>
+</div>
+<!-- /ko -->
 {% endblock task_details %}
 
 {% block etl_status %}
