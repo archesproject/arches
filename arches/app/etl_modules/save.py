@@ -208,7 +208,7 @@ def _post_save_edit_log(
                 ),
             )
             log_event_details(cursor, loadid, "done")
-            final_status = "indexed" if index else "unindexed"
+            final_status = "indexed" if index else "completed"
             cursor.execute(
                 """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
                 (final_status, datetime.now(), True, True, loadid),
