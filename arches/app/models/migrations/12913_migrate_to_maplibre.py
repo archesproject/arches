@@ -9,17 +9,13 @@ OLD_GLYPHS_DEFAULT = "mapbox://fonts/mapbox/{fontstack}/{range}.pbf"
 NEW_SPRITES_DEFAULT = "https://icons.maptoolkit.org/sprite"
 NEW_GLYPHS_DEFAULT = "https://fonts.maptoolkit.org/{fontstack}/{range}.pbf"
 
-# The default "streets" basemap previously relied on Mapbox's proprietary
-# mapbox:// tile protocol, which MapLibre GL JS does not support. This
-# migration swaps it for free, OpenStreetMap-based vector tiles served by
-# Maptoolkit (https://www.maptoolkit.org/), matching the equivalent change
-# made to a fresh install's arches/db/dml/db_data.sql.
+# Streets basemap used mapbox:// tiles, unsupported by MapLibre. Swap to
+# Maptoolkit's free OSM vector tiles, matching arches/db/dml/db_data.sql.
 OLD_MAPBOX_STREETS_SOURCE = json.loads(
     '{"url":"mapbox://mapbox.mapbox-streets-v8","type":"vector"}'
 )
 
-# The "satellite" basemap also used mapbox:// tiles, leaving an empty basemap
-# in the picker under MapLibre. It is removed rather than replaced.
+# Satellite basemap also used mapbox:// tiles; remove rather than replace.
 OLD_MAPBOX_SATELLITE_SOURCE = json.loads(
     '{"url":"mapbox://mapbox.satellite","type":"raster","tileSize":256}'
 )
