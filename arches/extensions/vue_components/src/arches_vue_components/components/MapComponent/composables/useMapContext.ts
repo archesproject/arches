@@ -10,7 +10,7 @@ import {
 
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import geojsonExtent from "@mapbox/geojson-extent";
-import maplibregl from "maplibre-gl";
+import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { uniqBy } from "es-toolkit";
