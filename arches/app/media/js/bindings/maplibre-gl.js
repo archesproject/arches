@@ -4,15 +4,11 @@ import ko from 'knockout';
 import arches from 'arches';
 import * as maplibre from 'maplibre-gl';
 
-// maplibre-gl auto-detects its worker script via `import.meta.url`, which
-// doesn't resolve correctly once bundled by webpack. Point it at the copy
-// webpack emits as a static asset instead.
+// Point maplibre-gl at its worker script as webpack-emitted static assets.
 maplibre.setWorkerUrl(
     new URL('maplibre-gl/dist/maplibre-gl-worker.mjs', import.meta.url).href
 );
-// The worker script above imports this module by relative path at runtime.
-// webpack can't see that import (it doesn't parse inside asset files), so
-// force it to also emit this as a static asset alongside the worker.
+// Force webpack to also emit the worker's runtime import as a static asset.
 new URL('maplibre-gl/dist/maplibre-gl-shared.mjs?asset', import.meta.url);
 
 const initialize = function(element, valueAccessor, maplibregl) {

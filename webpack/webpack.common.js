@@ -418,9 +418,7 @@ module.exports = () => {
                         loader: Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'vue-loader'),
                     },
                     {
-                        // maplibre-gl loads its tile-parsing worker as a separate script at
-                        // runtime; emit it as a standalone static asset so `new URL(...)`
-                        // resolves to a real, fetchable file instead of being inlined.
+                        // Emit maplibre-gl's worker script as a static asset for `new URL(...)`.
                         test: /maplibre-gl-worker(-dev)?\.mjs$/,
                         type: 'asset/resource',
                         generator: {
@@ -428,12 +426,8 @@ module.exports = () => {
                         },
                     },
                     {
-                        // the worker script above imports this module by relative path at
-                        // *runtime*, a path webpack can't see (it never parses inside an
-                        // asset/resource file), so it must be emitted alongside it as a real
-                        // file too. Bindings code triggers this explicitly with a `?asset`
-                        // suffix; the plain (no-query) import used by the main-thread bundle
-                        // still gets bundled normally by the rule below.
+                        // The worker imports this at runtime; emit it as an asset too
+                        // (via `?asset`), while normal imports still bundle as JS below.
                         test: /maplibre-gl-shared(-dev)?\.mjs$/,
                         resourceQuery: /asset/,
                         type: 'asset/resource',
