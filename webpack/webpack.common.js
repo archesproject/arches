@@ -47,7 +47,7 @@ module.exports = () => {
 
         let PROJECT_RELATIVE_NODE_MODULES_PATH;
         if (APP_ROOT.includes(ROOT_DIR)) {  // should only return truthy for running Arches-core without a project
-            PROJECT_RELATIVE_NODE_MODULES_PATH = Path.resolve(ROOT_DIR, '..', 'node_modules');
+            PROJECT_RELATIVE_NODE_MODULES_PATH = Path.resolve(APP_ROOT, '..', '..', 'node_modules');
         }
         else {
             PROJECT_RELATIVE_NODE_MODULES_PATH = Path.resolve(APP_ROOT, '..', 'node_modules');
@@ -57,11 +57,7 @@ module.exports = () => {
         // BEGIN create entry point configurations
 
         const archesCoreEntryPointConfiguration = buildFilepathLookup(Path.resolve(__dirname, ROOT_DIR, 'app', 'media', 'js'));
-
-        const runningWithoutProject = APP_ROOT.includes(ROOT_DIR);
-        const projectEntryPointConfiguration = runningWithoutProject
-            ? {}
-            : buildFilepathLookup(Path.resolve(__dirname, APP_ROOT, 'media', 'js'));
+        const projectEntryPointConfiguration = buildFilepathLookup(Path.resolve(__dirname, APP_ROOT, 'media', 'js'));
 
         const archesApplicationsEntrypointConfiguration = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => {
             return {
