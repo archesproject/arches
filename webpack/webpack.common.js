@@ -94,7 +94,8 @@ module.exports = () => {
         const archesCorePackageJSON = require(archesCorePackageJSONFilepath);
 
         const parsedArchesCoreNodeModulesAliases = Object.entries(archesCorePackageJSON['nodeModulesPaths']).reduce((acc, [alias, subPath]) => {
-            if (subPath.slice(0, 7) === 'plugins') {  // handles for node_modules -esque plugins in arches core
+            // handles for node_modules -esque sources shipped inside arches core's media directory
+            if (subPath.startsWith('plugins/') || subPath.startsWith('js/')) {
                 acc[alias] = Path.resolve(__dirname, ROOT_DIR, 'app', 'media', subPath);
             }
             else {

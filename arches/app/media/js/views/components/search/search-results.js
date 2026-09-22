@@ -1,7 +1,7 @@
 import $ from "jquery";
 import _ from "underscore";
 import BaseFilter from "views/components/search/base-filter";
-import bootstrap from "bootstrap";
+import "bootstrap";
 import arches from "arches";
 import select2 from "select-woo";
 import ko from "knockout";
@@ -10,7 +10,6 @@ import GraphModel from "models/graph";
 import viewdata from "view-data";
 import searchResultsTemplate from "templates/views/components/search/search-results.htm";
 import ariaUtils from "utils/aria";
-import "bootstrap-datetimepicker";
 
 
 var componentName = "search-results";
