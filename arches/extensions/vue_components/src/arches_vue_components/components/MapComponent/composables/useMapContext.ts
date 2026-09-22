@@ -434,7 +434,9 @@ export function useMapContext(
             updateDrawnFeatures({ shouldEmitValueChange: false });
         }
 
-        map.value!.on(DRAW_CREATE_EVENT, (drawEvent: DrawEvent) => {
+        // "draw.*" are custom events fired by @mapbox/mapbox-gl-draw, not part
+        // of maplibre-gl's typed MapEventType union.
+        map.value!.on(DRAW_CREATE_EVENT as any, (drawEvent: DrawEvent) => {
             if (
                 props.maxFeatures != null &&
                 draw.getAll().features.length > props.maxFeatures
@@ -451,15 +453,15 @@ export function useMapContext(
             selectNewlyDrawnFeature(drawEvent);
             updateDrawnFeatures();
         });
-        map.value!.on(DRAW_UPDATE_EVENT, (drawEvent: DrawEvent) => {
+        map.value!.on(DRAW_UPDATE_EVENT as any, (drawEvent: DrawEvent) => {
             selectedDrawnFeature.value = drawEvent.features[0] ?? null;
             updateDrawnFeatures();
         });
-        map.value!.on(DRAW_DELETE_EVENT, () => {
+        map.value!.on(DRAW_DELETE_EVENT as any, () => {
             selectedDrawnFeature.value = null;
             updateDrawnFeatures();
         });
-        map.value!.on(DRAW_SELECTION_CHANGE_EVENT, () => {
+        map.value!.on(DRAW_SELECTION_CHANGE_EVENT as any, () => {
             selectedDrawnFeature.value = draw.getSelected().features[0] ?? null;
         });
     }
@@ -692,7 +694,7 @@ export function useMapContext(
         const selectedFeatures = draw.getSelected();
         if (selectedFeatures.features.length) {
             draw.delete(selectedFeatures.features[0].id as string);
-            map.value!.fire(DRAW_DELETE_EVENT);
+            map.value!.fire(DRAW_DELETE_EVENT as any);
         }
     }
 
@@ -700,7 +702,7 @@ export function useMapContext(
         if (!draw) return;
 
         draw.deleteAll();
-        map.value!.fire(DRAW_DELETE_EVENT);
+        map.value!.fire(DRAW_DELETE_EVENT as any);
     }
 
     function setBufferForSelectedFeature(
@@ -714,7 +716,7 @@ export function useMapContext(
         feature.properties!.buffer_units = units;
 
         draw.add(feature);
-        map.value!.fire(DRAW_UPDATE_EVENT, { features: [feature] });
+        map.value!.fire(DRAW_UPDATE_EVENT as any, { features: [feature] });
     }
 
     function addFeatures(features: Feature[]): void {
