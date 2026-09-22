@@ -1,4 +1,5 @@
 import ko from 'knockout';
+import arches from 'arches';
 
 /**
  * Colour picker binding, replacing bootstrap-colorpicker 2.5.3, which was Bootstrap
@@ -18,6 +19,9 @@ import ko from 'knockout';
 
 const SWATCH_CLASS = 'color-picker-swatch';
 const ALPHA_CLASS = 'color-picker-alpha';
+const ALPHA_FIELD_CLASS = 'color-picker-alpha-field';
+
+let alphaFieldSequence = 0;
 
 function hexToRgb(hex) {
     const value = parseInt((hex.length === 4 ? expandShorthandHex(hex) : hex).slice(1), 16);
@@ -95,18 +99,58 @@ ko.bindingHandlers.colorPicker = {
             element.parentNode.insertBefore(swatch, element.nextSibling);
         }
 
+        // `type="color"` carries no alpha channel, so an rgba value needs a second
+        // control for it. It sits below the input group rather than inside it, because
+        // an `.input-group` is a table row and cannot stack.
         let alphaSlider = null;
+        let alphaReadout = null;
+        let alphaWidthObserver = null;
+
         if (format === 'rgba') {
+            const sliderId = `color-picker-alpha-${++alphaFieldSequence}`;
+            const anchor = inputGroup || element;
+
             alphaSlider = document.createElement('input');
             alphaSlider.type = 'range';
             alphaSlider.className = ALPHA_CLASS;
+            alphaSlider.id = sliderId;
             alphaSlider.min = '0';
             alphaSlider.max = '1';
             alphaSlider.step = '0.01';
             alphaSlider.value = String(initialColor.alpha);
-            alphaSlider.setAttribute('aria-label', 'Opacity');
-            // Outside the input-group, so the group's own layout is untouched.
-            (inputGroup || element).insertAdjacentElement('afterend', alphaSlider);
+
+            const label = document.createElement('label');
+            label.className = 'color-picker-alpha-label';
+            label.htmlFor = sliderId;
+            label.textContent = arches?.translations?.opacity || 'Opacity';
+
+            alphaReadout = document.createElement('output');
+            alphaReadout.className = 'color-picker-alpha-value';
+            alphaReadout.htmlFor = sliderId;
+
+            const header = document.createElement('div');
+            header.className = 'color-picker-alpha-header';
+            header.append(label, alphaReadout);
+
+            const field = document.createElement('div');
+            field.className = ALPHA_FIELD_CLASS;
+            field.append(header, alphaSlider);
+            anchor.insertAdjacentElement('afterend', field);
+
+            // The width has to be matched in script rather than CSS. The eleven call
+            // sites size their input group differently — arches caps the one in graph
+            // settings at 250px, while the map-styling forms let it fill a column — and
+            // the field is a sibling, so `width: 100%` resolves against the form group
+            // instead. Left alone the slider ran the full width of the form beneath a
+            // quarter-width input.
+            const matchAnchorWidth = () => {
+                field.style.inlineSize = `${anchor.getBoundingClientRect().width}px`;
+            };
+            matchAnchorWidth();
+            if (typeof ResizeObserver !== 'undefined') {
+                alphaWidthObserver = new ResizeObserver(matchAnchorWidth);
+                alphaWidthObserver.observe(anchor);
+            }
         }
 
         if (!element.value) {
@@ -122,15 +166,28 @@ ko.bindingHandlers.colorPicker = {
             synchronizing = false;
         }
 
+        function renderAlphaReadout(alpha) {
+            if (alphaReadout) {
+                alphaReadout.value = `${Math.round(alpha * 100)}%`;
+            }
+        }
+
         function showInControls(hex, alpha) {
             swatch.value = hex;
             if (alphaSlider) {
                 alphaSlider.value = String(alpha);
             }
+            renderAlphaReadout(alpha);
         }
+
+        renderAlphaReadout(initialColor.alpha);
 
         function publishFromControls() {
             const alpha = alphaSlider ? parseFloat(alphaSlider.value) : 1;
+            // The readout has to be refreshed here as well as in showInControls: this
+            // path runs while dragging the slider, which never round-trips through the
+            // observable, so the percentage would otherwise sit at its initial value.
+            renderAlphaReadout(alpha);
             element.value = formatColor(swatch.value, alpha, format);
             writeToObservable(swatch.value, alpha);
         }
@@ -168,6 +225,10 @@ ko.bindingHandlers.colorPicker = {
                 subscription.dispose();
             });
         }
+
+        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+            alphaWidthObserver?.disconnect();
+        });
     }
 };
 
