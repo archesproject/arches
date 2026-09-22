@@ -25,12 +25,24 @@ module.exports = () => {
         global.APP_ROOT = parsedData['APP_ROOT'];
         global.ARCHES_APPLICATIONS = parsedData['ARCHES_APPLICATIONS'];
         global.ARCHES_APPLICATIONS_PATHS = parsedData['ARCHES_APPLICATIONS_PATHS'];
+        global.RESOLVABLE_APPLICATION_PATHS = parsedData['RESOLVABLE_APPLICATION_PATHS'] || {};
         global.SITE_PACKAGES_DIRECTORY = parsedData['SITE_PACKAGES_DIRECTORY'];
         global.ROOT_DIR = parsedData['ROOT_DIR'];
         global.STATIC_URL = parsedData['STATIC_URL'];
         global.WEBPACK_DEVELOPMENT_SERVER_PORT = parsedData['WEBPACK_DEVELOPMENT_SERVER_PORT'];
 
         // END get data from `webpack-metadata.json`
+        // BEGIN identify bundled applications that are resolvable but not installed
+
+        // Bundled applications always ship their source with arches, so their internal
+        // imports (JS, templates, `@/<app>` Vue paths) must resolve even when a project
+        // has not enabled them. They must NOT contribute entry points, templates, or
+        // static files of their own -- those still come from installed applications only.
+        const resolvableOnlyApplicationLabels = Object.keys(RESOLVABLE_APPLICATION_PATHS).filter(
+            (label) => !ARCHES_APPLICATIONS.includes(label)
+        );
+
+        // END identify bundled applications that are resolvable but not installed
         // BEGIN workaround for handling node_modules paths in arches-core vs projects
 
         let PROJECT_RELATIVE_NODE_MODULES_PATH;
@@ -77,9 +89,22 @@ module.exports = () => {
             return acc;
         }, {});
 
+        // resolvable-but-not-installed bundled applications: alias-only, not merged into `entryPoints`
+        const resolvableOnlyApplicationsJavascriptEntrypointConfiguration = resolvableOnlyApplicationLabels.reduce((acc, label) => {
+            return {
+                ...acc,
+                ...buildFilepathLookup(Path.resolve(__dirname, RESOLVABLE_APPLICATION_PATHS[label], 'media', 'js'))
+            };
+        }, {});
+        const resolvableOnlyApplicationsJavascriptRelativeFilepathToAbsoluteFilepathLookup = Object.entries(resolvableOnlyApplicationsJavascriptEntrypointConfiguration).reduce((acc, [path, config]) => {
+            acc[path + '$'] = Path.resolve(__dirname, path, config['import']);
+            return acc;
+        }, {});
+
         // order is important! Arches core files are overwritten by arches-application files, arches-application files are overwritten by project files
         const javascriptRelativeFilepathToAbsoluteFilepathLookup = {
             ...archesCoreJavascriptRelativeFilepathToAbsoluteFilepathLookup,
+            ...resolvableOnlyApplicationsJavascriptRelativeFilepathToAbsoluteFilepathLookup,
             ...archesApplicationsJavascriptRelativeFilepathToAbsoluteFilepathLookup,
             ...projectJavascriptRelativeFilepathToAbsoluteFilepathLookup,
         };
@@ -178,9 +203,18 @@ module.exports = () => {
             };
         }, {});
 
+        // resolvable-but-not-installed bundled applications: alias-only, not merged into entry points
+        const resolvableOnlyApplicationsTemplatePathConfiguration = resolvableOnlyApplicationLabels.reduce((acc, label) => {
+            return {
+                ...acc,
+                ...buildFilepathLookup(Path.resolve(__dirname, RESOLVABLE_APPLICATION_PATHS[label], 'templates'))
+            };
+        }, {});
+
         // order is important! Arches core files are overwritten by arches-application files, arches-application files are overwritten by project files
         const templateFilepathLookup = {
             ...coreArchesTemplatePathConfiguration,
+            ...resolvableOnlyApplicationsTemplatePathConfiguration,
             ...archesApplicationsTemplatePathConfiguration,
             ...projectTemplatePathConfiguration,
         };
@@ -238,6 +272,12 @@ module.exports = () => {
             return acc;
         }, []);
 
+        // resolvable-but-not-installed bundled applications: alias-only, so their internal
+        // `@/<app>/...` imports resolve even though they contribute no CSS/entry points
+        const resolvableOnlyApplicationVuePaths = resolvableOnlyApplicationLabels.map(
+            (label) => Path.resolve(__dirname, RESOLVABLE_APPLICATION_PATHS[label], 'src')
+        );
+
         // END create vue filepath lookup
         // BEGIN create universal constants
 
@@ -284,14 +324,14 @@ module.exports = () => {
                     cacheGroups: {
                         vendors: {
                             test: /[\\/]node_modules[\\/]/,
-                            enforce: true, 
+                            enforce: true,
                             priority: -10,
                             reuseExistingChunk: true,
                             filename: 'chunks/vendors.[contenthash].js'
                         },
                         commons: {
                             minChunks: 2,
-                            enforce: true, 
+                            enforce: true,
                             priority: -20,
                             reuseExistingChunk: true,
                             filename: 'chunks/commons.[contenthash].js'
@@ -307,7 +347,7 @@ module.exports = () => {
                 new webpack.DefinePlugin({
                     ARCHES_URLS: webpack.DefinePlugin.runtimeValue(
                         () => fs.readFileSync(
-                            Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, '..', 'frontend_configuration', 'urls.json'), 
+                            Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, '..', 'frontend_configuration', 'urls.json'),
                             'utf-8'
                         ),
                         true  // should be re-evaluated on rebuild
@@ -347,7 +387,7 @@ module.exports = () => {
                     ...templateFilepathLookup,
                     ...imageFilepathLookup,
                     ...nodeModulesAliases,
-                    '@': [Path.resolve(__dirname, APP_ROOT, 'src'), ...archesApplicationsVuePaths, Path.resolve(__dirname, ROOT_DIR, 'app', 'src')],
+                    '@': [Path.resolve(__dirname, APP_ROOT, 'src'), ...archesApplicationsVuePaths, ...resolvableOnlyApplicationVuePaths, Path.resolve(__dirname, ROOT_DIR, 'app', 'src')],
                     'node_modules': Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH),
                     'arches/arches/app': Path.resolve(__dirname, ROOT_DIR, 'app'),  // ensure project-level imports of arches components point to local file
                     ...Object.fromEntries(ARCHES_APPLICATIONS.map(app => [  // ensure project-level imports of arches application components point to local file
@@ -413,6 +453,7 @@ module.exports = () => {
                             Path.resolve(__dirname, APP_ROOT, 'src'),
                             Path.resolve(__dirname, ROOT_DIR, 'app', 'src'),
                             ...archesApplicationsVuePaths,
+                            ...resolvableOnlyApplicationVuePaths,
                         ],
                         use: [
                             {

@@ -52,6 +52,18 @@ function generateConfig(): Promise<UserConfig> {
             alias[`@/${archesApplicationName}`] = path.join(archesApplicationPath, 'src', archesApplicationName);
         }
 
+        // Applications bundled with arches resolve whether or not this project enabled
+        // them, so that an installed application importing one still type checks and
+        // tests. Installed applications win, hence the conditional assignment.
+        for (
+            const [applicationName, applicationPath]
+            of Object.entries(
+                (parsedData['RESOLVABLE_APPLICATION_PATHS'] ?? {}) as { [key: string]: string }
+            )
+        ) {
+            alias[`@/${applicationName}`] ??= path.join(applicationPath, 'src', applicationName);
+        }
+
         resolve({
             plugins: [
                 vue(),
