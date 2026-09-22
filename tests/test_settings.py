@@ -96,13 +96,16 @@ CACHES = {
 # Bundled applications are opt-in, so arches.settings does not install them.
 # Arches' own test suite covers them, so it does.
 #
-# Order matters twice over. Django resolves management commands by iterating
-# app configs in reverse, so an application earlier in INSTALLED_APPS wins:
-# the bundled applications must precede "arches" for their command overrides
-# (vue_components ships its own validate) to take effect. Templates and static
-# files resolve the other way, so "arches.app" stays last. The project template
-# arrives at the same order by listing "arches" in its trailing block.
-_BUNDLED_APPS = (
+# Prepending is enough to satisfy both ordering constraints, because
+# arches.settings already orders the entries these have to sit relative to.
+# Django resolves management commands by iterating app configs in reverse, so
+# the earliest entry wins: the bundled applications have to precede "arches"
+# for their command overrides (vue_components ships its own validate and
+# widget, controlled_lists its own packages) to take effect. Templates and
+# static files resolve the other way, so "arches.app" has to stay last, which
+# it already is. The project template reaches the same arrangement by listing
+# "arches" in its trailing block.
+_BUNDLED_APPLICATIONS_WITH_DEPENDENCIES = (
     # Required by arches.extensions.controlled_lists, whose ListItem uses
     # ExclusionConstraint.
     "django.contrib.postgres",
@@ -111,12 +114,7 @@ _BUNDLED_APPS = (
     "arches.extensions.vue_components",
     "arches.extensions.controlled_lists",
 )
-_TRAILING = ("arches.app", "django.contrib.admin")
-_head = [app for app in INSTALLED_APPS if app not in _TRAILING]
-_arches_at = _head.index("arches")
-INSTALLED_APPS = (
-    tuple(_head[:_arches_at]) + _BUNDLED_APPS + tuple(_head[_arches_at:]) + _TRAILING
-)
+INSTALLED_APPS = _BUNDLED_APPLICATIONS_WITH_DEPENDENCIES + INSTALLED_APPS
 
 LOGGING["loggers"]["django.request"]["level"] = "ERROR"
 LOGGING["loggers"]["arches"]["level"] = "ERROR"
