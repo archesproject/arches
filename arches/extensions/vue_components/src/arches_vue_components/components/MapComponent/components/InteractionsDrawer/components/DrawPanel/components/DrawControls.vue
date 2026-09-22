@@ -58,11 +58,11 @@ const displayDrawType = computed(() => {
 });
 
 onMounted(() => {
-    map.value?.on(DRAW_CREATE_EVENT, clearDrawSelection);
+    map.value?.on(DRAW_CREATE_EVENT as any, clearDrawSelection);
 });
 
 onUnmounted(() => {
-    map.value?.off(DRAW_CREATE_EVENT, clearDrawSelection);
+    map.value?.off(DRAW_CREATE_EVENT as any, clearDrawSelection);
 });
 
 function onDrawTypeSelected(type: DrawMode | undefined): void {
