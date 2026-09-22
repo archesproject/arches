@@ -938,8 +938,6 @@ PERMISSION_DEFAULTS = {}
 ### END RUN TIME CONFIGURABLE SETTINGS ###
 ##########################################
 
-os.environ.setdefault("ARCHES_SITE_ID", APP_NAME)
-
 try:
     from .settings_local import *
 except ImportError:

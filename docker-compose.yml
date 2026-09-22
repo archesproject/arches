@@ -1,195 +1,111 @@
+version: '2'
 services:
+
     arches:
-        image: "fargeo/arches"
-        build:
-            args:
-                ARCHES_PROJECT: "arches"
-                ARCHES_PROJECT_PACKAGE: "arches"
-                BUILD_FRONTEND: "false"
-            context: .
-            dockerfile: ${ARCHES_DOCKER:-/Users/aarongundel/copilot-worktrees/copilot-worktrees/arches-docker/adg-fuzzy-engine}/production/Dockerfile.alpine
-        command: run_dev_server
-        volumes:
-            - ${ARCHES_CORE_HOST_DIR:-../arches/}:/opt/arches
-            - ./:/opt/arches
-        ports:
-            - ${HOST_PROJECT_PORT:-8096}:80
-            - ${HOST_PROJECT_DEBUG_PORT:-8099}:5678
-        stdin_open: true
-        tty: true
-        environment:
-            ARCHES_PROJECT: "arches"
-            INSTALL_DEFAULT_GRAPHS: "False"
-            INSTALL_DEFAULT_CONCEPTS: "False"
-            PGUSER: postgres
-            PGPASSWORD: postgis
-            PGDATABASE: "arches"
-            PGHOST: postgres
-            PGPORT: "5432"
-            DJANGO_MODE: DEV
-            DJANGO_DEBUG: "True"
-            ARCHES_DJANGO_DEBUG: "True"
-            DOMAIN_NAMES: "*"
-            DJANGO_PORT: "80"
-            PYTHONUNBUFFERED: "0"
-            TZ: PST
-            ARCHES_ES_INDEX_PREFIX: "arches"
-            ARCHES_ESHOST: elasticsearch
-            ARCHES_ESPORT: "9200"
-            ARCHES_ESPASSWORD: changeme
-            ARCHES_CELERY_BROKER_URL: amqp://arches:arches@rabbitmq:5672/
-        depends_on:
-            postgres:
-                condition: service_healthy
-            elasticsearch:
-                condition: service_healthy
-            webpack:
-                condition: service_healthy
-        healthcheck:
-            test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/80' 2>/dev/null || exit 1"]
-            interval: 10s
-            timeout: 10s
-            retries: 10
-            start_period: 30s
+      container_name: arches
+      image: getty/arches:5.0
+      build:
+        context: .
+        dockerfile: ./Dockerfile
+      command: run_arches
+      volumes:
+        - arches-log:/arches/arches/logs
+        - arches-static:/static_root
+      environment:
+        - INSTALL_DEFAULT_GRAPHS=False
+        - INSTALL_DEFAULT_CONCEPTS=False
+        - PGUSERNAME=postgres
+        - PGPASSWORD=postgres
+        - PGDBNAME=arches
+        - PGHOST=db
+        - PGPORT=5432
+        - ESHOST=elasticsearch
+        - ESPORT=9200
+        - DJANGO_MODE=PROD
+        - DJANGO_DEBUG=False
+        - DOMAIN_NAMES=localhost
+        - PYTHONUNBUFFERED=0
+        - TZ=PST
+      ports:
+        - '8000:8000'
+      depends_on:
+        - db
+        - elasticsearch
 
-    webpack:
-        image: "fargeo/arches"
-        command: run_webpack_dev_server
-        volumes:
-            - ${ARCHES_CORE_HOST_DIR:-../arches/}:/opt/arches
-            - ./:/opt/arches
-        environment:
-            ARCHES_PROJECT: "arches"
-            ARCHES_PUBLIC_SERVER_ADDRESS: http://arches:80/
-        # Gate on a real first compile, not just the container being alive.
-        healthcheck:
-            test: ["CMD-SHELL", "test -f $$APP_ROOT/webpack/webpack-stats.json && ! grep -q '^{}$$' $$APP_ROOT/webpack/webpack-stats.json"]
-            interval: 5s
-            timeout: 5s
-            retries: 60
-            start_period: 180s
+    nginx:
+      container_name: nginx
+      image: cvast/cvast-nginx:1.2.0
+      restart: unless-stopped
+      ports:
+        - '80:80'
+        - '443:443'
+      volumes:
+        - arches-static:/www/static
+        - letsencrypt-acme-challenge:/var/www
+        - letsencrypt:/etc/letsencrypt
+      environment:
+        - NGINX_PROXY_MODE=local
+        - NGINX_PROTOCOL=http
+        - LOCAL_PROXY_HOST=arches
+        - LOCAL_PROXY_PORT=8000
+        - DOMAIN_NAMES=localhost
+        - PUBLIC_MODE=False
+        - TZ=PST
+      depends_on:
+        - arches
 
-    # Runs the project's Python test suite once on startup, then stays up watching
-    # for file changes to re-run it automatically. Set ARCHES_TEST_RUN_ON_START=false
-    # to skip the initial run and stay idle until the first watched file changes.
-    # For a one-shot run instead, use `make test`.
-    tests:
-        image: "fargeo/arches"
-        command: run_tests_watch
-        volumes:
-            - ${ARCHES_CORE_HOST_DIR:-../arches/}:/opt/arches
-            - ./:/opt/arches
-        environment:
-            ARCHES_PROJECT: "arches"
-            PGUSER: postgres
-            PGPASSWORD: postgis
-            PGDATABASE: "arches"
-            PGHOST: postgres
-            PGPORT: "5432"
-            # Distinct from the app's index prefix so a test run's indices never
-            # collide with, or get cleaned up alongside, dev data.
-            ARCHES_TEST_ES_INDEX_PREFIX: "test_arches"
-            ARCHES_ESHOST: elasticsearch
-            ARCHES_ESPORT: "9200"
-            ARCHES_ESPASSWORD: changeme
-        depends_on:
-            postgres:
-                condition: service_healthy
-            elasticsearch:
-                condition: service_healthy
-        stdin_open: true
-        tty: true
-
-    celery:
-        image: "fargeo/arches"
-        command: run_celery
-        volumes:
-            - ${ARCHES_CORE_HOST_DIR:-../arches/}:/opt/arches
-            - ./:/opt/arches
-        environment:
-            ARCHES_PROJECT: "arches"
-            PGUSER: postgres
-            PGPASSWORD: postgis
-            PGDATABASE: "arches"
-            PGHOST: postgres
-            PGPORT: "5432"
-            ARCHES_ES_INDEX_PREFIX: "arches"
-            ARCHES_ESHOST: elasticsearch
-            ARCHES_ESPORT: "9200"
-            ARCHES_ESPASSWORD: changeme
-            ARCHES_CELERY_BROKER_URL: amqp://arches:arches@rabbitmq:5672/
-        depends_on:
-            rabbitmq:
-                condition: service_healthy
-            postgres:
-                condition: service_healthy
-            elasticsearch:
-                condition: service_healthy
-
-    rabbitmq:
-        image: rabbitmq:3-management
-        environment:
-            RABBITMQ_DEFAULT_USER: arches
-            RABBITMQ_DEFAULT_PASS: arches
-        healthcheck:
-            test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
-            interval: 10s
-            timeout: 10s
-            retries: 10
-
-    postgres:
-        image: postgis/postgis:16-3.5
-        platform: linux/amd64
-        volumes:
-            - postgres-data:/var/lib/postgresql/data
-        environment:
-            POSTGRES_USER: postgres
-            POSTGRES_PASSWORD: postgis
-        healthcheck:
-            test: ["CMD-SHELL", "pg_isready -U postgres"]
-            interval: 3s
-            timeout: 5s
-            retries: 10
+    db:
+      container_name: db
+      image: kartoza/postgis:12.0
+      volumes:
+          - postgres-data:/var/lib/postgresql/data
+          - postgres-log:/var/log/postgresql
+          - ./arches/install/init-unix.sql:/docker-entrypoint-initdb.d/init.sql # to set up the DB template
+      ports:
+        - '5432:5432'
+      environment:
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASS=postgres
+        - POSTGRES_DB=postgres
+        - POSTGRES_MULTIPLE_EXTENSIONS=postgis,postgis_topology
+        - TZ=PST
 
     elasticsearch:
-        image: elasticsearch:8.15.5
-        volumes:
-            - es-data:/usr/share/elasticsearch/data
-        environment:
-            discovery.type: single-node
-            xpack.security.enabled: "true"
-            ELASTIC_PASSWORD: changeme
-            ES_JAVA_OPTS: "-Xms512m -Xmx512m"
-        healthcheck:
-            test: ["CMD-SHELL", "curl -sf -u elastic:changeme http://localhost:9200/_cluster/health || exit 1"]
-            interval: 5s
-            timeout: 10s
-            retries: 20
+      container_name: elasticsearch
+      image: elasticsearch:7.5.1
+      volumes:
+        - elasticsearch-data:/usr/share/elasticsearch/data
+      ports:
+        - "9200:9200"
+        - "9300:9300"
+      environment:
+        - TZ=PST
+        - discovery.type=single-node
+        - discovery.seed_hosts=
+        - "ES_JAVA_OPTS=-Xms400m -Xmx400m"
 
-    geoserver:
-        image: docker.osgeo.org/geoserver:2.28.x
-        profiles:
-            - geoserver
-        volumes:
-            - geoserver-data:/opt/geoserver/data_dir
-        ports:
-            - ${HOST_GEOSERVER_PORT:-8080}:8080
-        environment:
-            INSTALL_EXTENSIONS: "true"
-            COMMUNITY_EXTENSIONS: sec-oidc
-            GEOSERVER_ADMIN_USER: admin
-            GEOSERVER_ADMIN_PASSWORD: geoserver
-        healthcheck:
-            test: ["CMD-SHELL", "curl -sf http://localhost:8080/geoserver/web/ || exit 1"]
-            interval: 10s
-            timeout: 10s
-            retries: 10
-            start_period: 60s
-        depends_on:
-            postgres:
-                condition: service_healthy
+    letsencrypt:
+      container_name: letsencrypt
+      image: cvast/cvast-letsencrypt:1.1
+      volumes:
+        - letsencrypt-acme-challenge:/var/www
+        - letsencrypt:/etc/letsencrypt
+        - letsencrypt-log:/var/log/letsencrypt
+      command: get_certificate
+      environment:
+        - MODE=regular
+        - LETSENCRYPT_EMAIL=info@example.com
+        - DOMAIN_NAMES=localhost
+        - PRODUCTION_MODE=False
+        - PERSISTENT_MODE=True
+        - TZ=PST
 
 volumes:
+    arches-log:
+    arches-static:
     postgres-data:
-    es-data:
-    geoserver-data:
+    postgres-log:
+    elasticsearch-data:
+    letsencrypt:
+    letsencrypt-log:
+    letsencrypt-acme-challenge:
