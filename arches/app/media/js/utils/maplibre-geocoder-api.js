@@ -1,16 +1,13 @@
 /**
- * Default geocoderApi for the maplibre-gl-geocoder control used on the
- * map search page. Backed by the free OpenStreetMap Nominatim service so
- * that no API key is required out of the box.
+ * Default geocoderApi for the maplibre-gl-geocoder control. Backed by
+ * OpenStreetMap Nominatim, so no API key is required out of the box.
  *
- * Projects that want a different geocoding backend (e.g. Mapbox,
- * MapTiler, an in-house service) can override this file at the same
- * path to swap in their own `forwardGeocode` implementation and update
- * `geocoderAttribution` to match, without touching `viewmodels/map.js`.
+ * Projects wanting a different backend (Mapbox, MapTiler, etc.) can
+ * override this file to swap in their own `forwardGeocode` and update
+ * `geocoderAttribution` to match.
  *
- * Nominatim's usage policy (https://operations.osmfoundation.org/policies/nominatim/)
- * requires visible attribution of OpenStreetMap/ODbL data; `geocoderAttribution`
- * is surfaced in the map's AttributionControl for this reason.
+ * Nominatim's usage policy requires attribution of OSM/ODbL data; see
+ * `geocoderAttribution` below and https://operations.osmfoundation.org/policies/nominatim/.
  */
 const NOMINATIM_SEARCH_URL = 'https://nominatim.openstreetmap.org/search';
 
