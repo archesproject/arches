@@ -6279,7 +6279,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .grid-list.provisional-edit-history {
-    height: 100%;
+    height: calc(100vh - 100px);
     position: absolute;
     width: 100%;
     overflow-y: scroll;
