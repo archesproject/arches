@@ -27,7 +27,7 @@
         "@eonasdan/tempus-dominus": "6.10.4",
         "@mapbox/geojson-extent": "1.0.1",
         "@mapbox/geojsonhint": "3.3.0",
-        "@mapbox/mapbox-gl-draw": "1.5.1",
+        "@mapbox/mapbox-gl-draw": "1.5.2",
         "@maplibre/maplibre-gl-geocoder": "1.9.4",
         "@primeuix/themes": "1.2.3",
         "@primevue/forms": "4.3.7",
