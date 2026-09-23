@@ -32,7 +32,7 @@ class BulkDataDeletion(BaseBulkEditor):
         }
 
         resourceids_query = (
-            "AND resourceinstanceid IN %(resourceids)s" if resourceids else ""
+            "AND resourceinstanceid = ANY(%(resourceids)s)" if resourceids else ""
         )
         tile_deletion_count = """
             SELECT COUNT(DISTINCT resourceinstanceid), COUNT(tileid)
@@ -52,7 +52,7 @@ class BulkDataDeletion(BaseBulkEditor):
             SELECT g.name ->> %(language_code)s, COUNT(r.resourceinstanceid)
             FROM resource_instances r, graphs g
             WHERE r.graphid = g.graphid
-            AND r.resourceinstanceid IN %(resourceids)s
+            AND r.resourceinstanceid = ANY(%(resourceids)s)
             GROUP BY g.name
         """
 
@@ -83,7 +83,7 @@ class BulkDataDeletion(BaseBulkEditor):
         }
 
         resourceids_query = (
-            "AND resourceinstanceid IN %(resourceids)s" if resourceids else ""
+            "AND resourceinstanceid = ANY(%(resourceids)s)" if resourceids else ""
         )
         get_sample_resource_ids = (
             """
@@ -259,7 +259,7 @@ class BulkDataDeletion(BaseBulkEditor):
                     },
                 }
         if resourceids:
-            resourceids = tuple(resourceids)
+            resourceids = list(resourceids)
 
         number_of_resource, number_of_tiles = self.get_number_of_deletions(
             graph_id, nodegroup_id, resourceids
@@ -286,7 +286,7 @@ class BulkDataDeletion(BaseBulkEditor):
         if resourceids:
             resourceids = json.loads(resourceids)
         if resourceids:
-            resourceids = tuple(resourceids)
+            resourceids = list(resourceids)
         if search_url:
             try:
                 resourceids = get_resourceids_from_search_url(
