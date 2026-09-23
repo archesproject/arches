@@ -17,15 +17,9 @@ import nonlocalizedTextWidgetTemplate from 'templates/views/components/widgets/n
 */
 
 const viewModel = function(params) {
-    params.configKeys = ['placeholder', 'width', 'maxLength', 'defaultValue', 'uneditable'];
+    params.configKeys = ['placeholder', 'width', 'maxLength', 'defaultValue'];
 
         WidgetViewModel.apply(this, [params]);
-
-        const self = this;
-
-        this.disable = ko.computed(() => {
-            return ko.unwrap(self.disabled) || ko.unwrap(self.uneditable); 
-        }, self);
 };
 
 export default ko.components.register('non-localized-text-widget', {

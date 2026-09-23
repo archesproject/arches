@@ -13,7 +13,7 @@
                 <label class="form-radio form-normal form-text" role="radio"
                     data-bind="css: {
                         'active': $parent.isOptionSelected($data),
-                        'disabled': $parent.disabled
+                        'disabled': $parent.disable
                     },
                     onEnterkeyClick,
                     onSpaceClick,
@@ -25,6 +25,7 @@
                     }"
                     tabindex="0">
                     <input type="radio" data-bind="checked: $parent.value,
+                        disable: $parent.disable,
                         attr: {
                             value: id,
                             name: $parent.node.nodeid
