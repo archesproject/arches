@@ -382,7 +382,10 @@ module.exports = () => {
             ],
             resolve: {
                 extensions: ['.ts', '.tsx', '.wasm', '.mjs', '.js', '.json'],
-                modules: [Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH)],
+                // 'node_modules' re-enables webpack's normal upward search so
+                // packages' own nested node_modules (e.g. nanoid pinned per-dependent
+                // due to a version conflict) are still resolvable.
+                modules: [Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH), 'node_modules'],
                 alias: {
                     ...javascriptRelativeFilepathToAbsoluteFilepathLookup,
                     ...templateFilepathLookup,

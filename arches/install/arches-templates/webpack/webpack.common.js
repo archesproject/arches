@@ -382,7 +382,10 @@ module.exports = () => {
             ],
             resolve: {
                 extensions: ['.ts', '.tsx', '.wasm', '.mjs', '.js', '.json'],
-                modules: [Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH)],
+                // 'node_modules' re-enables webpack's normal upward search so
+                // packages' own nested node_modules (e.g. nanoid pinned per-dependent
+                // due to a version conflict) are still resolvable.
+                modules: [Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH), 'node_modules'],
                 alias: {
                     ...javascriptRelativeFilepathToAbsoluteFilepathLookup,
                     ...templateFilepathLookup,
@@ -418,8 +421,28 @@ module.exports = () => {
                         loader: Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'vue-loader'),
                     },
                     {
+                        // Emit maplibre-gl's worker script as a static asset for `new URL(...)`.
+                        test: /maplibre-gl-worker(-dev)?\.mjs$/,
+                        type: 'asset/resource',
+                        generator: {
+                            filename: 'js/[name][ext]',
+                        },
+                    },
+                    {
+                        // The worker imports this at runtime; emit it as an asset too
+                        // (via `?asset`), while normal imports still bundle as JS below.
+                        test: /maplibre-gl-shared(-dev)?\.mjs$/,
+                        resourceQuery: /asset/,
+                        type: 'asset/resource',
+                        generator: {
+                            filename: 'js/[name][ext]',
+                        },
+                    },
+                    {
                         test: /\.mjs$/,
                         include: /node_modules/,
+                        exclude: /maplibre-gl-worker(-dev)?\.mjs$/,
+                        resourceQuery: { not: /asset/ },
                         type: 'javascript/auto',
                     },
                     {
