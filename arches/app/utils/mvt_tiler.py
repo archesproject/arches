@@ -55,15 +55,15 @@ class MVTTiler:
                     user, search_engine=self.se, resources=resources
                 )
                 permission_framework_filter = (
-                    "resourceinstanceid in %s"
+                    "resourceinstanceid = ANY(%s)"
                     if exclusive_set
-                    else "resourceinstanceid not in %s"
+                    else "resourceinstanceid != ALL(%s)"
                 )
                 if len(resource_ids) == 0:
                     resource_ids.append(
                         "10000000-0000-0000-0000-000000000001"
                     )  # This must have a uuid that will never be a resource id.
-                resource_ids = tuple(resource_ids)
+                resource_ids = list(resource_ids)
 
                 if int(zoom) <= int(config["clusterMaxZoom"]):
                     arc = self.EARTHCIRCUM / ((1 << int(zoom)) * self.PIXELSPERTILE)
