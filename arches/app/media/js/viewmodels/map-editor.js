@@ -452,8 +452,21 @@ var viewModel = function (params) {
         }
     };
 
+    // mapbox-gl-draw >= 1.5 generates non-UUID ids; Arches requires UUID feature ids.
+    var newFeatureWithUuid = function (geojson) {
+        return Object.getPrototypeOf(this).newFeature.call(
+            this,
+            Object.assign({}, geojson, { id: geojson.id || uuid.generate() })
+        );
+    };
+
     var setupDraw = function (map) {
-        var modes = MapboxDraw.modes;
+        var modes = {};
+        Object.keys(MapboxDraw.modes).forEach(function (name) {
+            modes[name] = Object.assign({}, MapboxDraw.modes[name], {
+                newFeature: newFeatureWithUuid,
+            });
+        });
         modes.static = {
             onSetup: function () {
                 this.setActionableState();
