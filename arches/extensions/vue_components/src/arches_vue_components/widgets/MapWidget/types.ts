@@ -26,7 +26,6 @@ export interface MapWidgetConfig {
     geometryTypes?: GeometryTypeConfig[];
     geocoderVisible?: boolean;
     geocodePlaceholder?: string;
-    geocodeProvider?: string;
     overlayConfigs?: unknown[];
     overlayOpacity?: number;
     maxDrawnFeatures?: number;

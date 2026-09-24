@@ -52,7 +52,6 @@ class PluginView(MapBaseManagerView):
         card_components = models.CardComponent.objects.all()
         datatypes = models.DDataType.objects.all()
         map_markers = models.MapMarker.objects.all()
-        geocoding_providers = models.Geocoder.objects.all()
         templates = models.ReportTemplate.objects.all()
         plugins = models.Plugin.objects.all()
 
@@ -70,7 +69,6 @@ class PluginView(MapBaseManagerView):
                 datatypes, exclude=["iconclass", "modulename", "classname"]
             ),
             map_markers=map_markers,
-            geocoding_providers=geocoding_providers,
             report_templates=templates,
             templates_json=JSONSerializer().serialize(
                 templates, sort_keys=False, exclude=["name", "description"]
