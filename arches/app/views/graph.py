@@ -316,7 +316,6 @@ class GraphDesignerView(GraphBaseView):
             map_sources=models.MapSource.objects.all(),
             applied_functions=JSONSerializer().serialize(serialized_graph["functions"]),
             primary_descriptor_function=primary_descriptor_function,
-            geocoding_providers=models.Geocoder.objects.all(),
             report_templates=models.ReportTemplate.objects.all(),
             ontologies=JSONSerializer().serialize(
                 models.Ontology.objects.filter(parentontology=None),

@@ -35,11 +35,10 @@
         <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Map Settings" %}</h4></a>
         <div class="ep-help-topic-content">
             <h4>{% trans "MapLibre" %}</h4>
-            <p>{% trans "Arches uses the MapLibre GL JS mapping library for map display and data creation. Arches also supports Mapbox's geocoding service and other basemap services." %}</p>
+            <p>{% trans "Arches uses the MapLibre GL JS mapping library for map display and data creation. Arches also supports a variety of basemap services." %}</p>
             <p>
-                {% blocktrans %}<strong>Mapbox API Key (Optional)</strong> - Used to authenticate against Mapbox's Geocoding API. You will need to <a href='https://www.mapbox.com/help/create-api-access-token/' target="_blank">create a free API key</a> (or "access token") if you want to use Mapbox for address search. Alternatively, a different geocoder can be configured.{% endblocktrans %}<br>
-                {% trans "<strong>MapLibre Sprites</strong> - Path to a sprite sheet to use for basemap icons (optional)." %}<br>
-                {% trans "<strong>MapLibre Glyphs</strong> - Path to a font glyph server for map text labels (defaults to MapLibre's free public font server)." %}<br>
+                {% trans "<strong>MapLibre Sprites</strong> - Path to a sprite sheet to use for basemap icons (defaults to Maptoolkit's free public sprite sheet)." %}<br>
+                {% trans "<strong>MapLibre Glyphs</strong> - Path to a font glyph server for map text labels (defaults to Maptoolkit's free public font server)." %}<br>
             </p>
             <h4>{% trans "Project Extent" %}</h4>
             <p>{% trans "Draw a polygon representing your project's extent. These bounds will serve as the default for the search result grid bounds, and map bounds in search, cards, and reports." %}</p>

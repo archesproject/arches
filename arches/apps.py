@@ -186,3 +186,19 @@ def warn_default_allow_permission_framework(app_configs, **kwargs):
             )
         )
     return errors
+
+
+@register(Tags.compatibility)
+def warn_mapbox_api_key_deprecated(app_configs, **kwargs):
+    errors = []
+
+    if getattr(settings, "MAPBOX_API_KEY", None):
+        errors.append(
+            Warning(
+                msg="MAPBOX_API_KEY is deprecated and no longer used by Arches.",
+                hint="Remove MAPBOX_API_KEY from your settings. It will be removed in a future release.",
+                obj=settings.APP_NAME,
+                id="arches.W004",
+            )
+        )
+    return errors

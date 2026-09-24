@@ -124,7 +124,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
     @staticmethod
     def _get_valid_feature_id(feature_id):
-        # geojson_geometries.featureid is a uuid column; replace missing/invalid ids.
         try:
             uuid.UUID(str(feature_id))
             return feature_id

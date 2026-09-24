@@ -64,14 +64,12 @@ def map_info(request):
             "map_filter_auto_zoom": (
                 "true" if settings.MAP_FILTER_AUTO_ZOOM_ENABLED else "false"
             ),
-            "mapbox_api_key": settings.MAPBOX_API_KEY,
             "hex_bin_size": (
                 settings.HEX_BIN_SIZE if settings.HEX_BIN_SIZE is not None else 100
             ),
             "maplibre_sprites": settings.MAPLIBRE_SPRITES,
             "maplibre_glyphs": settings.MAPLIBRE_GLYPHS,
             "hex_bin_bounds": json.dumps(hex_bin_bounds),
-            "geocoder_default": settings.DEFAULT_GEOCODER,
             "preferred_coordinate_systems": JSONSerializer().serialize(
                 settings.PREFERRED_COORDINATE_SYSTEMS
             ),
