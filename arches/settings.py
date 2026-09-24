@@ -694,8 +694,6 @@ ETL_USERNAME = "ETL"  # override this setting in your packages settings.py file
 
 GOOGLE_ANALYTICS_TRACKING_ID = None
 
-DEFAULT_GEOCODER = "10000000-0000-0000-0000-010000000000"
-
 SPARQL_ENDPOINT_PROVIDERS = (
     {
         "SPARQL_ENDPOINT_PROVIDER": "arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider"
@@ -764,7 +762,8 @@ FILE_TYPES = [
 FILENAME_GENERATOR = "arches.app.utils.storage_filename_generator.generate_filename"
 UPLOADED_FILES_DIR = "uploadedfiles"
 
-MAPBOX_API_KEY = ""  # Put your Mapbox key here! Used by the built-in Mapbox geocoder.
+# Deprecated: unused since the move to MapLibre and will be removed in a future release.
+MAPBOX_API_KEY = ""
 
 # links to sprites and glyphs for use on map. MapLibre GL JS does not require
 # an API key; these default to Maptoolkit's free tile/font/sprite service,

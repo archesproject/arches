@@ -32,7 +32,6 @@ from arches.app.models.models import (
     Widget,
     ReportTemplate,
     CardComponent,
-    Geocoder,
     SearchExportHistory,
 )
 from arches.app.models.concept import Concept
@@ -70,7 +69,6 @@ class SearchView(MapBaseManagerView):
             .exclude(is_active=False)
             .exclude(source_identifier__isnull=False)
         )
-        geocoding_providers = Geocoder.objects.all()
         search_component_factory = SearchFilterFactory(request)
         searchview_instance = search_component_factory.get_searchview_instance()
         if not searchview_instance:
@@ -84,7 +82,6 @@ class SearchView(MapBaseManagerView):
 
         context = self.get_context_data(
             map_markers=map_markers,
-            geocoding_providers=geocoding_providers,
             search_components=search_components,
             widgets=widgets,
             report_templates=templates,

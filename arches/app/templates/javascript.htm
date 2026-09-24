@@ -988,13 +988,6 @@
             "id": "{{ concept_collection.id }}"
         },{% endfor %}]'
         export-html-templates='[{% for template in export_html_templates %} "{{ template }}", {% endfor %}]'
-        geocoder-default="{{ map_info.geocoder_default }}"
-        geocoding-providers='[{% for provider in geocoding_providers %}{
-            "name": "{{ provider.name }}",
-            "geocoderid": "{{ provider.geocoderid }}",
-            "api_key": {% if provider.api_key != None %} "{{ provider.api_key }}" {% elif provider.api_key == None %} null {% endif %},
-            "component": "{{ provider.component }}"
-        },{% endfor %}]'
         graphs="{{graphs|default:'[]'}}"
         hex-bin-size="{{ map_info.hex_bin_size | unlocalize }}"
         hex-bin-bounds="{{ map_info.hex_bin_bounds }}"
@@ -1002,7 +995,6 @@
         active-language-dir="{{ app_settings.ACTIVE_LANGUAGE_DIR }}"
         languages='{{ app_settings.LANGUAGES }}'
         search-thumbnails='{{ app_settings.SEARCH_THUMBNAILS }}'
-        mapbox-api-key="{{ map_info.mapbox_api_key }}"
         maplibre-glyphs="{{ map_info.maplibre_glyphs }}"
         maplibre-sprites="{{ map_info.maplibre_sprites }}"
         map-default-x="{{ map_info.x|unlocalize }}"
@@ -1139,20 +1131,6 @@
                 "modulename": "{{ template.modulename }}",
                 "description": "{{ template.description }}",
                 "defaultconfig": "{{ template.defaultconfig }}"
-            },
-        {% endfor %}}'
-    ></div>
-
-
-    <!-- consumed by media/js/geocoder-templates.js -->
-    <div
-        id="geocoderTemplateData"
-        style="display: none;"
-        geocoderTemplates='{{% for provider in geocoding_providers %}
-            "{{ provider.geocoderid }}": {
-                "component": "{{ provider.component }}",
-                "name": "{{ provider.name }}",
-                "api_key": "{{ provider.api_key }}"
             },
         {% endfor %}}'
     ></div>

@@ -3,6 +3,13 @@ import json
 
 SPRITES_NODE_ID = "0e900254-4148-11e7-9902-c4b301baab9f"
 GLYPHS_NODE_ID = "0e90031e-4148-11e7-a176-c4b301baab9f"
+# MAPBOX_API_KEY is deprecated; hide its system settings widget.
+MAPBOX_API_KEY_WIDGET_ID = "0e9007d9-4148-11e7-9354-c4b301baab9f"
+# Dead geocoder reference in defaults that get copied into new cards.
+MAP_WIDGET_ID = "10000000-0000-0000-0000-000000000007"
+MAP_REPORT_TEMPLATE_ID = "50000000-0000-0000-0000-000000000002"
+# Set by 0003_40b4; points at the (now dropped) Mapbox geocoder row.
+OLD_GEOCODE_PROVIDER = "10000000-0000-0000-0000-010000000000"
 
 OLD_SPRITES_DEFAULT = "mapbox://sprites/mapbox/basic-v9"
 OLD_GLYPHS_DEFAULT = "mapbox://fonts/mapbox/{fontstack}/{range}.pbf"
@@ -45,6 +52,20 @@ def _references_source(layerdefinitions, source_name):
     )
 
 
+def strip_geocode_provider(model, pk):
+    obj = model.objects.filter(pk=pk).first()
+    if obj and isinstance(obj.defaultconfig, dict):
+        if obj.defaultconfig.pop("geocodeProvider", None) is not None:
+            obj.save()
+
+
+def restore_geocode_provider(model, pk):
+    obj = model.objects.filter(pk=pk).first()
+    if obj and isinstance(obj.defaultconfig, dict):
+        obj.defaultconfig.setdefault("geocodeProvider", OLD_GEOCODE_PROVIDER)
+        obj.save()
+
+
 def rename_node(Node, node_id, name, alias):
     Node.objects.filter(nodeid=node_id).update(name=name, alias=alias)
 
@@ -68,6 +89,9 @@ def forward(apps, schema_editor):
     MapSource = apps.get_model("models", "MapSource")
     MapLayer = apps.get_model("models", "MapLayer")
     TileModel = apps.get_model("models", "TileModel")
+    CardXNodeXWidget = apps.get_model("models", "CardXNodeXWidget")
+    Widget = apps.get_model("models", "Widget")
+    ReportTemplate = apps.get_model("models", "ReportTemplate")
 
     rename_node(Node, SPRITES_NODE_ID, "MAPLIBRE_SPRITES", "maplibre_sprites")
     rename_node(Node, GLYPHS_NODE_ID, "MAPLIBRE_GLYPHS", "maplibre_glyphs")
@@ -101,12 +125,20 @@ def forward(apps, schema_editor):
     )
     update_tile_value(TileModel, GLYPHS_NODE_ID, OLD_GLYPHS_DEFAULT, NEW_GLYPHS_DEFAULT)
 
+    CardXNodeXWidget.objects.filter(pk=MAPBOX_API_KEY_WIDGET_ID).update(visible=False)
+
+    strip_geocode_provider(Widget, MAP_WIDGET_ID)
+    strip_geocode_provider(ReportTemplate, MAP_REPORT_TEMPLATE_ID)
+
 
 def reverse(apps, schema_editor):
     Node = apps.get_model("models", "Node")
     MapSource = apps.get_model("models", "MapSource")
     MapLayer = apps.get_model("models", "MapLayer")
     TileModel = apps.get_model("models", "TileModel")
+    CardXNodeXWidget = apps.get_model("models", "CardXNodeXWidget")
+    Widget = apps.get_model("models", "Widget")
+    ReportTemplate = apps.get_model("models", "ReportTemplate")
 
     rename_node(Node, SPRITES_NODE_ID, "MAPBOX_SPRITES", "mapbox_sprites")
     rename_node(Node, GLYPHS_NODE_ID, "MAPBOX_GLYPHS", "mapbox_glyphs")
@@ -139,6 +171,11 @@ def reverse(apps, schema_editor):
         TileModel, SPRITES_NODE_ID, NEW_SPRITES_DEFAULT, OLD_SPRITES_DEFAULT
     )
     update_tile_value(TileModel, GLYPHS_NODE_ID, NEW_GLYPHS_DEFAULT, OLD_GLYPHS_DEFAULT)
+
+    CardXNodeXWidget.objects.filter(pk=MAPBOX_API_KEY_WIDGET_ID).update(visible=True)
+
+    restore_geocode_provider(Widget, MAP_WIDGET_ID)
+    restore_geocode_provider(ReportTemplate, MAP_REPORT_TEMPLATE_ID)
 
 
 class Migration(migrations.Migration):

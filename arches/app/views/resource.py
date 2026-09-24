@@ -331,7 +331,6 @@ class ResourceEditorView(MapBaseManagerView):
                 exclude=["iconclass", "modulename", "classname"],
             ),
             map_markers=models.MapMarker.objects.all(),
-            geocoding_providers=models.Geocoder.objects.all(),
             user_is_reviewer=json.dumps(user_is_reviewer),
             user_can_delete_resource=user_can_delete_resource(request.user, resourceid),
             creator=json.dumps(creator),
@@ -1011,7 +1010,6 @@ class ResourceReportView(MapBaseManagerView):
             card_components=models.CardComponent.objects.all(),
             widgets=models.Widget.objects.all(),
             map_markers=models.MapMarker.objects.all(),
-            geocoding_providers=models.Geocoder.objects.all(),
             graph_has_different_publication=graph_has_different_publication,
             graph_has_different_publication_and_user_has_insufficient_permissions=bool(
                 graph_has_different_publication

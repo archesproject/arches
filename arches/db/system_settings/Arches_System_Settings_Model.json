@@ -364,7 +364,6 @@
                         "featureLineWidth": 1,
                         "featurePointSize": 3,
                         "geocodePlaceholder": "Search",
-                        "geocodeProvider": "10000000-0000-0000-0000-010000000000",
                         "geocoderVisible": false,
                         "geometryTypes": [
                             {
@@ -515,7 +514,6 @@
                         "featureLineWidth": 1,
                         "featurePointSize": 3,
                         "geocodePlaceholder": "Search",
-                        "geocodeProvider": "10000000-0000-0000-0000-010000000000",
                         "geocoderVisible": true,
                         "geometryTypes": [
                             {
@@ -562,7 +560,7 @@
                         "i18n_properties": [
                             "placeholder"
                         ],
-                        "label": "MapBox API Key (Optional)",
+                        "label": "MapBox API Key (Deprecated)",
                         "maxLength": null,
                         "placeholder": {
                             "en": "Enter text"
@@ -572,12 +570,12 @@
                     },
                     "id": "0e9007d9-4148-11e7-9354-c4b301baab9f",
                     "label": {
-                        "en": "MapBox API Key (Optional)"
+                        "en": "MapBox API Key (Deprecated)"
                     },
                     "node_id": "0e9000b0-4148-11e7-bd19-c4b301baab9f",
                     "sortorder": 0,
                     "source_identifier_id": null,
-                    "visible": true,
+                    "visible": false,
                     "widget_id": "10000000-0000-0000-0000-000000000001"
                 },
                 {
