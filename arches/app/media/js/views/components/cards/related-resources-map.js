@@ -9,6 +9,7 @@ import MapFilterViewModel from 'viewmodels/map-filter';
 import selectFeatureLayersFactory from 'views/components/cards/select-related-feature-layers';
 import relatedResourcesMapTemplate from 'templates/views/components/cards/related-resources-map.htm';
 import relatedResourcesMapPopupTemplate from 'templates/views/components/cards/related-resources-map-popup.htm';
+import 'bindings/chosen';
 
 
 var viewModel = function(params) {

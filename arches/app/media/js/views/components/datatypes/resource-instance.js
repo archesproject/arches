@@ -6,6 +6,7 @@ import ontologyUtils from 'utils/ontology';
 import resourceInstanceDatatypeTemplate from 'templates/views/components/datatypes/resource-instance.htm';
 import 'views/components/widgets/resource-instance-select';
 import 'bindings/key-events-click';
+import 'bindings/chosen';
 
 
 var name = 'resource-instance-datatype-config';

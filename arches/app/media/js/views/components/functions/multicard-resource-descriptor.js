@@ -2,6 +2,7 @@ import MulticardResourceDescriptorTemplate from 'templates/views/components/func
 import ko from 'knockout';
 import _ from 'underscore';
 import arches from 'arches';
+import 'bindings/select2-query';
 
 let parentComponent;
 const setParentComponent = (found) => {

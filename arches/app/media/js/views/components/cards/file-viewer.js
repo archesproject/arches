@@ -12,6 +12,7 @@ import 'bindings/fadeVisible';
 import 'bindings/scroll-to-file';
 import 'dropzone';
 import 'bindings/dropzone';
+import 'bindings/select2-query';
 
 
 const viewModel = function(params) {

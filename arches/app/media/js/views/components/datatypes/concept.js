@@ -5,6 +5,7 @@ import arches from 'arches';
 import ConceptSelectViewModel from 'viewmodels/concept-select';
 import conceptDatatypeTemplate from 'templates/views/components/datatypes/concept.htm';
 import 'bindings/key-events-click';
+import 'bindings/select2-query';
 
 
 var name = 'concept-datatype-config';
