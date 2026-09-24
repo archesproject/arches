@@ -104,6 +104,15 @@ ELASTICSEARCH_CUSTOM_INDEXES = []
 #     'should_update_asynchronously': False
 # }]
 
+# Name of the index used by arches.extensions.controlled_lists for reference
+# data. The index itself is registered by the project, not here, so that
+# projects which do not install the application are not made to build it.
+REFERENCES_INDEX_NAME = "references"
+
+# Classes contributing additional mappings to the resource index, e.g.
+# "arches.extensions.controlled_lists.search.references_es_mapping_modifier.ReferencesEsMappingModifier"
+ES_MAPPING_MODIFIER_CLASSES = []
+
 TERM_SEARCH_TYPES = [
     {
         "type": "term",
@@ -560,7 +569,25 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.db.DatabaseCache",
         "LOCATION": "user_permission_cache",
     },
+    "querysets_concepts": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "querysets_concepts_cache",
+        "TIMEOUT": 86400,  # one day in seconds
+        "OPTIONS": {"MAX_ENTRIES": 1000},
+    },
+    "querysets_resource_instances": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "querysets_resource_instances_cache",
+        "TIMEOUT": 86400,  # one day in seconds
+        "OPTIONS": {"MAX_ENTRIES": 1000},
+    },
 }
+
+# Cache aliases used by arches.extensions.querysets. Both must name entries in
+# CACHES above; setting either to None falls back to the default cache, with a
+# system check warning.
+ARCHES_QUERYSETS_CONCEPT_CACHE = "querysets_concepts"
+ARCHES_QUERYSETS_RESOURCE_INSTANCE_CACHE = "querysets_resource_instances"
 
 DEFAULT_RESOURCE_IMPORT_USER = {"username": "admin", "userid": 1}
 
