@@ -84,6 +84,73 @@ def update_tile_value(TileModel, node_id, old_value, new_value):
             tile.save()
 
 
+def _update_published_graphs(apps, graph_transformer):
+    PublishedGraph = apps.get_model("models", "PublishedGraph")
+    batch_size = 25
+    graphs_to_update = []
+
+    queryset = PublishedGraph.objects.exclude(serialized_graph__isnull=True)
+    for published_graph in queryset.iterator(chunk_size=batch_size):
+        serialized_graph = published_graph.serialized_graph
+        if graph_transformer(serialized_graph):
+            graphs_to_update.append(published_graph)
+            if len(graphs_to_update) == batch_size:
+                PublishedGraph.objects.bulk_update(
+                    graphs_to_update, ["serialized_graph"]
+                )
+                graphs_to_update = []
+
+    if graphs_to_update:
+        PublishedGraph.objects.bulk_update(graphs_to_update, ["serialized_graph"])
+
+
+def _rename_node_in_serialized_graph(serialized_graph, node_id, name, alias):
+    changed = False
+    for node in serialized_graph.get("nodes", []):
+        if node.get("nodeid") == node_id and (
+            node.get("name") != name or node.get("alias") != alias
+        ):
+            node["name"] = name
+            node["alias"] = alias
+            changed = True
+    return changed
+
+
+def _set_widget_visibility_in_serialized_graph(serialized_graph, widget_id, visible):
+    changed = False
+    for widget in serialized_graph.get("cards_x_nodes_x_widgets", []):
+        if widget.get("id") == widget_id and widget.get("visible") != visible:
+            widget["visible"] = visible
+            changed = True
+    return changed
+
+
+def _rename_to_maplibre_and_hide_mapbox_key(serialized_graph):
+    changed = _rename_node_in_serialized_graph(
+        serialized_graph, SPRITES_NODE_ID, "MAPLIBRE_SPRITES", "maplibre_sprites"
+    )
+    changed |= _rename_node_in_serialized_graph(
+        serialized_graph, GLYPHS_NODE_ID, "MAPLIBRE_GLYPHS", "maplibre_glyphs"
+    )
+    changed |= _set_widget_visibility_in_serialized_graph(
+        serialized_graph, MAPBOX_API_KEY_WIDGET_ID, False
+    )
+    return changed
+
+
+def _rename_to_mapbox_and_show_mapbox_key(serialized_graph):
+    changed = _rename_node_in_serialized_graph(
+        serialized_graph, SPRITES_NODE_ID, "MAPBOX_SPRITES", "mapbox_sprites"
+    )
+    changed |= _rename_node_in_serialized_graph(
+        serialized_graph, GLYPHS_NODE_ID, "MAPBOX_GLYPHS", "mapbox_glyphs"
+    )
+    changed |= _set_widget_visibility_in_serialized_graph(
+        serialized_graph, MAPBOX_API_KEY_WIDGET_ID, True
+    )
+    return changed
+
+
 def forward(apps, schema_editor):
     Node = apps.get_model("models", "Node")
     MapSource = apps.get_model("models", "MapSource")
@@ -124,11 +191,12 @@ def forward(apps, schema_editor):
         TileModel, SPRITES_NODE_ID, OLD_SPRITES_DEFAULT, NEW_SPRITES_DEFAULT
     )
     update_tile_value(TileModel, GLYPHS_NODE_ID, OLD_GLYPHS_DEFAULT, NEW_GLYPHS_DEFAULT)
-
     CardXNodeXWidget.objects.filter(pk=MAPBOX_API_KEY_WIDGET_ID).update(visible=False)
 
     strip_geocode_provider(Widget, MAP_WIDGET_ID)
     strip_geocode_provider(ReportTemplate, MAP_REPORT_TEMPLATE_ID)
+
+    _update_published_graphs(apps, _rename_to_maplibre_and_hide_mapbox_key)
 
 
 def reverse(apps, schema_editor):
@@ -176,6 +244,8 @@ def reverse(apps, schema_editor):
 
     restore_geocode_provider(Widget, MAP_WIDGET_ID)
     restore_geocode_provider(ReportTemplate, MAP_REPORT_TEMPLATE_ID)
+
+    _update_published_graphs(apps, _rename_to_mapbox_and_show_mapbox_key)
 
 
 class Migration(migrations.Migration):
