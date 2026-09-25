@@ -5,6 +5,8 @@ SPRITES_NODE_ID = "0e900254-4148-11e7-9902-c4b301baab9f"
 GLYPHS_NODE_ID = "0e90031e-4148-11e7-a176-c4b301baab9f"
 # MAPBOX_API_KEY is deprecated; hide its system settings widget.
 MAPBOX_API_KEY_WIDGET_ID = "0e9007d9-4148-11e7-9354-c4b301baab9f"
+# System settings card housing the MapLibre/Mapbox API related widgets.
+MAPLIBRE_CARD_ID = "0e8fe699-4148-11e7-85ab-c4b301baab9f"
 # Dead geocoder reference in defaults that get copied into new cards.
 MAP_WIDGET_ID = "10000000-0000-0000-0000-000000000007"
 MAP_REPORT_TEMPLATE_ID = "50000000-0000-0000-0000-000000000002"
@@ -70,6 +72,18 @@ def rename_node(Node, node_id, name, alias):
     Node.objects.filter(nodeid=node_id).update(name=name, alias=alias)
 
 
+def rename_widget_label(CardXNodeXWidget, node_id, label):
+    CardXNodeXWidget.objects.filter(node_id=node_id).update(label=label)
+
+
+def rename_widget_label_by_id(CardXNodeXWidget, widget_id, label):
+    CardXNodeXWidget.objects.filter(pk=widget_id).update(label=label)
+
+
+def rename_card(CardModel, card_id, name):
+    CardModel.objects.filter(cardid=card_id).update(name=name)
+
+
 def update_tile_value(TileModel, node_id, old_value, new_value):
     for tile in TileModel.objects.filter(data__has_key=node_id):
         node_data = tile.data.get(node_id)
@@ -125,6 +139,33 @@ def _set_widget_visibility_in_serialized_graph(serialized_graph, widget_id, visi
     return changed
 
 
+def _rename_widget_label_in_serialized_graph(serialized_graph, node_id, label):
+    changed = False
+    for widget in serialized_graph.get("cards_x_nodes_x_widgets", []):
+        if widget.get("node_id") == node_id and widget.get("label") != label:
+            widget["label"] = label
+            changed = True
+    return changed
+
+
+def _rename_widget_label_by_id_in_serialized_graph(serialized_graph, widget_id, label):
+    changed = False
+    for widget in serialized_graph.get("cards_x_nodes_x_widgets", []):
+        if widget.get("id") == widget_id and widget.get("label") != label:
+            widget["label"] = label
+            changed = True
+    return changed
+
+
+def _rename_card_in_serialized_graph(serialized_graph, card_id, name):
+    changed = False
+    for card in serialized_graph.get("cards", []):
+        if card.get("cardid") == card_id and card.get("name") != name:
+            card["name"] = name
+            changed = True
+    return changed
+
+
 def _rename_to_maplibre_and_hide_mapbox_key(serialized_graph):
     changed = _rename_node_in_serialized_graph(
         serialized_graph, SPRITES_NODE_ID, "MAPLIBRE_SPRITES", "maplibre_sprites"
@@ -132,8 +173,20 @@ def _rename_to_maplibre_and_hide_mapbox_key(serialized_graph):
     changed |= _rename_node_in_serialized_graph(
         serialized_graph, GLYPHS_NODE_ID, "MAPLIBRE_GLYPHS", "maplibre_glyphs"
     )
+    changed |= _rename_widget_label_in_serialized_graph(
+        serialized_graph, SPRITES_NODE_ID, "MapLibre Sprites"
+    )
+    changed |= _rename_widget_label_in_serialized_graph(
+        serialized_graph, GLYPHS_NODE_ID, "MapLibre Glyphs"
+    )
     changed |= _set_widget_visibility_in_serialized_graph(
         serialized_graph, MAPBOX_API_KEY_WIDGET_ID, False
+    )
+    changed |= _rename_widget_label_by_id_in_serialized_graph(
+        serialized_graph, MAPBOX_API_KEY_WIDGET_ID, "MapBox API Key (Deprecated)"
+    )
+    changed |= _rename_card_in_serialized_graph(
+        serialized_graph, MAPLIBRE_CARD_ID, "MapLibre"
     )
     return changed
 
@@ -145,8 +198,20 @@ def _rename_to_mapbox_and_show_mapbox_key(serialized_graph):
     changed |= _rename_node_in_serialized_graph(
         serialized_graph, GLYPHS_NODE_ID, "MAPBOX_GLYPHS", "mapbox_glyphs"
     )
+    changed |= _rename_widget_label_in_serialized_graph(
+        serialized_graph, SPRITES_NODE_ID, "Mapbox Sprites"
+    )
+    changed |= _rename_widget_label_in_serialized_graph(
+        serialized_graph, GLYPHS_NODE_ID, "Mapbox Glyphs"
+    )
     changed |= _set_widget_visibility_in_serialized_graph(
         serialized_graph, MAPBOX_API_KEY_WIDGET_ID, True
+    )
+    changed |= _rename_widget_label_by_id_in_serialized_graph(
+        serialized_graph, MAPBOX_API_KEY_WIDGET_ID, "MapBox API Key (Optional)"
+    )
+    changed |= _rename_card_in_serialized_graph(
+        serialized_graph, MAPLIBRE_CARD_ID, "Mapbox API"
     )
     return changed
 
@@ -157,11 +222,18 @@ def forward(apps, schema_editor):
     MapLayer = apps.get_model("models", "MapLayer")
     TileModel = apps.get_model("models", "TileModel")
     CardXNodeXWidget = apps.get_model("models", "CardXNodeXWidget")
+    CardModel = apps.get_model("models", "CardModel")
     Widget = apps.get_model("models", "Widget")
     ReportTemplate = apps.get_model("models", "ReportTemplate")
 
     rename_node(Node, SPRITES_NODE_ID, "MAPLIBRE_SPRITES", "maplibre_sprites")
     rename_node(Node, GLYPHS_NODE_ID, "MAPLIBRE_GLYPHS", "maplibre_glyphs")
+    rename_widget_label(CardXNodeXWidget, SPRITES_NODE_ID, "MapLibre Sprites")
+    rename_widget_label(CardXNodeXWidget, GLYPHS_NODE_ID, "MapLibre Glyphs")
+    rename_widget_label_by_id(
+        CardXNodeXWidget, MAPBOX_API_KEY_WIDGET_ID, "MapBox API Key (Deprecated)"
+    )
+    rename_card(CardModel, MAPLIBRE_CARD_ID, "MapLibre")
 
     for name, source in NEW_MAP_SOURCES.items():
         MapSource.objects.get_or_create(name=name, defaults={"source": source})
@@ -205,11 +277,18 @@ def reverse(apps, schema_editor):
     MapLayer = apps.get_model("models", "MapLayer")
     TileModel = apps.get_model("models", "TileModel")
     CardXNodeXWidget = apps.get_model("models", "CardXNodeXWidget")
+    CardModel = apps.get_model("models", "CardModel")
     Widget = apps.get_model("models", "Widget")
     ReportTemplate = apps.get_model("models", "ReportTemplate")
 
     rename_node(Node, SPRITES_NODE_ID, "MAPBOX_SPRITES", "mapbox_sprites")
     rename_node(Node, GLYPHS_NODE_ID, "MAPBOX_GLYPHS", "mapbox_glyphs")
+    rename_widget_label(CardXNodeXWidget, SPRITES_NODE_ID, "MAPBOX_SPRITES")
+    rename_widget_label(CardXNodeXWidget, GLYPHS_NODE_ID, "MAPBOX_GLYPHS")
+    rename_widget_label_by_id(
+        CardXNodeXWidget, MAPBOX_API_KEY_WIDGET_ID, "MapBox API Key (Optional)"
+    )
+    rename_card(CardModel, MAPLIBRE_CARD_ID, "Mapbox API")
 
     MapSource.objects.get_or_create(
         name="mapbox-streets", defaults={"source": OLD_MAPBOX_STREETS_SOURCE}
