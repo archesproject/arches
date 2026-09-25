@@ -283,8 +283,8 @@ def reverse(apps, schema_editor):
 
     rename_node(Node, SPRITES_NODE_ID, "MAPBOX_SPRITES", "mapbox_sprites")
     rename_node(Node, GLYPHS_NODE_ID, "MAPBOX_GLYPHS", "mapbox_glyphs")
-    rename_widget_label(CardXNodeXWidget, SPRITES_NODE_ID, "MAPBOX_SPRITES")
-    rename_widget_label(CardXNodeXWidget, GLYPHS_NODE_ID, "MAPBOX_GLYPHS")
+    rename_widget_label(CardXNodeXWidget, SPRITES_NODE_ID, "Mapbox Sprites")
+    rename_widget_label(CardXNodeXWidget, GLYPHS_NODE_ID, "Mapbox Glyphs")
     rename_widget_label_by_id(
         CardXNodeXWidget, MAPBOX_API_KEY_WIDGET_ID, "MapBox API Key (Optional)"
     )
