@@ -1,5 +1,5 @@
 from django.db.models.lookups import Lookup, PatternLookup, Transform
-from psycopg2.extensions import AsIs, QuotedString
+from psycopg import sql
 
 from arches.extensions.querysets.fields import (
     CardinalityNResourceInstanceField,
@@ -17,8 +17,8 @@ class JSONPathFilter:
         rhs, params = super().process_rhs(compiler, connection)
         if '"' in params[0]:
             raise ValueError("Double quotes are not allowed in JSONPath filters.")
-        quoted = AsIs(QuotedString(params[0]).getquoted().decode()[1:-1])
-        return rhs, (quoted,)
+        quoted = sql.Literal(params[0]).as_string()[1:-1]
+        return quoted.replace("%", "%%"), ()
 
 
 @CardinalityNTextField.register_lookup
