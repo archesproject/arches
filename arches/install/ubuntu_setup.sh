@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # For Ubuntu 20.04+
-# Tested on Ubuntu 20.04
+# Tested on Ubuntu 26.04
 
 # Use the yes command if you would like to install postgres/postgis,
 # node/npm, and elasticsearch.
@@ -9,29 +9,29 @@
 # yes | sudo ./ubuntu_setup.sh
 
 function install_postgres {
-  sudo add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -sc)-pgdg main"
-  wget --quiet -O - http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | sudo apt-key add -
+  sudo apt-get install postgresql-common ca-certificates -y
+  sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
   sudo apt-get update
-  sudo apt-get install postgresql-14 postgresql-contrib-14 -y
-  sudo apt-get install postgresql-14-postgis-3 -y
+  sudo apt-get install postgresql-18 postgresql-contrib-18 -y
+  sudo apt-get install postgresql-18-postgis-3 -y
   PGPASS=$(openssl rand -base64 14)
   sudo -u postgres psql -d postgres -c "ALTER USER postgres with encrypted password '$PGPASS';"
   sudo echo "*:*:*:postgres:$PGPASS" >> ~/.pgpass
   sudo chmod 600 ~/.pgpass
-  sudo chmod 666 /etc/postgresql/14/main/postgresql.conf
-  sudo chmod 666 /etc/postgresql/14/main/pg_hba.conf
-  sudo echo "standard_conforming_strings = off" >> /etc/postgresql/14/main/postgresql.conf
-  sudo echo "listen_addresses = '*'" >> /etc/postgresql/14/main/postgresql.conf
-  sudo echo "#TYPE   DATABASE  USER  CIDR-ADDRESS  METHOD" > /etc/postgresql/14/main/pg_hba.conf
-  sudo echo "local   all       all                 trust" >> /etc/postgresql/14/main/pg_hba.conf
-  sudo echo "host    all       all   127.0.0.1/32  trust" >> /etc/postgresql/14/main/pg_hba.conf
-  sudo echo "host    all       all   ::1/128       trust" >> /etc/postgresql/14/main/pg_hba.conf
-  sudo echo "host    all       all   0.0.0.0/0     md5" >> /etc/postgresql/14/main/pg_hba.conf
-  sudo chmod 664 /etc/postgresql/14/main/postgresql.conf
-  sudo chmod 664 /etc/postgresql/14/main/pg_hba.conf
+  sudo chmod 666 /etc/postgresql/18/main/postgresql.conf
+  sudo chmod 666 /etc/postgresql/18/main/pg_hba.conf
+  sudo echo "standard_conforming_strings = off" >> /etc/postgresql/18/main/postgresql.conf
+  sudo echo "listen_addresses = '*'" >> /etc/postgresql/18/main/postgresql.conf
+  sudo echo "#TYPE   DATABASE  USER  CIDR-ADDRESS  METHOD" > /etc/postgresql/18/main/pg_hba.conf
+  sudo echo "local   all       all                 trust" >> /etc/postgresql/18/main/pg_hba.conf
+  sudo echo "host    all       all   127.0.0.1/32  trust" >> /etc/postgresql/18/main/pg_hba.conf
+  sudo echo "host    all       all   ::1/128       trust" >> /etc/postgresql/18/main/pg_hba.conf
+  sudo echo "host    all       all   0.0.0.0/0     md5" >> /etc/postgresql/18/main/pg_hba.conf
+  sudo chmod 664 /etc/postgresql/18/main/postgresql.conf
+  sudo chmod 664 /etc/postgresql/18/main/pg_hba.conf
   sudo service postgresql restart
 
-  sudo -u postgres createdb -E UTF8 -T template0 --locale=en_US.utf8 template_postgis
+  sudo -u postgres createdb -E UTF8 -T template0 --locale=C.utf8 template_postgis
   sudo -u postgres psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='template_postgis'"
   sudo -u postgres psql -d template_postgis -c "CREATE EXTENSION postgis;"
   sudo -u postgres psql -d template_postgis -c "CREATE EXTENSION \"uuid-ossp\";"

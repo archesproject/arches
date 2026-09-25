@@ -258,7 +258,7 @@ class Command(BaseCommand):
             cursor.execute(
                 """
                 select * from __arches_migrate_collections_to_clm(
-                    ARRAY[%s], %s, %s::boolean, %s
+                    %s::text[], %s, %s::boolean, %s
                 );
                 """,
                 [collections_in_db, host, overwrite, preferred_sort_language],

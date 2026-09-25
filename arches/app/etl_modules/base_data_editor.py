@@ -430,7 +430,7 @@ class BulkStringEditor(BaseBulkEditor):
                     },
                 }
         if resourceids:
-            resourceids = tuple(resourceids)
+            resourceids = list(resourceids)
 
         pattern = old_text
         if operation == "replace":
@@ -570,7 +570,7 @@ class BulkStringEditor(BaseBulkEditor):
                     search_url, self.request.user
                 )
             if resourceids:
-                resourceids = tuple(resourceids)
+                resourceids = list(resourceids)
             response = self.run_load_task(
                 self.userid,
                 self.loadid,
