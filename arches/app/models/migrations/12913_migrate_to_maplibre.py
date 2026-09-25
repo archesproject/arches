@@ -103,7 +103,10 @@ def _update_published_graphs(apps, graph_transformer):
     batch_size = 25
     graphs_to_update = []
 
-    queryset = PublishedGraph.objects.exclude(serialized_graph__isnull=True)
+    queryset = PublishedGraph.objects.exclude(serialized_graph__isnull=True).filter(
+        language_id="en",
+        publication__graph_id="ff623370-fa12-11e6-b98b-6c4008b05c4c",
+    )
     for published_graph in queryset.iterator(chunk_size=batch_size):
         serialized_graph = published_graph.serialized_graph
         if graph_transformer(serialized_graph):
