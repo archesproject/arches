@@ -74,12 +74,7 @@ class AdvancedSearch(BaseSearchFilter):
 
     def view_data(self):
         ret = {}
-        resource_graphs = (
-            GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-            .exclude(isresource=False)
-            .exclude(is_active=False)
-            .exclude(source_identifier__isnull=False)
-        )
+        resource_graphs = GraphModel.objects.get_resource_models()
         searchable_datatypes = [
             d.pk for d in DDataType.objects.filter(issearchable=True)
         ]

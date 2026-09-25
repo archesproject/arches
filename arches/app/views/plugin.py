@@ -40,14 +40,7 @@ class PluginView(MapBaseManagerView):
         if request.GET.get("json"):
             return JSONResponse(plugin)
 
-        resource_graphs = (
-            models.GraphModel.objects.exclude(
-                pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
-            )
-            .exclude(isresource=False)
-            .exclude(is_active=False)
-            .exclude(source_identifier__isnull=False)
-        )
+        resource_graphs = models.GraphModel.objects.get_resource_models()
         widgets = models.Widget.objects.all()
         card_components = models.CardComponent.objects.all()
         datatypes = models.DDataType.objects.all()

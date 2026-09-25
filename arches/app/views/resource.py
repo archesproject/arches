@@ -304,14 +304,7 @@ class ResourceEditorView(MapBaseManagerView):
             graphiconclass=graph.iconclass,
             graphname=graph.name,
             ontologyclass=ontologyclass,
-            resource_graphs=(
-                models.GraphModel.objects.exclude(
-                    pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
-                )
-                .exclude(isresource=False)
-                .exclude(is_active=False)
-                .exclude(source_identifier__isnull=False)
-            ),
+            resource_graphs=models.GraphModel.objects.get_resource_models(),
             relationship_types=get_resource_relationship_types(),
             widgets=updated_widgets,
             widgets_json=JSONSerializer().serialize(updated_widgets),
