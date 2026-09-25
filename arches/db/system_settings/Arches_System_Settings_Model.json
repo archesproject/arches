@@ -51,10 +51,10 @@
                         "en": ""
                     },
                     "instructions": {
-                        "en": "Arches uses the Mapbox mapping library for map display and data creation.  Arches also supports Mapbox basemaps and other services"
+                        "en": "Arches uses the MapLibre mapping library for map display and data creation."
                     },
                     "name": {
-                        "en": "Mapbox API"
+                        "en": "MapLibre"
                     },
                     "nodegroup_id": "0e8fe457-4148-11e7-9c10-c4b301baab9f",
                     "sortorder": 0,
@@ -590,7 +590,7 @@
                         "i18n_properties": [
                             "placeholder"
                         ],
-                        "label": "Mapbox Sprites",
+                        "label": "MapLibre Sprites",
                         "maxLength": "Sprites",
                         "placeholder": {
                             "en": "Enter text"
@@ -600,7 +600,7 @@
                     },
                     "id": "0e900826-4148-11e7-b767-c4b301baab9f",
                     "label": {
-                        "en": "Mapbox Sprites"
+                        "en": "MapLibre Sprites"
                     },
                     "node_id": "0e900254-4148-11e7-9902-c4b301baab9f",
                     "sortorder": 1,
@@ -620,7 +620,7 @@
                         "i18n_properties": [
                             "placeholder"
                         ],
-                        "label": "Mapbox Glyphs",
+                        "label": "MapLibre Glyphs",
                         "maxLength": null,
                         "placeholder": {
                             "en": "Enter text"
@@ -630,7 +630,7 @@
                     },
                     "id": "0e90086e-4148-11e7-bc0b-c4b301baab9f",
                     "label": {
-                        "en": "Mapbox Glyphs"
+                        "en": "MapLibre Glyphs"
                     },
                     "node_id": "0e90031e-4148-11e7-a176-c4b301baab9f",
                     "sortorder": 2,
