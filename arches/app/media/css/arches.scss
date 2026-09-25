@@ -2479,15 +2479,24 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     overflow-x: hidden;
     border-right: 1px solid #ddd;
 
-    .layer-list {
+    .layer-filter-container {
         height: 50px;
         padding: 10px;
         background: #f4f4f4;
         border-top: solid 1px #ddd;
     }
 
+    .layer-list {
+        padding: 10px;
+        border-top: solid 1px #ddd;
+    }
+
     .grid {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
         margin: 0;
+        background: transparent;
         .library-card {
             height: 60px;
             color: #666;
