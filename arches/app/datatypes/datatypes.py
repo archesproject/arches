@@ -1142,10 +1142,10 @@ class FileListDataType(BaseDataType):
         super(FileListDataType, self).__init__(model=model)
         self.node_lookup = {}
 
-    def validate_file_types(self, request=None, nodeid=None):
+    def validate_file_types(self, request=None, nodeid=None, tile=None):
         errors = []
         validator = FileValidator()
-        files = self._get_files_from_request(request, nodeid)
+        files = self._get_files_from_request(request, nodeid, tile)
         for file in files:
             errors = errors + validator.validate_file_type(
                 file.file, file.name.split(".")[-1]
@@ -1162,12 +1162,15 @@ class FileListDataType(BaseDataType):
         strict=False,
         path=None,
         request=None,
+        tile=None,
         **kwargs,
     ):
         errors = []
         file_type_errors = []
         if request:
-            file_type_errors = errors + self.validate_file_types(request, str(node.pk))
+            file_type_errors = errors + self.validate_file_types(
+                request, str(node.pk), tile
+            )
 
         if len(file_type_errors) > 0:
             title = _("Invalid File Type")
@@ -1219,7 +1222,7 @@ class FileListDataType(BaseDataType):
                                 ).format(metadata["name"]),
                             }
                         )
-                files = self._get_files_from_request(request, str(node.nodeid))
+                files = self._get_files_from_request(request, str(node.nodeid), tile)
                 for file in files:
                     width, height = get_image_dimensions(file.file)
                     if not width or not height:

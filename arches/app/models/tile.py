@@ -377,7 +377,9 @@ class Tile(models.TileModel):
             except TypeError:  # will catch if serialized_graph is None
                 node = models.Node.objects.get(nodeid=nodeid)
             datatype = self.datatype_factory.get_instance(node.datatype)
-            error = datatype.validate(value, node=node, strict=strict, request=request)
+            error = datatype.validate(
+                value, node=node, strict=strict, request=request, tile=self
+            )
             tile_errors += error
             for error_instance in error:
                 if error_instance["type"] == "ERROR":
