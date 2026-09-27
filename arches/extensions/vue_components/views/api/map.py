@@ -1,4 +1,5 @@
 import json
+from urllib.parse import urljoin
 
 from django.views.generic import View
 
@@ -17,8 +18,9 @@ class MapDataAPI(View):
         if "tiles" in source_dict:
             tiles = source_dict["tiles"]
             if tiles and not tiles[0].startswith("http"):
+                # Let urljoin reconcile potential "//"
                 source_dict["tiles"] = [
-                    "{}{}".format(settings.PUBLIC_SERVER_ADDRESS, tiles[0])
+                    urljoin(settings.PUBLIC_SERVER_ADDRESS, tiles[0])
                 ]
 
     def get(self, request):
