@@ -68,6 +68,17 @@ import type {
     RawBasemap,
 } from "@/arches_vue_components/components/MapComponent/types.ts";
 
+// Point maplibre-gl at its worker script as webpack-emitted static assets.
+// Without this, maplibre falls back to resolving the worker against its own
+// `import.meta.url`, which webpack rewrites to a `file://` URL; maplibre then
+// hands `new Worker()` an empty string, which resolves to the current page and
+// fails to load as HTML. Mirrors arches' `bindings/maplibre-gl` for Knockout.
+maplibregl.setWorkerUrl(
+    new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url).href,
+);
+// Force webpack to also emit the worker's runtime import as a static asset.
+new URL("maplibre-gl/dist/maplibre-gl-shared.mjs?asset", import.meta.url);
+
 interface DrawEvent {
     features: Feature[];
 }
