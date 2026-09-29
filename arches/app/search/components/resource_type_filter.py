@@ -18,10 +18,11 @@ details = {
 
 
 def get_permitted_graphids(permitted_nodegroups):
-    permitted_graphids = set()
-
-    for node in Node.objects.filter(nodegroup__in=permitted_nodegroups):
-        permitted_graphids.add(str(node.graph_id))
+    permitted_graphids = (
+        Node.objects.filter(nodegroup__in=permitted_nodegroups)
+        .values_list("graph_id", flat=True)
+        .distinct()
+    )
 
     permitted_and_published_graphids = set(
         str(graphid)
