@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watchEffect } from "vue";
 
-import FileUpload from "primevue/fileupload";
+import FileUpload from "openvue/fileupload";
 
 import FileList from "@/arches_vue_components/widgets/FileListWidget/components/FileListWidgetEditor/components/FileList.vue";
 import FileDropZone from "@/arches_vue_components/widgets/FileListWidget/components/FileListWidgetEditor/components/FileDropZone.vue";
@@ -15,7 +15,7 @@ import type {
 } from "@/arches_vue_components/datatypes/file-list/types.ts";
 import type {
     FileData,
-    PrimeVueFile,
+    OpenVueFile,
 } from "@/arches_vue_components/widgets/FileListWidget/types.ts";
 
 const { aliasedNodeData, cardXNodeXWidgetData = undefined } = defineProps<{
@@ -95,7 +95,7 @@ function emitUpdatedValue() {
     emit("update:aliasedNodeData", buildFileListAliasedNodeData(allFiles));
 }
 
-function onSelect(event: { files: PrimeVueFile[] }): void {
+function onSelect(event: { files: OpenVueFile[] }): void {
     pendingFiles.value = event.files.map((file) => ({
         name: file.name,
         size: file.size,

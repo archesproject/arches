@@ -3,7 +3,7 @@ import { computed, ref, watch, watchEffect } from "vue";
 
 import { useGettext } from "vue3-gettext";
 
-import Select from "primevue/select";
+import Select from "openvue/select";
 
 import ResourceInstanceCreation from "@/arches_vue_components/widgets/components/ResourceInstanceCreation.vue";
 
@@ -11,8 +11,8 @@ import { fetchRelatableResources } from "@/arches_vue_components/datatypes/resou
 import { buildResourceInstanceAliasedNodeData } from "@/arches_vue_components/datatypes/resource-instance/utils.ts";
 import { debounce } from "@/arches_vue_components/utils.ts";
 
-import type { SelectFilterEvent } from "primevue/select";
-import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
+import type { SelectFilterEvent } from "openvue/select";
+import type { VirtualScrollerLazyEvent } from "openvue/virtualscroller";
 
 import type {
     ResourceInstanceReference,

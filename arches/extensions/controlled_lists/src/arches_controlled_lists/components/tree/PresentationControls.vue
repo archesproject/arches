@@ -3,8 +3,8 @@ import arches from "arches";
 import { inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import Button from "primevue/button";
-import Select from "primevue/select";
+import Button from "openvue/button";
+import Select from "openvue/select";
 
 import {
     CONTRAST,

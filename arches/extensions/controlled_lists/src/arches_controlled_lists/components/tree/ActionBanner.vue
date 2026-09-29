@@ -2,8 +2,8 @@
 import { inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import Button from "primevue/button";
-import ToggleSwitch from "primevue/toggleswitch";
+import Button from "openvue/button";
+import ToggleSwitch from "openvue/toggleswitch";
 
 import {
     selectedLanguageKey,
@@ -17,8 +17,8 @@ import {
 } from "@/arches_controlled_lists/utils.ts";
 
 import type { Ref } from "vue";
-import type { TreeSelectionKeys } from "primevue/tree";
-import type { TreeNode } from "primevue/treenode";
+import type { TreeSelectionKeys } from "openvue/tree";
+import type { TreeNode } from "openvue/treenode";
 import type { Language } from "@/arches_controlled_lists/types";
 
 const isMultiSelecting = defineModel<boolean>("isMultiSelecting", {

@@ -5,9 +5,9 @@ import { useGettext } from "vue3-gettext";
 
 import shp from "shpjs";
 
-import FileUpload from "primevue/fileupload";
-import Message from "primevue/message";
-import ProgressSpinner from "primevue/progressspinner";
+import FileUpload from "openvue/fileupload";
+import Message from "openvue/message";
+import ProgressSpinner from "openvue/progressspinner";
 
 import { useResolvedMapContext } from "@/arches_vue_components/components/MapComponent/composables/useMapContext.ts";
 

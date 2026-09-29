@@ -2,7 +2,7 @@
 import { ref } from "vue";
 
 import { useGettext } from "vue3-gettext";
-import InputText from "primevue/inputtext";
+import InputText from "openvue/inputtext";
 
 import { buildURLAliasedNodeData } from "@/arches_vue_components/datatypes/url/utils.ts";
 

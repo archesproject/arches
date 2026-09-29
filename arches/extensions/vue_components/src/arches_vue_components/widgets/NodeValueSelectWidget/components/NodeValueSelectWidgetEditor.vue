@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import InputText from "primevue/inputtext";
+import InputText from "openvue/inputtext";
 
 import type { NodeValueAliasedNodeData } from "@/arches_vue_components/datatypes/node-value/types.ts";
 
