@@ -941,13 +941,12 @@ class ResourceTests(ArchesTestCase):
         self.assertEqual(all_datatypes_resource.graph_id, copied_resource.graph_id)
         self.assertEqual(len(all_datatypes_resource.tiles), len(copied_resource.tiles))
 
-        # copy() builds its tiles from an unordered queryset, so sort both sides
-        # before pairing them off
-        def by_sortorder(tile):
-            return (tile.sortorder, str(tile.nodegroup_id))
-
-        original_tiles = sorted(all_datatypes_resource.tiles, key=by_sortorder)
-        copied_tiles = sorted(copied_resource.tiles, key=by_sortorder)
+        # copy() reads the original's tiles straight off an unordered queryset,
+        # so pair the two lists up by sortorder rather than by position.
+        original_tiles = sorted(
+            all_datatypes_resource.tiles, key=lambda tile: tile.sortorder
+        )
+        copied_tiles = sorted(copied_resource.tiles, key=lambda tile: tile.sortorder)
 
         for original_tile, copied_tile in zip(
             original_tiles,

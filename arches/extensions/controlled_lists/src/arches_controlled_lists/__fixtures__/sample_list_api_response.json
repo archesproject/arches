@@ -1,0 +1,124 @@
+{
+    "controlled_lists": [
+        {
+            "dynamic": false,
+            "id": "14bac0aa-9ec6-4a77-b63c-6680b001575d",
+            "items": [
+                {
+                    "children": [
+                        {
+                            "children": [
+                                {
+                                    "children": [],
+                                    "depth": 2,
+                                    "guide": false,
+                                    "id": "ef296efc-95a0-4f9e-b083-9368098ebf09",
+                                    "images": [],
+                                    "list_id": "14bac0aa-9ec6-4a77-b63c-6680b001575d",
+                                    "parent_id": "b3762aac-b1f5-46f1-a50e-fda0501914e0",
+                                    "sortorder": 0,
+                                    "uri": "http://localhost:8000/plugins/controlled-list-manager/item/ef296efc-95a0-4f9e-b083-9368098ebf09",
+                                    "values": [
+                                        {
+                                            "id": "b3a606f6-2b34-4c4f-8deb-c2f8e8584de4",
+                                            "language_id": "en",
+                                            "list_item_id": "ef296efc-95a0-4f9e-b083-9368098ebf09",
+                                            "value": "Grandchild",
+                                            "valuetype_id": "prefLabel"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "depth": 1,
+                            "guide": false,
+                            "id": "b3762aac-b1f5-46f1-a50e-fda0501914e0",
+                            "images": [],
+                            "list_id": "14bac0aa-9ec6-4a77-b63c-6680b001575d",
+                            "parent_id": "97e5c362-4977-4652-b85b-e65643e06594",
+                            "sortorder": 0,
+                            "uri": "http://localhost:8000/plugins/controlled-list-manager/item/b3762aac-b1f5-46f1-a50e-fda0501914e0",
+                            "values": [
+                                {
+                                    "id": "1437e79f-d3eb-407a-bbaa-3f492c885aba",
+                                    "language_id": "en",
+                                    "list_item_id": "b3762aac-b1f5-46f1-a50e-fda0501914e0",
+                                    "value": "Child",
+                                    "valuetype_id": "prefLabel"
+                                }
+                            ]
+                        }
+                    ],
+                    "depth": 0,
+                    "guide": false,
+                    "id": "97e5c362-4977-4652-b85b-e65643e06594",
+                    "images": [],
+                    "list_id": "14bac0aa-9ec6-4a77-b63c-6680b001575d",
+                    "parent_id": null,
+                    "sortorder": 0,
+                    "uri": "http://localhost:8000/plugins/controlled-list-manager/item/97e5c362-4977-4652-b85b-e65643e06594",
+                    "values": [
+                        {
+                            "id": "c3e25a37-691d-4ab2-9f6b-e934e6ccd88c",
+                            "language_id": "en",
+                            "list_item_id": "97e5c362-4977-4652-b85b-e65643e06594",
+                            "value": "Parent",
+                            "valuetype_id": "prefLabel"
+                        }
+                    ]
+                },
+                {
+                    "children": [
+                        {
+                            "children": [],
+                            "depth": 1,
+                            "guide": false,
+                            "id": "685da5a5-1b8f-4908-b250-ed1985bc3670",
+                            "images": [],
+                            "list_id": "14bac0aa-9ec6-4a77-b63c-6680b001575d",
+                            "parent_id": "d37748cc-ab4d-49a1-9047-cf723625ebc1",
+                            "sortorder": 0,
+                            "uri": "http://localhost:8000/plugins/controlled-list-manager/item/685da5a5-1b8f-4908-b250-ed1985bc3670",
+                            "values": [
+                                {
+                                    "id": "3664d51e-92ad-4e13-9dc7-3bd245d45f0f",
+                                    "language_id": "en",
+                                    "list_item_id": "685da5a5-1b8f-4908-b250-ed1985bc3670",
+                                    "value": "Child of Parent 2",
+                                    "valuetype_id": "prefLabel"
+                                }
+                            ]
+                        }
+                    ],
+                    "depth": 0,
+                    "guide": false,
+                    "id": "d37748cc-ab4d-49a1-9047-cf723625ebc1",
+                    "images": [],
+                    "list_id": "14bac0aa-9ec6-4a77-b63c-6680b001575d",
+                    "parent_id": null,
+                    "sortorder": 1,
+                    "uri": "http://localhost:8000/plugins/controlled-list-manager/item/d37748cc-ab4d-49a1-9047-cf723625ebc1",
+                    "values": [
+                        {
+                            "id": "930267e3-6359-452e-9414-40f1c1e74795",
+                            "language_id": "en",
+                            "list_item_id": "d37748cc-ab4d-49a1-9047-cf723625ebc1",
+                            "value": "Parent 2",
+                            "valuetype_id": "prefLabel"
+                        }
+                    ]
+                }
+            ],
+            "name": "Test list",
+            "nodes": [
+                {
+                    "graph_id": "e8736c81-d8d6-478d-945e-e57000bc38a4",
+                    "graph_name": "Test model",
+                    "id": "c76e56e4-79c1-4ac5-94f2-dfff13728dd3",
+                    "name": "Reference node",
+                    "nodegroup_id": "87d0b6f2-1daf-46bc-9538-c6cc5c95b63c"
+                }
+            ],
+            "searchable": false
+        }
+    ]
+}

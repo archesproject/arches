@@ -42,6 +42,10 @@ dependencies = [
     "django-revproxy==0.13.0",
     "django-migrate-sql-deux==2.1.0",
     "django-webpack-loader==3.2.4",
+    # Required by the bundled arches.extensions.querysets REST layer, which
+    # arches.extensions.vue_components and .controlled_lists both build on.
+    # Was previously the arches-querysets[drf] extra.
+    "djangorestframework>=3.18",
     "edtf==4.0.1",
     "elasticsearch>=8.19.1,<9.0.0",
     "filetype==1.2.0",

@@ -51,10 +51,10 @@
                         "en": ""
                     },
                     "instructions": {
-                        "en": "Arches uses the Mapbox mapping library for map display and data creation.  Arches also supports Mapbox basemaps and other services"
+                        "en": "Arches uses the MapLibre mapping library for map display and data creation."
                     },
                     "name": {
-                        "en": "Mapbox API"
+                        "en": "MapLibre"
                     },
                     "nodegroup_id": "0e8fe457-4148-11e7-9c10-c4b301baab9f",
                     "sortorder": 0,
@@ -364,7 +364,6 @@
                         "featureLineWidth": 1,
                         "featurePointSize": 3,
                         "geocodePlaceholder": "Search",
-                        "geocodeProvider": "10000000-0000-0000-0000-010000000000",
                         "geocoderVisible": false,
                         "geometryTypes": [
                             {
@@ -515,7 +514,6 @@
                         "featureLineWidth": 1,
                         "featurePointSize": 3,
                         "geocodePlaceholder": "Search",
-                        "geocodeProvider": "10000000-0000-0000-0000-010000000000",
                         "geocoderVisible": true,
                         "geometryTypes": [
                             {
@@ -562,7 +560,7 @@
                         "i18n_properties": [
                             "placeholder"
                         ],
-                        "label": "MapBox API Key (Optional)",
+                        "label": "MapBox API Key (Deprecated)",
                         "maxLength": null,
                         "placeholder": {
                             "en": "Enter text"
@@ -572,12 +570,12 @@
                     },
                     "id": "0e9007d9-4148-11e7-9354-c4b301baab9f",
                     "label": {
-                        "en": "MapBox API Key (Optional)"
+                        "en": "MapBox API Key (Deprecated)"
                     },
                     "node_id": "0e9000b0-4148-11e7-bd19-c4b301baab9f",
                     "sortorder": 0,
                     "source_identifier_id": null,
-                    "visible": true,
+                    "visible": false,
                     "widget_id": "10000000-0000-0000-0000-000000000001"
                 },
                 {
@@ -592,7 +590,7 @@
                         "i18n_properties": [
                             "placeholder"
                         ],
-                        "label": "Mapbox Sprites",
+                        "label": "MapLibre Sprites",
                         "maxLength": "Sprites",
                         "placeholder": {
                             "en": "Enter text"
@@ -602,7 +600,7 @@
                     },
                     "id": "0e900826-4148-11e7-b767-c4b301baab9f",
                     "label": {
-                        "en": "Mapbox Sprites"
+                        "en": "MapLibre Sprites"
                     },
                     "node_id": "0e900254-4148-11e7-9902-c4b301baab9f",
                     "sortorder": 1,
@@ -622,7 +620,7 @@
                         "i18n_properties": [
                             "placeholder"
                         ],
-                        "label": "Mapbox Glyphs",
+                        "label": "MapLibre Glyphs",
                         "maxLength": null,
                         "placeholder": {
                             "en": "Enter text"
@@ -632,7 +630,7 @@
                     },
                     "id": "0e90086e-4148-11e7-bc0b-c4b301baab9f",
                     "label": {
-                        "en": "Mapbox Glyphs"
+                        "en": "MapLibre Glyphs"
                     },
                     "node_id": "0e90031e-4148-11e7-a176-c4b301baab9f",
                     "sortorder": 2,
@@ -1843,7 +1841,7 @@
                     "sourcebranchpublication_id": null
                 },
                 {
-                    "alias": "mapbox_sprites",
+                    "alias": "maplibre_sprites",
                     "config": {},
                     "datatype": "string",
                     "description": "Represents a single node in a graph",
@@ -1856,7 +1854,7 @@
                     "isrequired": false,
                     "issearchable": false,
                     "istopnode": false,
-                    "name": "MAPBOX_SPRITES",
+                    "name": "MAPLIBRE_SPRITES",
                     "nodegroup_id": "0e8fe457-4148-11e7-9c10-c4b301baab9f",
                     "nodeid": "0e900254-4148-11e7-9902-c4b301baab9f",
                     "ontologyclass": null,
@@ -1866,7 +1864,7 @@
                     "sourcebranchpublication_id": null
                 },
                 {
-                    "alias": "mapbox_glyphs",
+                    "alias": "maplibre_glyphs",
                     "config": {},
                     "datatype": "string",
                     "description": "Represents a single node in a graph",
@@ -1879,7 +1877,7 @@
                     "isrequired": false,
                     "issearchable": false,
                     "istopnode": false,
-                    "name": "MAPBOX_GLYPHS",
+                    "name": "MAPLIBRE_GLYPHS",
                     "nodegroup_id": "0e8fe457-4148-11e7-9c10-c4b301baab9f",
                     "nodeid": "0e90031e-4148-11e7-a176-c4b301baab9f",
                     "ontologyclass": null,

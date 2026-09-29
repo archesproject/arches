@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:arches_controlled_lists="https://archesproject.org/ns/controlled-lists#"
+>
+  <skos:ConceptScheme rdf:about="https://localhost:8000/78fa9ded-5c19-447b-abdb-74ef401d2382">
+    <dcterms:title>Searchable</dcterms:title>
+    <arches_controlled_lists:searchable rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</arches_controlled_lists:searchable>
+  </skos:ConceptScheme>
+</rdf:RDF>
