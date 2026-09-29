@@ -344,6 +344,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
                 & Q(graph__isresource=True)
             )
             .values_list("graph_id", flat=True)
+            .distinct()
         )
 
         return list(str(graph) for graph in graphs)
