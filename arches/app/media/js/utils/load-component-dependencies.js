@@ -84,8 +84,12 @@ async function importComponents(componentPaths) {
             try {
                 await import(`${ARCHES_CORE_DIRECTORY}/app/media/js/${componentPath}`);
             }
-            catch (e) {
-                console.error(`Component "${componentPath}" not found in any application or in Arches core.`);
+            catch (error) {
+                if (error.code === 'MODULE_NOT_FOUND') {
+                    console.error(`Component "${componentPath}" not found in any application or in Arches core.`);
+                } else {
+                    console.error(`Component ${componentPath} failed to load.`, error);
+                }
             }
         }
     }
