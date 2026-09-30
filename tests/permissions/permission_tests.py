@@ -15,14 +15,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
-from guardian.shortcuts import assign_perm
+from guardian.shortcuts import assign_perm, remove_perm
 from arches.app.models.models import ResourceInstance, Node, NodeGroup
 from arches.app.models.resource import Resource
+from arches.app.models.system_settings import settings
 from arches.app.search.components.resource_type_filter import get_permitted_graphids
 from arches.app.utils.permission_backend import user_can_read_resource
 from arches.app.utils.permission_backend import user_has_resource_model_permissions
 from arches.app.utils.permission_backend import get_restricted_users
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
+from arches.app.utils.permission_backend import get_resource_types_by_perm
 
 from tests.base_test import ArchesTestCase
 
@@ -261,3 +263,49 @@ class PermissionTests(ArchesTestCase):
             anonymous_user, ["models.read_nodegroup", "models.write_nodegroup"], False
         )
         self.assertFalse(nodegroup_set)
+
+    def test_get_resource_types_by_perm(self):
+        """
+        Tests which resource models are returned based on a user's nodegroup permissions
+        """
+
+        nodegroups = NodeGroup.objects.filter(
+            node__graph_id=self.data_type_graphid
+        ).distinct()
+
+        # User has read, write, and delete access to all nodegroups, test graph is returned
+        graphids = get_resource_types_by_perm(
+            self.user,
+            [
+                "models.read_nodegroup",
+                "models.write_nodegroup",
+                "models.delete_nodegroup",
+            ],
+        )
+        self.assertIn(self.data_type_graphid, graphids)
+
+        # Test the returned graphs are unique (using distinct) and don't contain duplicates
+        self.assertEqual(len(graphids), len(set(graphids)))
+
+        # If a user lacks access to all nodegroups, the graph should not be returned
+        assign_perm("no_access_to_nodegroup", self.user, nodegroups.all())
+        graphids = get_resource_types_by_perm(self.user, "models.read_nodegroup")
+        self.assertNotIn(self.data_type_graphid, graphids)
+
+        # Test that a user only needs read or write access to at least one of a graph's nodegroups to return the graph
+        perms = ["models.read_nodegroup", "models.write_nodegroup"]
+        for perm in perms:
+            with self.subTest(perm=perm):
+                assign_perm(perm, self.user, nodegroups.first())
+                graphids = get_resource_types_by_perm(self.user, perm)
+                self.assertIn(self.data_type_graphid, graphids)
+                remove_perm(perm, self.user, nodegroups.first()) # reset
+
+        # Test that the graphid will not return when testing write perms against a user with only read access
+        remove_perm("models.write_nodegroup", self.user, nodegroups.all()) # reset
+        assign_perm("models.read_nodegroup", self.user, nodegroups.all())
+        graphids = get_resource_types_by_perm(self.user, "models.write_nodegroup")
+        self.assertNotIn(self.data_type_graphid, graphids)
+
+        # Test that system settings graph is not returned for any user
+        self.assertNotIn(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID, graphids)
