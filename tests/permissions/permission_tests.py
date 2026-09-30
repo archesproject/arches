@@ -299,10 +299,10 @@ class PermissionTests(ArchesTestCase):
                 assign_perm(perm, self.user, nodegroups.first())
                 graphids = get_resource_types_by_perm(self.user, perm)
                 self.assertIn(self.data_type_graphid, graphids)
-                remove_perm(perm, self.user, nodegroups.first()) # reset
+                remove_perm(perm, self.user, nodegroups.first())  # reset
 
         # Test that the graphid will not return when testing write perms against a user with only read access
-        remove_perm("models.write_nodegroup", self.user, nodegroups.all()) # reset
+        remove_perm("models.write_nodegroup", self.user, nodegroups.all())  # reset
         assign_perm("models.read_nodegroup", self.user, nodegroups.all())
         graphids = get_resource_types_by_perm(self.user, "models.write_nodegroup")
         self.assertNotIn(self.data_type_graphid, graphids)
