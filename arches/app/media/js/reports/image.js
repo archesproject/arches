@@ -5,7 +5,7 @@ import arches from 'arches';
 import ReportViewModel from 'viewmodels/report';
 import imageReportTemplate from 'templates/views/report-templates/image.htm';
 
-import 'knockstrap';
+import 'bindings/carousel';
 import 'bindings/chosen';
 
 export default ko.components.register('image-report', {

@@ -209,8 +209,6 @@ var GraphTree = TreeView.extend({
     deleteNode: function(node, e) {
         e.stopImmediatePropagation();
 
-        $(e.target).tooltip('destroy');  // needs to be called before the node is deleted
-
         this.graphModel.deleteNode(node, function(_response, status) {
             if (status === 'success') {
                 if (node.isCollector()) {

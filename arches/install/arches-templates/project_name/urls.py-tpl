@@ -13,6 +13,12 @@ handler404 = "arches.app.views.main.custom_404"
 handler500 = "arches.app.views.main.custom_500"
 
 # Ensure Arches core urls are superseded by project-level urls
+# Bundled applications enabled in INSTALLED_APPS still need their routes
+# mounted. Drop any you removed from INSTALLED_APPS.
+urlpatterns.append(path('', include('arches.extensions.querysets.urls')))
+urlpatterns.append(path('', include('arches.extensions.vue_components.urls')))
+urlpatterns.append(path('', include('arches.extensions.controlled_lists.urls')))
+
 urlpatterns.append(path('', include('arches.urls')))
 
 # Adds URL pattern to serve media files during development

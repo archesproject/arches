@@ -28,7 +28,6 @@ class GuardedAdmin(GuardedModelAdmin):
 admin.site.register(
     [
         models.MapSource,
-        models.Geocoder,
         models.MapMarker,
         models.DDataType,
         models.Widget,

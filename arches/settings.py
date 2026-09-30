@@ -104,6 +104,15 @@ ELASTICSEARCH_CUSTOM_INDEXES = []
 #     'should_update_asynchronously': False
 # }]
 
+# Name of the index used by arches.extensions.controlled_lists for reference
+# data. The index itself is registered by the project, not here, so that
+# projects which do not install the application are not made to build it.
+REFERENCES_INDEX_NAME = "references"
+
+# Classes contributing additional mappings to the resource index, e.g.
+# "arches.extensions.controlled_lists.search.references_es_mapping_modifier.ReferencesEsMappingModifier"
+ES_MAPPING_MODIFIER_CLASSES = []
+
 TERM_SEARCH_TYPES = [
     {
         "type": "term",
@@ -560,7 +569,25 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.db.DatabaseCache",
         "LOCATION": "user_permission_cache",
     },
+    "querysets_concepts": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "querysets_concepts_cache",
+        "TIMEOUT": 86400,  # one day in seconds
+        "OPTIONS": {"MAX_ENTRIES": 1000},
+    },
+    "querysets_resource_instances": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "querysets_resource_instances_cache",
+        "TIMEOUT": 86400,  # one day in seconds
+        "OPTIONS": {"MAX_ENTRIES": 1000},
+    },
 }
+
+# Cache aliases used by arches.extensions.querysets. Both must name entries in
+# CACHES above; setting either to None falls back to the default cache, with a
+# system check warning.
+ARCHES_QUERYSETS_CONCEPT_CACHE = "querysets_concepts"
+ARCHES_QUERYSETS_RESOURCE_INSTANCE_CACHE = "querysets_resource_instances"
 
 DEFAULT_RESOURCE_IMPORT_USER = {"username": "admin", "userid": 1}
 
@@ -667,8 +694,6 @@ ETL_USERNAME = "ETL"  # override this setting in your packages settings.py file
 
 GOOGLE_ANALYTICS_TRACKING_ID = None
 
-DEFAULT_GEOCODER = "10000000-0000-0000-0000-010000000000"
-
 SPARQL_ENDPOINT_PROVIDERS = (
     {
         "SPARQL_ENDPOINT_PROVIDER": "arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider"
@@ -737,11 +762,14 @@ FILE_TYPES = [
 FILENAME_GENERATOR = "arches.app.utils.storage_filename_generator.generate_filename"
 UPLOADED_FILES_DIR = "uploadedfiles"
 
-MAPBOX_API_KEY = ""  # Put your Mapbox key here!
+# Deprecated: unused since the move to MapLibre and will be removed in a future release.
+MAPBOX_API_KEY = ""
 
-# links to sprites and glyphs for use on map
-MAPBOX_SPRITES = "mapbox://sprites/mapbox/basic-v9"
-MAPBOX_GLYPHS = "mapbox://fonts/mapbox/{fontstack}/{range}.pbf"
+# links to sprites and glyphs for use on map. MapLibre GL JS does not require
+# an API key; these default to Maptoolkit's free tile/font/sprite service,
+# which also backs the default "streets" basemap (see db_data.sql).
+MAPLIBRE_SPRITES = "https://icons.maptoolkit.org/sprite"
+MAPLIBRE_GLYPHS = "https://fonts.maptoolkit.org/{fontstack}/{range}.pbf"
 
 DEFAULT_MAP_ZOOM = 0
 MAP_MIN_ZOOM = 0

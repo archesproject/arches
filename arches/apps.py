@@ -20,6 +20,9 @@ class ArchesAppConfig(AppConfig):
     name = "arches"
     verbose_name = "Arches"
     is_arches_application = False
+    # Set on Arches applications that ship inside the arches distribution rather
+    # than as separately released packages. See check_arches_compatibility().
+    bundled_with_arches = False
 
     def ready(self):
         import arches.app.signals
@@ -91,6 +94,11 @@ def check_arches_compatibility(app_configs, **kwargs):
     errors = []
     for config in app_configs:
         if not getattr(config, "is_arches_application", False):
+            continue
+        if getattr(config, "bundled_with_arches", False):
+            # Bundled applications ship inside the arches distribution, so they have
+            # no pyproject.toml or distribution metadata of their own to declare an
+            # arches requirement in. Their compatibility is guaranteed by construction.
             continue
         project_requirements = ["No project requirements found."]
 
@@ -175,6 +183,22 @@ def warn_default_allow_permission_framework(app_configs, **kwargs):
                 hint="Set PERMISSION_FRAMEWORK to arches_default_deny.ArchesDefaultDenyPermissionFramework.",
                 obj=settings.APP_NAME,
                 id="arches.W003",
+            )
+        )
+    return errors
+
+
+@register(Tags.compatibility)
+def warn_mapbox_api_key_deprecated(app_configs, **kwargs):
+    errors = []
+
+    if getattr(settings, "MAPBOX_API_KEY", None):
+        errors.append(
+            Warning(
+                msg="MAPBOX_API_KEY is deprecated and no longer used by Arches.",
+                hint="Remove MAPBOX_API_KEY from your settings. It will be removed in a future release.",
+                obj=settings.APP_NAME,
+                id="arches.W004",
             )
         )
     return errors

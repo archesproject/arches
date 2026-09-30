@@ -18,8 +18,10 @@ class TestGenerateTsconfigPaths(TestCase):
         self,
     ):
         base_path_value = "/arches"
-        arches_application_names = ["app_one", "app_two"]
-        arches_application_paths = ["/arches_apps/app_one", "/arches_apps/app_two"]
+        arches_application_paths = {
+            "app_one": "/arches_apps/app_one",
+            "app_two": "/arches_apps/app_two",
+        }
 
         with (
             patch.object(
@@ -29,12 +31,7 @@ class TestGenerateTsconfigPaths(TestCase):
             ),
             patch.object(
                 self.tsconfig_paths_module,
-                "list_arches_app_names",
-                return_value=arches_application_names,
-            ),
-            patch.object(
-                self.tsconfig_paths_module,
-                "list_arches_app_paths",
+                "list_arches_app_labels_and_paths",
                 return_value=arches_application_paths,
             ),
         ):
@@ -75,10 +72,9 @@ class TestGenerateTsconfigPaths(TestCase):
                 return_value=base_path_value,
             ),
             patch.object(
-                self.tsconfig_paths_module, "list_arches_app_names", return_value=[]
-            ),
-            patch.object(
-                self.tsconfig_paths_module, "list_arches_app_paths", return_value=[]
+                self.tsconfig_paths_module,
+                "list_arches_app_labels_and_paths",
+                return_value={},
             ),
         ):
 
@@ -98,36 +94,9 @@ class TestGenerateTsconfigPaths(TestCase):
             paths_mapping["*"], ["../node_modules/@types/*", "../node_modules/*"]
         )
 
-    def test_generate_tsconfig_paths_raises_error_when_application_names_and_paths_do_not_match(
-        self,
-    ):
-        base_path_value = "/arches"
-
-        with (
-            patch.object(
-                self.tsconfig_paths_module,
-                "get_base_path",
-                return_value=base_path_value,
-            ),
-            patch.object(
-                self.tsconfig_paths_module,
-                "list_arches_app_names",
-                return_value=["one", "two"],
-            ),
-            patch.object(
-                self.tsconfig_paths_module,
-                "list_arches_app_paths",
-                return_value=["/arches_apps/one"],
-            ),
-        ):
-
-            with self.assertRaises(ValueError):
-                self.generate_tsconfig_paths_function()
-
     def test_generate_tsconfig_paths_when_root_directory_differs_from_base_path(self):
         base_path_value = "/project/arches"
-        arches_application_names = ["alpha"]
-        arches_application_paths = ["/project/apps/alpha"]
+        arches_application_paths = {"alpha": "/project/apps/alpha"}
 
         with override_settings(ROOT_DIR="/project"):
             with (
@@ -138,12 +107,7 @@ class TestGenerateTsconfigPaths(TestCase):
                 ),
                 patch.object(
                     self.tsconfig_paths_module,
-                    "list_arches_app_names",
-                    return_value=arches_application_names,
-                ),
-                patch.object(
-                    self.tsconfig_paths_module,
-                    "list_arches_app_paths",
+                    "list_arches_app_labels_and_paths",
                     return_value=arches_application_paths,
                 ),
             ):
