@@ -29,7 +29,6 @@ docs/_build
 arches/logs/*.log
 arches/logs/*.prof
 arches/db/system_settings/Arches_System_Settings_Local.json
-docker-compose-local.yml
 steps to release.txt
 dist
 jsdoc.json
@@ -54,11 +53,6 @@ frontend_configuration
 .runtime/conf.d/
 .runtime/nginx/
 .runtime/internal/
-docker-compose.yml
-docker-compose.dev.yml
-docker-compose.override.yml
-docker-compose.dev.override.yml
-docker-compose.dev.override.yml.example
 Makefile
 .runtime/development/env_file.env
 .runtime/development/env_file.env.sample
