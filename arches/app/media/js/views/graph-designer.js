@@ -195,10 +195,10 @@ var GraphDesignerView = BaseManagerView.extend({
             });
         };
         viewModel.newResource = function() {
-            newGraph('/graph/new', {isresource: true});
+            newGraph(arches.urls.new_graph, {isresource: true});
         };
         viewModel.newBranch = function() {
-            newGraph('/graph/new', {isresource: false});
+            newGraph(arches.urls.new_graph, {isresource: false});
         };
 
         viewModel.createDraftGraph = function() {
