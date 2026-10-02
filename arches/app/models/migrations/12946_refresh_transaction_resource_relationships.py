@@ -7,7 +7,7 @@ from arches.app.models.utils import format_file_into_sql
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "12779_add_multicard_resource_descriptor"),
+        ("models", "12913_remove_geocoders"),
     ]
 
     operations = [

@@ -7,7 +7,7 @@ ARCHES_JSON_IMPORT_MODULE_PK = "0a1c9d67-8b4e-4f2a-9d31-6c5b2e7a4f18"
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "12800_refresh_transaction_resource_relationships"),
+        ("models", "12946_refresh_transaction_resource_relationships"),
     ]
 
     def add_module(apps, schema_editor):
