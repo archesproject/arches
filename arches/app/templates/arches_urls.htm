@@ -39,6 +39,7 @@
     graph='"{% url "graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
     graph_designer='(graphid)=>{return "{% url "graph_designer" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
     graph_settings='(graphid)=>{return "{% url "graph_settings" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+    new_graph="{% url 'new_graph' %}"
     get_notifications="{% url 'get_notifications' %}"
     dismiss_notifications="{% url 'dismiss_notifications' %}"
     get_notification_types="{% url 'get_notification_types' %}"
