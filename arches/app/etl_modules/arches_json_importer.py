@@ -29,6 +29,7 @@ from arches.app.etl_modules.save import (
 from arches.app.models.models import (
     EditLog,
     ETLModule,
+    File,
     GraphModel,
     LoadErrors,
     LoadEvent,
@@ -226,6 +227,8 @@ class ArchesJsonImporter(BaseImportModule):
                 if member.is_dir() or member.filename.startswith("__MACOSX"):
                     continue
                 if member.filename.split(".")[-1].lower() not in ("json", "jsonl"):
+                    summary = result["summary"]
+                    summary["ignored_files"] = summary.get("ignored_files", 0) + 1
                     continue
                 self.cumulative_files_size += member.file_size
                 result["summary"]["files"][member.filename] = {
@@ -278,8 +281,10 @@ class ArchesJsonImporter(BaseImportModule):
     def _stage_files(self, files, summary):
         self._overwrite = bool(self._load_options().get("overwrite"))
         self._source_paths = list(files)
-        seen_resourceids = set()
+        seen_resourceids = {}
         legacyids = {}
+        tile_owners = {}
+        file_owners = {}
         constraint_candidates = {}
         cardinality_keys = {}
         counts = {}
@@ -309,12 +314,22 @@ class ArchesJsonImporter(BaseImportModule):
                     constraint_candidates,
                     cardinality_keys,
                     counts,
+                    tile_owners,
+                    file_owners,
                 )
                 failures.extend(errors)
+                # Checked as they stream: holding every tile id of a 200k-resource
+                # load would cost hundreds of MB.
+                if len(tile_owners) >= DB_CHECK_BATCH_SIZE:
+                    failures.extend(self._check_existing_tiles(tile_owners))
+                    tile_owners.clear()
                 if len(failures) >= 1000:
                     self._flush_failures(failures)
                     failures = []
 
+        failures.extend(self._check_existing_tiles(tile_owners))
+        failures.extend(self._check_existing_resources(seen_resourceids))
+        failures.extend(self._check_existing_files(file_owners))
         failures.extend(self._check_existing_legacyids(legacyids))
         failures.extend(self._check_global_constraints(constraint_candidates))
         failures.extend(self._check_existing_cardinality(cardinality_keys))
@@ -341,6 +356,8 @@ class ArchesJsonImporter(BaseImportModule):
         constraint_candidates,
         cardinality_keys,
         counts,
+        tile_owners,
+        file_owners,
     ):
         failures = []
         instance = resource.get("resourceinstance")
@@ -366,7 +383,7 @@ class ArchesJsonImporter(BaseImportModule):
                     ),
                 )
             ]
-        seen_resourceids.add(resourceid)
+        seen_resourceids[resourceid] = source
 
         try:
             graph = self._graph_info(graphid)
@@ -383,6 +400,18 @@ class ArchesJsonImporter(BaseImportModule):
 
         for tile in resource.get("tiles") or []:
             bucket["tiles"] += 1
+            tile_owners[str(tile.get("tileid"))] = (resourceid, source)
+            for file_id in self._file_ids(tile.get("data") or {}, graph):
+                if file_id in file_owners:
+                    failures.append(
+                        self._failure(
+                            source,
+                            _("File {} is used more than once in the import").format(
+                                file_id
+                            ),
+                        )
+                    )
+                file_owners.setdefault(file_id, (resourceid, source))
             failures.extend(
                 self._validate_tile(
                     tile,
@@ -675,6 +704,66 @@ class ArchesJsonImporter(BaseImportModule):
                         ).format(nodegroupid, colliding_resourceid),
                         nodegroupid=nodegroupid,
                         value=raw_key,
+                    )
+                )
+        return failures
+
+    def _check_existing_resources(self, resourceids):
+        if self._overwrite or not resourceids:
+            return []
+        existing = [
+            pk
+            for batch in self._in_batches(resourceids)
+            for pk in ResourceInstance.objects.filter(
+                resourceinstanceid__in=batch
+            ).values_list("resourceinstanceid", flat=True)
+        ]
+        return [
+            self._failure(
+                resourceids.get(str(pk)),
+                _(
+                    "Resource {} already exists. Tick Replace resources that already "
+                    "exist to replace it."
+                ).format(pk),
+            )
+            for pk in existing
+        ]
+
+    # Both modes: overwrite only clears a resource's own tiles, so a tile id held
+    # by a different resource would still collide on insert.
+    def _check_existing_tiles(self, tile_owners):
+        failures = []
+        for batch in self._in_batches(tile_owners):
+            for tileid, owner in TileModel.objects.filter(tileid__in=batch).values_list(
+                "tileid", "resourceinstance_id"
+            ):
+                resourceid, source = tile_owners.get(str(tileid), (None, None))
+                if str(owner) != str(resourceid):
+                    failures.append(
+                        self._failure(
+                            source,
+                            _("Tile {} already belongs to resource {}").format(
+                                tileid, owner
+                            ),
+                        )
+                    )
+        return failures
+
+    # A load without overwrite must only create, so undoing it can never remove a
+    # file that was there before; with overwrite a resource may keep its own files.
+    def _check_existing_files(self, file_owners):
+        failures = []
+        for batch in self._in_batches(file_owners):
+            for fileid, owner in File.objects.filter(fileid__in=batch).values_list(
+                "fileid", "tile__resourceinstance_id"
+            ):
+                resourceid, source = file_owners.get(str(fileid), (None, None))
+                if self._overwrite and str(owner) == str(resourceid):
+                    continue
+                failures.append(
+                    self._failure(
+                        source,
+                        _("File {} is already in the database").format(fileid),
                     )
                 )
         return failures

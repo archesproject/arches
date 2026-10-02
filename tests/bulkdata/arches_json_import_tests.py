@@ -1,10 +1,13 @@
+import base64
 import json
 import os
 import tempfile
 import uuid
+import zipfile
 from unittest.mock import patch
 
 from django.contrib.auth.models import User
+from django.core.files.storage import default_storage
 from django.test import SimpleTestCase, TestCase
 
 from arches.app.models.graph import Graph
@@ -400,6 +403,8 @@ class EtlCommandFlagTests(TestCase):
         self.assertEqual(options["max_subprocesses"], 8)
 
 
+# The file validator sniffs zip members, so the test needs a real image.
+ONE_PIXEL_PNG = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
 ALL_DATATYPES = "d71a8f56-987f-4fd1-87b5-538378740f15"
 STRING_NODE = "bf611c24-c8be-11ed-b6a9-0242ac130009"
 FILE_NODE = "1d1bfbea-c8bf-11ed-bf64-0242ac130009"
@@ -461,7 +466,7 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
         resource_graph_importer(archesfile["graph"])
         Graph.objects.get(graphid=ALL_DATATYPES).publish(user=self.test_users["admin"])
 
-    def _load(self, *resources, overwrite=False):
+    def _load(self, *resources, overwrite=False, status="completed"):
         loadid = str(uuid.uuid4())
         module = ETLModule.objects.get(slug="arches-json-importer")
         importer = ArchesJsonImporter(
@@ -484,9 +489,100 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
         )
         # The load's status, not cli()'s answer: run_load_task reports success
         # even when save_to_tiles failed.
-        status = LoadEvent.objects.get(loadid=loadid).status
-        self.assertEqual(status, "completed", f"{response} {errors}")
+        actual = LoadEvent.objects.get(loadid=loadid).status
+        self.assertEqual(actual, status, f"{response} {errors}")
         return loadid
+
+    def _errors(self, loadid):
+        return " | ".join(
+            LoadErrors.objects.filter(load_event_id=loadid).values_list(
+                "error", flat=True
+            )
+        )
+
+    def test_an_existing_resource_fails_without_overwrite(self):
+        monument, name = uuid.uuid4(), uuid.uuid4()
+        self._load(_resource(monument, _tile(STRING_NODE, _text("Monument 17"), name)))
+
+        loadid = self._load(
+            _resource(monument, _tile(STRING_NODE, _text("Monument 17, again"))),
+            status="failed",
+        )
+
+        self.assertIn("already exists", self._errors(loadid))
+        self.assertEqual(
+            list(
+                TileModel.objects.filter(resourceinstance_id=monument).values_list(
+                    "tileid", flat=True
+                )
+            ),
+            [name],
+        )
+
+    def test_a_tile_held_by_another_resource_fails_even_with_overwrite(self):
+        monument, site, tile = uuid.uuid4(), uuid.uuid4(), uuid.uuid4()
+        self._load(_resource(monument, _tile(STRING_NODE, _text("Monument 17"), tile)))
+
+        loadid = self._load(
+            _resource(site, _tile(STRING_NODE, _text("Site 4"), tile)),
+            overwrite=True,
+            status="failed",
+        )
+
+        self.assertIn("already belongs to resource", self._errors(loadid))
+        self.assertFalse(ResourceInstance.objects.filter(pk=site).exists())
+
+    def test_a_file_used_twice_in_one_import_fails(self):
+        plan = str(uuid.uuid4())
+        loadid = self._load(
+            _resource(uuid.uuid4(), _tile(FILE_NODE, [_file(plan, "plan.pdf")])),
+            _resource(uuid.uuid4(), _tile(FILE_NODE, [_file(plan, "plan.pdf")])),
+            status="failed",
+        )
+
+        self.assertIn("more than once", self._errors(loadid))
+        self.assertFalse(File.objects.filter(fileid=plan).exists())
+
+    def test_a_file_held_by_another_resource_fails_in_either_mode(self):
+        plan = str(uuid.uuid4())
+        self._load(_resource(uuid.uuid4(), _tile(FILE_NODE, [_file(plan, "plan.pdf")])))
+        owner = File.objects.get(fileid=plan).tile_id
+
+        for overwrite in (False, True):
+            with self.subTest(overwrite=overwrite):
+                site = uuid.uuid4()
+                loadid = self._load(
+                    _resource(site, _tile(FILE_NODE, [_file(plan, "plan.pdf")])),
+                    overwrite=overwrite,
+                    status="failed",
+                )
+                self.assertIn("already in the database", self._errors(loadid))
+                self.assertFalse(ResourceInstance.objects.filter(pk=site).exists())
+                self.assertEqual(File.objects.get(fileid=plan).tile_id, owner)
+
+    def test_a_zip_lists_the_files_it_ignores(self):
+        module = ETLModule.objects.get(slug="arches-json-importer")
+        importer = ArchesJsonImporter(
+            loadid=str(uuid.uuid4()), params={"module": str(module.etlmoduleid)}
+        )
+        importer.start(importer.request)
+
+        def cleanup():
+            if default_storage.exists(importer.temp_dir):
+                importer.delete_from_default_storage(importer.temp_dir)
+
+        self.addCleanup(cleanup)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "export.zip")
+            with zipfile.ZipFile(path, "w") as zf:
+                zf.writestr(
+                    "export.json", json.dumps({"business_data": {"resources": []}})
+                )
+                zf.writestr("photo.png", base64.b64decode(ONE_PIXEL_PNG))
+            response = importer.read(source=path)
+
+        self.assertIn("data", response, response)
+        self.assertEqual(response["data"]["summary"]["ignored_files"], 1)
 
     def test_overwrite_keeps_the_resource_and_links_into_it(self):
         monument, site = uuid.uuid4(), uuid.uuid4()

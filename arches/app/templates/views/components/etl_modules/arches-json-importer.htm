@@ -75,6 +75,12 @@
                     <div class="etl-loading-metadata-key" data-bind="text: $parent.response().result.summary.files[file].size"></div>
                 <!-- /ko -->
                 </div>
+                <!-- ko if: response().result.summary.ignored_files -->
+                <div class="etl-loading-metadata-key">
+                    <span data-bind="text: response().result.summary.ignored_files"></span>
+                    {% trans "non-JSON files ignored. Files are not imported; copy them to storage first." %}
+                </div>
+                <!-- /ko -->
             </div>
 
             <div class="etl-module-component">
