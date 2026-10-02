@@ -8,6 +8,7 @@ from unittest.mock import patch
 
 from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
+from django.http import HttpRequest
 from django.test import SimpleTestCase, TestCase
 
 from arches.app.models.graph import Graph
@@ -710,3 +711,36 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
         self.assertEqual(
             list(deleted.values_list("tileinstanceid", flat=True)), [str(sketch_tile)]
         )
+
+    def _reverse(self, loadid):
+        request = HttpRequest()
+        request.method = "POST"
+        request.user = self.test_users["admin"]
+        request.POST["loadid"] = loadid
+        return ArchesJsonImporter(loadid=loadid).reverse(request)
+
+    def test_a_load_can_be_undone(self):
+        monument = uuid.uuid4()
+        loadid = self._load(
+            _resource(monument, _tile(STRING_NODE, _text("Monument 17")))
+        )
+
+        response = self._reverse(loadid)
+
+        self.assertTrue(response["success"], response)
+        self.assertFalse(ResourceInstance.objects.filter(pk=monument).exists())
+        self.assertEqual(LoadEvent.objects.get(loadid=loadid).status, "unloaded")
+
+    def test_an_overwrite_load_cannot_be_undone(self):
+        monument = uuid.uuid4()
+        self._load(_resource(monument, _tile(STRING_NODE, _text("Monument 17"))))
+        loadid = self._load(
+            _resource(monument, _tile(STRING_NODE, _text("Monument 17, renamed"))),
+            overwrite=True,
+        )
+
+        response = self._reverse(loadid)
+
+        self.assertFalse(response["success"])
+        self.assertIn("cannot be undone", response["data"]["message"])
+        self.assertTrue(TileModel.objects.filter(resourceinstance_id=monument).exists())

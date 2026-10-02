@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
                     "celeryByteSizeLimit": 100000,
                     "logTileValues": False,
                 },
-                "reversible": False,  # does not support un-overwriting a resource
+                "reversible": True,
                 "slug": "arches-json-importer",
                 "description": "Import Arches JSON business data in bulk",
                 "helptemplate": "arches-json-importer-help",

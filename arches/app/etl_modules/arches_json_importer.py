@@ -15,6 +15,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import connection, transaction
 from django.http import HttpRequest
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -41,6 +42,7 @@ from arches.app.models.models import (
     TileModel,
 )
 from arches.app.models.system_settings import settings
+from arches.app.utils.decorators import user_created_transaction_match
 from arches.app.utils.file_validator import FileValidator
 
 logger = logging.getLogger(__name__)
@@ -140,9 +142,9 @@ class ArchesJsonImporter(BaseImportModule):
             return default
         return raw in ("true", "True", True)
 
-    def _load_options(self):
+    def _load_options(self, loadid=None):
         details = (
-            LoadEvent.objects.filter(loadid=self.loadid)
+            LoadEvent.objects.filter(loadid=loadid or self.loadid)
             .values_list("load_details", flat=True)
             .first()
         ) or {}
@@ -1234,7 +1236,7 @@ class ArchesJsonImporter(BaseImportModule):
     # ------------------------------------------------- set-based postprocess
 
     def _post_process(self, loadid):
-        with connection.cursor() as cursor:
+        with transaction.atomic(), connection.cursor() as cursor:
             # Create any missing File rows and point them at their tile.  This
             # is what FileListDataType.pre_tile_save does one row at a time --
             # and it must run *after* the tiles exist, which is why this module
@@ -1280,6 +1282,27 @@ class ArchesJsonImporter(BaseImportModule):
             cursor.execute("SELECT pg_advisory_unlock(%s)", [TILE_TRIGGER_LOCK_KEY])
         except Exception:
             logger.warning("Could not release the bulk-load advisory lock")
+
+    # ---------------------------------------------------------------- reverse
+
+    # Core undoes a load by deleting what its edit log says it created. An overwrite
+    # load also replaced tiles that no longer exist, so undoing it would leave the
+    # resources it replaced empty rather than restore them.
+    @method_decorator(user_created_transaction_match, name="dispatch")
+    def reverse(self, request, **kwargs):
+        loadid = self.loadid or request.POST.get("loadid")
+        if self._load_options(loadid).get("overwrite"):
+            return {
+                "success": False,
+                "data": {
+                    "title": _("Cannot undo this load"),
+                    "message": _(
+                        "An overwrite load cannot be undone: the tiles it replaced "
+                        "no longer exist."
+                    ),
+                },
+            }
+        return super().reverse(request, **kwargs)
 
     # ------------------------------------------------------------------ async
 
