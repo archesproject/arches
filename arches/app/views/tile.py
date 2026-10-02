@@ -322,7 +322,9 @@ class TileData(View):
                         # Not localized (not user-facing)
                         content={"exception": "TileModel.ObjectDoesNotExist"},
                     )
-                user_is_reviewer = user_is_resource_reviewer(request.user)
+                user_is_reviewer = user_is_resource_reviewer(
+                    request.user, resource=tile.resourceinstance
+                )
                 if (
                     user_is_reviewer or tile.is_provisional() is True
                 ) and is_active is True:

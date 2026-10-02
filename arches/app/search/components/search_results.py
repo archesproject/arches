@@ -95,7 +95,6 @@ class SearchResultsFilter(BaseSearchFilter):
 
     def post_search_hook(self, search_query_object, response_object, **kwargs):
         permitted_nodegroups = kwargs.get("permitted_nodegroups")
-        user_is_reviewer = user_is_resource_reviewer(self.request.user)
 
         descriptor_types = ("displaydescription", "displayname")
         active_and_default_language_codes = (get_language(), settings.LANGUAGE_CODE)
@@ -112,6 +111,10 @@ class SearchResultsFilter(BaseSearchFilter):
                 permission_backend.get_search_ui_permissions(
                     self.request.user, result, groups
                 )
+            )
+            resource_id = result.get("_id")
+            user_is_reviewer = user_is_resource_reviewer(
+                self.request.user, resource=resource_id
             )
             result["_source"]["points"] = select_geoms_for_results(
                 result["_source"]["points"], geojson_nodes, user_is_reviewer
