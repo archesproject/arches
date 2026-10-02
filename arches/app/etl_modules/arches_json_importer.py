@@ -380,6 +380,7 @@ class ArchesJsonImporter(BaseImportModule):
                     source, _("Resource {} is missing graph_id").format(resourceid)
                 )
             ]
+        resourceid = str(resourceid).lower()
         if resourceid in seen_resourceids:
             return [
                 self._failure(
@@ -406,7 +407,24 @@ class ArchesJsonImporter(BaseImportModule):
 
         for tile in resource.get("tiles") or []:
             bucket["tiles"] += 1
-            tile_owners[str(tile.get("tileid"))] = (resourceid, source)
+            tileid = str(tile.get("tileid") or "").lower()
+            if not tileid:
+                failures.append(
+                    self._failure(
+                        source,
+                        _("Resource {} has a tile with no tileid").format(resourceid),
+                    )
+                )
+            elif tileid in tile_owners:
+                failures.append(
+                    self._failure(
+                        source,
+                        _("Tile {} is used more than once in the import").format(
+                            tileid
+                        ),
+                    )
+                )
+            tile_owners[tileid] = (resourceid, source)
             for file_id in self._file_ids(tile.get("data") or {}, graph):
                 if file_id in file_owners:
                     failures.append(
@@ -1204,7 +1222,7 @@ class ArchesJsonImporter(BaseImportModule):
                 continue
             for item in value or []:
                 if isinstance(item, dict) and item.get("file_id"):
-                    file_ids.append(str(item["file_id"]))
+                    file_ids.append(str(item["file_id"]).lower())
         return file_ids
 
     # Overwrite replaces a resource's tiles, never the resource itself: deleting

@@ -596,6 +596,33 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
         self.assertIn("already belongs to resource", self._errors(loadid))
         self.assertFalse(ResourceInstance.objects.filter(pk=site).exists())
 
+    def test_a_tile_used_twice_in_one_import_fails(self):
+        tile = uuid.uuid4()
+        loadid = self._load(
+            _resource(uuid.uuid4(), _tile(STRING_NODE, _text("Monument 17"), tile)),
+            _resource(uuid.uuid4(), _tile(STRING_NODE, _text("Site 4"), tile)),
+            status="failed",
+        )
+
+        self.assertIn("more than once", self._errors(loadid))
+
+    def test_overwrite_matches_ids_whatever_their_case(self):
+        monument, tile = uuid.uuid4(), uuid.uuid4()
+        self._load(_resource(monument, _tile(STRING_NODE, _text("Monument 17"), tile)))
+
+        self._load(
+            _resource(
+                str(monument).upper(),
+                _tile(STRING_NODE, _text("Monument 17, renamed"), str(tile).upper()),
+            ),
+            overwrite=True,
+        )
+
+        self.assertEqual(
+            TileModel.objects.get(pk=tile).data[STRING_NODE]["en"]["value"],
+            "Monument 17, renamed",
+        )
+
     def test_a_file_used_twice_in_one_import_fails(self):
         plan = str(uuid.uuid4())
         loadid = self._load(
