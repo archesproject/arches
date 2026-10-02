@@ -525,6 +525,17 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
         self.assertIn("Try again when it finishes", response["data"]["message"])
         self.assertEqual(LoadEvent.objects.get(loadid=loadid).status, "failed")
 
+    def test_a_failed_index_is_not_reported_as_a_failed_write(self):
+        with patch(
+            "arches.app.etl_modules.arches_json_importer._post_save_edit_log",
+            return_value={"success": False, "data": "saved"},
+        ):
+            loadid, response = self._cli(
+                _resource(uuid.uuid4(), _tile(STRING_NODE, _text("Monument 17")))
+            )
+
+        self.assertTrue(response["success"], response)
+
     def test_a_rejected_upload_says_why_and_closes_the_file(self):
         opened = []
 

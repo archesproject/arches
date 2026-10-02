@@ -272,7 +272,12 @@ class BaseImportModule:
                     written = self.save_to_tiles(
                         cursor, userid, loadid, multiprocessing, max_subprocesses, index
                     )
-                    if written and written.get("success") is False:
+                    # "saved" is save.py's index failure: the data is in, so the refreshes still run
+                    if (
+                        written
+                        and written.get("success") is False
+                        and written.get("data") != "saved"
+                    ):
                         return {
                             "success": False,
                             "data": written.get("data")
