@@ -8,7 +8,8 @@
             <p>
                 {% blocktrans %}Bulk import of Arches JSON business data, built for large loads.
                 Upload a <strong>.json</strong> Arches business-data export, a <strong>.jsonl</strong>
-                file with one resource object per line, or a <strong>.zip</strong> of either. Files are
+                file with one resource object per line, or a <strong>.zip</strong> of .json files (upload
+                a .jsonl file on its own). Files are
                 not imported: file values must point at files already in storage, and anything else in a
                 zip is ignored.{% endblocktrans %}
             </p>
@@ -19,8 +20,9 @@
             <pre>jq -c '.business_data.resources[]' export.json &gt; export.jsonl</pre>
             <p>
                 {% blocktrans %}The file is read twice: once to validate every resource, once to write.
-                Nothing is written if validation turns up any error, so a failed load leaves the
-                database untouched. Failures appear in the standard error report.{% endblocktrans %}
+                If validation finds any error nothing is written, and the problems appear in the
+                standard error report. A load that fails while writing keeps the resources written
+                before the failure, and its message says how far it got.{% endblocktrans %}
             </p>
             <p>
                 {% blocktrans %}Tick <strong>Replace resources that already exist</strong> to replace
@@ -29,6 +31,12 @@
                 resource itself and links to it from other resources are kept. To update only part of a
                 resource, use the Tile Excel importer. Left unticked, importing a resource id that is
                 already present will fail the load.{% endblocktrans %}
+            </p>
+            <p>
+                {% blocktrans %}<strong>Undo import</strong> removes everything a load created,
+                including the stored files its tiles point at. A large load takes a long time to undo.
+                A load that replaced existing resources cannot be undone; run the file again
+                instead.{% endblocktrans %}
             </p>
             <p>
                 {% blocktrans %}Untick <strong>Index the data after import</strong> to write the tiles

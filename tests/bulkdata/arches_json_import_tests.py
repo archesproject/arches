@@ -744,3 +744,46 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
         self.assertFalse(response["success"])
         self.assertIn("cannot be undone", response["data"]["message"])
         self.assertTrue(TileModel.objects.filter(resourceinstance_id=monument).exists())
+
+    def test_a_write_failure_says_how_far_it_got(self):
+        first, second, third = uuid.uuid4(), uuid.uuid4(), uuid.uuid4()
+        real_chunks = ArchesJsonImporter._iter_resource_chunks
+        real_write = ArchesJsonImporter._write_chunk
+        calls = []
+
+        def one_per_chunk(importer, chunk_size):
+            return real_chunks(importer, 1)
+
+        def second_chunk_fails(importer, *args):
+            calls.append(args)
+            if len(calls) == 2:
+                raise RuntimeError("disk full")
+            return real_write(importer, *args)
+
+        with (
+            patch.object(ArchesJsonImporter, "_iter_resource_chunks", one_per_chunk),
+            patch.object(ArchesJsonImporter, "_write_chunk", second_chunk_fails),
+        ):
+            loadid = self._load(
+                *(
+                    _resource(r, _tile(STRING_NODE, _text("Monument")))
+                    for r in (first, second, third)
+                ),
+                status="failed",
+            )
+
+        message = LoadEvent.objects.get(loadid=loadid).error_message
+        self.assertIn(
+            f"Wrote 1 of 3 resources; the chunk starting at resource {second} (#2) "
+            "failed: disk full",
+            message,
+        )
+        self.assertIn("Undo the load", message)
+        self.assertEqual(
+            list(
+                ResourceInstance.objects.filter(
+                    pk__in=[first, second, third]
+                ).values_list("pk", flat=True)
+            ),
+            [first],
+        )

@@ -1019,6 +1019,7 @@ class ArchesJsonImporter(BaseImportModule):
                 },
             }
 
+        written, failing = 0, None
         try:
             log_event_details(cursor, loadid, "done|Saving the tiles...")
             # The etl-manager badge reads load_event.status alone, and "running"
@@ -1026,9 +1027,10 @@ class ArchesJsonImporter(BaseImportModule):
             LoadEvent.objects.filter(loadid=loadid).update(status="validated")
             disable_tile_triggers(cursor, loadid)
             try:
-                written = 0
                 for chunk in self._iter_resource_chunks(chunk_size):
+                    failing = chunk[0]["resourceinstance"]["resourceinstanceid"]
                     written += self._write_chunk(chunk, loadid, log_tile_values)
+                failing = None
                 logger.info("arches_json_importer wrote %s resources", written)
 
                 log_event_details(cursor, loadid, "done|Refreshing relationships...")
@@ -1037,14 +1039,27 @@ class ArchesJsonImporter(BaseImportModule):
                 reenable_tile_triggers(cursor, loadid)
         except Exception as e:
             logger.exception(e)
+            message = str(e)
+            if failing:
+                total = sum(count["resources"] for count in self._counts.values())
+                message = _(
+                    "Wrote {} of {} resources; the chunk starting at resource {} (#{}) "
+                    "failed: {}"
+                ).format(written, total, failing, written + 1, e)
+                if written:
+                    message += " " + (
+                        _("Run the same file again to finish.")
+                        if self._overwrite
+                        else _("Undo the load to remove what was written.")
+                    )
             # This branch returns a dict rather than raising, so nothing else
             # records the reason and the report reads "no errors found".
             LoadEvent.objects.filter(loadid=loadid).update(
-                status="failed", load_end_time=timezone.now(), error_message=str(e)
+                status="failed", load_end_time=timezone.now(), error_message=message
             )
             return {
                 "success": False,
-                "data": {"title": _("Failed to complete load"), "message": str(e)},
+                "data": {"title": _("Failed to complete load"), "message": message},
             }
         finally:
             self._release_trigger_lock(cursor)
