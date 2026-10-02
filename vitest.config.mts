@@ -52,6 +52,17 @@ function generateConfig(): Promise<UserConfig> {
             alias[`@/${archesApplicationName}`] = path.join(archesApplicationPath, 'src', archesApplicationName);
         }
 
+        // Applications bundled with arches resolve whether or not a project enabled
+        // them, so that arches' own frontend tests can import them.
+        for (
+            const [applicationName, applicationPath]
+            of Object.entries(
+                (parsedData['RESOLVABLE_APPLICATION_PATHS'] ?? {}) as { [key: string]: string }
+            )
+        ) {
+            alias[`@/${applicationName}`] ??= path.join(applicationPath, 'src', applicationName);
+        }
+
         resolve({
             plugins: [
                 vue(),
@@ -60,7 +71,10 @@ function generateConfig(): Promise<UserConfig> {
             test: {
                 alias: alias,
                 coverage: {
-                    include: [path.join(parsedData['APP_RELATIVE_PATH'], 'src', path.sep)],
+                    include: [
+                        path.join(parsedData['APP_RELATIVE_PATH'], 'src', path.sep),
+                        path.join('arches', 'extensions', '*', 'src', path.sep),
+                    ],
                     exclude: exclude,
                     reporter: [
                         ['clover', { 'file': 'coverage.xml' }],

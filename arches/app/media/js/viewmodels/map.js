@@ -7,8 +7,9 @@ import mapPopupProvider from 'utils/map-popup-provider';
 import mapConfigurator from 'utils/map-configurator';
 import ariaUtils from 'utils/aria';
 import 'templates/views/components/map-popup.htm';
-import MapboxGl from 'mapbox-gl';
-import MapboxGeocoder from 'mapbox-gl-geocoder';
+import * as MapLibreGl from 'maplibre-gl';
+import MaplibreGeocoder from '@maplibre/maplibre-gl-geocoder';
+import maplibreGeocoderApi, { geocoderAttribution } from 'utils/maplibre-geocoder-api';
 
 
 const viewModel = function (params) {
@@ -297,8 +298,8 @@ const viewModel = function (params) {
         style: {
             version: 8,
             sources: sources,
-            sprite: arches.mapboxSprites,
-            glyphs: arches.mapboxGlyphs,
+            sprite: arches.maplibreSprites,
+            glyphs: arches.maplibreGlyphs,
             layers: self.layers(),
             center: [
                 parseFloat(self.centerX()),
@@ -308,6 +309,8 @@ const viewModel = function (params) {
         },
         maxZoom: arches.mapDefaultMaxZoom,
         minZoom: arches.mapDefaultMinZoom,
+        // added explicitly in setupMap so geocoder attribution can be merged in
+        attributionControl: false,
     };
     if (!params.usePosition) {
         this.mapOptions.bounds = self.bounds;
@@ -452,11 +455,11 @@ const viewModel = function (params) {
         };
     };
 
-    this.onFeatureClick = function (features, lngLat, MapboxGl) {
+    this.onFeatureClick = function (features, lngLat, MapLibreGl) {
         const popupTemplate = this.popupTemplate ? this.popupTemplate : mapPopupProvider.getPopupTemplate(features);
         const map = self.map();
         const mapStyle = map.getStyle();
-        self.popup = new MapboxGl.Popup()
+        self.popup = new MapLibreGl.Popup()
             .setLngLat(lngLat)
             .setHTML(popupTemplate)
             .addTo(map);
@@ -528,13 +531,15 @@ const viewModel = function (params) {
     this.setupMap = function (map) {
         map.on('load', function () {
             mapConfigurator.preConfig(map);
-            map.addControl(new MapboxGl.NavigationControl(), 'top-left');
-            map.addControl(new MapboxGl.FullscreenControl({
+            map.addControl(new MapLibreGl.NavigationControl(), 'top-left');
+            map.addControl(new MapLibreGl.FullscreenControl({
                 container: $(map.getContainer()).closest('.workbench-card-wrapper')[0]
             }), 'top-left');
-            map.addControl(new MapboxGeocoder({
-                accessToken: MapboxGl.accessToken,
-                mapboxgl: MapboxGl,
+            map.addControl(new MapLibreGl.AttributionControl({
+                customAttribution: geocoderAttribution
+            }));
+            map.addControl(new MaplibreGeocoder(maplibreGeocoderApi, {
+                maplibregl: MapLibreGl,
                 placeholder: arches.translations.geocoderPlaceHolder,
                 bbox: arches.hexBinBounds
             }), 'top-right');
@@ -572,7 +577,7 @@ const viewModel = function (params) {
                     feature => mapPopupProvider.isFeatureClickable(feature, self)
                 );
                 if (popupFeatures.length) {
-                    self.onFeatureClick(popupFeatures, e.lngLat, MapboxGl);
+                    self.onFeatureClick(popupFeatures, e.lngLat, MapLibreGl);
                 }
             });
 
