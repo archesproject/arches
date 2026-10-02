@@ -29,6 +29,7 @@ docs/_build
 arches/logs/*.log
 arches/logs/*.prof
 arches/db/system_settings/Arches_System_Settings_Local.json
+docker-compose-local.yml
 steps to release.txt
 dist
 jsdoc.json
