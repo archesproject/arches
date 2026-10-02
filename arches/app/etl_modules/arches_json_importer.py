@@ -988,8 +988,8 @@ class ArchesJsonImporter(BaseImportModule):
 
     def _write_chunk(self, chunk, loadid, log_tile_values):
         now = timezone.now()
-        resources, tiles, edits = [], [], []
-        resourceids = []
+        resources, tiles, created, edits = [], [], [], []
+        resourceids, file_ids = [], []
 
         for resource in chunk:
             instance = resource["resourceinstance"]
@@ -1010,7 +1010,7 @@ class ArchesJsonImporter(BaseImportModule):
                     resource_instance_lifecycle_state_id=graph["lifecycle_state_id"],
                 )
             )
-            edits.append(
+            created.append(
                 EditLog(
                     resourceclassid=graphid,
                     resourceinstanceid=str(resourceid),
@@ -1024,6 +1024,8 @@ class ArchesJsonImporter(BaseImportModule):
             for tile in resource.get("tiles") or []:
                 tileid = uuid.UUID(str(tile["tileid"]))
                 data = tile.get("data") or {}
+                if self._overwrite:
+                    file_ids.extend(self._file_ids(data, graph))
                 tiles.append(
                     TileModel(
                         tileid=tileid,
@@ -1057,13 +1059,85 @@ class ArchesJsonImporter(BaseImportModule):
         # exactly what was written.
         with transaction.atomic():
             if self._overwrite:
-                ResourceInstance.objects.filter(
-                    resourceinstanceid__in=resourceids
-                ).delete()
-            ResourceInstance.objects.bulk_create(resources)
+                existing = {
+                    str(pk)
+                    for pk in ResourceInstance.objects.filter(
+                        resourceinstanceid__in=resourceids
+                    ).values_list("resourceinstanceid", flat=True)
+                }
+                created = [e for e in created if e.resourceinstanceid not in existing]
+                self._clear_replaced_tiles(
+                    loadid, resourceids, [t.tileid for t in tiles], file_ids
+                )
+                ResourceInstance.objects.bulk_create(
+                    resources,
+                    update_conflicts=True,
+                    unique_fields=["resourceinstanceid"],
+                    update_fields=[
+                        "graph",
+                        "legacyid",
+                        "graph_publication",
+                        "resource_instance_lifecycle_state",
+                    ],
+                )
+            else:
+                ResourceInstance.objects.bulk_create(resources)
             TileModel.objects.bulk_create(tiles)
-            EditLog.objects.bulk_create(edits)
+            EditLog.objects.bulk_create(created + edits)
         return len(resources)
+
+    @staticmethod
+    def _file_ids(data, graph):
+        file_ids = []
+        for nodeid, value in data.items():
+            if graph["nodes"].get(nodeid, {}).get("datatype") != "file-list":
+                continue
+            for item in value or []:
+                if isinstance(item, dict) and item.get("file_id"):
+                    file_ids.append(str(item["file_id"]))
+        return file_ids
+
+    # Overwrite replaces a resource's tiles, never the resource itself: deleting
+    # the resource would cascade away links into it from resources outside the load.
+    @staticmethod
+    def _clear_replaced_tiles(loadid, resourceids, tileids, file_ids):
+        old_tiles = (
+            "SELECT tileid FROM tiles WHERE resourceinstanceid = ANY(%s::uuid[])"
+        )
+        ids = [str(r) for r in resourceids]
+        with connection.cursor() as cursor:
+            # Only tiles the file no longer has: a kept tile is re-inserted and logged
+            # as created, and two rows for one tile in a load would make
+            # _post_process, which joins edit_log on the transaction, see it twice.
+            cursor.execute(
+                """
+                INSERT INTO edit_log (resourceclassid, resourceinstanceid, nodegroupid,
+                                      tileinstanceid, edittype, timestamp, note,
+                                      transactionid)
+                SELECT r.graphid::text, t.resourceinstanceid::text, t.nodegroupid::text,
+                       t.tileid::text, 'tile delete', now(),
+                       'removed by arches json overwrite', %s
+                FROM tiles t
+                JOIN resource_instances r USING (resourceinstanceid)
+                WHERE t.resourceinstanceid = ANY(%s::uuid[])
+                  AND t.tileid <> ALL(%s::uuid[])
+                """,
+                [loadid, ids, [str(t) for t in tileids]],
+            )
+            # Keeps the row, with its real path and thumbnail, of a file the import
+            # uses again; _post_process points it at the new tile.
+            cursor.execute(
+                f"UPDATE files SET tileid = NULL WHERE tileid IN ({old_tiles}) "
+                "AND fileid = ANY(%s::uuid[])",
+                [ids, file_ids],
+            )
+            for table in ("resource_x_resource", "geojson_geometries", "files"):
+                cursor.execute(
+                    f"DELETE FROM {table} WHERE tileid IN ({old_tiles})", [ids]
+                )
+            cursor.execute(
+                "DELETE FROM tiles WHERE resourceinstanceid = ANY(%s::uuid[])", [ids]
+            )
 
     # ------------------------------------------------- set-based postprocess
 

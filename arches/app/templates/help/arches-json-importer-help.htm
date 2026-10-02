@@ -21,9 +21,12 @@
                 database untouched. Failures appear in the standard error report.{% endblocktrans %}
             </p>
             <p>
-                {% blocktrans %}Tick <strong>Overwrite resources that already exist</strong> to replace
-                resources whose ids are already in the database. Left unticked, importing a resource id
-                that is already present will fail the load.{% endblocktrans %}
+                {% blocktrans %}Tick <strong>Replace resources that already exist</strong> to replace
+                resources whose ids are already in the database. Each resource in the file completely
+                replaces the existing one: any of its tiles not in the file are deleted, while the
+                resource itself and links to it from other resources are kept. To update only part of a
+                resource, use the Tile Excel importer. Left unticked, importing a resource id that is
+                already present will fail the load.{% endblocktrans %}
             </p>
             <p>
                 {% blocktrans %}Untick <strong>Index the data after import</strong> to write the tiles

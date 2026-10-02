@@ -55,7 +55,8 @@ class Command(BaseCommand):
             action="store_true",
             dest="overwrite",
             default=False,
-            help="Replace resources that already exist instead of failing on them",
+            help="Replace resources that already exist: each one in the file completely "
+            "replaces the existing one, and its tiles not in the file are deleted",
         )
         parser.add_argument(
             "-mp",

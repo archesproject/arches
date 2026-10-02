@@ -1,10 +1,30 @@
+import json
+import os
+import tempfile
 import uuid
 from unittest.mock import patch
 
 from django.contrib.auth.models import User
 from django.test import SimpleTestCase, TestCase
 
-from arches.app.models.models import ETLModule, LoadEvent, NodeGroup
+from arches.app.models.graph import Graph
+from arches.app.models.models import (
+    EditLog,
+    ETLModule,
+    File,
+    GeoJSONGeometry,
+    LoadErrors,
+    LoadEvent,
+    NodeGroup,
+    ResourceInstance,
+    ResourceXResource,
+    TileModel,
+)
+from arches.app.utils.betterJSONSerializer import JSONDeserializer
+from arches.app.utils.data_management.resource_graphs.importer import (
+    import_graph as resource_graph_importer,
+)
+from tests.base_test import ArchesTransactionTestCase
 from arches.app.etl_modules.arches_json_importer import (
     ArchesJsonImporter,
     DB_CHECK_BATCH_SIZE,
@@ -378,3 +398,178 @@ class EtlCommandFlagTests(TestCase):
         options = self._parse("-mp", "-mxp", "8")
         self.assertTrue(options["use_multiprocessing"])
         self.assertEqual(options["max_subprocesses"], 8)
+
+
+ALL_DATATYPES = "d71a8f56-987f-4fd1-87b5-538378740f15"
+STRING_NODE = "bf611c24-c8be-11ed-b6a9-0242ac130009"
+FILE_NODE = "1d1bfbea-c8bf-11ed-bf64-0242ac130009"
+IMAGE_NODE = "f85dab40-791d-11ee-88a6-0242ac130007"
+RESOURCE_NODE = "402c95f2-c8c1-11ed-87a7-0242ac130009"
+GEOMETRY_NODE = "be25bdf0-c8bf-11ed-a172-0242ac130009"
+
+
+def _resource(resourceid, *tiles):
+    return {
+        "resourceinstance": {
+            "resourceinstanceid": str(resourceid),
+            "graph_id": ALL_DATATYPES,
+            "legacyid": None,
+        },
+        "tiles": list(tiles),
+    }
+
+
+# Every test node is the only node in its own nodegroup, so nodegroup id == node id.
+def _tile(nodeid, value, tileid=None):
+    return {
+        "tileid": str(tileid or uuid.uuid4()),
+        "nodegroup_id": nodeid,
+        "parenttile_id": None,
+        "sortorder": 0,
+        "data": {nodeid: value},
+    }
+
+
+def _text(value):
+    return {"en": {"value": value, "direction": "ltr"}}
+
+
+def _point():
+    return {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "id": str(uuid.uuid4()),
+                "properties": {},
+                "geometry": {"type": "Point", "coordinates": [-5.93, 54.6]},
+            }
+        ],
+    }
+
+
+def _file(file_id, name):
+    return {"file_id": file_id, "name": name, "status": "uploaded", "size": 10}
+
+
+class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
+    serialized_rollback = True
+
+    def setUp(self):
+        with open("tests/fixtures/resource_graphs/All_Datatypes.json") as f:
+            archesfile = JSONDeserializer().deserialize(f)
+        resource_graph_importer(archesfile["graph"])
+        Graph.objects.get(graphid=ALL_DATATYPES).publish(user=self.test_users["admin"])
+
+    def _load(self, *resources, overwrite=False):
+        loadid = str(uuid.uuid4())
+        module = ETLModule.objects.get(slug="arches-json-importer")
+        importer = ArchesJsonImporter(
+            loadid=loadid,
+            params={
+                "module": str(module.etlmoduleid),
+                "overwrite": overwrite,
+                "index": False,
+            },
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "load.jsonl")
+            with open(path, "w") as f:
+                f.writelines(json.dumps(r) + "\n" for r in resources)
+            response = importer.cli(path)
+        errors = list(
+            LoadErrors.objects.filter(load_event_id=loadid).values_list(
+                "message", flat=True
+            )
+        )
+        # The load's status, not cli()'s answer: run_load_task reports success
+        # even when save_to_tiles failed.
+        status = LoadEvent.objects.get(loadid=loadid).status
+        self.assertEqual(status, "completed", f"{response} {errors}")
+        return loadid
+
+    def test_overwrite_keeps_the_resource_and_links_into_it(self):
+        monument, site = uuid.uuid4(), uuid.uuid4()
+        name, geometry = uuid.uuid4(), uuid.uuid4()
+        self._load(
+            _resource(
+                monument,
+                _tile(STRING_NODE, _text("Monument 17"), name),
+                _tile(GEOMETRY_NODE, _point(), geometry),
+            )
+        )
+        link = {
+            "resourceId": str(monument),
+            "ontologyProperty": "",
+            "inverseOntologyProperty": "",
+        }
+        self._load(_resource(site, _tile(RESOURCE_NODE, [link])))
+        createdtime = ResourceInstance.objects.get(pk=monument).createdtime
+
+        loadid = self._load(
+            _resource(
+                monument, _tile(STRING_NODE, _text("Monument 17, renamed"), name)
+            ),
+            overwrite=True,
+        )
+
+        self.assertTrue(
+            ResourceXResource.objects.filter(
+                from_resource_id=site, to_resource_id=monument
+            ).exists()
+        )
+        site_tile = TileModel.objects.get(resourceinstance_id=site)
+        self.assertEqual(site_tile.data[RESOURCE_NODE][0]["resourceId"], str(monument))
+        self.assertEqual(
+            ResourceInstance.objects.get(pk=monument).createdtime, createdtime
+        )
+        self.assertEqual(
+            list(
+                TileModel.objects.filter(resourceinstance_id=monument).values_list(
+                    "tileid", flat=True
+                )
+            ),
+            [name],
+        )
+        self.assertFalse(
+            GeoJSONGeometry.objects.filter(resourceinstance_id=monument).exists()
+        )
+        self.assertFalse(
+            EditLog.objects.filter(transactionid=loadid, edittype="create").exists()
+        )
+        deleted = EditLog.objects.filter(transactionid=loadid, edittype="tile delete")
+        self.assertEqual(
+            list(deleted.values_list("tileinstanceid", flat=True)), [str(geometry)]
+        )
+
+    def test_overwrite_keeps_the_row_of_a_file_it_imports_again(self):
+        monument = uuid.uuid4()
+        plan, sketch = str(uuid.uuid4()), str(uuid.uuid4())
+        plan_tile, sketch_tile = uuid.uuid4(), uuid.uuid4()
+        self._load(
+            _resource(
+                monument,
+                _tile(FILE_NODE, [_file(plan, "plan.pdf")], plan_tile),
+                _tile(IMAGE_NODE, [_file(sketch, "sketch.png")], sketch_tile),
+            )
+        )
+        File.objects.filter(fileid=plan).update(
+            path="uploadedfiles/plan_aB3x.pdf", thumbnail_data=b"thumb"
+        )
+
+        # The same tile id, as a real re-export has. Logging it as both deleted and
+        # created would make _post_process upsert the file row twice and fail.
+        loadid = self._load(
+            _resource(monument, _tile(FILE_NODE, [_file(plan, "plan.pdf")], plan_tile)),
+            overwrite=True,
+        )
+
+        kept = File.objects.get(fileid=plan)
+        self.assertEqual(kept.path.name, "uploadedfiles/plan_aB3x.pdf")
+        self.assertEqual(bytes(kept.thumbnail_data), b"thumb")
+        self.assertEqual(kept.tile_id, plan_tile)
+        self.assertFalse(File.objects.filter(fileid=sketch).exists())
+        deleted = EditLog.objects.filter(transactionid=loadid, edittype="tile delete")
+        self.assertEqual(
+            list(deleted.values_list("tileinstanceid", flat=True)), [str(sketch_tile)]
+        )
