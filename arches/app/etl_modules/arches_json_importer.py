@@ -885,11 +885,19 @@ class ArchesJsonImporter(BaseImportModule):
     # ---------------------------------------------------------- pass 2: write
 
     def save_to_tiles(
-        self, cursor, userid, loadid, multiprocessing=False, max_subprocesses=0
+        self,
+        cursor,
+        userid,
+        loadid,
+        multiprocessing=False,
+        max_subprocesses=0,
+        index=True,
     ):
         options = self._load_options()
         self._overwrite = bool(options.get("overwrite"))
-        index = options.get("index", True)
+        # run_load_task passes the request's choice; the Celery path cannot, so
+        # the one stored by start() counts too.
+        index = index and options.get("index", True)
         chunk_size = settings.BULK_IMPORT_BATCH_SIZE
         # edit_log.newvalue duplicates the tile data (~0.9KB/tile; ~4GB on a
         # 4.5M-tile load).  Reversal never reads it -- reverse_edit_log_entries
