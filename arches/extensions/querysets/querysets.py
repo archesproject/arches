@@ -13,6 +13,7 @@ from packaging.version import Version
 
 arches_version = Version(_arches_version_str)
 from arches.app.models.models import Node
+from arches.app.utils.permission_backend import user_is_resource_reviewer
 
 from arches.extensions.querysets.datatypes.datatypes import DataTypeFactory
 from arches.extensions.querysets.utils.models import (
@@ -23,26 +24,47 @@ from arches.extensions.querysets.utils.models import (
 NOT_PROVIDED = object()
 
 
-def reprocess_tiles_aliased_data(tiles, as_representation, grouping_node_lookup):
+def _resolve_provisional_data(tile, provisional_edits_for_user):
+    """Return the user's own provisional edit value, or None for authoritative data."""
+    if provisional_edits_for_user is None or not tile.provisionaledits:
+        return None
+
+    if user_is_resource_reviewer(provisional_edits_for_user):
+        return None
+
+    user_id_str = str(provisional_edits_for_user.pk)
+    provisional = tile.provisionaledits
+
+    if user_id_str in provisional:
+        return provisional[user_id_str]["value"]
+
+    return None
+
+
+def reprocess_tiles_aliased_data(
+    tiles, as_representation, grouping_node_lookup, *, provisional_edits_for_user=None
+):
     """Re-run aliased_data processing for a specific list of tiles.
 
-    This is equivalent to TileTreeQuerySet._set_aliased_data() but operates on
-    an arbitrary list of tiles rather than a queryset's _result_cache.  Used by
-    ResourceTileTree._targeted_refresh_aliased_data() to re-process only the
-    tiles that actually changed after a save, avoiding the full re-fetch of all
-    tiles that refresh_from_db() would trigger.
-
-    grouping_node_lookup: {node_pk: grouping_node} for the graph (used to
-    re-attach child tiles under the correct alias).
+    Used by _targeted_refresh_aliased_data() to re-process only changed tiles
+    without re-fetching the full tile set via refresh_from_db().
     """
     from arches.extensions.querysets.models import AliasedData
 
     values_by_datatype = defaultdict(list)
     aliased_data_to_update = {}
+    data_overrides = {}
 
     for tile in tiles:
         tile.aliased_data = AliasedData()
         tile._as_representation = as_representation
+        tile._provisional_edits_for_user = provisional_edits_for_user
+
+        provisional_data = _resolve_provisional_data(tile, provisional_edits_for_user)
+        if provisional_data is not None:
+            data_overrides[tile.pk] = tile.data
+            tile.data = provisional_data
+
         for node in tile.nodegroup.node_set.all():
             if node.datatype == "semantic":
                 continue
@@ -64,6 +86,10 @@ def reprocess_tiles_aliased_data(tiles, as_representation, grouping_node_lookup)
     for (tile, node), node_value in aliased_data_to_update.items():
         tile.set_aliased_data(node, node_value, datatype_contexts)
 
+    for tile in tiles:
+        if tile.pk in data_overrides:
+            tile.data = data_overrides[tile.pk]
+
     # Re-attach child tiles under the correct aliases on aliased_data, mirroring
     # TileTreeQuerySet._set_child_tile_data().
     for tile in tiles:
@@ -80,6 +106,7 @@ def reprocess_tiles_aliased_data(tiles, as_representation, grouping_node_lookup)
                 setattr(tile.aliased_data, child_nodegroup_alias, existing)
             child_tile.parent = tile
             child_tile._as_representation = as_representation
+            child_tile._provisional_edits_for_user = provisional_edits_for_user
 
         # Set default empty values for child nodegroups that have no tiles.
         child_nodegroups = (
@@ -183,6 +210,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         depth=20,
         nodes=None,
         graph_query=None,
+        provisional_edits_for_user=None,
     ):
         """
         Entry point for filtering arches data by nodegroups.
@@ -257,6 +285,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
             graph_slug=graph_slug,
             graph_query=graph_query,
             nodes=nodes,
+            provisional_edits_for_user=provisional_edits_for_user,
         )
 
         # Future: see various solutions mentioned here for avoiding
@@ -270,6 +299,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
                 depth=depth - 1,
                 nodes=resolved_nodes,
                 graph_query=graph_query,
+                provisional_edits_for_user=provisional_edits_for_user,
             )
 
             qs = qs.prefetch_related(
@@ -322,16 +352,27 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
 
         nodes = self._hints.get("nodes")
         node_pks = {node.pk for node in nodes} if nodes is not None else None
+        provisional_edits_for_user = self._hints.get("provisional_edits_for_user")
 
         aliased_data_to_update = {}
         values_by_datatype = defaultdict(list)
         datatype_contexts = {}
+        data_overrides = {}
+
         for tile in self._result_cache:
             if tile.aliased_data is None:
                 tile.aliased_data = AliasedData()
             else:
                 return  # already set
             tile.sync_private_attributes(self)
+
+            provisional_data = _resolve_provisional_data(
+                tile, provisional_edits_for_user
+            )
+            if provisional_data is not None:
+                data_overrides[tile.pk] = tile.data
+                tile.data = provisional_data
+
             nodegroup_nodes = tile.nodegroup.node_set.all()
             if node_pks is not None:
                 nodegroup_nodes = [
@@ -357,10 +398,15 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
             datatype_instance.set_display_value_context_in_bulk(bulk_values)
             datatype_contexts[datatype] = bulk_values
 
-        # Set aliased_data property.
+        # tile.data is still swapped so display_value reflects provisional data.
         for tile_node_pair, node_value in aliased_data_to_update.items():
             tile, node = tile_node_pair
             tile.set_aliased_data(node, node_value, datatype_contexts)
+
+        # Restore authoritative tile.data now that aliased_data is fully built.
+        for tile in self._result_cache:
+            if tile.pk in data_overrides:
+                tile.data = data_overrides[tile.pk]
 
         for tile in self._result_cache:
             self._set_child_tile_data(tile)
@@ -442,6 +488,7 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         nodes=None,
         depth=20,
         graph_query=None,
+        provisional_edits_for_user=None,
     ):
         """Aliases a ResourceTileTreeQuerySet with tile data unpacked
         and mapped onto nodegroup aliases, e.g.:
@@ -493,7 +540,11 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
 
         if graph_query is None:
             graph_query = GraphWithPrefetching.objects.prefetch(graph_slug)
-        self._add_hints(as_representation=as_representation, graph_query=graph_query)
+        self._add_hints(
+            as_representation=as_representation,
+            graph_query=graph_query,
+            provisional_edits_for_user=provisional_edits_for_user,
+        )
 
         if not nodes:
             # Violates laziness of QuerySets, but can be made fully lazy
@@ -536,6 +587,7 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
                         nodes=nodes,
                         graph_query=graph_query,
                         depth=depth,
+                        provisional_edits_for_user=provisional_edits_for_user,
                     ).filter(parenttile=None),
                     to_attr="_tile_trees",
                 ),
