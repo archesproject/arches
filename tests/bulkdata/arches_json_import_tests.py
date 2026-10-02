@@ -366,7 +366,8 @@ class TriggerLockContentionTests(TestCase):
 
         result = importer.save_to_tiles(None, user.id, event.loadid)
 
-        self.assertEqual(result["status"], 409)
+        self.assertFalse(result["success"])
+        self.assertEqual(result["data"]["title"], "Another bulk load is running")
         event.refresh_from_db()
         self.assertEqual(event.status, "failed")
         self.assertTrue(event.error_message)
@@ -466,7 +467,7 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
         resource_graph_importer(archesfile["graph"])
         Graph.objects.get(graphid=ALL_DATATYPES).publish(user=self.test_users["admin"])
 
-    def _load(self, *resources, overwrite=False, status="completed"):
+    def _cli(self, *resources, overwrite=False):
         loadid = str(uuid.uuid4())
         module = ETLModule.objects.get(slug="arches-json-importer")
         importer = ArchesJsonImporter(
@@ -481,17 +482,68 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
             path = os.path.join(tmp, "load.jsonl")
             with open(path, "w") as f:
                 f.writelines(json.dumps(r) + "\n" for r in resources)
-            response = importer.cli(path)
+            return loadid, importer.cli(path)
+
+    def _load(self, *resources, overwrite=False, status="completed"):
+        loadid, response = self._cli(*resources, overwrite=overwrite)
         errors = list(
             LoadErrors.objects.filter(load_event_id=loadid).values_list(
                 "message", flat=True
             )
         )
-        # The load's status, not cli()'s answer: run_load_task reports success
-        # even when save_to_tiles failed.
+        # The load's status, not cli()'s answer: a load that fails validation still
+        # comes back as a success, so the UI can show its error report.
         actual = LoadEvent.objects.get(loadid=loadid).status
         self.assertEqual(actual, status, f"{response} {errors}")
         return loadid
+
+    def _read(self, path):
+        module = ETLModule.objects.get(slug="arches-json-importer")
+        importer = ArchesJsonImporter(
+            loadid=str(uuid.uuid4()), params={"module": str(module.etlmoduleid)}
+        )
+        importer.start(importer.request)
+
+        def cleanup():
+            if default_storage.exists(importer.temp_dir):
+                importer.delete_from_default_storage(importer.temp_dir)
+
+        self.addCleanup(cleanup)
+        return importer.read(source=path)
+
+    def test_a_failed_write_is_reported_as_a_failure(self):
+        monument = uuid.uuid4()
+        with patch.object(
+            ArchesJsonImporter, "_acquire_trigger_lock", return_value=False
+        ):
+            loadid, response = self._cli(
+                _resource(monument, _tile(STRING_NODE, _text("Monument 17")))
+            )
+
+        self.assertFalse(response["success"])
+        self.assertIn("Try again when it finishes", response["data"]["message"])
+        self.assertEqual(LoadEvent.objects.get(loadid=loadid).status, "failed")
+
+    def test_a_rejected_upload_says_why_and_closes_the_file(self):
+        opened = []
+
+        def tracking_open(*args, **kwargs):
+            opened.append(open(*args, **kwargs))
+            return opened[-1]
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "notes.txt")
+            with open(path, "w") as f:
+                f.write("not an export")
+            with patch(
+                "arches.app.etl_modules.arches_json_importer.open",
+                tracking_open,
+                create=True,
+            ):
+                response = self._read(path)
+
+        self.assertEqual(response["data"]["title"], "Invalid file")
+        self.assertTrue(opened and all(f.closed for f in opened))
 
     def _errors(self, loadid):
         return " | ".join(
@@ -561,17 +613,6 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
                 self.assertEqual(File.objects.get(fileid=plan).tile_id, owner)
 
     def test_a_zip_lists_the_files_it_ignores(self):
-        module = ETLModule.objects.get(slug="arches-json-importer")
-        importer = ArchesJsonImporter(
-            loadid=str(uuid.uuid4()), params={"module": str(module.etlmoduleid)}
-        )
-        importer.start(importer.request)
-
-        def cleanup():
-            if default_storage.exists(importer.temp_dir):
-                importer.delete_from_default_storage(importer.temp_dir)
-
-        self.addCleanup(cleanup)
         with tempfile.TemporaryDirectory() as tmp:
             path = os.path.join(tmp, "export.zip")
             with zipfile.ZipFile(path, "w") as zf:
@@ -579,7 +620,7 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
                     "export.json", json.dumps({"business_data": {"resources": []}})
                 )
                 zf.writestr("photo.png", base64.b64decode(ONE_PIXEL_PNG))
-            response = importer.read(source=path)
+            response = self._read(path)
 
         self.assertIn("data", response, response)
         self.assertEqual(response["data"]["summary"]["ignored_files"], 1)

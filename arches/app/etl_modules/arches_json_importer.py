@@ -175,35 +175,39 @@ class ArchesJsonImporter(BaseImportModule):
             }
         }
 
-        validator = FileValidator()
-        extension = content.name.split(".")[-1].lower()
-        if extension not in ("json", "jsonl", "zip"):
-            return {
-                "status": 400,
-                "success": False,
-                "title": _("Invalid file"),
-                "message": _("Upload a .json, .jsonl or .zip file"),
-            }
-        if extension == "zip" and validator.validate_file_type(content, extension):
-            return {
-                "status": 400,
-                "success": False,
-                "title": _("Invalid zip file"),
-                "message": _("Upload a valid .zip file"),
-            }
+        try:
+            validator = FileValidator()
+            extension = content.name.split(".")[-1].lower()
+            if extension not in ("json", "jsonl", "zip"):
+                return {
+                    "success": False,
+                    "data": {
+                        "title": _("Invalid file"),
+                        "message": _("Upload a .json, .jsonl or .zip file"),
+                    },
+                }
+            if extension == "zip" and validator.validate_file_type(content, extension):
+                return {
+                    "success": False,
+                    "data": {
+                        "title": _("Invalid zip file"),
+                        "message": _("Upload a valid .zip file"),
+                    },
+                }
 
-        if extension == "zip":
-            self._read_zip(content, result)
-        else:
-            self.cumulative_files_size += content.size
-            result["summary"]["files"][content.name] = {
-                "size": self.filesize_format(content.size)
-            }
-            default_storage.save(
-                os.path.join(self.temp_dir, content.name), DjangoFile(content)
-            )
-        result["summary"]["cumulative_files_size"] = self.cumulative_files_size
-        content.file.close()
+            if extension == "zip":
+                self._read_zip(content, result)
+            else:
+                self.cumulative_files_size += content.size
+                result["summary"]["files"][content.name] = {
+                    "size": self.filesize_format(content.size)
+                }
+                default_storage.save(
+                    os.path.join(self.temp_dir, content.name), DjangoFile(content)
+                )
+            result["summary"]["cumulative_files_size"] = self.cumulative_files_size
+        finally:
+            content.file.close()
 
         if not result["summary"]["files"]:
             return {
@@ -1003,13 +1007,14 @@ class ArchesJsonImporter(BaseImportModule):
                 status="failed", load_end_time=timezone.now(), error_message=contention
             )
             return {
-                "status": 409,
                 "success": False,
-                "title": _("Another bulk load is running"),
-                "message": _(
-                    "Tile triggers are disabled database-wide during a bulk load, "
-                    "so only one may run at a time. Try again when it finishes."
-                ),
+                "data": {
+                    "title": _("Another bulk load is running"),
+                    "message": _(
+                        "Tile triggers are disabled database-wide during a bulk load, "
+                        "so only one may run at a time. Try again when it finishes."
+                    ),
+                },
             }
 
         try:
@@ -1036,10 +1041,8 @@ class ArchesJsonImporter(BaseImportModule):
                 status="failed", load_end_time=timezone.now(), error_message=str(e)
             )
             return {
-                "status": 400,
                 "success": False,
-                "title": _("Failed to complete load"),
-                "message": str(e),
+                "data": {"title": _("Failed to complete load"), "message": str(e)},
             }
         finally:
             self._release_trigger_lock(cursor)

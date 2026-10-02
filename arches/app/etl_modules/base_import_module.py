@@ -269,9 +269,18 @@ class BaseImportModule:
                 self.check_tile_cardinality(cursor)
                 result["validation"] = self.validate(loadid)
                 if len(result["validation"]["data"]) == 0:
-                    self.save_to_tiles(
+                    written = self.save_to_tiles(
                         cursor, userid, loadid, multiprocessing, max_subprocesses, index
                     )
+                    if written and written.get("success") is False:
+                        return {
+                            "success": False,
+                            "data": written.get("data")
+                            or {
+                                "title": written.get("title"),
+                                "message": written.get("message"),
+                            },
+                        }
                     # Multiprocessed indexing calls connections.close_all(), which
                     # invalidates the cursor opened above. Re-acquire one (Django
                     # reconnects lazily) for the post-index refresh.
