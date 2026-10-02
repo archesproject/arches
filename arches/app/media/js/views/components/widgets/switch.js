@@ -51,7 +51,7 @@ var SwitchWidget = function(params) {
 
 
     this.setvalue = this.config().setvalue || function(self, evt){
-        if (ko.unwrap(self.disabled) === false) {
+        if (ko.unwrap(self.disable) === false) {
             if(self.value() === self.on){
                 self.value(self.null);
             }else if (self.value() === self.null) {

@@ -251,7 +251,7 @@ var viewModel = function(params) {
     }
 
     this.disableDrawing = ko.computed(function() {
-        return !self.canvas();
+        return !self.canvas() || !!ko.unwrap(self.disable);
     });
 
     this.showFeature = function(feature) {
@@ -276,6 +276,7 @@ var viewModel = function(params) {
 
     var editingFeature;
     this.editFeature = function(feature) {
+        if (ko.unwrap(self.disable)) { return; }
         var layers = editItems.getLayers()[0].getLayers();
         if (self.manifest() !== feature.properties.manifest) {
             self.manifest(feature.properties.manifest);
@@ -288,6 +289,7 @@ var viewModel = function(params) {
     };
 
     this.deleteFeature = function(feature) {
+        if (ko.unwrap(self.disable)) { return; }
         drawFeatures().forEach(function(drawFeature) {
             if (drawFeature.id === feature.id) drawFeatures.remove(drawFeature);
         });
