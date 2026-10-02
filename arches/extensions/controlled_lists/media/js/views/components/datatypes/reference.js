@@ -3,6 +3,7 @@ import arches from "arches";
 import Cookies from "js-cookie";
 import referenceSelect from "viewmodels/reference-select";
 import referenceDatatypeTemplate from "templates/views/components/datatypes/reference.htm";
+import "bindings/select2-query";
 
 const viewModel = function (params) {
     const self = this;
