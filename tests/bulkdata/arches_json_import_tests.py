@@ -723,6 +723,21 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
             list(deleted.values_list("tileinstanceid", flat=True)), [str(sketch_tile)]
         )
 
+    def test_overwrite_reattaches_a_file_a_failed_overwrite_left_unhooked(self):
+        monument, plan_tile = uuid.uuid4(), uuid.uuid4()
+        plan = str(uuid.uuid4())
+        self._load(
+            _resource(monument, _tile(FILE_NODE, [_file(plan, "plan.pdf")], plan_tile))
+        )
+        File.objects.filter(fileid=plan).update(tile=None)
+
+        self._load(
+            _resource(monument, _tile(FILE_NODE, [_file(plan, "plan.pdf")], plan_tile)),
+            overwrite=True,
+        )
+
+        self.assertEqual(File.objects.get(fileid=plan).tile_id, plan_tile)
+
     def _reverse(self, loadid):
         request = HttpRequest()
         request.method = "POST"

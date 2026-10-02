@@ -764,7 +764,8 @@ class ArchesJsonImporter(BaseImportModule):
                 "fileid", "tile__resourceinstance_id"
             ):
                 resourceid, source = file_owners.get(str(fileid), (None, None))
-                if self._overwrite and str(owner) == str(resourceid):
+                # owner is None when a failed overwrite load unhooked it before re-pointing
+                if self._overwrite and (owner is None or str(owner) == resourceid):
                     continue
                 failures.append(
                     self._failure(
