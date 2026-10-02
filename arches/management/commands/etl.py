@@ -50,6 +50,14 @@ class Command(BaseCommand):
             help="The configuration for the etl-module to run",
         )
         parser.add_argument(
+            "-ow",
+            "--overwrite",
+            action="store_true",
+            dest="overwrite",
+            default=False,
+            help="Replace resources that already exist instead of failing on them",
+        )
+        parser.add_argument(
             "-mp",
             "--use_multiprocessing",
             action="store_true",
@@ -81,6 +89,7 @@ class Command(BaseCommand):
             config=options["config"],
             use_multiprocessing=options["use_multiprocessing"],
             max_subprocesses=options["max_subprocesses"],
+            overwrite=options["overwrite"],
             index=options["index"],
         )
 
@@ -91,12 +100,13 @@ class Command(BaseCommand):
         config,
         use_multiprocessing=False,
         max_subprocesses=0,
+        overwrite=False,
         index=True,
     ):
         """
         Run the specified module
-        Params --source(-s), --config(-c), --use_multiprocessing(-mp),
-        --max_subprocesses(-mxp), and --no-index
+        Params --source(-s), --config(-c), --overwrite(-ow), --no-index,
+        --use_multiprocessing(-mp), and --max_subprocesses(-mxp)
 
         """
         loadid = str(uuid.uuid4())
@@ -107,6 +117,7 @@ class Command(BaseCommand):
             config = {}
         config["multiprocessing"] = use_multiprocessing
         config["max_subprocesses"] = max_subprocesses
+        config["overwrite"] = overwrite
         config["index"] = index
         try:
             etl_module = ETLModule.objects.get(componentname=module)
