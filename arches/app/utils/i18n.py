@@ -10,6 +10,7 @@ from arches.app.models.fields.i18n import I18n_String
 from arches.app.models.models import (
     CardModel,
     CardXNodeXWidget,
+    GraphModel,
     Language,
     PublishedGraph,
 )
@@ -211,6 +212,9 @@ class ArchesPOWriter:
         """Populates a PO file with entries from several arches graph tables"""
         self.populate_from_card_x_node_x_widget(CardXNodeXWidget.objects.all())
         self.populate_from_cards(CardModel.objects.all())
+        self.populate_from_graphs(
+            GraphModel.objects.filter(source_identifier__isnull=True)
+        )
 
         self.pofile.save()
 
@@ -235,6 +239,15 @@ class ArchesPOWriter:
                 self.append(row.instructions, "cards")
                 self.append(row.helptitle, "cards")
                 self.append(row.helptext, "cards")
+            except KeyError:
+                pass
+
+    def populate_from_graphs(self, queryset):
+        for row in queryset:
+            try:
+                self.append(row.name, "graphs")
+                self.append(row.subtitle, "graphs")
+                self.append(row.description, "graphs")
             except KeyError:
                 pass
 
@@ -279,8 +292,11 @@ class ArchesPOLoader:
 
     def load(self):
         """Iterates through database, Loading translations from PO files"""
+        from arches.app.models.graph import Graph  # avoids circular import
+
         cards_x_nodes_x_widgets = CardXNodeXWidget.objects.all()
         cards = CardModel.objects.all()
+        graphs = GraphModel.objects.filter(source_identifier__isnull=True)
 
         # if lang and target lang are the same, msgstr will always be empty; do not load
         if self.id_language == self.target_language:
@@ -310,6 +326,16 @@ class ArchesPOLoader:
             self.update_i18n_string_cell(row.helptext)
 
             row.save()
+
+        for row in graphs:
+            self.update_i18n_string_cell(row.name)
+            self.update_i18n_string_cell(row.subtitle)
+            self.update_i18n_string_cell(row.description)
+
+            row.save()
+
+            if row.publication_id:
+                Graph.objects.get(pk=row.pk).update_published_graphs()
 
     def update_i18n_string_cell(self, cell: I18n_String):
         """Updates an i18n string field with a translated language value"""

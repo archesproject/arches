@@ -5,7 +5,8 @@ from unittest.case import TestCase
 import polib
 import importlib
 from arches.app.models.fields.i18n import I18n_String, I18n_JSON
-from arches.app.models.models import CardModel, CardXNodeXWidget
+from arches.app.models.graph import Graph
+from arches.app.models.models import CardModel, CardXNodeXWidget, GraphModel
 from arches.app.utils.i18n import ArchesPOFileFetcher, ArchesPOLoader, ArchesPOWriter
 from arches.app.models.system_settings import settings
 from unittest.mock import Mock, MagicMock
@@ -18,6 +19,8 @@ class PoFileTests(TestCase):
     def setUp(self):
         self.cardxnodexwidget_all = CardXNodeXWidget.objects.all
         self.cardmodel_all = CardModel.objects.all
+        self.graphmodel_filter = GraphModel.objects.filter
+        self.graph_get = Graph.objects.get
         self.open = builtins.open
         self.mkdir = pathlib.Path.mkdir
         self.pofactory = polib.pofile
@@ -26,6 +29,8 @@ class PoFileTests(TestCase):
     def tearDown(self):
         CardXNodeXWidget.objects.all = self.cardxnodexwidget_all
         CardModel.objects.all = CardModel.objects.all
+        GraphModel.objects.filter = self.graphmodel_filter
+        Graph.objects.get = self.graph_get
         builtins.open = self.open
         pathlib.Path.mkdir = self.mkdir
         polib.pofile = self.pofactory
@@ -35,11 +40,15 @@ class PoFileTests(TestCase):
         m_po_file = Mock(polib.POFile)
         m_all_method = Mock()
         m_all_method.return_value = []
+        m_filter_method = Mock()
+        m_filter_method.return_value = []
         writer = ArchesPOWriter(m_po_file, "en", "en")
         CardXNodeXWidget.objects.all = m_all_method
         CardModel.objects.all = m_all_method
+        GraphModel.objects.filter = m_filter_method
         writer.populate()
         self.assertEqual(m_all_method.call_count, 2)
+        m_filter_method.assert_called_once_with(source_identifier__isnull=True)
 
     def test_populate_from_card_x_node_x_widget(self):
         "Test to ensure PO Entries are appended with appropriate english messageids (no translations)"
@@ -125,6 +134,48 @@ class PoFileTests(TestCase):
             m_po_file.append.call_args_list[4][0][0].msgstr, "título de la ayuda"
         )
 
+    def test_populate_from_graphs(self):
+        "Test to ensure PO Entries are appended for graph name/subtitle/description"
+        m_po_file = Mock(polib.POFile)
+        writer = ArchesPOWriter(m_po_file, "en", "en")
+        model = MagicMock(GraphModel)
+        name_dict = {"en": "name"}
+        subtitle_dict = {"en": "subtitle"}
+        description_dict = {"en": "description"}
+        model.name.__getitem__.side_effect = name_dict.__getitem__
+        model.subtitle.__getitem__.side_effect = subtitle_dict.__getitem__
+        model.description.__getitem__.side_effect = description_dict.__getitem__
+        writer.populate_from_graphs([model])
+        self.assertEqual(m_po_file.append.call_count, 3)
+        self.assertEqual(m_po_file.append.call_args_list[0][0][0].msgid, "name")
+        self.assertEqual(m_po_file.append.call_args_list[0][0][0].msgstr, "")
+        self.assertEqual(m_po_file.append.call_args_list[1][0][0].msgid, "subtitle")
+        self.assertEqual(m_po_file.append.call_args_list[2][0][0].msgid, "description")
+        self.assertEqual(m_po_file.append.call_args_list[2][0][0].msgstr, "")
+
+    def test_populate_from_graphs_spanish(self):
+        "Test to ensure PO Entries are appended with appropriate spanish translations for graphs"
+        m_po_file = Mock(polib.POFile)
+        writer = ArchesPOWriter(m_po_file, "en", "es")
+        model = MagicMock(GraphModel)
+        name_dict = {"en": "name", "es": "nombre"}
+        subtitle_dict = {"en": "subtitle", "es": "subtítulo"}
+        description_dict = {"en": "description", "es": "descripción"}
+        model.name.__getitem__.side_effect = name_dict.__getitem__
+        model.name.__contains__.side_effect = name_dict.__contains__
+        model.subtitle.__getitem__.side_effect = subtitle_dict.__getitem__
+        model.subtitle.__contains__.side_effect = subtitle_dict.__contains__
+        model.description.__getitem__.side_effect = description_dict.__getitem__
+        model.description.__contains__.side_effect = description_dict.__contains__
+        writer.populate_from_graphs([model])
+        self.assertEqual(m_po_file.append.call_count, 3)
+        self.assertEqual(m_po_file.append.call_args_list[0][0][0].msgid, "name")
+        self.assertEqual(m_po_file.append.call_args_list[0][0][0].msgstr, "nombre")
+        self.assertEqual(m_po_file.append.call_args_list[1][0][0].msgid, "subtitle")
+        self.assertEqual(m_po_file.append.call_args_list[1][0][0].msgstr, "subtítulo")
+        self.assertEqual(m_po_file.append.call_args_list[2][0][0].msgid, "description")
+        self.assertEqual(m_po_file.append.call_args_list[2][0][0].msgstr, "descripción")
+
     def test_po_write_duplicate_exception_caught(self):
         def throw_value_error(val):
             raise ValueError()
@@ -166,11 +217,19 @@ class PoFileTests(TestCase):
         m_all_method_cardmodel.return_value = [m_card]
         CardModel.objects.all = m_all_method_cardmodel
 
+        m_filter_method_graphmodel = Mock()
+        m_graph = MagicMock(GraphModel)
+        m_graph.publication_id = None
+        m_graph.save.return_value = None
+        m_filter_method_graphmodel.return_value = [m_graph]
+        GraphModel.objects.filter = m_filter_method_graphmodel
+
         loader = ArchesPOLoader(m_po_file, "en", "es")
         loader.load()
 
         m_card.save.assert_called()
         m_cardxnodexwidget.save.assert_called()
+        m_graph.save.assert_called()
 
     def test_malformed_i18n_properties(self):
         """missing i18n_properties"""
@@ -192,6 +251,10 @@ class PoFileTests(TestCase):
         m_card.save.return_value = None
         m_all_method_cardmodel.return_value = [m_card]
         CardModel.objects.all = m_all_method_cardmodel
+
+        m_filter_method_graphmodel = Mock()
+        m_filter_method_graphmodel.return_value = []
+        GraphModel.objects.filter = m_filter_method_graphmodel
 
         loader = ArchesPOLoader(m_po_file, "en", "es")
         loader.load()
@@ -228,6 +291,16 @@ class PoFileTests(TestCase):
         m_all_method_cardxnodexwidgets.return_value = [m_cardxnodexwidget]
         CardXNodeXWidget.objects.all = m_all_method_cardxnodexwidgets
 
+        m_filter_method_graphmodel = Mock()
+        m_graph = MagicMock(GraphModel)
+        m_graph.publication_id = None
+        m_graph.save.return_value = None
+        m_graph.name = m_i18n_string
+        m_graph.subtitle = m_i18n_string
+        m_graph.description = m_i18n_string
+        m_filter_method_graphmodel.return_value = [m_graph]
+        GraphModel.objects.filter = m_filter_method_graphmodel
+
         loader = ArchesPOLoader(m_po_file, "en", "es")
         CardXNodeXWidget.objects.all = m_all_method_cardxnodexwidgets
         CardModel.objects.all = m_all_method_cardmodel
@@ -235,7 +308,8 @@ class PoFileTests(TestCase):
 
         m_card.save.assert_called()
         m_cardxnodexwidget.save.assert_called()
-        self.assertEqual(m_i18n_string.pop.call_count, 1)
+        m_graph.save.assert_called()
+        self.assertEqual(m_i18n_string.pop.call_count, 4)
 
     def test_arches_po_loader_removal(self):
         """Tests removing entries from the database when PO entry is empty string"""
@@ -266,6 +340,16 @@ class PoFileTests(TestCase):
         m_all_method_cardxnodexwidgets.return_value = [m_cardxnodexwidget]
         CardXNodeXWidget.objects.all = m_all_method_cardxnodexwidgets
 
+        m_filter_method_graphmodel = Mock()
+        m_graph = MagicMock(GraphModel)
+        m_graph.publication_id = None
+        m_graph.save.return_value = None
+        m_graph.name = m_i18n_string
+        m_graph.subtitle = m_i18n_string
+        m_graph.description = m_i18n_string
+        m_filter_method_graphmodel.return_value = [m_graph]
+        GraphModel.objects.filter = m_filter_method_graphmodel
+
         loader = ArchesPOLoader(m_po_file, "en", "es")
         CardXNodeXWidget.objects.all = m_all_method_cardxnodexwidgets
         CardModel.objects.all = m_all_method_cardmodel
@@ -273,11 +357,12 @@ class PoFileTests(TestCase):
 
         m_card.save.assert_called()
         m_cardxnodexwidget.save.assert_called()
-        self.assertEqual(m_i18n_string.pop.call_count, 1)
+        m_graph.save.assert_called()
+        self.assertEqual(m_i18n_string.pop.call_count, 4)
 
         i18n_json_dict["test2"] = m_i18n_string
         loader.load()
-        self.assertEqual(m_i18n_string.pop.call_count, 3)
+        self.assertEqual(m_i18n_string.pop.call_count, 9)
 
         # test that a msgid key won't blow up the whole import
         loader = ArchesPOLoader(m_po_file, "ar", "es")
@@ -303,6 +388,12 @@ class PoFileTests(TestCase):
         m_cardxnodexwidget.save.return_value = None
         m_all_method_cardxnodexwidgets.return_value = [m_cardxnodexwidget]
 
+        m_filter_method_graphmodel = Mock()
+        m_graph = MagicMock(GraphModel)
+        m_graph.save.return_value = None
+        m_filter_method_graphmodel.return_value = [m_graph]
+        GraphModel.objects.filter = m_filter_method_graphmodel
+
         loader = ArchesPOLoader(m_po_file, "en", "en")
         CardXNodeXWidget.objects.all = m_all_method_cardxnodexwidgets
         CardModel.objects.all = m_all_method_cardmodel
@@ -310,6 +401,67 @@ class PoFileTests(TestCase):
 
         m_card.save.assert_not_called()
         m_cardxnodexwidget.save.assert_not_called()
+        m_graph.save.assert_not_called()
+
+    def test_arches_po_loader_republishes_graph(self):
+        """When a graph has a publication_id, the loader should auto-republish."""
+        m_po_file = MagicMock(polib.POFile)
+
+        m_all_method_cardxnodexwidgets = Mock()
+        m_all_method_cardxnodexwidgets.return_value = []
+        CardXNodeXWidget.objects.all = m_all_method_cardxnodexwidgets
+
+        m_all_method_cardmodel = Mock()
+        m_all_method_cardmodel.return_value = []
+        CardModel.objects.all = m_all_method_cardmodel
+
+        m_filter_method_graphmodel = Mock()
+        m_graph = MagicMock(GraphModel)
+        m_graph.pk = "some-uuid"
+        m_graph.publication_id = "some-uuid"
+        m_graph.save.return_value = None
+        m_filter_method_graphmodel.return_value = [m_graph]
+        GraphModel.objects.filter = m_filter_method_graphmodel
+
+        m_graph_get = Mock()
+        m_published_graph = MagicMock(Graph)
+        m_graph_get.return_value = m_published_graph
+        Graph.objects.get = m_graph_get
+
+        loader = ArchesPOLoader(m_po_file, "en", "es")
+        loader.load()
+
+        m_graph.save.assert_called()
+        m_graph_get.assert_called_once_with(pk="some-uuid")
+        m_published_graph.update_published_graphs.assert_called_once()
+
+    def test_arches_po_loader_skips_republish_when_no_publication(self):
+        """When a graph has no publication_id, the loader should not call Graph.objects.get."""
+        m_po_file = MagicMock(polib.POFile)
+
+        m_all_method_cardxnodexwidgets = Mock()
+        m_all_method_cardxnodexwidgets.return_value = []
+        CardXNodeXWidget.objects.all = m_all_method_cardxnodexwidgets
+
+        m_all_method_cardmodel = Mock()
+        m_all_method_cardmodel.return_value = []
+        CardModel.objects.all = m_all_method_cardmodel
+
+        m_filter_method_graphmodel = Mock()
+        m_graph = MagicMock(GraphModel)
+        m_graph.publication_id = None
+        m_graph.save.return_value = None
+        m_filter_method_graphmodel.return_value = [m_graph]
+        GraphModel.objects.filter = m_filter_method_graphmodel
+
+        m_graph_get = Mock()
+        Graph.objects.get = m_graph_get
+
+        loader = ArchesPOLoader(m_po_file, "en", "es")
+        loader.load()
+
+        m_graph.save.assert_called()
+        m_graph_get.assert_not_called()
 
     def test_get_all_po_files(self):
         fetcher = ArchesPOFileFetcher()
