@@ -68,6 +68,12 @@ ko.bindingHandlers.datepicker = {
             };
         }
 
+        element.addEventListener('change', function (event) {
+            if (event.detail) {
+                event.stopImmediatePropagation();
+            }
+        }, true);
+
         const picker = new TempusDominus(element, buildPickerOptions());
 
         /** Writes the moment-formatted string to both the input and the observable. */
