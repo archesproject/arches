@@ -1038,7 +1038,7 @@ class ArchesJsonImporter(BaseImportModule):
                 },
             }
 
-        written, failing = 0, None
+        written, failing, removed = 0, None, False
         try:
             log_event_details(cursor, loadid, "done|Saving the tiles...")
             # The etl-manager badge reads load_event.status alone, and "running"
@@ -1054,6 +1054,11 @@ class ArchesJsonImporter(BaseImportModule):
 
                 log_event_details(cursor, loadid, "done|Refreshing relationships...")
                 self._post_process(loadid)
+            except Exception:
+                if not self._overwrite:
+                    self._remove_written(loadid)
+                    removed = True
+                raise
             finally:
                 reenable_tile_triggers(cursor, loadid)
         except Exception as e:
@@ -1065,12 +1070,10 @@ class ArchesJsonImporter(BaseImportModule):
                     "Wrote {} of {} resources; the chunk starting at resource {} (#{}) "
                     "failed: {}"
                 ).format(written, total, failing, written + 1, e)
-                if written:
-                    message += " " + (
-                        _("Run the same file again to finish.")
-                        if self._overwrite
-                        else _("Undo the load to remove what was written.")
-                    )
+            if removed:
+                message += " " + _("Nothing from this load was kept.")
+            elif written:
+                message += " " + _("Run the same file again to finish.")
             # This branch returns a dict rather than raising, so nothing else
             # records the reason and the report reads "no errors found".
             LoadEvent.objects.filter(loadid=loadid).update(
@@ -1224,6 +1227,22 @@ class ArchesJsonImporter(BaseImportModule):
                 if isinstance(item, dict) and item.get("file_id"):
                     file_ids.append(str(item["file_id"]).lower())
         return file_ids
+
+    # Only for a load without overwrite: pass 1 proved every resource new and
+    # _post_process never committed, so resource and tile rows are all it wrote.
+    @staticmethod
+    def _remove_written(loadid):
+        created = (
+            "SELECT resourceinstanceid::uuid FROM edit_log "
+            "WHERE transactionid = %s AND edittype = 'create'"
+        )
+        with transaction.atomic(), connection.cursor() as cursor:
+            for table in ("tiles", "resource_instances"):
+                cursor.execute(
+                    f"DELETE FROM {table} WHERE resourceinstanceid IN ({created})",
+                    [loadid],
+                )
+            cursor.execute("DELETE FROM edit_log WHERE transactionid = %s", [loadid])
 
     # Overwrite replaces a resource's tiles, never the resource itself: deleting
     # the resource would cascade away links into it from resources outside the load.

@@ -21,8 +21,9 @@
             <p>
                 {% blocktrans %}The file is read twice: once to validate every resource, once to write.
                 If validation finds any error nothing is written, and the problems appear in the
-                standard error report. A load that fails while writing keeps the resources written
-                before the failure, and its message says how far it got.{% endblocktrans %}
+                standard error report. If writing fails, everything the load wrote is removed again and
+                its message says where it failed. A load replacing existing resources keeps what it
+                replaced before the failure; run the same file again to finish it.{% endblocktrans %}
             </p>
             <p>
                 {% blocktrans %}Tick <strong>Replace resources that already exist</strong> to replace

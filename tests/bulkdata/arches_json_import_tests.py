@@ -798,6 +798,21 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
         self.assertIn("cannot be undone", response["data"]["message"])
         self.assertTrue(TileModel.objects.filter(resourceinstance_id=monument).exists())
 
+    def test_a_failure_after_every_chunk_is_written_keeps_nothing(self):
+        monument = uuid.uuid4()
+        with patch.object(
+            ArchesJsonImporter, "_post_process", side_effect=RuntimeError("conflict")
+        ):
+            loadid = self._load(
+                _resource(monument, _tile(STRING_NODE, _text("Monument 17"))),
+                status="failed",
+            )
+
+        self.assertFalse(ResourceInstance.objects.filter(pk=monument).exists())
+        self.assertFalse(
+            TileModel.objects.filter(resourceinstance_id=monument).exists()
+        )
+
     def test_a_write_failure_says_how_far_it_got(self):
         first, second, third = uuid.uuid4(), uuid.uuid4(), uuid.uuid4()
         real_chunks = ArchesJsonImporter._iter_resource_chunks
@@ -831,12 +846,16 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
             "failed: disk full",
             message,
         )
-        self.assertIn("Undo the load", message)
+        self.assertIn("Nothing from this load was kept", message)
+        self.assertFalse(ResourceInstance.objects.filter(pk=first).exists())
+        self.assertFalse(EditLog.objects.filter(transactionid=loadid).exists())
+
+        self._load(
+            *(
+                _resource(r, _tile(STRING_NODE, _text("Monument")))
+                for r in (first, second, third)
+            )
+        )
         self.assertEqual(
-            list(
-                ResourceInstance.objects.filter(
-                    pk__in=[first, second, third]
-                ).values_list("pk", flat=True)
-            ),
-            [first],
+            ResourceInstance.objects.filter(pk__in=[first, second, third]).count(), 3
         )
