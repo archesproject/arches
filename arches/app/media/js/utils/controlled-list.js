@@ -3,10 +3,11 @@ import ko from 'knockout';
 import arches from 'arches';
 
 /**
- * Utilities for reading controlled lists (provided by the arches_controlled_lists
- * application) without taking a hard dependency on it. Everything here is routed
- * through arches.urls, which that application contributes, so callers must check
- * isAvailable() before offering a controlled list as an option.
+ * Utilities for reading controlled lists (provided by the
+ * arches.extensions.controlled_lists application) without taking a hard
+ * dependency on it. Everything here is routed through arches.urls, which that
+ * application contributes, so callers must check isAvailable() before offering
+ * a controlled list as an option.
  */
 
 const listCache = {};
