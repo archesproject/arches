@@ -957,9 +957,10 @@ class Resource(models.ResourceInstance):
 
         # Fetch pref labels for relationship types in bulk.
         relationship_types = {
-            relation["relationshiptype"]
+            relation[key]
             for relation in permitted_relation_dicts
-            if relation["relationshiptype"]
+            for key in ("relationshiptype", "inverserelationshiptype")
+            if relation[key]
         }
 
         preflabel_lookup = get_resource_relationship_type_label(
@@ -969,6 +970,10 @@ class Resource(models.ResourceInstance):
         for relation in permitted_relation_dicts:
             relation["relationshiptype_label"] = preflabel_lookup.get(
                 relation["relationshiptype"], relation["relationshiptype"] or ""
+            )
+            relation["inverserelationshiptype_label"] = preflabel_lookup.get(
+                relation["inverserelationshiptype"],
+                relation["inverserelationshiptype"] or "",
             )
 
             ret["resource_relationships"].append(relation)

@@ -1054,10 +1054,9 @@ class RelatedResourcesView(BaseManagerView):
         page = paginator.page(page)
 
         def parse_relationshiptype_label(relationship):
-            if relationship["relationshiptype_label"].startswith("http"):
-                relationship["relationshiptype_label"] = relationship[
-                    "relationshiptype_label"
-                ].rsplit("/")[-1]
+            for key in ("relationshiptype_label", "inverserelationshiptype_label"):
+                if relationship.get(key, "").startswith("http"):
+                    relationship[key] = relationship[key].rsplit("/")[-1]
             return relationship
 
         related_resources["resource_relationships"] = [

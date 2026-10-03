@@ -74,13 +74,16 @@ const viewModel = function(params) {
         return filteredNodes;
     });
     // strips URL from relationship labels, if present, for presentation
-    var getRelationshipLabel = function(edgeData) {
-        var label;
+    var getRelationshipLabel = function(edgeData, inverse) {
+        var label = edgeData.relationshiptype_label;
+        if (inverse && edgeData.inverserelationshiptype_label) {
+            label = edgeData.inverserelationshiptype_label;
+        }
         try {
-            var url = new window.URL(edgeData.relationshiptype_label);
+            var url = new window.URL(label);
             label = url.pathname.split('/')[url.pathname.split('/').length - 1];
         } catch (e) {
-            label = edgeData.relationshiptype_label;
+            // not a URL, use the label as-is
         }
         return label;
     };
@@ -95,7 +98,9 @@ const viewModel = function(params) {
             var addRelationship = function(edge, nodeType) {
                 var edgeData = edge.data();
                 var nodeData = edge[nodeType]().data();
-                var label = getRelationshipLabel(edgeData);
+                // when the selected node is the edge's target, describe the
+                // relationship from its side using the inverse label
+                var label = getRelationshipLabel(edgeData, nodeType === 'source');
 
                 relationships.push({
                     label: label,
