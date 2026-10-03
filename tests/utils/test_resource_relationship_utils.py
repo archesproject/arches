@@ -10,7 +10,7 @@ import uuid
 # these tests can be run from the command line via
 # python manage.py test tests.utils.test_resource_relationship_utils --settings="tests.test_settings"
 
-CONTROLLED_LISTS_INSTALLED = apps.is_installed("arches_controlled_lists")
+CONTROLLED_LISTS_INSTALLED = apps.is_installed("arches.extensions.controlled_lists")
 
 
 class ResourceRelationshipUtilsTests(TestCase):
@@ -27,13 +27,17 @@ class ResourceRelationshipUtilsTests(TestCase):
 
 
 @unittest.skipUnless(
-    CONTROLLED_LISTS_INSTALLED, "requires the arches_controlled_lists application"
+    CONTROLLED_LISTS_INSTALLED, "requires the controlled_lists application"
 )
 class ReferenceRelationshipTypeLabelTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        from arches_controlled_lists.models import List, ListItem, ListItemValue
+        from arches.extensions.controlled_lists.models import (
+            List,
+            ListItem,
+            ListItemValue,
+        )
 
         cls.list = List.objects.create(name="Relationship Types")
         # a uri that doesn't end in the item id, as imported vocabularies have
