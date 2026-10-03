@@ -69,14 +69,16 @@ def _get_list_item_labels(relationship_types, lang):
     a node config can be stale or belong to another environment. Fall back to
     matching the item id, which is the trailing segment of a generated uri.
 
-    Returns nothing when the arches_controlled_lists application isn't installed,
+    Returns nothing when the controlled_lists application isn't installed,
     the same soft dependency the frontend takes (see utils/controlled-list.js).
     """
-    if not relationship_types or not apps.is_installed("arches_controlled_lists"):
+    if not relationship_types or not apps.is_installed(
+        "arches.extensions.controlled_lists"
+    ):
         return {}
 
-    # imported here because arches_controlled_lists imports from arches.app.models
-    from arches_controlled_lists.models import ListItem
+    # imported here because controlled_lists imports from arches.app.models
+    from arches.extensions.controlled_lists.models import ListItem
 
     relationship_types_by_item_id = defaultdict(list)
     for relationship_type in relationship_types:
