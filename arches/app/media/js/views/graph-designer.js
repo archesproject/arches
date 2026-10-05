@@ -621,7 +621,8 @@ var GraphDesignerView = BaseManagerView.extend({
         });
 
         viewModel.permissionsDesigner = new PermissionDesigner({
-            cardTree: viewModel.permissionTree
+            cardTree: viewModel.permissionTree,
+            alert: viewModel.alert
         });
 
         viewModel.graphSettingsViewModel = new GraphSettingsViewModel({
@@ -854,7 +855,6 @@ var GraphDesignerView = BaseManagerView.extend({
         document.addEventListener('reorderCards', () => viewModel.graphHasUnpublishedChanges(true));
         document.addEventListener('cardSave', () => viewModel.graphHasUnpublishedChanges(true));
         document.addEventListener('nodeSave', () => viewModel.graphHasUnpublishedChanges(true));
-        document.addEventListener('permissionsSave', () => viewModel.graphHasUnpublishedChanges(true));
         document.addEventListener('graphSettingsSave', () => viewModel.graphHasUnpublishedChanges(true));
         
         BaseManagerView.prototype.initialize.apply(this, arguments);

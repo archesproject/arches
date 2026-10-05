@@ -34,6 +34,8 @@ from django.http import HttpResponseNotFound, HttpResponse
 from django.views.generic import View, TemplateView
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
+from django.core.cache import caches
+from guardian.models import GroupObjectPermission, UserObjectPermission
 from django.utils import translation
 from django.core.exceptions import PermissionDenied
 from arches.app.utils.decorators import group_required
@@ -60,8 +62,6 @@ from arches.app.utils.permission_backend import (
     assign_perm,
     get_perms,
     remove_perm,
-    get_group_perms,
-    get_user_perms,
 )
 
 logger = logging.getLogger(__name__)
@@ -998,23 +998,16 @@ class FunctionManagerView(GraphBaseView):
 
 
 @method_decorator(group_required("Graph Editor"), name="dispatch")
+class PermissionDataError(Exception):
+    pass
+
+
 class PermissionDataView(View):
-    perm_cache = {}
     action = None
 
-    def get_perm_name(self, codename):
-        if codename not in self.perm_cache:
-            try:
-                self.perm_cache[codename] = Permission.objects.get(
-                    codename=codename,
-                    content_type__app_label="models",
-                    content_type__model="nodegroup",
-                )
-                return self.perm_cache[codename]
-            except:
-                return None
-                # codename for nodegroup probably doesn't exist
-        return self.perm_cache[codename]
+    def get_nodegroup_permissions(self):
+        content_type = ContentType.objects.get_for_model(models.NodeGroup)
+        return Permission.objects.filter(content_type=content_type)
 
     def get(self, request):
         if self.action == "get_permission_manager_data":
@@ -1044,94 +1037,237 @@ class PermissionDataView(View):
                     }
                 )
 
-            content_type = ContentType.objects.get_for_model(models.NodeGroup)
-            nodegroup_permissions = Permission.objects.filter(content_type=content_type)
-            ret = {"identities": identities, "permissions": nodegroup_permissions}
+            ret = {
+                "identities": identities,
+                "permissions": self.get_nodegroup_permissions(),
+            }
             return JSONResponse(ret)
 
-        nodegroup_ids = JSONDeserializer().deserialize(request.GET.get("nodegroupIds"))
-        identityId = request.GET.get("identityId")
-        identityType = request.GET.get("identityType")
+        try:
+            nodegroup_ids = [
+                str(uuid.UUID(str(nodegroup_id)))
+                for nodegroup_id in JSONDeserializer().deserialize(
+                    request.GET.get("nodegroupIds", "[]")
+                )
+            ]
+        except (TypeError, ValueError):
+            return JSONErrorResponse(
+                _("Invalid request"),
+                _("One or more nodegroup ids are invalid."),
+                status=HTTPStatus.BAD_REQUEST,
+            )
+        identity_id = request.GET.get("identityId")
+        identity_type = request.GET.get("identityType")
+
+        try:
+            if identity_type == "group":
+                identity = Group.objects.get(pk=identity_id)
+            else:
+                identity = User.objects.get(pk=identity_id)
+        except (Group.DoesNotExist, User.DoesNotExist, ValueError):
+            return JSONErrorResponse(
+                _("Identity not found"),
+                _("The selected group or account does not exist."),
+                status=HTTPStatus.NOT_FOUND,
+            )
+
+        return JSONResponse(
+            self.get_permissions_for_identity(identity, identity_type, nodegroup_ids)
+        )
+
+    def get_permissions_for_identity(self, identity, identity_type, nodegroup_ids):
+        """
+        Returns explicit and effective nodegroup permissions for an identity,
+        mirroring PermissionBackend.has_perm: explicit object permissions
+        (user + the user's groups) win; otherwise model-level defaults apply.
+        """
+        nodegroup_permissions = self.get_nodegroup_permissions()
+        content_type_id = ContentType.objects.get_for_model(models.NodeGroup).pk
+        perm_lookup = {
+            perm.pk: {"codename": perm.codename, "name": perm.name}
+            for perm in nodegroup_permissions
+        }
+
+        def to_perms(permission_ids):
+            return sorted(
+                (perm_lookup[pk] for pk in permission_ids if pk in perm_lookup),
+                key=lambda perm: perm["codename"],
+            )
+
+        object_filter = {
+            "content_type_id": content_type_id,
+            "object_pk__in": nodegroup_ids,
+        }
+        own_perms = {nodegroup_id: set() for nodegroup_id in nodegroup_ids}
+        group_perms = {nodegroup_id: {} for nodegroup_id in nodegroup_ids}
+
+        if identity_type == "group":
+            rows = GroupObjectPermission.objects.filter(
+                group=identity, **object_filter
+            ).values_list("object_pk", "permission_id")
+            for object_pk, permission_id in rows:
+                own_perms[object_pk].add(permission_id)
+            default_permission_ids = set(
+                identity.permissions.filter(
+                    content_type_id=content_type_id
+                ).values_list("pk", flat=True)
+            )
+        else:
+            rows = UserObjectPermission.objects.filter(
+                user=identity, **object_filter
+            ).values_list("object_pk", "permission_id")
+            for object_pk, permission_id in rows:
+                own_perms[object_pk].add(permission_id)
+            group_rows = GroupObjectPermission.objects.filter(
+                group__in=identity.groups.all(), **object_filter
+            ).values_list("object_pk", "permission_id", "group__name")
+            for object_pk, permission_id, group_name in group_rows:
+                group_perms[object_pk].setdefault(group_name, set()).add(permission_id)
+            default_permission_ids = set(
+                nodegroup_permissions.filter(
+                    Q(user=identity) | Q(group__user=identity)
+                ).values_list("pk", flat=True)
+            )
 
         ret = []
-        if identityType == "group":
-            identity = Group.objects.get(pk=identityId)
-            for nodegroup_id in nodegroup_ids:
-                nodegroup = models.NodeGroup.objects.get(pk=nodegroup_id)
-                group_perm_strings = [
-                    perm.codename for perm in get_group_perms(identity, nodegroup)
-                ]
-                perms = [
-                    {"codename": codename, "name": self.get_perm_name(codename).name}
-                    for codename in group_perm_strings
-                ]
-                ret.append({"perms": perms, "nodegroup_id": nodegroup_id})
-        else:
-            identity = User.objects.get(pk=identityId)
-            for nodegroup_id in nodegroup_ids:
-                nodegroup = models.NodeGroup.objects.get(pk=nodegroup_id)
-                user_perm_strings = [
-                    perm.codename for perm in get_user_perms(identity, nodegroup)
-                ]
-                perms = [
-                    {"codename": codename, "name": self.get_perm_name(codename).name}
-                    for codename in user_perm_strings
-                ]
+        for nodegroup_id in nodegroup_ids:
+            explicit_ids = own_perms[nodegroup_id]
+            inherited_ids = set().union(*group_perms[nodegroup_id].values())
 
-                # only get the group perms ("defaults") if no user defined object settings have been saved
-                if len(perms) == 0:
-                    perms = [
-                        {
-                            "codename": codename,
-                            "name": self.get_perm_name(codename).name,
-                        }
-                        for codename in set(get_group_perms(identity, nodegroup))
-                    ]
-                ret.append({"perms": perms, "nodegroup_id": nodegroup_id})
+            if explicit_ids:
+                source = identity_type
+                effective_ids = explicit_ids | inherited_ids
+            elif inherited_ids:
+                source = "group:" + ", ".join(sorted(group_perms[nodegroup_id]))
+                effective_ids = inherited_ids
+            else:
+                source = "default"
+                effective_ids = default_permission_ids
 
-        return JSONResponse(ret)
+            effective = to_perms(effective_ids)
+            if any(perm["codename"] == "no_access_to_nodegroup" for perm in effective):
+                effective = to_perms(
+                    pk
+                    for pk, perm in perm_lookup.items()
+                    if perm["codename"] == "no_access_to_nodegroup"
+                )
+
+            ret.append(
+                {
+                    "nodegroup_id": nodegroup_id,
+                    # legacy key: explicit perms, falling back to group overrides
+                    "perms": to_perms(explicit_ids or inherited_ids),
+                    "explicit": to_perms(explicit_ids),
+                    "effective": effective,
+                    "source": source,
+                }
+            )
+        return ret
 
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
-        self.apply_permissions(data)
+        try:
+            self.apply_permissions(data)
+        except PermissionDataError as e:
+            return JSONErrorResponse(
+                _("Unable to apply permissions"), str(e), status=HTTPStatus.BAD_REQUEST
+            )
         return JSONResponse(data)
 
     def delete(self, request):
         data = JSONDeserializer().deserialize(request.body)
-        self.apply_permissions(data, revert=True)
+        try:
+            self.apply_permissions(data, revert=True)
+        except PermissionDataError as e:
+            return JSONErrorResponse(
+                _("Unable to reset permissions"), str(e), status=HTTPStatus.BAD_REQUEST
+            )
         return JSONResponse(data)
 
+    @staticmethod
+    def get_nodegroup_id(card):
+        # 'nodegroupid' is sent by the permission manager; the other keys are legacy
+        try:
+            nodegroup_id = (
+                next(
+                    (
+                        card[key]
+                        for key in ("nodegroupid", "nodegroup", "nodegroup_id")
+                        if card.get(key)
+                    ),
+                    None,
+                )
+                or card["model"]["nodegroup_id"]
+            )
+            return str(uuid.UUID(str(nodegroup_id)))
+        except (KeyError, TypeError, ValueError, AttributeError):
+            raise PermissionDataError(_("A selected card has no valid nodegroup."))
+
     def apply_permissions(self, data, revert=False):
+        codenames = (
+            []
+            if revert
+            else list(
+                dict.fromkeys(
+                    perm["codename"] for perm in data.get("selectedPermissions", [])
+                )
+            )
+        )
+        valid_codenames = set(
+            self.get_nodegroup_permissions().values_list("codename", flat=True)
+        )
+        invalid_codenames = set(codenames) - valid_codenames
+        if invalid_codenames:
+            raise PermissionDataError(
+                _("Invalid permissions: {codenames}").format(
+                    codenames=", ".join(sorted(invalid_codenames))
+                )
+            )
+        if "no_access_to_nodegroup" in codenames and len(codenames) > 1:
+            raise PermissionDataError(
+                _("'No Access' cannot be combined with other permissions.")
+            )
+
+        nodegroup_ids = {
+            self.get_nodegroup_id(card) for card in data.get("selectedCards", [])
+        }
+        nodegroups = list(models.NodeGroup.objects.filter(pk__in=nodegroup_ids))
+        if len(nodegroups) != len(nodegroup_ids):
+            raise PermissionDataError(_("One or more selected cards do not exist."))
+
         with transaction.atomic():
-            for identity in data["selectedIdentities"]:
-                if identity["type"] == "group":
-                    identityModel = Group.objects.get(pk=identity["id"])
-                else:
-                    identityModel = User.objects.get(pk=identity["id"])
+            for identity in data.get("selectedIdentities", []):
+                try:
+                    if identity["type"] == "group":
+                        identity_model = Group.objects.get(pk=identity["id"])
+                    else:
+                        identity_model = User.objects.get(pk=identity["id"])
+                except (Group.DoesNotExist, User.DoesNotExist, KeyError, ValueError):
+                    raise PermissionDataError(
+                        _("The selected group or account does not exist.")
+                    )
 
-                for card in data["selectedCards"]:
-                    # TODO The following try block is here because the key for the nodegroupid in the new permission manager
-                    # is 'nodegroupid' where it was 'nodegroup' in the old permission manager. Once the old permission manager is deleted
-                    # we can replace it with `nodegroupid = card['nodegroupid']`
-
-                    try:
-                        nodegroupid = card["nodegroupid"]
-                    except KeyError:
-                        try:
-                            nodegroupid = card["nodegroup"]
-                        except KeyError:
-                            nodegroupid = card["model"]["nodegroup_id"]
-
-                    nodegroup = models.NodeGroup.objects.get(pk=nodegroupid)
-
+                for nodegroup in nodegroups:
                     # first remove all the current permissions
-                    for perm in get_perms(identityModel, nodegroup):
-                        remove_perm(perm, identityModel, nodegroup)
+                    for perm in get_perms(identity_model, nodegroup):
+                        remove_perm(perm, identity_model, nodegroup)
 
-                    if not revert:
-                        # then add the new permissions
-                        for perm in data["selectedPermissions"]:
-                            assign_perm(perm["codename"], identityModel, nodegroup)
+                    # then add the new permissions
+                    for codename in codenames:
+                        assign_perm(codename, identity_model, nodegroup)
+
+            # keep published snapshots in sync so publish/revert don't restore stale permissions
+            graph_ids = (
+                models.Node.objects.filter(nodegroup_id__in=nodegroup_ids)
+                .values_list("graph_id", flat=True)
+                .distinct()
+            )
+            for graph in Graph.objects.filter(
+                pk__in=graph_ids, source_identifier__isnull=True
+            ):
+                graph.sync_published_graph_permissions()
+
+            transaction.on_commit(lambda: caches["user_permission"].clear())
 
 
 class IconDataView(View):
