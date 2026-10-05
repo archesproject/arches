@@ -160,7 +160,7 @@
         <span class="node-permissions">
             <!-- ko if: card.perms -->
             <!-- ko foreach: card.perms() -->
-            <i class="node-permission-icon" data-bind="css: $data.icon"></i>
+            <i class="node-permission-icon" data-bind="css: $data.inherited ? $data.icon + ' inherited' : $data.icon, attr: {title: $data.title}"></i>
             <!-- /ko -->
             <!-- /ko -->
         </span>

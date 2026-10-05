@@ -110,13 +110,6 @@ def import_graph(graphs, overwrite_graphs=True, user=None):
             try:
                 graph = Graph(resource)
 
-                try:
-                    graph.update_permissions_from_serialized_graph(resource)
-                except (
-                    AttributeError
-                ):  # AttributeError happens if attempting to update permissions on a non-existent NodeGroup
-                    pass
-
                 ontology_classes = [
                     str(f["source"])
                     for f in OntologyClass.objects.all().values("source")
@@ -166,6 +159,9 @@ def import_graph(graphs, overwrite_graphs=True, user=None):
                                     graph.name
                                 )
                             )
+
+                # nodegroups must exist before permissions can reference them
+                graph.update_permissions_from_serialized_graph(resource)
 
                 if not hasattr(graph, "cards_x_nodes_x_widgets"):
                     errors.append(

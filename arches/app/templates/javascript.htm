@@ -70,6 +70,25 @@
             "title": "{% trans "Draft Deleted" %}",
             "text": "{% trans "The draft has been successfully deleted." %}"
         }'
+        graph-designer-permissions-applied='{
+            "title": "{% jsescaped_trans "Permissions Applied" %}",
+            "text": "{% jsescaped_trans "The permissions are now in effect." %}"
+        }'
+        graph-designer-permissions-reset='{
+            "title": "{% jsescaped_trans "Permissions Reset" %}",
+            "text": "{% jsescaped_trans "The selected cards now use default permissions for this group or account." %}"
+        }'
+        graph-designer-permissions-reset-confirm='{
+            "title": "{% jsescaped_trans "Reset to Default?" %}",
+            "text": "{% jsescaped_trans "This removes the explicit permissions for the selected group or account on the selected cards. They will fall back to inherited or default permissions." %}"
+        }'
+        graph-designer-permissions-load-error='{
+            "title": "{% jsescaped_trans "Unable to Load Permissions" %}",
+            "text": "{% jsescaped_trans "Sorry! The request failed. Please try again. Contact your system administrator if the problem persists." %}"
+        }'
+        permissions-source-default='"{% jsescaped_trans "default" %}"'
+        permissions-source-group='"{% jsescaped_trans "inherited from" %}"'
+        permissions-source-explicit='"{% jsescaped_trans "explicit" %}"'
         resource-report-redirect-from-resource-editor-not-permissioned='{
             "title": "{% trans "Redirected from the Resource Editor" %}",
             "text": "{% trans "The current user does not have permission to edit this resource. You have been redirected to the appropriate page." %}"
