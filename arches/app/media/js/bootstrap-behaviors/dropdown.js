@@ -12,14 +12,15 @@ function parentOf(trigger) {
 }
 
 function closeAll(except = null) {
-    for (const open of document.querySelectorAll(`.${OPEN_CLASS}`)) {
-        // `.open` is a generic enough class name that arches uses it elsewhere, so
-        // only close elements that actually hold a dropdown trigger.
-        const trigger = open.querySelector(TRIGGER_SELECTOR);
-        if (open === except || !trigger) {
+    for (const trigger of document.querySelectorAll(TRIGGER_SELECTOR)) {
+        // `.open` is a generic enough class name that arches uses it elsewhere,
+        // including containers that wrap dropdowns (e.g. search filters), so
+        // start from each trigger and only close its parent.
+        const parent = parentOf(trigger);
+        if (!parent || parent === except || !parent.classList.contains(OPEN_CLASS)) {
             continue;
         }
-        open.classList.remove(OPEN_CLASS);
+        parent.classList.remove(OPEN_CLASS);
         trigger.setAttribute('aria-expanded', 'false');
     }
 }

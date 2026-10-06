@@ -9,8 +9,8 @@ import {
     watchEffect,
 } from "vue";
 
-import Message from "primevue/message";
-import Skeleton from "primevue/skeleton";
+import Message from "openvue/message";
+import Skeleton from "openvue/skeleton";
 
 import GenericWidgetLabel from "@/arches_vue_components/generics/GenericWidget/components/GenericWidgetLabel.vue";
 import GenericFormField from "@/arches_vue_components/generics/GenericWidget/components/GenericFormField.vue";

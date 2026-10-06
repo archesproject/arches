@@ -289,11 +289,18 @@ module.exports = () => {
             SITE_PACKAGES_DIRECTORY: JSON.stringify(SITE_PACKAGES_DIRECTORY).replace(/\\/g, '/'),
         };
 
+        // loadComponentDependencies() first tries `SITE_PACKAGES_DIRECTORY/<app>/media/js/...`,
+        // so only applications that do NOT live at that conventional location need an explicit
+        // path constant. That includes linked (editable) applications as well as applications
+        // bundled inside Arches core, e.g. `site-packages/arches/extensions/controlled_lists`.
         let linkedApplicationPathCount = 0;
         for (const archesApplication of ARCHES_APPLICATIONS) {
-            if (!ARCHES_APPLICATIONS_PATHS[archesApplication].includes('site-packages')) {
+            const applicationPath = ARCHES_APPLICATIONS_PATHS[archesApplication];
+            const conventionalPath = Path.join(SITE_PACKAGES_DIRECTORY, archesApplication);
+
+            if (Path.resolve(applicationPath) !== Path.resolve(conventionalPath)) {
                 universalConstants[`LINKED_APPLICATION_PATH_${linkedApplicationPathCount}`] = JSON.stringify(
-                    ARCHES_APPLICATIONS_PATHS[archesApplication]
+                    applicationPath
                 ).replace(/\\/g, '/');
                 linkedApplicationPathCount += 1;
             }

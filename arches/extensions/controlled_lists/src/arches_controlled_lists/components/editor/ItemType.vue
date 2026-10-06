@@ -2,8 +2,8 @@
 import { inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import ToggleSwitch from "primevue/toggleswitch";
-import { useToast } from "primevue/usetoast";
+import ToggleSwitch from "openvue/toggleswitch";
+import { useToast } from "openvue/usetoast";
 
 import { patchItem } from "@/arches_controlled_lists/api.ts";
 import {

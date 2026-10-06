@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { inject } from "vue";
 
-import ProgressSpinner from "primevue/progressspinner";
-import Splitter from "primevue/splitter";
-import SplitterPanel from "primevue/splitterpanel";
+import ProgressSpinner from "openvue/progressspinner";
+import Splitter from "openvue/splitter";
+import SplitterPanel from "openvue/splitterpanel";
 
 import { displayedRowKey } from "@/arches_controlled_lists/constants.ts";
 import { dataIsList } from "@/arches_controlled_lists/utils.ts";

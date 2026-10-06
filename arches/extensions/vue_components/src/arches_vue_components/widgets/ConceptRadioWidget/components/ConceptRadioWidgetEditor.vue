@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch, watchEffect } from "vue";
 
-import RadioButton from "primevue/radiobutton";
-import RadioButtonGroup from "primevue/radiobuttongroup";
+import RadioButton from "openvue/radiobutton";
+import RadioButtonGroup from "openvue/radiobuttongroup";
 
 import { useConceptTreeStore } from "@/arches_vue_components/stores/useConceptTreeStore.ts";
 import type {

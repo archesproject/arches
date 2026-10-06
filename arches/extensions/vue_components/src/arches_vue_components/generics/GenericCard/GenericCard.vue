@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, useTemplateRef, watchEffect } from "vue";
 
-import Message from "primevue/message";
-import Skeleton from "primevue/skeleton";
+import Message from "openvue/message";
+import Skeleton from "openvue/skeleton";
 
 import GenericCardEditor from "@/arches_vue_components/generics/GenericCard/components/GenericCardEditor.vue";
 import GenericCardViewer from "@/arches_vue_components/generics/GenericCard/components/GenericCardViewer.vue";

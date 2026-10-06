@@ -4,6 +4,7 @@ import uuid from 'uuid';
 import arches from 'arches';
 import JsonErrorAlertViewModel from 'viewmodels/alert-json';
 import migrateTemplate from 'templates/views/components/etl_modules/migrate-to-reference-datatype.htm';
+import 'bindings/chosen';
 
 
 const ViewModel = function(params) {

@@ -2,9 +2,9 @@
 import { ref, watchEffect } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import InputText from "primevue/inputtext";
-import Select from "primevue/select";
-import Textarea from "primevue/textarea";
+import InputText from "openvue/inputtext";
+import Select from "openvue/select";
+import Textarea from "openvue/textarea";
 
 import { MULTILINE_RENDER_CONTEXT } from "@/arches_vue_components/widgets/TextWidget/constants.ts";
 import { fetchLanguages } from "@/arches_vue_components/widgets/api.ts";

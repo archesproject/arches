@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Checkbox from "primevue/checkbox";
-import CheckboxGroup from "primevue/checkboxgroup";
+import Checkbox from "openvue/checkbox";
+import CheckboxGroup from "openvue/checkboxgroup";
 
 import { buildDomainListAliasedNodeData } from "@/arches_vue_components/datatypes/domain/utils.ts";
 

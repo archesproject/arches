@@ -2,8 +2,8 @@
 import { ref, watchEffect } from "vue";
 
 import { useGettext } from "vue3-gettext";
-import Editor from "primevue/editor";
-import Select from "primevue/select";
+import Editor from "openvue/editor";
+import Select from "openvue/select";
 
 import FocusController from "@/arches_vue_components/widgets/RichTextWidget/components/RichTextWidgetEditor/components/FocusController.vue";
 

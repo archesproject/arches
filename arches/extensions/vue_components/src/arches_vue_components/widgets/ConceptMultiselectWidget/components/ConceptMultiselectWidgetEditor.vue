@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed, ref, watch, watchEffect } from "vue";
 
-import TreeSelect from "primevue/treeselect";
+import TreeSelect from "openvue/treeselect";
 
 import { useConceptTreeStore } from "@/arches_vue_components/stores/useConceptTreeStore.ts";
 import { buildConceptListAliasedNodeData } from "@/arches_vue_components/datatypes/concept-list/utils.ts";
 import { getOption } from "@/arches_vue_components/datatypes/concept/utils.ts";
 
 import type { Ref } from "vue";
-import type { TreeNode } from "primevue/treenode";
+import type { TreeNode } from "openvue/treenode";
 import type { CardXNodeXWidgetData } from "@/arches_vue_components/types.ts";
 import type {
     CollectionItem,

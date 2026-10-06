@@ -2,6 +2,8 @@ import ko from 'knockout';
 import uuid from 'uuid';
 import _ from 'underscore';
 import domainValueDatatypeTemplate from 'templates/views/components/datatypes/domain-value.htm';
+import 'bindings/sortable';
+import 'bindings/select2-query';
 
 
 const name = 'domain-value-datatype-config';

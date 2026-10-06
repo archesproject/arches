@@ -4,9 +4,9 @@ import { provide, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 import { useRouter } from "vue-router";
 
-import { useConfirm } from "primevue/useconfirm";
-import ConfirmDialog from "primevue/confirmdialog";
-import Toast from "primevue/toast";
+import { useConfirm } from "openvue/useconfirm";
+import ConfirmDialog from "openvue/confirmdialog";
+import Toast from "openvue/toast";
 
 import {
     CONTRAST,
