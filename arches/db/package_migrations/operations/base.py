@@ -14,6 +14,10 @@ from arches.db.package_migrations.state import collection_for, fields_for
 DEFAULT_BATCH_SIZE = 5000
 
 
+class PackageMigrationError(Exception):
+    pass
+
+
 def keyset_batches(queryset, pk_field, batch_size):
     """Yield lists of primary keys in pk order, resuming after the last one seen.
 
@@ -110,6 +114,9 @@ class PackageOperation(Operation):
         that transaction.
         """
         return model.objects.using(schema_editor.connection.alias)
+
+    def has_pending_work(self, using):
+        return True
 
 
 class _AlterRowOperation(PackageOperation):

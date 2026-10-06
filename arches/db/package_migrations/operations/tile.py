@@ -8,9 +8,8 @@ datatype layer instead, per tile. No operation in this module may branch on a
 node's datatype; that knowledge belongs to DDataType and the datatype factory.
 
 Derived state (Elasticsearch, geojson_geometries, resource_x_resource) is NOT
-this module's concern either. Operations report which resources they touched and
-the runner reconciles those graphs once, post-commit, using the maintenance
-routines Arches already owns.
+this module's concern either. migratepkg prints the reindex command for the graphs
+a run touched.
 
 Avoiding the Tile proxy is also a hard performance requirement: Tile.__init__
 calls load_serialized_graph(), which fetches a PublishedGraph row and parses a
@@ -23,7 +22,7 @@ stable marker of which shape a record's data is in.
 
 import json
 
-from django.db.models import JSONField
+from django.db.models import JSONField, Q
 from django.db.models.expressions import RawSQL
 
 from arches.app.models import models
@@ -81,11 +80,15 @@ class AddNodeToTiles(_ChunkedTileOperation):
     def state_forwards(self, app_label, state):
         pass  # data only, like RunPython
 
+    def _pending(self, alias):
+        return self._tiles(alias).exclude(data__has_key=str(self.nodeid))
+
+    def has_pending_work(self, using):
+        return self._pending(using).exists()
+
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         return self._apply_in_batches(
-            self._tiles(schema_editor.connection.alias).exclude(
-                data__has_key=str(self.nodeid)
-            ),
+            self._pending(schema_editor.connection.alias),
             RawSQL(
                 "jsonb_set(tiledata, ARRAY[%s], %s::jsonb)",
                 [str(self.nodeid), json.dumps(self.value)],
@@ -124,6 +127,15 @@ class RemoveNodeFromTiles(_ChunkedTileOperation):
 
     def state_forwards(self, app_label, state):
         pass
+
+    def has_pending_work(self, using):
+        return (
+            self._tiles(using)
+            .filter(
+                Q(data__has_key=str(self.nodeid)) | Q(provisionaledits__isnull=False)
+            )
+            .exists()
+        )
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         total = self._drop_key(schema_editor)
@@ -188,6 +200,9 @@ class DeleteTilesForNodeGroup(_ChunkedTileOperation):
 
     def state_forwards(self, app_label, state):
         pass
+
+    def has_pending_work(self, using):
+        return self._tiles(using).exists()
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         alias = schema_editor.connection.alias
