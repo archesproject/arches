@@ -1634,7 +1634,10 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
         """
         from arches.app.datatypes.datatypes import DataTypeFactory
 
-        original_tiles = self.tilemodel_set.prefetch_related("nodegroup__node_set")
+        # order deterministically; sortorder can be null so tileid breaks ties
+        original_tiles = self.tilemodel_set.order_by(
+            "sortorder", "tileid"
+        ).prefetch_related("nodegroup__node_set")
         datatype_factory = DataTypeFactory()
 
         new_resource = copy.copy(self)
@@ -2168,22 +2171,6 @@ class Widget(SaveSupportsBlindOverwriteMixin, models.Model):
     class Meta:
         managed = True
         db_table = "widgets"
-
-
-class Geocoder(SaveSupportsBlindOverwriteMixin, models.Model):
-    geocoderid = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, db_default=UUID4()
-    )
-    name = models.TextField(unique=True)
-    component = models.TextField(unique=True)
-    api_key = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        managed = True
-        db_table = "geocoders"
 
 
 class MapSource(models.Model):

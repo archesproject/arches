@@ -103,6 +103,11 @@ class BranchExcelTests(ArchesTransactionTestCase):
         if os.path.exists(exported_file_path):
             os.remove(exported_file_path)
 
+        uploaded_files_dir = default_storage.path(settings.UPLOADED_FILES_DIR)
+        for file_name in os.listdir(uploaded_files_dir):
+            if file_name.startswith("tile_excel_test_") and file_name.endswith(".xlsx"):
+                os.remove(os.path.join(uploaded_files_dir, file_name))
+
     def test_write(self):
         load_id = "d481d116-7c1e-4b36-b7ef-85963d482db0"
         edits = EditLog.objects.filter(transactionid=load_id)

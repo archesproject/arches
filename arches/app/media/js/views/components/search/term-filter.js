@@ -5,6 +5,7 @@ import BaseFilter from 'views/components/search/base-filter';
 import arches from 'arches';
 import termFilterTemplate from 'templates/views/components/search/term-filter.htm';
 import 'bindings/term-search';
+import 'bindings/select2-query';
 
 
 var componentName = 'term-filter';

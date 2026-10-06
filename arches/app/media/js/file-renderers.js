@@ -1,4 +1,4 @@
-import { loadComponentDependencies } from "utils/load-component-dependencies";
+import { registerComponentPaths } from "utils/load-component-dependencies";
 
 function removeTrailingCommaFromObject(string) {
     return string.replace(/,\s*}*$/, "}");
@@ -10,7 +10,7 @@ try {
     const fileRendererData = fileRendererDataHTML.getAttribute('fileRenderers');
     fileRenderers = JSON.parse(removeTrailingCommaFromObject(fileRendererData));
 
-    loadComponentDependencies(Object.values(fileRenderers).map(value => value['component']));
+    registerComponentPaths(fileRenderers, 'name', 'component');
 } catch (error) {
     console.error(error);
 }

@@ -302,7 +302,7 @@ article.main-search-container {
                     }
                 }
             }
-            .mapboxgl-ctrl-geocoder {
+            .maplibregl-ctrl-geocoder {
                 @include break-at(mobile) {
                     margin: 3px;
                 }

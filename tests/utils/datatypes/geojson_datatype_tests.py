@@ -99,6 +99,29 @@ class GeoJsonDataTypeTest(ArchesTestCase):
             geom_datatype.check_geojson_value(json.loads(geom_json))
             geom_datatype.validate(json.loads(geom_json))
 
+    def test_check_geojson_value_replaces_invalid_feature_ids(self):
+        geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
+        valid_id = str(uuid.uuid4())
+        point = {"type": "Point", "coordinates": [0, 0]}
+        geojson = {
+            "type": "FeatureCollection",
+            "features": [
+                {"type": "Feature", "id": valid_id, "geometry": point},
+                {
+                    "type": "Feature",
+                    "id": "8YCKQfmFV8p90ryP7YxMp9rGmOdgXgWw",
+                    "geometry": point,
+                },
+                {"type": "Feature", "id": None, "geometry": point},
+                {"type": "Feature", "geometry": point},
+            ],
+        }
+        result = geom_datatype.check_geojson_value(geojson)
+        ids = [feature["id"] for feature in result["features"]]
+        self.assertEqual(ids[0], valid_id)
+        for feature_id in ids[1:]:
+            uuid.UUID(feature_id)
+
     def test_check_geom_property_cleaning(self):
         geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
         document = {"geometries": [], "points": []}

@@ -4,12 +4,13 @@ import ko from 'knockout';
 import arches from 'arches';
 import geojsonFeatureCollectionDatatypeTemplate from 'templates/views/components/datatypes/geojson-feature-collection.htm';
 import 'bindings/color-picker';
-import 'bindings/mapbox-gl';
+import 'bindings/maplibre-gl';
 import 'bindings/codemirror';
 import 'bindings/key-events-click';
 import 'codemirror/mode/javascript/javascript';
 import 'bindings/ckeditor';
 import 'views/components/icon-selector';
+import 'bindings/select2-query';
 
 
 var name = 'geojson-feature-collection-datatype-config';
@@ -132,8 +133,8 @@ const viewModel = function(params) {
                     "mapbox:type": "template"
                 },
                 "sources": sources,
-                "sprite": "mapbox://sprites/mapbox/basic-v9",
-                "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
+                "sprite": arches.maplibreSprites,
+                "glyphs": arches.maplibreGlyphs,
                 "layers": basemapLayers.concat(displayLayers)
             };
             this.zoom = ko.observable(arches.mapDefaultZoom);

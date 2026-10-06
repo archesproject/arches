@@ -354,7 +354,7 @@ var IIIFViewerViewmodel = function(params) {
                                     popupData.description(descriptors['map_popup']);
                                 });
                             var popupElement = popup.getElement()
-                                .querySelector('.mapboxgl-popup-content');
+                                .querySelector('.maplibregl-popup-content');
                             ko.applyBindingsToDescendants(popupData, popupElement);
                         });
                     layer.bindPopup(popup);

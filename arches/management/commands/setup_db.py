@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
-import psycopg2
+import psycopg
 
 # import the basic django settings here, don't use the Arches system_settings module
 # because it makes database calls that don't necessarily work at this stage
@@ -92,8 +92,8 @@ class Command(BaseCommand):
         try:
             # Connect directly to the user's database. This should work in most
             # superuser contexts.
-            conn = psycopg2.connect(conn_string)
-        except psycopg2.OperationalError as e:
+            conn = psycopg.connect(conn_string)
+        except psycopg.OperationalError as e:
             # If that connection fails, try connecting to the Arches database
             # itself. This is for non-superusers for whom the database has
             # already been created.
@@ -102,8 +102,8 @@ class Command(BaseCommand):
                 conn_string = conn_string.replace(
                     "dbname=" + username, "dbname=" + db["NAME"]
                 )
-                conn = psycopg2.connect(conn_string)
-            except psycopg2.OperationalError as e:
+                conn = psycopg.connect(conn_string)
+            except psycopg.OperationalError as e:
                 # If that connection fails, this is probably a non-superuser
                 # whose database has not yet been created.
                 safestr = " ".join(
@@ -118,6 +118,8 @@ class Command(BaseCommand):
                 )
                 exit()
 
+        conn.autocommit = True
+
         cursor = conn.cursor()
         cursor.execute(
             "SELECT rolcreatedb FROM pg_roles WHERE rolname = '{}'".format(username)
@@ -129,8 +131,6 @@ class Command(BaseCommand):
         )
         superuser = cursor.fetchone()[0]
 
-        # autocommit false
-        conn.set_isolation_level(0)
         return {"connection": conn, "can_create_db": any([cancreate, superuser])}
 
     def reset_db(self, cursor):
@@ -179,9 +179,9 @@ CREATE DATABASE {}
 
         try:
             cursor.execute(create_query)
-        except psycopg2.ProgrammingError as e:
-            print(e.pgerror)
-            if "template database" in e.pgerror:
+        except psycopg.ProgrammingError as e:
+            print(str(e))
+            if "template database" in str(e):
                 msg = """It looks like your PostGIS template database is not correctly referenced in
 settings.py/settings_local.py, or it has not yet been created.
 
