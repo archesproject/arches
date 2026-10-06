@@ -11,16 +11,14 @@ from django.db import connection
 
 from arches.app.models import models
 from arches.app.models.graph import Graph
+from arches.db.package_migrations.operations.base import PackageMigrationError
 from arches.db.package_migrations.operations.edge import CreateEdge
 from arches.db.package_migrations.operations.node import CreateNode
 from arches.db.package_migrations.operations.nodegroup import CreateNodeGroup
 from arches.db.package_migrations.operations.resource import SetResourcePublication
 from arches.db.package_migrations.operations.graph import CreateGraph, PublishGraph
 
-from tests.package_migrations.spike_tests import (
-    PackageMigrationOperationTests,
-    _FakeSchemaEditor,
-)
+from tests.package_migrations.spike_tests import PackageMigrationOperationTests
 
 
 class PublicationLifecycleTests(PackageMigrationOperationTests):
@@ -41,8 +39,8 @@ class PublicationLifecycleTests(PackageMigrationOperationTests):
 
     def test_resources_move_onto_the_publication_and_back(self):
         """Publishing and stamping resources are two operations. Reverse order is
-        load-bearing: unapply() reverses operation order, so resources come off the
-        publication (PROTECT) before PublishGraph deletes it."""
+        load-bearing: the data migration unapplies before the graph migration, so
+        resources come off the publication (PROTECT) before PublishGraph deletes it."""
         resource = models.ResourceInstance.objects.create(graph=self.graph)
         old_publication_id = self.graph.publication_id
         publication_id = str(uuid.uuid4())
@@ -161,7 +159,7 @@ class PublicationLifecycleTests(PackageMigrationOperationTests):
             fields={
                 "graphid": graphid,
                 "name": "Throwaway",
-                "slug": "throwaway_%s" % graphid[:8],
+                "slug": f"throwaway_{graphid[:8]}",
                 "isresource": True,
             }
         )
@@ -171,7 +169,7 @@ class PublicationLifecycleTests(PackageMigrationOperationTests):
         self.assertTrue(models.GraphModel.objects.filter(pk=graphid).exists())
 
         resource = models.ResourceInstance.objects.create(graph_id=graphid)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(PackageMigrationError):
             operation.database_backwards(
                 "arches", self.schema_editor, self._state(), self._state()
             )

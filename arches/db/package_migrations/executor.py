@@ -7,9 +7,12 @@ CreateModel/AddField-specific and returns a MUTATED state while reporting False,
 so inheriting it silently double-applies state under --fake-initial.
 """
 
+from django.db import transaction
 from django.db.migrations.executor import MigrationExecutor
 
+from arches.app.models import models
 from arches.db.package_migrations.loader import PackageMigrationLoader
+from arches.db.package_migrations.operations.graph import PublishGraph
 from arches.db.package_migrations.recorder import PackageMigrationRecorder
 from arches.db.package_migrations.state import PackageState
 
@@ -39,6 +42,36 @@ class PackageMigrationExecutor(MigrationExecutor):
             for migration, _ in full_plan:
                 if migration in applied_migrations:
                     migration.mutate_state(state, preserve=False)
+        return state
+
+    def unapply_migration(self, state, migration, fake=False):
+        publications = [
+            operation
+            for operation in migration.operations
+            if isinstance(operation, PublishGraph)
+        ]
+        if fake or not publications:
+            return super().unapply_migration(state, migration, fake=fake)
+
+        alias = self.connection.alias
+        graphs = models.GraphModel.objects.using(alias)
+        flags_before = {
+            str(graphid): has_unpublished_changes
+            for graphid, has_unpublished_changes in graphs.filter(
+                pk__in=[publication.graphid for publication in publications]
+            ).values_list("graphid", "has_unpublished_changes")
+        }
+        with transaction.atomic(using=alias):
+            state = super().unapply_migration(state, migration, fake=fake)
+            # PublishGraph unapplies first, so the reversed rows after it re-flag
+            # the graph as having unpublished changes.
+            for publication in publications:
+                if publication.updates_in_place:
+                    publication.refresh(alias)
+                else:
+                    graphs.filter(pk=publication.graphid).update(
+                        has_unpublished_changes=flags_before[str(publication.graphid)]
+                    )
         return state
 
     def detect_soft_applied(self, project_state, migration):

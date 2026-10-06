@@ -19,6 +19,7 @@ from arches.app.models import models
 from arches.app.models.graph import Graph
 from arches.db.package_migrations.state import STATE_COLLECTIONS
 from arches.db.package_migrations.operations.base import (
+    PackageMigrationError,
     PackageOperation,
     _AlterRowOperation,
     _short,
@@ -68,7 +69,7 @@ class CreateGraph(PackageOperation):
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         if self.has_resources(schema_editor.connection.alias):
-            raise ValueError(
+            raise PackageMigrationError(
                 f"Graph {self.graphid} has resource instances. Deleting it would "
                 "delete them and their tiles."
             )
@@ -110,12 +111,15 @@ class AlterGraph(_AlterRowOperation):
 
 
 class PublishGraph(PackageOperation):
-    """Mint a publication with a portable id.
+    """Put the graph on the publication the authoring database was on.
+
+    The Graph Designer publishes two ways: Publish mints a new publication, and
+    Update Publication rewrites the current one in place. A migration made after
+    the second carries the previous publication id again, so it refreshes that
+    publication rather than creating it.
 
     Graph rows only. Moving resources onto the publication is SetResourcePublication's
-    job, in the data operations. These two run in the same migration, but they are
-    not the same change, and the reverse order matters: unapply() reverses operation
-    order, so the resources come off this publication before it is deleted.
+    job, in the data migration that follows, which unapplies first.
     """
 
     scope = "graph"
@@ -133,13 +137,33 @@ class PublishGraph(PackageOperation):
         # Nothing to restore without the publication this one replaced.
         return self.previous_publication_id is not None
 
+    @property
+    def updates_in_place(self):
+        return str(self.publication_id) == str(self.previous_publication_id)
+
     def state_forwards(self, app_label, state):
         state.graph_for_write(self.graphid)["publication_id"] = str(self.publication_id)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        Graph.objects.using(schema_editor.connection.alias).get(
-            pk=self.graphid
-        ).publish(notes=self.notes, publication_id=self.publication_id)
+        alias = schema_editor.connection.alias
+        if (
+            self.qs(models.GraphXPublishedGraph, schema_editor)
+            .filter(pk=self.publication_id)
+            .exists()
+        ):
+            self.qs(models.GraphModel, schema_editor).filter(pk=self.graphid).update(
+                publication_id=self.publication_id
+            )
+            self.refresh(alias)
+        else:
+            Graph.objects.using(alias).get(pk=self.graphid).publish(
+                notes=self.notes, publication_id=self.publication_id
+            )
+
+    def refresh(self, using):
+        Graph.objects.using(using).get(pk=self.graphid).update_published_graphs(
+            notes=self.notes
+        )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         if self.previous_publication_id is None:
@@ -147,15 +171,34 @@ class PublishGraph(PackageOperation):
                 f"PublishGraph for graph {self.graphid} has no previous "
                 "publication to restore."
             )
-        # graphs.publicationid references the publication this operation minted,
-        # so the graph moves back before it is deleted. Resources are already off
-        # it: SetResourcePublication runs after this one, so it reverses first.
-        self.qs(models.GraphModel, schema_editor).filter(pk=self.graphid).update(
-            publication_id=self.previous_publication_id, has_unpublished_changes=False
+        if self.updates_in_place:
+            # The executor re-snapshots it once the reversed rows are back.
+            return
+        publications = self.qs(models.GraphXPublishedGraph, schema_editor)
+        if not publications.filter(pk=self.previous_publication_id).exists():
+            raise PackageMigrationError(
+                f"Graph {self.graphid} cannot go back to publication "
+                f"{self.previous_publication_id}: this database never had it, "
+                "because the migration that created it was recorded with --fake here."
+            )
+        remaining = (
+            self.qs(models.ResourceInstance, schema_editor)
+            .filter(graph_publication_id=self.publication_id)
+            .count()
         )
-        self.qs(models.GraphXPublishedGraph, schema_editor).filter(
-            pk=self.publication_id
-        ).delete()
+        if remaining:
+            raise PackageMigrationError(
+                f"{remaining} resources of graph {self.graphid} are still on "
+                f"publication {self.publication_id}. Unapply the data migration "
+                "that follows this one as well, by targeting a migration before both."
+            )
+        # graphs.publicationid references this publication, so the graph moves
+        # back before it is deleted. Resources are already off it: the data
+        # migration's SetResourcePublication unapplies first.
+        self.qs(models.GraphModel, schema_editor).filter(pk=self.graphid).update(
+            publication_id=self.previous_publication_id
+        )
+        publications.filter(pk=self.publication_id).delete()
 
     def describe(self):
         return f"Publish graph {self.graphid} as {self.publication_id}"
