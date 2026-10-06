@@ -46,7 +46,12 @@ class Command(BaseCommand):
 
     def _show_list(self, loader, app_labels):
         applied = loader.applied_migrations
-        nodes = sorted(loader.graph.nodes)
+        missing_files = {
+            node
+            for node in applied
+            if node not in loader.graph.nodes and node[0] in loader.migrated_apps
+        }
+        nodes = sorted(set(loader.graph.nodes) | missing_files)
         if app_labels:
             nodes = [node for node in nodes if node[0] in app_labels]
         if not nodes:
@@ -55,13 +60,16 @@ class Command(BaseCommand):
         for app_label, group in groupby(nodes, key=lambda node: node[0]):
             self.stdout.write(app_label, self.style.MIGRATE_LABEL)
             for node in group:
-                line = f" [X] {node[1]}" if node in applied else f" [ ] {node[1]}"
+                if node in missing_files:
+                    line = f" [X] {node[1]} (recorded here, but its file is missing)"
+                elif node in applied:
+                    line = f" [X] {node[1]}"
+                else:
+                    line = f" [ ] {node[1]}"
                 if self.verbosity >= 2 and node in applied:
                     record = applied[node]
                     if getattr(record, "applied", None):
-                        line += " (applied at %s)" % record.applied.strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        )
+                        line += f" (applied at {record.applied:%Y-%m-%d %H:%M:%S})"
                 self.stdout.write(line)
 
     def _show_plan(self, loader, app_labels):
