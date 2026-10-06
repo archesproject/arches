@@ -1,6 +1,7 @@
 import ko from 'knockout';
 import DomainWidgetViewModel from 'viewmodels/domain-widget';
 import selectTemplate from 'templates/views/components/widgets/select.htm';
+import 'bindings/select2-query';
 
 
 /**
