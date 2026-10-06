@@ -1,8 +1,7 @@
 """End-to-end: a real package migration, applied and reversed by migratepkg.
 
-The fixture app is built in a temp directory rather than under tests/, because
-ArchesTestRunner rewrites test discovery from test*.py to *.py: a migration
-module living here would be imported as a test module.
+The fixture app lives in a temp directory: ArchesTestRunner discovers *.py, so a
+migration module under tests/ would be imported as a test module.
 """
 
 import shutil
@@ -13,7 +12,7 @@ import uuid
 from io import StringIO
 from pathlib import Path
 
-from django.apps import apps
+from django.conf import settings
 from django.core.management import call_command
 from django.db import connection
 from django.test import override_settings
@@ -107,13 +106,9 @@ class MigratePkgCommandTests(PackageMigrationOperationTests):
 
     def _installed(self):
         return override_settings(
-            INSTALLED_APPS=list(apps.app_configs) and self._app_list()
+            INSTALLED_APPS=list(settings.INSTALLED_APPS)
+            + [f"{APP_NAME}.apps.FixtureConfig"]
         )
-
-    def _app_list(self):
-        from django.conf import settings
-
-        return list(settings.INSTALLED_APPS) + [f"{APP_NAME}.apps.FixtureConfig"]
 
     def test_migratepkg_applies_and_reverses_a_real_migration(self):
         tile = models.TileModel.objects.create(
@@ -137,7 +132,6 @@ class MigratePkgCommandTests(PackageMigrationOperationTests):
             call_command("showpkgmigrations", APP_NAME, stdout=out)
             self.assertIn("[X] 0001_add_survey_date", out.getvalue())
 
-            # Re-running is a no-op rather than a re-apply.
             out = StringIO()
             call_command("migratepkg", APP_NAME, stdout=out)
             self.assertIn("No package migrations to apply", out.getvalue())

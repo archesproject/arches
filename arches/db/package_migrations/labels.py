@@ -1,13 +1,5 @@
-"""Readable names for the ids an operation describes.
-
-describe() stays in ids: an operation knows its own row and nothing else, and a
-name copied into a migration file would be a lie the first time someone renames
-the node. The commands resolve names at display time instead, from data they
-already hold: makepkgmigrations from the graphs it read, migratepkg from the
-database.
-
-A nodegroup's id is its grouping node's id (node_groups.grouping_node_matches_pk_or_null),
-so naming nodes names nodegroups too.
+"""Readable names for the ids an operation describes, resolved at display time.
+A nodegroup's id is its grouping node's id, so naming nodes names nodegroups too.
 """
 
 import re

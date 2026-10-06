@@ -1,11 +1,5 @@
-"""Writing package migration files.
-
-MigrationWriter.basedir calls MigrationLoader.migrations_module on the BASE class
-(django writer.py:220), not on ``self``, so overriding that classmethod on
-PackageMigrationLoader has no effect on where files land. Left alone, generated
-package migrations are written into <app>/migrations/, where Django's own
-loader picks them up and `manage.py migrate` executes them against a real
-ProjectState.
+"""MigrationWriter for package migrations. basedir is overridden because Django's
+calls MigrationLoader.migrations_module directly, not the package loader's.
 """
 
 import os
@@ -16,17 +10,12 @@ from django.db.migrations.writer import MigrationWriter
 
 from arches.db.package_migrations.loader import PACKAGE_MIGRATIONS_MODULE_NAME
 
-PACKAGE = "arches.db.package_migrations"
-OPERATIONS_MODULE = f"{PACKAGE}.operations"
+OPERATIONS_MODULE = "arches.db.package_migrations.operations"
 
 
 class PackageMigrationWriter(MigrationWriter):
     def as_string(self):
-        """Django's OperationWriter renders any non-Django operation as
-        ``<module>.<ClassName>(``, which here is a 45-character prefix on every
-        operation. Import the operations a migration actually uses and call them
-        by name, so the file reads as what it does.
-        """
+        """Imports the operations used by name instead of by full module path."""
         rendered = super().as_string()
         used = sorted(
             set(

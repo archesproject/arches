@@ -1,7 +1,5 @@
 """The projection into state: shape, stability, and agreement with the operations.
-
-No database.
-"""
+No database."""
 
 import uuid
 
@@ -34,7 +32,6 @@ def _serialized_graph():
         "name": {"en": "Heritage Asset"},
         "slug": "heritage-asset",
         "isresource": True,
-        # derived / install-local keys that must NOT survive the projection
         "relatable_resource_model_ids": {GRAPH},
         "domain_connections": [{"whatever": 1}],
         "functions_x_graphs": [{"id": 1}],
@@ -113,9 +110,7 @@ class CanonicalProjectionTests(SimpleTestCase):
             self.assertNotIn(key, card, key)
 
     def test_tuples_normalize(self):
-        """A tuple and a list compare unequal, so config that round-trips through
-        Python must land as a list. (Sets cannot reach here; config comes from
-        JSONB.)"""
+        """A tuple and a list compare unequal, so config must land as a list."""
         graph = _serialized_graph()
         graph["nodes"][0]["config"] = {"options": ("b", "a")}
         node = canonical_graph(graph)["nodes"][NODE]
@@ -123,13 +118,7 @@ class CanonicalProjectionTests(SimpleTestCase):
 
 
 class OperationStateMatchesProjectionTests(SimpleTestCase):
-    """The drift guard.
-
-    A Create* operation stores the canonical row verbatim, so the guard is that
-    the projection's field set for each model is exactly what the corresponding
-    model declares. If they ever disagree, every makepkgmigrations run reports a
-    phantom change that no migration can resolve.
-    """
+    """If these disagree, every makepkgmigrations run reports a phantom change."""
 
     def test_projection_covers_every_package_content_column(self):
         from arches.db.package_migrations.state import EXCLUDED_FIELDS
@@ -171,10 +160,6 @@ class OperationStateMatchesProjectionTests(SimpleTestCase):
                     "arches", state
                 )
                 stored = state.graphs[GRAPH][collection][key]
-                # State holds every column, because that is what the row will hold
-                # once created; absent keys come from the model's own defaults.
-                # Wherever the projected row speaks, state must agree with it, or
-                # the next diff invents a change nobody made.
                 self.assertEqual(
                     {field: stored[field] for field in projected}, projected
                 )

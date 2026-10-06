@@ -1,19 +1,14 @@
-"""Tests for arches.app.utils.resource_instance_data."""
-
-from unittest.mock import patch
-
 from arches.app.models import models
 from arches.app.utils.resource_instance_data import (
     move_resources_to_publication,
     reshape_tiles,
 )
 
-from tests.tasks_tests import UpdateResourceInstanceDataTaskTests
+from tests.tasks_tests import ResourceInstanceDataTestCase
 
 
-class ResourceInstanceDataTests(UpdateResourceInstanceDataTaskTests):
+class ResourceInstanceDataTests(ResourceInstanceDataTestCase):
     def _publish_with_node_deleted(self):
-        """Delete the concept node and republish, returning (initial, updated)."""
         initial = models.PublishedGraph.objects.get(
             publication=self.test_graph.publication, language="en"
         ).serialized_graph
@@ -30,8 +25,7 @@ class ResourceInstanceDataTests(UpdateResourceInstanceDataTaskTests):
         ).serialized_graph
         return initial, updated
 
-    @patch("arches.app.tasks.notify_completion")
-    def test_moves_resources_onto_the_new_publication(self, mock_notify):
+    def test_moves_resources_onto_the_new_publication(self):
         resource_instance = models.ResourceInstance.objects.create(
             graph=self.test_graph
         )
@@ -51,14 +45,7 @@ class ResourceInstanceDataTests(UpdateResourceInstanceDataTaskTests):
             str(resource_instance.graph_publication_id), updated["publication_id"]
         )
 
-    @patch("arches.app.tasks.notify_completion")
-    def test_prunes_deleted_node_from_provisionaledits(self, mock_notify):
-        """provisionaledits is keyed by the same nodeids as data.
-
-        If a deleted node's key survives there, approving the pending edit later
-        writes it back into data, and Tile.save() then raises Node.DoesNotExist
-        because the node is gone, leaving a record no curator can fix from the UI.
-        """
+    def test_prunes_deleted_node_from_provisionaledits(self):
         resource_instance = models.ResourceInstance.objects.create(
             graph=self.test_graph
         )

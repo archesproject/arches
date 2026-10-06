@@ -130,8 +130,6 @@ class MakePkgMigrationsTests(PackageMigrationOperationTests):
         return nodeid
 
     def _publish_a_new_node(self, alias="survey_date"):
-        """What a Graph Designer publish leaves behind: new rows on the source
-        graph, on a new publication."""
         nodeid = self._add_node(alias)
         Graph.objects.get(pk=self.graph.graphid).publish()
         return nodeid
@@ -241,8 +239,7 @@ class MakePkgMigrationsTests(PackageMigrationOperationTests):
             self.assertEqual(self._recorded(), set())
 
     def test_refuses_while_a_migration_of_the_app_is_unapplied(self):
-        """A new migration depends on the leaf, so recording it while the leaf is
-        unapplied leaves an applied migration whose parent is not."""
+        """Recording a migration whose parent is unapplied would orphan it."""
         with self._installed():
             self._adopt()
             self._publish_a_new_node()
@@ -345,8 +342,6 @@ class MakePkgMigrationsTests(PackageMigrationOperationTests):
         self.assertIn(OTHER_APP_NAME, str(refusal.exception))
 
     def test_created_graphs_get_a_graph_migration_of_their_own(self):
-        """A site that already has the new graph from load_package records that
-        migration and applies the change to the existing graph."""
         with self._installed():
             self._adopt()
             self._publish_a_new_node()
@@ -370,8 +365,6 @@ class MakePkgMigrationsTests(PackageMigrationOperationTests):
             self.assertEqual(self._recorded(), {name[:-3] for name in files[:3]})
 
     def test_moving_a_node_between_nodegroups_warns_that_data_is_stranded(self):
-        """Nodegroup membership follows the edge tree, so the node moves the way
-        the Designer moves it: under another collector."""
         with self._installed():
             self._adopt()
             collector_id = uuid.uuid4()

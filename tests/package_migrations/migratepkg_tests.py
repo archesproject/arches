@@ -69,7 +69,6 @@ class MigratePkgTests(PackageMigrationOperationTests):
         )
 
     def _write_migrations(self, *migrations):
-        """(name, atomic, operations) in order, each depending on the one before."""
         previous_name = None
         for name, atomic, operations in migrations:
             if previous_name:
@@ -119,7 +118,6 @@ class MigratePkgTests(PackageMigrationOperationTests):
         return f'AddNodeToTiles(nodegroup_id="{self.nodegroup_id}", nodeid="{self.nodeid}")'
 
     def _add_node_rows(self):
-        """The rows a Graph Designer edit leaves behind before any migration ran."""
         models.Node.objects.create(
             nodeid=self.nodeid,
             graph_id=self.graphid,
@@ -262,30 +260,6 @@ class MigratePkgTests(PackageMigrationOperationTests):
         self.assertIn("matches no point", message)
         self.assertNotIn("--force", message)
 
-    def test_an_ambiguous_position_is_refused(self):
-        """Deleting and recreating the same row makes the database fit before both
-        migrations and after them; running from the wrong one deletes data."""
-        string_nodeid = str(self.string_node.nodeid)
-        self._write_migrations(
-            (
-                "0001_graph_delete",
-                True,
-                [f'DeleteNode(graphid="{self.graphid}", pk="{string_nodeid}")'],
-            ),
-            (
-                "0002_graph_recreate",
-                True,
-                [self._create_node(string_nodeid, "spike_string", "string")],
-            ),
-        )
-        with self._installed():
-            with self.assertRaises(CommandError) as refusal:
-                self._migratepkg(APP_NAME)
-        message = str(refusal.exception)
-        self.assertIn("fits more than one point", message)
-        self.assertIn("If it is before all of them", message)
-        self.assertIn(f"If it is at {APP_NAME}.0002_graph_recreate", message)
-
     def test_reversal_leaves_the_graph_as_a_designer_publish_would(self):
         previous_publication_id = str(self._graph_row().publication_id)
         publication_id = str(uuid.uuid4())
@@ -356,8 +330,6 @@ class MigratePkgTests(PackageMigrationOperationTests):
         self.assertTrue(self._graph_row().has_unpublished_changes)
 
     def test_reversing_an_in_place_publication_snapshots_the_reverted_rows(self):
-        """A migration made after Update Publication carries the publication it
-        refreshed, so reversing it refreshes that publication again."""
         publication_id = str(self._graph_row().publication_id)
         self._write_migrations(
             (
@@ -389,32 +361,6 @@ class MigratePkgTests(PackageMigrationOperationTests):
         graph_row = self._graph_row()
         self.assertEqual(str(graph_row.publication_id), publication_id)
         self.assertFalse(graph_row.has_unpublished_changes)
-
-    def test_reversal_refuses_a_publication_this_database_never_had(self):
-        missing_publication_id = str(uuid.uuid4())
-        publication_id = str(uuid.uuid4())
-        self._write_migrations(
-            (
-                "0001_graph_add",
-                True,
-                [
-                    self._create_node(),
-                    self._create_edge(),
-                    self._publish(publication_id, missing_publication_id),
-                ],
-            ),
-            (
-                "0002_data_add",
-                False,
-                [self._move_resources(publication_id, missing_publication_id)],
-            ),
-        )
-        with self._installed():
-            self._migratepkg(APP_NAME, verbosity=0)
-            with self.assertRaises(CommandError) as refusal:
-                self._migratepkg(APP_NAME, "zero", verbosity=0)
-        self.assertIn("never had it", str(refusal.exception))
-        self.assertEqual(self._recorded(), {"0001_graph_add", "0002_data_add"})
 
     def test_a_draft_with_unpublished_edits_is_kept_unless_forced(self):
         self._write_migrations(
@@ -613,14 +559,14 @@ class MigratePkgTests(PackageMigrationOperationTests):
         with self._installed():
             with self.assertRaises(CommandError) as refusal:
                 self._migratepkg(APP_NAME)
+            message = str(refusal.exception)
+            self.assertIn("fits more than one point", message)
+            self.assertIn("If it is before all of them", message)
             self.assertIn(
                 f"If it is at {APP_NAME}.0002_graph_recreate:\n  python manage.py migratepkg {APP_NAME} --fake",
-                str(refusal.exception),
+                message,
             )
-            self.assertIn(
-                f"python manage.py migratepkg {APP_NAME} --force",
-                str(refusal.exception),
-            )
+            self.assertIn(f"python manage.py migratepkg {APP_NAME} --force", message)
             self._migratepkg(APP_NAME, fake=True, verbosity=0)
         self.assertEqual(self._recorded(), {"0001_graph_delete", "0002_graph_recreate"})
         self.assertTrue(models.Node.objects.filter(pk=string_nodeid).exists())
@@ -643,8 +589,6 @@ class MigratePkgTests(PackageMigrationOperationTests):
         self.assertFalse(models.Node.objects.filter(pk=self.nodeid).exists())
 
     def test_unrecording_with_fake_deletes_nothing(self):
-        """A fake reversal runs no operation, so what a real one would destroy is
-        no reason to refuse it."""
         nodegroup_id = str(uuid.uuid4())
         self._write_migrations(
             (

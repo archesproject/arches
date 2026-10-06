@@ -1,15 +1,4 @@
-"""Node operations.
-
-Structural only: creating a node does not put a key in any tile and deleting one
-does not remove it. That is what the data operations are for, and keeping them
-separate is what lets a chunked backfill run in its own non-atomic migration.
-
-A non-collector node must be paired with a CreateEdge joining it to the tree.
-Graph.copy() nulls every non-collector node's nodegroup and rebuilds membership
-with populate_null_nodegroups(), which walks edges, so a stranded node makes the
-graph uncopyable, so create_draft_graph() and promote_draft_graph_to_active_graph()
-both fail.
-"""
+"""Node operations. Structural only: tile keys are the data operations' job."""
 
 from arches.app.models import models
 from arches.db.package_migrations.operations.base import (

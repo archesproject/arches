@@ -1,8 +1,6 @@
 """Package migration operations.
 
-Public API: generated migration files import these by dotted path and ship inside
-third-party wheels. Constructor signatures are additive-only: new parameters
-must have defaults, and removing one requires a two-release deprecation.
+Public API imported by generated migrations: constructor signatures are additive-only.
 """
 
 from arches.db.package_migrations.operations.base import PackageOperation

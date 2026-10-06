@@ -1,10 +1,6 @@
-"""Discovery and graph building for package migrations.
-
-MigrationLoader hardcodes MigrationRecorder in two places and MigrationGraph in
-one, so build_graph() and check_consistent_history() must be overridden as well
-as migrations_module(). Without the build_graph override the loader reads
-django_migrations, concludes nothing is applied, and re-runs every package
-migration's database_forwards against live data.
+"""MigrationLoader for package migrations. build_graph() and
+check_consistent_history() are overridden because Django hardcodes its own
+recorder and graph in them.
 """
 
 from django.apps import apps
@@ -17,10 +13,7 @@ from django.db.migrations.loader import MigrationLoader
 from arches.db.package_migrations.graph import PackageMigrationGraph
 from arches.db.package_migrations.recorder import PackageMigrationRecorder
 
-# The literal "migrations" segment is load-bearing: load_disk only swallows
-# ModuleNotFoundError when MIGRATIONS_MODULE_NAME appears in the missing module
-# path, so a top-level "<app>.package_migrations" would raise for every app that
-# does not ship one.
+# load_disk only tolerates a missing module whose path contains "migrations".
 PACKAGE_MIGRATIONS_MODULE_NAME = "migrations.package_migrations"
 
 
@@ -33,14 +26,9 @@ class PackageMigrationLoader(MigrationLoader):
         app_config = apps.get_app_config(app_label)
         if not getattr(app_config, "is_arches_application", False):
             return None, False
-        # explicit=False so load_disk treats a missing package as "unmigrated"
-        # rather than raising.
         return f"{app_config.name}.{PACKAGE_MIGRATIONS_MODULE_NAME}", False
 
     def build_graph(self):
-        """Mirrors MigrationLoader.build_graph, substituting the package
-        recorder (django loader.py:287) and graph (loader.py:292).
-        """
         self.load_disk()
         if self.connection is None:
             self.applied_migrations = {}
@@ -69,7 +57,7 @@ class PackageMigrationLoader(MigrationLoader):
                 for replaced in migration.replaces:
                     reverse_replacements.setdefault(replaced, set()).add(key)
             if node_not_found_error.node in reverse_replacements:
-                candidates = reverse_replacements.get(node_not_found_error.node, set())
+                candidates = reverse_replacements[node_not_found_error.node]
                 is_replaced = any(
                     candidate in self.graph.nodes for candidate in candidates
                 )
@@ -84,9 +72,6 @@ class PackageMigrationLoader(MigrationLoader):
         self.graph.ensure_not_cyclic()
 
     def check_consistent_history(self, connection):
-        """django loader.py:349 hardcodes MigrationRecorder, which would consult
-        django_migrations.
-        """
         recorder = self.recorder_class(connection)
         applied = recorder.applied_migrations()
         for migration in applied:

@@ -47,7 +47,6 @@ def _names(operations):
 
 
 def _structural(operations):
-    """Names minus the publication tail every non-empty diff appends."""
     return [n for n in _names(operations) if n not in PUBLICATION]
 
 
@@ -92,7 +91,6 @@ class DiffGraphTests(SimpleTestCase):
         self.assertNotIn("graphid", operations[0].changes)
 
     def test_creates_run_nodegroup_before_node(self):
-        """A node references its nodegroup, so the nodegroup must exist first."""
         after = _graph(nodes=[_node()], nodegroups=[{"nodegroupid": NODEGROUP}])
         names = _structural(changes_for_graph(_graph(), after, PUBLICATION_ID))
         self.assertLess(names.index("CreateNodeGroup"), names.index("CreateNode"))
@@ -106,9 +104,7 @@ class DiffGraphTests(SimpleTestCase):
         self.assertLess(names.index("DeleteNode"), names.index("DeleteNodeGroup"))
 
     def test_a_key_the_to_state_omits_is_not_a_change(self):
-        """Reading an absent key as null emitted AlterNode(alias=None), which is
-        written to disk, shipped, and only fails on the customer's database --
-        Node.alias is NOT NULL."""
+        """Reading it as null would emit AlterNode(alias=None); alias is NOT NULL."""
         complete = _node(alias="survey_date", hascustomalias=True)
         partial = {
             key: value
@@ -121,8 +117,6 @@ class DiffGraphTests(SimpleTestCase):
         self.assertEqual(changes_for_graph(before, after, PUBLICATION_ID), [])
 
     def test_diff_is_the_inverse_of_replaying_its_own_operations(self):
-        """The property that makes the autodetector trustworthy: applying the
-        emitted operations to the from-state must produce the to-state."""
         before = _graph(nodegroups=[{"nodegroupid": NODEGROUP}])
         after = _graph(
             nodes=[_node()],
@@ -134,11 +128,7 @@ class DiffGraphTests(SimpleTestCase):
         for operation in changes_for_graph(before, after, PUBLICATION_ID):
             operation.state_forwards("arches", state)
         replayed = state.graphs[GRAPH]
-        # Replayed state holds every column, because that is what the rows hold
-        # once created; the canonical graph holds only the keys it was given, and
-        # PublishGraph adds a publication the projection never carries. The
-        # property that matters is that the two agree wherever the canonical graph
-        # speaks. Anywhere they disagree, the next diff invents a change nobody made.
+        # Replayed rows hold every column, so compare only the keys the graph gives.
         for key, expected in after.items():
             if key in ("nodes", "nodegroups", "edges", "cards", "widgets"):
                 self.assertEqual(set(replayed[key]), set(expected), key)
@@ -153,10 +143,6 @@ class DiffGraphTests(SimpleTestCase):
 
 class PublicationTailTests(SimpleTestCase):
     def test_every_non_empty_diff_publishes_and_moves_resources(self):
-        """Without this tail a migration mutates rows and nothing the application
-        reads changes: the published snapshot keeps the old graph, resources stay
-        pinned to the old publication, and the stale draft reverts the migration on
-        the next Graph Designer publish."""
         before = _graph()
         after = _graph(nodes=[_node()], nodegroups=[{"nodegroupid": NODEGROUP}])
         names = _names(changes_for_graph(before, after, PUBLICATION_ID))
@@ -173,9 +159,6 @@ class PublicationTailTests(SimpleTestCase):
         self.assertFalse(publish.updates_in_place)
 
     def test_an_unchanged_publication_id_updates_in_place(self):
-        """The Graph Designer's Update Publication rewrites the current
-        publication rather than minting one, so the id read back is the one
-        history already holds."""
         before = dict(_graph(), publication_id=PUBLICATION_ID)
         after = _graph(nodes=[_node()], nodegroups=[{"nodegroupid": NODEGROUP}])
         publish = changes_for_graph(before, after, PUBLICATION_ID)[-2]
@@ -185,9 +168,6 @@ class PublicationTailTests(SimpleTestCase):
 
 class DeleteNodeGroupStateTests(SimpleTestCase):
     def test_state_loses_everything_the_database_cascade_takes(self):
-        """The row cascade reaches nodes, cards, the widgets on those cards and the
-        edges joining those nodes. State that keeps them makes the next diff emit
-        deletes for rows that are already gone."""
         from arches.db.package_migrations.operations.nodegroup import DeleteNodeGroup
 
         card = str(uuid.uuid4())

@@ -2670,7 +2670,7 @@ class Graph(models.GraphModel):
 
         # update graph data
         serialized_draft_graph["graphid"] = serialized_source_graph["graphid"]
-        if "resource_instance_lifecycle_id" in serialized_source_graph.keys():
+        if "resource_instance_lifecycle_id" in serialized_source_graph:
             serialized_draft_graph["resource_instance_lifecycle_id"] = (
                 serialized_source_graph["resource_instance_lifecycle_id"]
             )
@@ -2810,17 +2810,10 @@ class Graph(models.GraphModel):
 
             return Graph.objects.get(pk=updated_graph.pk)
 
-    def publish(
-        self, user=None, notes=None, *, publication_id=None, published_time=None
-    ):
+    def publish(self, user=None, notes=None, *, publication_id=None):
         """
         Adds a corresponding entry to the GraphXPublishedGraph table,
         and creates a PublishedGraph entry for every active language
-
-        publication_id and published_time let a caller supply the publication's
-        identity rather than minting a random one. A package migration ships the
-        same publication id to every install, so "which version is this site on"
-        is answerable across installs instead of being local to whoever published.
         """
         if self.source_identifier_id:
             raise RuntimeError("Publishing a draft_graph is prohibited.")
@@ -2835,8 +2828,6 @@ class Graph(models.GraphModel):
             publication_fields = {}
             if publication_id is not None:
                 publication_fields["publicationid"] = publication_id
-            if published_time is not None:
-                publication_fields["published_time"] = published_time
             publication = models.GraphXPublishedGraph.objects.create(
                 graph=self, notes=notes, user=user, **publication_fields
             )

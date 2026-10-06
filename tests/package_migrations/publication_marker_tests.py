@@ -1,24 +1,15 @@
-"""Pins the behaviour that tile-data operations select on content, not on
-resource_instances.graph_publication_id.
-
-ResourceInstance.save() unconditionally re-stamps graph_publication to the
-graph's CURRENT publication (models.py:1548), so between a modeler publishing and
-ops running a migration, any record a curator touches is stamped as the new
-version while its tile data is still the old shape. A migration that filtered on
-that column would silently skip exactly those records.
-"""
-
-from unittest.mock import patch
+"""Why tile-data operations select on content rather than graph_publication_id:
+ResourceInstance.save() re-stamps it to the current publication, whatever shape
+the tile data is in."""
 
 from arches.app.models import models
 from arches.app.models.resource import Resource
 
-from tests.tasks_tests import UpdateResourceInstanceDataTaskTests
+from tests.tasks_tests import ResourceInstanceDataTestCase
 
 
-class PublicationMarkerTests(UpdateResourceInstanceDataTaskTests):
-    @patch("arches.app.tasks.notify_completion")
-    def test_ordinary_saves_restamp_the_publication_marker(self, mock_notify):
+class PublicationMarkerTests(ResourceInstanceDataTestCase):
+    def test_ordinary_saves_restamp_the_publication_marker(self):
         resource_instance = models.ResourceInstance.objects.create(
             graph=self.test_graph
         )
@@ -38,8 +29,7 @@ class PublicationMarkerTests(UpdateResourceInstanceDataTaskTests):
         self.assertEqual(
             str(resource_instance.graph_publication_id),
             new_publication_id,
-            "ResourceInstance.save() must re-stamp; if this ever stops being true, "
-            "revisit D5 (content-addressed tile selection).",
+            "ResourceInstance.save() must re-stamp",
         )
 
         models.ResourceInstance.objects.filter(pk=resource_instance.pk).update(
@@ -51,12 +41,7 @@ class PublicationMarkerTests(UpdateResourceInstanceDataTaskTests):
             str(resource_instance.graph_publication_id), new_publication_id
         )
 
-    @patch("arches.app.tasks.notify_completion")
-    def test_tile_save_does_not_restamp_the_resource(self, mock_notify):
-        """Counterpart to the above: tile.save() does NOT reach
-        ResourceInstance.save(), so the repoint loop in
-        update_resource_instance_data_based_on_graph_diff is not defeated by it.
-        """
+    def test_tile_save_does_not_restamp_the_resource(self):
         resource_instance = models.ResourceInstance.objects.create(
             graph=self.test_graph
         )

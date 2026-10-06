@@ -1,23 +1,5 @@
-"""Tile operations.
-
-These are set-based BECAUSE the transformations here are datatype-agnostic:
-adding or removing a JSON key with a literal value carries no datatype meaning,
-creates no relationships and no geometries. Anything that does need datatype
-semantics (converting stored values, for instance) must go through the
-datatype layer instead, per tile. No operation in this module may branch on a
-node's datatype; that knowledge belongs to DDataType and the datatype factory.
-
-Derived state (Elasticsearch, geojson_geometries, resource_x_resource) is NOT
-this module's concern either. migratepkg prints the reindex command for the graphs
-a run touched.
-
-Avoiding the Tile proxy is also a hard performance requirement: Tile.__init__
-calls load_serialized_graph(), which fetches a PublishedGraph row and parses a
-multi-megabyte JSON blob per instance.
-
-Selection is by tile CONTENT, never by resource_instances.graph_publication_id:
-ResourceInstance.save() re-stamps that column on every write, so it is not a
-stable marker of which shape a record's data is in.
+"""Set-based tile operations. They must stay datatype-agnostic, avoid the Tile proxy,
+and select tiles by content, never by graph_publication_id.
 """
 
 import json
@@ -29,17 +11,12 @@ from arches.app.models import models
 from arches.db.package_migrations.operations.base import (
     DEFAULT_BATCH_SIZE,
     PackageOperation,
+    _short,
     keyset_batches,
 )
 
 
 class _ChunkedTileOperation(PackageOperation):
-    """Shared keyset-chunking over (nodegroupid, tileid).
-
-    Leading underscore: __init_subclass__ skips the contract checks for
-    intermediate bases.
-    """
-
     scope = "data"
 
     def _tiles(self, alias):
@@ -63,11 +40,7 @@ class _ChunkedTileOperation(PackageOperation):
 
 
 class AddNodeToTiles(_ChunkedTileOperation):
-    """Add a node's key to tiles that do not have it yet.
-
-    Idempotent by construction: the NOT (tiledata ? nodeid) predicate is the
-    version test done directly, so a killed run simply resumes.
-    """
+    """Add a node's key to tiles that do not have it yet; a killed run resumes."""
 
     reversible = True
 
@@ -78,7 +51,7 @@ class AddNodeToTiles(_ChunkedTileOperation):
         self.batch_size = batch_size
 
     def state_forwards(self, app_label, state):
-        pass  # data only, like RunPython
+        pass
 
     def _pending(self, alias):
         return self._tiles(alias).exclude(data__has_key=str(self.nodeid))
@@ -104,18 +77,13 @@ class AddNodeToTiles(_ChunkedTileOperation):
 
     @property
     def migration_name_fragment(self):
-        return f"add_node_to_tiles_{str(self.nodeid).replace('-', '')[:8]}"
+        return f"add_node_to_tiles_{_short(self.nodeid)}"
 
 
 class RemoveNodeFromTiles(_ChunkedTileOperation):
-    """Strip a node's key from every tile in its nodegroup.
+    """Strip a node's key from every tile in its nodegroup. Irreversible.
 
-    Must run AFTER the node row is gone: TileModel.save() calls
-    set_missing_keys_to_none(), which re-adds a key for any live Node in the
-    nodegroup, so removing data while the node still exists is undone by the next
-    ordinary save.
-
-    Irreversible: the values are discarded and nothing captures them.
+    Must run after the node is deleted, or the next TileModel.save() re-adds the key.
     """
 
     reversible = False
@@ -143,18 +111,10 @@ class RemoveNodeFromTiles(_ChunkedTileOperation):
         return total
 
     def _prune_provisional_edits(self, schema_editor):
-        """A pending provisional edit is keyed by the same nodeids as tiledata.
-
-        A stale key there is written back into data when a reviewer approves the
-        edit, and Tile.save() then raises Node.DoesNotExist because the node is
-        gone, leaving a record no curator can fix from the UI. Arches' own graph-diff
-        path prunes them for the same reason.
-        """
         alias = schema_editor.connection.alias
         pending = self._tiles(alias).filter(provisionaledits__isnull=False)
         expression = RawSQL(
-            # provisionaledits is {user_id: {"value": {nodeid: ...}, ...}}, so the
-            # key has to come out of every user's edit, not off the top level.
+            # provisionaledits is {user_id: {"value": {nodeid: ...}, ...}}.
             """
             COALESCE((
                 SELECT jsonb_object_agg(
@@ -180,17 +140,11 @@ class RemoveNodeFromTiles(_ChunkedTileOperation):
 
     @property
     def migration_name_fragment(self):
-        return f"remove_node_from_tiles_{str(self.nodeid).replace('-', '')[:8]}"
+        return f"remove_node_from_tiles_{_short(self.nodeid)}"
 
 
 class DeleteTilesForNodeGroup(_ChunkedTileOperation):
-    """Remove tiles belonging to a nodegroup that no longer exists.
-
-    TileModel.nodegroup is db_constraint=False, on_delete=DO_NOTHING, so deleting
-    a nodegroup leaves its tiles behind with nothing to reference.
-
-    Irreversible: the tiles and their data are gone.
-    """
+    """Remove tiles left behind by a deleted nodegroup. Irreversible."""
 
     reversible = False
 
@@ -218,4 +172,4 @@ class DeleteTilesForNodeGroup(_ChunkedTileOperation):
 
     @property
     def migration_name_fragment(self):
-        return f"delete_tiles_{str(self.nodegroup_id).replace('-', '')[:8]}"
+        return f"delete_tiles_{_short(self.nodegroup_id)}"

@@ -1,34 +1,15 @@
 """Bring existing business data into line with a republished graph.
 
-Two separate changes, in this order:
-
-* ``reshape_tiles`` rewrites the tiles of resources still on the old publication,
-  so their data matches the new graph.
-* ``move_resources_to_publication`` then points those resources at the new
-  publication, which is what marks them current.
-
-The order is the point. A resource's publication says "this record matches the
-published graph", so moving it before its tiles are reshaped would claim
-something untrue.
-
-Both raise rather than swallowing: only the Celery wrapper in arches.app.tasks
-may catch, or a failure here would be reported as success.
+Reshape the tiles first, then move the resources: a resource's publication says
+its data matches that published graph.
 """
 
-from django.db import DEFAULT_DB_ALIAS
 from django.db.models import F, Q
 
 from arches.app.models import models
 
 
-def reshape_tiles(initial_graph, updated_graph, using=DEFAULT_DB_ALIAS):
-    """Rewrite the tiles of resources on ``initial_graph``'s publication.
-
-    Tiles gain keys for nodes the new graph adds, lose keys for nodes it removes,
-    and are deleted when their nodegroup is gone. Both arguments are serialized
-    graphs (``PublishedGraph.serialized_graph``). Returns the number of tiles
-    deleted or rewritten.
-    """
+def reshape_tiles(initial_graph, updated_graph):
     updated_nodegroup_ids = {
         nodegroup["nodegroupid"] for nodegroup in updated_graph["nodegroups"]
     }
@@ -39,26 +20,17 @@ def reshape_tiles(initial_graph, updated_graph, using=DEFAULT_DB_ALIAS):
     }
 
     # delete tiles whose nodegroups are no longer in the updated graph
-    orphaned, _ = (
-        models.TileModel.objects.using(using)
-        .filter(
-            nodegroup_id__in=orphaned_nodegroup_ids,
-            resourceinstance__graph_publication_id=initial_graph["publication_id"],
-        )
-        .delete()
-    )
+    models.TileModel.objects.filter(
+        nodegroup_id__in=orphaned_nodegroup_ids,
+        resourceinstance__graph_publication_id=initial_graph["publication_id"],
+    ).delete()
 
     # delete tiles whose parent tile's nodegroup_id does not match the expected
     # parent nodegroup_id
-    misparented, _ = (
-        models.TileModel.objects.using(using)
-        .filter(
-            parenttile__isnull=False,
-            resourceinstance__graph_publication_id=initial_graph["publication_id"],
-        )
-        .filter(~Q(parenttile__nodegroup_id=F("nodegroup__parentnodegroup_id")))
-        .delete()
-    )
+    models.TileModel.objects.filter(
+        parenttile__isnull=False,
+        resourceinstance__graph_publication_id=initial_graph["publication_id"],
+    ).filter(~Q(parenttile__nodegroup_id=F("nodegroup__parentnodegroup_id"))).delete()
 
     initial_node_ids_to_default_values = {
         node["nodeid"]: (node.get("config") or {}).get("defaultValue")
@@ -74,8 +46,7 @@ def reshape_tiles(initial_graph, updated_graph, using=DEFAULT_DB_ALIAS):
             node["nodeid"]
         )
 
-    rewritten = 0
-    tiles = models.TileModel.objects.using(using).filter(
+    tiles = models.TileModel.objects.filter(
         resourceinstance__graph_publication_id=initial_graph["publication_id"]
     )
     for tile in tiles.iterator():
@@ -86,10 +57,8 @@ def reshape_tiles(initial_graph, updated_graph, using=DEFAULT_DB_ALIAS):
             if node_id not in updated_node_ids:
                 del tile.data[node_id]
 
-        # ...and from any pending provisional edit, which is keyed by the same
-        # nodeids. A stale key there is written back into data when a reviewer
-        # approves the edit, and Tile.save() then raises Node.DoesNotExist because
-        # the node is gone, leaving a record no curator can fix from the UI.
+        # A stale key in a provisional edit is written back into data on approval,
+        # and Tile.save() then raises Node.DoesNotExist.
         for provisional_edit in (tile.provisionaledits or {}).values():
             for node_id in list(provisional_edit.get("value", {})):
                 if node_id not in updated_node_ids:
@@ -107,18 +76,10 @@ def reshape_tiles(initial_graph, updated_graph, using=DEFAULT_DB_ALIAS):
                 tile.data[node_id] = updated_node_ids_to_default_values.get(node_id)
 
         tile.save()
-        rewritten += 1
-
-    return orphaned + misparented + rewritten
 
 
-def move_resources_to_publication(initial_graph, updated_graph, using=DEFAULT_DB_ALIAS):
-    """Point resources on ``initial_graph``'s publication at ``updated_graph``'s.
-
-    Run this after reshape_tiles: the publication is what says a resource matches
-    the published graph. Returns the number of resources moved.
-    """
-    resource_instances = models.ResourceInstance.objects.using(using).filter(
+def move_resources_to_publication(initial_graph, updated_graph):
+    resource_instances = models.ResourceInstance.objects.filter(
         graph_publication_id=initial_graph["publication_id"]
     )
     moved = 0

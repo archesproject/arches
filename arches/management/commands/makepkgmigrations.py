@@ -1,14 +1,7 @@
 """Generate package migrations from the graphs in this database.
 
-The graphs as they are here, edited and published in the Graph Designer, are the
-desired state. They are diffed against the state this app's committed migrations
-replay to, and because this database already has what a new graph migration
-describes, that migration is recorded as applied here.
-
-Structural operations and chunked data operations are written into separate
-migrations. Graph foreign keys are DEFERRABLE INITIALLY DEFERRED, which lets
-structural operations run in any order inside one transaction, a guarantee that
-disappears under `atomic = False`, which the chunked data operations require.
+Graph and data operations get separate migrations: deferred graph foreign keys need
+a transaction, and chunked data operations cannot run inside one.
 """
 
 import os
@@ -94,8 +87,7 @@ class Command(BaseCommand):
                 f"{app_label} has no package migrations yet, so nothing says which graphs belong to it. Name them:\n  python manage.py makepkgmigrations {app_label} --graph <graph id or slug>"
             )
 
-        # Replay only this app's history: the default replays every app's leaves,
-        # which would diff this app's graphs against other apps' graphs.
+        # Replay only this app's leaf, or other apps' graphs join the diff.
         from_state = loader.project_state(nodes=[leaf] if leaf else [])
 
         with transaction.atomic():
@@ -271,8 +263,7 @@ class Command(BaseCommand):
         )
 
     def _database_graphs(self, graphids):
-        # The exact call `packages -o export_graphs` makes, so histories built
-        # from exported files see no change that is not there.
+        # Same call as `packages -o export_graphs`, so exported baselines diff clean.
         if not graphids:
             return {}
         return {
@@ -291,8 +282,6 @@ class Command(BaseCommand):
         }
 
     def _warn_about_data_the_generator_cannot_convert(self, operations, to_graphs):
-        """Two node changes leave stored values behind, and neither can be fixed
-        automatically: the conversion needs a decision a diff cannot make."""
         for operation in operations:
             if not isinstance(operation, AlterNode):
                 continue
@@ -316,17 +305,7 @@ class Command(BaseCommand):
                 )
 
     def _build_migrations(self, app_label, operations, leaf, name):
-        """One migration per kind of change. Graph operations rewrite the
-        definition and run in a transaction; data operations rewrite business
-        records, chunk their own work, and must not. Keeping them in separate
-        files is what makes the ordering true rather than conventional: the graph
-        is published first, and resources stay on the old publication --
-        read-only, until the data migration has brought their tiles in line and
-        moved them.
-
-        Created graphs get a graph migration of their own, so a site that has
-        them from load_package can record it and apply the rest.
-        """
+        # Created graphs get their own migration for load_package sites to record.
         created_graphids = {
             operation.graphid
             for operation in operations
@@ -427,7 +406,6 @@ class Command(BaseCommand):
             "initial": dependency is None,
         }
         if not atomic:
-            # Chunked data operations cannot run inside the migration transaction.
             attributes["atomic"] = False
         return type("Migration", (migrations.Migration,), attributes)("", app_label)
 
@@ -437,8 +415,7 @@ class Command(BaseCommand):
         basedir = writers[0].basedir
         os.makedirs(basedir, exist_ok=True)
         init = os.path.join(basedir, "__init__.py")
-        # Without __init__.py the directory is a namespace package, which
-        # load_disk silently treats as "this app has no migrations".
+        # load_disk treats a namespace package as "no migrations".
         if not os.path.exists(init):
             open(init, "w").close()
         written_paths = []

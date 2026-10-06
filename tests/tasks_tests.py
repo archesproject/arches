@@ -10,7 +10,7 @@ from arches.app.models.graph import Graph
 from tests.base_test import ArchesTestCase
 
 
-class UpdateResourceInstanceDataTaskTests(ArchesTestCase):
+class ResourceInstanceDataTestCase(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
         logging.getLogger("arches.app.tasks").setLevel(logging.CRITICAL)
@@ -168,6 +168,8 @@ class UpdateResourceInstanceDataTaskTests(ArchesTestCase):
         graph.publish()
         return graph
 
+
+class UpdateResourceInstanceDataTaskTests(ResourceInstanceDataTestCase):
     @patch("arches.app.tasks.notify_completion")
     def test_task_runs_and_notifies_success(self, mock_notify):
         published_graph = models.PublishedGraph.objects.get(
@@ -260,15 +262,6 @@ class UpdateResourceInstanceDataTaskTests(ArchesTestCase):
 
     @patch("arches.app.tasks.notify_completion")
     def test_updates_publication_id_for_resources_with_tiles(self, mock_notify):
-        """The sibling test above covers only resources with no tiles.
-
-        `resource_instances` is a lazy queryset filtered on the OLD publication
-        id. The tile loop calls tile.save(), which cascades to
-        Resource.save_descriptors() -> ResourceInstance.save(), and that
-        unconditionally re-stamps graph_publication to the graph's CURRENT
-        publication. By the time the repoint loop re-evaluates the queryset, every
-        tile-bearing resource has already fallen out of it.
-        """
         resource_instance = models.ResourceInstance.objects.create(
             graph=self.test_graph
         )

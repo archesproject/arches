@@ -1,9 +1,4 @@
-"""Applied-state ledger for package migrations.
-
-The same three columns as django_migrations, in a table of its own, so the base
-MigrationRecorder.ensure_schema() creates it on first use exactly as it creates
-django_migrations.
-"""
+"""Applied-state ledger for package migrations, shaped like django_migrations."""
 
 from django.apps.registry import Apps
 from django.db import models
@@ -13,10 +8,7 @@ from django.utils.timezone import now
 
 
 class PackageMigrationRecorder(MigrationRecorder):
-    # MigrationRecorder caches its floating model with ``if cls._migration_class
-    # is None``, which reads through the MRO. Without redeclaring it here, a
-    # subclass silently returns the BASE model and writes to django_migrations
-    # whenever anything has touched MigrationRecorder.Migration first.
+    # Redeclared so the cache is not inherited from MigrationRecorder.
     _migration_class = None
 
     @classproperty

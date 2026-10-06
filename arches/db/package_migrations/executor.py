@@ -1,11 +1,4 @@
-"""Execution for package migrations.
-
-Injecting the loader and recorder is not enough: _create_project_state()
-hardcodes ProjectState (django executor.py:80) and is reached from three
-branches of migrate() plus _migrate_all_backwards(). detect_soft_applied() is
-CreateModel/AddField-specific and returns a MUTATED state while reporting False,
-so inheriting it silently double-applies state under --fake-initial.
-"""
+"""MigrationExecutor with package state, loader and recorder."""
 
 from django.db import transaction
 from django.db.migrations.executor import MigrationExecutor
@@ -29,7 +22,7 @@ class PackageMigrationExecutor(MigrationExecutor):
         self.progress_callback = progress_callback
 
     def _create_project_state(self, with_applied_migrations=False):
-        state = self.state_class(real_apps=self.loader.unmigrated_apps)
+        state = self.state_class()
         if with_applied_migrations:
             full_plan = self.migration_plan(
                 self.loader.graph.leaf_nodes(), clean_start=True
@@ -63,8 +56,7 @@ class PackageMigrationExecutor(MigrationExecutor):
         }
         with transaction.atomic(using=alias):
             state = super().unapply_migration(state, migration, fake=fake)
-            # PublishGraph unapplies first, so the reversed rows after it re-flag
-            # the graph as having unpublished changes.
+            # Reversed rows after PublishGraph re-flag the graph as unpublished.
             for publication in publications:
                 if publication.updates_in_place:
                     publication.refresh(alias)
@@ -75,10 +67,5 @@ class PackageMigrationExecutor(MigrationExecutor):
         return state
 
     def detect_soft_applied(self, project_state, migration):
-        """Django's implementation introspects information_schema for
-        CreateModel/AddField operations. Package operations are never either, so
-        it always reports False while handing back a mutated state, which then
-        gets migrated on top of. Adoption of an already-loaded package is handled
-        by `migratepkg --fake`, not by soft-apply detection.
-        """
+        # Django's version returns a mutated state, which would be applied twice.
         return False, project_state

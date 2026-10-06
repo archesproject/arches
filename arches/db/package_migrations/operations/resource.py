@@ -1,37 +1,17 @@
-"""Resource instance operations.
-
-A resource's graph_publication says "this resource matches the published graph".
-It is business data, not graph structure: it moves only after the tile operations
-have brought the resource's data in line, which is why this lives here and runs
-after them.
-"""
-
 from arches.app.models import models
 from arches.db.package_migrations.operations.base import (
     DEFAULT_BATCH_SIZE,
     PackageMigrationError,
     PackageOperation,
+    _short,
     keyset_batches,
 )
 
 
 class SetResourcePublication(PackageOperation):
-    """Move a graph's resources onto a publication.
+    """Move every resource of a graph onto its current publication, after the tiles.
 
-    Every resource of the graph moves, in both directions, not only those on the
-    publication being left: a site that adopted package migrations with --fake
-    never had that publication, so a from-scoped update there matches nothing and
-    silently leaves every resource pinned to the old one, where the editor
-    redirects them to the read-only report.
-
-    That is only true because the operations before it have already brought every
-    tile of the graph in line: the stamp says "this resource matches the
-    published graph", so it must run last.
-
-    Set-based rather than save(): ResourceInstance.save() would re-stamp
-    graph_publication from the graph anyway, and doing this per row on a
-    multi-million-resource graph is the single most expensive thing a migration
-    can do.
+    Not scoped to the publication being left: a site adopted with --fake never had it.
     """
 
     scope = "data"
@@ -50,17 +30,13 @@ class SetResourcePublication(PackageOperation):
 
     @property
     def reversible(self):
-        # Nowhere to move resources back to without the previous publication.
         return self.previous_publication_id is not None
 
     def state_forwards(self, app_label, state):
-        pass  # data only, like RunPython
+        pass
 
     def _current_publication(self, alias):
-        # The graph's CURRENT publication, not the one recorded here. They are the
-        # same on any install that ran the graph migration, and they differ where
-        # the graph migration was recorded rather than run. Reading it makes this
-        # operation say what it means: resources match the graph.
+        # Not self.publication_id: the two differ where the graph migration was faked.
         return (
             models.GraphModel.objects.using(alias)
             .filter(pk=self.graphid)
@@ -97,7 +73,6 @@ class SetResourcePublication(PackageOperation):
                 "publication to move resources back to."
             )
         if str(self.publication_id) == str(self.previous_publication_id):
-            # Updated in place: the publication is the one resources were already on.
             return 0
         alias = schema_editor.connection.alias
         if (
@@ -116,9 +91,6 @@ class SetResourcePublication(PackageOperation):
         )
 
     def _move(self, queryset, publication_id):
-        """Batched: one UPDATE over every resource of a large graph is a single
-        long statement, a lock on every row it touches, and the first thing to die
-        under statement_timeout."""
         total = 0
         for keys in keyset_batches(queryset, "resourceinstanceid", self.batch_size):
             total += queryset.filter(resourceinstanceid__in=keys).update(
@@ -131,4 +103,4 @@ class SetResourcePublication(PackageOperation):
 
     @property
     def migration_name_fragment(self):
-        return f"resource_publication_{str(self.publication_id).replace('-', '')[:8]}"
+        return f"resource_publication_{_short(self.publication_id)}"

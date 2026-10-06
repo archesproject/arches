@@ -1,10 +1,4 @@
-"""Contract tests covering every package migration operation at once.
-
-No database. These catch the class of defect that shipped in the first attempt:
-a codegen kwarg that is not an __init__ parameter is silently dropped by
-OperationWriter, producing a migration file that imports cleanly and does
-nothing.
-"""
+"""Contract tests covering every package migration operation at once. No database."""
 
 import uuid
 
@@ -80,26 +74,13 @@ class OperationContractTests(SimpleTestCase):
             "every exported operation needs a sample in this contract test",
         )
 
-    def test_deconstruct_kwargs_are_all_init_parameters(self):
-        """OperationWriter silently drops any kwarg that is not an __init__
-        parameter, so a mismatch produces a migration file that does nothing."""
+    def test_deconstruct_emits_exactly_the_init_parameters(self):
+        """OperationWriter silently drops a kwarg that is not an __init__ parameter."""
         for op in SAMPLES:
             with self.subTest(op=type(op).__name__):
                 _name, args, kwargs = op.deconstruct()
-                init_params = set(get_func_args(op.__init__))
                 self.assertEqual(args, [])
-                self.assertTrue(
-                    set(kwargs) <= init_params,
-                    f"{type(op).__name__} emits {set(kwargs) - init_params} which are not __init__ parameters",
-                )
-
-    def test_deconstruct_emits_every_parameter(self):
-        """Including defaulted ones, so a committed migration is self-describing."""
-        for op in SAMPLES:
-            with self.subTest(op=type(op).__name__):
-                _name, _args, kwargs = op.deconstruct()
-                expected = set(get_func_args(op.__init__))
-                self.assertEqual(set(kwargs), expected)
+                self.assertEqual(set(kwargs), set(get_func_args(op.__init__)))
 
     def test_operations_serialize(self):
         for op in SAMPLES:
@@ -129,11 +110,7 @@ class OperationContractTests(SimpleTestCase):
                 self.assertTrue(op.migration_name_fragment)
 
     def test_no_operation_branches_on_a_datatype(self):
-        """Datatype behaviour belongs to DDataType and the datatype factory.
-
-        An operation branching on a datatype name hardcodes that knowledge in the
-        migration layer and rots when a datatype gains post-save behaviour.
-        """
+        """Datatype behaviour belongs to the datatype factory, not operations."""
         import pathlib
 
         package = pathlib.Path(ops.__file__).parent

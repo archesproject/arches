@@ -7,8 +7,7 @@ from arches.db.package_migrations.operations.base import (
 
 
 class CreateNodeGroup(_CreateRowOperation):
-    """grouping_node_id names a collector node CreateNode inserts afterwards. The
-    FK is DEFERRABLE INITIALLY DEFERRED, so this relies on an atomic migration."""
+    # grouping_node_id's FK is deferred, so this relies on an atomic migration.
 
     model = models.NodeGroup
     verbose_name = "nodegroup"
@@ -20,12 +19,7 @@ class AlterNodeGroup(_AlterRowOperation):
 
 
 class DeleteNodeGroup(_DeleteRowOperation):
-    """Deleting the row ORM-cascades to the nodegroup's nodes and cards, to the
-    widgets on those cards, and to the edges joining those nodes, so state has
-    to lose them too, or a later diff emits deletes for rows already gone.
-
-    It does NOT remove tiles: TileModel.nodegroup is db_constraint=False,
-    on_delete=DO_NOTHING, so orphaned tiles need DeleteTilesForNodeGroup.
+    """Cascades to the nodegroup's nodes, cards, widgets and edges, but not tiles.
 
     Irreversible: the cascade destroys rows this operation does not record.
     """

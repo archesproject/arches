@@ -1,17 +1,6 @@
 """Where a database sits in a plan of package migrations, and what would break.
-
-Package migrations are generated from the database they were authored on, not
-from the database being migrated, and a graph is rows a curator can edit in the
-Graph Designer at runtime.
-
-On a graph that has diverged, the failures are silent. An AlterNode for a node
-the site deleted updates zero rows and reports success. A CreateNode for a node
-the site already added collides, or quietly writes over it.
-
-So before applying, check the rows the plan is about to write: whether they are
-there, not what they contain. Field-level comparison is deliberately out of scope
--- it needs a three-way merge against the last-applied package snapshot, and it
-would report false conflicts for i18n fields, which serialize per active language.
+Rows are checked for presence only; field-level comparison would need a three-way
+merge and would misreport i18n fields.
 """
 
 import collections
@@ -26,20 +15,12 @@ from arches.db.package_migrations.operations.graph import CreateGraph, PublishGr
 from arches.db.package_migrations.operations.nodegroup import CreateNodeGroup
 from arches.db.package_migrations.state import COLLECTIONS
 
-# Rows the migrations create themselves; anything else a row points at has to be
-# installed already.
 GRAPH_ROW_MODELS = {entry[2] for entry in COLLECTIONS} | {models.GraphModel}
 
-
-# kind is "present" (a row the plan creates is already there), "missing" (a row it
-# changes or deletes is not), "reference" (something outside the graph that a row
-# points at is not installed), "destructive" or "orphans" (what unapplying would
-# destroy). Which one it is decides what the operator should do next.
+# kind: "present", "missing", "reference", "destructive" or "orphans".
 Problem = collections.namedtuple("Problem", "kind message")
 
-# position: how many of the migrations this database already has, None when no
-# point fits. ambiguous: every fitting position, when rows are deleted and
-# recreated between them.
+# position: how many migrations the database already has, or None.
 Fit = collections.namedtuple("Fit", "position problems ambiguous")
 
 
@@ -72,11 +53,8 @@ def fit(migrations, using):
 
 
 def missing_references(plan, using):
-    """A graph is not self-contained: it points at an ontology, a template, card
-    components and widgets, which a package installs through load_package rather
-    than through graph rows. Without this the first sign of trouble is a
-    DoesNotExist raised deep inside Graph.publish().
-    """
+    """Rows outside the graph (ontologies, widgets, ...) that the plan points at
+    but the database lacks."""
     wanted = collections.defaultdict(dict)
     for migration, backwards in plan:
         if backwards:
@@ -106,8 +84,7 @@ def missing_references(plan, using):
 
 
 def reverse_problems(plan, using):
-    """Unapplying recreates rows from replayed state, so the forward checks do
-    not hold in reverse. What does matter is what a reversal destroys."""
+    """What unapplying the plan would destroy."""
     found = []
     for migration, backwards in plan:
         if not backwards:
@@ -167,8 +144,7 @@ def _existing(keys, using):
 
 
 def _earliest_position(migrations, using):
-    """A new publication only exists where its migration ran. Not finding one
-    proves nothing: a site that faked its history has publications of its own."""
+    # A missing publication proves nothing: a faked history has its own.
     earliest = 0
     for index, migration in enumerate(migrations):
         published = [
@@ -202,8 +178,6 @@ def _mismatches(transitions, existing, position):
 
 
 def _recreated(transitions):
-    """Rows deleted and then created again. Creating a row and later deleting it
-    destroys nothing when replayed, so only this order makes positions ambiguous."""
     deleted, recreated = set(), set()
     for rows in transitions:
         for key, before, after in rows:
@@ -224,7 +198,6 @@ def _mismatch_problem(migration, model, primary_key, expected):
 
 
 def _references(operation):
-    """(model, pk) an operation points at outside the graph's own rows."""
     model = getattr(operation, "model", None)
     values = getattr(operation, "fields", None) or getattr(operation, "changes", None)
     if model is None or not values:

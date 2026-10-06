@@ -1,7 +1,7 @@
-"""Base class for package-data migration operations.
+"""Base classes for package migration operations.
 
-Subclasses are public API: generated migration files import them by dotted path
-and ship inside third-party wheels, so constructor signatures are additive-only.
+Subclasses are public API imported by generated migrations, so constructor
+signatures are additive-only.
 """
 
 import inspect
@@ -19,13 +19,7 @@ class PackageMigrationError(Exception):
 
 
 def keyset_batches(queryset, pk_field, batch_size):
-    """Yield lists of primary keys in pk order, resuming after the last one seen.
-
-    Operations that run outside a transaction walk their work this way: each
-    batch commits on its own, so locks are released and a killed run resumes.
-    The cursor is what bounds the work: without it the database re-scans from
-    the start of the table on every batch.
-    """
+    """Yield lists of primary keys in pk order, resuming after the last one seen."""
     last = None
     while True:
         batch = queryset
@@ -41,33 +35,19 @@ def keyset_batches(queryset, pk_field, batch_size):
 
 
 def _short(value):
-    """Migration file names carry a readable slice of a uuid, not the whole thing."""
     return str(value).replace("-", "")[:8]
 
 
 class PackageOperation(Operation):
-    # Package operations mutate rows and JSONB, not DDL. collect_sql would emit
-    # a placeholder comment for them (and skip state_forwards), so there is no
-    # sqlpkgmigrate; `migratepkg --plan` prints describe() instead.
     reduces_to_sql = False
-
-    # Django's default. An operation that needs to escape the migration's
-    # transaction cannot do it from here: only Migration.atomic = False achieves
-    # that, which the autodetector sets when it sees requires_non_atomic_migration.
     atomic = False
-
-    # Chunked data operations cannot run inside the migration transaction.
-    requires_non_atomic_migration = False
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
         if inspect.isabstract(cls) or cls.__name__.startswith("_"):
             return
 
-        # D6: Migration.unapply() raises IrreversibleError in phase 1 only when
-        # reversible is False. A reversible=True operation whose backwards is
-        # unimplemented instead lets phase 2 partially reverse the database and
-        # then blow up, so the two must agree at class-definition time.
+        # Otherwise unapply() partially reverses the database before failing.
         implements_backwards = (
             cls.database_backwards is not PackageOperation.database_backwards
         )
@@ -88,31 +68,15 @@ class PackageOperation(Operation):
                 raise TypeError(f"{cls.__name__} must define {name}.")
 
     def deconstruct(self):
-        """Emit every constructor parameter explicitly.
+        """Emit every constructor parameter explicitly, read back from self.
 
-        Operation.__new__ captures the raw call arguments before __init__ runs,
-        so the inherited deconstruct() omits anything the caller left defaulted
-        and reports pre-normalization values. Reading from self instead makes
-        generated migration files fully self-describing.
-
-        OperationWriter silently drops any kwarg whose name is not an __init__
-        parameter, so attribute names must match parameter names, so a mismatch
-        surfaces here as AttributeError rather than as a quietly empty call in a
-        generated file.
+        Attribute names must match __init__ parameter names: OperationWriter
+        filters kwargs with get_func_args and silently drops the rest.
         """
-        # get_func_args is the helper OperationWriter itself uses to decide which
-        # kwargs survive, so reading the parameter list with anything else risks
-        # emitting kwargs the writer then silently drops.
         kwargs = {name: getattr(self, name) for name in get_func_args(self.__init__)}
         return (self.__class__.__name__, [], kwargs)
 
     def qs(self, model, schema_editor):
-        """Every query must be bound to the migration's connection.
-
-        The executor opens its transaction and records the ledger row on the
-        selected alias; a bare Model.objects would execute on `default`, outside
-        that transaction.
-        """
         return model.objects.using(schema_editor.connection.alias)
 
     def has_pending_work(self, using):
@@ -120,21 +84,10 @@ class PackageOperation(Operation):
 
 
 class _AlterRowOperation(PackageOperation):
-    """Shared implementation for the Alter* family.
-
-    All six do the same thing: write a dict of field changes onto one row, and
-    reverse by reading the previous values back out of the replayed state. The
-    operation carries only the NEW values, because unapply() phase 1 replays state
-    forwards, so to_state still holds the old ones, exactly as Django's
-    AlterField recovers the previous field definition.
-
-    Subclasses set ``model``, ``state_collection`` and ``pk_attribute``.
-    """
-
     reversible = True
     scope = "graph"
     model = None
-    verbose_name = None  # "node", "card", ... drives describe() and the file name
+    verbose_name = None
 
     @property
     def state_collection(self):
@@ -150,21 +103,17 @@ class _AlterRowOperation(PackageOperation):
         self.changes = changes
 
     def _entry(self, state):
-        """Read-only view of the row, for recovering previous values on reverse."""
         return (
-            state.graph(self.graphid)
-            .get(self.state_collection, {})
-            .get(str(self._pk), {})
+            state.graph(self.graphid).get(self.state_collection, {}).get(self._pk, {})
         )
 
     def _entry_for_write(self, state):
         collection = state.graph_for_write(self.graphid).setdefault(
             self.state_collection, {}
         )
-        # Replace rather than mutate: the row may still be shared with the state
-        # this one was cloned from, which reverse reads to restore old values.
-        row = dict(collection.get(str(self._pk), {}))
-        collection[str(self._pk)] = row
+        # Replace rather than mutate: the row may be shared with the cloned-from state.
+        row = dict(collection.get(self._pk, {}))
+        collection[self._pk] = row
         return row
 
     def state_forwards(self, app_label, state):
@@ -175,9 +124,7 @@ class _AlterRowOperation(PackageOperation):
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         previous = self._entry(to_state)
-        # _entry() seeds an empty dict for a row the history never created, so
-        # index rather than .get(): a KeyError beats writing NULL into every
-        # column this operation changed.
+        # Index rather than .get(): a KeyError beats writing NULLs.
         self.qs(self.model, schema_editor).filter(pk=self._pk).update(
             **{field: previous[field] for field in self.changes}
         )
@@ -192,22 +139,10 @@ class _AlterRowOperation(PackageOperation):
 
 
 class _RowOperation(PackageOperation):
-    """Shared plumbing for the per-row operations.
-
-    Every one of them carries the row as a single ``fields`` dict rather than an
-    enumerated signature. That dict IS the canonical projection of the row, so it
-    cannot drift from the model the way a hand-maintained parameter list does,
-    and adding a column to a model never changes a public constructor signature.
-
-    (A ``**kwargs`` signature would not work: get_func_args excludes VAR_KEYWORD,
-    so OperationWriter silently drops every extra kwarg and writes an empty call.
-    A single dict parameter is the only shape that both stays open and
-    round-trips.)
-    """
-
+    # A single fields dict, not **kwargs: OperationWriter drops VAR_KEYWORD args.
     scope = "graph"
     model = None
-    verbose_name = None  # "node", "card", ... drives describe() and the file name
+    verbose_name = None
 
     @property
     def state_collection(self):
@@ -219,12 +154,10 @@ class _RowOperation(PackageOperation):
 
     @property
     def has_graph_fk(self):
-        # NodeGroup and CardXNodeXWidget rows carry no graph FK.
         return "graph_id" in {
             field.attname for field in self.model._meta.concrete_fields
         }
 
-    # Renders one key per line in generated migrations instead of one long dict.
     serialization_expand_args = ["fields"]
 
     def __init__(self, graphid, fields):
@@ -232,13 +165,6 @@ class _RowOperation(PackageOperation):
         self.fields = fields
 
     def _complete_fields(self):
-        """Fill any column the caller left out from the model's own default.
-
-        The canonical projection always supplies every field, but a hand-written
-        migration reasonably names only the ones it cares about. Defaults come
-        from the model rather than from a constructor signature, so they cannot
-        drift from it.
-        """
         completed = {}
         missing_required = []
         for name in fields_for(self.model):
@@ -251,9 +177,6 @@ class _RowOperation(PackageOperation):
             elif field.null or field.blank:
                 completed[name] = None
             else:
-                # Guessing a value for a NOT NULL column with no default would be
-                # inventing package content. Say so here rather than surfacing an
-                # IntegrityError from deep inside the apply.
                 missing_required.append(name)
         if missing_required:
             raise ValueError(
@@ -269,7 +192,6 @@ class _RowOperation(PackageOperation):
 
     @property
     def _label(self):
-        """What describe() calls this row; overridden where a human name exists."""
         return self._pk
 
     @property
@@ -306,7 +228,6 @@ class _CreateRowOperation(_RowOperation):
         return f"{self.verbose_name}_{self._fragment}"
 
     def state_forwards(self, app_label, state):
-        # Store the completed row, so replayed state and the database agree.
         self._collection_for_write(state)[self._pk] = self._complete_fields()
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
@@ -317,9 +238,6 @@ class _CreateRowOperation(_RowOperation):
 
 
 class _DeleteRowOperation(_RowOperation):
-    """Reversible because unapply() phase 1 replays state forwards, so to_state
-    still holds the row's full definition to recreate from."""
-
     reversible = True
 
     def __init__(self, graphid, pk):

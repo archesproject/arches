@@ -1,10 +1,9 @@
-"""Stage 0.5 spike: exercise real package-migration operations against a real
-Arches graph, so stage 4's per-operation estimate rests on something measured.
-
-Also pins the draft-graph behaviour that makes draft reconciliation mandatory.
-"""
+"""Package migration operations against a real graph, and the draft-graph
+behaviour that makes draft reconciliation mandatory."""
 
 import uuid
+
+from django.db import connection
 
 from arches.app.models import models
 from arches.app.models.graph import Graph
@@ -12,15 +11,13 @@ from arches.db.package_migrations.operations.tile import (
     AddNodeToTiles,
     RemoveNodeFromTiles,
 )
-from arches.db.package_migrations.operations.node import CreateNode, DeleteNode
+from arches.db.package_migrations.operations.node import CreateNode
 from arches.db.package_migrations.state import PackageState
 
 from tests.base_test import ArchesTestCase
 
 
 class _FakeSchemaEditor:
-    """Operations only use schema_editor.connection.alias."""
-
     def __init__(self, connection):
         self.connection = connection
 
@@ -33,19 +30,11 @@ class PackageMigrationOperationTests(ArchesTestCase):
 
     @classmethod
     def create_test_graph(cls):
-        """A resource graph with one collector nodegroup holding a string node.
-
-        Built directly rather than by appending a branch, because these are the
-        same primitives CreateNodeGroup/CreateNode use.
-        """
         graph = Graph.objects.create_graph(name="SPIKE RESOURCE", is_resource=True)
 
         collector_id = uuid.uuid4()
-        nodegroup = models.NodeGroup.objects.create(
-            nodegroupid=collector_id, cardinality="n"
-        )
-        # node_groups.grouping_node_matches_pk_or_null: grouping_node must be the
-        # nodegroup's own pk, so the collector node shares the nodegroup id.
+        models.NodeGroup.objects.create(nodegroupid=collector_id, cardinality="n")
+        # The collector node shares the nodegroup id: grouping_node_matches_pk_or_null.
         models.Node.objects.create(
             nodeid=collector_id,
             graph_id=graph.graphid,
@@ -72,10 +61,7 @@ class PackageMigrationOperationTests(ArchesTestCase):
             hascustomalias=True,
             istopnode=False,
         )
-        # Edges are not optional. Graph.copy() nulls every non-collector node's
-        # nodegroup and then rebuilds membership with populate_null_nodegroups(),
-        # which walks the EDGE tree, so a graph whose nodes are not joined by
-        # edges cannot be copied, drafted or promoted.
+        # Graph.copy() rebuilds nodegroups by walking edges, so every node needs one.
         models.Edge.objects.create(
             edgeid=uuid.uuid4(),
             graph_id=graph.graphid,
@@ -95,8 +81,6 @@ class PackageMigrationOperationTests(ArchesTestCase):
         return Graph.objects.get(pk=graph.graphid)
 
     def setUp(self):
-        from django.db import connection
-
         self.schema_editor = _FakeSchemaEditor(connection)
         self.graph = Graph.objects.get(pk=self.test_graph.graphid)
         self.string_node = [
@@ -121,6 +105,8 @@ class PackageMigrationOperationTests(ArchesTestCase):
             },
         )
 
+
+class NodeAndTileOperationTests(PackageMigrationOperationTests):
     def test_create_node_writes_a_real_row_and_keeps_the_alias(self):
         nodeid = uuid.uuid4()
         op = CreateNode(
@@ -140,8 +126,6 @@ class PackageMigrationOperationTests(ArchesTestCase):
 
         node = models.Node.objects.get(pk=nodeid)
         self.assertEqual(node.datatype, "date")
-        # The alias must survive exactly: deriving it at apply time would run the
-        # __arches_slugify stored procedure and make it install-dependent.
         self.assertEqual(node.alias, "survey_date")
         self.assertEqual(str(node.graph_id), str(self.graph.graphid))
         self.assertIn(str(nodeid), state.graphs[str(self.graph.graphid)]["nodes"])
@@ -182,7 +166,6 @@ class PackageMigrationOperationTests(ArchesTestCase):
         self.assertIn(new_nodeid, tile.data)
         self.assertIsNone(tile.data[new_nodeid])
 
-        # Re-running matches nothing: the content predicate IS the version test.
         self.assertEqual(
             op.database_forwards(
                 "arches", self.schema_editor, self._state(), self._state()
@@ -191,10 +174,6 @@ class PackageMigrationOperationTests(ArchesTestCase):
         )
 
     def test_removing_a_node_also_clears_it_from_provisional_edits(self):
-        """A pending provisional edit is keyed by the same nodeids as tiledata. A
-        stale key there is written back into data when a reviewer approves the
-        edit, and Tile.save() then raises Node.DoesNotExist, leaving a record no curator
-        can fix from the UI."""
         doomed = str(uuid.uuid4())
         keeper = str(uuid.uuid4())
         tile = self._make_tile()
@@ -204,7 +183,6 @@ class PackageMigrationOperationTests(ArchesTestCase):
                 "status": "pending",
                 "value": {doomed: "pending value", keeper: "keep me"},
             },
-            # An edit with no "value" key must survive untouched.
             "7f3b4e2a-0000-4000-8000-00000000000b": {"status": "pending"},
         }
         models.TileModel.objects.filter(pk=tile.pk).update(
@@ -238,12 +216,7 @@ class PackageMigrationOperationTests(ArchesTestCase):
         self.assertNotIn(new_nodeid, tile.data)
 
     def test_tile_save_readds_keys_for_live_nodes(self):
-        """Pins why RemoveNodeFromTiles must run AFTER DeleteNode.
-
-        TileModel.save() -> set_missing_keys_to_none() reads live Node rows and
-        re-adds any missing key, so stripping data while the node still exists is
-        undone by the next ordinary save.
-        """
+        """Pins why RemoveNodeFromTiles must run after DeleteNode."""
         tile = self._make_tile()
         nodeid = uuid.uuid4()
         CreateNode(
@@ -269,12 +242,6 @@ class PackageMigrationOperationTests(ArchesTestCase):
         self.assertIn(str(nodeid), tile.data)
 
     def test_package_migration_is_reverted_by_promoting_a_stale_draft(self):
-        """The finding that makes draft reconciliation mandatory.
-
-        A package migration mutates the live graph. The draft copy is untouched,
-        so the next Graph Designer publish promotes the stale draft and the
-        migration's node disappears.
-        """
         nodeid = uuid.uuid4()
         CreateNode(
             graphid=str(self.graph.graphid),

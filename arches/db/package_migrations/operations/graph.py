@@ -1,18 +1,3 @@
-"""Graph operations: the graph row and its publication.
-
-The draft copy is derived state: migratepkg drops a stale one after a run.
-
-CreateGraph uses models.GraphModel.objects.create(), NOT
-Graph.objects.create_graph(). The latter mints a random root nodeid, publishes
-with a random publicationid and creates a second GraphModel row (a draft), none
-of which a migration can predict or reproduce on another install, and the
-leftover draft then makes Graph.validate() raise code 1019 for every later
-operation in the same migration.
-
-(The NotImplementedError guard lives on the Graph PROXY's manager;
-models.GraphModel.objects is a plain manager.)
-"""
-
 from django.conf import settings
 
 from arches.app.models import models
@@ -29,11 +14,7 @@ from arches.db.package_migrations.operations.base import (
 class CreateGraph(PackageOperation):
     """Reversible only while the graph holds no resources.
 
-    ResourceInstance.graph is on_delete=CASCADE, so deleting a graph destroys
-    every resource on it and every tile under them. Rolling back a package on a
-    dev machine, in CI, or on a fresh install is ordinary and safe; rolling one
-    back on a site with data is not the same act at all, and migratepkg refuses
-    it before anything runs rather than discovering it halfway through.
+    Not Graph.objects.create_graph(): its random ids and draft are not reproducible.
     """
 
     reversible = True
@@ -42,7 +23,6 @@ class CreateGraph(PackageOperation):
     serialization_expand_args = ["fields"]
 
     def __init__(self, fields):
-        # The graph's own id lives in fields, like every other row's pk.
         self.fields = fields
 
     @property
@@ -60,8 +40,6 @@ class CreateGraph(PackageOperation):
         if fields.get("resource_instance_lifecycle_id") is None and fields.get(
             "isresource"
         ):
-            # graphs.resource_instance_lifecycle_conditional_null requires a
-            # non-null lifecycle on every non-draft resource graph.
             fields["resource_instance_lifecycle_id"] = (
                 settings.DEFAULT_RESOURCE_INSTANCE_LIFECYCLE_ID
             )
@@ -91,12 +69,7 @@ class CreateGraph(PackageOperation):
 
 
 class AlterGraph(_AlterRowOperation):
-    """Graph metadata and ontology.
-
-    Writes through a queryset update rather than Graph.save(): validate() raises
-    code 1018 ("You cannot change the slug of a published graph").
-    """
-
+    # A queryset update, not Graph.save(): validate() refuses a published slug change.
     model = models.GraphModel
     verbose_name = "graph"
 
@@ -113,13 +86,7 @@ class AlterGraph(_AlterRowOperation):
 class PublishGraph(PackageOperation):
     """Put the graph on the publication the authoring database was on.
 
-    The Graph Designer publishes two ways: Publish mints a new publication, and
-    Update Publication rewrites the current one in place. A migration made after
-    the second carries the previous publication id again, so it refreshes that
-    publication rather than creating it.
-
-    Graph rows only. Moving resources onto the publication is SetResourcePublication's
-    job, in the data migration that follows, which unapplies first.
+    Refreshes that publication if it already exists, else creates it.
     """
 
     scope = "graph"
@@ -134,7 +101,6 @@ class PublishGraph(PackageOperation):
 
     @property
     def reversible(self):
-        # Nothing to restore without the publication this one replaced.
         return self.previous_publication_id is not None
 
     @property
@@ -192,9 +158,7 @@ class PublishGraph(PackageOperation):
                 f"publication {self.publication_id}. Unapply the data migration "
                 "that follows this one as well, by targeting a migration before both."
             )
-        # graphs.publicationid references this publication, so the graph moves
-        # back before it is deleted. Resources are already off it: the data
-        # migration's SetResourcePublication unapplies first.
+        # The graph references this publication, so it moves back before the delete.
         self.qs(models.GraphModel, schema_editor).filter(pk=self.graphid).update(
             publication_id=self.previous_publication_id
         )
@@ -205,4 +169,4 @@ class PublishGraph(PackageOperation):
 
     @property
     def migration_name_fragment(self):
-        return f"publish_{str(self.publication_id).replace('-', '')[:8]}"
+        return f"publish_{_short(self.publication_id)}"

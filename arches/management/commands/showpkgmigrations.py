@@ -74,9 +74,8 @@ class Command(BaseCommand):
 
     def _show_plan(self, loader, app_labels):
         applied = loader.applied_migrations
-        targets = loader.graph.leaf_nodes()
         seen, plan = set(), []
-        for target in targets:
+        for target in loader.graph.leaf_nodes():
             for node in loader.graph.forwards_plan(target):
                 if node not in seen:
                     seen.add(node)

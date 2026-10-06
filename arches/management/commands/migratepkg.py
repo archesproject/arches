@@ -1,10 +1,7 @@
-"""Apply package migrations.
-
-A thin wrapper over PackageMigrationExecutor, deliberately shaped like
-`manage.py migrate` so an operator who knows one knows the other.
-"""
+"""Apply package migrations, shaped like `manage.py migrate`."""
 
 import os
+from collections import Counter
 
 from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError
@@ -133,8 +130,6 @@ class Command(BaseCommand):
         if migration_name == "zero":
             return [(app_label, None)]
 
-        # MigrationLoader already does prefix resolution, and raises
-        # AmbiguityError when a prefix matches more than one migration.
         try:
             migration = executor.loader.get_migration_by_prefix(
                 app_label, migration_name
@@ -230,12 +225,7 @@ class Command(BaseCommand):
         )
 
     def _refuse_faking_work(self, plan):
-        """Faking structural work is safe when the rows already exist: the end
-        state matches. Faking data work is not, unless there is none to do here.
-        Nothing else adds a key to a tile, and once the migration is recorded its
-        content-addressed predicate is never consulted again, so the work is
-        skipped in silence.
-        """
+        # A faked data migration is never checked again, so its work is lost.
         if plan[0][1]:
             with_data = [
                 migration
@@ -296,9 +286,7 @@ class Command(BaseCommand):
         )
 
     def _refuse_misfit_database(self, plan):
-        """These migrations were generated from the database they were authored
-        on, not from this one. If a curator has edited the graph since, an alter
-        updates zero rows and reports success."""
+        # An alter on rows edited since updates nothing and still succeeds.
         if plan[0][1]:
             return
         recorded, to_apply, commands = [], [], []
@@ -359,8 +347,6 @@ class Command(BaseCommand):
         )
 
     def _fit(self, migrations):
-        """Where several points fit, the operator says which: recording all of
-        them with --fake, or running from the earliest with --force."""
         fit = drift.fit(migrations, self.database)
         if not fit.ambiguous:
             return fit
@@ -387,10 +373,7 @@ class Command(BaseCommand):
         )
 
     def _steps(self, migrations, position):
-        """A data migration is recorded only when it has nothing to do here and
-        nothing runs before it, since that could give it work. Data migrations
-        write no rows the position can see, so they stay on the recorded side
-        until the next graph migration."""
+        # Record a data migration only if it and every earlier step need no work.
         steps = []
         applying = False
         beyond = False
@@ -512,11 +495,7 @@ class Command(BaseCommand):
         )
 
     def _discard_stale_drafts(self, plan):
-        """A draft copied before this run would undo it on the next Designer
-        publish, which rebuilds the live graph entirely from the draft. Dropping
-        it is the whole fix: Draft a Model Update copies the migrated graph, which
-        is the state a Designer publish leaves too.
-        """
+        # Publishing a stale draft rebuilds the graph from it, undoing this run.
         for graphid in self._graphids(plan, scope="graph"):
             graph = Graph.objects.using(self.database).filter(pk=graphid).first()
             if graph is not None and graph.get_draft_graph():
@@ -564,11 +543,7 @@ class Command(BaseCommand):
         )
 
     def _refuse_half_reversals(self, plan):
-        """Django unapplies migration by migration and only raises when it reaches
-        the irreversible one, so a `zero` that cannot finish still unapplies
-        everything before it, leaving the graph on the new publication and its
-        resources on the old, which is the read-only state. Refuse up front.
-        """
+        # Django raises only at the irreversible one, after unapplying those before it.
         for migration, backwards in plan:
             if not backwards:
                 continue
@@ -593,9 +568,6 @@ class Command(BaseCommand):
             self._print_operations(migration.operations)
 
     def _print_operations(self, operations):
-        """A migration that adopts an existing package describes every row of
-        every graph, which is thousands of lines nobody reads. Summarise by kind
-        unless asked for the whole thing."""
         described = [operation.describe() for operation in operations]
         if self.verbosity >= 2 or len(operations) <= self.PLAN_DETAIL_LIMIT:
             names = labels.from_database("\n".join(described), self.database)
@@ -603,11 +575,7 @@ class Command(BaseCommand):
                 self.stdout.write(f"      {labels.humanize(description, names)}")
             return
 
-        counts = {}
-        for operation in operations:
-            counts[type(operation).__name__] = (
-                counts.get(type(operation).__name__, 0) + 1
-            )
+        counts = Counter(type(operation).__name__ for operation in operations)
         for name in sorted(counts):
             self.stdout.write(f"      {name} x{counts[name]}")
         self.stdout.write(f"      ({len(operations)} operations; -v 2 lists them)")
@@ -620,10 +588,8 @@ class Command(BaseCommand):
         if action == "apply_start":
             self.stdout.write(f"  Applying {migration}...", ending="")
             self.stdout.flush()
-        elif action == "apply_success":
-            self.stdout.write(self.style.SUCCESS(" FAKED" if fake else " OK"))
         elif action == "unapply_start":
             self.stdout.write(f"  Unapplying {migration}...", ending="")
             self.stdout.flush()
-        elif action == "unapply_success":
+        elif action in ("apply_success", "unapply_success"):
             self.stdout.write(self.style.SUCCESS(" FAKED" if fake else " OK"))
