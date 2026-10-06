@@ -33,17 +33,16 @@ def _write_fixture_app(root, graphid, nodegroup_id, nodeid):
     (package / "__init__.py").write_text("")
     (package / "migrations" / "__init__.py").write_text("")
     (migrations / "__init__.py").write_text("")
-    (package / "apps.py").write_text(textwrap.dedent("""
+    (package / "apps.py").write_text(textwrap.dedent(f"""
             from django.apps import AppConfig
 
 
             class FixtureConfig(AppConfig):
-                name = "%s"
+                name = "{APP_NAME}"
                 is_arches_application = True
-            """ % APP_NAME))
-    (migrations / "0001_add_survey_date.py").write_text(
-        textwrap.dedent(
-            """
+            """))
+    edgeid = str(uuid.uuid4())
+    (migrations / "0001_add_survey_date.py").write_text(textwrap.dedent(f"""
             from django.db import migrations
 
             from arches.db.package_migrations.operations.tile import AddNodeToTiles
@@ -56,39 +55,31 @@ def _write_fixture_app(root, graphid, nodegroup_id, nodeid):
                 dependencies = []
                 operations = [
                     CreateNode(
-                        graphid="%(graphid)s",
-                        fields={
-                            "nodeid": "%(nodeid)s",
+                        graphid="{graphid}",
+                        fields={{
+                            "nodeid": "{nodeid}",
                             "name": "Survey Date",
                             "datatype": "date",
                             "alias": "survey_date_cmd",
-                            "nodegroup_id": "%(nodegroup_id)s",
+                            "nodegroup_id": "{nodegroup_id}",
                             "istopnode": False,
-                        },
+                        }},
                     ),
                     CreateEdge(
-                        graphid="%(graphid)s",
-                        fields={
-                            "edgeid": "%(edgeid)s",
-                            "domainnode_id": "%(nodegroup_id)s",
-                            "rangenode_id": "%(nodeid)s",
-                        },
+                        graphid="{graphid}",
+                        fields={{
+                            "edgeid": "{edgeid}",
+                            "domainnode_id": "{nodegroup_id}",
+                            "rangenode_id": "{nodeid}",
+                        }},
                     ),
                     AddNodeToTiles(
-                        nodegroup_id="%(nodegroup_id)s",
-                        nodeid="%(nodeid)s",
+                        nodegroup_id="{nodegroup_id}",
+                        nodeid="{nodeid}",
                         value=None,
                     ),
                 ]
-            """
-            % {
-                "graphid": graphid,
-                "nodeid": nodeid,
-                "nodegroup_id": nodegroup_id,
-                "edgeid": str(uuid.uuid4()),
-            }
-        )
-    )
+            """))
     return package
 
 
@@ -122,7 +113,7 @@ class MigratePkgCommandTests(PackageMigrationOperationTests):
     def _app_list(self):
         from django.conf import settings
 
-        return list(settings.INSTALLED_APPS) + ["%s.apps.FixtureConfig" % APP_NAME]
+        return list(settings.INSTALLED_APPS) + [f"{APP_NAME}.apps.FixtureConfig"]
 
     def test_migratepkg_applies_and_reverses_a_real_migration(self):
         tile = models.TileModel.objects.create(

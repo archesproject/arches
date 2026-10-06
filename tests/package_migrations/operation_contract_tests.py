@@ -90,8 +90,7 @@ class OperationContractTests(SimpleTestCase):
                 self.assertEqual(args, [])
                 self.assertTrue(
                     set(kwargs) <= init_params,
-                    "%s emits %s which are not __init__ parameters"
-                    % (type(op).__name__, set(kwargs) - init_params),
+                    f"{type(op).__name__} emits {set(kwargs) - init_params} which are not __init__ parameters",
                 )
 
     def test_deconstruct_emits_every_parameter(self):
@@ -120,8 +119,7 @@ class OperationContractTests(SimpleTestCase):
                 self.assertIsNot(
                     type(op).database_backwards,
                     PackageOperation.database_backwards,
-                    "%s claims reversible but inherits the raising base"
-                    % type(op).__name__,
+                    f"{type(op).__name__} claims reversible but inherits the raising base",
                 )
 
     def test_describe_and_name_fragment(self):
@@ -146,5 +144,5 @@ class OperationContractTests(SimpleTestCase):
                 if stripped.startswith("#") or '"""' in stripped:
                     continue
                 if "datatype ==" in stripped or "datatype in (" in stripped:
-                    offenders.append("%s:%s" % (path.name, lineno))
+                    offenders.append(f"{path.name}:{lineno}")
         self.assertEqual(offenders, [])

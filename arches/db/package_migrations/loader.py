@@ -63,25 +63,23 @@ class PackageMigrationLoader(MigrationLoader):
                 self.replace_migration(migration_key)
         try:
             self.graph.validate_consistency()
-        except NodeNotFoundError as exc:
+        except NodeNotFoundError as node_not_found_error:
             reverse_replacements = {}
             for key, migration in self.replacements.items():
                 for replaced in migration.replaces:
                     reverse_replacements.setdefault(replaced, set()).add(key)
-            if exc.node in reverse_replacements:
-                candidates = reverse_replacements.get(exc.node, set())
+            if node_not_found_error.node in reverse_replacements:
+                candidates = reverse_replacements.get(node_not_found_error.node, set())
                 is_replaced = any(
                     candidate in self.graph.nodes for candidate in candidates
                 )
                 if not is_replaced:
                     tries = ", ".join(f"{app}.{name}" for app, name in candidates)
+                    missing_app_label, missing_name = node_not_found_error.node
                     raise NodeNotFoundError(
-                        "Package migration {0} depends on nonexistent node "
-                        "('{1}', '{2}'). Tried [{3}].".format(
-                            exc.origin, exc.node[0], exc.node[1], tries
-                        ),
-                        exc.node,
-                    ) from exc
+                        f"Package migration {node_not_found_error.origin} depends on nonexistent node ('{missing_app_label}', '{missing_name}'). Tried [{tries}].",
+                        node_not_found_error.node,
+                    ) from node_not_found_error
             raise
         self.graph.ensure_not_cyclic()
 
@@ -99,12 +97,5 @@ class PackageMigrationLoader(MigrationLoader):
                     if self.all_replaced_applied(parent.key, applied):
                         continue
                     raise InconsistentMigrationHistory(
-                        "Package migration {}.{} is applied before its "
-                        "dependency {}.{} on database '{}'.".format(
-                            migration[0],
-                            migration[1],
-                            parent[0],
-                            parent[1],
-                            connection.alias,
-                        )
+                        f"Package migration {migration[0]}.{migration[1]} is applied before its dependency {parent[0]}.{parent[1]} on database '{connection.alias}'."
                     )

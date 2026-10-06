@@ -44,10 +44,10 @@ class PackageMigrationWriter(MigrationWriter):
         )
         if not used:
             return rendered
+        used_operations = ",\n    ".join(used)
         return rendered.replace(
             "from django.db import migrations",
-            f"from django.db import migrations\n\n"
-            f"from {OPERATIONS_MODULE} import (\n    " + ",\n    ".join(used) + ",\n)",
+            f"from django.db import migrations\n\nfrom {OPERATIONS_MODULE} import (\n    {used_operations},\n)",
             1,
         )
 
