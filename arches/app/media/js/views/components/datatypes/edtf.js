@@ -1,5 +1,6 @@
 import ko from 'knockout';
 import edtfDatatypeTemplate from 'templates/views/components/datatypes/edtf.htm';
+import 'bindings/select2-query';
 
 
 var name = 'edtf-datatype-config';

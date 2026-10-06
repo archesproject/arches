@@ -1,6 +1,7 @@
 import ko from "knockout";
 import _ from "underscore";
 import fileListDatatypeTemplate from "templates/views/components/datatypes/file-list.htm";
+import 'bindings/select2-query';
 
 
 const name = 'file-list-datatype-config';
