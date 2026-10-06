@@ -18,9 +18,6 @@ from django.db.models import Case, F, JSONField, Max, Q, Value, When
 from django.db.models.constraints import UniqueConstraint
 from django.db.models.expressions import CombinedExpression
 from django.db.models.functions import Concat, Lower
-from django.contrib.postgres.fields import ArrayField
-from django.db.models import JSONField
-from django.db.models import Q, Max
 from django.utils import translation
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _

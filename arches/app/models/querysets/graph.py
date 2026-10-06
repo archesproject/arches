@@ -26,22 +26,19 @@ class GraphQuerySet(models.QuerySet):
 
         return slug
 
-    def create_graph(
-        self, graphid=None, name="", *, slug=None, user=None, is_resource=False
-    ):
+    def create_graph(self, name="", *, slug=None, user=None, is_resource=False):
         from arches.app.models import models as arches_models
 
         """
         Create a new Graph and related objects, encapsulating all creation side effects.
         """
-        root_node_id = uuid.uuid4()
+        new_id = uuid.uuid4()
         nodegroup = None
 
         if not slug:
             slug = self.generate_slug(name, is_resource)
 
         graph_model = arches_models.GraphModel(
-            pk=graphid or uuid.uuid4(),
             name=name,
             subtitle="",
             author=(
@@ -59,14 +56,14 @@ class GraphQuerySet(models.QuerySet):
         graph_model.save()  # to access side-effects declared in save method
 
         if not is_resource:
-            nodegroup = arches_models.NodeGroup.objects.create(pk=root_node_id)
+            nodegroup = arches_models.NodeGroup.objects.create(pk=new_id)
             arches_models.CardModel.objects.create(
                 nodegroup=nodegroup, name=name, graph=graph_model
             )
 
         # root node
         arches_models.Node.objects.create(
-            pk=root_node_id,
+            pk=new_id,
             name=name,
             description="",
             istopnode=True,
