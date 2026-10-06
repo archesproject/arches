@@ -47,18 +47,43 @@ class Migration(migrations.Migration):
         );
     """
 
+    # Lossy: the unused side of each pair was discarded going forward, and 'reference'
+    # has no legacy equivalent, so it is restored as a concept.
+    reverse_node_configs = """
+        UPDATE nodes SET config = jsonb_set(config, '{graphs}', (
+            SELECT jsonb_agg(
+                (element
+                    - 'relationshipSource'
+                    - 'relationship'
+                    - 'inverseRelationship'
+                ) || jsonb_build_object(
+                    'useOntologyRelationship',
+                    element->>'relationshipSource' = 'ontology-property',
+                    'ontologyProperty',
+                    CASE WHEN element->>'relationshipSource' = 'ontology-property'
+                        THEN element->'relationship' ELSE 'null'::jsonb END,
+                    'inverseOntologyProperty',
+                    CASE WHEN element->>'relationshipSource' = 'ontology-property'
+                        THEN element->'inverseRelationship' ELSE 'null'::jsonb END,
+                    'relationshipConcept',
+                    CASE WHEN element->>'relationshipSource' = 'ontology-property'
+                        THEN 'null'::jsonb ELSE element->'relationship' END,
+                    'inverseRelationshipConcept',
+                    CASE WHEN element->>'relationshipSource' = 'ontology-property'
+                        THEN 'null'::jsonb ELSE element->'inverseRelationship' END
+                )
+            )
+            FROM jsonb_array_elements(config -> 'graphs') element
+        ))
+        WHERE datatype IN ('resource-instance', 'resource-instance-list')
+        AND jsonb_typeof(config -> 'graphs') = 'array'
+        AND jsonb_array_length(config -> 'graphs') > 0
+        AND EXISTS (
+            SELECT * FROM jsonb_array_elements(config -> 'graphs')
+            WHERE value->'relationshipSource' IS NOT NULL
+        );
     """
-    Reversing the rewrite of a property in a nested array means disassembling and reassembling
-    the object. see https://stackoverflow.com/a/58802637
-    Because the new properties are inert in prior versions of Arches and because of the possible
-    complexity of these configs, there is a chance of rebuilding node configs incorrectly in a
-    reverse migration, so the reverse migration leaves them in place.
-    """
-    reverse_node_configs = ""
 
-    # The node config defaults read by this function move with the keys above. The COALESCE
-    # keeps configs that have not been rewritten (eg. a graph imported from an older package)
-    # working. The tile-level reads are unchanged.
     update_relationship_function = """
         CREATE OR REPLACE FUNCTION public.__arches_create_resource_x_resource_relationships(IN tile_id uuid)
         RETURNS boolean
