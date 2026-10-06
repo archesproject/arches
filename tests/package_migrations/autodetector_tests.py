@@ -10,6 +10,7 @@ from arches.db.package_migrations.autodetector import changes_for_graph
 GRAPH = str(uuid.uuid4())
 NODEGROUP = str(uuid.uuid4())
 NODE = str(uuid.uuid4())
+PUBLICATION_ID = str(uuid.uuid4())
 
 
 def _graph(nodes=(), nodegroups=(), **overrides):
@@ -53,17 +54,17 @@ def _structural(operations):
 class DiffGraphTests(SimpleTestCase):
     def test_no_change_produces_no_operations(self):
         graph = _graph(nodes=[_node()], nodegroups=[{"nodegroupid": NODEGROUP}])
-        self.assertEqual(changes_for_graph(graph, graph), [])
+        self.assertEqual(changes_for_graph(graph, graph, PUBLICATION_ID), [])
 
     def test_new_graph_emits_create_graph_first(self):
-        operations = changes_for_graph(None, _graph(nodes=[_node()]))
+        operations = changes_for_graph(None, _graph(nodes=[_node()]), PUBLICATION_ID)
         self.assertEqual(_names(operations)[0], "CreateGraph")
         self.assertIn("CreateNode", _names(operations))
 
     def test_added_node_emits_create_node_with_every_field(self):
         before = _graph(nodegroups=[{"nodegroupid": NODEGROUP}])
         after = _graph(nodes=[_node()], nodegroups=[{"nodegroupid": NODEGROUP}])
-        operations = changes_for_graph(before, after)
+        operations = changes_for_graph(before, after, PUBLICATION_ID)
         self.assertEqual(_structural(operations), ["CreateNode", "AddNodeToTiles"])
         self.assertEqual(operations[0].fields["alias"], "survey_date")
         self.assertEqual(operations[0].fields["datatype"], "date")
@@ -71,7 +72,7 @@ class DiffGraphTests(SimpleTestCase):
     def test_changed_field_emits_alter_with_only_that_field(self):
         before = _graph(nodes=[_node()])
         after = _graph(nodes=[_node(datatype="concept")])
-        operations = changes_for_graph(before, after)
+        operations = changes_for_graph(before, after, PUBLICATION_ID)
         self.assertEqual(_structural(operations), ["AlterNode"])
         self.assertEqual(operations[0].changes, {"datatype": "concept"})
 
@@ -79,34 +80,33 @@ class DiffGraphTests(SimpleTestCase):
         before = _graph(nodes=[_node()])
         after = _graph()
         self.assertEqual(
-            _structural(changes_for_graph(before, after)),
+            _structural(changes_for_graph(before, after, PUBLICATION_ID)),
             ["DeleteNode", "RemoveNodeFromTiles"],
         )
 
     def test_graph_metadata_change_emits_alter_graph(self):
         before = _graph()
         after = _graph(subtitle={"en": "new"})
-        operations = changes_for_graph(before, after)
+        operations = changes_for_graph(before, after, PUBLICATION_ID)
         self.assertEqual(_structural(operations), ["AlterGraph"])
         self.assertNotIn("graphid", operations[0].changes)
 
     def test_creates_run_nodegroup_before_node(self):
         """A node references its nodegroup, so the nodegroup must exist first."""
         after = _graph(nodes=[_node()], nodegroups=[{"nodegroupid": NODEGROUP}])
-        names = _structural(changes_for_graph(_graph(), after))
+        names = _structural(changes_for_graph(_graph(), after, PUBLICATION_ID))
         self.assertLess(names.index("CreateNodeGroup"), names.index("CreateNode"))
 
     def test_deletes_run_before_creates_and_in_reverse_order(self):
         other_node = str(uuid.uuid4())
         before = _graph(nodes=[_node()], nodegroups=[{"nodegroupid": NODEGROUP}])
         after = _graph(nodes=[_node(nodeid=other_node)])
-        names = _structural(changes_for_graph(before, after))
+        names = _structural(changes_for_graph(before, after, PUBLICATION_ID))
         self.assertLess(names.index("DeleteNode"), names.index("CreateNode"))
         self.assertLess(names.index("DeleteNode"), names.index("DeleteNodeGroup"))
 
-    def test_a_key_the_committed_file_omits_is_not_a_change(self):
-        """Packages exported by an older Arches carry no alias or hascustomalias.
-        Reading an absent key as null emitted AlterNode(alias=None), which is
+    def test_a_key_the_to_state_omits_is_not_a_change(self):
+        """Reading an absent key as null emitted AlterNode(alias=None), which is
         written to disk, shipped, and only fails on the customer's database --
         Node.alias is NOT NULL."""
         complete = _node(alias="survey_date", hascustomalias=True)
@@ -118,7 +118,7 @@ class DiffGraphTests(SimpleTestCase):
         nodegroups = [{"nodegroupid": NODEGROUP}]
         before = _graph(nodes=[complete], nodegroups=nodegroups)
         after = _graph(nodes=[partial], nodegroups=nodegroups)
-        self.assertEqual(changes_for_graph(before, after), [])
+        self.assertEqual(changes_for_graph(before, after, PUBLICATION_ID), [])
 
     def test_diff_is_the_inverse_of_replaying_its_own_operations(self):
         """The property that makes the autodetector trustworthy: applying the
@@ -131,14 +131,14 @@ class DiffGraphTests(SimpleTestCase):
         )
         state = PackageState()
         state.add_graph(before)
-        for operation in changes_for_graph(before, after):
+        for operation in changes_for_graph(before, after, PUBLICATION_ID):
             operation.state_forwards("arches", state)
         replayed = state.graphs[GRAPH]
         # Replayed state holds every column, because that is what the rows hold
-        # once created; the committed graph holds only what its author wrote, and
-        # PublishGraph adds a publication the file never carries. The property
-        # that matters is that the two agree wherever the file speaks. Anywhere
-        # they disagree, the next diff invents a change nobody made.
+        # once created; the canonical graph holds only the keys it was given, and
+        # PublishGraph adds a publication the projection never carries. The
+        # property that matters is that the two agree wherever the canonical graph
+        # speaks. Anywhere they disagree, the next diff invents a change nobody made.
         for key, expected in after.items():
             if key in ("nodes", "nodegroups", "edges", "cards", "widgets"):
                 self.assertEqual(set(replayed[key]), set(expected), key)
@@ -159,8 +159,28 @@ class PublicationTailTests(SimpleTestCase):
         the next Graph Designer publish."""
         before = _graph()
         after = _graph(nodes=[_node()], nodegroups=[{"nodegroupid": NODEGROUP}])
-        names = _names(changes_for_graph(before, after))
+        names = _names(changes_for_graph(before, after, PUBLICATION_ID))
         self.assertEqual(names[-2:], ["PublishGraph", "SetResourcePublication"])
+
+    def test_the_publication_is_the_one_the_graph_was_read_from(self):
+        previous_publication_id = str(uuid.uuid4())
+        before = dict(_graph(), publication_id=previous_publication_id)
+        after = _graph(nodes=[_node()], nodegroups=[{"nodegroupid": NODEGROUP}])
+        publish, move = changes_for_graph(before, after, PUBLICATION_ID)[-2:]
+        for operation in (publish, move):
+            self.assertEqual(operation.publication_id, PUBLICATION_ID)
+            self.assertEqual(operation.previous_publication_id, previous_publication_id)
+        self.assertFalse(publish.updates_in_place)
+
+    def test_an_unchanged_publication_id_updates_in_place(self):
+        """The Graph Designer's Update Publication rewrites the current
+        publication rather than minting one, so the id read back is the one
+        history already holds."""
+        before = dict(_graph(), publication_id=PUBLICATION_ID)
+        after = _graph(nodes=[_node()], nodegroups=[{"nodegroupid": NODEGROUP}])
+        publish = changes_for_graph(before, after, PUBLICATION_ID)[-2]
+        self.assertTrue(publish.updates_in_place)
+        self.assertTrue(publish.reversible)
 
 
 class DeleteNodeGroupStateTests(SimpleTestCase):

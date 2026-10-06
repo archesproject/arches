@@ -21,8 +21,6 @@ Emission order matters and is fixed here rather than left to the caller:
   stranded node makes the graph uncopyable.
 """
 
-import uuid
-
 from arches.db.package_migrations.state import STATE_COLLECTIONS
 
 from arches.db.package_migrations.operations.resource import SetResourcePublication
@@ -89,11 +87,12 @@ def _changed_fields(before, after):
     }
 
 
-def changes_for_graph(from_graph, to_graph):
+def changes_for_graph(from_graph, to_graph, publication_id):
     """Operations that turn ``from_graph`` into ``to_graph``.
 
     Both are canonical projections. ``from_graph`` may be None, meaning the graph
-    does not exist yet.
+    does not exist yet. ``publication_id`` is the publication ``to_graph`` was read
+    from.
     """
     operations = []
 
@@ -139,7 +138,9 @@ def changes_for_graph(from_graph, to_graph):
     # irreversible for want of a previous publication.
     if not creating:
         operations.extend(_data_operations(from_graph, to_graph))
-    operations.extend(_publication_operations(from_graph, to_graph, creating))
+    operations.extend(
+        _publication_operations(from_graph, to_graph, creating, publication_id)
+    )
     return operations
 
 
@@ -188,7 +189,7 @@ def _data_operations(from_graph, to_graph):
     return operations
 
 
-def _publication_operations(from_graph, to_graph, creating=False):
+def _publication_operations(from_graph, to_graph, creating, publication_id):
     """Publish, then move resources onto the publication. Always last.
 
     Without these a migration mutates node/card/edge rows and nothing the
@@ -197,7 +198,6 @@ def _publication_operations(from_graph, to_graph, creating=False):
     draft reverts the whole migration on the next Graph Designer publish.
     """
     graphid = to_graph["graphid"]
-    publication_id = str(uuid.uuid4())
     previous_publication_id = from_graph.get("publication_id")
     operations = [
         PublishGraph(
@@ -218,11 +218,15 @@ def _publication_operations(from_graph, to_graph, creating=False):
     return operations
 
 
-def changes_for_package(from_state_graphs, to_state_graphs):
+def changes_for_package(from_state_graphs, to_state_graphs, publication_ids):
     """Operations for every graph in a package, keyed by graphid."""
     operations = []
     for graphid in sorted(to_state_graphs):
         operations.extend(
-            changes_for_graph(from_state_graphs.get(graphid), to_state_graphs[graphid])
+            changes_for_graph(
+                from_state_graphs.get(graphid),
+                to_state_graphs[graphid],
+                publication_ids[graphid],
+            )
         )
     return operations

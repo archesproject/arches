@@ -3,7 +3,7 @@
 describe() stays in ids: an operation knows its own row and nothing else, and a
 name copied into a migration file would be a lie the first time someone renames
 the node. The commands resolve names at display time instead, from data they
-already hold: makepkgmigrations from the committed JSON, migratepkg from the
+already hold: makepkgmigrations from the graphs it read, migratepkg from the
 database.
 
 A nodegroup's id is its grouping node's id (node_groups.grouping_node_matches_pk_or_null),
@@ -20,7 +20,7 @@ UUID = re.compile(
 
 
 def from_graphs(graphs):
-    """Names from committed graph JSON, keyed by id."""
+    """Names from canonical graphs, keyed by id."""
     names = {}
     for graphid, graph in graphs.items():
         if graph.get("slug"):

@@ -6,8 +6,8 @@ deliberate difference.
 Django needs ``ModelState`` because a Django model is not data: it is a class
 with fields, managers, options and bases, and ModelState is a serializable
 projection of it. An Arches graph is already JSON: ``Graph.serialize()``
-returns a dict, the canonical projection returns a dict, and the committed
-``pkg/graphs/*.json`` is a dict. Wrapping that in a state class would buy a
+returns a dict, and the canonical projection returns a dict. Wrapping that in a
+state class would buy a
 JSON-to-object mapping layer, an object-to-JSON layer for diffing, and a
 hand-written clone/eq, for three representations of one thing.
 
@@ -123,7 +123,7 @@ class PackageState:
     """The package-data counterpart of ProjectState.
 
     ``graphs`` maps graphid -> the graph's canonical dict, in exactly the shape
-    the canonical projection emits and the committed package JSON stores:
+    the canonical projection emits:
 
         {
             "graphid": ..., "slug": ..., "name": {...}, "is_resource": bool,
