@@ -136,8 +136,12 @@ export default ko.components.register('etl-manager', {
                     return response.json();
                 }).then(function(result) {
                     if (result.success === false) {
-                        const error = result.data || result;
-                        self.alert(new AlertViewModel('ep-alert-red', error.title, error.message));
+                        const error = result.data || {};
+                        self.alert(new AlertViewModel(
+                            'ep-alert-red',
+                            error.title || arches.translations.requestFailed.title,
+                            error.message || arches.translations.requestFailed.text
+                        ));
                     }
                     self.fetchLoadEvent();
                     event.loading(false);
