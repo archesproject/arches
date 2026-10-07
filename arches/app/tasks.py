@@ -458,6 +458,13 @@ def load_json_ld(userid, files, summary, result, temp_dir, loadid, moduleid):
 
 
 @shared_task
+def reverse_arches_json_load(loadid):
+    from arches.app.etl_modules import arches_json_importer
+
+    arches_json_importer.ArchesJsonImporter(loadid=loadid).reverse_load(loadid)
+
+
+@shared_task
 def load_arches_json(userid, files, summary, result, temp_dir, loadid, moduleid):
     from arches.app.etl_modules import arches_json_importer
 

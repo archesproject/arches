@@ -39,9 +39,15 @@ from arches.app.models.models import (
     NodeGroup,
     ResourceInstance,
     ResourceInstanceLifecycleState,
+    ResourceXResource,
     TileModel,
 )
+from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
+from arches.app.search.elasticsearch_dsl_builder import Bool, Query, Terms
+from arches.app.search.mappings import RESOURCES_INDEX, TERMS_INDEX
+from arches.app.search.search_engine_factory import SearchEngineInstance as se
+from arches.app.utils import import_class_from_string, task_management
 from arches.app.utils.decorators import user_created_transaction_match
 from arches.app.utils.file_validator import FileValidator
 
@@ -64,6 +70,10 @@ TILE_TRIGGER_LOCK_KEY = 8202514
 # clause under Postgres' 65,535 bind parameters and the unnest arrays small
 # enough to build without a memory spike.
 DB_CHECK_BATCH_SIZE = 20000
+CREATED_BY_LOAD = (
+    "SELECT resourceinstanceid::uuid FROM edit_log "
+    "WHERE transactionid = %s AND edittype = 'create'"
+)
 
 
 class ArchesJsonImporter(BaseImportModule):
@@ -1232,14 +1242,10 @@ class ArchesJsonImporter(BaseImportModule):
     # _post_process never committed, so resource and tile rows are all it wrote.
     @staticmethod
     def _remove_written(loadid):
-        created = (
-            "SELECT resourceinstanceid::uuid FROM edit_log "
-            "WHERE transactionid = %s AND edittype = 'create'"
-        )
         with transaction.atomic(), connection.cursor() as cursor:
             for table in ("tiles", "resource_instances"):
                 cursor.execute(
-                    f"DELETE FROM {table} WHERE resourceinstanceid IN ({created})",
+                    f"DELETE FROM {table} WHERE resourceinstanceid IN ({CREATED_BY_LOAD})",
                     [loadid],
                 )
             cursor.execute("DELETE FROM edit_log WHERE transactionid = %s", [loadid])
@@ -1344,18 +1350,165 @@ class ArchesJsonImporter(BaseImportModule):
     @method_decorator(user_created_transaction_match, name="dispatch")
     def reverse(self, request, **kwargs):
         loadid = self.loadid or request.POST.get("loadid")
-        if self._load_options(loadid).get("overwrite"):
+        refusal = self._undo_refusal(loadid)
+        if refusal:
             return {
                 "success": False,
-                "data": {
-                    "title": _("Cannot undo this load"),
-                    "message": _(
-                        "An overwrite load cannot be undone: the tiles it replaced "
-                        "no longer exist."
-                    ),
-                },
+                "data": {"title": _("Cannot undo this load"), "message": refusal},
             }
-        return super().reverse(request, **kwargs)
+        try:
+            if task_management.check_if_celery_available():
+                import arches.app.tasks as tasks
+
+                tasks.reverse_arches_json_load.apply_async([loadid])
+            else:
+                self.reverse_load(loadid)
+        except Exception as e:
+            logger.exception(e)
+            return {
+                "success": False,
+                "data": {"title": _("Undo failed"), "message": str(e)},
+            }
+        return {"success": True, "data": ""}
+
+    # Undo deletes the load's resources outright, so it must not take with it what a
+    # later load or an edit has put on them since.
+    def _undo_refusal(self, loadid):
+        if self._load_options(loadid).get("overwrite"):
+            return _(
+                "An overwrite load cannot be undone: the tiles it replaced no longer exist."
+            )
+        created = EditLog.objects.filter(
+            transactionid=loadid, edittype="create"
+        ).values("resourceinstanceid")
+        changed = (
+            EditLog.objects.filter(resourceinstanceid__in=created)
+            .exclude(transactionid=loadid)
+            .values("resourceinstanceid")
+            .distinct()
+            .count()
+        )
+        if changed:
+            return _(
+                "{} resources from this load have been changed since, by another load "
+                "or an edit. This undo cannot be performed."
+            ).format(changed)
+        return None
+
+    # The inverse of the load: batched deletes with the tile triggers off, and the
+    # search index once at the end. Like the load, it runs no graph functions.
+    def reverse_load(self, loadid):
+        previous = LoadEvent.objects.get(loadid=loadid).status
+        resourceids = list(
+            EditLog.objects.filter(transactionid=loadid, edittype="create").values_list(
+                "resourceinstanceid", flat=True
+            )
+        )
+        LoadEvent.objects.filter(loadid=loadid).update(status="reversing")
+        with connection.cursor() as cursor:
+            if not self._acquire_trigger_lock(cursor):
+                LoadEvent.objects.filter(loadid=loadid).update(status=previous)
+                raise RuntimeError(
+                    _("Another bulk load is running. Try again when it finishes.")
+                )
+            try:
+                disable_tile_triggers(cursor, loadid)
+                with transaction.atomic():
+                    linking_resources = self._unlink_from_outside(cursor, loadid)
+                    removed = self._delete_load(cursor, loadid, resourceids)
+            except Exception as e:
+                LoadEvent.objects.filter(loadid=loadid).update(
+                    status=previous, error_message=_("Not undone: {}").format(e)
+                )
+                raise
+            finally:
+                reenable_tile_triggers(cursor, loadid)
+                self._release_trigger_lock(cursor)
+            cursor.execute("SELECT __arches_refresh_spatial_views()")
+            cursor.execute(
+                """UPDATE load_event SET status = %s, load_details = load_details::jsonb || ('{"resources_removed":' || %s || '}')::jsonb WHERE loadid = %s""",
+                ("unloaded", removed, loadid),
+            )
+        # arches_search's rows went with the delete above; Elasticsearch may be absent,
+        # so failing to clean it is not a failed undo.
+        try:
+            self._remove_from_index(resourceids, linking_resources)
+        except Exception as e:
+            logger.warning(
+                "Load %s was undone but Elasticsearch was not updated (%s); "
+                "reindex if this project still uses it.",
+                loadid,
+                e,
+            )
+
+    # Links into the load from resources outside it, made after the load: core's
+    # ResourceXResource.delete strips the reference from the outside tile's JSON.
+    @staticmethod
+    def _unlink_from_outside(cursor, loadid):
+        cursor.execute(
+            f"""
+            SELECT resourcexid FROM resource_x_resource
+            WHERE resourceinstanceidto IN ({CREATED_BY_LOAD})
+              AND resourceinstanceidfrom NOT IN ({CREATED_BY_LOAD})
+            """,
+            [loadid, loadid],
+        )
+        linking_resources = set()
+        for link in ResourceXResource.objects.filter(
+            pk__in=[row[0] for row in cursor.fetchall()]
+        ):
+            linking_resources.add(str(link.from_resource_id))
+            link.delete(deletedResourceId=link.to_resource_id)
+        return linking_resources
+
+    # Django's cascade, in batches, rather than a list of tables: it also clears what
+    # other apps keep against tiles and resources, as a resource delete in the UI does.
+    def _delete_load(self, cursor, loadid, resourceids):
+        removed = 0
+        for batch in self._in_batches(resourceids):
+            EditLog.objects.bulk_create(
+                EditLog(
+                    resourceclassid=str(graphid),
+                    resourceinstanceid=str(resourceid),
+                    edittype="delete",
+                    timestamp=timezone.now(),
+                    note="removed by undoing an arches json load",
+                    transactionid=loadid,
+                )
+                for resourceid, graphid in ResourceInstance.objects.filter(
+                    pk__in=batch
+                ).values_list("pk", "graph_id")
+            )
+            # File's post_delete signal would remove the stored files, which the
+            # import never wrote, so their rows go first and by SQL.
+            cursor.execute(
+                "DELETE FROM files WHERE tileid IN (SELECT tileid FROM tiles "
+                "WHERE resourceinstanceid = ANY(%s::uuid[]))",
+                [batch],
+            )
+            _, deleted = ResourceInstance.objects.filter(pk__in=batch).delete()
+            removed += deleted.get(ResourceInstance._meta.label, 0)
+        return removed
+
+    def _remove_from_index(self, resourceids, linking_resources):
+        custom_indexes = [
+            import_class_from_string(index["module"])(index["name"])
+            for index in settings.ELASTICSEARCH_CUSTOM_INDEXES
+        ]
+        for batch in self._in_batches(resourceids):
+            for index in (RESOURCES_INDEX, TERMS_INDEX):
+                query = Query(se)
+                bool_query = Bool()
+                bool_query.filter(Terms(field="resourceinstanceid", terms=batch))
+                query.add_query(bool_query)
+                query.delete(index=index)
+            for custom_index in custom_indexes:
+                custom_index.delete_resources(
+                    resources=[ResourceInstance(pk=resourceid) for resourceid in batch]
+                )
+        for resource in Resource.objects.filter(pk__in=linking_resources):
+            resource.load_tiles()
+            resource.index()
 
     # ------------------------------------------------------------------ async
 

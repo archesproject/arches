@@ -7,11 +7,13 @@ import zipfile
 from unittest.mock import patch
 
 from django.contrib.auth.models import User
+from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.http import HttpRequest
 from django.test import SimpleTestCase, TestCase
 
 from arches.app.models.graph import Graph
+from arches.app.models.system_settings import settings
 from arches.app.models.models import (
     EditLog,
     ETLModule,
@@ -783,6 +785,107 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
         self.assertTrue(response["success"], response)
         self.assertFalse(ResourceInstance.objects.filter(pk=monument).exists())
         self.assertEqual(LoadEvent.objects.get(loadid=loadid).status, "unloaded")
+
+    def test_undo_removes_what_the_load_wrote_and_nothing_else(self):
+        site, monument = uuid.uuid4(), uuid.uuid4()
+        self._load(_resource(site, _tile(STRING_NODE, _text("Site 4"))))
+        plan = str(uuid.uuid4())
+        stored = default_storage.save(
+            f"{settings.UPLOADED_FILES_DIR}/{plan}.pdf", ContentFile(b"plan")
+        )
+        self.addCleanup(default_storage.delete, stored)
+        link = {
+            "resourceId": str(site),
+            "ontologyProperty": "",
+            "inverseOntologyProperty": "",
+        }
+        loadid = self._load(
+            _resource(
+                monument,
+                _tile(GEOMETRY_NODE, _point()),
+                _tile(FILE_NODE, [_file(plan, f"{plan}.pdf")]),
+                _tile(RESOURCE_NODE, [link]),
+            )
+        )
+        self.assertTrue(File.objects.filter(fileid=plan).exists())
+
+        response = self._reverse(loadid)
+
+        self.assertTrue(response["success"], response)
+        self.assertFalse(ResourceInstance.objects.filter(pk=monument).exists())
+        self.assertFalse(
+            TileModel.objects.filter(resourceinstance_id=monument).exists()
+        )
+        self.assertFalse(
+            GeoJSONGeometry.objects.filter(resourceinstance_id=monument).exists()
+        )
+        self.assertFalse(File.objects.filter(fileid=plan).exists())
+        self.assertFalse(
+            ResourceXResource.objects.filter(from_resource_id=monument).exists()
+        )
+        self.assertTrue(default_storage.exists(stored))
+        self.assertTrue(TileModel.objects.filter(resourceinstance_id=site).exists())
+        self.assertTrue(
+            EditLog.objects.filter(
+                transactionid=loadid,
+                edittype="delete",
+                resourceinstanceid=str(monument),
+            ).exists()
+        )
+        self.assertEqual(LoadEvent.objects.get(loadid=loadid).status, "unloaded")
+
+    def test_undo_succeeds_when_elasticsearch_is_unavailable(self):
+        monument = uuid.uuid4()
+        loadid = self._load(_resource(monument, _tile(STRING_NODE, _text("Monument"))))
+
+        with patch(
+            "arches.app.etl_modules.arches_json_importer.Query.delete",
+            side_effect=ConnectionError("elasticsearch is gone"),
+        ):
+            response = self._reverse(loadid)
+
+        self.assertTrue(response["success"], response)
+        self.assertFalse(ResourceInstance.objects.filter(pk=monument).exists())
+        self.assertEqual(LoadEvent.objects.get(loadid=loadid).status, "unloaded")
+
+    def test_a_load_overwritten_since_cannot_be_undone(self):
+        monument = uuid.uuid4()
+        loadid = self._load(_resource(monument, _tile(STRING_NODE, _text("Monument"))))
+        self._load(
+            _resource(monument, _tile(STRING_NODE, _text("Monument, renamed"))),
+            overwrite=True,
+        )
+
+        response = self._reverse(loadid)
+
+        self.assertFalse(response["success"])
+        self.assertIn("changed since", response["data"]["message"])
+        self.assertEqual(
+            TileModel.objects.get(resourceinstance_id=monument).data[STRING_NODE]["en"][
+                "value"
+            ],
+            "Monument, renamed",
+        )
+
+    def test_undo_removes_links_into_the_load_from_outside_it(self):
+        monument, site = uuid.uuid4(), uuid.uuid4()
+        loadid = self._load(_resource(monument, _tile(STRING_NODE, _text("Monument"))))
+        link = {
+            "resourceId": str(monument),
+            "ontologyProperty": "",
+            "inverseOntologyProperty": "",
+        }
+        self._load(_resource(site, _tile(RESOURCE_NODE, [link])))
+
+        self._reverse(loadid)
+
+        self.assertFalse(ResourceInstance.objects.filter(pk=monument).exists())
+        self.assertEqual(
+            TileModel.objects.get(resourceinstance_id=site).data[RESOURCE_NODE], []
+        )
+        self.assertFalse(
+            ResourceXResource.objects.filter(to_resource_id=monument).exists()
+        )
 
     def test_an_overwrite_load_cannot_be_undone(self):
         monument = uuid.uuid4()
