@@ -67,16 +67,16 @@ const viewModel = function(params) {
                 text: arches.translations.ontologyPropertySource
             });
         }
-        this.relationshipSources.push({
-            id: 'concept',
-            text: arches.translations.conceptSource
-        });
         if (this.controlledListsAvailable) {
             this.relationshipSources.push({
                 id: 'reference',
                 text: arches.translations.referenceSource
             });
         }
+        this.relationshipSources.push({
+            id: 'concept',
+            text: arches.translations.conceptSource
+        });
 
         this.selectedResourceType = ko.observable(null);
         this.toggleSelectedResource = function(resourceRelationship) {
