@@ -1,7 +1,6 @@
 /* eslint-disable */
 
 const Path = require('path');
-const TerserPlugin = require("terser-webpack-plugin");
 const Webpack = require('webpack');
 const { merge } = require('webpack-merge');
 
@@ -16,19 +15,16 @@ module.exports = () => {
                 bail: true,
                 optimization: {
                     minimize: true,
-                    minimizer: [
-                        new TerserPlugin({
-                            parallel: true,
-                            terserOptions: {
-                                compress: {
-                                    drop_console: true,
-                                },
-                                mangle: true,
-                                keep_classnames: true,
-                                keep_fnames: true,
+                    minimizeOptions: {
+                        javascript: {
+                            compress: {
+                                drop_console: true,
                             },
-                        }),
-                    ],
+                            mangle: true,
+                            keep_classnames: true,
+                            keep_fnames: true,
+                        },
+                    },
                 },
                 plugins: [
                     new Webpack.DefinePlugin({
