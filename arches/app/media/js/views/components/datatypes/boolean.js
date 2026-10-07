@@ -1,5 +1,6 @@
 import ko from 'knockout';
 import booleanTemplate from 'templates/views/components/datatypes/boolean.htm';
+import 'bindings/select2-query';
 
 var name = 'boolean-datatype-config';
 
