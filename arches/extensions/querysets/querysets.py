@@ -651,6 +651,9 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
 
         for resource in self._result_cache:
             resource._as_representation = self._hints.get("as_representation", False)
+            resource._provisional_edits_for_user = self._hints.get(
+                "provisional_edits_for_user"
+            )
 
             # Prepare empty aliased data containers.
             for grouping_node in grouping_nodes.values():

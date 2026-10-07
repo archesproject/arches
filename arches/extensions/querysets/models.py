@@ -115,6 +115,7 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
     def __init__(self, *args, **kwargs):
         self._as_representation = kwargs.pop("__as_representation", False)
         self._request = kwargs.pop("__request", None)
+        self._provisional_edits_for_user = None
         arches_model_kwargs, other_kwargs = pop_arches_model_kwargs(
             kwargs, self._meta.get_fields()
         )
@@ -151,7 +152,6 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         index=True,
         partial=None,
         force_admin=False,
-        provisional_edits_for_user=None,
         **kwargs,
     ):
         """
@@ -188,7 +188,6 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
             index=index,
             partial=partial,
             force_admin=force_admin,
-            provisional_edits_for_user=provisional_edits_for_user,
             **kwargs,
         )
 
@@ -263,7 +262,6 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         using=None,
         fields=None,
         from_queryset=None,
-        provisional_edits_for_user=None,
     ):
         if from_queryset is None:
             # TODO: symptom that we need a backreference to the queryset args.
@@ -293,7 +291,9 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
                 as_representation=getattr(self, "_as_representation", False),
                 nodes=nodes or None,
                 graph_query=graph_query,
-                provisional_edits_for_user=provisional_edits_for_user,
+                provisional_edits_for_user=getattr(
+                    self, "_provisional_edits_for_user", None
+                ),
             )
         self._refresh_aliased_data(using, fields, from_queryset)
 
@@ -304,7 +304,6 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         index=True,
         partial=True,
         force_admin=False,
-        provisional_edits_for_user=None,
         **kwargs,
     ):
         """Raises a compound ValidationError with any failing tile values."""
@@ -370,13 +369,11 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
                 operation=operation,
                 changed_tile_pks=changed_tile_pks,
                 deleted_tile_pks=deleted_tile_pks,
-                provisional_edits_for_user=provisional_edits_for_user,
             )
         else:
             self.refresh_from_db(
                 using=kwargs.get("using"),
                 fields=kwargs.get("update_fields"),
-                provisional_edits_for_user=provisional_edits_for_user,
             )
 
         if request.GET.get("fill_blanks", "f").lower().startswith("t"):
@@ -389,7 +386,6 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         operation,
         changed_tile_pks,
         deleted_tile_pks,
-        provisional_edits_for_user=None,
     ):
         """Efficiently refresh aliased_data after a save.
 
@@ -522,7 +518,9 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
                 tiles_to_reprocess,
                 as_representation=getattr(self, "_as_representation", False),
                 grouping_node_lookup=grouping_node_lookup,
-                provisional_edits_for_user=provisional_edits_for_user,
+                provisional_edits_for_user=getattr(
+                    self, "_provisional_edits_for_user", None
+                ),
             )
 
         # Step 5: Rebuild the resource's top-level aliased_data from the updated tree.
@@ -1022,6 +1020,9 @@ class TileTree(TileModel, AliasedDataMixin):
                 self.resourceinstance.graph.slug,
                 nodegroup_alias=self.find_nodegroup_alias(),
                 as_representation=getattr(self, "_as_representation", False),
+                provisional_edits_for_user=getattr(
+                    self, "_provisional_edits_for_user", None
+                ),
             )
         self._refresh_aliased_data(using, fields, from_queryset)
 
