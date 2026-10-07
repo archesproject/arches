@@ -83,19 +83,28 @@
                 <!-- /ko -->
             </div>
 
-            <div class="etl-module-component">
-                <label style="display: block;">
-                    <input type="checkbox" data-bind="checked: overwrite" />
-                    <span data-bind="text: $root.translations.overwriteExistingResources"></span>
-                </label>
-                <div class="etl-loading-metadata-key" data-bind="text: overwrite() ? $root.translations.replaceExistingResourcesHelp : $root.translations.existingResourcesFail"></div>
-                <label style="display: block;">
-                    <input type="checkbox" data-bind="checked: index" />
-                    <span data-bind="text: $root.translations.indexAfterImport"></span>
-                </label>
-                <!-- ko ifnot: index -->
-                <div class="etl-loading-metadata-key" data-bind="text: $root.translations.reindexLater"></div>
-                <!-- /ko -->
+            <div class="etl-module-component" style="margin-top: 20px;">
+                <h4 class="branch-xl-title">
+                    <span data-bind="text: $root.translations.importOptions"></span>
+                </h4>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+                    <div>
+                        <label style="display: flex; align-items: center; gap: 8px; margin: 0; font-weight: normal;">
+                            <input type="checkbox" style="margin: 0;" data-bind="checked: overwrite" />
+                            <span data-bind="text: $root.translations.overwriteExistingResources"></span>
+                        </label>
+                        <div class="text-warning" style="font-size: 1.5rem; margin-left: 21px;" data-bind="text: overwrite() ? $root.translations.replaceExistingResourcesHelp : $root.translations.existingResourcesFail"></div>
+                    </div>
+                    <div>
+                        <label style="display: flex; align-items: center; gap: 8px; margin: 0; font-weight: normal;">
+                            <input type="checkbox" style="margin: 0;" data-bind="checked: index" />
+                            <span data-bind="text: $root.translations.indexAfterImport"></span>
+                        </label>
+                        <!-- ko ifnot: index -->
+                        <div class="text-warning" style="font-size: 1.5rem; margin-left: 21px;" data-bind="text: $root.translations.reindexLater"></div>
+                        <!-- /ko -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
