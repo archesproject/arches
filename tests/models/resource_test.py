@@ -273,8 +273,8 @@ class ResourceTests(ArchesTestCase):
             return [
                 {
                     "resourceId": str(related_resource_id),
-                    "ontologyProperty": "",
-                    "inverseOntologyProperty": "",
+                    "relationship": "",
+                    "inverseRelationship": "",
                 }
             ]
 
@@ -282,8 +282,8 @@ class ResourceTests(ArchesTestCase):
             return [
                 {
                     "resourceId": str(related_resource_id),
-                    "ontologyProperty": "",
-                    "inverseOntologyProperty": "",
+                    "relationship": "",
+                    "inverseRelationship": "",
                 }
             ]
 
@@ -855,8 +855,8 @@ class ResourceTests(ArchesTestCase):
                 str(resource_instance_node.pk): [
                     {
                         "resourceId": str(resource.pk),
-                        "ontologyProperty": "",
-                        "inverseOntologyProperty": "",
+                        "relationship": "",
+                        "inverseRelationship": "",
                     }
                 ],
             },
@@ -966,12 +966,12 @@ class ResourceTests(ArchesTestCase):
                         copied_value["resourceId"],
                     )
                     self.assertEqual(
-                        original_value["ontologyProperty"],
-                        copied_value["ontologyProperty"],
+                        original_value["relationship"],
+                        copied_value["relationship"],
                     )
                     self.assertEqual(
-                        original_value["inverseOntologyProperty"],
-                        copied_value["inverseOntologyProperty"],
+                        original_value["inverseRelationship"],
+                        copied_value["inverseRelationship"],
                     )
                     copied_cross_record = copied_value["resourceXresourceId"]
                     self.assertNotEqual(
@@ -1034,12 +1034,12 @@ class ResourceTests(ArchesTestCase):
                         copied_value["resourceId"],
                     )
                     self.assertEqual(
-                        original_value["ontologyProperty"],
-                        copied_value["ontologyProperty"],
+                        original_value["relationship"],
+                        copied_value["relationship"],
                     )
                     self.assertEqual(
-                        original_value["inverseOntologyProperty"],
-                        copied_value["inverseOntologyProperty"],
+                        original_value["inverseRelationship"],
+                        copied_value["inverseRelationship"],
                     )
                     copied_cross_record = copied_value["resourceXresourceId"]
                     self.assertNotEqual(

@@ -371,8 +371,8 @@ class DatatypeMethodTests(GraphTestCase):
                     "output": [
                         {
                             "resourceId": str(self.resource_42.pk),
-                            "ontologyProperty": "",
-                            "inverseOntologyProperty": "",
+                            "relationship": "",
+                            "inverseRelationship": "",
                         }
                     ],
                 },
@@ -381,8 +381,8 @@ class DatatypeMethodTests(GraphTestCase):
                     "output": [
                         {
                             "resourceId": str(self.resource_42.pk),
-                            "ontologyProperty": "",
-                            "inverseOntologyProperty": "",
+                            "relationship": "",
+                            "inverseRelationship": "",
                         }
                     ],
                 },
@@ -391,8 +391,8 @@ class DatatypeMethodTests(GraphTestCase):
                     "output": [
                         {
                             "resourceId": str(self.resource_42.pk),
-                            "ontologyProperty": "",
-                            "inverseOntologyProperty": "",
+                            "relationship": "",
+                            "inverseRelationship": "",
                         }
                     ],
                 },
@@ -401,16 +401,16 @@ class DatatypeMethodTests(GraphTestCase):
                         [
                             {  # test as stringified dict
                                 "resourceId": str(self.resource_42.pk),
-                                "ontologyProperty": "testProperty",
-                                "inverseOntologyProperty": "testInverseProperty",
+                                "relationship": "testProperty",
+                                "inverseRelationship": "testInverseProperty",
                             }
                         ]
                     ),
                     "output": [
                         {
                             "resourceId": str(self.resource_42.pk),
-                            "ontologyProperty": "testProperty",
-                            "inverseOntologyProperty": "testInverseProperty",
+                            "relationship": "testProperty",
+                            "inverseRelationship": "testInverseProperty",
                         }
                     ],
                 },
@@ -418,15 +418,15 @@ class DatatypeMethodTests(GraphTestCase):
                     "input": [
                         {  # test as dict
                             "resourceId": str(self.resource_42.pk),
-                            "ontologyProperty": "testProperty",
-                            "inverseOntologyProperty": "testInverseProperty",
+                            "relationship": "testProperty",
+                            "inverseRelationship": "testInverseProperty",
                         }
                     ],
                     "output": [
                         {
                             "resourceId": str(self.resource_42.pk),
-                            "ontologyProperty": "testProperty",
-                            "inverseOntologyProperty": "testInverseProperty",
+                            "relationship": "testProperty",
+                            "inverseRelationship": "testInverseProperty",
                         }
                     ],
                 },
@@ -437,8 +437,8 @@ class DatatypeMethodTests(GraphTestCase):
                     "output": [
                         {
                             "resourceId": str(self.resource_42.pk),
-                            "ontologyProperty": "",
-                            "inverseOntologyProperty": "",
+                            "relationship": "",
+                            "inverseRelationship": "",
                         }
                     ],
                 }
