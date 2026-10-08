@@ -80,6 +80,7 @@ class MapDataAPI(View):
                 "resource_map_layers": resource_map_layers,
                 "resource_map_sources": resource_map_sources,
                 "default_bounds": getattr(settings, "DEFAULT_BOUNDS", None),
+                "preferred_coordinate_systems": settings.PREFERRED_COORDINATE_SYSTEMS,
             }
         )
 

@@ -1,7 +1,8 @@
 from types import SimpleNamespace
 from unittest import mock
 from uuid import uuid4
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase, TestCase, override_settings
+from django.urls import reverse
 from django.core import management
 from django.test.utils import captured_stdout
 
@@ -151,3 +152,24 @@ class EnsureAbsoluteTileURLsTests(SimpleTestCase):
         with self.stub_settings("http://localhost:8000/"):
             map_api.MapDataAPI._ensure_absolute_tile_urls(source)
         self.assertEqual(source, {"type": "raster"})
+
+
+class MapDataAPITests(TestCase):
+    COORDINATE_SYSTEMS = (
+        {
+            "name": "Geographic",
+            "srid": "4326",
+            "proj4": "+proj=longlat +datum=WGS84 +no_defs",
+            "default": True,
+        },
+    )
+
+    @override_settings(PREFERRED_COORDINATE_SYSTEMS=COORDINATE_SYSTEMS)
+    def test_includes_preferred_coordinate_systems(self):
+        response = self.client.get(reverse("arches_vue_components:api-map-data"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json()["preferred_coordinate_systems"],
+            list(self.COORDINATE_SYSTEMS),
+        )
