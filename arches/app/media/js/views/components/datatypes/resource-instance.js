@@ -98,43 +98,17 @@ const viewModel = function(params) {
             };
         };
 
-        const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-        const readLegacyRelationship = function(graph) {
-            const useOntologyRelationship = ko.unwrap(graph.useOntologyRelationship);
-            const relationship = ko.unwrap(useOntologyRelationship ? graph.ontologyProperty : graph.relationshipConcept);
-            const inverseRelationship = ko.unwrap(useOntologyRelationship ? graph.inverseOntologyProperty : graph.inverseRelationshipConcept);
-
-            let source;
-            if (useOntologyRelationship) {
-                source = 'ontology';
-            } else {
-                const value = relationship || inverseRelationship;
-                source = value && !uuidPattern.test(value) ? 'reference' : 'concept';
-            }
-            return {source, relationship, inverseRelationship};
-        };
-
         var preventSetup = false;
         var setupConfig = function(graph) {
             var model = _.find(self.resourceModels, function(model){
                 return graph.graphid === model.graphid;
             });
 
-            // read the legacy keys once, then drop them so they aren't saved again
-            const legacy = readLegacyRelationship(graph);
-
-            graph.relationshipSource = ko.observable(ko.unwrap(graph.relationshipSource) || legacy.source);
+            graph.relationshipSource = ko.observable(ko.unwrap(graph.relationshipSource) || 'concept');
             graph.relationshipCollection = ko.observable(ko.unwrap(graph.relationshipCollection) || defaultRelationshipCollection);
             graph.relationshipControlledList = ko.observable(ko.unwrap(graph.relationshipControlledList) || null);
-            graph.relationship = ko.observable(ko.unwrap(graph.relationship) ?? legacy.relationship ?? defaultRelationship(graph));
-            graph.inverseRelationship = ko.observable(ko.unwrap(graph.inverseRelationship) ?? legacy.inverseRelationship ?? defaultRelationship(graph));
-
-            delete graph.useOntologyRelationship;
-            delete graph.ontologyProperty;
-            delete graph.inverseOntologyProperty;
-            delete graph.relationshipConcept;
-            delete graph.inverseRelationshipConcept;
+            graph.relationship = ko.observable(ko.unwrap(graph.relationship) ?? defaultRelationship(graph));
+            graph.inverseRelationship = ko.observable(ko.unwrap(graph.inverseRelationship) ?? defaultRelationship(graph));
 
             graph.removeRelationship = function(graph){
                 self.config.graphs.remove(graph);

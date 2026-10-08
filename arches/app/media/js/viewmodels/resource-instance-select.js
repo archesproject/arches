@@ -153,17 +153,10 @@ var ResourceInstanceSelectViewModel = function(params) {
         if (!nodeConfigGraph) {
             return null;
         }
-        const useOntologyRelationship = ko.unwrap(nodeConfigGraph.useOntologyRelationship);
-        const source = ko.unwrap(nodeConfigGraph.relationshipSource)
-            || (useOntologyRelationship ? 'ontology' : 'concept');
-        const legacyRelationship = source === 'ontology'
-            ? nodeConfigGraph.ontologyProperty : nodeConfigGraph.relationshipConcept;
-        const legacyInverseRelationship = source === 'ontology'
-            ? nodeConfigGraph.inverseOntologyProperty : nodeConfigGraph.inverseRelationshipConcept;
         return {
-            source: source,
-            relationship: ko.unwrap(nodeConfigGraph.relationship) ?? ko.unwrap(legacyRelationship),
-            inverseRelationship: ko.unwrap(nodeConfigGraph.inverseRelationship) ?? ko.unwrap(legacyInverseRelationship),
+            source: ko.unwrap(nodeConfigGraph.relationshipSource),
+            relationship: ko.unwrap(nodeConfigGraph.relationship),
+            inverseRelationship: ko.unwrap(nodeConfigGraph.inverseRelationship),
             relationshipCollection: ko.unwrap(nodeConfigGraph.relationshipCollection),
             relationshipControlledList: ko.unwrap(nodeConfigGraph.relationshipControlledList)
         };
@@ -191,8 +184,8 @@ var ResourceInstanceSelectViewModel = function(params) {
         self.defaultResourceInstance().forEach(function(val){
             var ri = {
                 "resourceId": ko.observable(val.resourceId),
-                "relationship": ko.observable(val.relationship),
-                "inverseRelationship": ko.observable(val.inverseRelationship),
+                "relationship": ko.observable(val.relationship ?? val.ontologyProperty),
+                "inverseRelationship": ko.observable(val.inverseRelationship ?? val.inverseOntologyProperty),
                 "resourceXresourceId": ""
             };
             ri.relationship.subscribe(function(){
@@ -241,6 +234,13 @@ var ResourceInstanceSelectViewModel = function(params) {
             if(!!value) {
                 value.forEach(function(val) {
                     if (val) {
+                        // tile values saved before the keys were renamed
+                        if(val.relationship === undefined && val.ontologyProperty !== undefined) {
+                            val.relationship = val.ontologyProperty;
+                        }
+                        if(val.inverseRelationship === undefined && val.inverseOntologyProperty !== undefined) {
+                            val.inverseRelationship = val.inverseOntologyProperty;
+                        }
                         if(!val.resourceName) {
                             Object.defineProperty(val, 'resourceName', {value: ko.observable()});
                         }
