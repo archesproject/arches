@@ -105,7 +105,7 @@ provide(mapContextKey, context);
             position="right"
             :context="context"
             :items="resolvedInteractionTools"
-            :default-open-index="0"
+            :default-open-index="undefined"
         />
         <Toast group="map-component" />
     </div>

@@ -1,6 +1,7 @@
 import ko from 'knockout';
 import arches from 'arches';
 import stringDatatypeTemplate from 'templates/views/components/datatypes/string.htm';
+import 'bindings/select2-query';
 
 
 var name = 'string-datatype-config';

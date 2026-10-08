@@ -1,5 +1,6 @@
 import ko from "knockout";
 import numberDatatypeTemplate from "templates/views/components/datatypes/number.htm";
+import 'bindings/select2-query';
 
 
 var name = 'number-datatype-config';

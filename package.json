@@ -73,7 +73,7 @@
         "lt-themify-icons": "1.1.0",
         "maplibre-gl": "6.9.0",
         "metismenu": "2.7.2",
-        "moment": "2.30.1",
+        "moment": "2.31.0",
         "normalize.css": "8.0.1",
         "nouislider": "11.0.3",
         "numeral": "2.0.6",
@@ -130,7 +130,7 @@
         "vitest": "3.2.7",
         "vue-loader": "17.4.2",
         "vue-tsc": "3.3.8",
-        "webpack": "5.105.4",
+        "webpack": "5.111.1",
         "webpack-cli": "5.1.4",
         "webpack-dev-server": "5.2.6",
         "webpack-merge": "5.10.0"

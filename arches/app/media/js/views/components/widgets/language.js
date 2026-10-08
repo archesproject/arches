@@ -1,6 +1,7 @@
 import ko from "knockout";
 import LanguageSelectViewModel from "viewmodels/language-select";
 import selectTemplate from "templates/views/components/widgets/select.htm";
+import 'bindings/select2-query';
 
 const viewModel = function(params) {
     params.configKeys = ["defaultValue"];

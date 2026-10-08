@@ -45,7 +45,6 @@ const shouldShowRequiredAsterisk = computed(() => {
                 v-if="shouldShowRequiredAsterisk"
                 aria-hidden="true"
                 class="pi pi-asterisk"
-                style="font-size: 0.75rem; padding-top: 0.25rem"
             />
         </div>
     </label>
@@ -56,5 +55,9 @@ const shouldShowRequiredAsterisk = computed(() => {
     display: flex;
     cursor: pointer;
     font-weight: 600;
+}
+.widget-label .pi-asterisk {
+    font-size: 0.75rem;
+    padding-top: 0.25rem;
 }
 </style>

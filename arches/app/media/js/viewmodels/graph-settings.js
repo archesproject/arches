@@ -6,7 +6,7 @@ import arches from 'arches';
 import colorPicker from 'bindings/color-picker';
 import JsonErrorAlertViewModel from 'viewmodels/alert-json';
 import chosen from 'bindings/chosen';
-import setCsrfToken from 'utils/set-csrf-token';
+import 'utils/set-csrf-token';
 
 
 var GraphSettingsViewModel = function(params) {

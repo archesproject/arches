@@ -19,8 +19,10 @@ import PermissionDesigner from 'views/graph/permission-designer';
 import GraphSettingsViewModel from 'viewmodels/graph-settings';
 import 'bindings/resizable-sidepanel';
 import 'views/components/simple-switch';
+import 'views/components/icon-selector';
 import 'utils/set-csrf-token';
 import 'datatype-config-components';
+import 'bindings/ckeditor';
 
 
 var GraphDesignerView = BaseManagerView.extend({
@@ -195,10 +197,10 @@ var GraphDesignerView = BaseManagerView.extend({
             });
         };
         viewModel.newResource = function() {
-            newGraph('/graph/new', {isresource: true});
+            newGraph(arches.urls.new_graph, {isresource: true});
         };
         viewModel.newBranch = function() {
-            newGraph('/graph/new', {isresource: false});
+            newGraph(arches.urls.new_graph, {isresource: false});
         };
 
         viewModel.createDraftGraph = function() {
