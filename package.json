@@ -86,7 +86,7 @@
         "shpjs": "6.1.0",
         "underscore": "^1.13.6",
         "uuidjs": "3.6.2",
-        "vue": "3.5.20",
+        "vue": "3.5.43",
         "vue-router": "4.4.3",
         "vue3-gettext": "3.0.0-beta.6",
         "webpack-bundle-tracker": "3.2.0"
