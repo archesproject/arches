@@ -17,7 +17,6 @@ class Migration(migrations.Migration):
     #   inverseOntologyProperty  -> inverseRelationship
     #   relationshipConcept      -> relationship
     #   inverseRelationshipConcept -> inverseRelationship
-    # Tile values keep ontologyProperty/inverseOntologyProperty; only node configs change.
     update_node_configs = """
         UPDATE nodes SET config = jsonb_set(config, '{graphs}', (
             SELECT jsonb_agg(
@@ -180,13 +179,13 @@ class Migration(migrations.Migration):
                     ELSE (relationship->>'resourceXresourceId')::uuid
                 END,
                 '',
-                CASE relationship->>'ontologyProperty'
+                CASE COALESCE(relationship->>'relationship', relationship->>'ontologyProperty')
                     WHEN '' THEN defaultOntologyProperty
-                    ELSE relationship->>'ontologyProperty'
+                    ELSE COALESCE(relationship->>'relationship', relationship->>'ontologyProperty')
                 END,
-                CASE relationship->>'inverseOntologyProperty'
+                CASE COALESCE(relationship->>'inverseRelationship', relationship->>'inverseOntologyProperty')
                     WHEN '' THEN defaultInverseOntologyProperty
-                    ELSE relationship->>'inverseOntologyProperty'
+                    ELSE COALESCE(relationship->>'inverseRelationship', relationship->>'inverseOntologyProperty')
                 END,
                 resourceinstancefrom_id,
                 (relationship->>'resourceId')::uuid,
@@ -306,7 +305,197 @@ class Migration(migrations.Migration):
         $BODY$;
     """
 
+    update_tile_data = """
+        DO $$
+        DECLARE
+            node RECORD;
+        BEGIN
+            FOR node IN
+                SELECT nodeid, nodegroupid FROM nodes
+                WHERE datatype IN ('resource-instance', 'resource-instance-list')
+            LOOP
+                UPDATE tiles SET tiledata = jsonb_set(tiledata, ARRAY[node.nodeid::text], (
+                    SELECT jsonb_agg(
+                        CASE WHEN jsonb_typeof(element) = 'object' THEN
+                            (element - 'ontologyProperty' - 'inverseOntologyProperty')
+                            || CASE WHEN element->'ontologyProperty' IS NOT NULL
+                                THEN jsonb_build_object('relationship', element->'ontologyProperty')
+                                ELSE '{}'::jsonb END
+                            || CASE WHEN element->'inverseOntologyProperty' IS NOT NULL
+                                THEN jsonb_build_object('inverseRelationship', element->'inverseOntologyProperty')
+                                ELSE '{}'::jsonb END
+                        ELSE element END
+                    )
+                    FROM jsonb_array_elements(tiledata->node.nodeid::text) element
+                ))
+                WHERE nodegroupid = node.nodegroupid
+                AND jsonb_typeof(tiledata->node.nodeid::text) = 'array'
+                AND EXISTS (
+                    SELECT * FROM jsonb_array_elements(tiledata->node.nodeid::text) element
+                    WHERE jsonb_typeof(element) = 'object'
+                    AND (element->'ontologyProperty' IS NOT NULL
+                        OR element->'inverseOntologyProperty' IS NOT NULL)
+                );
+            END LOOP;
+        END
+        $$;
+    """
+
+    reverse_tile_data = """
+        DO $$
+        DECLARE
+            node RECORD;
+        BEGIN
+            FOR node IN
+                SELECT nodeid, nodegroupid FROM nodes
+                WHERE datatype IN ('resource-instance', 'resource-instance-list')
+            LOOP
+                UPDATE tiles SET tiledata = jsonb_set(tiledata, ARRAY[node.nodeid::text], (
+                    SELECT jsonb_agg(
+                        CASE WHEN jsonb_typeof(element) = 'object' THEN
+                            (element - 'relationship' - 'inverseRelationship')
+                            || CASE WHEN element->'relationship' IS NOT NULL
+                                THEN jsonb_build_object('ontologyProperty', element->'relationship')
+                                ELSE '{}'::jsonb END
+                            || CASE WHEN element->'inverseRelationship' IS NOT NULL
+                                THEN jsonb_build_object('inverseOntologyProperty', element->'inverseRelationship')
+                                ELSE '{}'::jsonb END
+                        ELSE element END
+                    )
+                    FROM jsonb_array_elements(tiledata->node.nodeid::text) element
+                ))
+                WHERE nodegroupid = node.nodegroupid
+                AND jsonb_typeof(tiledata->node.nodeid::text) = 'array'
+                AND EXISTS (
+                    SELECT * FROM jsonb_array_elements(tiledata->node.nodeid::text) element
+                    WHERE jsonb_typeof(element) = 'object'
+                    AND (element->'relationship' IS NOT NULL
+                        OR element->'inverseRelationship' IS NOT NULL)
+                );
+            END LOOP;
+        END
+        $$;
+    """
+
+    update_refresh_function = """
+        CREATE OR REPLACE FUNCTION public.__arches_refresh_tile_resource_relationships(tile_id uuid)
+        RETURNS boolean
+        LANGUAGE plpgsql
+        AS $function$
+        DECLARE
+            resource_id uuid;
+        BEGIN
+            SELECT resourceinstanceid INTO resource_id FROM tiles WHERE tileid = tile_id;
+
+            DELETE FROM resource_x_resource WHERE tileid = tile_id;
+
+            WITH relationships AS (
+                SELECT n.nodeid,
+                    jsonb_array_elements(t.tiledata->n.nodeid::text) AS relationship
+                FROM tiles t
+                    LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
+                WHERE n.datatype IN ('resource-instance-list', 'resource-instance')
+                    AND t.tileid = tile_id
+                    AND t.tiledata->>n.nodeid::text IS NOT null
+            )
+            INSERT INTO resource_x_resource (
+                resourcexid,
+                notes,
+                relationshiptype,
+                resourceinstanceidfrom,
+                resourceinstanceidto,
+                inverserelationshiptype,
+                tileid,
+                nodeid,
+                created,
+                modified,
+                resourceinstancefrom_graphid,
+                resourceinstanceto_graphid
+            ) SELECT
+                CASE relationship->>'resourceXresourceId'
+                    WHEN '' THEN uuid_generate_v4()
+                    ELSE (relationship->>'resourceXresourceId')::uuid
+                END,
+                '',
+                COALESCE(relationship->>'relationship', relationship->>'ontologyProperty'),
+                resource_id,
+                (relationship->>'resourceId')::uuid,
+                COALESCE(relationship->>'inverseRelationship', relationship->>'inverseOntologyProperty'),
+                tile_id,
+                nodeid,
+                now(),
+                now(),
+                resourcefrom.graphid,
+                resourceto.graphid
+            FROM relationships r
+                LEFT JOIN resource_instances resourcefrom ON resourcefrom.resourceinstanceid = resource_id
+                LEFT JOIN resource_instances resourceto ON resourceto.resourceinstanceid = (r.relationship ->> 'resourceId')::uuid;
+            RETURN true;
+        END;
+        $function$
+    """
+
+    reverse_refresh_function = """
+        CREATE OR REPLACE FUNCTION public.__arches_refresh_tile_resource_relationships(tile_id uuid)
+        RETURNS boolean
+        LANGUAGE plpgsql
+        AS $function$
+        DECLARE
+            resource_id uuid;
+        BEGIN
+            SELECT resourceinstanceid INTO resource_id FROM tiles WHERE tileid = tile_id;
+
+            DELETE FROM resource_x_resource WHERE tileid = tile_id;
+
+            WITH relationships AS (
+                SELECT n.nodeid,
+                    jsonb_array_elements(t.tiledata->n.nodeid::text) AS relationship
+                FROM tiles t
+                    LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
+                WHERE n.datatype IN ('resource-instance-list', 'resource-instance')
+                    AND t.tileid = tile_id
+                    AND t.tiledata->>n.nodeid::text IS NOT null
+            )
+            INSERT INTO resource_x_resource (
+                resourcexid,
+                notes,
+                relationshiptype,
+                resourceinstanceidfrom,
+                resourceinstanceidto,
+                inverserelationshiptype,
+                tileid,
+                nodeid,
+                created,
+                modified,
+                resourceinstancefrom_graphid,
+                resourceinstanceto_graphid
+            ) SELECT
+                CASE relationship->>'resourceXresourceId'
+                    WHEN '' THEN uuid_generate_v4()
+                    ELSE (relationship->>'resourceXresourceId')::uuid
+                END,
+                '',
+                relationship->>'ontologyProperty',
+                resource_id,
+                (relationship->>'resourceId')::uuid,
+                relationship->>'inverseOntologyProperty',
+                tile_id,
+                nodeid,
+                now(),
+                now(),
+                resourcefrom.graphid,
+                resourceto.graphid
+            FROM relationships r
+                LEFT JOIN resource_instances resourcefrom ON resourcefrom.resourceinstanceid = resource_id
+                LEFT JOIN resource_instances resourceto ON resourceto.resourceinstanceid = (r.relationship ->> 'resourceId')::uuid;
+            RETURN true;
+        END;
+        $function$
+    """
+
     operations = [
         migrations.RunSQL(update_node_configs, reverse_node_configs),
+        migrations.RunSQL(update_tile_data, reverse_tile_data),
         migrations.RunSQL(update_relationship_function, reverse_relationship_function),
+        migrations.RunSQL(update_refresh_function, reverse_refresh_function),
     ]
