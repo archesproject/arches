@@ -99,27 +99,36 @@ const viewModel = function(params) {
         };
 
         const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+        const readLegacyRelationship = function(graph) {
+            const useOntologyRelationship = ko.unwrap(graph.useOntologyRelationship);
+            const relationship = ko.unwrap(useOntologyRelationship ? graph.ontologyProperty : graph.relationshipConcept);
+            const inverseRelationship = ko.unwrap(useOntologyRelationship ? graph.inverseOntologyProperty : graph.inverseRelationshipConcept);
+
+            let source;
+            if (useOntologyRelationship) {
+                source = 'ontology-property';
+            } else {
+                const value = relationship || inverseRelationship;
+                source = value && !uuidPattern.test(value) ? 'reference' : 'concept';
+            }
+            return {source, relationship, inverseRelationship};
+        };
+
         var preventSetup = false;
         var setupConfig = function(graph) {
             var model = _.find(self.resourceModels, function(model){
                 return graph.graphid === model.graphid;
             });
 
-            // configs saved before relationshipSource was introduced still carry the
-            // legacy keys; read them once, then drop them so they aren't saved again
-            const useOntologyRelationship = ko.unwrap(graph.useOntologyRelationship);
-            const legacyRelationship = useOntologyRelationship ? graph.ontologyProperty : graph.relationshipConcept;
-            const legacyInverseRelationship = useOntologyRelationship ? graph.inverseOntologyProperty : graph.inverseRelationshipConcept;
+            // read the legacy keys once, then drop them so they aren't saved again
+            const legacy = readLegacyRelationship(graph);
 
-            // without the ontology, a UUID is a concept value id and anything else is a URI
-            const legacyConcept = ko.unwrap(legacyRelationship) || ko.unwrap(legacyInverseRelationship);
-            const legacySource = useOntologyRelationship ? 'ontology-property'
-                : (legacyConcept && !uuidPattern.test(legacyConcept) ? 'reference' : 'concept');
-            graph.relationshipSource = ko.observable(ko.unwrap(graph.relationshipSource) || legacySource);
+            graph.relationshipSource = ko.observable(ko.unwrap(graph.relationshipSource) || legacy.source);
             graph.relationshipCollection = ko.observable(ko.unwrap(graph.relationshipCollection) || defaultRelationshipCollection);
             graph.relationshipControlledList = ko.observable(ko.unwrap(graph.relationshipControlledList) || null);
-            graph.relationship = ko.observable(ko.unwrap(graph.relationship) ?? ko.unwrap(legacyRelationship) ?? defaultRelationship(graph));
-            graph.inverseRelationship = ko.observable(ko.unwrap(graph.inverseRelationship) ?? ko.unwrap(legacyInverseRelationship) ?? defaultRelationship(graph));
+            graph.relationship = ko.observable(ko.unwrap(graph.relationship) ?? legacy.relationship ?? defaultRelationship(graph));
+            graph.inverseRelationship = ko.observable(ko.unwrap(graph.inverseRelationship) ?? legacy.inverseRelationship ?? defaultRelationship(graph));
 
             delete graph.useOntologyRelationship;
             delete graph.ontologyProperty;
