@@ -622,14 +622,14 @@ class TileTests(ArchesTestCase):
                 "a4157df0-e222-11e8-9acb-a4d18cec433a": None,
                 "eb115780-e222-11e8-aaed-a4d18cec433a": [
                     {
-                        "inverseOntologyProperty": "",
-                        "ontologyProperty": "",
+                        "inverseRelationship": "",
+                        "relationship": "",
                         "resourceId": "92b2db6a-d13f-4cc7-aec7-e4caf91b45f8",
                         "resourceXresourceId": "",
                     },
                     {
-                        "inverseOntologyProperty": "http://www.cidoc-crm.org/cidoc-crm/P62i_is_depicted_by",
-                        "ontologyProperty": "http://www.cidoc-crm.org/cidoc-crm/P62_depicts",
+                        "inverseRelationship": "http://www.cidoc-crm.org/cidoc-crm/P62i_is_depicted_by",
+                        "relationship": "http://www.cidoc-crm.org/cidoc-crm/P62_depicts",
                         "resourceId": "e72844fc-7bc0-4851-89ca-5bb1c6b3ba22",
                         "resourceXresourceId": "5f418480-534a-4dba-87d9-67eb27f0cc6a",
                     },
@@ -716,8 +716,8 @@ class TileTests(ArchesTestCase):
                 "a4157df0-e222-11e8-9acb-a4d18cec433a": None,
                 "eb115780-e222-11e8-aaed-a4d18cec433a": [
                     {
-                        "inverseOntologyProperty": "",
-                        "ontologyProperty": "http://www.cidoc-crm.org/cidoc-crm/P62_depicts",
+                        "inverseRelationship": "",
+                        "relationship": "http://www.cidoc-crm.org/cidoc-crm/P62_depicts",
                         "resourceId": "85b2db6a-d13f-4cc7-aec7-e4caf91b45f7",
                         "resourceXresourceId": "",
                     }

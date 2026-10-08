@@ -358,8 +358,8 @@ class ResourceViewTests(ArchesTestCase):
         reference_tile.data[self.reference_nodeid] = [
             {
                 "resourceName": "",
-                "ontologyProperty": en_preflabel,
-                "inverseOntologyProperty": en_preflabel,
+                "relationship": en_preflabel,
+                "inverseRelationship": en_preflabel,
                 "resourceId": person_resourceid,
             }
         ]
