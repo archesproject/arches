@@ -1,3 +1,5 @@
+import type { MapSettings } from "@/arches_vue_components/components/MapComponent/types.ts";
+
 export const BUFFER_FILL_COLOR = "#ea7f08";
 export const BUFFER_FILL_OPACITY = 0.3;
 export const BUFFER_LAYER_ID = "buffer-layer";
@@ -28,3 +30,43 @@ export const POLYGON = "polygon";
 export const SIMPLE_SELECT = "simple_select";
 export const STYLE_LOAD_EVENT = "style.load";
 export const YARDS = "yards";
+export const BUFFER_INPUT_DEBOUNCE_MILLISECONDS = 300;
+export const DEFAULT_BUFFER_DISTANCE = 100;
+export const DEFAULT_OVERLAY_OPACITY_PERCENT = 100;
+export const FEATURE_HIGHLIGHT_COLOR = "#e08a2b";
+export const FEATURE_HIGHLIGHT_LINE_WIDTH = 3;
+export const FEATURE_HIGHLIGHT_POINT_RADIUS = 11;
+export const FEATURE_HIGHLIGHT_SOURCE_ID = "map-component-feature-highlight";
+export const FEATURE_HIGHLIGHT_POINT_LAYER_ID =
+    "map-component-feature-highlight-point";
+export const FEATURE_HIGHLIGHT_OUTLINE_LAYER_ID =
+    "map-component-feature-highlight-outline";
+export const COORDINATE_PREVIEW_SOURCE_ID = "map-component-coordinate-preview";
+export const VERTEX_HIGHLIGHT_SOURCE_ID = "map-component-vertex-highlight";
+export const COMPONENT_LAYER_ID_PREFIX = "map-component-";
+export const WGS84_SRID = "4326";
+export const THUMBNAIL_WIDTH_PIXELS = 240;
+export const THUMBNAIL_HEIGHT_PIXELS = 160;
+
+export const GEOMETRY_ICON_BY_TYPE: Record<string, string> = {
+    Point: "pi pi-map-marker",
+    MultiPoint: "pi pi-map-marker",
+    LineString: "pi pi-minus",
+    MultiLineString: "pi pi-minus",
+    Polygon: "pi pi-stop",
+    MultiPolygon: "pi pi-stop",
+};
+
+export const DEFAULT_MAP_SETTINGS: MapSettings = {
+    showCursorCoordinates: true,
+    coordinateReadoutSrid: WGS84_SRID,
+    coordinateReadoutFormat: "dd",
+    showMapScale: true,
+    mapScaleUnit: "metric",
+    showZoomLevel: true,
+    geocoderVisible: true,
+    showNavigationControl: true,
+    showFullscreenControl: true,
+    scrollZoomRequiresKey: false,
+    allow3d: false,
+};
