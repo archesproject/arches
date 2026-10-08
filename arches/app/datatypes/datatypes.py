@@ -2204,6 +2204,22 @@ class ResourceInstanceDataType(BaseDataType):
 
     """
 
+    RELATIONSHIP_SOURCES = ("ontology", "concept", "reference")
+
+    def validate_node(self, node):
+        from arches.app.models.graph import GraphValidationError
+
+        try:
+            for graph in node.config.get("graphs") or []:
+                if graph["relationshipSource"] not in self.RELATIONSHIP_SOURCES:
+                    raise ValueError
+        except (AttributeError, KeyError, TypeError, ValueError):
+            raise GraphValidationError(
+                _(
+                    "A resource instance node's relationshipSource must be one of: {sources}"
+                ).format(sources=", ".join(self.RELATIONSHIP_SOURCES))
+            )
+
     def validate(
         self,
         value,
