@@ -16,6 +16,7 @@ from unittest.mock import MagicMock, patch
 
 from django.contrib.auth.models import User
 from django.core.management import call_command
+from django.http.request import HttpRequest
 
 from arches.app.models.models import TileModel
 
@@ -339,6 +340,42 @@ class TileTreeProvisionalEditsTests(GraphTestCase):
         tile = self._fetch(as_representation=True)
         self.assertEqual(
             tile.aliased_data.number_alias["node_value"], self.AUTHORITATIVE_NUMBER
+        )
+
+    def test_reverting_provisional_value_to_authoritative_is_saved(self):
+        """Saving a value that matches authoritative data must still update the
+        provisional edit — the no-op check must not fire when a provisional edit
+        exists for the saving user."""
+        unstable_node_ids = {
+            str(node.pk): None
+            for node in self.data_nodes_1
+            if node.alias in {"string_alias", "file_list_alias"}
+        }
+        tile_model = TileModel.objects.get(pk=self.cardinality_1_tile.pk)
+        provisional_edits = tile_model.provisionaledits
+        provisional_edits[str(self.provisional_editor.pk)]["value"].update(
+            unstable_node_ids
+        )
+        TileModel.objects.filter(pk=tile_model.pk).update(
+            data={**tile_model.data, **unstable_node_ids},
+            provisionaledits=provisional_edits,
+        )
+
+        request = HttpRequest()
+        request.user = self.provisional_editor
+        tile = self._fetch(provisional_edits_for_user=self.provisional_editor)
+        self.assertEqual(tile.aliased_data.number_alias, self.PROVISIONAL_NUMBER)
+
+        tile.aliased_data.number_alias = self.AUTHORITATIVE_NUMBER
+        tile.save(request=request)
+
+        saved_tile = TileModel.objects.get(pk=self.cardinality_1_tile.pk)
+        own_provisional_value = saved_tile.provisionaledits[
+            str(self.provisional_editor.pk)
+        ]["value"]
+        self.assertEqual(
+            own_provisional_value[str(self.number_node_1.pk)],
+            self.AUTHORITATIVE_NUMBER,
         )
 
 

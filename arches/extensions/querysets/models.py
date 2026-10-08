@@ -1037,19 +1037,36 @@ class TileTree(TileModel, AliasedDataMixin):
             return self.parenttile.backfill_parent_tiles()
         return self
 
-    def _tile_update_is_noop(self, original_tile):
+    def _tile_update_is_noop(self, original_tile, *, request=None):
         """Skipping no-op tile saves avoids regenerating RxR rows, at least
         given the current implementation that doesn't serialize them."""
+        from arches.app.utils.permission_backend import user_is_resource_reviewer
 
         datatype_factory = DataTypeFactory()
         if self.sortorder != original_tile["sortorder"]:
             return False
 
+        # For a non-reviewer with an existing provisional edit, compare incoming
+        # tile.data against their provisional values rather than the authoritative
+        # data.
+        user = getattr(request or self._request, "user", None)
+        user_provisional_edit = (
+            not user_is_resource_reviewer(user)
+            and (original_tile.get("provisionaledits") or {}).get(str(user.pk))
+            if user
+            else None
+        )
+        existing_data = (
+            user_provisional_edit["value"]
+            if user_provisional_edit
+            else original_tile["data"]
+        )
+
         for node in self.nodegroup.node_set.all():
             if node.datatype == "semantic":
                 continue
             node_id_str = str(node.nodeid)
-            old = original_tile["data"].get(node_id_str)
+            old = existing_data.get(node_id_str)
             datatype_instance = datatype_factory.get_instance(node.datatype)
             new = self.data[node_id_str]
             if not datatype_instance.values_match(old, new):
