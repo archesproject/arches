@@ -16,6 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import copy
+import json
 import uuid
 from unittest.mock import patch
 
@@ -298,13 +300,13 @@ class ResourceInstanceListDataTypeTests(ArchesTestCase):
                     str(dummy_node.pk): [
                         {
                             "resourceId": str(resource1.pk),
-                            "ontologyProperty": "",
-                            "inverseOntologyProperty": "",
+                            "relationship": "",
+                            "inverseRelationship": "",
                         },
                         {
                             "resourceId": str(resource2.pk),
-                            "ontologyProperty": "",
-                            "inverseOntologyProperty": "",
+                            "relationship": "",
+                            "inverseRelationship": "",
                         },
                     ]
                 },
@@ -319,6 +321,39 @@ class ResourceInstanceListDataTypeTests(ArchesTestCase):
         self.assertEqual(
             [inner["display_value"] for inner in json["instance_details"]],
             ["ONE", "TWO"],
+        )
+
+
+class ResourceInstanceLegacyKeysTests(ArchesTestCase):
+    def test_transform_value_for_tile_renames_legacy_keys(self):
+        ri = DataTypeFactory().get_instance("resource-instance")
+        legacy = [
+            {
+                "resourceId": "abc",
+                "ontologyProperty": "P1",
+                "inverseOntologyProperty": "P2",
+                "resourceXresourceId": "",
+            }
+        ]
+        for value in (json.dumps(legacy), legacy):
+            with self.subTest(value=type(value).__name__):
+                self.assertEqual(
+                    ri.transform_value_for_tile(copy.deepcopy(value)),
+                    [
+                        {
+                            "resourceId": "abc",
+                            "relationship": "P1",
+                            "inverseRelationship": "P2",
+                            "resourceXresourceId": "",
+                        }
+                    ],
+                )
+
+    def test_rename_legacy_relationship_keys_prefers_new_keys(self):
+        ri = DataTypeFactory().get_instance("resource-instance")
+        value = [{"relationship": "new", "ontologyProperty": "old"}]
+        self.assertEqual(
+            ri.rename_legacy_relationship_keys(value), [{"relationship": "new"}]
         )
 
 

@@ -2879,8 +2879,8 @@ class DraftGraphTests(ArchesTestCase):
                 },
                 str(resource_instance_node.pk): {
                     "resourceId": str(resource.pk),
-                    "ontologyProperty": "",
-                    "inverseOntologyProperty": "",
+                    "relationship": "",
+                    "inverseRelationship": "",
                 },
             },
             sortorder=0,
