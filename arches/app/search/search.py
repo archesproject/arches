@@ -312,10 +312,15 @@ class SearchEngine(object):
         try:
             helpers.bulk(self.es, data, **kwargs)
         except Exception as detail:
+            errors = getattr(detail, "errors", [])
             self.logger.warning(
-                "%s: WARNING: failed to bulk index documents, \nException detail: %s\n"
-                % (datetime.now(), detail)
+                f"{datetime.now()}: WARNING: failed to bulk index documents, \nException detail: {detail}\n"
             )
+            for error in errors:
+                err = error["index"]
+                self.logger.warning(
+                    f"{err['error']['type']} for resourceid: {err['_id']}; {err['error']['reason']}\n"
+                )
 
     def create_bulk_item(self, op_type="index", index=None, id=None, data=None):
         return {
