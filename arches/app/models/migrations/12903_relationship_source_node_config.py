@@ -148,12 +148,12 @@ class Migration(migrations.Migration):
             , relationships3 AS (
                 SELECT fr.nodeid, fr.relationship, fr.to_graphid,
                 (
-                    SELECT COALESCE(graphs->>'relationship', graphs->>'ontologyProperty')
+                    SELECT graphs->>'relationship'
                     FROM jsonb_array_elements(fr.config->'graphs') AS graphs
                     WHERE graphs->>'graphid' = fr.to_graphid::text
                 ) AS defaultOntologyProperty,
                 (
-                    SELECT COALESCE(graphs->>'inverseRelationship', graphs->>'inverseOntologyProperty')
+                    SELECT graphs->>'inverseRelationship'
                     FROM jsonb_array_elements(fr.config->'graphs') AS graphs
                     WHERE graphs->>'graphid' = fr.to_graphid::text
                 ) AS defaultInverseOntologyProperty
