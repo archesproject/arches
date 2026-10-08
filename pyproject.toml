@@ -47,7 +47,7 @@ dependencies = [
     # Was previously the arches-querysets[drf] extra.
     "djangorestframework>=3.18",
     "edtf==4.0.1",
-    "elasticsearch>=8.19.1,<9.0.0",
+    "elasticsearch>=9.5.1,<10.0.0",
     "filetype==1.2.0",
     "openpyxl==3.1.5",
     "packaging==26.2",
