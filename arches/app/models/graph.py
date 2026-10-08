@@ -2670,9 +2670,10 @@ class Graph(models.GraphModel):
 
         # update graph data
         serialized_draft_graph["graphid"] = serialized_source_graph["graphid"]
-        serialized_draft_graph["resource_instance_lifecycle_id"] = (
-            serialized_source_graph["resource_instance_lifecycle_id"]
-        )
+        if "resource_instance_lifecycle_id" in serialized_source_graph:
+            serialized_draft_graph["resource_instance_lifecycle_id"] = (
+                serialized_source_graph["resource_instance_lifecycle_id"]
+            )
         serialized_draft_graph["source_identifier_id"] = None
 
         # update permissions
@@ -2776,7 +2777,7 @@ class Graph(models.GraphModel):
 
             updated_graph = Graph(serialized_graph)
             updated_graph.widgets = widget_dict
-            updated_graph.is_active = self.is_active
+            updated_graph.is_active = serialized_graph.get("is_active", self.is_active)
 
             try:
                 updated_graph.update_permissions_from_serialized_graph(serialized_graph)
@@ -2804,10 +2805,12 @@ class Graph(models.GraphModel):
             models.GraphModel.objects.filter(pk=updated_graph.pk).update(
                 has_unpublished_changes=False,
             )
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT * FROM refresh_geojson_geometries();")
 
             return Graph.objects.get(pk=updated_graph.pk)
 
-    def publish(self, user=None, notes=None):
+    def publish(self, user=None, notes=None, *, publication_id=None):
         """
         Adds a corresponding entry to the GraphXPublishedGraph table,
         and creates a PublishedGraph entry for every active language
@@ -2822,8 +2825,11 @@ class Graph(models.GraphModel):
                 update_published_graphs=False
             )
 
+            publication_fields = {}
+            if publication_id is not None:
+                publication_fields["publicationid"] = publication_id
             publication = models.GraphXPublishedGraph.objects.create(
-                graph=self, notes=notes, user=user
+                graph=self, notes=notes, user=user, **publication_fields
             )
 
             self.publication = publication

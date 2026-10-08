@@ -10,7 +10,7 @@ from arches.app.models.graph import Graph
 from tests.base_test import ArchesTestCase
 
 
-class UpdateResourceInstanceDataTaskTests(ArchesTestCase):
+class ResourceInstanceDataTestCase(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
         logging.getLogger("arches.app.tasks").setLevel(logging.CRITICAL)
@@ -168,6 +168,8 @@ class UpdateResourceInstanceDataTaskTests(ArchesTestCase):
         graph.publish()
         return graph
 
+
+class UpdateResourceInstanceDataTaskTests(ResourceInstanceDataTestCase):
     @patch("arches.app.tasks.notify_completion")
     def test_task_runs_and_notifies_success(self, mock_notify):
         published_graph = models.PublishedGraph.objects.get(
@@ -255,6 +257,37 @@ class UpdateResourceInstanceDataTaskTests(ArchesTestCase):
         )
         self.assertEqual(
             str(second_resource_instance.graph_publication_id),
+            updated_published_graph.serialized_graph["publication_id"],
+        )
+
+    @patch("arches.app.tasks.notify_completion")
+    def test_updates_publication_id_for_resources_with_tiles(self, mock_notify):
+        resource_instance = models.ResourceInstance.objects.create(
+            graph=self.test_graph
+        )
+        models.TileModel.objects.create(
+            resourceinstance=resource_instance,
+            data={str(self.concept_node_id): "DUMMY DATA"},
+            sortorder=0,
+        )
+
+        original_published_graph = models.PublishedGraph.objects.get(
+            publication=self.test_graph.publication, language="en"
+        )
+        self.test_graph.publish()
+        updated_published_graph = models.PublishedGraph.objects.get(
+            publication=self.test_graph.publication, language="en"
+        )
+
+        update_resource_instance_data_based_on_graph_diff(
+            initial_graph=original_published_graph.serialized_graph,
+            updated_graph=updated_published_graph.serialized_graph,
+            user_id=self.user.pk,
+        )
+
+        resource_instance.refresh_from_db()
+        self.assertEqual(
+            str(resource_instance.graph_publication_id),
             updated_published_graph.serialized_graph["publication_id"],
         )
 
