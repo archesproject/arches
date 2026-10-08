@@ -997,11 +997,11 @@ class FunctionManagerView(GraphBaseView):
         return JSONResponse(data)
 
 
-@method_decorator(group_required("Graph Editor"), name="dispatch")
 class PermissionDataError(Exception):
     pass
 
 
+@method_decorator(group_required("Graph Editor"), name="dispatch")
 class PermissionDataView(View):
     action = None
 
