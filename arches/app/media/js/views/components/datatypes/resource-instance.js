@@ -63,7 +63,7 @@ const viewModel = function(params) {
         this.relationshipSources = [];
         if (this.graphIsSemantic) {
             this.relationshipSources.push({
-                id: 'ontology-property',
+                id: 'ontology',
                 text: arches.translations.ontologyPropertySource
             });
         }
@@ -107,7 +107,7 @@ const viewModel = function(params) {
 
             let source;
             if (useOntologyRelationship) {
-                source = 'ontology-property';
+                source = 'ontology';
             } else {
                 const value = relationship || inverseRelationship;
                 source = value && !uuidPattern.test(value) ? 'reference' : 'concept';
