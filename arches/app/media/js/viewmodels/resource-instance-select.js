@@ -191,14 +191,14 @@ var ResourceInstanceSelectViewModel = function(params) {
         self.defaultResourceInstance().forEach(function(val){
             var ri = {
                 "resourceId": ko.observable(val.resourceId),
-                "ontologyProperty": ko.observable(val.ontologyProperty),
-                "inverseOntologyProperty": ko.observable(val.inverseOntologyProperty),
+                "relationship": ko.observable(val.relationship),
+                "inverseRelationship": ko.observable(val.inverseRelationship),
                 "resourceXresourceId": ""
             };
-            ri.ontologyProperty.subscribe(function(){
+            ri.relationship.subscribe(function(){
                 self.defaultResourceInstance(self.value());
             });
-            ri.inverseOntologyProperty.subscribe(function(){
+            ri.inverseRelationship.subscribe(function(){
                 self.defaultResourceInstance(self.value());
             });
             ret.push(ri);
@@ -298,25 +298,25 @@ var ResourceInstanceSelectViewModel = function(params) {
         var graph = self.graphLookup[esSource.graph_id];
         var iconClass = graph?.iconclass  || 'fa fa-question';
 
-        var ontologyProperty;
-        var inverseOntologyProperty;
+        var relationship;
+        var inverseRelationship;
         let relationshipConfig;
 
         if (graph) {
-            ontologyProperty = graph.config.ontologyProperty;
-            inverseOntologyProperty = graph.config.inverseOntologyProperty;
+            relationship = graph.config.relationship;
+            inverseRelationship = graph.config.inverseRelationship;
 
-            if (self.node && (!ontologyProperty || !inverseOntologyProperty) ) {
+            if (self.node && (!relationship || !inverseRelationship) ) {
                 relationshipConfig = self.relationshipConfigForGraph(graph.graphid);
 
                 if (relationshipConfig) {
                     self.relationship(true);
                     if (relationshipConfig.source === 'ontology') {
-                        ontologyProperty = ontologyProperty || relationshipConfig.relationship;
-                        inverseOntologyProperty = inverseOntologyProperty || relationshipConfig.inverseRelationship;
+                        relationship = relationship || relationshipConfig.relationship;
+                        inverseRelationship = inverseRelationship || relationshipConfig.inverseRelationship;
                     } else {
-                        ontologyProperty = relationshipConfig.relationship;
-                        inverseOntologyProperty = relationshipConfig.inverseRelationship;
+                        relationship = relationshipConfig.relationship;
+                        inverseRelationship = relationshipConfig.inverseRelationship;
                     }
                 }
             }
@@ -324,8 +324,8 @@ var ResourceInstanceSelectViewModel = function(params) {
 
         var ret = {
             "resourceId": ko.observable(id),
-            "ontologyProperty": ko.observable(ontologyProperty || ""),
-            "inverseOntologyProperty": ko.observable(inverseOntologyProperty || ""),
+            "relationship": ko.observable(relationship || ""),
+            "inverseRelationship": ko.observable(inverseRelationship || ""),
             "resourceXresourceId": ""
         };
         Object.defineProperty(ret, 'resourceName', {value: ko.observable(esSource.displayname)});
@@ -337,10 +337,10 @@ var ResourceInstanceSelectViewModel = function(params) {
         Object.defineProperty(ret, 'relationshipCollection', {value: ko.observable(relationshipConfig?.relationshipCollection)});
         Object.defineProperty(ret, 'relationshipControlledList', {value: ko.observable(relationshipConfig?.relationshipControlledList)});
         if (!!params.configForm) {
-            ret.ontologyProperty.subscribe(function(){
+            ret.relationship.subscribe(function(){
                 self.defaultResourceInstance(self.value());
             });
-            ret.inverseOntologyProperty.subscribe(function(){
+            ret.inverseRelationship.subscribe(function(){
                 self.defaultResourceInstance(self.value());
             });
         }

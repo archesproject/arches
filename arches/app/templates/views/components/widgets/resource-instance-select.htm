@@ -83,7 +83,7 @@
                                 <i class="fa fa-info-circle" aria-hidden="true"></i>
                             </button>
                         </div>
-                        <!-- ko if: self.relationship() || ko.unwrap($data.ontologyProperty) -->
+                        <!-- ko if: self.relationship() || ko.unwrap($data.relationship) -->
                         <div class='rr-table-column icon-column'>
                             <button data-bind="click: function() { self.toggleSelectedResourceRelationship($data); }, clickBubble: false,
                             attr: {'aria-label': $root.translations.expandRelatioshipOntologyOptions($parent.resourceInstanceDisplayName, $data.resourceName()) }
@@ -97,7 +97,7 @@
                             </div>
                         </div>
                         <!-- /ko -->
-                        <!-- ko if: !self.relationship() && !ko.unwrap($data.ontologyProperty) -->
+                        <!-- ko if: !self.relationship() && !ko.unwrap($data.relationship) -->
                         <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;">
                             <div class="rr-table-instance-label">
                                 <i class="sm-icon-wrap" data-bind="css: $data.iconClass()"></i><span data-bind="text: $data.resourceName()"></span>
@@ -130,7 +130,7 @@
                                                 name: 'concept-select-widget',
                                                 params: {
                                                     node: {'config': {'rdmCollection': $data.relationshipCollection() }},
-                                                    value: $data.ontologyProperty,
+                                                    value: $data.relationship,
                                                 }
                                             },
                                             attr: {'aria-labeledby': resourceToRRLabel}
@@ -142,7 +142,7 @@
                                             data-bind="
                                                 select2Query: {
                                                     select2Config: self.getSelect2ConfigForControlledListItems(
-                                                        $data.ontologyProperty,
+                                                        $data.relationship,
                                                         $data.relationshipControlledList,
                                                         $root.translations.selectAReference,
                                                         true
@@ -158,7 +158,7 @@
                                             data-bind="
                                                 select2Query: {
                                                     select2Config: self.getSelect2ConfigForOntologyProperties(
-                                                        $data.ontologyProperty,
+                                                        $data.relationship,
                                                         self.rootOntologyClass,
                                                         $data.ontologyClass(),
                                                         $root.translations.selectAnOntologyProperty
@@ -195,7 +195,7 @@
                                                 name: 'concept-select-widget',
                                                 params: {
                                                     node: {'config': {'rdmCollection': $data.relationshipCollection() }},
-                                                    value: $data.inverseOntologyProperty,
+                                                    value: $data.inverseRelationship,
                                                 }
                                             },
                                             attr: {'aria-labeledby': rrToResourceLabel}
@@ -207,7 +207,7 @@
                                             data-bind="
                                                 select2Query: {
                                                     select2Config: self.getSelect2ConfigForControlledListItems(
-                                                        $data.inverseOntologyProperty,
+                                                        $data.inverseRelationship,
                                                         $data.relationshipControlledList,
                                                         $root.translations.selectAReference,
                                                         true
@@ -223,7 +223,7 @@
                                             data-bind="
                                                 select2Query: {
                                                     select2Config: self.getSelect2ConfigForOntologyProperties(
-                                                        $data.inverseOntologyProperty,
+                                                        $data.inverseRelationship,
                                                         $data.ontologyClass(),
                                                         self.rootOntologyClass,
                                                         $root.translations.selectAnOntologyProperty
@@ -419,7 +419,7 @@
                                                     name: 'concept-select-widget',
                                                     params: {
                                                         node: {'config': {'rdmCollection': $data.relationshipCollection() }},
-                                                        value: $data.ontologyProperty,
+                                                        value: $data.relationship,
                                                     }
                                                 },
                                                 attr: {'aria-labeledby': resourceToRRLabel}
@@ -431,7 +431,7 @@
                                                 data-bind="
                                                     select2Query: {
                                                         select2Config: self.getSelect2ConfigForControlledListItems(
-                                                            $data.ontologyProperty,
+                                                            $data.relationship,
                                                             $data.relationshipControlledList,
                                                             $root.translations.selectAReference,
                                                             true
@@ -446,7 +446,7 @@
                                                 data-bind="
                                                     select2Query: {
                                                         select2Config: self.getSelect2ConfigForOntologyProperties(
-                                                            $data.ontologyProperty,
+                                                            $data.relationship,
                                                             self.rootOntologyClass,
                                                             $data.ontologyClass(),
                                                             $root.translations.selectAnOntologyProperty
@@ -483,7 +483,7 @@
                                                     name: 'concept-select-widget',
                                                     params: {
                                                         node: {'config': {'rdmCollection': $data.relationshipCollection() }},
-                                                        value: $data.inverseOntologyProperty,
+                                                        value: $data.inverseRelationship,
                                                     }
                                                 },
                                                 attr: {'aria-labeledby': rrToResourceLabel}
@@ -495,7 +495,7 @@
                                                 data-bind="
                                                     select2Query: {
                                                         select2Config: self.getSelect2ConfigForControlledListItems(
-                                                            $data.inverseOntologyProperty,
+                                                            $data.inverseRelationship,
                                                             $data.relationshipControlledList,
                                                             $root.translations.selectAReference,
                                                             true
@@ -510,7 +510,7 @@
                                                 data-bind="
                                                     select2Query: {
                                                         select2Config: self.getSelect2ConfigForOntologyProperties(
-                                                            $data.inverseOntologyProperty,
+                                                            $data.inverseRelationship,
                                                             $data.ontologyClass(),
                                                             self.rootOntologyClass,
                                                             $root.translations.selectAnOntologyProperty

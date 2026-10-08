@@ -2198,8 +2198,8 @@ class ResourceInstanceDataType(BaseDataType):
     tile data comes from the client looking like this:
     {
         "resourceId": "",
-        "ontologyProperty": "",
-        "inverseOntologyProperty": ""
+        "relationship": "",
+        "inverseRelationship": ""
     }
 
     """
@@ -2358,19 +2358,19 @@ class ResourceInstanceDataType(BaseDataType):
                         "provisional": provisional,
                     }
                 )
-            for ontology_property_item in [
-                relatedResourceItem.get("ontologyProperty", ""),
-                relatedResourceItem.get("inverseOntologyProperty", ""),
+            for relationship_item in [
+                relatedResourceItem.get("relationship", ""),
+                relatedResourceItem.get("inverseRelationship", ""),
             ]:
-                if ontology_property_item != "":
+                if relationship_item:
                     try:
-                        uuid.UUID(ontology_property_item)
+                        uuid.UUID(relationship_item)
                         relationship = (
-                            self.get_relationship_display_value(ontology_property_item)
-                            or ontology_property_item
+                            self.get_relationship_display_value(relationship_item)
+                            or relationship_item
                         )
                     except ValueError:
-                        relationship = ontology_property_item
+                        relationship = relationship_item
                     document["strings"].append(
                         {
                             "string": relationship,
@@ -2387,20 +2387,20 @@ class ResourceInstanceDataType(BaseDataType):
                 terms.append(
                     SearchTerm(value=relatedResourceItem["resourceName"], lang="")
                 )
-            for ontology_property_item in [
-                relatedResourceItem.get("ontologyProperty", ""),
-                relatedResourceItem.get("inverseOntologyProperty", ""),
+            for relationship_item in [
+                relatedResourceItem.get("relationship", ""),
+                relatedResourceItem.get("inverseRelationship", ""),
             ]:
-                if ontology_property_item != "":
+                if relationship_item:
                     try:
-                        uuid.UUID(ontology_property_item)
+                        uuid.UUID(relationship_item)
                         relationship = (
-                            self.get_relationship_display_value(ontology_property_item)
-                            or ontology_property_item
+                            self.get_relationship_display_value(relationship_item)
+                            or relationship_item
                         )
                         terms.append(SearchTerm(value=relationship, lang=""))
                     except ValueError:
-                        terms.append(SearchTerm(value=ontology_property_item, lang=""))
+                        terms.append(SearchTerm(value=relationship_item, lang=""))
 
         return terms
 
@@ -2511,8 +2511,8 @@ class ResourceInstanceDataType(BaseDataType):
             return [
                 {
                     "resourceId": m.groupdict()["r"],
-                    "ontologyProperty": "",
-                    "inverseOntologyProperty": "",
+                    "relationship": "",
+                    "inverseRelationship": "",
                     "resourceXresourceId": "",
                 }
             ]
@@ -2536,11 +2536,11 @@ class ResourceInstanceDataType(BaseDataType):
                     "type": "text",
                     "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}},
                 },
-                "ontologyProperty": {
+                "relationship": {
                     "type": "text",
                     "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}},
                 },
-                "inverseOntologyProperty": {
+                "inverseRelationship": {
                     "type": "text",
                     "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}},
                 },
