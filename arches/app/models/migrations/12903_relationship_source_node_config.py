@@ -10,6 +10,9 @@ class Migration(migrations.Migration):
     # config.graphs into a single discriminator plus one pair of values, so that a
     # relationship type can also be drawn from a controlled list:
     #   useOntologyRelationship  -> relationshipSource ('ontology-property'|'concept'|'reference')
+    #     (when not using the ontology, the relationship is a 'concept' if its value is a
+    #     UUID (RDM value id), and a 'reference' if it is anything else, i.e. a URI from a
+    #     controlled list)
     #   ontologyProperty         -> relationship
     #   inverseOntologyProperty  -> inverseRelationship
     #   relationshipConcept      -> relationship
@@ -26,8 +29,18 @@ class Migration(migrations.Migration):
                     - 'inverseRelationshipConcept'
                 ) || jsonb_build_object(
                     'relationshipSource',
-                    CASE WHEN element->>'useOntologyRelationship' = 'true'
-                        THEN 'ontology-property' ELSE 'concept' END,
+                    CASE
+                        WHEN element->>'useOntologyRelationship' = 'true' THEN 'ontology-property'
+                        WHEN COALESCE(
+                            NULLIF(element->>'relationshipConcept', ''),
+                            NULLIF(element->>'inverseRelationshipConcept', '')
+                        ) ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+                        OR COALESCE(
+                            NULLIF(element->>'relationshipConcept', ''),
+                            NULLIF(element->>'inverseRelationshipConcept', '')
+                        ) IS NULL THEN 'concept'
+                        ELSE 'reference'
+                    END,
                     'relationship',
                     CASE WHEN element->>'useOntologyRelationship' = 'true'
                         THEN element->'ontologyProperty' ELSE element->'relationshipConcept' END,
@@ -47,8 +60,9 @@ class Migration(migrations.Migration):
         );
     """
 
-    # Lossy: the unused side of each pair was discarded going forward, and 'reference'
-    # has no legacy equivalent, so it is restored as a concept.
+    # Lossy: the unused side of each pair was discarded going forward. 'concept' and
+    # 'reference' both restore to useOntologyRelationship false, with the relationship
+    # (a UUID or a URI respectively) kept in relationshipConcept.
     reverse_node_configs = """
         UPDATE nodes SET config = jsonb_set(config, '{graphs}', (
             SELECT jsonb_agg(
