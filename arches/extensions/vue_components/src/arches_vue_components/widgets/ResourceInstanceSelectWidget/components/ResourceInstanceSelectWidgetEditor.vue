@@ -174,8 +174,8 @@ function onUpdateModelValue(updatedValue: string | null) {
     selectedValue.value = updatedValue;
     if (updatedValue) {
         const nodeValue: ResourceInstanceReference = {
-            inverseOntologyProperty: "",
-            ontologyProperty: "",
+            inverseRelationship: "",
+            relationship: "",
             resourceId: updatedValue,
             resourceXresourceId: "",
         };

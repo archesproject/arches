@@ -5,9 +5,9 @@ import type {
 
 export interface ResourceInstanceReference {
     resourceId: string;
-    ontologyProperty?: string;
+    relationship?: string;
     resourceXresourceId?: string;
-    inverseOntologyProperty?: string;
+    inverseRelationship?: string;
 }
 
 export interface ResourceInstanceDataItem {
