@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
     # Collapse the four relationship keys on each entry of a resource-instance node's
     # config.graphs into a single discriminator plus one pair of values, so that a
     # relationship type can also be drawn from a controlled list:
-    #   useOntologyRelationship  -> relationshipSource ('ontology-property'|'concept'|'reference')
+    #   useOntologyRelationship  -> relationshipSource ('ontology'|'concept'|'reference')
     #     (when not using the ontology, the relationship is a 'concept' if its value is a
     #     UUID (RDM value id), and a 'reference' if it is anything else, i.e. a URI from a
     #     controlled list)
@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
                 ) || jsonb_build_object(
                     'relationshipSource',
                     CASE
-                        WHEN element->>'useOntologyRelationship' = 'true' THEN 'ontology-property'
+                        WHEN element->>'useOntologyRelationship' = 'true' THEN 'ontology'
                         WHEN COALESCE(
                             NULLIF(element->>'relationshipConcept', ''),
                             NULLIF(element->>'inverseRelationshipConcept', '')
@@ -72,18 +72,18 @@ class Migration(migrations.Migration):
                     - 'inverseRelationship'
                 ) || jsonb_build_object(
                     'useOntologyRelationship',
-                    element->>'relationshipSource' = 'ontology-property',
+                    element->>'relationshipSource' = 'ontology',
                     'ontologyProperty',
-                    CASE WHEN element->>'relationshipSource' = 'ontology-property'
+                    CASE WHEN element->>'relationshipSource' = 'ontology'
                         THEN element->'relationship' ELSE 'null'::jsonb END,
                     'inverseOntologyProperty',
-                    CASE WHEN element->>'relationshipSource' = 'ontology-property'
+                    CASE WHEN element->>'relationshipSource' = 'ontology'
                         THEN element->'inverseRelationship' ELSE 'null'::jsonb END,
                     'relationshipConcept',
-                    CASE WHEN element->>'relationshipSource' = 'ontology-property'
+                    CASE WHEN element->>'relationshipSource' = 'ontology'
                         THEN 'null'::jsonb ELSE element->'relationship' END,
                     'inverseRelationshipConcept',
-                    CASE WHEN element->>'relationshipSource' = 'ontology-property'
+                    CASE WHEN element->>'relationshipSource' = 'ontology'
                         THEN 'null'::jsonb ELSE element->'inverseRelationship' END
                 )
             )

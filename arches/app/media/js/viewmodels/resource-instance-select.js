@@ -155,10 +155,10 @@ var ResourceInstanceSelectViewModel = function(params) {
         }
         const useOntologyRelationship = ko.unwrap(nodeConfigGraph.useOntologyRelationship);
         const source = ko.unwrap(nodeConfigGraph.relationshipSource)
-            || (useOntologyRelationship ? 'ontology-property' : 'concept');
-        const legacyRelationship = source === 'ontology-property'
+            || (useOntologyRelationship ? 'ontology' : 'concept');
+        const legacyRelationship = source === 'ontology'
             ? nodeConfigGraph.ontologyProperty : nodeConfigGraph.relationshipConcept;
-        const legacyInverseRelationship = source === 'ontology-property'
+        const legacyInverseRelationship = source === 'ontology'
             ? nodeConfigGraph.inverseOntologyProperty : nodeConfigGraph.inverseRelationshipConcept;
         return {
             source: source,
@@ -311,7 +311,7 @@ var ResourceInstanceSelectViewModel = function(params) {
 
                 if (relationshipConfig) {
                     self.relationship(true);
-                    if (relationshipConfig.source === 'ontology-property') {
+                    if (relationshipConfig.source === 'ontology') {
                         ontologyProperty = ontologyProperty || relationshipConfig.relationship;
                         inverseOntologyProperty = inverseOntologyProperty || relationshipConfig.inverseRelationship;
                     } else {
