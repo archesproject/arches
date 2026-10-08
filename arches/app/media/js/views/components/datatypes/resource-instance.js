@@ -98,6 +98,7 @@ const viewModel = function(params) {
             };
         };
 
+        const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
         var preventSetup = false;
         var setupConfig = function(graph) {
             var model = _.find(self.resourceModels, function(model){
@@ -110,9 +111,11 @@ const viewModel = function(params) {
             const legacyRelationship = useOntologyRelationship ? graph.ontologyProperty : graph.relationshipConcept;
             const legacyInverseRelationship = useOntologyRelationship ? graph.inverseOntologyProperty : graph.inverseRelationshipConcept;
 
-            graph.relationshipSource = ko.observable(
-                ko.unwrap(graph.relationshipSource) || (useOntologyRelationship ? 'ontology-property' : 'concept')
-            );
+            // without the ontology, a UUID is a concept value id and anything else is a URI
+            const legacyConcept = ko.unwrap(legacyRelationship) || ko.unwrap(legacyInverseRelationship);
+            const legacySource = useOntologyRelationship ? 'ontology-property'
+                : (legacyConcept && !uuidPattern.test(legacyConcept) ? 'reference' : 'concept');
+            graph.relationshipSource = ko.observable(ko.unwrap(graph.relationshipSource) || legacySource);
             graph.relationshipCollection = ko.observable(ko.unwrap(graph.relationshipCollection) || defaultRelationshipCollection);
             graph.relationshipControlledList = ko.observable(ko.unwrap(graph.relationshipControlledList) || null);
             graph.relationship = ko.observable(ko.unwrap(graph.relationship) ?? ko.unwrap(legacyRelationship) ?? defaultRelationship(graph));
