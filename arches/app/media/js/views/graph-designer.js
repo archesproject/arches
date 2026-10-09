@@ -789,12 +789,19 @@ var GraphDesignerView = BaseManagerView.extend({
             }
         };
 
+        // only follow the Cards tab when its selection changed, so a multi-selection survives tab switches
+        var lastSyncedCardSelection;
         var updatePermissionCardSelection = function() {
-            var matchingCard = correspondingCard(viewModel.cardTree.selection(), viewModel.permissionTree);
+            var cardSelection = viewModel.cardTree.selection();
+            if (cardSelection === lastSyncedCardSelection) {
+                return;
+            }
+            lastSyncedCardSelection = cardSelection;
+            var matchingCard = correspondingCard(cardSelection, viewModel.permissionTree);
             if (matchingCard) {
                 viewModel.permissionTree.expandToRoot(matchingCard);
                 viewModel.permissionTree.selection.removeAll();
-                matchingCard.selectChildCards();
+                matchingCard.selectChildCards(true);
             }
         };
 

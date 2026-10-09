@@ -29,9 +29,14 @@ import PermissionSettingsForm from 'views/graph/permission-manager/permission-se
         self.identityList = new IdentityList({
             items: ko.observableArray()
         });
-        self.identityList.selectedItems.subscribe(function() {
-            self.updatePermissions();
+        var currentIdentity;
+        self.identityList.selectedItems.subscribe(function(items) {
+            if (items[0] !== currentIdentity) {
+                currentIdentity = items[0];
+                self.updatePermissions();
+            }
         });
+        var requestCount = 0;
         self.showPermissionsForm = ko.observable(false);
         self.loading = ko.observable(false);
         self.cardTree = params.cardTree;
@@ -123,6 +128,8 @@ import PermissionSettingsForm from 'views/graph/permission-manager/permission-se
             var identity = self.identityList.selectedItems()[0];
 
             if (!identity || !self.cardList) {
+                requestCount++;
+                self.loading(false);
                 self.permissionsByNodegroup({});
                 (self.cardList || []).forEach(function(card) {
                     setCardPerms(card, [], '');
@@ -134,6 +141,7 @@ import PermissionSettingsForm from 'views/graph/permission-manager/permission-se
                 return card.model.nodegroup_id();
             });
 
+            var request = ++requestCount;
             self.permissionsByNodegroup({});
             self.loading(true);
             $.ajax({
@@ -142,6 +150,10 @@ import PermissionSettingsForm from 'views/graph/permission-manager/permission-se
                 data: {'nodegroupIds': JSON.stringify(nodegroupIds), 'identityType': identity.type, 'identityId': identity.id}
             })
                 .done(function(res) {
+                    // ignore responses superseded by a later identity selection
+                    if (request !== requestCount) {
+                        return;
+                    }
                     var byNodegroup = {};
                     res.forEach(function(nodegroup) {
                         byNodegroup[nodegroup.nodegroup_id] = nodegroup;
@@ -169,10 +181,14 @@ import PermissionSettingsForm from 'views/graph/permission-manager/permission-se
                     self.permissionsByNodegroup(byNodegroup);
                 })
                 .fail(function(response) {
-                    showError(response.responseJSON, arches.translations.graphDesignerPermissionsLoadError);
+                    if (request === requestCount) {
+                        showError(response.responseJSON, arches.translations.graphDesignerPermissionsLoadError);
+                    }
                 })
                 .always(function() {
-                    self.loading(false);
+                    if (request === requestCount) {
+                        self.loading(false);
+                    }
                 });
         };
     };
