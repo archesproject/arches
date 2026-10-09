@@ -150,6 +150,9 @@ class NodegroupPermissionTests(ArchesTestCase):
         result = self.get_permissions("user", self.user.pk)
         self.assertEqual(result["source"], "default")
         self.assertEqual(result["explicit"], [])
+        self.assertIn(
+            "read_nodegroup", [perm["codename"] for perm in result["effective"]]
+        )
 
         self.apply(["read_nodegroup"])
 
