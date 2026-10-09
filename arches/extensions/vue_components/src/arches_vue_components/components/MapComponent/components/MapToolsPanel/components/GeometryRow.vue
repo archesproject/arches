@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref, useId, watch } from "vue";
 
+import { debounce } from "es-toolkit";
 import { useGettext } from "vue3-gettext";
 
 import Button from "openvue/button";
@@ -18,9 +19,10 @@ import {
     YARDS,
 } from "@/arches_vue_components/components/MapComponent/constants.ts";
 
-import type { Feature } from "geojson";
-
 import { useResolvedMapContext } from "@/arches_vue_components/components/MapComponent/composables/useMapContext.ts";
+
+import type { Feature } from "geojson";
+import type { InputNumberInputEvent } from "openvue/inputnumber";
 
 import type { MapContext } from "@/arches_vue_components/components/MapComponent/types.ts";
 
@@ -59,9 +61,13 @@ const bufferDistance = ref<number | null>(
     feature.properties?.buffer_distance || DEFAULT_BUFFER_DISTANCE,
 );
 const bufferUnits = ref<string>(feature.properties?.buffer_units ?? METERS);
+const isBufferOn = ref(feature.properties?.buffer_distance > 0);
 const areBufferControlsVisible = ref(true);
 
-let bufferUpdateTimer: ReturnType<typeof setTimeout> | undefined;
+const applyBufferDebounced = debounce(
+    applyBuffer,
+    BUFFER_INPUT_DEBOUNCE_MILLISECONDS,
+);
 
 const unitOptions = [
     { label: $gettext("Meters"), value: METERS },
@@ -71,8 +77,6 @@ const unitOptions = [
     { label: $gettext("Yards"), value: YARDS },
 ];
 
-const isBufferOn = computed(() => feature.properties?.buffer_distance > 0);
-
 const iconClass = computed(
     () => GEOMETRY_ICON_BY_TYPE[feature.geometry.type] ?? "pi pi-question",
 );
@@ -81,36 +85,40 @@ const canEditCoordinates = computed(() =>
     SINGLE_PART_GEOMETRY_TYPES.includes(feature.geometry.type),
 );
 
-watch([bufferDistance, bufferUnits], () => {
-    if (!isBufferOn.value) {
-        return;
+const bufferToggleLabel = computed(() => {
+    if (isBufferOn.value) {
+        return $gettext("Remove buffer from %{label}", { label });
     }
+    return $gettext("Apply buffer to %{label}", { label });
+});
 
-    clearTimeout(bufferUpdateTimer);
-    bufferUpdateTimer = setTimeout(
-        applyBuffer,
-        BUFFER_INPUT_DEBOUNCE_MILLISECONDS,
-    );
+watch([bufferDistance, bufferUnits], () => {
+    if (isBufferOn.value) {
+        applyBufferDebounced();
+    }
 });
 
 onUnmounted(() => {
-    clearTimeout(bufferUpdateTimer);
+    applyBufferDebounced.flush();
 });
 
 function applyBuffer(): void {
-    setBufferForFeature(
-        feature,
-        Math.max(bufferDistance.value ?? 0, 0),
-        bufferUnits.value,
-    );
+    setBufferForFeature(feature, bufferDistance.value ?? 0, bufferUnits.value);
+}
+
+function updateBufferDistance(event: InputNumberInputEvent): void {
+    bufferDistance.value = typeof event.value === "number" ? event.value : null;
 }
 
 function toggleBuffer(): void {
-    if (isBufferOn.value) {
+    selectFeature();
+    applyBufferDebounced.cancel();
+    isBufferOn.value = !isBufferOn.value;
+
+    if (!isBufferOn.value) {
         setBufferForFeature(feature, 0, bufferUnits.value);
         return;
     }
-    bufferDistance.value ||= DEFAULT_BUFFER_DISTANCE;
     areBufferControlsVisible.value = true;
     applyBuffer();
 }
@@ -174,6 +182,8 @@ function editFeature(): void {
                 :text="!isBufferOn"
                 :rounded="true"
                 :aria-pressed="isBufferOn"
+                :aria-label="bufferToggleLabel"
+                :title="bufferToggleLabel"
                 @click="toggleBuffer"
             />
             <Button
@@ -198,6 +208,7 @@ function editFeature(): void {
             <Button
                 class="geometry-delete-button"
                 icon="pi pi-trash"
+                :title="$gettext('Delete')"
                 severity="secondary"
                 size="small"
                 :aria-label="$gettext('Delete %{label}', { label })"
@@ -217,6 +228,7 @@ function editFeature(): void {
                 :aria-label="
                     $gettext('Buffer distance for %{label}', { label })
                 "
+                @input="updateBufferDistance"
             />
             <Select
                 v-model="bufferUnits"
