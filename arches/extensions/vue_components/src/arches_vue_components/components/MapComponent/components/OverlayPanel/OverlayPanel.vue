@@ -110,20 +110,22 @@ function endDrag(): void {
             {{ $gettext("Clear the filter to reorder overlays.") }}
         </p>
     </div>
-    <OverlayRow
-        v-for="overlay in filteredOverlays"
-        :key="overlay.maplayerid"
-        :overlay="overlay"
-        :is-reorder-disabled="isFiltering"
-        :is-drag-target="dragTargetOverlayId === overlay.maplayerid"
-        :context="resolvedContext"
-        @toggle-visibility="toggleOverlayVisibility(overlay)"
-        @drag-start="startDrag($event, overlay)"
-        @drag-end="endDrag"
-        @dragover="handleDragOver($event, overlay)"
-        @dragleave="handleDragLeave(overlay)"
-        @drop.prevent="handleDrop(overlay)"
-    />
+    <div class="overlay-list">
+        <OverlayRow
+            v-for="overlay in filteredOverlays"
+            :key="overlay.maplayerid"
+            :overlay="overlay"
+            :is-reorder-disabled="isFiltering"
+            :is-drag-target="dragTargetOverlayId === overlay.maplayerid"
+            :context="resolvedContext"
+            @toggle-visibility="toggleOverlayVisibility(overlay)"
+            @drag-start="startDrag($event, overlay)"
+            @drag-end="endDrag"
+            @dragover="handleDragOver($event, overlay)"
+            @dragleave="handleDragLeave(overlay)"
+            @drop.prevent="handleDrop(overlay)"
+        />
+    </div>
     <div
         v-if="!filteredOverlays.length"
         class="overlay-empty"

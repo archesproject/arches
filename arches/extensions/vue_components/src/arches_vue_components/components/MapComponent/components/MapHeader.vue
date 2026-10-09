@@ -64,6 +64,7 @@ function focusTool(toolName: string): void {
             @click="emit(TOGGLE_TOOL_EVENT, tool.name)"
         >
             <i
+                class="map-header-icon"
                 aria-hidden="true"
                 :class="tool.icon"
             />
@@ -93,6 +94,10 @@ function focusTool(toolName: string): void {
     color: var(--p-text-muted-color);
     font-size: 1.35rem;
     font-weight: 600;
+}
+
+.map-header-icon {
+    font-size: 1.6rem;
 }
 
 .map-header-button.map-header-button-active {

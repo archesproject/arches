@@ -44,7 +44,7 @@ describe("LegendPanel", () => {
         expect(wrapper.findAll(".legend-group")).toHaveLength(0);
     });
 
-    it("groups visible overlays into resource layers and overlays", () => {
+    it("groups visible overlays into resource geometries and overlays", () => {
         const wrapper = mountLegendPanel([
             buildOverlay({
                 maplayerid: "monuments",
@@ -61,7 +61,7 @@ describe("LegendPanel", () => {
 
         const groups = wrapper.findAll(".legend-group");
         expect(groups).toHaveLength(2);
-        expect(groups[0].text()).toContain("Resource layers");
+        expect(groups[0].text()).toContain("Resource geometries");
         expect(groups[0].text()).toContain("Monuments");
         expect(groups[1].text()).toContain("Boroughs");
         expect(wrapper.text()).not.toContain("Hidden");

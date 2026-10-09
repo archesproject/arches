@@ -42,7 +42,7 @@ const visibleGroups = computed(() => {
     const groups = [
         {
             id: RESOURCE_LAYERS_GROUP_ID,
-            label: $gettext("Resource layers"),
+            label: $gettext("Resource geometries"),
             overlays: visibleOverlays.filter(
                 (overlay) => overlay.is_resource_layer,
             ),
@@ -203,7 +203,7 @@ function getOpacityPercent(overlay: MapLayer): number {
     <div class="legend-footnote">
         {{
             $gettext(
-                "Read-only — every entry mirrors an overlay currently switched on in Overlays.",
+                "Read-only — every entry mirrors an overlay currently switched on in Overlays. Toggle something off there and it disappears from here immediately.",
             )
         }}
     </div>
