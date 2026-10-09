@@ -269,6 +269,7 @@ function handleDocumentClick(event: MouseEvent): void {
     --p-badge-height: var(--map-component-badge-size);
     --p-button-badge-size: var(--map-component-badge-size);
     --map-component-status-bar-height: 3.6rem;
+    --map-component-status-bar-attribution-inset: 0.6rem;
     --map-component-popup-height: 26rem;
     --map-component-panel-inset: 1.6rem;
     --map-component-panel-inset-above-status-bar: 5.2rem;
@@ -323,8 +324,12 @@ function handleDocumentClick(event: MouseEvent): void {
     inset-block-end: var(--map-component-panel-inset-above-status-bar);
 }
 
-.map-body-with-status-bar :deep(.maplibregl-ctrl-bottom-left),
-.map-body-with-status-bar :deep(.maplibregl-ctrl-bottom-right) {
+.map-body-with-status-bar :deep(.maplibregl-ctrl-bottom-left) {
     inset-block-end: var(--map-component-status-bar-height);
+}
+
+.map-body-with-status-bar
+    :deep(.maplibregl-ctrl-bottom-right .maplibregl-ctrl-attrib) {
+    margin-block-end: var(--map-component-status-bar-attribution-inset);
 }
 </style>

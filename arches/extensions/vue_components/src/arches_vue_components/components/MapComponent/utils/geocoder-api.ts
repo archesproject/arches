@@ -9,8 +9,8 @@ import type {
 const NOMINATIM_SEARCH_URL = "https://nominatim.openstreetmap.org/search";
 const DEFAULT_RESULT_LIMIT = 5;
 
-export const GEOCODER_ATTRIBUTION =
-    'Geocoding by <a href="https://nominatim.org" target="_blank">Nominatim</a>';
+export const OPENSTREETMAP_CREDIT =
+    '<a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>';
 
 interface NominatimProperties {
     place_id: number;

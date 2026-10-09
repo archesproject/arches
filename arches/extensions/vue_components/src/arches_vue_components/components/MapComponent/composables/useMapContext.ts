@@ -23,7 +23,7 @@ import { useDrawnFeatures } from "@/arches_vue_components/components/MapComponen
 import { useFeaturePopup } from "@/arches_vue_components/components/MapComponent/composables/useFeaturePopup.ts";
 import { useMapControls } from "@/arches_vue_components/components/MapComponent/composables/useMapControls.ts";
 import { useOverlayLayers } from "@/arches_vue_components/components/MapComponent/composables/useOverlayLayers.ts";
-import { GEOCODER_ATTRIBUTION } from "@/arches_vue_components/components/MapComponent/utils/geocoder-api.ts";
+import { OPENSTREETMAP_CREDIT } from "@/arches_vue_components/components/MapComponent/utils/geocoder-api.ts";
 import { registerCoordinateSystems } from "@/arches_vue_components/components/MapComponent/utils/coordinate-systems.ts";
 
 import type { InjectionKey, Ref } from "vue";
@@ -213,7 +213,7 @@ export function useMapContext(
             ...(props.maxZoom != null ? { maxZoom: props.maxZoom } : {}),
             attributionControl: {
                 compact: true,
-                customAttribution: GEOCODER_ATTRIBUTION,
+                customAttribution: OPENSTREETMAP_CREDIT,
             },
         });
 
