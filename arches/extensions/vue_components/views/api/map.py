@@ -1,12 +1,23 @@
 import json
 from urllib.parse import urljoin
 
+from django.contrib.gis.gdal.error import GDALException
+from django.core.exceptions import ValidationError
+from django.http import (
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    HttpResponseNotFound,
+)
 from django.views.generic import View
 
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.models.system_settings import settings
-from arches.app.utils.permission_backend import user_can_read_map_layers
+from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.utils.permission_backend import (
+    get_filtered_instances,
+    user_can_read_map_layers,
+)
 from arches.app.utils.response import JSONResponse
 
 from arches.extensions.vue_components.utils.geo_utils import GeoUtils
@@ -80,6 +91,7 @@ class MapDataAPI(View):
                 "resource_map_layers": resource_map_layers,
                 "resource_map_sources": resource_map_sources,
                 "default_bounds": getattr(settings, "DEFAULT_BOUNDS", None),
+                "preferred_coordinate_systems": settings.PREFERRED_COORDINATE_SYSTEMS,
             }
         )
 
@@ -89,6 +101,47 @@ class FeatureBufferAPI(View):
         data = json.loads(request.body)
         geo_utils = GeoUtils()
         return JSONResponse(geo_utils.buffer_feature_collection(data["features"]))
+
+
+class ClusterResourcesAPI(View):
+    def get(self, request):
+        try:
+            node = models.Node.objects.select_related("nodegroup").get(
+                nodeid=request.GET.get("nodeid")
+            )
+        except (models.Node.DoesNotExist, ValidationError):
+            return HttpResponseNotFound()
+
+        if not request.user.has_perm("read_nodegroup", node.nodegroup):
+            return HttpResponseForbidden()
+
+        try:
+            resource_ids = GeoUtils().get_resource_ids_within_extent(
+                node.nodeid, request.GET.get("extent", "")
+            )
+        except (ValueError, GDALException):
+            return HttpResponseBadRequest()
+
+        is_exclusive_set, filtered_ids = get_filtered_instances(
+            request.user,
+            search_engine=SearchEngineFactory().create(),
+            resources=resource_ids,
+        )
+        filtered_ids = set(filtered_ids)
+        if is_exclusive_set:
+            permitted_ids = [
+                resource_id
+                for resource_id in resource_ids
+                if resource_id in filtered_ids
+            ]
+        else:
+            permitted_ids = [
+                resource_id
+                for resource_id in resource_ids
+                if resource_id not in filtered_ids
+            ]
+
+        return JSONResponse({"resourceinstanceids": permitted_ids})
 
 
 class GeoJSONBoundsAPI(View):

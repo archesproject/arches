@@ -1,18 +1,29 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, inject, onUnmounted, ref, watch } from "vue";
+
+import { useGettext } from "vue3-gettext";
 
 import Button from "openvue/button";
 import Skeleton from "openvue/skeleton";
-import { useGettext } from "vue3-gettext";
+import Tag from "openvue/tag";
 
 import { generateArchesURL } from "@/arches_vue_components/application/generate-arches-url.ts";
 import { fetchResourceDescriptor } from "@/arches_vue_components/components/MapComponent/api.ts";
+import { mapContextKey } from "@/arches_vue_components/components/MapComponent/composables/useMapContext.ts";
 
-import type { MapGeoJSONFeature } from "maplibre-gl";
+import type { Feature } from "geojson";
 
-import type { ResourceDescriptor } from "@/arches_vue_components/components/MapComponent/types.ts";
+import type {
+    MapContext,
+    ResourceDescriptor,
+} from "@/arches_vue_components/components/MapComponent/types.ts";
 
-const { features } = defineProps<{ features: MapGeoJSONFeature[] }>();
+const { features, context = undefined } = defineProps<{
+    features: Feature[];
+    context?: MapContext;
+}>();
+
+const resolvedContext = context ?? inject(mapContextKey, null);
 
 const { $gettext } = useGettext();
 
@@ -20,142 +31,199 @@ const index = ref(0);
 const isLoading = ref(false);
 const descriptor = ref<ResourceDescriptor | null>(null);
 
+let isUnmounted = false;
+
 const feature = computed(() => features[index.value]);
 const resourceId = computed(
     () => feature.value?.properties?.resourceinstanceid ?? null,
 );
 const total = computed(() => features.length);
+const isFirstLoad = computed(
+    () => isLoading.value && descriptor.value === null,
+);
+const isShowingStaleContent = computed(
+    () => isLoading.value && descriptor.value !== null,
+);
+
+watch(
+    () => features,
+    () => {
+        index.value = 0;
+    },
+);
 
 watch(
     resourceId,
     async (id) => {
-        descriptor.value = null;
-        if (!id) return;
+        if (!id) {
+            descriptor.value = null;
+            resolvedContext?.clearFeatureHighlight();
+            return;
+        }
         isLoading.value = true;
         try {
-            descriptor.value = await fetchResourceDescriptor(id);
+            const fetchedDescriptor = await fetchResourceDescriptor(id);
+            if (isUnmounted || id !== resourceId.value) {
+                return;
+            }
+            descriptor.value = fetchedDescriptor;
+            resolvedContext?.showFeatureHighlight(
+                fetchedDescriptor.geometries.flatMap((descriptorGeometry) =>
+                    descriptorGeometry.geom.features.map(
+                        (geometryFeature) => geometryFeature.geometry,
+                    ),
+                ),
+            );
         } catch (error) {
+            descriptor.value = null;
+            resolvedContext?.clearFeatureHighlight();
             console.error("Error fetching resource descriptor:", error);
         } finally {
-            isLoading.value = false;
+            if (id === resourceId.value) {
+                isLoading.value = false;
+            }
         }
     },
     { immediate: true },
 );
 
-function navigateToPreviousFeature() {
+onUnmounted(() => {
+    isUnmounted = true;
+});
+
+function navigateToPreviousFeature(): void {
     index.value = (index.value - 1 + total.value) % total.value;
 }
 
-function navigateToNextFeature() {
+function navigateToNextFeature(): void {
     index.value = (index.value + 1) % total.value;
 }
 </script>
 
 <template>
     <div class="popup">
-        <div class="popup-title-bar">
-            <Button
-                v-if="total > 1"
-                icon="pi pi-chevron-left"
-                severity="secondary"
-                text
-                rounded
-                @click="navigateToPreviousFeature"
-            />
-            <div class="popup-title">
-                <Skeleton
-                    v-if="isLoading"
-                    height="1rem"
-                    width="60%"
-                />
-                <template v-else>
-                    {{ descriptor?.displayname ?? resourceId }}
-                </template>
-            </div>
-            <Button
-                v-if="total > 1"
-                icon="pi pi-chevron-right"
-                severity="secondary"
-                text
-                rounded
-                @click="navigateToNextFeature"
-            />
-        </div>
-
-        <div class="popup-body">
-            <template v-if="isLoading">
-                <Skeleton
-                    height="1rem"
-                    class="popup-skeleton-row"
-                />
-                <Skeleton
-                    height="1rem"
-                    width="80%"
-                    class="popup-skeleton-row"
-                />
-                <Skeleton
-                    height="1rem"
-                    width="60%"
-                    class="popup-skeleton-row"
-                />
-            </template>
-            <template v-else-if="descriptor">
-                <!-- eslint-disable vue/no-v-html -->
-                <div
-                    v-if="descriptor.map_popup"
-                    class="popup-html-content"
-                    v-html="descriptor.map_popup"
-                />
-                <!-- eslint-enable vue/no-v-html -->
-                <div class="popup-metadata-block">
-                    <div
-                        v-if="descriptor.graph_name"
-                        class="popup-metadata"
-                    >
-                        {{
-                            $gettext("Resource Model: %{name}", {
-                                name: descriptor.graph_name,
-                            })
-                        }}
-                    </div>
-                    <div
-                        v-if="resourceId"
-                        class="popup-metadata popup-id-value"
-                    >
-                        {{ $gettext("ID: %{id}", { id: resourceId }) }}
-                    </div>
-                </div>
-            </template>
-        </div>
-
-        <div class="popup-footer">
-            <Button
-                v-if="resourceId"
-                as="a"
-                :href="
-                    generateArchesURL('arches:resource_report', {
-                        resourceid: resourceId,
-                    })
-                "
-                target="_blank"
-                icon="pi pi-book"
-                :label="$gettext('Report')"
-                severity="secondary"
-                text
-                size="small"
-            />
-            <div
-                v-if="total > 1"
-                class="popup-counter"
-            >
+        <div class="popup-pager">
+            <span class="popup-pager-count">
                 {{
                     $gettext("%{current} of %{total}", {
                         current: String(index + 1),
                         total: String(total),
                     })
                 }}
+            </span>
+            <div class="popup-pager-actions">
+                <template v-if="total > 1">
+                    <Button
+                        class="popup-pager-button"
+                        icon="pi pi-chevron-left"
+                        :rounded="true"
+                        :aria-label="$gettext('Previous feature')"
+                        @click="navigateToPreviousFeature"
+                    />
+                    <Button
+                        class="popup-pager-button"
+                        icon="pi pi-chevron-right"
+                        :rounded="true"
+                        :aria-label="$gettext('Next feature')"
+                        @click="navigateToNextFeature"
+                    />
+                </template>
+                <Button
+                    v-if="resolvedContext"
+                    class="popup-pager-button"
+                    icon="pi pi-times"
+                    :rounded="true"
+                    :aria-label="$gettext('Close')"
+                    @click="resolvedContext.closeFeaturePopup"
+                />
             </div>
+        </div>
+
+        <div
+            class="popup-content"
+            :class="{ 'popup-content-stale': isShowingStaleContent }"
+            :aria-busy="isLoading"
+        >
+            <div class="popup-header">
+                <Skeleton
+                    v-if="isFirstLoad"
+                    height="1.6rem"
+                    width="60%"
+                />
+                <template v-else>
+                    <div class="popup-title">
+                        {{ descriptor?.displayname ?? resourceId }}
+                    </div>
+                    <div
+                        v-if="descriptor"
+                        class="popup-badges"
+                    >
+                        <Tag
+                            v-if="descriptor.graph_name"
+                            class="popup-model-badge"
+                            severity="secondary"
+                            :icon="descriptor.graph_iconclass ?? undefined"
+                            :value="descriptor.graph_name"
+                            :rounded="true"
+                        />
+                        <Tag
+                            v-if="descriptor.lifecycle_state"
+                            class="popup-status-badge"
+                            severity="info"
+                            :value="descriptor.lifecycle_state"
+                            :rounded="true"
+                        />
+                    </div>
+                </template>
+            </div>
+
+            <div
+                v-if="isFirstLoad"
+                class="popup-body"
+            >
+                <Skeleton height="1.6rem" />
+                <Skeleton
+                    height="1.6rem"
+                    width="80%"
+                />
+            </div>
+            <template v-else-if="descriptor">
+                <!-- eslint-disable vue/no-v-html -->
+                <div
+                    v-if="descriptor.map_popup"
+                    class="popup-body popup-html-content"
+                    v-html="descriptor.map_popup"
+                />
+                <!-- eslint-enable vue/no-v-html -->
+                <div
+                    v-if="descriptor.displaydescription"
+                    class="popup-snippet-section"
+                >
+                    <p class="popup-snippet">
+                        {{ descriptor.displaydescription }}
+                    </p>
+                </div>
+            </template>
+        </div>
+
+        <div
+            v-if="resourceId"
+            class="popup-footer"
+        >
+            <Button
+                class="popup-footer-link"
+                as="a"
+                target="_blank"
+                icon="pi pi-book"
+                size="small"
+                :href="
+                    generateArchesURL('arches:resource_report', {
+                        resourceid: resourceId,
+                    })
+                "
+                :label="$gettext('Report')"
+                :link="true"
+            />
         </div>
     </div>
 </template>
@@ -165,84 +233,122 @@ function navigateToNextFeature() {
     display: flex;
     flex-direction: column;
     height: 100%;
-    font-size: 1.375rem;
-    border: 0.0625rem solid var(--p-menubar-border-color);
-    border-radius: 0.25rem;
-    overflow: hidden;
-    background: var(--p-content-background);
-    color: var(--p-content-color);
+    font-size: 1.35rem;
 }
 
-.popup-title-bar {
+.popup-pager {
     display: flex;
     align-items: center;
-    gap: 0.375rem;
-    padding: 0.5rem 3.5rem 0.5rem 0.625rem;
-    border-bottom: 0.0625rem solid var(--p-menubar-border-color);
-    min-height: 2.5rem;
+    justify-content: space-between;
+    gap: 0.95rem;
+    min-height: 3rem;
+    padding-block: 0.55rem;
+    padding-inline: 0.95rem;
+    background: var(--p-primary-color);
+    color: var(--p-primary-contrast-color);
+}
+
+.popup-pager-count {
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+.popup-pager-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.popup-pager-button {
+    --p-button-primary-background: var(--p-primary-hover-color);
+    --p-button-primary-border-color: var(--p-primary-hover-color);
+    --p-button-primary-hover-background: var(--p-primary-active-color);
+    --p-button-primary-hover-border-color: var(--p-primary-active-color);
+    width: 2.4rem;
+    height: 2.4rem;
+    padding: 0;
+}
+
+.popup-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    overflow-y: auto;
+    transition: opacity var(--p-transition-duration);
+}
+
+.popup-content-stale {
+    opacity: 0.5;
+}
+
+.popup-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding-block: 1.1rem 0.8rem;
+    padding-inline: 1.45rem;
 }
 
 .popup-title {
-    flex: 1;
-    min-width: 0;
-    font-weight: 500;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    color: var(--p-primary-color);
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.popup-badges {
+    --popup-badge-font-size: 1.1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+}
+
+.popup-model-badge,
+.popup-status-badge {
+    --p-tag-icon-size: var(--popup-badge-font-size);
+    font-size: var(--popup-badge-font-size);
+    text-transform: uppercase;
 }
 
 .popup-body {
-    flex: 1;
-    padding: 0.75rem 1rem;
-    overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-}
-
-.popup-skeleton-row {
-    display: block;
+    gap: 0.65rem;
+    padding-block: 0.65rem 0.95rem;
+    padding-inline: 1.45rem;
 }
 
 .popup-html-content {
-    margin-bottom: 0.5rem;
+    overflow-wrap: break-word;
 }
 
-.popup-metadata-block {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    font-size: 1.125rem;
-    opacity: 0.75;
+.popup-snippet-section {
+    padding-block-end: 1.1rem;
+    padding-inline: 1.45rem;
 }
 
-.popup-metadata {
-    display: flex;
-    gap: 0.25rem;
-}
-
-.popup-metadata-value {
-    color: var(--p-primary-color);
-}
-
-.popup-id-value {
-    word-break: break-all;
+.popup-snippet {
+    margin: 0;
+    padding-block-start: 0.95rem;
+    border-block-start: 0.1rem dashed var(--p-content-border-color);
+    color: var(--p-text-muted-color);
+    font-size: 1.3rem;
+    line-height: 1.4;
 }
 
 .popup-footer {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 0.5rem 1rem;
-    border-top: 0.0625rem solid var(--p-menubar-border-color);
-    background: var(--p-button-secondary-hover-background);
+    padding-block: 0.6rem;
+    padding-inline: 1.2rem;
+    border-block-start: 0.1rem solid var(--p-content-border-color);
+    background: var(--p-content-hover-background);
 }
 
-.popup-counter {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    font-weight: 500;
-    font-size: 1rem;
+.popup-footer-link {
+    padding-inline: 0.25rem;
+    font-size: 1.25rem;
+    font-weight: 600;
 }
 </style>

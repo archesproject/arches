@@ -8,63 +8,37 @@ import {
     watch,
 } from "vue";
 
-import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import geojsonExtent from "@mapbox/geojson-extent";
 import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
-import { uniqBy } from "es-toolkit";
-import { useToast } from "openvue/usetoast";
-import { useGettext } from "vue3-gettext";
+import { fetchMapData } from "@/arches_vue_components/components/MapComponent/api.ts";
 
 import {
-    fetchMapData,
-    fetchDrawnFeaturesBuffer,
-    fetchGeoJSONBounds,
-} from "@/arches_vue_components/components/MapComponent/api.ts";
-
-import {
-    BUFFER_FILL_COLOR,
-    BUFFER_FILL_OPACITY,
-    BUFFER_LAYER_ID,
-    DIRECT_SELECT,
-    DRAW_CREATE_EVENT,
-    DRAW_DELETE_EVENT,
-    DRAW_LAYER_ID_PREFIX,
-    DRAW_LINE_STRING,
-    DRAW_POINT,
-    DRAW_POLYGON,
-    DRAW_SELECTION_CHANGE_EVENT,
-    DRAW_UPDATE_EVENT,
-    GEOMETRY_TYPE_LINESTRING,
-    GEOMETRY_TYPE_POINT,
-    GEOMETRY_TYPE_POLYGON,
-    IDLE,
-    METERS,
-    SIMPLE_SELECT,
+    DEFAULT_MAP_SETTINGS,
     STYLE_LOAD_EVENT,
 } from "@/arches_vue_components/components/MapComponent/constants.ts";
+import { useBasemapStyle } from "@/arches_vue_components/components/MapComponent/composables/useBasemapStyle.ts";
+import { useDrawnFeatures } from "@/arches_vue_components/components/MapComponent/composables/useDrawnFeatures.ts";
+import { useFeaturePopup } from "@/arches_vue_components/components/MapComponent/composables/useFeaturePopup.ts";
+import { useMapControls } from "@/arches_vue_components/components/MapComponent/composables/useMapControls.ts";
+import { useOverlayLayers } from "@/arches_vue_components/components/MapComponent/composables/useOverlayLayers.ts";
+import { OPENSTREETMAP_CREDIT } from "@/arches_vue_components/components/MapComponent/utils/geocoder-api.ts";
+import { registerCoordinateSystems } from "@/arches_vue_components/components/MapComponent/utils/coordinate-systems.ts";
 
 import type { InjectionKey, Ref } from "vue";
-import type { Feature, FeatureCollection } from "geojson";
-import type {
-    AddLayerObject,
-    GeoJSONSource,
-    LngLat,
-    Map as MaplibreMap,
-    MapGeoJSONFeature,
-    MapMouseEvent,
-    Popup,
-    SourceSpecification,
-} from "maplibre-gl";
+import type { FeatureCollection } from "geojson";
+import type { Map as MaplibreMap } from "maplibre-gl";
+
+import type { UseFeaturePopupReturn } from "@/arches_vue_components/components/MapComponent/composables/useFeaturePopup.ts";
 
 import type {
     Basemap,
-    DrawMode,
-    LayerDefinition,
-    MapLayer,
-    MapSource,
+    CoordinateSystem,
     MapContext,
+    MapLayer,
+    MapSettings,
+    MapSource,
     RawBasemap,
 } from "@/arches_vue_components/components/MapComponent/types.ts";
 
@@ -78,10 +52,6 @@ maplibregl.setWorkerUrl(
 );
 // Force webpack to also emit the worker's runtime import as a static asset.
 new URL("maplibre-gl/dist/maplibre-gl-shared.mjs?asset", import.meta.url);
-
-interface DrawEvent {
-    features: Feature[];
-}
 
 export interface MapComponentEmit {
     (event: "update:value", value: FeatureCollection): void;
@@ -151,6 +121,11 @@ export function resolveDefaultOverlayLayers(
         );
 }
 
+export interface UseMapContextReturn
+    extends Pick<UseFeaturePopupReturn, "popupContainer" | "popupFeatures"> {
+    context: MapContext;
+}
+
 export function useMapContext(
     props: {
         value: FeatureCollection | null;
@@ -167,76 +142,63 @@ export function useMapContext(
             candidateOverlayLayers: MapLayer[],
         ) => MapLayer[];
         maxFeatures?: number;
+        settings?: Partial<MapSettings>;
     },
     emit: MapComponentEmit,
     mapContainer: Readonly<Ref<HTMLDivElement | null>>,
-) {
-    const toast = useToast();
-    const { $gettext } = useGettext();
-
+    fullscreenContainer: Readonly<Ref<HTMLElement | null>>,
+): UseMapContextReturn {
     const map = shallowRef<MaplibreMap | null>(null);
     const isLoading = ref(false);
-    const selectedDrawnFeature: Ref<Feature | null> = ref(null);
-    const drawnFeatures = shallowRef<Feature[]>([]);
     const basemaps = ref<Basemap[]>([]);
     const overlays = ref<MapLayer[]>([]);
-    const popupFeatures = ref<MapGeoJSONFeature[]>([]);
-    const popupContainer = ref<HTMLElement | null>(null);
-
-    let activePopup: Popup | null = null;
-    let draw: InstanceType<typeof MapboxDraw>;
-    let mapSources: MapSource[] = [];
-    let defaultBounds: [number, number, number, number] | null = null;
-    let currentBufferData: FeatureCollection = {
-        type: "FeatureCollection",
-        features: [],
-    };
-    // Each updateDrawnFeatures() call claims the next token; a call whose
-    // async buffer fetch resolves after a newer call has already started
-    // (e.g. a stale buffer request outliving a subsequent "clear all") is no
-    // longer the latest, so it must not clobber the buffer layer or re-emit
-    // its now-outdated feature collection.
-    let latestUpdateDrawnFeaturesToken = 0;
-
-    const overlayLayerIds = computed(() =>
-        overlays.value
-            .filter((overlay) => overlay.addtomap)
-            .flatMap((overlay) =>
-                overlay.layerdefinitions.map((layerDef) => layerDef.id),
+    const mapSources = ref<MapSource[]>([]);
+    const coordinateSystems = ref<CoordinateSystem[]>([]);
+    const settings = ref<MapSettings>({
+        ...DEFAULT_MAP_SETTINGS,
+        ...Object.fromEntries(
+            Object.entries(props.settings ?? {}).filter(
+                ([, settingValue]) => settingValue !== undefined,
             ),
-    );
+        ),
+    });
+
+    let defaultBounds: [number, number, number, number] | null = null;
 
     const allowedGeometryTypes = computed(
         () => props.allowedGeometryTypes ?? null,
     );
 
+    const drawnFeatureControls = useDrawnFeatures(
+        map,
+        { value: props.value, maxFeatures: props.maxFeatures },
+        emit,
+    );
+    const {
+        overlayOpacities,
+        overlayLayerIds,
+        updateMapOverlays,
+        setOverlayOpacity,
+        moveOverlay,
+    } = useOverlayLayers(map, overlays, mapSources);
+    const {
+        popupFeatures,
+        popupContainer,
+        showFeatureHighlight,
+        clearFeatureHighlight,
+        closeFeaturePopup,
+    } = useFeaturePopup(
+        map,
+        overlayLayerIds,
+        drawnFeatureControls.isActivelyDrawingOrEditing,
+        drawnFeatureControls.isDrawnFeatureOnTop,
+    );
+    useBasemapStyle(map, basemaps);
+    useMapControls(map, settings, fullscreenContainer);
+
     watch(isLoading, (newValue) => {
         emit("update:isLoading", newValue);
     });
-
-    watch(
-        basemaps,
-        (updatedBasemaps) => {
-            const activeBasemap = updatedBasemaps.find(
-                (basemap) => basemap.active,
-            );
-
-            if (activeBasemap && map.value) {
-                map.value.setStyle(activeBasemap.url, { diff: false });
-            }
-        },
-        { deep: true },
-    );
-
-    watch(
-        overlays,
-        (updatedOverlays) => {
-            if (map.value?.isStyleLoaded()) {
-                updateMapOverlays(updatedOverlays);
-            }
-        },
-        { deep: true },
-    );
 
     onMounted(async () => {
         await waitForNonZeroContainerSize(mapContainer.value!);
@@ -249,16 +211,14 @@ export function useMapContext(
             bearing: props.bearing ?? 0,
             ...(props.minZoom != null ? { minZoom: props.minZoom } : {}),
             ...(props.maxZoom != null ? { maxZoom: props.maxZoom } : {}),
-            attributionControl: { compact: true },
+            attributionControl: {
+                compact: true,
+                customAttribution: OPENSTREETMAP_CREDIT,
+            },
         });
 
-        map.value.addControl(new maplibregl.NavigationControl(), "top-left");
-
-        map.value.on("click", handleMapClick);
-        map.value.on("mousemove", handleMapMousemove);
-
         map.value.once(STYLE_LOAD_EVENT, () => {
-            setupDraw();
+            drawnFeatureControls.setupDraw();
 
             if (defaultBounds) {
                 const [west, south, east, north] = defaultBounds;
@@ -276,7 +236,7 @@ export function useMapContext(
         map.value.on(STYLE_LOAD_EVENT, () => {
             map.value!.resize();
 
-            addBufferLayer();
+            drawnFeatureControls.addBufferLayer();
             updateMapOverlays(overlays.value);
 
             emit("update:overlays");
@@ -288,83 +248,6 @@ export function useMapContext(
     onUnmounted(() => {
         map.value?.remove();
     });
-
-    function handleMapClick(event: MapMouseEvent): void {
-        if (!overlayLayerIds.value.length) return;
-        if (isActivelyDrawingOrEditing()) return;
-
-        const features = map.value!.queryRenderedFeatures(event.point, {
-            layers: overlayLayerIds.value,
-        });
-
-        if (!features.length) return;
-        if (isDrawnFeatureOnTop(event.point)) return;
-
-        openFeaturePopup(deduplicateFeatures(features), event.lngLat);
-    }
-
-    function isActivelyDrawingOrEditing(): boolean {
-        return draw && draw.getMode() !== SIMPLE_SELECT;
-    }
-
-    function isDrawnFeatureOnTop(point: MapMouseEvent["point"]): boolean {
-        const topFeature = map.value!.queryRenderedFeatures(point)[0];
-        return topFeature?.layer.id.startsWith(DRAW_LAYER_ID_PREFIX);
-    }
-
-    function deduplicateFeatures(
-        features: MapGeoJSONFeature[],
-    ): MapGeoJSONFeature[] {
-        const identifiableFeatures = features.filter(
-            (feature) => feature.properties?.resourceinstanceid || feature.id,
-        );
-
-        return uniqBy(identifiableFeatures, (feature) =>
-            String(feature.properties?.resourceinstanceid ?? feature.id),
-        );
-    }
-
-    function openFeaturePopup(
-        features: MapGeoJSONFeature[],
-        lngLat: LngLat,
-    ): void {
-        activePopup?.remove();
-
-        const container = document.createElement("div");
-        container.style.height = "100%";
-
-        activePopup = new maplibregl.Popup({
-            maxWidth: "none",
-            className: "feature-info-popup",
-        })
-            .setDOMContent(container)
-            .setLngLat(lngLat)
-            .addTo(map.value!);
-
-        popupContainer.value = container;
-        popupFeatures.value = features;
-
-        activePopup.on("close", () => {
-            popupContainer.value = null;
-            popupFeatures.value = [];
-            activePopup = null;
-        });
-    }
-
-    function handleMapMousemove(event: MapMouseEvent): void {
-        const canvas = map.value!.getCanvas();
-
-        if (!overlayLayerIds.value.length) {
-            canvas.style.cursor = "";
-            return;
-        }
-
-        const features = map.value!.queryRenderedFeatures(event.point, {
-            layers: overlayLayerIds.value,
-        });
-
-        canvas.style.cursor = features.length ? "pointer" : "";
-    }
 
     async function loadMapData(): Promise<void> {
         isLoading.value = true;
@@ -385,24 +268,33 @@ export function useMapContext(
                     source: raw.source,
                 }),
             );
-            mapSources = [
+            mapSources.value = [
                 ...((mapData?.map_sources ?? []) as MapSource[]),
                 ...resourceSources,
             ];
+
+            coordinateSystems.value = (mapData?.preferred_coordinate_systems ??
+                []) as CoordinateSystem[];
+            registerCoordinateSystems(coordinateSystems.value);
 
             const rawBasemaps = (mapData?.basemaps ?? []) as RawBasemap[];
             const hasPreferredBasemap = rawBasemaps.some(
                 (layer) => layer.name === props.basemap,
             );
 
+            function isInitiallyActive(layer: RawBasemap): boolean {
+                if (hasPreferredBasemap) {
+                    return layer.name === props.basemap;
+                }
+                return layer.addtomap;
+            }
+
             // Folded into `active` rather than a separate setStyle() call, since assigning basemaps.value below already triggers one via watch(basemaps, ...).
             basemaps.value = rawBasemaps.map((layer) => ({
                 id: layer.name,
                 name: layer.title,
                 value: layer.name,
-                active: hasPreferredBasemap
-                    ? layer.name === props.basemap
-                    : layer.addtomap,
+                active: isInitiallyActive(layer),
                 url: layer.url,
             }));
 
@@ -424,343 +316,36 @@ export function useMapContext(
         }
     }
 
-    function setupDraw(): void {
-        draw = new MapboxDraw({
-            displayControlsDefault: false,
-            controls: {
-                point: false,
-                line_string: false,
-                polygon: false,
-                trash: false,
-            },
-        });
-
-        map.value!.addControl(draw);
-
-        if (props.value?.features?.length) {
-            for (const feature of props.value.features) {
-                draw.add(feature);
-            }
-
-            updateDrawnFeatures({ shouldEmitValueChange: false });
-        }
-
-        // "draw.*" are custom events fired by @mapbox/mapbox-gl-draw, not part
-        // of maplibre-gl's typed MapEventType union.
-        map.value!.on(DRAW_CREATE_EVENT as any, (drawEvent: DrawEvent) => {
-            if (
-                props.maxFeatures != null &&
-                draw.getAll().features.length > props.maxFeatures
-            ) {
-                const rejectedIds = drawEvent.features.map(
-                    (feature) => feature.id as string,
-                );
-                draw.delete(rejectedIds);
-                notifyMaxFeaturesReached();
-                updateDrawnFeatures();
-                return;
-            }
-
-            selectNewlyDrawnFeature(drawEvent);
-            updateDrawnFeatures();
-        });
-        map.value!.on(DRAW_UPDATE_EVENT as any, (drawEvent: DrawEvent) => {
-            selectedDrawnFeature.value = drawEvent.features[0] ?? null;
-            updateDrawnFeatures();
-        });
-        map.value!.on(DRAW_DELETE_EVENT as any, () => {
-            selectedDrawnFeature.value = null;
-            updateDrawnFeatures();
-        });
-        map.value!.on(DRAW_SELECTION_CHANGE_EVENT as any, () => {
-            selectedDrawnFeature.value = draw.getSelected().features[0] ?? null;
-        });
-    }
-
-    function addBufferLayer(): void {
-        if (!map.value!.getSource(BUFFER_LAYER_ID)) {
-            map.value!.addSource(BUFFER_LAYER_ID, {
-                type: "geojson",
-                data: currentBufferData,
-            });
-        }
-        if (!map.value!.getLayer(BUFFER_LAYER_ID)) {
-            map.value!.addLayer({
-                id: BUFFER_LAYER_ID,
-                type: "fill",
-                source: BUFFER_LAYER_ID,
-                layout: {},
-                paint: {
-                    "fill-color": BUFFER_FILL_COLOR,
-                    "fill-opacity": BUFFER_FILL_OPACITY,
-                },
-            });
-        }
-    }
-
-    function selectNewlyDrawnFeature(drawEvent: DrawEvent): void {
-        const feature = drawEvent.features[0];
-        const featureId = feature.id as string;
-
-        map.value!.once(IDLE, () => {
-            if (feature.geometry.type === GEOMETRY_TYPE_POINT) {
-                draw.changeMode(SIMPLE_SELECT, { featureIds: [featureId] });
-            } else if (
-                feature.geometry.type === GEOMETRY_TYPE_LINESTRING ||
-                feature.geometry.type === GEOMETRY_TYPE_POLYGON
-            ) {
-                draw.changeMode(DIRECT_SELECT, { featureId });
-            }
-        });
-    }
-
-    function notifyMaxFeaturesReached(): void {
-        toast.add({
-            severity: "error",
-            summary: $gettext("Feature limit reached"),
-            detail: $gettext(
-                "Only %{max} feature(s) can be drawn on this map.",
-                { max: String(props.maxFeatures) },
-            ),
-            life: 5000,
-            group: "map-component",
-        });
-    }
-
-    async function updateDrawnFeatures(
-        { shouldEmitValueChange }: { shouldEmitValueChange: boolean } = {
-            shouldEmitValueChange: true,
-        },
-    ): Promise<void> {
-        const updateToken = ++latestUpdateDrawnFeaturesToken;
-
-        const drawnFeatureCollection = draw.getAll() as FeatureCollection;
-        drawnFeatures.value = drawnFeatureCollection.features as Feature[];
-
-        for (const feature of drawnFeatureCollection.features) {
-            feature.properties!.buffer_distance ??= 0;
-            feature.properties!.buffer_units ??= METERS;
-        }
-
-        try {
-            const featuresToBuffer: FeatureCollection = {
-                ...drawnFeatureCollection,
-                features: drawnFeatureCollection.features.filter(
-                    (feature) => feature.properties!.buffer_distance,
-                ),
-            };
-
-            let bufferedFeatures: FeatureCollection = {
-                type: "FeatureCollection",
-                features: [],
-            };
-            if (featuresToBuffer.features.length) {
-                bufferedFeatures =
-                    await fetchDrawnFeaturesBuffer(featuresToBuffer);
-            }
-
-            if (updateToken !== latestUpdateDrawnFeaturesToken) {
-                return;
-            }
-
-            currentBufferData = bufferedFeatures;
-            (map.value!.getSource(BUFFER_LAYER_ID) as GeoJSONSource)?.setData(
-                currentBufferData,
-            );
-
-            if (drawnFeatureCollection.features.length) {
-                const allFeatures: FeatureCollection = {
-                    type: "FeatureCollection",
-                    features: [
-                        ...drawnFeatureCollection.features,
-                        ...bufferedFeatures.features,
-                    ],
-                };
-
-                const [west, south, east, north] =
-                    await fetchGeoJSONBounds(allFeatures);
-
-                if (updateToken !== latestUpdateDrawnFeaturesToken) {
-                    return;
-                }
-
-                map.value!.fitBounds(
-                    [
-                        [west, south],
-                        [east, north],
-                    ],
-                    {
-                        padding: { top: 50, right: 100, bottom: 50, left: 50 },
-                    },
-                );
-            }
-        } catch (error) {
-            console.error("Error updating drawn features:", error);
-        }
-
-        if (shouldEmitValueChange) {
-            emit("update:value", drawnFeatureCollection);
-        }
-    }
-
-    function addOverlayToMap(overlay: MapLayer): void {
-        for (const layerDef of overlay.layerdefinitions) {
-            try {
-                if (layerDef.source && !map.value!.getSource(layerDef.source)) {
-                    const sourceSpec = mapSources.find(
-                        (mapSource) => mapSource.name === layerDef.source,
-                    );
-                    if (sourceSpec) {
-                        map.value!.addSource(
-                            layerDef.source,
-                            sourceSpec.source as SourceSpecification,
-                        );
-                    }
-                }
-                if (!map.value!.getLayer(layerDef.id)) {
-                    map.value!.addLayer(layerDef as AddLayerObject);
-                }
-            } catch (error) {
-                console.error(error);
-            }
-        }
-    }
-
-    function removeOverlayFromMap(overlay: MapLayer): void {
-        const sourcesToRemove: Record<string, boolean> = {};
-
-        for (const layerDef of overlay.layerdefinitions) {
-            if (map.value!.getLayer(layerDef.id)) {
-                map.value!.removeLayer(layerDef.id);
-                if (layerDef.source) {
-                    sourcesToRemove[layerDef.source] = true;
-                }
-            }
-        }
-
-        for (const layer of (map.value!.getStyle()?.layers ??
-            []) as LayerDefinition[]) {
-            const layerSource = layer.source;
-            if (layerSource && sourcesToRemove[layerSource]) {
-                delete sourcesToRemove[layerSource];
-            }
-        }
-
-        for (const source of Object.keys(sourcesToRemove)) {
-            if (map.value!.getSource(source)) {
-                map.value!.removeSource(source);
-            }
-        }
-    }
-
-    function updateMapOverlays(overlaysToUpdate: MapLayer[]): void {
-        for (const overlay of overlaysToUpdate) {
-            for (const layerDef of overlay.layerdefinitions) {
-                if (map.value!.getLayer(layerDef.id)) {
-                    map.value!.removeLayer(layerDef.id);
-                }
-            }
-        }
-        for (const overlay of overlaysToUpdate) {
-            if (overlay.addtomap) {
-                addOverlayToMap(overlay);
-            } else {
-                removeOverlayFromMap(overlay);
-            }
-        }
-    }
-
-    function setDrawMode(mode: DrawMode | null): void {
-        if (!mode || !draw) {
-            if (map.value) {
-                map.value.getCanvas().style.cursor = "";
-            }
-            return;
-        }
-
-        map.value!.getCanvas().style.cursor = "crosshair";
-
-        if (mode === "point") {
-            draw.changeMode(DRAW_POINT);
-        } else if (mode === "line") {
-            draw.changeMode(DRAW_LINE_STRING);
-        } else if (mode === "polygon") {
-            draw.changeMode(DRAW_POLYGON);
-        }
-    }
-
-    function selectDrawnFeature(feature: Feature): void {
-        selectedDrawnFeature.value = feature;
-        draw?.changeMode(SIMPLE_SELECT, { featureIds: [String(feature.id)] });
-    }
-
-    function deselectDrawnFeature(): void {
-        selectedDrawnFeature.value = null;
-        draw?.changeMode(SIMPLE_SELECT);
-    }
-
-    function deleteSelectedDrawnFeature(): void {
-        if (!draw) return;
-
-        const selectedFeatures = draw.getSelected();
-        if (selectedFeatures.features.length) {
-            draw.delete(selectedFeatures.features[0].id as string);
-            map.value!.fire(DRAW_DELETE_EVENT as any);
-        }
-    }
-
-    function deleteAllDrawnFeatures(): void {
-        if (!draw) return;
-
-        draw.deleteAll();
-        map.value!.fire(DRAW_DELETE_EVENT as any);
-    }
-
-    function setBufferForSelectedFeature(
-        distance: number,
-        units: string,
-    ): void {
-        const feature = selectedDrawnFeature.value;
-        if (!feature || !draw) return;
-
-        feature.properties!.buffer_distance = distance;
-        feature.properties!.buffer_units = units;
-
-        draw.add(feature);
-        map.value!.fire(DRAW_UPDATE_EVENT as any, { features: [feature] });
-    }
-
-    function addFeatures(features: Feature[]): void {
-        if (!draw || !features.length) return;
-
-        const projectedCount = draw.getAll().features.length + features.length;
-        if (props.maxFeatures != null && projectedCount > props.maxFeatures) {
-            notifyMaxFeaturesReached();
-            return;
-        }
-
-        for (const feature of features) {
-            draw.add(feature);
-        }
-
-        updateDrawnFeatures();
-    }
-
     const context: MapContext = {
         map,
         isLoading,
         basemaps,
         overlays,
-        drawnFeatures,
-        selectedDrawnFeature,
+        overlayOpacities,
+        settings,
+        coordinateSystems,
+        drawnFeatures: drawnFeatureControls.drawnFeatures,
+        selectedDrawnFeature: drawnFeatureControls.selectedDrawnFeature,
         allowedGeometryTypes,
-        setDrawMode,
-        selectDrawnFeature,
-        deselectDrawnFeature,
-        deleteSelectedDrawnFeature,
-        deleteAllDrawnFeatures,
-        setBufferForSelectedFeature,
-        addFeatures,
+        setDrawMode: drawnFeatureControls.setDrawMode,
+        selectDrawnFeature: drawnFeatureControls.selectDrawnFeature,
+        deselectDrawnFeature: drawnFeatureControls.deselectDrawnFeature,
+        editDrawnFeature: drawnFeatureControls.editDrawnFeature,
+        deleteDrawnFeature: drawnFeatureControls.deleteDrawnFeature,
+        deleteSelectedDrawnFeature:
+            drawnFeatureControls.deleteSelectedDrawnFeature,
+        deleteAllDrawnFeatures: drawnFeatureControls.deleteAllDrawnFeatures,
+        setBufferForSelectedFeature:
+            drawnFeatureControls.setBufferForSelectedFeature,
+        setBufferForFeature: drawnFeatureControls.setBufferForFeature,
+        addFeatures: drawnFeatureControls.addFeatures,
+        updateDrawnFeature: drawnFeatureControls.updateDrawnFeature,
+        fitToFeatures: drawnFeatureControls.fitToFeatures,
+        moveOverlay,
+        setOverlayOpacity,
+        showFeatureHighlight,
+        clearFeatureHighlight,
+        closeFeaturePopup,
     };
 
     return { context, popupContainer, popupFeatures };

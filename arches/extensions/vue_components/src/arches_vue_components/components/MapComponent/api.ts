@@ -44,6 +44,19 @@ export async function fetchResourceDescriptor(
     return parsed;
 }
 
+export async function fetchClusterResourceIds(
+    nodeId: string,
+    extent: string,
+): Promise<string[]> {
+    const query = new URLSearchParams({ nodeid: nodeId, extent });
+    const response = await fetch(
+        `${generateArchesURL("arches_vue_components:api-cluster-resources")}?${query}`,
+    );
+    const parsed = await response.json();
+    if (!response.ok) throw new Error(parsed.message ?? response.statusText);
+    return parsed.resourceinstanceids;
+}
+
 export async function fetchGeoJSONBounds(
     features: FeatureCollection,
 ): Promise<[number, number, number, number]> {

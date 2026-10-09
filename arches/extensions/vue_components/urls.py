@@ -5,6 +5,7 @@ from arches.extensions.vue_components.views.api.language import (
     LanguageViewWithRequestLanguage,
 )
 from arches.extensions.vue_components.views.api.map import (
+    ClusterResourcesAPI,
     FeatureBufferAPI,
     GeoJSONBoundsAPI,
     MapDataAPI,
@@ -32,6 +33,11 @@ urlpatterns = [
     path("api/settings", SettingsAPI.as_view(), name="api-settings"),
     path("api/feature-buffer", FeatureBufferAPI.as_view(), name="api-feature-buffer"),
     path("api/geojson-bounds", GeoJSONBoundsAPI.as_view(), name="api-geojson-bounds"),
+    path(
+        "api/cluster-resources",
+        ClusterResourcesAPI.as_view(),
+        name="api-cluster-resources",
+    ),
     path(
         "api/languages-with-request-language",
         LanguageViewWithRequestLanguage.as_view(),
