@@ -8,34 +8,6 @@ class Migration(migrations.Migration):
     ]
 
     sql_string = """
-            do
-            $do$
-            declare
-                database_name     text;
-                sv_user_sql     text;
-            begin
-                if not exists (
-                    select from pg_catalog.pg_roles
-                    where  rolname = 'arches_spatial_views') then
-
-                    select current_database() into database_name;
-
-                    create role arches_spatial_views with
-                    login
-                    nosuperuser
-                    inherit
-                    nocreatedb
-                    nocreaterole
-                    noreplication
-                    password 'arches_spatial_views';
-
-                    sv_user_sql := format('grant connect on database %s to arches_spatial_views;', database_name);
-                    execute sv_user_sql;
-
-                end if;
-            end
-            $do$;
-
             create or replace function __arches_get_concept_label(concept_value uuid) returns text language plpgsql as $$
                 declare
                     concept_label     text := '';
@@ -594,8 +566,6 @@ class Migration(migrations.Migration):
                             where geo.nodeid = ''%s''
                                 %s;
 
-                            grant select on table %s to arches_spatial_views;
-
                             comment on view %s is ''%s'';
 
                             ',
@@ -603,7 +573,6 @@ class Migration(migrations.Migration):
                             att_table_name,
                             geometry_node_id::text,
                             geom_type_filter,
-                            sv_name_slug_with_geom,
                             sv_name_slug_with_geom,
                             spv_description);
 
@@ -1031,26 +1000,6 @@ class Migration(migrations.Migration):
             drop function if exists __arches_get_resourceinstance_label;
             drop function if exists __arches_get_nodevalue_label;
 
-            do
-            $do$
-            declare
-                database_name     text;
-                sv_user_sql     text;
-            begin
-                if exists (
-                    select from pg_catalog.pg_roles
-                    where  rolname = 'arches_spatial_views') then
-
-                    select current_database() into database_name;
-                    
-                    sv_user_sql := format('revoke connect on database %s from arches_spatial_views;', database_name);
-                    execute sv_user_sql;
-
-                end if;
-            end
-            $do$;
-
-            drop role if exists arches_spatial_views;
         """
 
     operations = [
