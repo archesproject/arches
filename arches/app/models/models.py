@@ -10,6 +10,7 @@ import uuid
 import django.utils.timezone
 from django.contrib.auth.models import Group, User
 from django.contrib.gis.db import models
+from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import RegexValidator, validate_slug
@@ -2691,6 +2692,13 @@ class SpatialView(models.Model):
     isactive = models.BooleanField(
         default=True
     )  # the view is not created in the DB until set to active.
+    # database roles granted SELECT on the views; roles that don't exist are skipped
+    dbroles = ArrayField(
+        models.CharField(max_length=63),
+        default=list,
+        db_default=[],
+        blank=True,
+    )
 
     def __str__(self):
         return f"{self.schema}.{self.slug}"
@@ -2779,6 +2787,7 @@ class SpatialView(models.Model):
             "language": self.language.code,
             "attributenodes": self.attributenodes,
             "isactive": self.isactive,
+            "dbroles": self.dbroles,
         }
 
 
