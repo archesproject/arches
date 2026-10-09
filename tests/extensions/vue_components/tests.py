@@ -6,11 +6,13 @@ from django.urls import reverse
 from django.core import management
 from django.test.utils import captured_stdout
 
-from arches.app.models.models import Widget
+from arches.app.models.models import Node, Widget
 from arches.extensions.vue_components.models import WidgetMapping
 from arches.extensions.vue_components.utils.widget_synchronizer import (
     WidgetSynchronizer,
 )
+
+from tests.base_test import ArchesTestCase
 from arches.extensions.vue_components.views.api import map as map_api
 
 
@@ -173,3 +175,61 @@ class MapDataAPITests(TestCase):
             response.json()["preferred_coordinate_systems"],
             list(self.COORDINATE_SYSTEMS),
         )
+
+
+class ClusterResourcesAPITests(ArchesTestCase):
+    NODE = SimpleNamespace(nodeid=uuid4(), nodegroup=None)
+    PERMITTED_ID = str(uuid4())
+    RESTRICTED_ID = str(uuid4())
+    EXTENT = '{"type":"Point","coordinates":[1168854.65,6710219.08]}'
+
+    def setUp(self):
+        super().setUp()
+        self.client.login(username="admin", password="admin")
+        node_lookup = mock.patch.object(Node.objects, "select_related")
+        self.get_node = node_lookup.start().return_value.get
+        self.get_node.return_value = self.NODE
+        self.addCleanup(node_lookup.stop)
+
+    def get_cluster_resources(self, extent=EXTENT):
+        return self.client.get(
+            reverse("arches_vue_components:api-cluster-resources"),
+            {"nodeid": str(self.NODE.nodeid), "extent": extent},
+        )
+
+    def get_permitted_cluster_resources(self, filtered_instances):
+        with (
+            mock.patch(
+                "arches.extensions.vue_components.views.api.map.GeoUtils.get_resource_ids_within_extent",
+                return_value=[self.PERMITTED_ID, self.RESTRICTED_ID],
+            ),
+            mock.patch(
+                "arches.extensions.vue_components.views.api.map.get_filtered_instances",
+                return_value=filtered_instances,
+            ),
+        ):
+            return self.get_cluster_resources()
+
+    def test_excludes_restricted_resources(self):
+        response = self.get_permitted_cluster_resources((False, [self.RESTRICTED_ID]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["resourceinstanceids"], [self.PERMITTED_ID])
+
+    def test_keeps_only_exclusively_permitted_resources(self):
+        response = self.get_permitted_cluster_resources((True, [self.PERMITTED_ID]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["resourceinstanceids"], [self.PERMITTED_ID])
+
+    def test_unknown_node_is_not_found(self):
+        self.get_node.side_effect = Node.DoesNotExist
+
+        response = self.get_cluster_resources()
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_invalid_extent_is_bad_request(self):
+        response = self.get_cluster_resources(extent="not geojson")
+
+        self.assertEqual(response.status_code, 400)
