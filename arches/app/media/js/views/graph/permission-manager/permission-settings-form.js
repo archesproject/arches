@@ -58,8 +58,17 @@ var PermissionSettingsForm = Backbone.View.extend({
         this.identityid = ko.observable();
 
         this.identityid.subscribe(function(val) {
-            _.forEach(options.identityList.items(), function(item) {
-                item.selected(item.combinedId === val);
+            // deselect before selecting so selectedItems never briefly holds two identities
+            var items = options.identityList.items();
+            items.forEach(function(item) {
+                if (item.combinedId !== val) {
+                    item.selected(false);
+                }
+            });
+            items.forEach(function(item) {
+                if (item.combinedId === val) {
+                    item.selected(true);
+                }
             });
         });
 

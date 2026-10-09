@@ -59,16 +59,17 @@
                 <div class="permission-selector">
                     <div>{% trans 'Permissions' %}</div>
                     <!-- ko if: permissionsDesigner.loading -->
-                    <div class="permissions-loading"><i class="fa fa-spinner fa-spin"></i> {% trans "Loading saved permissions..." %}</div>
+                    <div class="permissions-loading" role="status"><i class="fa fa-spinner fa-spin"></i> {% trans "Loading saved permissions..." %}</div>
                     <!-- /ko -->
                     <ul class="permissions-options" style="list-style: none; margin-left: -5px;" data-bind="foreach: permissionsDesigner.permissionSettingsForm.nodegroupPermissions">
                         <li>
                         <label class="form-checkbox form-normal form-primary form-text permission-option"
                             data-bind="css: {
-                                'active': $data.selected
+                                'active': $data.selected,
+                                'indeterminate': $data.indeterminate
                             },
                             click: $data.selected.bind($data, !$data.selected())">
-                            <input type="checkbox" data-bind="checked: $data.selected, indeterminate: $data.indeterminate, attr: {'aria-checked': $data.indeterminate() ? 'mixed' : String($data.selected())}">
+                            <input type="checkbox" data-bind="checked: $data.selected, click: function() { return true; }, clickBubble: false, indeterminate: $data.indeterminate, attr: {'aria-checked': $data.indeterminate() ? 'mixed' : String($data.selected())}">
                             <i data-bind="css: $data.icon"></i> <span data-bind="text: $data.name"></span>
                         </label>
                         </li>
@@ -110,7 +111,7 @@
                 <div class="control-panel">
                     <div class="permissions-list">
                         <div class="node-list-panel">
-                            <span class="permissions-title">{% trans "Selected Cards" %}</span>
+                            <span class="permissions-title">{% trans "Selected Cards" %} <span data-bind="text: '(' + permissionsDesigner.permissionSettingsForm.selectedCards().length + ')'"></span></span>
                             <ul class="permissions-selected" data-bind="visible: permissionsDesigner.permissionSettingsForm.selectedCards().length === 0">
                                 <li class="no-cards-selected">
                                     <i class="confirmation ion-information-circled"></i> <span>{% trans "No cards selected" %}</span>
