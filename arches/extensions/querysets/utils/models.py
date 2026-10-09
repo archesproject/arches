@@ -24,6 +24,7 @@ from packaging.version import Version
 
 arches_version = Version(_arches_version_str)
 from arches.app.models.models import ResourceInstance, TileModel
+from arches.app.utils.permission_backend import user_is_resource_reviewer
 
 from arches.extensions.querysets.datatypes.datatypes import DataTypeFactory
 from arches.extensions.querysets.fields import (
@@ -263,6 +264,26 @@ def append_tiles_recursively(resource_or_tile):
         for tile in maybe_tiles:
             if isinstance(tile, TileTree):
                 tile.fill_blanks()
+
+
+def get_provisional_edits_for_user(tile, user):
+    """Return the user's own provisional edit value, or None for authoritative data."""
+    provisionaledits = (
+        tile.get("provisionaledits")
+        if isinstance(tile, dict)
+        else tile.provisionaledits
+    )
+    if user is None or not provisionaledits:
+        return None
+
+    if user_is_resource_reviewer(user):
+        return None
+
+    user_id_str = str(user.pk)
+    if user_id_str in provisionaledits:
+        return provisionaledits[user_id_str]["value"]
+
+    return None
 
 
 def ensure_request(request, force_admin=False):

@@ -32,6 +32,7 @@ from arches.extensions.querysets.utils.models import (
     field_attnames,
     get_nodegroups_here_and_below,
     pop_arches_model_kwargs,
+    get_provisional_edits_for_user,
 )
 
 logger = logging.getLogger(__name__)
@@ -325,7 +326,7 @@ class TileTreeOperation:
             tile.set_missing_keys_to_none()
 
             # Remove no-op upserts (validation may normalize values to match existing).
-            if original and tile._tile_update_is_noop(original):
+            if original and tile._tile_update_is_noop(original, request=self.request):
                 to_update.remove(tile)
 
         self.to_insert |= to_insert
@@ -415,11 +416,17 @@ class TileTreeOperation:
         if incoming_sortorder != original_tile["sortorder"]:
             return False
 
+        # For a non-reviewer with an existing provisional edit, compare incoming
+        # against their provisional values rather than the authoritative data.
+        user = getattr(self.request, "user", None)
+        provisional_data = get_provisional_edits_for_user(original_tile, user)
+        existing_data = provisional_data or original_tile["data"]
+
         incoming_aliased = incoming.aliased_data
 
         for node in non_semantic_nodes:
             node_id_str = str(node.pk)
-            existing_value = original_tile["data"].get(node_id_str)
+            existing_value = existing_data.get(node_id_str)
 
             if isinstance(incoming_aliased, AliasedData):
                 incoming_value = getattr(incoming_aliased, node.alias, NOT_PROVIDED)
