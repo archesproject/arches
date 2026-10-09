@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from "vue";
+import { computed, ref, useTemplateRef } from "vue";
 
 import { useGettext } from "vue3-gettext";
 
@@ -19,6 +19,7 @@ import { useResolvedMapContext } from "@/arches_vue_components/components/MapCom
 import type { MapContext } from "@/arches_vue_components/components/MapComponent/types.ts";
 import type { GeometryImportErrorCode } from "@/arches_vue_components/components/MapComponent/utils/geometry-import.ts";
 
+const UPLOAD_LINK_PLACEHOLDER = "%{uploadLink}";
 const ACCEPTED_FILE_TYPES = ACCEPTED_GEOMETRY_FILE_EXTENSIONS.map(
     (extension) => `.${extension}`,
 ).join(",");
@@ -37,16 +38,36 @@ const { $gettext } = useGettext();
 const isLoading = ref(false);
 const errorMessage = ref<string | null>(null);
 
-function getErrorMessage(code: GeometryImportErrorCode): string {
+const dropZoneTextParts = computed(() => {
+    const template = $gettext(
+        "Drag and drop a GeoJSON, KML, or shapefile here to add its geometry, or %{uploadLink}.",
+        { uploadLink: UPLOAD_LINK_PLACEHOLDER },
+    );
+    const [before, after = ""] = template.split(UPLOAD_LINK_PLACEHOLDER);
+    return { before, after };
+});
+
+function getErrorMessage(
+    code: GeometryImportErrorCode,
+    fileName: string,
+    reason = "",
+): string {
     if (code === "unsupported-file-type") {
         return $gettext(
-            "Unsupported file type. Use a zipped shapefile (.zip), .shp, GeoJSON (.json, .geojson), or KML (.kml) file.",
+            'Unsupported file type "%{fileName}". Drop a .geojson, .json, .kml, .zip, or .shp file.',
+            { fileName },
         );
     }
     if (code === "no-features") {
-        return $gettext("No features found in that file.");
+        return $gettext(
+            'No usable Point/Line/Polygon geometry found in "%{fileName}".',
+            { fileName },
+        );
     }
-    return $gettext("Unable to read that file.");
+    return $gettext('Could not parse "%{fileName}" — %{reason}.', {
+        fileName,
+        reason: reason || $gettext("invalid file"),
+    });
 }
 
 async function onSelect(event: { files: File[] }): Promise<void> {
@@ -62,9 +83,13 @@ async function onSelect(event: { files: File[] }): Promise<void> {
         addFeatures(await parseGeometryFile(file));
     } catch (error) {
         if (error instanceof GeometryImportError) {
-            errorMessage.value = getErrorMessage(error.code);
+            errorMessage.value = getErrorMessage(
+                error.code,
+                file.name,
+                error.reason,
+            );
         } else {
-            errorMessage.value = getErrorMessage("parse-failed");
+            errorMessage.value = getErrorMessage("parse-failed", file.name);
         }
     } finally {
         isLoading.value = false;
@@ -104,19 +129,16 @@ function openFileChooser(): void {
                         aria-hidden="true"
                     />
                     <span class="drop-zone-text">
-                        {{
-                            $gettext(
-                                "Drag and drop a shapefile, GeoJSON, or KML file here to add its geometry.",
-                            )
-                        }}
+                        <span>{{ dropZoneTextParts.before }}</span>
+                        <Button
+                            class="drop-zone-upload-button"
+                            size="small"
+                            :label="$gettext('Upload file')"
+                            :link="true"
+                            @click="openFileChooser"
+                        />
+                        <span>{{ dropZoneTextParts.after }}</span>
                     </span>
-                    <Button
-                        class="drop-zone-upload-button"
-                        size="small"
-                        :label="$gettext('Upload file')"
-                        :link="true"
-                        @click="openFileChooser"
-                    />
                 </div>
             </template>
         </FileUpload>
