@@ -1,4 +1,3 @@
-from django.contrib.postgres.fields import ArrayField
 from django.db import migrations, models
 
 
@@ -137,7 +136,9 @@ class Migration(migrations.Migration):
                                 for r in
                                     select pr.rolname, v.view_name
                                     from spatial_views sv
-                                        cross join unnest(sv.dbroles) as dr(rolname)
+                                        cross join jsonb_array_elements_text(
+                                            case when jsonb_typeof(sv.dbroles) = 'array' then sv.dbroles else '[]'::jsonb end
+                                        ) as dr(rolname)
                                         join pg_roles pr on pr.rolname = dr.rolname
                                         cross join unnest(sv_names) as v(view_name)
                                     where sv.slug = spatial_view_name_slug
@@ -289,7 +290,7 @@ class Migration(migrations.Migration):
             alter table spatial_views disable trigger user;
 
             update spatial_views
-            set dbroles = array['arches_spatial_views']
+            set dbroles = '["arches_spatial_views"]'::jsonb
             where exists (
                 select from pg_catalog.pg_roles
                 where rolname = 'arches_spatial_views'
@@ -302,13 +303,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="spatialview",
             name="dbroles",
-            field=ArrayField(
-                base_field=models.CharField(max_length=63),
-                blank=True,
-                db_default=[],
-                default=list,
-                size=None,
-            ),
+            field=models.JSONField(blank=True, db_default=[], default=list),
         ),
         migrations.RunSQL(
             create_spatial_view_with_grants, create_spatial_view_without_grants
