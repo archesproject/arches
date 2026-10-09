@@ -2206,6 +2206,20 @@ class ResourceInstanceDataType(BaseDataType):
 
     RELATIONSHIP_SOURCES = ("ontology", "concept", "reference")
 
+    def rename_legacy_relationship_keys(self, value):
+        legacy_relationship_keys = {
+            "ontologyProperty": "relationship",
+            "inverseOntologyProperty": "inverseRelationship",
+        }
+        items = value if isinstance(value, list) else [value]
+        for item in items:
+            if isinstance(item, dict):
+                for legacy_key, key in legacy_relationship_keys.items():
+                    if legacy_key in item:
+                        legacy_value = item.pop(legacy_key)
+                        item.setdefault(key, legacy_value)
+        return value
+
     def validate_node(self, node):
         from arches.app.models.graph import GraphValidationError
 
@@ -2422,17 +2436,18 @@ class ResourceInstanceDataType(BaseDataType):
 
     def transform_value_for_tile(self, value, **kwargs):
         try:
-            return json.loads(value)
+            value = json.loads(value)
         except ValueError:
             # do this if json (invalid) is formatted with single quotes, re #6390
             try:
-                return ast.literal_eval(value)
+                value = ast.literal_eval(value)
             except:
-                return value
+                pass
         except TypeError:
             # data should come in as json but python list is accepted as well
-            if isinstance(value, list):
-                return value
+            if not isinstance(value, list):
+                return None
+        return self.rename_legacy_relationship_keys(value)
 
     def transform_export_values(self, value, *args, **kwargs):
         return json.dumps(value)
