@@ -62,9 +62,3 @@ export function buildGeometry(
     }
     return { type: "Polygon", coordinates: [[...positions, positions[0]]] };
 }
-
-export function cloneProperties(
-    properties: Record<string, unknown> | null | undefined,
-): Record<string, unknown> {
-    return JSON.parse(JSON.stringify(properties ?? {}));
-}

@@ -1,21 +1,20 @@
-import { computed, ref } from "vue";
+import { computed, ref, shallowRef } from "vue";
 
+import { cloneDeep, isEqual } from "es-toolkit";
 import { useGettext } from "vue3-gettext";
 
 import { WGS84_SRID } from "@/arches_vue_components/components/MapComponent/constants.ts";
-import { useCoordinateUndo } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/composables/useCoordinateUndo.ts";
 import {
     fromWgs84,
     getCoordinateDecimalPlaces,
     isGeographicCoordinateSystem,
     toWgs84,
 } from "@/arches_vue_components/components/MapComponent/utils/coordinate-systems.ts";
-import { findGeoJsonErrors } from "@/arches_vue_components/components/MapComponent/utils/geometry-import.ts";
+import { findGeoJsonIssues } from "@/arches_vue_components/components/MapComponent/utils/geometry-import.ts";
 import {
     KIND_BY_GEOMETRY_TYPE,
     MINIMUM_VERTICES,
     buildGeometry,
-    cloneProperties,
     createEmptyRows,
     isRowComplete,
     positionsFromGeometry,
@@ -28,25 +27,30 @@ import type { Feature, Geometry, Position } from "geojson";
 import type {
     CoordinateEntryKind,
     CoordinateRow,
-    GeoJsonError,
 } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/types.ts";
 import type { MapContext } from "@/arches_vue_components/components/MapComponent/types.ts";
+import type { GeoJsonIssue } from "@/arches_vue_components/components/MapComponent/utils/geometry-import.ts";
 
-interface CoordinateSnapshot {
+const UNDO_HISTORY_LIMIT = 50;
+
+interface CoordinateDraft {
+    kind: CoordinateEntryKind;
+    srid: string;
     rows: CoordinateRow[];
     properties: Record<string, unknown>;
 }
 
 export interface UseCoordinateEditorReturn {
     editingFeature: Feature | null;
-    kind: Ref<CoordinateEntryKind>;
-    srid: Ref<string>;
-    rows: Ref<CoordinateRow[]>;
+    kind: ComputedRef<CoordinateEntryKind>;
+    srid: ComputedRef<string>;
+    rows: ComputedRef<CoordinateRow[]>;
     errorMessage: Ref<string | null>;
     canUndo: ComputedRef<boolean>;
     decimalPlaces: ComputedRef<number>;
     axisLabels: ComputedRef<{ x: string; y: string }>;
     minimumVertices: ComputedRef<number>;
+    areAllRowsComplete: ComputedRef<boolean>;
     previewGeometry: ComputedRef<Geometry | null>;
     setKind: (newKind: CoordinateEntryKind) => void;
     setSrid: (newSrid: string) => void;
@@ -57,12 +61,11 @@ export interface UseCoordinateEditorReturn {
     ) => void;
     addRow: (afterIndex: number | null) => number;
     removeRow: (index: number) => void;
-    beginRowEdit: () => void;
     commitRowEdit: () => void;
     undo: () => void;
     getRowWgs84Position: (index: number) => Position | null;
     buildGeoJsonText: () => string;
-    applyGeoJsonText: (text: string) => GeoJsonError[];
+    applyGeoJsonText: (text: string) => GeoJsonIssue[];
     submit: () => boolean;
 }
 
@@ -79,27 +82,32 @@ export function useCoordinateEditor(
         addFeatures,
         updateDrawnFeature,
     } = context;
-    const { canUndo, pushSnapshot, popSnapshot, clearHistory } =
-        useCoordinateUndo<CoordinateSnapshot>();
 
     const editingFeature: Feature | null =
         drawnFeatures.value.find(
             (feature) => String(feature.id) === editingFeatureId,
         ) ?? null;
-
-    const kind = ref<CoordinateEntryKind>(getInitialKind());
-    const srid = ref(
+    const initialSrid =
         coordinateSystems.value.find(
             (coordinateSystem) => coordinateSystem.default,
-        )?.srid ?? WGS84_SRID,
-    );
-    const rows = ref<CoordinateRow[]>(getInitialRows());
-    const draftProperties = ref<Record<string, unknown>>(
-        cloneProperties(editingFeature?.properties),
-    );
+        )?.srid ?? WGS84_SRID;
+
+    const draft = ref<CoordinateDraft>({
+        kind: getInitialKind(),
+        srid: initialSrid,
+        rows: getInitialRows(),
+        properties: cloneDeep(editingFeature?.properties ?? {}),
+    });
     const errorMessage = ref<string | null>(null);
 
-    let pendingRowEditSnapshot: CoordinateSnapshot | null = null;
+    const undoStack = shallowRef<CoordinateDraft[]>([]);
+
+    let committedDraft = cloneDeep(draft.value);
+
+    const canUndo = computed(() => undoStack.value.length > 0);
+    const kind = computed(() => draft.value.kind);
+    const srid = computed(() => draft.value.srid);
+    const rows = computed(() => draft.value.rows);
 
     const coordinateSystem = computed(() =>
         coordinateSystems.value.find(
@@ -165,19 +173,68 @@ export function useCoordinateEditor(
         if (editingFeature) {
             return rowsFromWgs84Positions(
                 positionsFromGeometry(editingFeature.geometry),
+                initialSrid,
             );
         }
         return createEmptyRows(MINIMUM_VERTICES[defaultKind]);
+    }
+
+    function getKindLabel(entryKind: CoordinateEntryKind): string {
+        if (entryKind === "point") {
+            return $gettext("Point");
+        }
+        if (entryKind === "line") {
+            return $gettext("Line");
+        }
+        return $gettext("Polygon");
+    }
+
+    function getMinimumVerticesMessage(
+        entryKind: CoordinateEntryKind,
+        count: number,
+    ): string {
+        const parameters = { count: String(count) };
+        if (entryKind === "point") {
+            return $gettext(
+                "A point needs at least %{count} vertices.",
+                parameters,
+            );
+        }
+        if (entryKind === "line") {
+            return $gettext(
+                "A line needs at least %{count} vertices.",
+                parameters,
+            );
+        }
+        return $gettext(
+            "A polygon needs at least %{count} vertices.",
+            parameters,
+        );
+    }
+
+    function getNotEnoughCoordinatesMessage(
+        entryKind: CoordinateEntryKind,
+    ): string {
+        if (entryKind === "point") {
+            return $gettext("Not enough valid coordinates for a point.");
+        }
+        if (entryKind === "line") {
+            return $gettext("Not enough valid coordinates for a line.");
+        }
+        return $gettext("Not enough valid coordinates for a polygon.");
     }
 
     function roundToDecimalPlaces(value: number, places: number): number {
         return Number(value.toFixed(places));
     }
 
-    function rowsFromWgs84Positions(positions: Position[]): CoordinateRow[] {
-        const places = getDecimalPlacesForSrid(srid.value);
+    function rowsFromWgs84Positions(
+        positions: Position[],
+        targetSrid: string,
+    ): CoordinateRow[] {
+        const places = getDecimalPlacesForSrid(targetSrid);
         return positions.map((position) => {
-            const [xCoordinate, yCoordinate] = fromWgs84(srid.value, position);
+            const [xCoordinate, yCoordinate] = fromWgs84(targetSrid, position);
             return {
                 x: roundToDecimalPlaces(xCoordinate, places),
                 y: roundToDecimalPlaces(yCoordinate, places),
@@ -185,40 +242,33 @@ export function useCoordinateEditor(
         });
     }
 
-    function takeSnapshot(): CoordinateSnapshot {
-        return {
-            rows: rows.value.map((row) => ({ ...row })),
-            properties: cloneProperties(draftProperties.value),
-        };
-    }
-
-    function recordSnapshot(): void {
-        pushSnapshot(takeSnapshot());
-    }
-
-    function beginRowEdit(): void {
-        pendingRowEditSnapshot = takeSnapshot();
-    }
-
-    function commitRowEdit(): void {
-        if (
-            pendingRowEditSnapshot &&
-            JSON.stringify(pendingRowEditSnapshot.rows) !==
-                JSON.stringify(rows.value)
-        ) {
-            pushSnapshot(pendingRowEditSnapshot);
-        }
-        pendingRowEditSnapshot = null;
+    function commit(): void {
+        undoStack.value = [...undoStack.value, committedDraft].slice(
+            -UNDO_HISTORY_LIMIT,
+        );
+        committedDraft = cloneDeep(draft.value);
     }
 
     function undo(): void {
-        const previousSnapshot = popSnapshot();
-        if (!previousSnapshot) {
+        const previousDraft = undoStack.value.at(-1);
+        if (!previousDraft) {
             return;
         }
 
-        rows.value = previousSnapshot.rows;
-        draftProperties.value = previousSnapshot.properties;
+        undoStack.value = undoStack.value.slice(0, -1);
+        committedDraft = previousDraft;
+        draft.value = cloneDeep(previousDraft);
+    }
+
+    function resetHistory(): void {
+        undoStack.value = [];
+        committedDraft = cloneDeep(draft.value);
+    }
+
+    function commitRowEdit(): void {
+        if (!isEqual(draft.value, committedDraft)) {
+            commit();
+        }
     }
 
     function updateRow(
@@ -226,25 +276,25 @@ export function useCoordinateEditor(
         axis: keyof CoordinateRow,
         value: number | null,
     ): void {
-        rows.value[index][axis] = value;
+        draft.value.rows[index][axis] = value;
         errorMessage.value = null;
     }
 
     function setKind(newKind: CoordinateEntryKind): void {
-        kind.value = newKind;
-        errorMessage.value = null;
-        draftProperties.value = {};
-        clearHistory();
-
         const minimum = MINIMUM_VERTICES[newKind];
+        draft.value.kind = newKind;
+        draft.value.properties = {};
+        errorMessage.value = null;
+
         if (newKind === "point") {
-            rows.value = rows.value.slice(0, minimum);
-        } else if (rows.value.length < minimum) {
-            rows.value = [
-                ...rows.value,
-                ...createEmptyRows(minimum - rows.value.length),
+            draft.value.rows = draft.value.rows.slice(0, minimum);
+        } else if (draft.value.rows.length < minimum) {
+            draft.value.rows = [
+                ...draft.value.rows,
+                ...createEmptyRows(minimum - draft.value.rows.length),
             ];
         }
+        resetHistory();
     }
 
     function setSrid(newSrid: string): void {
@@ -252,11 +302,10 @@ export function useCoordinateEditor(
             return;
         }
 
-        recordSnapshot();
         const previousSrid = srid.value;
         const places = getDecimalPlacesForSrid(newSrid);
 
-        rows.value = rows.value.map((row) => {
+        draft.value.rows = draft.value.rows.map((row) => {
             if (!isRowComplete(row)) {
                 return row;
             }
@@ -269,24 +318,27 @@ export function useCoordinateEditor(
                 y: roundToDecimalPlaces(yCoordinate, places),
             };
         });
-        srid.value = newSrid;
+        draft.value.srid = newSrid;
+        commit();
     }
 
     function addRow(afterIndex: number | null): number {
-        recordSnapshot();
-        const insertIndex =
-            afterIndex === null ? rows.value.length : afterIndex + 1;
-        rows.value.splice(insertIndex, 0, { x: null, y: null });
+        let insertIndex = draft.value.rows.length;
+        if (afterIndex !== null) {
+            insertIndex = afterIndex + 1;
+        }
+        draft.value.rows.splice(insertIndex, 0, { x: null, y: null });
+        commit();
         return insertIndex;
     }
 
     function removeRow(index: number): void {
-        if (rows.value.length <= minimumVertices.value) {
+        if (draft.value.rows.length <= minimumVertices.value) {
             return;
         }
 
-        recordSnapshot();
-        rows.value.splice(index, 1);
+        draft.value.rows.splice(index, 1);
+        commit();
     }
 
     function getRowWgs84Position(index: number): Position | null {
@@ -305,7 +357,7 @@ export function useCoordinateEditor(
         return JSON.stringify(
             {
                 type: "Feature",
-                properties: draftProperties.value,
+                properties: draft.value.properties,
                 geometry,
             },
             null,
@@ -313,13 +365,10 @@ export function useCoordinateEditor(
         );
     }
 
-    function applyGeoJsonText(text: string): GeoJsonError[] {
-        const hintErrors = findGeoJsonErrors(text);
-        if (hintErrors.length) {
-            return hintErrors.map((hint) => ({
-                line: hint.line,
-                message: hint.message,
-            }));
+    function applyGeoJsonText(text: string): GeoJsonIssue[] {
+        const issues = findGeoJsonIssues(text);
+        if (issues.length) {
+            return issues;
         }
 
         const parsed = JSON.parse(text);
@@ -338,7 +387,7 @@ export function useCoordinateEditor(
             return [
                 {
                     message: $gettext(
-                        'Unsupported geometry type "%{type}". Only Point, LineString, and Polygon are supported.',
+                        'Unsupported geometry type "%{type}" — only Point, LineString, and Polygon are supported.',
                         { type: String(parsed.geometry.type) },
                     ),
                 },
@@ -348,7 +397,8 @@ export function useCoordinateEditor(
             return [
                 {
                     message: $gettext(
-                        "The geometry type cannot change while editing an existing shape.",
+                        "Geometry type must stay %{kind} while editing this shape.",
+                        { kind: getKindLabel(kind.value) },
                     ),
                 },
             ];
@@ -358,40 +408,37 @@ export function useCoordinateEditor(
         if (positions.length < MINIMUM_VERTICES[parsedKind]) {
             return [
                 {
-                    message: $gettext(
-                        "Not enough valid coordinates for this geometry type.",
-                    ),
+                    message: getNotEnoughCoordinatesMessage(parsedKind),
                 },
             ];
         }
 
-        const newRows = rowsFromWgs84Positions(positions);
-        const newProperties = cloneProperties(parsed.properties);
+        const newRows = rowsFromWgs84Positions(positions, srid.value);
+        const newProperties = cloneDeep(parsed.properties ?? {});
         const hasChanged =
-            JSON.stringify(newRows) !== JSON.stringify(rows.value) ||
-            JSON.stringify(newProperties) !==
-                JSON.stringify(draftProperties.value);
+            !isEqual(newRows, draft.value.rows) ||
+            !isEqual(newProperties, draft.value.properties);
 
         if (hasChanged) {
-            recordSnapshot();
-            kind.value = parsedKind;
-            rows.value = newRows;
-            draftProperties.value = newProperties;
+            draft.value.kind = parsedKind;
+            draft.value.rows = newRows;
+            draft.value.properties = newProperties;
+            commit();
         }
         return [];
     }
 
     function submit(): boolean {
         if (rows.value.length < minimumVertices.value) {
-            errorMessage.value = $gettext(
-                "This geometry needs at least %{count} vertices.",
-                { count: String(minimumVertices.value) },
+            errorMessage.value = getMinimumVerticesMessage(
+                kind.value,
+                minimumVertices.value,
             );
             return false;
         }
         if (!areAllRowsComplete.value) {
             errorMessage.value = $gettext(
-                "Enter a valid number for every coordinate field.",
+                "Enter a valid number for every X and Y field.",
             );
             return false;
         }
@@ -406,21 +453,25 @@ export function useCoordinateEditor(
             updateDrawnFeature({
                 type: "Feature",
                 id: editingFeature.id,
-                properties: draftProperties.value,
+                properties: cloneDeep(draft.value.properties),
                 geometry,
             });
             return true;
         }
 
         const wasAdded = addFeatures([
-            { type: "Feature", properties: draftProperties.value, geometry },
+            {
+                type: "Feature",
+                properties: cloneDeep(draft.value.properties),
+                geometry,
+            },
         ]);
         if (!wasAdded) {
             return false;
         }
-        rows.value = createEmptyRows(minimumVertices.value);
-        draftProperties.value = {};
-        clearHistory();
+        draft.value.rows = createEmptyRows(minimumVertices.value);
+        draft.value.properties = {};
+        resetHistory();
         return false;
     }
 
@@ -434,13 +485,13 @@ export function useCoordinateEditor(
         decimalPlaces,
         axisLabels,
         minimumVertices,
+        areAllRowsComplete,
         previewGeometry,
         setKind,
         setSrid,
         updateRow,
         addRow,
         removeRow,
-        beginRowEdit,
         commitRowEdit,
         undo,
         getRowWgs84Position,

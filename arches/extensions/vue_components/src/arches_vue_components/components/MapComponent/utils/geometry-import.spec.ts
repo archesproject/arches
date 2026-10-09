@@ -91,6 +91,7 @@ describe("parseGeometryFile", () => {
             buildFile("broken.json", "{ not json"),
         );
         expect(error.code).toBe("parse-failed");
+        expect(error.reason).not.toBe("");
     });
 
     it("rejects files without features", async () => {

@@ -58,6 +58,7 @@ const drawToolOptions = computed(() => [
         value: COORDINATES_TOOL,
         label: $gettext("Coordinates"),
         icon: "pi pi-table",
+        title: $gettext("Add a geometry by typing its vertex coordinates"),
     },
 ]);
 

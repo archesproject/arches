@@ -4,7 +4,7 @@ import Button from "openvue/button";
 const SELECT_EVENT = "select" as const;
 
 const { options, activeValue } = defineProps<{
-    options: { value: Value; label: string; icon: string }[];
+    options: { value: Value; label: string; icon: string; title?: string }[];
     activeValue: Value | null;
 }>();
 
@@ -22,6 +22,7 @@ const emit = defineEmits<{
             :class="{ 'tool-button-active': option.value === activeValue }"
             :outlined="true"
             :aria-pressed="option.value === activeValue"
+            :title="option.title"
             @click="emit(SELECT_EVENT, option.value)"
         >
             <i

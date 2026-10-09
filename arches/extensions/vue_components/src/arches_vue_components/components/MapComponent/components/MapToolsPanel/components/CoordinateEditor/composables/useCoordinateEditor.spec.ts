@@ -162,7 +162,6 @@ describe("useCoordinateEditor", () => {
     it("records a single undo step per committed row edit", () => {
         const editor = useCoordinateEditor(buildContext(), null, "point");
 
-        editor.beginRowEdit();
         editor.updateRow(0, "x", 1);
         editor.updateRow(0, "x", 12);
         editor.commitRowEdit();

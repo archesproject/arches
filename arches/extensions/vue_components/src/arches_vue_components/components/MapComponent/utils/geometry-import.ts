@@ -1,4 +1,4 @@
-import geojsonhint from "@mapbox/geojsonhint/geojsonhint.js";
+import { getIssues } from "@placemarkio/check-geojson";
 import { kml } from "@tmcw/togeojson";
 import shp from "shpjs";
 
@@ -19,22 +19,25 @@ export type GeometryImportErrorCode =
 
 export class GeometryImportError extends Error {
     code: GeometryImportErrorCode;
+    reason: string;
 
-    constructor(code: GeometryImportErrorCode) {
+    constructor(code: GeometryImportErrorCode, reason = "") {
         super(code);
         this.code = code;
+        this.reason = reason;
     }
 }
 
-interface GeoJsonHint {
-    level?: string;
+export interface GeoJsonIssue {
     line?: number;
     message: string;
 }
 
-export function findGeoJsonErrors(text: string): GeoJsonHint[] {
-    const hints: GeoJsonHint[] = geojsonhint.hint(text);
-    return hints.filter((hint) => hint.level !== "message");
+export function findGeoJsonIssues(text: string): GeoJsonIssue[] {
+    return getIssues(text).map((issue) => ({
+        line: text.slice(0, issue.from).split("\n").length,
+        message: issue.message,
+    }));
 }
 
 function toFeatureCollection(geojson: GeoJSON): FeatureCollection {
@@ -72,8 +75,9 @@ async function parseFeatureCollections(
     if (extension === "kml") {
         return [kml(new DOMParser().parseFromString(text, "text/xml"))];
     }
-    if (findGeoJsonErrors(text).length) {
-        throw new GeometryImportError("parse-failed");
+    const [firstIssue] = findGeoJsonIssues(text);
+    if (firstIssue) {
+        throw new Error(firstIssue.message);
     }
     return [toFeatureCollection(JSON.parse(text))];
 }
@@ -87,8 +91,12 @@ export async function parseGeometryFile(file: File): Promise<Feature[]> {
     let collections: FeatureCollection[];
     try {
         collections = await parseFeatureCollections(file, extension);
-    } catch {
-        throw new GeometryImportError("parse-failed");
+    } catch (error) {
+        let reason = "";
+        if (error instanceof Error) {
+            reason = error.message;
+        }
+        throw new GeometryImportError("parse-failed", reason);
     }
 
     const features = collections

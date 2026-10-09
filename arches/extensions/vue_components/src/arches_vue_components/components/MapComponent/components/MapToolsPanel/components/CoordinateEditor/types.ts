@@ -9,8 +9,3 @@ export interface CompleteCoordinateRow {
     x: number;
     y: number;
 }
-
-export interface GeoJsonError {
-    line?: number;
-    message: string;
-}

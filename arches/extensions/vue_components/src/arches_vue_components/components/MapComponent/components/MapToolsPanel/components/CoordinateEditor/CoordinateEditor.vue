@@ -9,6 +9,7 @@ import {
     watch,
 } from "vue";
 
+import { debounce } from "es-toolkit";
 import { useGettext } from "vue3-gettext";
 
 import Button from "openvue/button";
@@ -30,16 +31,20 @@ import { useResolvedMapContext } from "@/arches_vue_components/components/MapCom
 import { useCoordinateEditor } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/composables/useCoordinateEditor.ts";
 import { useCoordinatePreview } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/composables/useCoordinatePreview.ts";
 
+import type { Geometry } from "geojson";
+
 import type {
     CoordinateEntryKind,
-    GeoJsonError,
+    CoordinateRow,
 } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/types.ts";
 import type { MapContext } from "@/arches_vue_components/components/MapComponent/types.ts";
+import type { GeoJsonIssue } from "@/arches_vue_components/components/MapComponent/utils/geometry-import.ts";
 
 const CLOSE_EVENT = "close" as const;
 const PREVIEW_DEBOUNCE_MILLISECONDS = 300;
 const GEOJSON_APPLY_DEBOUNCE_MILLISECONDS = 200;
 const VERTEX_FOCUS_ZOOM = 17;
+const EDITING_LABEL_PLACEHOLDER = "%{label}";
 
 type DisplayMode = "vertices" | "geojson";
 
@@ -78,13 +83,13 @@ const {
     decimalPlaces,
     axisLabels,
     minimumVertices,
+    areAllRowsComplete,
     previewGeometry,
     setKind,
     setSrid,
     updateRow,
     addRow,
     removeRow,
-    beginRowEdit,
     commitRowEdit,
     undo,
     getRowWgs84Position,
@@ -99,10 +104,21 @@ const sridSelectId = useId();
 const displayMode = ref<DisplayMode>("vertices");
 const focusedRowIndex = ref<number | null>(null);
 const geoJsonText = ref("");
-const geoJsonErrors = ref<GeoJsonError[]>([]);
+const geoJsonErrors = ref<GeoJsonIssue[]>([]);
 
-let previewTimer: ReturnType<typeof setTimeout> | undefined;
-let geoJsonTimer: ReturnType<typeof setTimeout> | undefined;
+let hasFittedDraft = false;
+
+const refreshPreviewDebounced = debounce(
+    refreshPreview,
+    PREVIEW_DEBOUNCE_MILLISECONDS,
+);
+const followFocusedRowDebounced = debounce(
+    followFocusedRow,
+    PREVIEW_DEBOUNCE_MILLISECONDS,
+);
+const applyPendingGeoJsonText = debounce(() => {
+    geoJsonErrors.value = applyGeoJsonText(geoJsonText.value);
+}, GEOJSON_APPLY_DEBOUNCE_MILLISECONDS);
 
 const displayModeOptions = [
     { value: "vertices", label: $gettext("Vertices"), icon: "pi pi-list" },
@@ -144,6 +160,28 @@ const editingFeatureLabel = computed(() => {
     return labelsByFeatureId.value[editingFeatureId];
 });
 
+const editingLabelParts = computed(() => {
+    const template = $gettext("Editing %{label}", {
+        label: EDITING_LABEL_PLACEHOLDER,
+    });
+    const [before, after = ""] = template.split(EDITING_LABEL_PLACEHOLDER);
+    return { before, after };
+});
+
+const centerTitle = computed(() => {
+    if (displayMode.value === "vertices") {
+        return $gettext("Center map on the focused vertex");
+    }
+    return $gettext("Center map on this geometry");
+});
+
+const undoTitle = computed(() => {
+    if (displayMode.value === "vertices") {
+        return $gettext("Undo the last vertex edit");
+    }
+    return $gettext("Undo the last edit");
+});
+
 const listHeaderLabel = computed(() => {
     if (displayMode.value === "vertices") {
         return $gettext("Vertices");
@@ -165,21 +203,16 @@ const submitLabel = computed(() => {
     return $gettext("Add geometry");
 });
 
-watch(previewGeometry, (geometry) => {
-    clearTimeout(previewTimer);
-    previewTimer = setTimeout(
-        () => showPreviewGeometry(geometry),
-        PREVIEW_DEBOUNCE_MILLISECONDS,
-    );
-});
+watch(previewGeometry, refreshPreviewDebounced);
 
 watch(focusedRowPosition, (position) => {
     showVertexHighlight(position);
 });
 
 onUnmounted(() => {
-    clearTimeout(previewTimer);
-    clearTimeout(geoJsonTimer);
+    refreshPreviewDebounced.cancel();
+    followFocusedRowDebounced.cancel();
+    applyPendingGeoJsonText.cancel();
 });
 
 function selectKind(newKind: CoordinateEntryKind): void {
@@ -197,15 +230,20 @@ function setDisplayMode(mode: DisplayMode): void {
 
 function updateGeoJsonText(text: string): void {
     geoJsonText.value = text;
-    clearTimeout(geoJsonTimer);
-    geoJsonTimer = setTimeout(() => {
-        geoJsonErrors.value = applyGeoJsonText(text);
-    }, GEOJSON_APPLY_DEBOUNCE_MILLISECONDS);
+    applyPendingGeoJsonText();
+}
+
+function handleRowUpdate(
+    index: number,
+    axis: keyof CoordinateRow,
+    value: number | null,
+): void {
+    updateRow(index, axis, value);
+    followFocusedRowDebounced();
 }
 
 function handleRowFocus(index: number): void {
     focusedRowIndex.value = index;
-    beginRowEdit();
 }
 
 function handleRowRemove(index: number): void {
@@ -222,13 +260,8 @@ async function handleAddRow(): Promise<void> {
     vertexTable.value?.focusRow(insertedIndex);
 }
 
-function flushPendingGeoJsonText(): void {
-    clearTimeout(geoJsonTimer);
-    geoJsonErrors.value = applyGeoJsonText(geoJsonText.value);
-}
-
 function handleUndo(): void {
-    clearTimeout(geoJsonTimer);
+    applyPendingGeoJsonText.cancel();
     undo();
     if (displayMode.value === "geojson") {
         geoJsonText.value = buildGeoJsonText();
@@ -236,29 +269,52 @@ function handleUndo(): void {
     }
 }
 
+function refreshPreview(geometry: Geometry | null): void {
+    showPreviewGeometry(geometry);
+
+    if (!geometry || !areAllRowsComplete.value || kind.value === POINT) {
+        hasFittedDraft = false;
+        return;
+    }
+    if (editingFeature || hasFittedDraft) {
+        return;
+    }
+
+    hasFittedDraft = true;
+    followFocusedRowDebounced.cancel();
+    fitToGeometry(geometry);
+}
+
+function followFocusedRow(): void {
+    if (!focusedRowPosition.value) {
+        return;
+    }
+
+    const [longitude, latitude] = focusedRowPosition.value;
+    map.value?.flyTo({
+        center: [longitude, latitude],
+        zoom: Math.max(map.value.getZoom(), VERTEX_FOCUS_ZOOM),
+        essential: true,
+    });
+}
+
+function fitToGeometry(geometry: Geometry): void {
+    fitToFeatures([{ type: "Feature", properties: {}, geometry }]);
+}
+
 function centerMap(): void {
     if (displayMode.value === "vertices" && focusedRowPosition.value) {
-        const [longitude, latitude] = focusedRowPosition.value;
-        map.value?.flyTo({
-            center: [longitude, latitude],
-            zoom: Math.max(map.value.getZoom(), VERTEX_FOCUS_ZOOM),
-        });
+        followFocusedRow();
         return;
     }
     if (previewGeometry.value) {
-        fitToFeatures([
-            {
-                type: "Feature",
-                properties: {},
-                geometry: previewGeometry.value,
-            },
-        ]);
+        fitToGeometry(previewGeometry.value);
     }
 }
 
 function handleSubmit(): void {
     if (displayMode.value === "geojson") {
-        flushPendingGeoJsonText();
+        applyPendingGeoJsonText.flush();
         if (geoJsonErrors.value.length) {
             return;
         }
@@ -297,11 +353,9 @@ function handleSubmit(): void {
                     :class="editingIconClass"
                 />
                 <span>
-                    {{
-                        $gettext("Editing %{label}", {
-                            label: editingFeatureLabel,
-                        })
-                    }}
+                    {{ editingLabelParts.before
+                    }}<strong>{{ editingFeatureLabel }}</strong
+                    >{{ editingLabelParts.after }}
                 </span>
             </div>
             <SelectButton
@@ -352,6 +406,7 @@ function handleSubmit(): void {
                     <Button
                         icon="pi pi-search-plus"
                         size="small"
+                        :title="centerTitle"
                         :label="$gettext('Center')"
                         :link="true"
                         :disabled="!canCenter"
@@ -360,6 +415,7 @@ function handleSubmit(): void {
                     <Button
                         icon="pi pi-undo"
                         size="small"
+                        :title="undoTitle"
                         :label="$gettext('Undo')"
                         :link="true"
                         :disabled="!canUndo"
@@ -375,7 +431,7 @@ function handleSubmit(): void {
                     :decimal-places="decimalPlaces"
                     :minimum-vertices="minimumVertices"
                     :highlighted-row-index="focusedRowIndex"
-                    @update-row="updateRow"
+                    @update-row="handleRowUpdate"
                     @focus-row="handleRowFocus"
                     @blur-row="commitRowEdit"
                     @remove-row="handleRowRemove"

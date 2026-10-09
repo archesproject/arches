@@ -91,6 +91,7 @@ function focusRow(index: number): void {
             <Button
                 v-if="rows.length > minimumVertices"
                 icon="pi pi-trash"
+                :title="$gettext('Remove vertex')"
                 severity="secondary"
                 size="small"
                 :aria-label="
