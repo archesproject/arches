@@ -1087,6 +1087,11 @@ class PermissionDataView(View):
             perm.pk: {"codename": perm.codename, "name": perm.name}
             for perm in nodegroup_permissions
         }
+        read_permission_ids = {
+            pk
+            for pk, perm in perm_lookup.items()
+            if perm["codename"] == "read_nodegroup"
+        }
 
         def to_perms(permission_ids):
             return sorted(
@@ -1141,8 +1146,11 @@ class PermissionDataView(View):
                 source = "group:" + ", ".join(sorted(group_perms[nodegroup_id]))
                 effective_ids = inherited_ids
             else:
+                # nodegroups without explicit perms are readable by everyone
+                # (see get_nodegroups_by_perm_for_user_or_group); write/delete
+                # fall back to model-level perms (see PermissionBackend.has_perm)
                 source = "default"
-                effective_ids = default_permission_ids
+                effective_ids = default_permission_ids | read_permission_ids
 
             effective = to_perms(effective_ids)
             if any(perm["codename"] == "no_access_to_nodegroup" for perm in effective):
