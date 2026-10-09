@@ -489,3 +489,43 @@ class SpatialViewTriggerTests(ArchesTransactionTestCase):
 
         # will throw if spatial view doesn't exist
         spatialview.refresh_from_db()
+
+    def role_can_select_views(self, role, slug):
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT bool_and(has_table_privilege(%s, format('public.%%s_%%s', %s::text, g), 'SELECT'))
+                FROM unnest(array['point', 'linestring', 'polygon']) g
+                """,
+                [role, slug],
+            )
+            return cursor.fetchone()[0]
+
+    def test_dbroles_granted_select_and_survive_refresh(self):
+        role = f"sv_test_reader_{uuid.uuid4().hex[:8]}"
+        with connection.cursor() as cursor:
+            cursor.execute(f'CREATE ROLE "{role}" NOLOGIN')
+
+        def drop_role():
+            with connection.cursor() as cursor:
+                cursor.execute(f'DROP OWNED BY "{role}"; DROP ROLE IF EXISTS "{role}"')
+
+        self.addCleanup(drop_role)
+
+        spatialview = self.test_spatial_view
+        self.assertFalse(self.role_can_select_views(role, spatialview.slug))
+
+        # nonexistent roles are skipped rather than failing the rebuild
+        spatialview.dbroles = [role, "sv_test_role_that_does_not_exist"]
+        spatialview.full_clean()
+        spatialview.save()
+        self.assertTrue(self.role_can_select_views(role, spatialview.slug))
+
+        # bulk loads drop and recreate every view
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT __arches_refresh_spatial_views()")
+        self.assertTrue(self.role_can_select_views(role, spatialview.slug))
+
+        spatialview.dbroles = []
+        spatialview.save()
+        self.assertFalse(self.role_can_select_views(role, spatialview.slug))
