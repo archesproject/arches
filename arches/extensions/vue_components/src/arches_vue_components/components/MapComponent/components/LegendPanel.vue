@@ -8,7 +8,7 @@ import Button from "openvue/button";
 
 import OverlaySwatch from "@/arches_vue_components/components/MapComponent/components/OverlaySwatch.vue";
 
-import { panelHeaderActionsIdKey } from "@/arches_vue_components/components/MapComponent/components/FloatingPanel/injection-keys.ts";
+import { panelHeaderActionsIdKey } from "@/arches_vue_components/components/MapComponent/constants.ts";
 import { useResolvedMapContext } from "@/arches_vue_components/components/MapComponent/composables/useMapContext.ts";
 import { getOverlayOpacityPercent } from "@/arches_vue_components/components/MapComponent/utils/overlay-opacity.ts";
 

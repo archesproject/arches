@@ -1,3 +1,5 @@
+import type { InjectionKey } from "vue";
+
 import type { MapSettings } from "@/arches_vue_components/components/MapComponent/types.ts";
 
 export const BUFFER_FILL_COLOR = "#ea7f08";
@@ -70,3 +72,7 @@ export const DEFAULT_MAP_SETTINGS: MapSettings = {
     scrollZoomRequiresKey: false,
     allow3d: false,
 };
+
+export const panelHeaderActionsIdKey: InjectionKey<string> = Symbol(
+    "panelHeaderActionsId",
+);

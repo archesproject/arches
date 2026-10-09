@@ -5,7 +5,7 @@ import { useGettext } from "vue3-gettext";
 
 import Button from "openvue/button";
 
-import { panelHeaderActionsIdKey } from "@/arches_vue_components/components/MapComponent/components/FloatingPanel/injection-keys.ts";
+import { panelHeaderActionsIdKey } from "@/arches_vue_components/components/MapComponent/constants.ts";
 
 const CLOSE_EVENT = "close" as const;
 

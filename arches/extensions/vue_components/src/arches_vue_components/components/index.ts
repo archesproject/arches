@@ -2,7 +2,7 @@ export { default as BasemapPanel } from "@/arches_vue_components/components/MapC
 export { default as CoordinateEditor } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/CoordinateEditor.vue";
 export { default as FeaturePopup } from "@/arches_vue_components/components/MapComponent/components/FeaturePopup.vue";
 export { default as FileDropZone } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/FileDropZone.vue";
-export { default as FloatingPanel } from "@/arches_vue_components/components/MapComponent/components/FloatingPanel/FloatingPanel.vue";
+export { default as FloatingPanel } from "@/arches_vue_components/components/MapComponent/components/FloatingPanel.vue";
 export { default as GeometryList } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/GeometryList.vue";
 export { default as GeometryRow } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/GeometryRow.vue";
 export { default as LegendPanel } from "@/arches_vue_components/components/MapComponent/components/LegendPanel.vue";
