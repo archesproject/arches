@@ -211,7 +211,9 @@ class ResourceEditorView(MapBaseManagerView):
             if len(primary_descriptor_functions) > 0
             else None
         )
-        user_is_reviewer = user_is_resource_reviewer(request.user)
+        user_is_reviewer = user_is_resource_reviewer(
+            request.user, resource=resource_instance, graph=graph
+        )
         is_system_settings = False
         if resource_instance is None:
             tiles = []
@@ -488,7 +490,8 @@ class ResourcePermissionDataView(View):
                     user, resource_instance
                 ),
                 "is_editor_or_reviewer": bool(
-                    user_is_resource_editor(user) or user_is_resource_reviewer(user)
+                    user_is_resource_editor(user, resource=resource_instance)
+                    or user_is_resource_reviewer(user, resource=resource_instance)
                 ),
             }
             for user in User.objects.prefetch_related("groups")

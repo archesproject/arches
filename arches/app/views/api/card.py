@@ -35,7 +35,9 @@ class Card(APIBase):
                 ):
                     permitted_nodegroups.append(node.nodegroup)
 
-        user_is_reviewer = user_is_resource_reviewer(request.user)
+        user_is_reviewer = user_is_resource_reviewer(
+            request.user, resource=resource_instance, graph=graph
+        )
 
         if resource_instance is None:
             tiles = []

@@ -14,6 +14,7 @@ from arches.app.search.components.base import BaseSearchFilter
 from arches.app.search.components.resource_type_filter import get_permitted_graphids
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.utils import permission_backend
+from django.db.models.query import prefetch_related_objects
 from django.utils.translation import get_language, gettext as _
 
 details = {
@@ -95,14 +96,14 @@ class SearchResultsFilter(BaseSearchFilter):
 
     def post_search_hook(self, search_query_object, response_object, **kwargs):
         permitted_nodegroups = kwargs.get("permitted_nodegroups")
-        user_is_reviewer = user_is_resource_reviewer(self.request.user)
 
         descriptor_types = ("displaydescription", "displayname")
         active_and_default_language_codes = (get_language(), settings.LANGUAGE_CODE)
+        prefetch_related_objects([self.request.user], "groups")
         groups = [group.id for group in self.request.user.groups.all()]
         response_object["groups"] = groups
 
-        # only reuturn points and geometries a user is allowed to view
+        # only return points and geometries a user is allowed to view
         geojson_nodes = get_nodegroups_by_datatype_and_perm(
             self.request, "geojson-feature-collection", "read_nodegroup"
         )
@@ -112,6 +113,10 @@ class SearchResultsFilter(BaseSearchFilter):
                 permission_backend.get_search_ui_permissions(
                     self.request.user, result, groups
                 )
+            )
+            resource_id = result.get("_id")
+            user_is_reviewer = user_is_resource_reviewer(
+                self.request.user, resource=resource_id
             )
             result["_source"]["points"] = select_geoms_for_results(
                 result["_source"]["points"], geojson_nodes, user_is_reviewer

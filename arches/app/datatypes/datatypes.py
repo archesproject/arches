@@ -1351,7 +1351,9 @@ class FileListDataType(BaseDataType):
             # this does not get called when saving data from the mobile app
             previously_saved_tile = models.TileModel.objects.filter(pk=tile.tileid)
             user = request.user
-            user_is_reviewer = user_is_resource_reviewer(request.user)
+            user_is_reviewer = user_is_resource_reviewer(
+                request.user, resource=tile.resourceinstance
+            )
             current_tile_data = self.get_tile_data(tile)
             if previously_saved_tile.count() == 1:
                 previously_saved_tile_data = self.get_tile_data(
