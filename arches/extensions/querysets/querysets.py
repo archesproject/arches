@@ -13,7 +13,7 @@ from packaging.version import Version
 
 arches_version = Version(_arches_version_str)
 from arches.app.models.models import Node
-from arches.app.utils.permission_backend import user_is_resource_reviewer
+from arches.extensions.querysets.utils.models import get_provisional_edits_for_user
 
 from arches.extensions.querysets.datatypes.datatypes import DataTypeFactory
 from arches.extensions.querysets.utils.models import (
@@ -24,25 +24,8 @@ from arches.extensions.querysets.utils.models import (
 NOT_PROVIDED = object()
 
 
-def _resolve_provisional_data(tile, provisional_edits_for_user):
-    """Return the user's own provisional edit value, or None for authoritative data."""
-    if provisional_edits_for_user is None or not tile.provisionaledits:
-        return None
-
-    if user_is_resource_reviewer(provisional_edits_for_user):
-        return None
-
-    user_id_str = str(provisional_edits_for_user.pk)
-    provisional = tile.provisionaledits
-
-    if user_id_str in provisional:
-        return provisional[user_id_str]["value"]
-
-    return None
-
-
 def reprocess_tiles_aliased_data(
-    tiles, as_representation, grouping_node_lookup, *, provisional_edits_for_user=None
+    tiles, as_representation, grouping_node_lookup, *, provisional_edits_user=None
 ):
     """Re-run aliased_data processing for a specific list of tiles.
 
@@ -58,9 +41,9 @@ def reprocess_tiles_aliased_data(
     for tile in tiles:
         tile.aliased_data = AliasedData()
         tile._as_representation = as_representation
-        tile._provisional_edits_for_user = provisional_edits_for_user
+        tile._provisional_edits_user = provisional_edits_user
 
-        provisional_data = _resolve_provisional_data(tile, provisional_edits_for_user)
+        provisional_data = get_provisional_edits_for_user(tile, provisional_edits_user)
         if provisional_data is not None:
             data_overrides[tile.pk] = tile.data
             tile.data = provisional_data
@@ -106,7 +89,7 @@ def reprocess_tiles_aliased_data(
                 setattr(tile.aliased_data, child_nodegroup_alias, existing)
             child_tile.parent = tile
             child_tile._as_representation = as_representation
-            child_tile._provisional_edits_for_user = provisional_edits_for_user
+            child_tile._provisional_edits_user = provisional_edits_user
 
         # Set default empty values for child nodegroups that have no tiles.
         child_nodegroups = (
@@ -210,7 +193,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         depth=20,
         nodes=None,
         graph_query=None,
-        provisional_edits_for_user=None,
+        provisional_edits_user=None,
     ):
         """
         Entry point for filtering arches data by nodegroups.
@@ -285,7 +268,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
             graph_slug=graph_slug,
             graph_query=graph_query,
             nodes=nodes,
-            provisional_edits_for_user=provisional_edits_for_user,
+            provisional_edits_user=provisional_edits_user,
         )
 
         # Future: see various solutions mentioned here for avoiding
@@ -299,7 +282,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
                 depth=depth - 1,
                 nodes=resolved_nodes,
                 graph_query=graph_query,
-                provisional_edits_for_user=provisional_edits_for_user,
+                provisional_edits_user=provisional_edits_user,
             )
 
             qs = qs.prefetch_related(
@@ -352,7 +335,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
 
         nodes = self._hints.get("nodes")
         node_pks = {node.pk for node in nodes} if nodes is not None else None
-        provisional_edits_for_user = self._hints.get("provisional_edits_for_user")
+        user = self._hints.get("provisional_edits_user")
 
         aliased_data_to_update = {}
         values_by_datatype = defaultdict(list)
@@ -366,9 +349,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
                 return  # already set
             tile.sync_private_attributes(self)
 
-            provisional_data = _resolve_provisional_data(
-                tile, provisional_edits_for_user
-            )
+            provisional_data = get_provisional_edits_for_user(tile, user)
             if provisional_data is not None:
                 data_overrides[tile.pk] = tile.data
                 tile.data = provisional_data
@@ -488,7 +469,7 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         nodes=None,
         depth=20,
         graph_query=None,
-        provisional_edits_for_user=None,
+        provisional_edits_user=None,
     ):
         """Aliases a ResourceTileTreeQuerySet with tile data unpacked
         and mapped onto nodegroup aliases, e.g.:
@@ -543,7 +524,7 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         self._add_hints(
             as_representation=as_representation,
             graph_query=graph_query,
-            provisional_edits_for_user=provisional_edits_for_user,
+            provisional_edits_user=provisional_edits_user,
         )
 
         if not nodes:
@@ -587,7 +568,7 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
                         nodes=nodes,
                         graph_query=graph_query,
                         depth=depth,
-                        provisional_edits_for_user=provisional_edits_for_user,
+                        provisional_edits_user=provisional_edits_user,
                     ).filter(parenttile=None),
                     to_attr="_tile_trees",
                 ),
@@ -651,9 +632,7 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
 
         for resource in self._result_cache:
             resource._as_representation = self._hints.get("as_representation", False)
-            resource._provisional_edits_for_user = self._hints.get(
-                "provisional_edits_for_user"
-            )
+            resource._provisional_edits_user = self._hints.get("provisional_edits_user")
 
             # Prepare empty aliased data containers.
             for grouping_node in grouping_nodes.values():

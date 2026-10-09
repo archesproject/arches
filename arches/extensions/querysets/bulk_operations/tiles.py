@@ -32,6 +32,7 @@ from arches.extensions.querysets.utils.models import (
     field_attnames,
     get_nodegroups_here_and_below,
     pop_arches_model_kwargs,
+    get_provisional_edits_for_user,
 )
 
 logger = logging.getLogger(__name__)
@@ -418,17 +419,8 @@ class TileTreeOperation:
         # For a non-reviewer with an existing provisional edit, compare incoming
         # against their provisional values rather than the authoritative data.
         user = getattr(self.request, "user", None)
-        user_provisional_edit = (
-            not user_is_resource_reviewer(user)
-            and (original_tile.get("provisionaledits") or {}).get(str(user.pk))
-            if user
-            else None
-        )
-        existing_data = (
-            user_provisional_edit["value"]
-            if user_provisional_edit
-            else original_tile["data"]
-        )
+        provisional_data = get_provisional_edits_for_user(original_tile, user)
+        existing_data = provisional_data or original_tile["data"]
 
         incoming_aliased = incoming.aliased_data
 

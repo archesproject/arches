@@ -36,6 +36,7 @@ from arches.extensions.querysets.utils.models import (
     append_tiles_recursively,
     ensure_request,
     pop_arches_model_kwargs,
+    get_provisional_edits_for_user,
 )
 from arches.extensions.querysets.tasks import index_resource
 import arches.app.utils.task_management as task_management
@@ -115,7 +116,7 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
     def __init__(self, *args, **kwargs):
         self._as_representation = kwargs.pop("__as_representation", False)
         self._request = kwargs.pop("__request", None)
-        self._provisional_edits_for_user = None
+        self._provisional_edits_user = None
         arches_model_kwargs, other_kwargs = pop_arches_model_kwargs(
             kwargs, self._meta.get_fields()
         )
@@ -207,7 +208,7 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         as_representation=False,
         nodes=None,
         graph_query=None,
-        provisional_edits_for_user=None,
+        provisional_edits_user=None,
     ):
         """Return a chainable QuerySet for a requested graph's instances,
         with tile data keyed by node and nodegroup aliases.
@@ -220,7 +221,7 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
             as_representation=as_representation,
             nodes=nodes,
             graph_query=graph_query,
-            provisional_edits_for_user=provisional_edits_for_user,
+            provisional_edits_user=provisional_edits_user,
         )
 
     def append_tile(self, nodegroup_alias):
@@ -291,9 +292,7 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
                 as_representation=getattr(self, "_as_representation", False),
                 nodes=nodes or None,
                 graph_query=graph_query,
-                provisional_edits_for_user=getattr(
-                    self, "_provisional_edits_for_user", None
-                ),
+                provisional_edits_user=getattr(self, "_provisional_edits_user", None),
             )
         self._refresh_aliased_data(using, fields, from_queryset)
 
@@ -518,9 +517,7 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
                 tiles_to_reprocess,
                 as_representation=getattr(self, "_as_representation", False),
                 grouping_node_lookup=grouping_node_lookup,
-                provisional_edits_for_user=getattr(
-                    self, "_provisional_edits_for_user", None
-                ),
+                provisional_edits_user=getattr(self, "_provisional_edits_user", None),
             )
 
         # Step 5: Rebuild the resource's top-level aliased_data from the updated tree.
@@ -579,7 +576,7 @@ class TileTree(TileModel, AliasedDataMixin):
     def __init__(self, *args, **kwargs):
         self._as_representation = kwargs.pop("__as_representation", False)
         self._request = kwargs.pop("__request", None)
-        self._provisional_edits_for_user = None
+        self._provisional_edits_user = None
         arches_model_kwargs, other_kwargs = pop_arches_model_kwargs(
             kwargs, self._meta.get_fields()
         )
@@ -672,7 +669,7 @@ class TileTree(TileModel, AliasedDataMixin):
         as_representation=False,
         nodes=None,
         depth=20,
-        provisional_edits_for_user=None,
+        provisional_edits_user=None,
     ):
         """See `arches.extensions.querysets.querysets.TileTreeQuerySet.get_tiles`."""
         return cls.objects.get_tiles(
@@ -682,7 +679,7 @@ class TileTree(TileModel, AliasedDataMixin):
             as_representation=as_representation,
             nodes=nodes,
             depth=depth,
-            provisional_edits_for_user=provisional_edits_for_user,
+            provisional_edits_user=provisional_edits_user,
         )
 
     def serialize(self, **kwargs):
@@ -771,13 +768,13 @@ class TileTree(TileModel, AliasedDataMixin):
     def sync_private_attributes(self, source):
         if isinstance(source, models.QuerySet):
             self._as_representation = source._hints.get("as_representation", False)
-            self._provisional_edits_for_user = source._hints.get(
-                "provisional_edits_for_user", None
+            self._provisional_edits_user = source._hints.get(
+                "provisional_edits_user", None
             )
         else:
             self._as_representation = source._as_representation
-            self._provisional_edits_for_user = getattr(
-                source, "_provisional_edits_for_user", None
+            self._provisional_edits_user = getattr(
+                source, "_provisional_edits_user", None
             )
 
     def append_tile(self, nodegroup_alias):
@@ -1020,9 +1017,7 @@ class TileTree(TileModel, AliasedDataMixin):
                 self.resourceinstance.graph.slug,
                 nodegroup_alias=self.find_nodegroup_alias(),
                 as_representation=getattr(self, "_as_representation", False),
-                provisional_edits_for_user=getattr(
-                    self, "_provisional_edits_for_user", None
-                ),
+                provisional_edits_user=getattr(self, "_provisional_edits_user", None),
             )
         self._refresh_aliased_data(using, fields, from_queryset)
 
@@ -1050,17 +1045,8 @@ class TileTree(TileModel, AliasedDataMixin):
         # tile.data against their provisional values rather than the authoritative
         # data.
         user = getattr(request or self._request, "user", None)
-        user_provisional_edit = (
-            not user_is_resource_reviewer(user)
-            and (original_tile.get("provisionaledits") or {}).get(str(user.pk))
-            if user
-            else None
-        )
-        existing_data = (
-            user_provisional_edit["value"]
-            if user_provisional_edit
-            else original_tile["data"]
-        )
+        provisional_data = get_provisional_edits_for_user(original_tile, user)
+        existing_data = provisional_data or original_tile["data"]
 
         for node in self.nodegroup.node_set.all():
             if node.datatype == "semantic":
