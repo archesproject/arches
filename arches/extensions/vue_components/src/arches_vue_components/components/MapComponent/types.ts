@@ -1,6 +1,6 @@
 import type { Component, ComputedRef, Ref, ShallowRef } from "vue";
 import type { Feature, FeatureCollection, GeoJSON, Geometry } from "geojson";
-import type { Map as MaplibreMap, MapGeoJSONFeature } from "maplibre-gl";
+import type { Map as MaplibreMap } from "maplibre-gl";
 
 export interface Basemap {
     id: string;
@@ -121,10 +121,11 @@ export interface MapContext {
     setOverlayOpacity: (overlay: MapLayer, opacityPercent: number) => void;
     showFeatureHighlight: (geometries: Geometry[]) => void;
     clearFeatureHighlight: () => void;
+    closeFeaturePopup: () => void;
 }
 
 export interface FeaturePopupProps {
-    features: MapGeoJSONFeature[];
+    features: Feature[];
     context?: MapContext;
 }
 

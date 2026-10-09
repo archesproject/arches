@@ -2,9 +2,11 @@ import { ref, shallowRef, watch } from "vue";
 
 import * as maplibregl from "maplibre-gl";
 
-import { uniqBy } from "es-toolkit";
+import { buffer } from "@turf/turf";
+import { partition, uniqBy } from "es-toolkit";
 
 import {
+    FEATURE_HIGHLIGHT_BUFFER_METERS,
     FEATURE_HIGHLIGHT_COLOR,
     FEATURE_HIGHLIGHT_LINE_WIDTH,
     FEATURE_HIGHLIGHT_OUTLINE_LAYER_ID,
@@ -12,10 +14,11 @@ import {
     FEATURE_HIGHLIGHT_POINT_RADIUS,
     FEATURE_HIGHLIGHT_SOURCE_ID,
 } from "@/arches_vue_components/components/MapComponent/constants.ts";
+import { fetchClusterResourceIds } from "@/arches_vue_components/components/MapComponent/api.ts";
 import { geometriesToFeatureCollection } from "@/arches_vue_components/components/MapComponent/utils/feature-collection.ts";
 
 import type { ComputedRef, Ref, ShallowRef } from "vue";
-import type { Geometry } from "geojson";
+import type { Feature, Geometry } from "geojson";
 import type {
     GeoJSONSource,
     LngLat,
@@ -30,8 +33,11 @@ import type { MapContext } from "@/arches_vue_components/components/MapComponent
 const POINT_GEOMETRY_TYPES = ["Point", "MultiPoint"];
 
 export interface UseFeaturePopupReturn
-    extends Pick<MapContext, "showFeatureHighlight" | "clearFeatureHighlight"> {
-    popupFeatures: ShallowRef<MapGeoJSONFeature[]>;
+    extends Pick<
+        MapContext,
+        "showFeatureHighlight" | "clearFeatureHighlight" | "closeFeaturePopup"
+    > {
+    popupFeatures: ShallowRef<Feature[]>;
     popupContainer: Ref<HTMLElement | null>;
 }
 
@@ -41,10 +47,11 @@ export function useFeaturePopup(
     isActivelyDrawingOrEditing: () => boolean,
     isDrawnFeatureOnTop: (point: MapMouseEvent["point"]) => boolean,
 ): UseFeaturePopupReturn {
-    const popupFeatures = shallowRef<MapGeoJSONFeature[]>([]);
+    const popupFeatures = shallowRef<Feature[]>([]);
     const popupContainer = ref<HTMLElement | null>(null);
 
     let activePopup: Popup | null = null;
+    let latestClickToken = 0;
 
     watch(
         map,
@@ -60,6 +67,8 @@ export function useFeaturePopup(
     );
 
     function handleMapClick(event: MapMouseEvent): void {
+        latestClickToken += 1;
+
         if (!overlayLayerIds.value.length) {
             return;
         }
@@ -78,25 +87,63 @@ export function useFeaturePopup(
             return;
         }
 
-        openFeaturePopup(deduplicateFeatures(features), event.lngLat);
+        if (isClusterFeature(features[0])) {
+            openClusterPopup(features[0], event.lngLat);
+            return;
+        }
+
+        const resourceFeatures = getResourceFeatures(features);
+        if (resourceFeatures.length) {
+            openFeaturePopup(resourceFeatures, event.lngLat);
+        }
     }
 
-    function deduplicateFeatures(
+    function isClusterFeature(feature: MapGeoJSONFeature): boolean {
+        return feature.properties.total > 1;
+    }
+
+    async function openClusterPopup(
+        clusterFeature: MapGeoJSONFeature,
+        lngLat: LngLat,
+    ): Promise<void> {
+        const clickToken = latestClickToken;
+
+        try {
+            const resourceIds = await fetchClusterResourceIds(
+                clusterFeature.sourceLayer!,
+                clusterFeature.properties.extent,
+            );
+            if (clickToken !== latestClickToken || !resourceIds.length) {
+                return;
+            }
+
+            openFeaturePopup(
+                resourceIds.map((resourceId) => ({
+                    type: "Feature",
+                    properties: { resourceinstanceid: resourceId },
+                    geometry: clusterFeature.geometry,
+                })),
+                lngLat,
+            );
+        } catch (error) {
+            console.error("Error fetching cluster resources:", error);
+        }
+    }
+
+    function getResourceFeatures(
         features: MapGeoJSONFeature[],
     ): MapGeoJSONFeature[] {
-        const identifiableFeatures = features.filter(
-            (feature) => feature.properties?.resourceinstanceid || feature.id,
+        const resourceFeatures = features.filter(
+            (feature) => feature.properties.resourceinstanceid,
         );
 
-        return uniqBy(identifiableFeatures, (feature) =>
-            String(feature.properties?.resourceinstanceid ?? feature.id),
+        return uniqBy(
+            resourceFeatures,
+            (feature) => feature.properties.resourceinstanceid,
         );
     }
 
-    function openFeaturePopup(
-        features: MapGeoJSONFeature[],
-        lngLat: LngLat,
-    ): void {
+    function openFeaturePopup(features: Feature[], lngLat: LngLat): void {
         activePopup?.remove();
 
         const container = document.createElement("div");
@@ -105,6 +152,7 @@ export function useFeaturePopup(
         activePopup = new maplibregl.Popup({
             maxWidth: "none",
             className: "feature-info-popup",
+            closeButton: false,
         })
             .setDOMContent(container)
             .setLngLat(lngLat)
@@ -121,6 +169,10 @@ export function useFeaturePopup(
         });
     }
 
+    function closeFeaturePopup(): void {
+        activePopup?.remove();
+    }
+
     function handleMapMousemove(event: MapMouseEvent): void {
         const canvas = map.value!.getCanvas();
 
@@ -132,8 +184,13 @@ export function useFeaturePopup(
         const features = map.value!.queryRenderedFeatures(event.point, {
             layers: overlayLayerIds.value,
         });
+        const isOverClickableFeature = features.some(
+            (feature) =>
+                isClusterFeature(feature) ||
+                feature.properties.resourceinstanceid,
+        );
 
-        canvas.style.cursor = features.length ? "pointer" : "";
+        canvas.style.cursor = isOverClickableFeature ? "pointer" : "";
     }
 
     function ensureHighlightLayers(): void {
@@ -187,10 +244,26 @@ export function useFeaturePopup(
             return;
         }
 
+        const [pointGeometries, shapeGeometries] = partition(
+            geometries,
+            (geometry) => POINT_GEOMETRY_TYPES.includes(geometry.type),
+        );
+        const bufferedShapes = buffer(
+            geometriesToFeatureCollection(shapeGeometries),
+            FEATURE_HIGHLIGHT_BUFFER_METERS,
+            { units: "meters" },
+        );
+
         ensureHighlightLayers();
         (
             map.value.getSource(FEATURE_HIGHLIGHT_SOURCE_ID) as GeoJSONSource
-        ).setData(geometriesToFeatureCollection(geometries));
+        ).setData({
+            type: "FeatureCollection",
+            features: [
+                ...geometriesToFeatureCollection(pointGeometries).features,
+                ...bufferedShapes.features,
+            ],
+        });
     }
 
     function clearFeatureHighlight(): void {
@@ -206,5 +279,6 @@ export function useFeaturePopup(
         popupContainer,
         showFeatureHighlight,
         clearFeatureHighlight,
+        closeFeaturePopup,
     };
 }

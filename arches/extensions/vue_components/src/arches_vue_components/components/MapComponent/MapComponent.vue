@@ -247,29 +247,11 @@ function handleDocumentClick(event: MouseEvent): void {
     display: flex;
     flex-direction: column;
     width: 35rem;
+    height: var(--map-component-popup-height);
     padding: 0;
     overflow: hidden;
     background: var(--p-content-background);
     color: var(--p-content-color);
-}
-
-.feature-info-popup .maplibregl-popup-close-button {
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    inset-block-start: 0.5rem;
-    inset-inline-end: 0.5rem;
-    width: 2.4rem;
-    height: 2.4rem;
-    padding: 0;
-    border-radius: 50%;
-    color: var(--p-primary-contrast-color);
-    font-size: 1.75rem;
-}
-
-.feature-info-popup .maplibregl-popup-close-button:hover {
-    background: var(--p-primary-hover-color);
 }
 </style>
 
@@ -287,6 +269,7 @@ function handleDocumentClick(event: MouseEvent): void {
     --p-badge-height: var(--map-component-badge-size);
     --p-button-badge-size: var(--map-component-badge-size);
     --map-component-status-bar-height: 3.6rem;
+    --map-component-popup-height: 26rem;
     --map-component-panel-inset: 1.6rem;
     --map-component-panel-inset-above-status-bar: 5.2rem;
     position: relative;

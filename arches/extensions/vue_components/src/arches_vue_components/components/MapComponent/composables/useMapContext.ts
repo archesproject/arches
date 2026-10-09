@@ -186,6 +186,7 @@ export function useMapContext(
         popupContainer,
         showFeatureHighlight,
         clearFeatureHighlight,
+        closeFeaturePopup,
     } = useFeaturePopup(
         map,
         overlayLayerIds,
@@ -344,6 +345,7 @@ export function useMapContext(
         setOverlayOpacity,
         showFeatureHighlight,
         clearFeatureHighlight,
+        closeFeaturePopup,
     };
 
     return { context, popupContainer, popupFeatures };
