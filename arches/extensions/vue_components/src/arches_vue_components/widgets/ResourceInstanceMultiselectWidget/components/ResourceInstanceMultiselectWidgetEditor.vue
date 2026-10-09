@@ -182,8 +182,8 @@ function onCreateNewResource(graphId: string) {
 function onUpdateModelValue(updatedValue: string[]) {
     selectedValues.value = updatedValue;
     const nodeValues = updatedValue.map((selectedId) => ({
-        inverseOntologyProperty: "",
-        ontologyProperty: "",
+        inverseRelationship: "",
+        relationship: "",
         resourceId: selectedId,
         resourceXresourceId: "",
     }));

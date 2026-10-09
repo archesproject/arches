@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import uuid
+from django.core.exceptions import ValidationError
 from django.db import transaction, connection
 from django.db.models import Q
 from django.http import (
@@ -507,7 +508,12 @@ def paged_dropdown(request):
 
 def get_pref_label(request):
     valueid = request.GET.get("valueid")
-    label = get_preflabel_from_valueid(valueid, request.LANGUAGE_CODE)
+    try:
+        label = get_preflabel_from_valueid(valueid, request.LANGUAGE_CODE)
+    except (ValidationError, models.Value.DoesNotExist):
+        # the requested value is not a concept value -- eg. a relationship type
+        # drawn from a controlled list rather than the RDM
+        return JSONErrorResponse(status=404)
     return JSONResponse(label)
 
 

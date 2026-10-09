@@ -546,14 +546,14 @@ class SearchTests(ArchesTestCase):
         new_ri_tile_1.data[ri_dt_nodeid] = [
             {
                 "resourceId": str(new_cardinality_resource_1.resourceinstanceid),
-                "ontologyProperty": "",
-                "inverseOntologyProperty": "",
+                "relationship": "",
+                "inverseRelationship": "",
                 "resourceXresourceId": str(uuid.uuid4()),
             },
             {
                 "resourceId": str(new_cardinality_resource_2.resourceinstanceid),
-                "ontologyProperty": "",
-                "inverseOntologyProperty": "",
+                "relationship": "",
+                "inverseRelationship": "",
                 "resourceXresourceId": str(uuid.uuid4()),
             },
         ]
@@ -565,8 +565,8 @@ class SearchTests(ArchesTestCase):
         new_ri_tile_2.data[ri_dt_nodeid] = [
             {
                 "resourceId": str(new_cardinality_resource_1.resourceinstanceid),
-                "ontologyProperty": "",
-                "inverseOntologyProperty": "",
+                "relationship": "",
+                "inverseRelationship": "",
                 "resourceXresourceId": str(uuid.uuid4()),
             },
         ]

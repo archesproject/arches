@@ -2198,11 +2198,41 @@ class ResourceInstanceDataType(BaseDataType):
     tile data comes from the client looking like this:
     {
         "resourceId": "",
-        "ontologyProperty": "",
-        "inverseOntologyProperty": ""
+        "relationship": "",
+        "inverseRelationship": ""
     }
 
     """
+
+    RELATIONSHIP_SOURCES = ("ontology", "concept", "reference")
+
+    def rename_legacy_relationship_keys(self, value):
+        legacy_relationship_keys = {
+            "ontologyProperty": "relationship",
+            "inverseOntologyProperty": "inverseRelationship",
+        }
+        items = value if isinstance(value, list) else [value]
+        for item in items:
+            if isinstance(item, dict):
+                for legacy_key, key in legacy_relationship_keys.items():
+                    if legacy_key in item:
+                        legacy_value = item.pop(legacy_key)
+                        item.setdefault(key, legacy_value)
+        return value
+
+    def validate_node(self, node):
+        from arches.app.models.graph import GraphValidationError
+
+        try:
+            for graph in node.config.get("graphs") or []:
+                if graph["relationshipSource"] not in self.RELATIONSHIP_SOURCES:
+                    raise ValueError
+        except (AttributeError, KeyError, TypeError, ValueError):
+            raise GraphValidationError(
+                _(
+                    "A resource instance node's relationshipSource must be one of: {sources}"
+                ).format(sources=", ".join(self.RELATIONSHIP_SOURCES))
+            )
 
     def validate(
         self,
@@ -2358,19 +2388,19 @@ class ResourceInstanceDataType(BaseDataType):
                         "provisional": provisional,
                     }
                 )
-            for ontology_property_item in [
-                relatedResourceItem.get("ontologyProperty", ""),
-                relatedResourceItem.get("inverseOntologyProperty", ""),
+            for relationship_item in [
+                relatedResourceItem.get("relationship", ""),
+                relatedResourceItem.get("inverseRelationship", ""),
             ]:
-                if ontology_property_item != "":
+                if relationship_item:
                     try:
-                        uuid.UUID(ontology_property_item)
+                        uuid.UUID(relationship_item)
                         relationship = (
-                            self.get_relationship_display_value(ontology_property_item)
-                            or ontology_property_item
+                            self.get_relationship_display_value(relationship_item)
+                            or relationship_item
                         )
                     except ValueError:
-                        relationship = ontology_property_item
+                        relationship = relationship_item
                     document["strings"].append(
                         {
                             "string": relationship,
@@ -2387,36 +2417,37 @@ class ResourceInstanceDataType(BaseDataType):
                 terms.append(
                     SearchTerm(value=relatedResourceItem["resourceName"], lang="")
                 )
-            for ontology_property_item in [
-                relatedResourceItem.get("ontologyProperty", ""),
-                relatedResourceItem.get("inverseOntologyProperty", ""),
+            for relationship_item in [
+                relatedResourceItem.get("relationship", ""),
+                relatedResourceItem.get("inverseRelationship", ""),
             ]:
-                if ontology_property_item != "":
+                if relationship_item:
                     try:
-                        uuid.UUID(ontology_property_item)
+                        uuid.UUID(relationship_item)
                         relationship = (
-                            self.get_relationship_display_value(ontology_property_item)
-                            or ontology_property_item
+                            self.get_relationship_display_value(relationship_item)
+                            or relationship_item
                         )
                         terms.append(SearchTerm(value=relationship, lang=""))
                     except ValueError:
-                        terms.append(SearchTerm(value=ontology_property_item, lang=""))
+                        terms.append(SearchTerm(value=relationship_item, lang=""))
 
         return terms
 
     def transform_value_for_tile(self, value, **kwargs):
         try:
-            return json.loads(value)
+            value = json.loads(value)
         except ValueError:
             # do this if json (invalid) is formatted with single quotes, re #6390
             try:
-                return ast.literal_eval(value)
+                value = ast.literal_eval(value)
             except:
-                return value
+                pass
         except TypeError:
             # data should come in as json but python list is accepted as well
-            if isinstance(value, list):
-                return value
+            if not isinstance(value, list):
+                return None
+        return self.rename_legacy_relationship_keys(value)
 
     def transform_export_values(self, value, *args, **kwargs):
         return json.dumps(value)
@@ -2511,8 +2542,8 @@ class ResourceInstanceDataType(BaseDataType):
             return [
                 {
                     "resourceId": m.groupdict()["r"],
-                    "ontologyProperty": "",
-                    "inverseOntologyProperty": "",
+                    "relationship": "",
+                    "inverseRelationship": "",
                     "resourceXresourceId": "",
                 }
             ]
@@ -2536,11 +2567,11 @@ class ResourceInstanceDataType(BaseDataType):
                     "type": "text",
                     "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}},
                 },
-                "ontologyProperty": {
+                "relationship": {
                     "type": "text",
                     "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}},
                 },
-                "inverseOntologyProperty": {
+                "inverseRelationship": {
                     "type": "text",
                     "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}},
                 },

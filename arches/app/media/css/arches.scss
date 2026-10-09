@@ -7358,6 +7358,67 @@ a.mega-dropdown-toggle.disabled {
     margin: 5px 0px 15px -7.5px;
 }
 
+.rr-relationship-config {
+    .rr-relationship-field {
+        margin-bottom: 15px;
+    }
+
+    .rr-relationship-field:last-child {
+        margin-bottom: 0px;
+    }
+
+    .rr-relationship-source {
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .rr-relationship-label,
+    .node-config-item .control-label {
+        display: block;
+        margin: 0px 0px 5px 0px;
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .rr-relationship-ontology-class {
+        margin: 3px 0px;
+        color: #666;
+    }
+
+    .rr-relationship-select {
+        width: 100%;
+    }
+
+    .select2-container {
+        display: block;
+        width: 100% !important;
+    }
+
+    .node-config-item {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    div.row.widget-wrapper {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    .form-group {
+        margin: 0px;
+    }
+
+    .resource-instance-wrapper {
+        padding: 0px;
+    }
+
+    .widget-wrapper .widget-input-label {
+        display: none;
+    }
+}
+
 .rr-table-column {
     padding-right: 10px;
     border-left: solid 1px #ddd;
