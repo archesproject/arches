@@ -24,10 +24,7 @@ import {
     DRAW_DELETE_EVENT,
     DRAW_SELECTION_CHANGE_EVENT,
     DRAW_UPDATE_EVENT,
-    GEOMETRY_TYPE_LINESTRING,
     GEOMETRY_TYPE_POINT,
-    GEOMETRY_TYPE_POLYGON,
-    IDLE,
     METERS,
     SIMPLE_SELECT,
 } from "@/arches_vue_components/components/MapComponent/constants.ts";
@@ -131,7 +128,10 @@ export function useDrawnFeatures(
                 draw.add(feature);
             }
 
-            updateDrawnFeatures({ shouldEmitValueChange: false });
+            updateDrawnFeatures({
+                shouldEmitValueChange: false,
+                shouldFitBounds: true,
+            });
         }
 
         onDrawEvent(map.value!, DRAW_CREATE_EVENT, (drawEvent: DrawEvent) => {
@@ -148,7 +148,6 @@ export function useDrawnFeatures(
                 return;
             }
 
-            selectNewlyDrawnFeature(drawEvent);
             updateDrawnFeatures();
         });
         onDrawEvent(map.value!, DRAW_UPDATE_EVENT, (drawEvent: DrawEvent) => {
@@ -185,22 +184,6 @@ export function useDrawnFeatures(
         }
     }
 
-    function selectNewlyDrawnFeature(drawEvent: DrawEvent): void {
-        const feature = drawEvent.features[0];
-        const featureId = feature.id as string;
-
-        map.value!.once(IDLE, () => {
-            if (feature.geometry.type === GEOMETRY_TYPE_POINT) {
-                draw.changeMode(SIMPLE_SELECT, { featureIds: [featureId] });
-            } else if (
-                feature.geometry.type === GEOMETRY_TYPE_LINESTRING ||
-                feature.geometry.type === GEOMETRY_TYPE_POLYGON
-            ) {
-                draw.changeMode(DIRECT_SELECT, { featureId });
-            }
-        });
-    }
-
     function notifyMaxFeaturesReached(): void {
         toast.add({
             severity: "error",
@@ -216,7 +199,7 @@ export function useDrawnFeatures(
 
     async function updateDrawnFeatures({
         shouldEmitValueChange = true,
-        shouldFitBounds = true,
+        shouldFitBounds = false,
     }: {
         shouldEmitValueChange?: boolean;
         shouldFitBounds?: boolean;
@@ -384,7 +367,7 @@ export function useDrawnFeatures(
         feature.properties!.buffer_units = units;
 
         draw.add(feature);
-        updateDrawnFeatures({ shouldFitBounds: false });
+        updateDrawnFeatures();
     }
 
     function addFeatures(features: Feature[]): boolean {
@@ -402,13 +385,13 @@ export function useDrawnFeatures(
             draw.add(feature);
         }
 
-        updateDrawnFeatures();
+        updateDrawnFeatures({ shouldFitBounds: true });
         return true;
     }
 
     function updateDrawnFeature(feature: Feature): void {
         draw.add(feature);
-        updateDrawnFeatures();
+        updateDrawnFeatures({ shouldFitBounds: true });
     }
 
     function fitToFeatures(features: Feature[]): void {

@@ -22,7 +22,6 @@ export const FEET = "feet";
 export const GEOMETRY_TYPE_LINESTRING = "LineString";
 export const GEOMETRY_TYPE_POINT = "Point";
 export const GEOMETRY_TYPE_POLYGON = "Polygon";
-export const IDLE = "idle";
 export const KILOMETERS = "kilometers";
 export const LINE = "line";
 export const METERS = "meters";
