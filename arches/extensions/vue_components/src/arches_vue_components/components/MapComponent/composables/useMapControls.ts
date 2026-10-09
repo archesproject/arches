@@ -24,9 +24,7 @@ export function useMapControls(
 ): void {
     const { $gettext } = useGettext();
 
-    let geocoderControl: MaplibreGeocoder | null = null;
-    let navigationControl: IControl | null = null;
-    let fullscreenControl: IControl | null = null;
+    let orderedControls: { control: IControl; isVisible: () => boolean }[] = [];
 
     watch(
         map,
@@ -35,29 +33,28 @@ export function useMapControls(
                 return;
             }
 
-            geocoderControl = new MaplibreGeocoder(nominatimGeocoderApi, {
-                maplibregl,
-                placeholder:
-                    settings.value.geocoderPlaceholder ??
-                    $gettext("Search for a place"),
-            });
-            navigationControl = new maplibregl.NavigationControl();
-            fullscreenControl = new maplibregl.FullscreenControl({
-                container: fullscreenContainer.value ?? undefined,
-            });
-
-            setControlVisibility(
-                geocoderControl,
-                settings.value.geocoderVisible,
-            );
-            setControlVisibility(
-                navigationControl,
-                settings.value.showNavigationControl,
-            );
-            setControlVisibility(
-                fullscreenControl,
-                settings.value.showFullscreenControl,
-            );
+            orderedControls = [
+                {
+                    control: new MaplibreGeocoder(nominatimGeocoderApi, {
+                        maplibregl,
+                        placeholder:
+                            settings.value.geocoderPlaceholder ??
+                            $gettext("Search for a place"),
+                    }),
+                    isVisible: () => settings.value.geocoderVisible,
+                },
+                {
+                    control: new maplibregl.NavigationControl(),
+                    isVisible: () => settings.value.showNavigationControl,
+                },
+                {
+                    control: new maplibregl.FullscreenControl({
+                        container: fullscreenContainer.value ?? undefined,
+                    }),
+                    isVisible: () => settings.value.showFullscreenControl,
+                },
+            ];
+            syncControls();
             applyScrollZoomRequiresKey();
             applyAllow3d();
         },
@@ -70,31 +67,24 @@ export function useMapControls(
     );
     watch(() => settings.value.allow3d, applyAllow3d);
     watch(
-        () => settings.value.geocoderVisible,
-        (isVisible) => setControlVisibility(geocoderControl, isVisible),
-    );
-    watch(
-        () => settings.value.showNavigationControl,
-        (isVisible) => setControlVisibility(navigationControl, isVisible),
-    );
-    watch(
-        () => settings.value.showFullscreenControl,
-        (isVisible) => setControlVisibility(fullscreenControl, isVisible),
+        () => [
+            settings.value.geocoderVisible,
+            settings.value.showNavigationControl,
+            settings.value.showFullscreenControl,
+        ],
+        syncControls,
     );
 
-    function setControlVisibility(
-        control: IControl | null,
-        isVisible: boolean,
-    ): void {
-        if (!map.value || !control) {
-            return;
+    function syncControls(): void {
+        for (const { control } of orderedControls) {
+            if (map.value!.hasControl(control)) {
+                map.value!.removeControl(control);
+            }
         }
-
-        const isAdded = map.value.hasControl(control);
-        if (isVisible && !isAdded) {
-            map.value.addControl(control, CONTROL_POSITION);
-        } else if (!isVisible && isAdded) {
-            map.value.removeControl(control);
+        for (const { control, isVisible } of orderedControls) {
+            if (isVisible()) {
+                map.value!.addControl(control, CONTROL_POSITION);
+            }
         }
     }
 
