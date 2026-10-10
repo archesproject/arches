@@ -63,6 +63,17 @@ ANONYMOUS_USER_NAME = None
 ELASTICSEARCH_HTTP_PORT = (
     9200  # this should be in increments of 200, eg: 9400, 9600, 9800
 )
+
+# Set to False to run Arches without an Elasticsearch instance. Intended for
+# projects that supply their own search implementation (e.g. a PostgreSQL-backed
+# Arches application). When False:
+#   - SearchEngineFactory returns a no-op engine and all indexing is discarded
+#   - the core search views return 404 and the core search nav links are hidden
+#   - RDM/concept search and term autocomplete return no results
+#   - Elasticsearch snapshot/restore is unavailable
+#   - the default allow permission framework cannot be used
+ELASTICSEARCH_ENABLED = True
+
 SEARCH_BACKEND = "arches.app.search.search.SearchEngine"
 SEARCH_THUMBNAILS = False
 # see http://elasticsearch-py.readthedocs.org/en/master/api.html#elasticsearch.Elasticsearch

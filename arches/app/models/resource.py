@@ -979,13 +979,30 @@ class Resource(models.ResourceInstance):
             instanceids.remove(str(self.resourceinstanceid))
 
         if len(instanceids) > 0:
-            related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
-            if related_resources:
+            if settings.ELASTICSEARCH_ENABLED:
+                related_resources = se.search(
+                    index=RESOURCES_INDEX, id=list(instanceids)
+                )
+                related_resource_ids = (
+                    [
+                        resource["_id"]
+                        for resource in related_resources["docs"]
+                        if resource["found"]
+                    ]
+                    if related_resources
+                    else None
+                )
+            else:
+                # the index lookup above only establishes which ids actually exist
+                related_resources = True
                 related_resource_ids = [
-                    resource["_id"]
-                    for resource in related_resources["docs"]
-                    if resource["found"]
+                    str(pk)
+                    for pk in models.ResourceInstance.objects.filter(
+                        pk__in=instanceids
+                    ).values_list("pk", flat=True)
                 ]
+
+            if related_resources:
                 if include_rr_count:
                     to_counts = (
                         models.ResourceXResource.objects.filter(

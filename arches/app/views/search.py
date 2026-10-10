@@ -24,6 +24,7 @@ from django.core.cache import cache
 from django.db import connection
 from django.http import Http404
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from arches.app.models.models import (
     MapMarker,
@@ -48,7 +49,7 @@ from arches.app.utils.permission_backend import (
     get_nodegroups_by_perm,
     user_is_resource_reviewer,
 )
-from arches.app.utils.decorators import group_required
+from arches.app.utils.decorators import group_required, requires_elasticsearch
 import arches.app.utils.zip as zip_utils
 import arches.app.utils.task_management as task_management
 from arches.app.utils.data_management.resources.formats.htmlfile import HtmlWriter
@@ -60,6 +61,7 @@ from arches.app.models.system_settings import settings
 logger = logging.getLogger(__name__)
 
 
+@method_decorator(requires_elasticsearch, name="dispatch")
 class SearchView(MapBaseManagerView):
     def get(self, request):
         map_markers = MapMarker.objects.all()
@@ -141,6 +143,7 @@ def home_page(request):
     )
 
 
+@requires_elasticsearch
 def search_terms(request):
     lang = request.GET.get("lang", request.LANGUAGE_CODE)
     searchString = request.GET.get("q", "")
@@ -159,6 +162,7 @@ def search_terms(request):
 
 
 @group_required("Resource Exporter")
+@requires_elasticsearch
 def export_results(request):
     total = int(request.GET.get("total", 0))
     format = request.GET.get("format", "tilecsv")
@@ -248,11 +252,13 @@ def append_instance_permission_filter_dsl(request, search_query_object):
             )
 
 
+@requires_elasticsearch
 def get_dsl_from_search_string(request):
     dsl = search_results(request, returnDsl=True).dsl
     return JSONResponse(dsl)
 
 
+@requires_elasticsearch
 def search_results(request, returnDsl=False):
     search_filter_factory = SearchFilterFactory(request)
     searchview_component_instance = search_filter_factory.get_searchview_instance()
@@ -325,6 +331,7 @@ def get_permitted_nodegroups(user):
     return get_nodegroups_by_perm(user, "models.read_nodegroup")
 
 
+@requires_elasticsearch
 def buffer(request):
     spatial_filter = JSONDeserializer().deserialize(
         request.GET.get(
@@ -388,6 +395,7 @@ def _get_child_concepts(conceptid):
     return list(ret)
 
 
+@requires_elasticsearch
 def time_wheel_config(request):
     time_wheel = TimeWheel()
     key = "time_wheel_config_{0}".format(request.user.username)
@@ -397,6 +405,7 @@ def time_wheel_config(request):
     return JSONResponse(config, indent=4)
 
 
+@requires_elasticsearch
 def get_export_file(request):
     exportid = request.GET.get("exportid", None)
     user = request.user
