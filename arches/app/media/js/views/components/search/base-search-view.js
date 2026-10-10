@@ -72,6 +72,12 @@ export default Backbone.View.extend({
                 this.sharedStateObject.total(response.total_results);
                 this.sharedStateObject.hits(response.results.hits.hits.length);
                 this.sharedStateObject.alert(false);
+
+                // only record history for completed queries, and skip duplicates
+                const newSearch = '?' + $.param(queryObj).split('+').join('%20');
+                if (newSearch !== window.location.search) {
+                    window.history.pushState({}, '', newSearch);
+                }
             },
             error: function(response, status, error) {
                 const alert = new AlertViewModel('ep-alert-red', arches.translations.requestFailed.title, response.responseJSON?.message);
@@ -82,7 +88,6 @@ export default Backbone.View.extend({
             },
             complete: function(request, status) {
                 self.updateRequest = undefined;
-                window.history.pushState({}, '', '?' + $.param(queryObj).split('+').join('%20'));
                 this.sharedStateObject.loading(false);
             }
         });
