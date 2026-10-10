@@ -72,6 +72,9 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
             else:
                 all = True
 
+        if not settings.ELASTICSEARCH_ENABLED:
+            return self._get_allowed_instances_from_db(user, all, resources)
+
         query = Query(search_engine, start=0, limit=settings.SEARCH_RESULT_LIMIT)  # type: ignore
         nested_groups_read = Nested(
             path="permissions",
@@ -113,6 +116,54 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
         restricted_ids = [res["_id"] for res in results["hits"]["hits"]]
         return restricted_ids
 
+    def _permitted_resourceinstance_ids(
+        self,
+        user: User,
+        resourceinstances,
+        permission: str = "models.view_resourceinstance",
+    ):
+        """
+        Returns a values_list queryset of the resourceinstanceids within
+        `resourceinstances` that `user` may access via `permission`, either
+        through an explicit user/group permission or by being the principal user.
+        """
+        permitted = guardian_shortcuts.get_objects_for_user(
+            user,
+            permission,
+            klass=resourceinstances,
+            use_groups=True,
+            any_perm=True,
+            with_superuser=False,
+            accept_global_perms=False,
+        )
+        owned = resourceinstances.filter(principaluser_id=user.id)
+
+        return (permitted | owned).values_list("resourceinstanceid", flat=True)
+
+    def _get_allowed_instances_from_db(
+        self,
+        user: User,
+        all: bool,
+        resources: list[str] | None = None,
+    ) -> list[str]:
+        """
+        ORM equivalent of the Elasticsearch query in get_allowed_instances(), used
+        when settings.ELASTICSEARCH_ENABLED is False.
+        """
+        resourceinstances = ResourceInstance.objects.all()
+        if resources is not None:
+            resourceinstances = resourceinstances.filter(
+                resourceinstanceid__in=resources
+            )
+
+        if all:
+            # a superuser with no resource subset: everything is allowed
+            allowed = resourceinstances.values_list("resourceinstanceid", flat=True)
+        else:
+            allowed = self._permitted_resourceinstance_ids(user, resourceinstances)
+
+        return [str(resourceinstanceid) for resourceinstanceid in allowed]
+
     def filter_resource_queryset(
         self,
         user: User,
@@ -132,17 +183,9 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
             resourceinstanceid__in=candidate_ids
         )
 
-        permitted = guardian_shortcuts.get_objects_for_user(
-            user,
-            permission,
-            klass=resourceinstances,
-            use_groups=True,
-            any_perm=True,
-            with_superuser=False,
-            accept_global_perms=False,
+        permitted_ids = self._permitted_resourceinstance_ids(
+            user, resourceinstances, permission
         )
-        owned = resourceinstances.filter(principaluser_id=user.id)
-        permitted_ids = (permitted | owned).values_list("resourceinstanceid", flat=True)
 
         return queryset.filter(**{f"{resourceinstance_field}__in": permitted_ids})
 

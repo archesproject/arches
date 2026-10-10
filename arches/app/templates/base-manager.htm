@@ -173,7 +173,7 @@
                         {% endif %}
 
                         <!-- Search Bar -->
-                        {% if nav.search %}
+                        {% if nav.search and app_settings.ELASTICSEARCH_ENABLED %}
                         <li>
                             <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" aria-label="{% trans 'Visit the Search page' %}"
                                 data-bind="click:function () { navigate('{% url 'search_home' %}') }">

@@ -21,6 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from typing import Any, Optional
 from django.core.management.base import BaseCommand
 from arches.app.models.resource import Resource
+from arches.app.models.system_settings import settings
 from arches.app.search.elasticsearch_dsl_builder import Query, Term
 from arches.app.search.mappings import (
     RESOURCES_INDEX,
@@ -36,6 +37,10 @@ class Command(BaseCommand):
         parser.add_argument("-operation", action="store", dest="operation", default="")
 
     def handle(self, *args: Any, **options: Any) -> Optional[str]:
+        if not settings.ELASTICSEARCH_ENABLED:
+            self.stdout.write("Elasticsearch is disabled; nothing to index.")
+            return
+
         bulk_index_queue = BulkIndexQueue.objects.all()
         queued_ids = bulk_index_queue.values_list("resourceinstanceid", flat=True)
         resources = Resource.objects.filter(resourceinstanceid__in=queued_ids)
