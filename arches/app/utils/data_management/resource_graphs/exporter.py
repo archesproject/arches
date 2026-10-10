@@ -361,7 +361,7 @@ def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=N
                 )
             except:
                 relations_concepts = "You do not appear to have values for resource to resource relationships in your rdm."
-            values["Resource to Resource Relationship Types"] = relation_concepts
+            values["Resource to Resource Relationship Types"] = relations_concepts
 
     # Concept lookup file
     if include_concepts == True:
