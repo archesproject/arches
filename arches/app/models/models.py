@@ -305,9 +305,13 @@ class Edge(SaveSupportsBlindOverwriteMixin, models.Model):
         if isinstance(self.edgeid, str):
             self.edgeid = uuid.UUID(self.edgeid)
 
-    def save(self, **kwargs):
+    def clean(self):
         if self.pk == self.source_identifier_id:
             self.source_identifier_id = None
+            return True
+
+    def save(self, **kwargs):
+        if updated := self.clean():
             kwargs = add_to_update_fields(kwargs, "source_identifier_id")
         super(Edge, self).save(**kwargs)
 
