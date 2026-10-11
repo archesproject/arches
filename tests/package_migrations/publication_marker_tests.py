@@ -5,10 +5,12 @@ the tile data is in."""
 from arches.app.models import models
 from arches.app.models.resource import Resource
 
-from tests.tasks_tests import ResourceInstanceDataTestCase
+from tests.package_migrations.operation_integration_tests import (
+    PackageMigrationOperationTests,
+)
 
 
-class PublicationMarkerTests(ResourceInstanceDataTestCase):
+class PublicationMarkerTests(PackageMigrationOperationTests):
     def test_ordinary_saves_restamp_the_publication_marker(self):
         resource_instance = models.ResourceInstance.objects.create(
             graph=self.test_graph
@@ -47,7 +49,10 @@ class PublicationMarkerTests(ResourceInstanceDataTestCase):
         )
         tile = models.TileModel.objects.create(
             resourceinstance=resource_instance,
-            data={str(self.concept_node_id): "DUMMY DATA"},
+            nodegroup_id=self.nodegroup_id,
+            data={
+                str(self.string_node.nodeid): {"en": {"value": "x", "direction": "ltr"}}
+            },
             sortorder=0,
         )
         old_publication_id = str(self.test_graph.publication_id)

@@ -5,6 +5,8 @@ merge and would misreport i18n fields.
 
 import collections
 
+from django.core.exceptions import FieldDoesNotExist
+
 from arches.app.models import models
 from arches.db.package_migrations.operations.base import (
     _AlterRowOperation,
@@ -207,7 +209,7 @@ def _references(operation):
             continue
         try:
             field = model._meta.get_field(name[: -len("_id")])
-        except Exception:
+        except FieldDoesNotExist:
             continue
         if not field.is_relation or field.related_model in GRAPH_ROW_MODELS:
             continue

@@ -564,7 +564,7 @@ class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
             return None
 
         if not language:
-            language = translation.get_language() or settings.LANGUAGE_CODE
+            language = translation.get_language()
 
         return self.publication.find_publication_in_language(language)
 

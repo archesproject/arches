@@ -13,7 +13,9 @@ from arches.app.models.graph import Graph
 from arches.db.package_migrations import drift, labels
 from arches.db.package_migrations.executor import PackageMigrationExecutor
 from arches.db.package_migrations.operations.base import PackageMigrationError
+from arches.db.package_migrations.operations.graph import PublishGraph
 from arches.db.package_migrations.operations.python import RunPackagePython
+from arches.db.package_migrations.operations.resource import SetResourcePublication
 
 
 class Command(BaseCommand):
@@ -552,10 +554,18 @@ class Command(BaseCommand):
                 for operation in migration.operations
                 if not operation.reversible
             ]
-            if irreversible:
-                raise CommandError(
-                    f"{migration.app_label}.{migration.name} cannot be unapplied: {type(irreversible[0]).__name__} is irreversible. Unapplying the migrations after it would leave the graph and its resources on different publications."
-                )
+            if not irreversible:
+                continue
+            operation = irreversible[0]
+            if isinstance(operation, (PublishGraph, SetResourcePublication)):
+                reason = "Unapplying the migrations after it would leave the graph and its resources on different publications."
+            elif isinstance(operation, RunPackagePython):
+                reason = "It has no reverse_code."
+            else:
+                reason = "It deletes data that is not recorded anywhere, so reversing it cannot bring that data back."
+            raise CommandError(
+                f"{migration.app_label}.{migration.name} cannot be unapplied: {operation.describe()} is irreversible. {reason}"
+            )
 
     def _print_plan(self, plan):
         if not plan:
