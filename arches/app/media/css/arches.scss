@@ -2727,6 +2727,63 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     background: #fbfbfb;
 }
 
+.permission-manager {
+    .permissions-instructions-panel {
+        padding: 15px 20px;
+        margin-bottom: 20px;
+    }
+
+    .permission-selector {
+        margin: 15px 0px 20px 0px;
+    }
+
+    .permissions-options {
+        flex-wrap: wrap;
+        gap: 5px 20px;
+
+        // keep the checkbox reachable by keyboard while the theme draws the box
+        .form-checkbox > input[type="checkbox"] {
+            display: block;
+            position: absolute;
+            visibility: visible;
+            width: 1px;
+            height: 1px;
+            margin: 0;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+        }
+
+        .form-checkbox:focus-within {
+            outline: 2px solid #489eed;
+            outline-offset: 2px;
+        }
+
+        // box has a 3px left margin here; center the theme's check in it
+        .form-checkbox.form-normal:not(.disabled):hover:after,
+        .form-checkbox.form-normal.active:after {
+            left: 5.5px;
+        }
+
+        .form-checkbox.form-normal.indeterminate:not(.active):after {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 50%;
+            width: 10px;
+            height: 0;
+            margin-top: -1px;
+            transform: none;
+            border-left: 0;
+            border-bottom: 2.5px solid #404449;
+        }
+    }
+}
+
+.designer-permission-tree .permissions-card:focus-visible {
+    outline: 2px solid #489eed;
+    outline-offset: -2px;
+}
+
 .settings-panel-heading+.permissions-instructions-panel {
     margin-top: 55px;
 }
@@ -6650,6 +6707,10 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .node-permission-icon {
     padding-right: 3px;
+}
+
+.node-permission-icon.inherited {
+    opacity: 0.55;
 }
 
 .expand-icon {

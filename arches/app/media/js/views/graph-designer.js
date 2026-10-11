@@ -621,7 +621,8 @@ var GraphDesignerView = BaseManagerView.extend({
         });
 
         viewModel.permissionsDesigner = new PermissionDesigner({
-            cardTree: viewModel.permissionTree
+            cardTree: viewModel.permissionTree,
+            alert: viewModel.alert
         });
 
         viewModel.graphSettingsViewModel = new GraphSettingsViewModel({
@@ -788,12 +789,19 @@ var GraphDesignerView = BaseManagerView.extend({
             }
         };
 
+        // only follow the Cards tab when its selection changed, so a multi-selection survives tab switches
+        var lastSyncedCardSelection;
         var updatePermissionCardSelection = function() {
-            var matchingCard = correspondingCard(viewModel.cardTree.selection(), viewModel.permissionTree);
+            var cardSelection = viewModel.cardTree.selection();
+            if (cardSelection === lastSyncedCardSelection) {
+                return;
+            }
+            lastSyncedCardSelection = cardSelection;
+            var matchingCard = correspondingCard(cardSelection, viewModel.permissionTree);
             if (matchingCard) {
                 viewModel.permissionTree.expandToRoot(matchingCard);
                 viewModel.permissionTree.selection.removeAll();
-                matchingCard.selectChildCards();
+                matchingCard.selectChildCards(true);
             }
         };
 
@@ -854,7 +862,6 @@ var GraphDesignerView = BaseManagerView.extend({
         document.addEventListener('reorderCards', () => viewModel.graphHasUnpublishedChanges(true));
         document.addEventListener('cardSave', () => viewModel.graphHasUnpublishedChanges(true));
         document.addEventListener('nodeSave', () => viewModel.graphHasUnpublishedChanges(true));
-        document.addEventListener('permissionsSave', () => viewModel.graphHasUnpublishedChanges(true));
         document.addEventListener('graphSettingsSave', () => viewModel.graphHasUnpublishedChanges(true));
         
         BaseManagerView.prototype.initialize.apply(this, arguments);

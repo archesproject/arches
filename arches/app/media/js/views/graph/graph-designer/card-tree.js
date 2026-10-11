@@ -64,6 +64,10 @@ var CardTreeViewModel = function(params) {
     };
 
     var selectAll = function(state) {
+        if (self.multiselect) {
+            selection(state ? self.flattenTree(self.topCards(), []) : []);
+            return;
+        }
         self.updateNodeList();
         _.each(self.cachedFlatTree, function(node) {
             if (node.selected() !== state) {
