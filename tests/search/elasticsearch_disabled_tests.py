@@ -146,3 +146,27 @@ class DefaultDenyAllowedInstancesFromDbTests(TestCase):
         framework = ArchesDefaultDenyPermissionFramework()
         user = User.objects.create_user("nobody", password="x")
         self.assertEqual(framework.get_allowed_instances(user), [])
+
+
+class ResourceLookupFromDbTests(TestCase):
+    """
+    The resource-instance widget looks up resources through the search_results url.
+    They must be drawn from the database with ES disabled.
+    """
+
+    def test_lookup_returns_the_shape_the_widget_expects(self):
+        admin = User.objects.get(username="admin")
+        self.client.force_login(admin)
+
+        with elasticsearch_enabled(False):
+            response = self.client.get(
+                "/search/resources", {"paging-filter": 1, "sort-results": "asc"}
+            )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertIn("hits", payload["results"])
+        self.assertIn("has_next", payload["paging-filter"]["paginator"])
+        for hit in payload["results"]["hits"]["hits"]:
+            self.assertIn("displayname", hit["_source"])
+            self.assertIn("graph_id", hit["_source"])

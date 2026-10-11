@@ -16,17 +16,22 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import json
 import logging
 import os
 
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.cache import cache
+from django.core.paginator import Paginator
 from django.db import connection
+from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
-from django.utils.translation import gettext as _
+from django.utils.translation import get_language, gettext as _
 from arches.app.models.models import (
+    Node,
+    ResourceInstance,
     MapMarker,
     GraphModel,
     DDataType,
@@ -258,8 +263,118 @@ def get_dsl_from_search_string(request):
     return JSONResponse(dsl)
 
 
-@requires_elasticsearch
+def _localized(value, language_codes):
+    """Picks the first non-empty entry of an i18n dict for the given languages."""
+    value = getattr(value, "raw_value", value)  # unwrap I18n_String
+    if not isinstance(value, dict):
+        return value
+    for code in language_codes:
+        if value.get(code):
+            return value[code]
+    return next((v for v in value.values() if v), "")
+
+
+def resource_lookup_from_db(request):
+    """
+    Minimal database-backed equivalent of search_results, used when
+    settings.ELASTICSEARCH_ENABLED is False. It serves the resource-instance widgets,
+    which look resources up through the search_results url, and supports only the
+    parameters they send: id, paging-filter, resource-type-filter, term-filter
+    (matched against the resource name) and sort-results.
+    """
+    language_codes = [get_language(), settings.LANGUAGE_CODE]
+
+    queryset = ResourceInstance.objects.exclude(
+        pk=settings.SYSTEM_SETTINGS_RESOURCE_ID
+    ).select_related("graph")
+
+    readable_graphids = permission_backend.get_resource_types_by_perm(
+        request.user, ["models.read_nodegroup"]
+    )
+    queryset = queryset.filter(graph_id__in=readable_graphids)
+    queryset = permission_backend.filter_resource_queryset(request.user, queryset)
+
+    ids = request.GET.get("id")
+    if ids:
+        queryset = queryset.filter(pk__in=ids.split(","))
+
+    graphids = [
+        f["graphid"]
+        for f in json.loads(request.GET.get("resource-type-filter") or "[]")
+        if not f.get("inverted")
+    ]
+    if graphids:
+        queryset = queryset.filter(graph_id__in=graphids)
+
+    for term in json.loads(request.GET.get("term-filter") or "[]"):
+        value = term.get("value")
+        if not value or term.get("inverted"):
+            continue
+        name_query = Q()
+        for code in language_codes:
+            name_query |= Q(**{"name__%s__icontains" % code: value})
+        queryset = queryset.filter(name_query)
+
+    ordering = "name__%s" % language_codes[0]
+    if request.GET.get("sort-results") == "desc":
+        ordering = "-" + ordering
+    queryset = queryset.order_by(ordering, "pk")
+
+    page_number = int(request.GET.get("paging-filter") or 1)
+    paginator = Paginator(queryset, settings.SEARCH_ITEMS_PER_PAGE)
+    page = paginator.get_page(page_number)
+
+    ontology_classes = dict(
+        Node.objects.filter(
+            graph_id__in={r.graph_id for r in page.object_list}, istopnode=True
+        ).values_list("graph_id", "ontologyclass")
+    )
+
+    hits = []
+    for resource in page.object_list:
+        descriptors = resource.descriptors or {}
+        source = {
+            "graph_id": str(resource.graph_id),
+            "displayname": _localized(resource.name, language_codes) or _("Undefined"),
+            "displaydescription": _localized(
+                {k: v.get("description") for k, v in descriptors.items()},
+                language_codes,
+            ),
+            "root_ontology_class": ontology_classes.get(resource.graph_id),
+        }
+        hits.append({"_id": str(resource.pk), "_source": source})
+
+    return JSONResponse(
+        {
+            "results": {
+                "hits": {"hits": hits, "total": {"value": paginator.count}},
+            },
+            "paging-filter": {
+                "paginator": {
+                    "current_page": page.number,
+                    "has_next": page.has_next(),
+                    "has_previous": page.has_previous(),
+                    "has_other_pages": page.has_other_pages(),
+                    "next_page_number": (
+                        page.next_page_number() if page.has_next() else None
+                    ),
+                    "previous_page_number": (
+                        page.previous_page_number() if page.has_previous() else None
+                    ),
+                    "start_index": page.start_index(),
+                    "end_index": page.end_index(),
+                }
+            },
+        }
+    )
+
+
 def search_results(request, returnDsl=False):
+    if not settings.ELASTICSEARCH_ENABLED:
+        if returnDsl:
+            raise Http404("This view requires Elasticsearch, which is disabled.")
+        return resource_lookup_from_db(request)
+
     search_filter_factory = SearchFilterFactory(request)
     searchview_component_instance = search_filter_factory.get_searchview_instance()
     if not searchview_component_instance:
