@@ -190,6 +190,7 @@ class NodegroupPermissionTests(ArchesTestCase):
 
         graph = Graph.objects.get(pk=self.graph_id)
         graph.promote_draft_graph_to_active_graph()
+        graph.publish()
 
         self.assertEqual(self.group_codenames(), {"read_nodegroup", "write_nodegroup"})
         for codenames in self.published_group_codenames():
@@ -211,6 +212,8 @@ class NodegroupPermissionTests(ArchesTestCase):
             JSONSerializer().serialize(graph.serialize(force_recalculation=True))
         )
         self.assertTrue(exported["group_permissions"].get(self.nodegroup_id))
+        # mirror the exporter, which does not export publication_id
+        exported.pop("publication_id", None)
 
         graph.delete()
         GroupObjectPermission.objects.filter(object_pk=self.nodegroup_id).delete()
