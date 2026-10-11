@@ -189,3 +189,37 @@ class DeleteNodeGroupStateTests(SimpleTestCase):
         graph = state.graphs[GRAPH]
         for collection in ("nodegroups", "nodes", "cards", "edges", "widgets"):
             self.assertEqual(graph[collection], {}, collection)
+
+
+class MisparentedTileTests(SimpleTestCase):
+    def test_reparented_nodegroup_deletes_misparented_tiles(self):
+        before = _graph(
+            nodegroups=[
+                {"nodegroupid": NODEGROUP, "parentnodegroup_id": str(uuid.uuid4())}
+            ]
+        )
+        after = _graph(
+            nodegroups=[
+                {"nodegroupid": NODEGROUP, "parentnodegroup_id": str(uuid.uuid4())}
+            ]
+        )
+
+        operation_names = _names(changes_for_graph(before, after, PUBLICATION_ID))
+
+        self.assertIn("DeleteMisparentedTiles", operation_names)
+        self.assertLess(
+            operation_names.index("AlterNodeGroup"),
+            operation_names.index("DeleteMisparentedTiles"),
+        )
+
+    def test_deleted_nodegroup_only_deletes_its_tiles(self):
+        before = _graph(
+            nodegroups=[
+                {"nodegroupid": NODEGROUP, "parentnodegroup_id": str(uuid.uuid4())}
+            ]
+        )
+
+        operation_names = _names(changes_for_graph(before, _graph(), PUBLICATION_ID))
+
+        self.assertNotIn("DeleteMisparentedTiles", operation_names)
+        self.assertIn("DeleteTilesForNodeGroup", operation_names)

@@ -19,7 +19,9 @@ from arches.app.models import models
 from arches.app.models.graph import Graph
 from arches.db.package_migrations.recorder import PackageMigrationRecorder
 
-from tests.package_migrations.spike_tests import PackageMigrationOperationTests
+from tests.package_migrations.operation_integration_tests import (
+    PackageMigrationOperationTests,
+)
 
 APP_NAME = "pkgmigratefixture"
 ONTOLOGY_PROPERTY = "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by"

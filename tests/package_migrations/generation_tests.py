@@ -25,7 +25,9 @@ from arches.management.commands.makepkgmigrations import (
     Command as MakePkgMigrationsCommand,
 )
 
-from tests.package_migrations.spike_tests import PackageMigrationOperationTests
+from tests.package_migrations.operation_integration_tests import (
+    PackageMigrationOperationTests,
+)
 
 APP_NAME = "pkggenfixture"
 OTHER_APP_NAME = "pkggenother"

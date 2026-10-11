@@ -12,7 +12,9 @@ from arches.db.package_migrations.operations.node import CreateNode
 from arches.db.package_migrations.operations.nodegroup import CreateNodeGroup
 from arches.db.package_migrations.operations.graph import CreateGraph, PublishGraph
 
-from tests.package_migrations.spike_tests import PackageMigrationOperationTests
+from tests.package_migrations.operation_integration_tests import (
+    PackageMigrationOperationTests,
+)
 
 
 class PublicationLifecycleTests(PackageMigrationOperationTests):

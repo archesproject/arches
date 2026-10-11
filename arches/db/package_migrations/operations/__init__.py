@@ -7,6 +7,7 @@ from arches.db.package_migrations.operations.base import PackageOperation
 from arches.db.package_migrations.operations.resource import SetResourcePublication
 from arches.db.package_migrations.operations.tile import (
     AddNodeToTiles,
+    DeleteMisparentedTiles,
     DeleteTilesForNodeGroup,
     RemoveNodeFromTiles,
 )
@@ -65,6 +66,7 @@ __all__ = [
     "RemoveNodeFromTiles",
     "SetResourcePublication",
     "DeleteTilesForNodeGroup",
+    "DeleteMisparentedTiles",
     "PublishGraph",
     "RunPackagePython",
 ]

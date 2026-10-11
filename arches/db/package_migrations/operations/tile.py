@@ -4,7 +4,7 @@ and select tiles by content, never by graph_publication_id.
 
 import json
 
-from django.db.models import JSONField, Q
+from django.db.models import F, JSONField, Q
 from django.db.models.expressions import RawSQL
 
 from arches.app.models import models
@@ -173,3 +173,44 @@ class DeleteTilesForNodeGroup(_ChunkedTileOperation):
     @property
     def migration_name_fragment(self):
         return f"delete_tiles_{_short(self.nodegroup_id)}"
+
+
+class DeleteMisparentedTiles(_ChunkedTileOperation):
+    """Remove tiles whose parent tile is not in the nodegroup's parent nodegroup,
+    as publishing in the Graph Designer does. Irreversible."""
+
+    reversible = False
+
+    def __init__(self, nodegroup_id, batch_size=DEFAULT_BATCH_SIZE):
+        self.nodegroup_id = nodegroup_id
+        self.batch_size = batch_size
+
+    def state_forwards(self, app_label, state):
+        pass
+
+    def _misparented(self, alias):
+        return (
+            self._tiles(alias)
+            .filter(parenttile__isnull=False)
+            .filter(~Q(parenttile__nodegroup_id=F("nodegroup__parentnodegroup_id")))
+        )
+
+    def has_pending_work(self, using):
+        return self._misparented(using).exists()
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        alias = schema_editor.connection.alias
+        total = 0
+        for tileids in keyset_batches(
+            self._misparented(alias), "tileid", self.batch_size
+        ):
+            models.TileModel.objects.using(alias).filter(tileid__in=tileids).delete()
+            total += len(tileids)
+        return total
+
+    def describe(self):
+        return f"Delete misparented tiles in nodegroup {self.nodegroup_id}"
+
+    @property
+    def migration_name_fragment(self):
+        return f"delete_misparented_tiles_{_short(self.nodegroup_id)}"

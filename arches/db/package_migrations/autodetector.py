@@ -6,6 +6,7 @@ from arches.db.package_migrations.state import STATE_COLLECTIONS
 from arches.db.package_migrations.operations.resource import SetResourcePublication
 from arches.db.package_migrations.operations.tile import (
     AddNodeToTiles,
+    DeleteMisparentedTiles,
     DeleteTilesForNodeGroup,
     RemoveNodeFromTiles,
 )
@@ -139,6 +140,13 @@ def _data_operations(from_graph, to_graph):
             operations.append(
                 RemoveNodeFromTiles(nodegroup_id=node["nodegroup_id"], nodeid=nodeid)
             )
+
+    for nodegroupid in sorted(set(before_nodegroups) & set(after_nodegroups)):
+        changes = _changed_fields(
+            before_nodegroups[nodegroupid], after_nodegroups[nodegroupid]
+        )
+        if "parentnodegroup_id" in changes:
+            operations.append(DeleteMisparentedTiles(nodegroup_id=nodegroupid))
 
     for nodegroupid in sorted(deleted_nodegroups):
         # TileModel.nodegroup is DO_NOTHING, so tiles outlive their nodegroup.

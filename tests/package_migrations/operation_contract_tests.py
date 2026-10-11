@@ -58,6 +58,7 @@ SAMPLES = [
     ops.AddNodeToTiles(nodegroup_id=NODEGROUP, nodeid=NODE),
     ops.RemoveNodeFromTiles(nodegroup_id=NODEGROUP, nodeid=NODE),
     ops.DeleteTilesForNodeGroup(nodegroup_id=NODEGROUP),
+    ops.DeleteMisparentedTiles(nodegroup_id=NODEGROUP),
     ops.PublishGraph(graphid=GRAPH, publication_id=PUB),
     ops.SetResourcePublication(graphid=GRAPH, publication_id=PUB),
     ops.RunPackagePython(code=_noop),

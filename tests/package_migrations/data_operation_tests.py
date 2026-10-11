@@ -10,11 +10,14 @@ from arches.db.package_migrations.operations.python import RunPackagePython
 from arches.db.package_migrations.operations.resource import SetResourcePublication
 from arches.db.package_migrations.operations.tile import (
     AddNodeToTiles,
+    DeleteMisparentedTiles,
     DeleteTilesForNodeGroup,
     RemoveNodeFromTiles,
 )
 
-from tests.package_migrations.spike_tests import PackageMigrationOperationTests
+from tests.package_migrations.operation_integration_tests import (
+    PackageMigrationOperationTests,
+)
 
 
 class PendingWorkTests(PackageMigrationOperationTests):
@@ -101,3 +104,50 @@ class SetResourcePublicationBackwardsTests(PackageMigrationOperationTests):
         )
         with self.assertRaises(PackageMigrationError):
             operation.database_backwards("arches", self.schema_editor, None, None)
+
+
+class DeleteMisparentedTilesTests(PackageMigrationOperationTests):
+    def test_deletes_only_tiles_whose_parent_tile_no_longer_fits(self):
+        new_parent_nodegroup_id = uuid.uuid4()
+        child_nodegroup_id = uuid.uuid4()
+        models.NodeGroup.objects.create(
+            nodegroupid=new_parent_nodegroup_id, cardinality="n"
+        )
+        models.NodeGroup.objects.create(
+            nodegroupid=child_nodegroup_id,
+            cardinality="n",
+            parentnodegroup_id=self.nodegroup_id,
+        )
+        old_parent_tile = self._make_tile()
+        new_parent_tile = models.TileModel.objects.create(
+            resourceinstance=old_parent_tile.resourceinstance,
+            nodegroup_id=new_parent_nodegroup_id,
+            data={},
+        )
+        models.TileModel.objects.create(
+            resourceinstance=old_parent_tile.resourceinstance,
+            nodegroup_id=child_nodegroup_id,
+            parenttile=old_parent_tile,
+            data={},
+        )
+        fitting_tile = models.TileModel.objects.create(
+            resourceinstance=old_parent_tile.resourceinstance,
+            nodegroup_id=child_nodegroup_id,
+            parenttile=new_parent_tile,
+            data={},
+        )
+        models.NodeGroup.objects.filter(pk=child_nodegroup_id).update(
+            parentnodegroup_id=new_parent_nodegroup_id
+        )
+        operation = DeleteMisparentedTiles(nodegroup_id=str(child_nodegroup_id))
+
+        self.assertTrue(operation.has_pending_work("default"))
+        operation.database_forwards("arches", self.schema_editor, None, None)
+
+        remaining_tile_ids = set(
+            models.TileModel.objects.filter(
+                nodegroup_id=child_nodegroup_id
+            ).values_list("tileid", flat=True)
+        )
+        self.assertEqual(remaining_tile_ids, {fitting_tile.tileid})
+        self.assertFalse(operation.has_pending_work("default"))

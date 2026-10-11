@@ -26,6 +26,7 @@ from arches.db.package_migrations.loader import (
 )
 from arches.db.package_migrations.operations.graph import CreateGraph
 from arches.db.package_migrations.operations.node import AlterNode
+from arches.db.package_migrations.operations.nodegroup import AlterNodeGroup
 from arches.db.package_migrations.recorder import PackageMigrationRecorder
 from arches.db.package_migrations.state import canonical_graph
 from arches.db.package_migrations.writer import PackageMigrationWriter
@@ -103,7 +104,9 @@ class Command(BaseCommand):
             operations = changes_for_package(
                 from_state.graphs, to_graphs, self._publication_ids(present)
             )
-            self._warn_about_data_the_generator_cannot_convert(operations, to_graphs)
+            self._warn_about_data_the_generator_cannot_convert(
+                operations, from_state.graphs, to_graphs
+            )
             if not operations:
                 if self.verbosity >= 1:
                     self.stdout.write("No changes detected.")
@@ -281,8 +284,19 @@ class Command(BaseCommand):
             ).values_list("graphid", "publication_id")
         }
 
-    def _warn_about_data_the_generator_cannot_convert(self, operations, to_graphs):
+    def _warn_about_data_the_generator_cannot_convert(
+        self, operations, from_graphs, to_graphs
+    ):
         for operation in operations:
+            if (
+                isinstance(operation, AlterNodeGroup)
+                and "parentnodegroup_id" in operation.changes
+            ):
+                self._warn(
+                    f"Nodegroup {operation.pk} is moving to parent nodegroup {operation.changes['parentnodegroup_id']}. Publishing in the Graph Designer deleted its tiles whose parent tile is not in the new parent nodegroup, and installs that apply this migration will delete them too."
+                )
+                continue
+
             if not isinstance(operation, AlterNode):
                 continue
             node = (
@@ -303,6 +317,21 @@ class Command(BaseCommand):
                 self._warn(
                     f"Node {name} ({operation.pk}) is changing datatype to '{new_datatype}'. Values already stored for it keep the old shape, and tile JSONB is cast straight to the node's declared datatype when it is read: write a RunPackagePython migration in the same release to convert them."
                 )
+
+            if "config" in operation.changes:
+                previous_node = (
+                    from_graphs.get(str(operation.graphid), {})
+                    .get("nodes", {})
+                    .get(str(operation.pk), {})
+                )
+                previous_default = (previous_node.get("config") or {}).get(
+                    "defaultValue"
+                )
+                new_default = (operation.changes["config"] or {}).get("defaultValue")
+                if previous_default != new_default:
+                    self._warn(
+                        f"Node {name} ({operation.pk}) has a new default value. Publishing in the Graph Designer replaced stored values equal to the old default on this database, but installs that apply this migration will keep them: write a RunPackagePython migration if they should change there too."
+                    )
 
     def _build_migrations(self, app_label, operations, leaf, name):
         # Created graphs get their own migration for load_package sites to record.

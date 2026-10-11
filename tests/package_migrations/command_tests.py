@@ -20,7 +20,9 @@ from django.test import override_settings
 from arches.app.models import models
 from arches.db.package_migrations.recorder import PackageMigrationRecorder
 
-from tests.package_migrations.spike_tests import PackageMigrationOperationTests
+from tests.package_migrations.operation_integration_tests import (
+    PackageMigrationOperationTests,
+)
 
 APP_NAME = "pkgmigfixture"
 
