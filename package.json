@@ -141,8 +141,6 @@
         "themepunch-tools": "plugins/revolution-slider/rs-plugin/js/jquery.themepunch.tools.min",
         "revolution-slider": "plugins/revolution-slider",
         "slick": "plugins/slick/slick.min",
-        "async": "node_modules/requirejs-plugins/src/async",
-        "text": "node_modules/requirejs-text/text",
         "jquery": "node_modules/jquery/dist/jquery.min",
         "js-cookie": "node_modules/js-cookie/dist/js.cookie",
         "select-woo": "node_modules/select-woo/dist/js/selectWoo.full",

@@ -34,7 +34,6 @@ from arches.app.models.models import (
     CardComponent,
     SearchExportHistory,
 )
-from arches.app.models.concept import Concept
 from arches.app.utils import import_class_from_string
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -129,16 +128,6 @@ class SearchView(MapBaseManagerView):
         context["term_search_types"] = JSONSerializer().serialize(term_search_types)
 
         return render(request, "views/search.htm", context)
-
-
-def home_page(request):
-    return render(
-        request,
-        "views/search.htm",
-        {
-            "main_script": "views/search",
-        },
-    )
 
 
 def search_terms(request):
@@ -379,13 +368,6 @@ def _buffer(geojson, width=0, unit="ft"):
             res = cursor.fetchone()
             geom = GEOSGeometry(res[0], srid=4326)
     return geom
-
-
-def _get_child_concepts(conceptid):
-    ret = {conceptid}
-    for row in Concept().get_child_concepts(conceptid, ["prefLabel"]):
-        ret.add(row[0])
-    return list(ret)
 
 
 def time_wheel_config(request):

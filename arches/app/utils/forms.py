@@ -30,11 +30,7 @@ from django.db import transaction
 from django.utils.translation import gettext as _
 from arches.app.models import models
 
-# Allow arches apps to depend on django_recaptcha (Django 5.2) or captcha (Django 4.2)
-try:
-    from django_recaptcha.fields import ReCaptchaField
-except ImportError:
-    from captcha.fields import ReCaptchaField
+from django_recaptcha.fields import ReCaptchaField
 
 
 class ArchesUserCreationForm(UserCreationForm):

@@ -525,18 +525,6 @@ class TileData(View):
             return response
 
 
-# Move to util function
-def get(id):
-    try:
-        uuid.UUID(id)
-        return uuid.UUID(id), False
-    except (ValueError, TypeError):
-        return uuid.uuid4(), True
-
-
-uuid.get_or_create = get
-
-
 def update_system_settings_cache(tile):
     if str(tile.resourceinstance_id) == settings.RESOURCE_INSTANCE_ID:
         settings.update_from_db()

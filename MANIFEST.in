@@ -10,7 +10,6 @@ recursive-exclude .eggs *
 recursive-exclude .github *
 recursive-exclude .idea *
 recursive-exclude contributing *
-recursive-exclude cypress *
 recursive-exclude docker *
 recursive-exclude node_modules *
 recursive-exclude releases *

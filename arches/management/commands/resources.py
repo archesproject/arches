@@ -140,7 +140,6 @@ class Command(BaseCommand):
         """
         Runs the resource_remover command found in data_management.resources
         """
-        # resource_remover.delete_resources(load_id)
         if not force:
             if graphid is None:
                 if not utils.get_yn_input("all resources will be removed. continue?"):

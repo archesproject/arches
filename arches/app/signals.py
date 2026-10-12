@@ -226,53 +226,6 @@ def update_permissions_for_group(sender, instance, action, **kwargs):
         update_permissions_for_group(instance)
 
 
-@receiver(post_save, sender=models.UserXNotification)
-def send_email_on_save(sender, instance, **kwargs):
-    """Checks if a notification type needs to send an email, does so if email server exists"""
-
-    if instance.notif.notiftype is not None and instance.isread is False:
-        if models.UserXNotificationType.objects.filter(
-            user=instance.recipient,
-            notiftype=instance.notif.notiftype,
-            emailnotify=False,
-        ).exists():
-            return False
-
-        try:
-            context = instance.notif.context.copy()
-            text_content = render_to_string(
-                instance.notif.notiftype.emailtemplate, context
-            )
-            html_template = get_template(instance.notif.notiftype.emailtemplate)
-            html_content = html_template.render(context)
-            if context["email"] == instance.recipient.email:
-                email_to = instance.recipient.email
-            else:
-                email_to = context["email"]
-
-            if type(email_to) is not list:
-                email_to = [email_to]
-
-            subject, from_email, to = (
-                instance.notif.notiftype.name,
-                settings.DEFAULT_FROM_EMAIL,
-                email_to,
-            )
-            msg = EmailMultiAlternatives(subject, text_content, from_email, to)
-            msg.attach_alternative(html_content, "text/html")
-            msg.send()
-            if instance.notif.notiftype.webnotify is not True:
-                instance.isread = True
-                instance.save()
-        except Exception as e:
-            logger.warning(e)
-            logger.warning(
-                "Error occurred sending email.  See previous stack trace and check email configuration in settings.py."
-            )
-
-    return False
-
-
 @receiver(pre_save, sender=models.SearchComponent)
 def ensure_single_default_searchview(sender, instance, **kwargs):
     if instance.config.get("default", False) and instance.type == "search-view":

@@ -33,8 +33,6 @@ except ImportError:  # unable to import prior to installing requirements
 ###          STATIC SETTINGS          ###
 #########################################
 
-STREAMLINE_IMPORT = True
-
 MODE = "PROD"  # options are either "PROD" or "DEV" (installing with Dev mode set, gets you extra dependencies)
 DEBUG = True
 INTERNAL_IPS = ("127.0.0.1",)
@@ -131,9 +129,6 @@ TERM_SEARCH_TYPES = [
 THUMBNAIL_GENERATOR = None  # "arches.app.utils.thumbnail_generator.ThumbnailGenerator"
 GENERATE_THUMBNAILS_ON_DEMAND = (
     False  # True to generate a thumnail on request if it doens't exist
-)
-MIN_FILE_SIZE_T0_GENERATE_THUMBNAIL = (
-    150000  # yet to be implemented, in bytes eg: 150000 = 150kb
 )
 
 # This should point to the url where you host your site
@@ -338,11 +333,6 @@ STATIC_URL = "/static/"
 # when hosting Arches under a sub path set this value to the sub path eg : "/{sub_path}/"
 FORCE_SCRIPT_NAME = None
 
-# URL prefix for admin static files -- CSS, JavaScript and images.
-# Make sure to use a trailing slash.
-# Examples: "http://foo.com/static/admin/", "/static/admin/".
-ADMIN_MEDIA_PREFIX = "/media/admin/"
-
 STATICFILES_DIRS = build_staticfiles_dirs(
     app_root=ROOT_DIR
 )  # app_root=ROOT_DIR is a workaround to find `node_modules` when running Arches without a project
@@ -361,8 +351,6 @@ STATICFILES_FINDERS = (
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = "django-insecure-c7ky-mc6vdnv+avp0r@(a)8y^51ex=25nogq@+q5$fnc*mxwdi"
-JWT_KEY = SECRET_KEY
-JWT_TOKEN_EXPIRATION = 50  # days before the token becomes stale
 JWT_ALGORITHM = "HS256"
 
 # OAuth settings
@@ -414,7 +402,6 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    #'arches.app.utils.middleware.TokenMiddleware',
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -497,8 +484,6 @@ LOGIN_URL = "auth"
 # See options (including None or python callables):
 # https://django-ratelimit.readthedocs.io/en/stable/rates.html#rates-chapter
 RATE_LIMIT = "5/m"
-
-PROFILE_LOG_BASE = os.path.join(ROOT_DIR, "logs")
 
 BULK_IMPORT_BATCH_SIZE = 2000
 
@@ -669,7 +654,6 @@ OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 604800}  # one week
 ###   RUN TIME CONFIGURABLE SETTINGS   ###
 ##########################################
 
-PHONE_REGEX = r"^\+\d{8,15}$"
 SEARCH_ITEMS_PER_PAGE = 5
 SEARCH_EXPORT_LIMIT = 100000
 SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD = 2000  # The maximum number of instances a user can download from search export without celery
@@ -841,7 +825,6 @@ CELERY_BEAT_SCHEDULE = {
 # way of monitoring celery so you can detect the background task not being available.
 CELERY_CHECK_ONLY_INSPECT_BROKER = False
 
-AUTO_REFRESH_GEOM_VIEW = True
 TILE_CACHE_TIMEOUT = 600  # seconds
 CLUSTER_DISTANCE_MAX = 5000  # meters
 GRAPH_MODEL_CACHE_TIMEOUT = None  # seconds * hours * days = ~1mo
