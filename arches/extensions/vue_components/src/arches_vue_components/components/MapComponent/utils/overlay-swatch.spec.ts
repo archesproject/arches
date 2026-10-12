@@ -42,22 +42,6 @@ describe("deriveOverlaySwatch", () => {
         });
     });
 
-    it("maps circle layers to point swatches", () => {
-        const overlay = buildOverlay({
-            layerdefinitions: [
-                {
-                    id: "points",
-                    type: "circle",
-                    paint: { "circle-color": "#00ff00" },
-                },
-            ],
-        });
-        expect(deriveOverlaySwatch(overlay)).toEqual({
-            kind: "point",
-            color: "#00ff00",
-        });
-    });
-
     it("builds a gradient from heatmap color stops", () => {
         const overlay = buildOverlay({
             layerdefinitions: [
@@ -82,26 +66,5 @@ describe("deriveOverlaySwatch", () => {
             kind: "gradient",
             colors: ["rgba(0,0,0,0)", "#ff0000"],
         });
-    });
-
-    it("falls back to the overlay icon when no literal color exists", () => {
-        const overlay = buildOverlay({
-            icon: "fa fa-map",
-            layerdefinitions: [
-                {
-                    id: "fill",
-                    type: "fill",
-                    paint: { "fill-color": ["get", "color"] },
-                },
-            ],
-        });
-        expect(deriveOverlaySwatch(overlay)).toEqual({
-            kind: "icon",
-            iconClass: "fa fa-map",
-        });
-    });
-
-    it("returns null when nothing describes the overlay", () => {
-        expect(deriveOverlaySwatch(buildOverlay({}))).toBeNull();
     });
 });

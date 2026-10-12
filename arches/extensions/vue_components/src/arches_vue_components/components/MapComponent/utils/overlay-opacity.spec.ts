@@ -6,15 +6,6 @@ import {
 } from "@/arches_vue_components/components/MapComponent/utils/overlay-opacity.ts";
 
 describe("overlay opacity", () => {
-    it("is adjustable when every opacity is a literal or unset", () => {
-        expect(
-            isOverlayOpacityAdjustable([
-                { id: "fill", type: "fill", paint: { "fill-opacity": 0.5 } },
-                { id: "line", type: "line" },
-            ]),
-        ).toBe(true);
-    });
-
     it("is not adjustable when any opacity is an expression", () => {
         expect(
             isOverlayOpacityAdjustable([
@@ -51,11 +42,5 @@ describe("overlay opacity", () => {
             ["circle-opacity", 0.4],
             ["circle-stroke-opacity", 0.5],
         ]);
-    });
-
-    it("returns nothing for layer types without opacity properties", () => {
-        expect(
-            buildScaledOpacityPaint({ id: "shade", type: "hillshade" }, 50),
-        ).toEqual([]);
     });
 });

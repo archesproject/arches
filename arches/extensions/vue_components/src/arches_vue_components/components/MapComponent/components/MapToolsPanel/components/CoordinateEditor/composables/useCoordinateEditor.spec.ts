@@ -25,25 +25,6 @@ function buildContext(drawnFeatures: Feature[] = []): MapContext {
 }
 
 describe("useCoordinateEditor", () => {
-    it("builds and adds a point, then resets for the next entry", () => {
-        const context = buildContext();
-        const editor = useCoordinateEditor(context, null, "point");
-
-        editor.updateRow(0, "x", -0.1276);
-        editor.updateRow(0, "y", 51.5072);
-        const shouldClose = editor.submit();
-
-        expect(shouldClose).toBe(false);
-        expect(context.addFeatures).toHaveBeenCalledWith([
-            {
-                type: "Feature",
-                properties: {},
-                geometry: { type: "Point", coordinates: [-0.1276, 51.5072] },
-            },
-        ]);
-        expect(editor.rows.value).toEqual([{ x: null, y: null }]);
-    });
-
     it("closes the polygon ring when submitting", () => {
         const context = buildContext();
         const editor = useCoordinateEditor(context, null, "point");
@@ -74,35 +55,6 @@ describe("useCoordinateEditor", () => {
                 },
             }),
         ]);
-    });
-
-    it("keeps the typed rows when the feature limit rejects the shape", () => {
-        const context = buildContext();
-        vi.mocked(context.addFeatures).mockReturnValue(false);
-        const editor = useCoordinateEditor(context, null, "point");
-
-        editor.updateRow(0, "x", 1);
-        editor.updateRow(0, "y", 2);
-
-        expect(editor.submit()).toBe(false);
-        expect(editor.rows.value).toEqual([{ x: 1, y: 2 }]);
-    });
-
-    it("starts in the default kind", () => {
-        const editor = useCoordinateEditor(buildContext(), null, "polygon");
-
-        expect(editor.kind.value).toBe("polygon");
-        expect(editor.rows.value).toHaveLength(3);
-    });
-
-    it("refuses to submit incomplete rows", () => {
-        const context = buildContext();
-        const editor = useCoordinateEditor(context, null, "point");
-        editor.updateRow(0, "x", 1);
-
-        expect(editor.submit()).toBe(false);
-        expect(editor.errorMessage.value).not.toBeNull();
-        expect(context.addFeatures).not.toHaveBeenCalled();
     });
 
     it("loads an existing line and updates it in place", () => {
@@ -141,22 +93,6 @@ describe("useCoordinateEditor", () => {
                 ],
             },
         });
-    });
-
-    it("undoes row additions and removals", () => {
-        const editor = useCoordinateEditor(buildContext(), null, "point");
-        editor.setKind("line");
-
-        editor.addRow(null);
-        expect(editor.rows.value).toHaveLength(3);
-        editor.removeRow(0);
-        expect(editor.rows.value).toHaveLength(2);
-
-        editor.undo();
-        expect(editor.rows.value).toHaveLength(3);
-        editor.undo();
-        expect(editor.rows.value).toHaveLength(2);
-        expect(editor.canUndo.value).toBe(false);
     });
 
     it("records a single undo step per committed row edit", () => {

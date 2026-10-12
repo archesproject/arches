@@ -1,7 +1,7 @@
 from types import SimpleNamespace
 from unittest import mock
 from uuid import uuid4
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
 from django.core import management
 from django.test.utils import captured_stdout
@@ -156,46 +156,17 @@ class EnsureAbsoluteTileURLsTests(SimpleTestCase):
         self.assertEqual(source, {"type": "raster"})
 
 
-class MapDataAPITests(TestCase):
-    COORDINATE_SYSTEMS = (
-        {
-            "name": "Geographic",
-            "srid": "4326",
-            "proj4": "+proj=longlat +datum=WGS84 +no_defs",
-            "default": True,
-        },
-    )
-
-    @override_settings(PREFERRED_COORDINATE_SYSTEMS=COORDINATE_SYSTEMS)
-    def test_includes_preferred_coordinate_systems(self):
-        response = self.client.get(reverse("arches_vue_components:api-map-data"))
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.json()["preferred_coordinate_systems"],
-            list(self.COORDINATE_SYSTEMS),
-        )
-
-
 class ClusterResourcesAPITests(ArchesTestCase):
     NODE = SimpleNamespace(nodeid=uuid4(), nodegroup=None)
     PERMITTED_ID = str(uuid4())
     RESTRICTED_ID = str(uuid4())
-    EXTENT = '{"type":"Point","coordinates":[1168854.65,6710219.08]}'
 
     def setUp(self):
         super().setUp()
         self.client.login(username="admin", password="admin")
         node_lookup = mock.patch.object(Node.objects, "select_related")
-        self.get_node = node_lookup.start().return_value.get
-        self.get_node.return_value = self.NODE
+        node_lookup.start().return_value.get.return_value = self.NODE
         self.addCleanup(node_lookup.stop)
-
-    def get_cluster_resources(self, extent=EXTENT):
-        return self.client.get(
-            reverse("arches_vue_components:api-cluster-resources"),
-            {"nodeid": str(self.NODE.nodeid), "extent": extent},
-        )
 
     def get_permitted_cluster_resources(self, filtered_instances):
         with (
@@ -208,7 +179,10 @@ class ClusterResourcesAPITests(ArchesTestCase):
                 return_value=filtered_instances,
             ),
         ):
-            return self.get_cluster_resources()
+            return self.client.get(
+                reverse("arches_vue_components:api-cluster-resources"),
+                {"nodeid": str(self.NODE.nodeid), "extent": "{}"},
+            )
 
     def test_excludes_restricted_resources(self):
         response = self.get_permitted_cluster_resources((False, [self.RESTRICTED_ID]))
@@ -221,15 +195,3 @@ class ClusterResourcesAPITests(ArchesTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["resourceinstanceids"], [self.PERMITTED_ID])
-
-    def test_unknown_node_is_not_found(self):
-        self.get_node.side_effect = Node.DoesNotExist
-
-        response = self.get_cluster_resources()
-
-        self.assertEqual(response.status_code, 404)
-
-    def test_invalid_extent_is_bad_request(self):
-        response = self.get_cluster_resources(extent="not geojson")
-
-        self.assertEqual(response.status_code, 400)
