@@ -19,6 +19,7 @@ from arches.app.models.models import (
     ETLModule,
     File,
     GeoJSONGeometry,
+    GraphModel,
     LoadErrors,
     LoadEvent,
     NodeGroup,
@@ -599,6 +600,25 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
 
         self.assertIn("already belongs to resource", self._errors(loadid))
         self.assertFalse(ResourceInstance.objects.filter(pk=site).exists())
+
+    def test_an_overwrite_cannot_change_a_resources_graph(self):
+        monument = uuid.uuid4()
+        self._load(_resource(monument, _tile(STRING_NODE, _text("Monument 17"))))
+        other_graph = GraphModel.objects.create(
+            name="Other", slug="other", isresource=True
+        ).pk
+        ResourceInstance.objects.filter(pk=monument).update(graph_id=other_graph)
+
+        loadid = self._load(
+            _resource(monument, _tile(STRING_NODE, _text("Monument 17, renamed"))),
+            overwrite=True,
+            status="failed",
+        )
+
+        self.assertIn("cannot change its graph", self._errors(loadid))
+        self.assertEqual(
+            ResourceInstance.objects.get(pk=monument).graph_id, other_graph
+        )
 
     def test_a_tile_repeated_after_a_batch_is_checked_still_fails(self):
         tile = uuid.uuid4()

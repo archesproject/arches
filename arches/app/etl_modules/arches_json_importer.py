@@ -313,6 +313,7 @@ class ArchesJsonImporter(BaseImportModule):
         seen_resourceids = {}
         legacyids = {}
         tile_owners = {}
+        resource_graphs = {}
         seen_tiles = set()
         file_owners = {}
         constraint_candidates = {}
@@ -345,6 +346,7 @@ class ArchesJsonImporter(BaseImportModule):
                     cardinality_keys,
                     counts,
                     tile_owners,
+                    resource_graphs,
                     seen_tiles,
                     file_owners,
                 )
@@ -354,11 +356,15 @@ class ArchesJsonImporter(BaseImportModule):
                 if len(tile_owners) >= DB_CHECK_BATCH_SIZE:
                     failures.extend(self._check_existing_tiles(tile_owners))
                     tile_owners.clear()
+                if len(resource_graphs) >= DB_CHECK_BATCH_SIZE:
+                    failures.extend(self._check_resource_graphs(resource_graphs))
+                    resource_graphs.clear()
                 if len(failures) >= 1000:
                     self._flush_failures(failures)
                     failures = []
 
         failures.extend(self._check_existing_tiles(tile_owners))
+        failures.extend(self._check_resource_graphs(resource_graphs))
         failures.extend(self._check_existing_resources(seen_resourceids))
         failures.extend(self._check_existing_files(file_owners))
         failures.extend(self._check_existing_legacyids(legacyids))
@@ -388,6 +394,7 @@ class ArchesJsonImporter(BaseImportModule):
         cardinality_keys,
         counts,
         tile_owners,
+        resource_graphs,
         seen_tiles,
         file_owners,
     ):
@@ -430,6 +437,8 @@ class ArchesJsonImporter(BaseImportModule):
             return [self._failure(source, _("Graph {} does not exist").format(graphid))]
         except ValueError as unpublished:
             return [self._failure(source, str(unpublished))]
+        if self._overwrite:
+            resource_graphs[resourceid] = (str(graphid).lower(), source)
 
         if instance.get("legacyid"):
             legacyids.setdefault(str(instance["legacyid"]), (resourceid, source))
@@ -807,6 +816,27 @@ class ArchesJsonImporter(BaseImportModule):
             )
             for pk in existing
         ]
+
+    # Overwrite keeps the resource row, so a new graph would change its model while
+    # links into it still name the old one.
+    def _check_resource_graphs(self, resource_graphs):
+        failures = []
+        for batch in self._in_batches(resource_graphs):
+            for resourceid, existing in ResourceInstance.objects.filter(
+                resourceinstanceid__in=batch
+            ).values_list("resourceinstanceid", "graph_id"):
+                graphid, source = resource_graphs[str(resourceid)]
+                if str(existing) != graphid:
+                    failures.append(
+                        self._failure(
+                            source,
+                            _(
+                                "Resource {} belongs to graph {}, not {}. "
+                                "Replacing a resource cannot change its graph."
+                            ).format(resourceid, existing, graphid),
+                        )
+                    )
+        return failures
 
     # Both modes: overwrite only clears a resource's own tiles, so a tile id held
     # by a different resource would still collide on insert.
