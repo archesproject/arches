@@ -1339,13 +1339,8 @@ class ArchesJsonImporter(BaseImportModule):
                 "AND fileid = ANY(%s::uuid[])",
                 [ids, file_ids],
             )
-            for table in ("resource_x_resource", "geojson_geometries", "files"):
-                cursor.execute(
-                    f"DELETE FROM {table} WHERE tileid IN ({old_tiles})", [ids]
-                )
-            cursor.execute(
-                "DELETE FROM tiles WHERE resourceinstanceid = ANY(%s::uuid[])", [ids]
-            )
+            cursor.execute(f"DELETE FROM files WHERE tileid IN ({old_tiles})", [ids])
+        TileModel.objects.filter(resourceinstance_id__in=resourceids).delete()
 
     # ------------------------------------------------- set-based postprocess
 
