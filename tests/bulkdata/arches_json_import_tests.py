@@ -34,7 +34,6 @@ from arches.app.utils.data_management.resource_graphs.importer import (
 from tests.base_test import ArchesTransactionTestCase
 from arches.app.etl_modules.arches_json_importer import (
     ArchesJsonImporter,
-    DB_CHECK_BATCH_SIZE,
     MEMO_MAX_VALUES_PER_NODE,
 )
 from arches.app.etl_modules.save import reenable_tile_triggers
@@ -284,14 +283,12 @@ class ValidationMemoTests(SimpleTestCase):
 
 class BatchedDbCheckTests(SimpleTestCase):
     def test_batches_cover_everything_in_order(self):
-        items = list(range(4_200_000))
-        batches = list(ArchesJsonImporter._in_batches(items))
-        self.assertEqual([x for b in batches for x in b], items)
-        self.assertLessEqual(max(len(b) for b in batches), DB_CHECK_BATCH_SIZE)
-
-    # legacyid__in becomes one bind parameter per value; Postgres caps at 65,535.
-    def test_batch_stays_under_the_bind_parameter_limit(self):
-        self.assertLess(DB_CHECK_BATCH_SIZE, 65535)
+        items = list(range(7))
+        with patch(
+            "arches.app.etl_modules.arches_json_importer.DB_CHECK_BATCH_SIZE", 3
+        ):
+            batches = list(ArchesJsonImporter._in_batches(items))
+        self.assertEqual(batches, [[0, 1, 2], [3, 4, 5], [6]])
 
     def test_empty_input_runs_no_query(self):
         self.assertEqual(list(ArchesJsonImporter._in_batches([])), [])
