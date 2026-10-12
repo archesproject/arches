@@ -1,14 +1,5 @@
 <script setup lang="ts">
-import {
-    computed,
-    nextTick,
-    onMounted,
-    onUnmounted,
-    provide,
-    ref,
-    useId,
-    useTemplateRef,
-} from "vue";
+import { computed, nextTick, provide, ref, useId, useTemplateRef } from "vue";
 
 import Skeleton from "openvue/skeleton";
 import Toast from "openvue/toast";
@@ -129,16 +120,6 @@ const activeTool = computed(() =>
     ),
 );
 
-onMounted(() => {
-    document.addEventListener("keydown", handleDocumentKeydown);
-    document.addEventListener("click", handleDocumentClick);
-});
-
-onUnmounted(() => {
-    document.removeEventListener("keydown", handleDocumentKeydown);
-    document.removeEventListener("click", handleDocumentClick);
-});
-
 function openPanel(toolName: string): void {
     activeToolName.value = toolName;
 }
@@ -160,29 +141,13 @@ async function closePanel(): Promise<void> {
         mapHeader.value?.focusTool(previousToolName);
     }
 }
-
-function handleDocumentKeydown(event: KeyboardEvent): void {
-    if (event.key === "Escape" && activeToolName.value) {
-        closePanel();
-    }
-}
-
-function handleDocumentClick(event: MouseEvent): void {
-    if (!activeToolName.value || !mapShell.value) {
-        return;
-    }
-    if (event.composedPath().includes(mapShell.value)) {
-        return;
-    }
-
-    activeToolName.value = null;
-}
 </script>
 
 <template>
     <div
         ref="mapShell"
         class="map-component"
+        @keydown.esc="closePanel"
     >
         <MapHeader
             v-if="resolvedInteractionTools.length"
