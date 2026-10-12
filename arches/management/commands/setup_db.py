@@ -210,11 +210,12 @@ To create it, use:
             self.drop_and_recreate_db(cursor)
         else:
             self.reset_db(cursor)
-        # delete existing indexes
-        management.call_command("es", operation="delete_indexes")
+        if settings.ELASTICSEARCH_ENABLED:
+            # delete existing indexes
+            management.call_command("es", operation="delete_indexes")
 
-        # setup initial Elasticsearch indexes
-        management.call_command("es", operation="setup_indexes")
+            # setup initial Elasticsearch indexes
+            management.call_command("es", operation="setup_indexes")
 
         management.call_command("createcachetable")
         management.call_command("migrate")

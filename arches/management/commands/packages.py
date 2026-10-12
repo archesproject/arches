@@ -395,7 +395,11 @@ class Command(BaseCommand):
                 prevent_indexing=prevent_indexing,
             )
 
-            if defer_indexing and not prevent_indexing:
+            if (
+                defer_indexing
+                and not prevent_indexing
+                and settings.ELASTICSEARCH_ENABLED
+            ):
                 # index concepts if new concepts created
                 if concept_count != models.Value.objects.count():
                     management.call_command("es", "index_concepts")
@@ -1253,7 +1257,7 @@ class Command(BaseCommand):
         load_users(package_location, "users")
         print("loading templates")
         load_templates(package_location)
-        if defer_indexing is True:
+        if defer_indexing is True and settings.ELASTICSEARCH_ENABLED:
             print("indexing database")
             management.call_command(
                 "es", "reindex_database", recalculate_descriptors=True, quiet=self.quiet
@@ -1336,9 +1340,15 @@ class Command(BaseCommand):
         management.call_command("setup_db", force=True)
 
     def setup_indexes(self):
+        if not settings.ELASTICSEARCH_ENABLED:
+            print("Elasticsearch is disabled; skipping index setup.")
+            return
         management.call_command("es", operation="setup_indexes")
 
     def delete_indexes(self):
+        if not settings.ELASTICSEARCH_ENABLED:
+            print("Elasticsearch is disabled; skipping index deletion.")
+            return
         management.call_command("es", operation="delete_indexes")
 
     def export_business_data(

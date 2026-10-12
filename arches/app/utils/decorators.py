@@ -23,10 +23,11 @@ import datetime
 
 from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse
 
 from arches.app.models import models
+from arches.app.models.system_settings import settings
 from arches.app.utils.permission_backend import user_can_read_resource
 from arches.app.utils.permission_backend import user_can_edit_resource
 from arches.app.utils.permission_backend import user_can_delete_resource
@@ -154,6 +155,24 @@ def can_read_concept():
     """
 
     return user_passes_test(user_can_read_concepts)
+
+
+def requires_elasticsearch(function):
+    """
+    Makes a view unavailable when settings.ELASTICSEARCH_ENABLED is False.
+
+    The url stays registered so that {% url %} tags and arches.urls entries used by
+    other applications keep resolving, but the view itself 404s rather than failing
+    against an absent search index.
+    """
+
+    @functools.wraps(function)
+    def wrapper(request, *args, **kwargs):
+        if not settings.ELASTICSEARCH_ENABLED:
+            raise Http404("This view requires Elasticsearch, which is disabled.")
+        return function(request, *args, **kwargs)
+
+    return wrapper
 
 
 # Checks whether current user is the one who created a particular transaction ID

@@ -29,7 +29,7 @@ runs:
     - name: Set up Elasticsearch
       uses: ankane/setup-elasticsearch@v1
       with:
-        elasticsearch-version: 8
+        elasticsearch-version: 9
 
     - name: Install Python packages
       run: |
