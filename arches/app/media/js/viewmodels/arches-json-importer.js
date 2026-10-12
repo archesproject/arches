@@ -1,6 +1,5 @@
 import ko from 'knockout';
 import ImporterViewModel from 'viewmodels/base-import-view-model';
-import arches from 'arches';
 import AlertViewModel from 'viewmodels/alert';
 import 'dropzone';
 import 'bindings/select2-query';
@@ -15,9 +14,7 @@ const ArchesJsonImportViewModel = function(params) {
     this.loading = params.loading || ko.observable();
     this.moduleId = params.etlmoduleid;
     ImporterViewModel.apply(this, arguments);
-    this.loadStatus = ko.observable('ready');
     this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
-    this.editHistoryUrl = `${arches.urls.edit_history}?transactionid=${ko.unwrap(params.selectedLoadEvent)?.loadid}`;
     this.validationErrors = params.validationErrors || ko.observable();
     this.validated = params.validated || ko.observable();
     this.getErrorReport = params.getErrorReport;
