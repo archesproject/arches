@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { provide, useId } from "vue";
+import { provide, useTemplateRef } from "vue";
 
 import { useGettext } from "vue3-gettext";
 
 import Button from "openvue/button";
 
-import { panelHeaderActionsIdKey } from "@/arches_vue_components/components/MapComponent/constants.ts";
+import { panelHeaderActionsKey } from "@/arches_vue_components/components/MapComponent/constants.ts";
 
 const CLOSE_EVENT = "close" as const;
 
@@ -25,9 +25,11 @@ const emit = defineEmits<{
 
 const { $gettext } = useGettext();
 
-const headerActionsId = useId();
+const headerActionsElement = useTemplateRef<HTMLDivElement>(
+    "headerActionsElement",
+);
 
-provide(panelHeaderActionsIdKey, headerActionsId);
+provide(panelHeaderActionsKey, headerActionsElement);
 </script>
 
 <template>
@@ -41,7 +43,7 @@ provide(panelHeaderActionsIdKey, headerActionsId);
         <header class="floating-panel-header">
             <span class="floating-panel-title">{{ title }}</span>
             <div
-                :id="headerActionsId"
+                ref="headerActionsElement"
                 class="floating-panel-header-actions"
             />
             <Button

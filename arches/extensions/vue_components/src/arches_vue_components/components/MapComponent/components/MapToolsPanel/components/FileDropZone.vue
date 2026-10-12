@@ -99,9 +99,8 @@ async function onSelect(event: { files: File[] }): Promise<void> {
 }
 
 function openFileChooser(): void {
-    // @ts-expect-error FileUpload does not have a type definition for $el
-    const rootElement = fileUpload.value?.$el;
-    rootElement?.querySelector('input[type="file"]')?.click();
+    // @ts-expect-error FileUpload does not have a type definition for choose
+    fileUpload.value?.choose();
 }
 </script>
 

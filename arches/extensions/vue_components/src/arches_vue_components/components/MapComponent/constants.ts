@@ -1,4 +1,4 @@
-import type { InjectionKey } from "vue";
+import type { InjectionKey, ShallowRef } from "vue";
 
 import type { MapSettings } from "@/arches_vue_components/components/MapComponent/types.ts";
 
@@ -71,6 +71,6 @@ export const DEFAULT_MAP_SETTINGS: MapSettings = {
     allow3d: false,
 };
 
-export const panelHeaderActionsIdKey: InjectionKey<string> = Symbol(
-    "panelHeaderActionsId",
-);
+export const panelHeaderActionsKey: InjectionKey<
+    Readonly<ShallowRef<HTMLDivElement | null>>
+> = Symbol("panelHeaderActions");

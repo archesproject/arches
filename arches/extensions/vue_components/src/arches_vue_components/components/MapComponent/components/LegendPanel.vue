@@ -8,7 +8,7 @@ import Button from "openvue/button";
 
 import OverlaySwatch from "@/arches_vue_components/components/MapComponent/components/OverlaySwatch.vue";
 
-import { panelHeaderActionsIdKey } from "@/arches_vue_components/components/MapComponent/constants.ts";
+import { panelHeaderActionsKey } from "@/arches_vue_components/components/MapComponent/constants.ts";
 import { useResolvedMapContext } from "@/arches_vue_components/components/MapComponent/composables/useMapContext.ts";
 import { getOverlayOpacityPercent } from "@/arches_vue_components/components/MapComponent/utils/overlay-opacity.ts";
 
@@ -24,7 +24,7 @@ const { context = undefined } = defineProps<{
     context?: MapContext;
 }>();
 
-const panelHeaderActionsId = inject(panelHeaderActionsIdKey, null);
+const panelHeaderActions = inject(panelHeaderActionsKey, null);
 
 const { overlays, overlayOpacities } = useResolvedMapContext(
     context,
@@ -63,13 +63,6 @@ const areAllGroupsCollapsed = computed(() =>
         collapsedGroupIds.value.includes(group.id),
     ),
 );
-
-const headerActionsSelector = computed(() => {
-    if (!panelHeaderActionsId) {
-        return "body";
-    }
-    return `#${panelHeaderActionsId}`;
-});
 
 const toggleAllGroupsIcon = computed(() => {
     if (areAllGroupsCollapsed.value) {
@@ -115,9 +108,8 @@ function getOpacityPercent(overlay: MapLayer): number {
 <template>
     <Teleport
         v-if="visibleGroups.length"
-        :to="headerActionsSelector"
-        :disabled="!panelHeaderActionsId"
-        :defer="true"
+        :to="panelHeaderActions"
+        :disabled="!panelHeaderActions"
     >
         <div class="legend-actions">
             <Button

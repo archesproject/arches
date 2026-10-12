@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useId } from "vue";
+import { useTemplateRef } from "vue";
 
 import { useGettext } from "vue3-gettext";
 
@@ -44,19 +44,18 @@ defineExpose({ focusRow });
 
 const { $gettext } = useGettext();
 
-const idPrefix = useId();
-
-function getInputId(index: number, axis: keyof CoordinateRow): string {
-    return `${idPrefix}-${axis}-${index}`;
-}
+const vertexTableElement = useTemplateRef<HTMLDivElement>("vertexTableElement");
 
 function focusRow(index: number): void {
-    document.getElementById(getInputId(index, "x"))?.focus();
+    vertexTableElement.value?.children[index].querySelector("input")?.focus();
 }
 </script>
 
 <template>
-    <div class="vertex-table">
+    <div
+        ref="vertexTableElement"
+        class="vertex-table"
+    >
         <div
             v-for="(row, index) in rows"
             :key="index"
@@ -70,7 +69,6 @@ function focusRow(index: number): void {
                 class="vertex-input"
                 size="small"
                 :model-value="row[axis]"
-                :input-id="getInputId(index, axis)"
                 :placeholder="axisLabels[axis]"
                 :aria-label="
                     $gettext('%{axis} for vertex %{number}', {
