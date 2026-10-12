@@ -135,12 +135,12 @@ class DefaultDenyAllowedInstancesFromDbTests(TestCase):
     def test_superuser_gets_all_or_requested_subset(self):
         framework = ArchesDefaultDenyPermissionFramework()
         admin = User.objects.get(username="admin")
-        all_ids = {str(pk) for pk in ResourceInstance.objects.values_list("pk", flat=True)}
+        all_ids = {
+            str(pk) for pk in ResourceInstance.objects.values_list("pk", flat=True)
+        }
 
         self.assertEqual(set(framework.get_allowed_instances(admin)), all_ids)
-        self.assertEqual(
-            framework.get_allowed_instances(admin, resources=["x"]), ["x"]
-        )
+        self.assertEqual(framework.get_allowed_instances(admin, resources=["x"]), ["x"])
 
     def test_user_without_permissions_gets_nothing(self):
         framework = ArchesDefaultDenyPermissionFramework()
