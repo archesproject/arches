@@ -1555,7 +1555,7 @@ class ArchesJsonImporter(BaseImportModule):
     # other apps keep against tiles and resources, as a resource delete in the UI does.
     def _delete_load(self, cursor, loadid, resourceids):
         removed = 0
-        for batch in self._in_batches(resourceids):
+        for batch in self._in_batches(resourceids, settings.BULK_IMPORT_BATCH_SIZE):
             EditLog.objects.bulk_create(
                 EditLog(
                     resourceclassid=str(graphid),
