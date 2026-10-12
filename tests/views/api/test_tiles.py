@@ -134,6 +134,22 @@ class ResourceAPITests(ArchesTestCase):
         )
         self.assertEqual(response.status_code, 403)
 
+    def test_tiles_endpoint_delete(self):
+        tile = models.TileModel.objects.create(
+            nodegroup_id=uuid.UUID("e7364d1e-95c4-11e8-9e7c-acde48001122"),
+            data={"f08a3057-95c4-11e8-9761-acde48001122": 1},
+            resourceinstance=self.non_legacy_resource,
+        )
+        url = reverse("api_tiles", kwargs={"tileid": str(tile.tileid)})
+
+        self.client.force_login(User.objects.get(username="anonymous"))
+        self.assertEqual(self.client.delete(url).status_code, 403)
+
+        self.client.force_login(User.objects.get(username="sam"))
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(models.TileModel.objects.filter(pk=tile.pk).exists())
+
     def test_tiles_endpoint(self):
         user = User.objects.get(username="ben")
         self.client.force_login(user)
