@@ -29,6 +29,7 @@ from arches.app.etl_modules.save import (
     reenable_tile_triggers,
 )
 from arches.app.models.models import (
+    ConstraintModel,
     EditLog,
     ETLModule,
     File,
@@ -699,8 +700,6 @@ class ArchesJsonImporter(BaseImportModule):
     @staticmethod
     def _constraints_for_nodegroups(nodegroupids):
         """uniquetoallinstances constraints, keyed by nodegroup."""
-        from arches.app.models.models import ConstraintModel
-
         constraints = {}
         for constraint in (
             ConstraintModel.objects.filter(
