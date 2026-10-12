@@ -23,7 +23,7 @@ const ArchesJsonImportViewModel = function(params) {
     // Replaces resources that already exist rather than failing on them.
     this.overwrite = ko.observable(false);
     // Off writes the tiles but leaves them out of the search index until a
-    // manage.py index_database run.
+    // manage.py es index_database run.
     this.index = ko.observable(true);
 
     this.showAlert = (data) => {

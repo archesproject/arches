@@ -41,9 +41,10 @@
             </p>
             <p>
                 {% blocktrans %}Untick <strong>Index the data after import</strong> to write the tiles
-                without indexing them. The data is saved but will not appear in search until you run
-                <code>python manage.py index_database</code>. Useful when loading several files in a
-                row: skip indexing on each and index once at the end.{% endblocktrans %}
+                without indexing them. The data is saved, but it will not appear in search, and the
+                resources will have no display names, until you run
+                <code>python manage.py es index_database --recalculate-descriptors</code>. Useful when
+                loading several files in a row: skip indexing on each and index once at the end.{% endblocktrans %}
             </p>
         </div>
     </div>
