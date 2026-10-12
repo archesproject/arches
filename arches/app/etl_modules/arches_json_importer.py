@@ -370,7 +370,9 @@ class ArchesJsonImporter(BaseImportModule):
         failures.extend(self._check_existing_resources(seen_resourceids))
         failures.extend(self._check_existing_files(file_owners))
         failures.extend(self._check_existing_legacyids(legacyids))
-        failures.extend(self._check_global_constraints(constraint_candidates))
+        failures.extend(
+            self._check_global_constraints(constraint_candidates, seen_resourceids)
+        )
         failures.extend(self._check_existing_cardinality(cardinality_keys))
         self._flush_failures(failures)
 
@@ -737,7 +739,7 @@ class ArchesJsonImporter(BaseImportModule):
             group = constraint_candidates.setdefault((nodegroupid, tuple(node_ids)), {})
             group.setdefault(json.dumps(values, sort_keys=True), []).append(resourceid)
 
-    def _check_global_constraints(self, constraint_candidates):
+    def _check_global_constraints(self, constraint_candidates, importing):
         failures = []
         for (nodegroupid, node_ids), group in constraint_candidates.items():
             for key, resourceids in group.items():
@@ -762,9 +764,6 @@ class ArchesJsonImporter(BaseImportModule):
                       SELECT jsonb_array_elements(%s::jsonb)
                   )
             """
-            # importing is built from the whole group, not the batch: a
-            # colliding resource may sit in a different batch.
-            importing = {rid for rids in group.values() for rid in rids}
             collisions = []
             for batch in self._in_batches(group):
                 params = (

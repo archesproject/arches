@@ -15,6 +15,8 @@ from django.test import SimpleTestCase, TestCase
 from arches.app.models.graph import Graph
 from arches.app.models.system_settings import settings
 from arches.app.models.models import (
+    CardModel,
+    ConstraintModel,
     EditLog,
     ETLModule,
     File,
@@ -617,6 +619,26 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
 
         self.assertIn("already belongs to resource", self._errors(loadid))
         self.assertFalse(ResourceInstance.objects.filter(pk=site).exists())
+
+    def test_an_overwrite_can_move_a_unique_value_off_a_replaced_resource(self):
+        constraint = ConstraintModel.objects.create(
+            card=CardModel.objects.get(nodegroup_id=STRING_NODE),
+            uniquetoallinstances=True,
+        )
+        constraint.nodes.add(STRING_NODE)
+        monument, site = uuid.uuid4(), uuid.uuid4()
+        self._load(_resource(monument, _tile(STRING_NODE, _text("Old Mill"))))
+
+        self._load(
+            _resource(monument),
+            _resource(site, _tile(STRING_NODE, _text("Old Mill"))),
+            overwrite=True,
+        )
+
+        self.assertFalse(
+            TileModel.objects.filter(resourceinstance_id=monument).exists()
+        )
+        self.assertTrue(TileModel.objects.filter(resourceinstance_id=site).exists())
 
     def test_an_overwrite_cannot_change_a_resources_graph(self):
         monument = uuid.uuid4()
