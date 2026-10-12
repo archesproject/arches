@@ -726,6 +726,18 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
         self.assertIn("data", response, response)
         self.assertEqual(response["data"]["summary"]["ignored_files"], 1)
 
+    def test_a_zip_with_two_files_of_the_same_name_is_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "export.zip")
+            empty = json.dumps({"business_data": {"resources": []}})
+            with zipfile.ZipFile(path, "w") as zf:
+                zf.writestr("a/data.json", empty)
+                zf.writestr("b/data.json", empty)
+            response = self._read(path)
+
+        self.assertFalse(response["success"])
+        self.assertIn("data.json", response["data"]["message"])
+
     def test_overwrite_keeps_the_resource_and_links_into_it(self):
         monument, site = uuid.uuid4(), uuid.uuid4()
         name, geometry = uuid.uuid4(), uuid.uuid4()

@@ -209,7 +209,18 @@ class ArchesJsonImporter(BaseImportModule):
                 }
 
             if extension == "zip":
-                self._read_zip(content, result)
+                duplicate = self._read_zip(content, result)
+                if duplicate:
+                    return {
+                        "success": False,
+                        "data": {
+                            "title": _("Invalid zip file"),
+                            "message": _(
+                                "More than one file in the zip is named {}. "
+                                "Give each file a unique name."
+                            ).format(duplicate),
+                        },
+                    }
             else:
                 self.cumulative_files_size += content.size
                 result["summary"]["files"][content.name] = {
@@ -239,6 +250,7 @@ class ArchesJsonImporter(BaseImportModule):
         )
 
     def _read_zip(self, content, result):
+        names = set()
         with zipfile.ZipFile(content, "r") as zip_ref:
             for member in zip_ref.infolist():
                 if member.is_dir() or member.filename.startswith("__MACOSX"):
@@ -247,15 +259,17 @@ class ArchesJsonImporter(BaseImportModule):
                     summary = result["summary"]
                     summary["ignored_files"] = summary.get("ignored_files", 0) + 1
                     continue
+                name = Path(member.filename).name
+                if name in names:
+                    return name
+                names.add(name)
                 self.cumulative_files_size += member.file_size
                 result["summary"]["files"][member.filename] = {
                     "size": self.filesize_format(member.file_size)
                 }
                 with zip_ref.open(member) as opened:
-                    default_storage.save(
-                        Path(self.temp_dir) / Path(member.filename).name,
-                        DjangoFile(opened),
-                    )
+                    default_storage.save(Path(self.temp_dir) / name, DjangoFile(opened))
+        return None
 
     # -------------------------------------------------------------- streaming
 
