@@ -100,6 +100,23 @@ class ResourceAPITests(ArchesTestCase):
         response_data = json.loads(response.content)
         self.assertEqual(response_data["data"][nodeid], new_value)
 
+    def test_node_value_endpoint_records_creator_of_new_resource(self):
+        user = User.objects.get(username="ben")
+        self.client.force_login(user)
+        payload = {
+            "nodeid": "f08a3057-95c4-11e8-9761-acde48001122",
+            "data": 7,
+        }
+        response = self.client.post(
+            reverse("api_node_value"),
+            payload,
+        )
+        self.assertEqual(response.status_code, 200)
+        created_resource = models.ResourceInstance.objects.get(
+            pk=json.loads(response.content)["resourceinstance_id"]
+        )
+        self.assertEqual(created_resource.principaluser, user)
+
     def test_node_value_endpoint_without_permission(self):
         user = User.objects.get(username="anonymous")
         self.client.force_login(user)
