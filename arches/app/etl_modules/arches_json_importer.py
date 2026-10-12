@@ -1409,8 +1409,6 @@ class ArchesJsonImporter(BaseImportModule):
                 "SELECT __arches_refresh_transaction_resource_relationships(%s)",
                 [loadid],
             )
-            # ponytail: one statement over every geojson tile in the load.  If a
-            # 300k load makes this the bottleneck, chunk it by resource-id range.
             cursor.execute(
                 "SELECT refresh_transaction_geojson_geometries(%s)", [loadid]
             )
