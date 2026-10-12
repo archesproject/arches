@@ -717,8 +717,6 @@ class ArchesJsonImporter(BaseImportModule):
 
     # ------------------------------------------------- set-based DB checks
 
-    # Only the overwrite=False path reaches the checks below, and a 331k-resource
-    # load asks them about ~4.2M tiles -- past Postgres' bind-parameter limit.
     @staticmethod
     def _in_batches(items, size=None):
         # Read at call time, not bound as a default, so a test can shrink it.
