@@ -473,6 +473,40 @@ class MigratePkgTests(PackageMigrationOperationTests):
         self.assertTrue(models.NodeGroup.objects.filter(pk=nodegroup_id).exists())
         self.assertIn("not the tiles or values they deleted", stderr)
 
+    def test_a_child_moved_off_a_deleted_parent_survives_and_reverses(self):
+        parent_id, child_id = str(uuid.uuid4()), str(uuid.uuid4())
+        self._write_migrations(
+            (
+                "0001_graph_nodegroups",
+                True,
+                [
+                    f'CreateNodeGroup(graphid="{self.graphid}", fields={{"nodegroupid": "{parent_id}", "cardinality": "n"}})',
+                    f'CreateNodeGroup(graphid="{self.graphid}", fields={{"nodegroupid": "{child_id}", "cardinality": "n", "parentnodegroup_id": "{parent_id}"}})',
+                ],
+            ),
+            (
+                "0002_graph_move_child_delete_parent",
+                True,
+                [
+                    f'AlterNodeGroup(graphid="{self.graphid}", pk="{child_id}", changes={{"parentnodegroup_id": None}})',
+                    f'DeleteNodeGroup(graphid="{self.graphid}", pk="{parent_id}")',
+                ],
+            ),
+        )
+        with self._installed():
+            self._migratepkg(APP_NAME, verbosity=0)
+            self.assertIsNone(
+                models.NodeGroup.objects.get(pk=child_id).parentnodegroup_id
+            )
+            self.assertFalse(models.NodeGroup.objects.filter(pk=parent_id).exists())
+
+            self._migratepkg(APP_NAME, "0001_graph_nodegroups", verbosity=0)
+
+        self.assertEqual(
+            str(models.NodeGroup.objects.get(pk=child_id).parentnodegroup_id),
+            parent_id,
+        )
+
     def test_missing_reference_data_names_the_package_to_install(self):
         graphid = str(uuid.uuid4())
         ontology_id = str(uuid.uuid4())

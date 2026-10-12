@@ -223,3 +223,191 @@ class MisparentedTileTests(SimpleTestCase):
 
         self.assertNotIn("DeleteMisparentedTiles", operation_names)
         self.assertIn("DeleteTilesForNodeGroup", operation_names)
+
+
+class CascadeOrderTests(SimpleTestCase):
+    def _positions(self, operations):
+        return [
+            (type(operation).__name__, str(getattr(operation, "pk", "")))
+            for operation in operations
+        ]
+
+    def test_a_child_moved_off_a_deleted_parent_moves_before_the_delete(self):
+        parent_id, child_id, new_parent_id = (
+            str(uuid.uuid4()),
+            str(uuid.uuid4()),
+            str(uuid.uuid4()),
+        )
+        before = _graph(
+            nodegroups=[
+                {"nodegroupid": parent_id},
+                {"nodegroupid": child_id, "parentnodegroup_id": parent_id},
+                {"nodegroupid": new_parent_id},
+            ]
+        )
+        after = _graph(
+            nodegroups=[
+                {"nodegroupid": child_id, "parentnodegroup_id": new_parent_id},
+                {"nodegroupid": new_parent_id},
+            ]
+        )
+
+        positions = self._positions(changes_for_graph(before, after, PUBLICATION_ID))
+
+        self.assertLess(
+            positions.index(("AlterNodeGroup", child_id)),
+            positions.index(("DeleteNodeGroup", parent_id)),
+        )
+
+    def test_an_edge_moved_onto_a_deleted_edges_pair_waits_for_that_delete(self):
+        deleted_node_id, kept_node_id, range_node_id = (
+            str(uuid.uuid4()),
+            str(uuid.uuid4()),
+            str(uuid.uuid4()),
+        )
+        deleted_edge_id, moved_edge_id = str(uuid.uuid4()), str(uuid.uuid4())
+        nodes = [
+            _node(nodeid=deleted_node_id, alias="deleted", name="deleted"),
+            _node(nodeid=kept_node_id, alias="kept", name="kept"),
+            _node(nodeid=range_node_id, alias="range", name="range"),
+        ]
+        before = _graph(
+            nodes=nodes,
+            edges=[
+                {
+                    "edgeid": deleted_edge_id,
+                    "domainnode_id": kept_node_id,
+                    "rangenode_id": range_node_id,
+                },
+                {
+                    "edgeid": moved_edge_id,
+                    "domainnode_id": deleted_node_id,
+                    "rangenode_id": range_node_id,
+                },
+            ],
+        )
+        after = _graph(
+            nodes=nodes[1:],
+            edges=[
+                {
+                    "edgeid": moved_edge_id,
+                    "domainnode_id": kept_node_id,
+                    "rangenode_id": range_node_id,
+                }
+            ],
+        )
+
+        positions = self._positions(changes_for_graph(before, after, PUBLICATION_ID))
+
+        self.assertLess(
+            positions.index(("DeleteEdge", deleted_edge_id)),
+            positions.index(("AlterEdge", moved_edge_id)),
+        )
+        self.assertLess(
+            positions.index(("AlterEdge", moved_edge_id)),
+            positions.index(("DeleteNode", deleted_node_id)),
+        )
+
+    def test_a_node_moving_into_a_taken_name_gets_the_holder_out_of_the_way(self):
+        deleted_nodegroup_id, target_nodegroup_id, other_nodegroup_id = (
+            str(uuid.uuid4()),
+            str(uuid.uuid4()),
+            str(uuid.uuid4()),
+        )
+        moving_node_id, holder_node_id = str(uuid.uuid4()), str(uuid.uuid4())
+        nodegroups = [
+            {"nodegroupid": target_nodegroup_id},
+            {"nodegroupid": other_nodegroup_id},
+        ]
+        before = _graph(
+            nodegroups=nodegroups + [{"nodegroupid": deleted_nodegroup_id}],
+            nodes=[
+                _node(
+                    nodeid=moving_node_id,
+                    name="Survey Date",
+                    alias="moving",
+                    nodegroup_id=deleted_nodegroup_id,
+                ),
+                _node(
+                    nodeid=holder_node_id,
+                    name="Survey Date",
+                    alias="holder",
+                    nodegroup_id=target_nodegroup_id,
+                ),
+            ],
+        )
+        after = _graph(
+            nodegroups=nodegroups,
+            nodes=[
+                _node(
+                    nodeid=moving_node_id,
+                    name="Survey Date",
+                    alias="moving",
+                    nodegroup_id=target_nodegroup_id,
+                ),
+                _node(
+                    nodeid=holder_node_id,
+                    name="Survey Date",
+                    alias="holder",
+                    nodegroup_id=other_nodegroup_id,
+                ),
+            ],
+        )
+
+        operations = changes_for_graph(before, after, PUBLICATION_ID)
+        holder_alters = [
+            operation.changes
+            for operation in operations
+            if type(operation).__name__ == "AlterNode"
+            and str(operation.pk) == holder_node_id
+        ]
+        positions = self._positions(operations)
+        moving_alter = positions.index(("AlterNode", moving_node_id))
+
+        self.assertEqual(
+            holder_alters,
+            [
+                {"name": f"_placeholder_{holder_node_id}"},
+                {"nodegroup_id": other_nodegroup_id, "name": "Survey Date"},
+            ],
+        )
+        self.assertLess(positions.index(("AlterNode", holder_node_id)), moving_alter)
+        self.assertLess(
+            moving_alter,
+            positions.index(("DeleteNodeGroup", deleted_nodegroup_id)),
+        )
+
+    def test_a_moved_and_renamed_node_renames_after_the_deletes(self):
+        deleted_nodegroup_id = str(uuid.uuid4())
+        before = _graph(
+            nodegroups=[
+                {"nodegroupid": NODEGROUP},
+                {"nodegroupid": deleted_nodegroup_id},
+            ],
+            nodes=[_node(nodegroup_id=deleted_nodegroup_id)],
+        )
+        after = _graph(
+            nodegroups=[{"nodegroupid": NODEGROUP}],
+            nodes=[_node(alias="renamed")],
+        )
+
+        operations = changes_for_graph(before, after, PUBLICATION_ID)
+        node_alters = [
+            operation.changes
+            for operation in operations
+            if type(operation).__name__ == "AlterNode"
+        ]
+        positions = self._positions(operations)
+
+        alias_alter = [
+            index
+            for index, operation in enumerate(operations)
+            if getattr(operation, "changes", None) == {"alias": "renamed"}
+        ][0]
+        delete = positions.index(("DeleteNodeGroup", deleted_nodegroup_id))
+
+        self.assertEqual(
+            node_alters, [{"nodegroup_id": NODEGROUP}, {"alias": "renamed"}]
+        )
+        self.assertLess(positions.index(("AlterNode", NODE)), delete)
+        self.assertLess(delete, alias_alter)

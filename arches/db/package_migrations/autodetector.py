@@ -2,7 +2,9 @@
 Creates run in dependency order and deletes in reverse.
 """
 
-from arches.db.package_migrations.state import STATE_COLLECTIONS
+from django.db.models import CASCADE
+
+from arches.db.package_migrations.state import EXCLUDED_FIELDS, STATE_COLLECTIONS
 from arches.db.package_migrations.operations.resource import SetResourcePublication
 from arches.db.package_migrations.operations.tile import (
     AddNodeToTiles,
@@ -57,6 +59,94 @@ COLLECTION_OPERATIONS = (
 )
 
 
+COLLECTION_MODELS = {
+    state_key: alter.model
+    for state_key, _pk, _create, alter, _delete in COLLECTION_OPERATIONS
+}
+COLLECTION_ALTERS = {
+    state_key: alter
+    for state_key, _pk, _create, alter, _delete in COLLECTION_OPERATIONS
+}
+
+
+def _cascading_fields(state_key):
+    collections_by_model = {
+        model: collection for collection, model in COLLECTION_MODELS.items()
+    }
+    return {
+        field.attname: collections_by_model[field.related_model]
+        for field in COLLECTION_MODELS[state_key]._meta.concrete_fields
+        if field.is_relation
+        and field.related_model in collections_by_model
+        and field.remote_field.on_delete is CASCADE
+        and field.attname not in EXCLUDED_FIELDS
+    }
+
+
+def _deleted_ancestors(before_by_collection, deleted, state_key, key):
+    found = set()
+    pending = [(state_key, key)]
+    while pending:
+        collection, row_key = pending.pop()
+        if row_key not in deleted[collection] or (collection, row_key) in found:
+            continue
+        found.add((collection, row_key))
+        row = before_by_collection[collection][row_key]
+        for field, target_collection in _cascading_fields(collection).items():
+            if row.get(field) is not None:
+                pending.append((target_collection, str(row[field])))
+    return found
+
+
+def _delete_operations(graphid, deleted, include):
+    return [
+        delete(graphid=graphid, pk=key)
+        for state_key, _pk, _create, _alter, delete in reversed(COLLECTION_OPERATIONS)
+        for key in sorted(deleted[state_key])
+        if include((state_key, key))
+    ]
+
+
+def _placeholders(
+    graphid,
+    repoints,
+    before_by_collection,
+    after_by_collection,
+    deleted,
+    late_deletes,
+    remaining_changes,
+):
+    # A node re-pointed into a nodegroup keeps its old name until its remaining alter,
+    # so whichever node holds that name there gives it up first.
+    placeholders = []
+    nodes_before = before_by_collection["nodes"]
+    for state_key, key, repoint in repoints:
+        if state_key != "nodes" or "nodegroup_id" not in repoint:
+            continue
+        for holder_key, holder in sorted(nodes_before.items()):
+            if holder_key == key:
+                continue
+            if str(holder.get("nodegroup_id")) != str(repoint["nodegroup_id"]):
+                continue
+            if holder.get("name") != nodes_before[key].get("name"):
+                continue
+            surviving = holder_key not in deleted["nodes"]
+            if not surviving and ("nodes", holder_key) not in late_deletes:
+                continue
+            placeholders.append(
+                AlterNode(
+                    graphid=graphid,
+                    pk=holder_key,
+                    changes={"name": f"_placeholder_{holder_key}"},
+                )
+            )
+            if surviving:
+                remaining_changes[("nodes", holder_key)]["name"] = after_by_collection[
+                    "nodes"
+                ][holder_key]["name"]
+    return placeholders
+
+
 def _scalar_fields(graph):
     return {key: value for key, value in graph.items() if key not in STATE_COLLECTIONS}
 
@@ -83,21 +173,71 @@ def changes_for_graph(from_graph, to_graph, publication_id):
             operations.append(AlterGraph(graphid=to_graph["graphid"], changes=changes))
 
     graphid = to_graph["graphid"]
+    before_by_collection = {key: from_graph.get(key) or {} for key in STATE_COLLECTIONS}
+    after_by_collection = {key: to_graph.get(key) or {} for key in STATE_COLLECTIONS}
+    deleted = {
+        key: set(before_by_collection[key]) - set(after_by_collection[key])
+        for key in STATE_COLLECTIONS
+    }
 
-    for state_key, _pk, _create, _alter, delete in reversed(COLLECTION_OPERATIONS):
-        before = from_graph.get(state_key) or {}
-        after = to_graph.get(state_key) or {}
-        for key in sorted(set(before) - set(after)):
-            operations.append(delete(graphid=graphid, pk=key))
-
-    for state_key, pk, create, alter, _delete in COLLECTION_OPERATIONS:
-        before = from_graph.get(state_key) or {}
-        after = to_graph.get(state_key) or {}
-        for key in sorted(set(after) - set(before)):
-            operations.append(create(graphid=graphid, fields=after[key]))
+    # Rows moving off a deleted row move before it is deleted, or its cascade takes them.
+    repoints = []
+    remaining_changes = {}
+    late_deletes = set()
+    for state_key, pk, _create, _alter, _delete in COLLECTION_OPERATIONS:
+        before = before_by_collection[state_key]
+        after = after_by_collection[state_key]
+        cascading_fields = _cascading_fields(state_key)
         for key in sorted(set(after) & set(before)):
             changes = _changed_fields(before[key], after[key])
             changes.pop(pk, None)
+            repoint = {}
+            for field, target_collection in cascading_fields.items():
+                previous_target = before[key].get(field)
+                if field not in changes or previous_target is None:
+                    continue
+                if str(previous_target) not in deleted[target_collection]:
+                    continue
+                repoint[field] = changes.pop(field)
+                late_deletes |= _deleted_ancestors(
+                    before_by_collection,
+                    deleted,
+                    target_collection,
+                    str(previous_target),
+                )
+            if repoint:
+                repoints.append((state_key, key, repoint))
+            remaining_changes[(state_key, key)] = changes
+
+    operations.extend(
+        _delete_operations(graphid, deleted, lambda row: row not in late_deletes)
+    )
+    operations.extend(
+        _placeholders(
+            graphid,
+            repoints,
+            before_by_collection,
+            after_by_collection,
+            deleted,
+            late_deletes,
+            remaining_changes,
+        )
+    )
+    for state_key, key, repoint in repoints:
+        operations.append(
+            COLLECTION_ALTERS[state_key](graphid=graphid, pk=key, changes=repoint)
+        )
+    operations.extend(
+        _delete_operations(graphid, deleted, lambda row: row in late_deletes)
+    )
+
+    for state_key, _pk, create, alter, _delete in COLLECTION_OPERATIONS:
+        before = before_by_collection[state_key]
+        after = after_by_collection[state_key]
+        for key in sorted(set(after) - set(before)):
+            operations.append(create(graphid=graphid, fields=after[key]))
+        for key in sorted(set(after) & set(before)):
+            changes = remaining_changes[(state_key, key)]
             if changes:
                 operations.append(alter(graphid=graphid, pk=key, changes=changes))
 
