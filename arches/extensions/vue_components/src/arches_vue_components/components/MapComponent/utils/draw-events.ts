@@ -11,16 +11,12 @@ export interface DrawEvent {
 
 // "draw.*" are custom events fired by @mapbox/mapbox-gl-draw, not part
 // of maplibre-gl's typed MapEventType union.
-function toMapEventName(drawEventName: string): keyof MapEventType {
-    return drawEventName as keyof MapEventType;
-}
-
 export function onDrawEvent(
     map: MaplibreMap,
     drawEventName: string,
     listener: (drawEvent: DrawEvent) => void,
 ): Subscription {
-    return map.on(toMapEventName(drawEventName), (event: unknown) =>
+    return map.on(drawEventName as keyof MapEventType, (event: unknown) =>
         listener(event as DrawEvent),
     );
 }
