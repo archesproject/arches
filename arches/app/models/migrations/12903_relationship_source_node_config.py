@@ -1,6 +1,57 @@
 from django.db import migrations
 
 
+# Renames the relationship keys on each entry of every resource-instance value in
+# a tile. Each tile is rewritten once, however many resource-instance nodes its
+# nodegroup has, rather than once per node.
+def rename_tile_data_keys(old_key, new_key, old_inverse_key, new_inverse_key):
+    return f"""
+        WITH ri_nodes AS (
+            SELECT nodegroupid, array_agg(nodeid::text) AS nodeids
+            FROM nodes
+            WHERE datatype IN ('resource-instance', 'resource-instance-list')
+            GROUP BY nodegroupid
+        )
+        UPDATE tiles t SET tiledata = (
+            SELECT jsonb_object_agg(
+                tile_value.key,
+                CASE WHEN tile_value.key = ANY(ri.nodeids)
+                    AND jsonb_typeof(tile_value.value) = 'array'
+                THEN (
+                    SELECT COALESCE(jsonb_agg(
+                        CASE WHEN jsonb_typeof(element) = 'object' THEN
+                            (element - '{old_key}' - '{old_inverse_key}')
+                            || CASE WHEN element ? '{old_key}'
+                                THEN jsonb_build_object('{new_key}', element->'{old_key}')
+                                ELSE '{{}}'::jsonb END
+                            || CASE WHEN element ? '{old_inverse_key}'
+                                THEN jsonb_build_object('{new_inverse_key}', element->'{old_inverse_key}')
+                                ELSE '{{}}'::jsonb END
+                        ELSE element END
+                        ORDER BY ordinality
+                    ), '[]'::jsonb)
+                    FROM jsonb_array_elements(tile_value.value)
+                        WITH ORDINALITY AS elements(element, ordinality)
+                )
+                ELSE tile_value.value END
+            )
+            FROM jsonb_each(t.tiledata) tile_value
+        )
+        FROM ri_nodes ri
+        WHERE t.nodegroupid = ri.nodegroupid
+        AND EXISTS (
+            SELECT 1
+            FROM unnest(ri.nodeids) nodeid,
+                jsonb_array_elements(
+                    CASE WHEN jsonb_typeof(t.tiledata->nodeid) = 'array'
+                        THEN t.tiledata->nodeid ELSE '[]'::jsonb END
+                ) element
+            WHERE jsonb_typeof(element) = 'object'
+            AND (element ? '{old_key}' OR element ? '{old_inverse_key}')
+        );
+    """
+
+
 class Migration(migrations.Migration):
     dependencies = [
         ("models", "12913_remove_geocoders"),
@@ -305,77 +356,19 @@ class Migration(migrations.Migration):
         $BODY$;
     """
 
-    update_tile_data = """
-        DO $$
-        DECLARE
-            node RECORD;
-        BEGIN
-            FOR node IN
-                SELECT nodeid, nodegroupid FROM nodes
-                WHERE datatype IN ('resource-instance', 'resource-instance-list')
-            LOOP
-                UPDATE tiles SET tiledata = jsonb_set(tiledata, ARRAY[node.nodeid::text], (
-                    SELECT jsonb_agg(
-                        CASE WHEN jsonb_typeof(element) = 'object' THEN
-                            (element - 'ontologyProperty' - 'inverseOntologyProperty')
-                            || CASE WHEN element->'ontologyProperty' IS NOT NULL
-                                THEN jsonb_build_object('relationship', element->'ontologyProperty')
-                                ELSE '{}'::jsonb END
-                            || CASE WHEN element->'inverseOntologyProperty' IS NOT NULL
-                                THEN jsonb_build_object('inverseRelationship', element->'inverseOntologyProperty')
-                                ELSE '{}'::jsonb END
-                        ELSE element END
-                    )
-                    FROM jsonb_array_elements(tiledata->node.nodeid::text) element
-                ))
-                WHERE nodegroupid = node.nodegroupid
-                AND jsonb_typeof(tiledata->node.nodeid::text) = 'array'
-                AND EXISTS (
-                    SELECT * FROM jsonb_array_elements(tiledata->node.nodeid::text) element
-                    WHERE jsonb_typeof(element) = 'object'
-                    AND (element->'ontologyProperty' IS NOT NULL
-                        OR element->'inverseOntologyProperty' IS NOT NULL)
-                );
-            END LOOP;
-        END
-        $$;
-    """
+    update_tile_data = rename_tile_data_keys(
+        "ontologyProperty",
+        "relationship",
+        "inverseOntologyProperty",
+        "inverseRelationship",
+    )
 
-    reverse_tile_data = """
-        DO $$
-        DECLARE
-            node RECORD;
-        BEGIN
-            FOR node IN
-                SELECT nodeid, nodegroupid FROM nodes
-                WHERE datatype IN ('resource-instance', 'resource-instance-list')
-            LOOP
-                UPDATE tiles SET tiledata = jsonb_set(tiledata, ARRAY[node.nodeid::text], (
-                    SELECT jsonb_agg(
-                        CASE WHEN jsonb_typeof(element) = 'object' THEN
-                            (element - 'relationship' - 'inverseRelationship')
-                            || CASE WHEN element->'relationship' IS NOT NULL
-                                THEN jsonb_build_object('ontologyProperty', element->'relationship')
-                                ELSE '{}'::jsonb END
-                            || CASE WHEN element->'inverseRelationship' IS NOT NULL
-                                THEN jsonb_build_object('inverseOntologyProperty', element->'inverseRelationship')
-                                ELSE '{}'::jsonb END
-                        ELSE element END
-                    )
-                    FROM jsonb_array_elements(tiledata->node.nodeid::text) element
-                ))
-                WHERE nodegroupid = node.nodegroupid
-                AND jsonb_typeof(tiledata->node.nodeid::text) = 'array'
-                AND EXISTS (
-                    SELECT * FROM jsonb_array_elements(tiledata->node.nodeid::text) element
-                    WHERE jsonb_typeof(element) = 'object'
-                    AND (element->'relationship' IS NOT NULL
-                        OR element->'inverseRelationship' IS NOT NULL)
-                );
-            END LOOP;
-        END
-        $$;
-    """
+    reverse_tile_data = rename_tile_data_keys(
+        "relationship",
+        "ontologyProperty",
+        "inverseRelationship",
+        "inverseOntologyProperty",
+    )
 
     update_refresh_function = """
         CREATE OR REPLACE FUNCTION public.__arches_refresh_tile_resource_relationships(tile_id uuid)
