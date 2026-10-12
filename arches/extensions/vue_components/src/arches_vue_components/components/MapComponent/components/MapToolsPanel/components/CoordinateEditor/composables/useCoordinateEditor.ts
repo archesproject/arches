@@ -25,8 +25,8 @@ import {
 import type { ComputedRef, Ref } from "vue";
 import type { Feature, Geometry, Position } from "geojson";
 
-import type { CoordinateRow } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/types.ts";
 import type {
+    CoordinateRow,
     CoordinateSystem,
     DrawMode,
     MapContext,

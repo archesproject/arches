@@ -23,8 +23,8 @@ import { useCoordinateEditor } from "@/arches_vue_components/components/MapCompo
 import { useCoordinateGeoJsonText } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/composables/useCoordinateGeoJsonText.ts";
 import { useCoordinatePreview } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/composables/useCoordinatePreview.ts";
 
-import type { CoordinateRow } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/types.ts";
 import type {
+    CoordinateRow,
     DrawMode,
     MapContext,
 } from "@/arches_vue_components/components/MapComponent/types.ts";

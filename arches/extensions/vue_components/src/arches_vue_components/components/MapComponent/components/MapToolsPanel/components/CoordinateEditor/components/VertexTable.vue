@@ -6,7 +6,7 @@ import { useGettext } from "vue3-gettext";
 import Button from "openvue/button";
 import InputNumber from "openvue/inputnumber";
 
-import type { CoordinateRow } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/types.ts";
+import type { CoordinateRow } from "@/arches_vue_components/components/MapComponent/types.ts";
 
 const UPDATE_ROW_EVENT = "update-row" as const;
 const FOCUS_ROW_EVENT = "focus-row" as const;

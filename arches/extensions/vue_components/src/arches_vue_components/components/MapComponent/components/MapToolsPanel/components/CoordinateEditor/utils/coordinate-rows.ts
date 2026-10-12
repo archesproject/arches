@@ -3,10 +3,9 @@ import { fromWgs84 } from "@/arches_vue_components/components/MapComponent/utils
 import type { Geometry, Position } from "geojson";
 
 import type {
-    CompleteCoordinateRow,
     CoordinateRow,
-} from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/types.ts";
-import type { DrawMode } from "@/arches_vue_components/components/MapComponent/types.ts";
+    DrawMode,
+} from "@/arches_vue_components/components/MapComponent/types.ts";
 
 export function createEmptyRows(count: number): CoordinateRow[] {
     return Array.from({ length: count }, () => ({ x: null, y: null }));
@@ -14,11 +13,11 @@ export function createEmptyRows(count: number): CoordinateRow[] {
 
 export function isRowComplete(
     row: CoordinateRow,
-): row is CompleteCoordinateRow {
+): row is Record<keyof CoordinateRow, number> {
     return Number.isFinite(row.x) && Number.isFinite(row.y);
 }
 
-export function toPosition(row: CompleteCoordinateRow): Position {
+export function toPosition(row: Record<keyof CoordinateRow, number>): Position {
     return [row.x, row.y];
 }
 

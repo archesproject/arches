@@ -59,6 +59,11 @@ export interface MapInteractionTool {
 
 export type DrawMode = "point" | "line" | "polygon";
 
+export interface CoordinateRow {
+    x: number | null;
+    y: number | null;
+}
+
 export interface CoordinateSystem {
     name: string;
     srid: string;
