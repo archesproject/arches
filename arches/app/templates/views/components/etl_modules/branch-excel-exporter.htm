@@ -9,6 +9,7 @@
             <span data-bind="text: $root.translations.exportBranchExcel"></span>
         </h2>
         <section class="etl-module-component">
+            {% if app_settings.ELASTICSEARCH_ENABLED %}
             <div class="etl-module-component-block">
                 <h3>
                     <label for="search-url-input" data-bind="text: $root.translations.useSearchUrlOptional"></label>
@@ -18,6 +19,7 @@
                     class="form-control textarea textarea-resizable" spellcheck="false" data-bind="textInput: searchUrl"
                 ></textarea>
             </div>
+            {% endif %}
             <div class="etl-module-component-block">
                 <h3>
                     <label for="resource-model-select" data-bind="text: $root.translations.selectAResourceModel"></label>
