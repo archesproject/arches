@@ -17,18 +17,7 @@ class GeoJSON(APIBase):
     se = SearchEngineFactory().create()
 
     def get_name(self, resource):
-        graph_function = models.FunctionXGraph.objects.filter(
-            graph_id=resource.graph_id, function__functiontype="primarydescriptors"
-        ).select_related("function")
-        if len(graph_function) == 1:
-            module = graph_function[0].function.get_class_module()()
-            return module.get_primary_descriptor_from_nodes(
-                self,
-                graph_function[0].config["descriptor_types"]["name"],
-                descriptor="name",
-            )
-        else:
-            return _("Unnamed Resource")
+        return str(resource.name or "") or _("Unnamed Resource")
 
     def get(self, request):
         datatype_factory = DataTypeFactory()
@@ -70,9 +59,11 @@ class GeoJSON(APIBase):
         property_tiles = models.TileModel.objects.filter(nodegroup_id__in=nodegroups)
         property_node_map = {}
         property_nodes = models.Node.objects.filter(nodegroup_id__in=nodegroups)
+        resourceids = resourceid.split(",") if resourceid else None
         exclusive_set, filtered_instance_ids = get_filtered_instances(
-            request.user, self.se, resources=resourceid.split(",")
+            request.user, self.se, resources=resourceids
         )
+        filtered_instance_ids = set(filtered_instance_ids)
         for node in property_nodes:
             property_node_map[str(node.nodeid)] = {"node": node}
             if node.fieldname is None or node.fieldname == "":
@@ -83,18 +74,18 @@ class GeoJSON(APIBase):
                 property_node_map[str(node.nodeid)]["name"] = node.fieldname
         tiles = models.TileModel.objects.filter(
             nodegroup_id__in=[node.nodegroup_id for node in nodes]
-        )
+        ).select_related("resourceinstance")
         last_page = None
-        if resourceid is not None:
-            tiles = tiles.filter(resourceinstance_id__in=resourceid.split(","))
+        if resourceids is not None:
+            tiles = tiles.filter(resourceinstance_id__in=resourceids)
         if tileid is not None:
             tiles = tiles.filter(tileid=tileid)
         tiles = tiles.order_by("sortorder")
-        resource_available = str(tile.resourceinstance_id) not in filtered_instance_ids
-        resource_available = (
-            not (resource_available) if exclusive_set else resource_available
-        )
-        tiles = [tile for tile in tiles if resource_available]
+        tiles = [
+            tile
+            for tile in tiles
+            if (str(tile.resourceinstance_id) in filtered_instance_ids) == exclusive_set
+        ]
         if limit is not None:
             start = (page - 1) * limit
             end = start + limit
@@ -171,6 +162,8 @@ class GeoJSON(APIBase):
                                         node.pk,
                                     )
                                 )
+                            if "id" in feature:
+                                feature["properties"]["featureid"] = feature["id"]
                             feature["id"] = i
                             if precision is not None:
                                 coordinates = set_precision(
