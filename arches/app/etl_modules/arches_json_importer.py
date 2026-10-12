@@ -19,6 +19,7 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 
+import arches.app.tasks as tasks
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.base_import_module import BaseImportModule
 from arches.app.etl_modules.decorators import load_data_async
@@ -1443,8 +1444,6 @@ class ArchesJsonImporter(BaseImportModule):
             }
         try:
             if task_management.check_if_celery_available():
-                import arches.app.tasks as tasks
-
                 tasks.reverse_arches_json_load.apply_async([loadid])
             else:
                 self.reverse_load(loadid)
@@ -1602,8 +1601,6 @@ class ArchesJsonImporter(BaseImportModule):
 
     @load_data_async
     def run_load_task_async(self, request):
-        import arches.app.tasks as tasks
-
         details = json.loads(self.file_details)
         summary = details["result"]["summary"]
         load_task = tasks.load_arches_json.apply_async(
