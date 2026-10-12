@@ -99,6 +99,7 @@
         "@babel/plugin-transform-runtime": "7.29.0",
         "@babel/preset-env": "7.29.0",
         "@eslint/js": "10.0.1",
+        "@types/codemirror": "5.60.18",
         "@types/js-cookie": "3.0.6",
         "@typescript-eslint/parser": "8.57.0",
         "@vitejs/plugin-vue": "5.2.4",

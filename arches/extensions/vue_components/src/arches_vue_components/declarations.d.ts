@@ -7,4 +7,3 @@ declare module "@mapbox/mapbox-gl-draw";
 declare module "@mapbox/geojson-extent";
 declare module "shpjs";
 declare module "@tmcw/togeojson";
-declare module "codemirror";

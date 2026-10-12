@@ -39,6 +39,10 @@ watch(
 );
 
 onMounted(() => {
+    if (!editorContainer.value) {
+        return;
+    }
+
     editor = CodeMirror(editorContainer.value, {
         value: modelValue,
         mode: { name: "javascript", json: true },
