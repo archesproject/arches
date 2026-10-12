@@ -1,5 +1,3 @@
-export type CoordinateEntryKind = "point" | "line" | "polygon";
-
 export interface CoordinateRow {
     x: number | null;
     y: number | null;

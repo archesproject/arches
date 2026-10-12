@@ -1,6 +1,9 @@
 import type { InjectionKey, ShallowRef } from "vue";
 
-import type { MapSettings } from "@/arches_vue_components/components/MapComponent/types.ts";
+import type {
+    DrawMode,
+    MapSettings,
+} from "@/arches_vue_components/components/MapComponent/types.ts";
 
 export const BUFFER_FILL_COLOR = "#ea7f08";
 export const BUFFER_FILL_OPACITY = 0.3;
@@ -47,6 +50,12 @@ export const COORDINATE_PREVIEW_SOURCE_ID = "map-component-coordinate-preview";
 export const VERTEX_HIGHLIGHT_SOURCE_ID = "map-component-vertex-highlight";
 export const COMPONENT_LAYER_ID_PREFIX = "map-component-";
 export const WGS84_SRID = "4326";
+
+export const DRAW_MODE_BY_GEOMETRY_TYPE: Record<string, DrawMode> = {
+    [GEOMETRY_TYPE_POINT]: POINT,
+    [GEOMETRY_TYPE_LINESTRING]: LINE,
+    [GEOMETRY_TYPE_POLYGON]: POLYGON,
+};
 
 export const GEOMETRY_ICON_BY_TYPE: Record<string, string> = {
     Point: "pi pi-map-marker",

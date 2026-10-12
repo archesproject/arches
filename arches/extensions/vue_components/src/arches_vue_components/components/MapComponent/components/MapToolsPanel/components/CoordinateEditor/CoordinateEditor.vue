@@ -34,11 +34,11 @@ import { useCoordinatePreview } from "@/arches_vue_components/components/MapComp
 
 import type { Geometry } from "geojson";
 
+import type { CoordinateRow } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/types.ts";
 import type {
-    CoordinateEntryKind,
-    CoordinateRow,
-} from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/types.ts";
-import type { MapContext } from "@/arches_vue_components/components/MapComponent/types.ts";
+    DrawMode,
+    MapContext,
+} from "@/arches_vue_components/components/MapComponent/types.ts";
 import type { GeoJsonIssue } from "@/arches_vue_components/components/MapComponent/utils/geometry-import.ts";
 
 const CLOSE_EVENT = "close" as const;
@@ -221,7 +221,7 @@ onUnmounted(() => {
     applyPendingGeoJsonText.cancel();
 });
 
-function selectKind(newKind: CoordinateEntryKind): void {
+function selectKind(newKind: DrawMode): void {
     setKind(newKind);
     focusedRowIndex.value = null;
 }

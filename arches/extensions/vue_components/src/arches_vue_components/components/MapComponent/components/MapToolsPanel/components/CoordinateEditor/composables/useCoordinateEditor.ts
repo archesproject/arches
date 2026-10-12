@@ -3,7 +3,10 @@ import { computed, ref } from "vue";
 import { cloneDeep, isEqual } from "es-toolkit";
 import { useGettext } from "vue3-gettext";
 
-import { WGS84_SRID } from "@/arches_vue_components/components/MapComponent/constants.ts";
+import {
+    DRAW_MODE_BY_GEOMETRY_TYPE,
+    WGS84_SRID,
+} from "@/arches_vue_components/components/MapComponent/constants.ts";
 import {
     getCoordinateDecimalPlaces,
     isGeographicCoordinateSystem,
@@ -11,13 +14,10 @@ import {
 } from "@/arches_vue_components/components/MapComponent/utils/coordinate-systems.ts";
 import { useDraftHistory } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/composables/useDraftHistory.ts";
 import {
-    KIND_BY_GEOMETRY_TYPE,
-    MINIMUM_VERTICES,
     buildGeometry,
     createEmptyRows,
     isRowComplete,
     positionsFromGeometry,
-    reprojectRow,
     rowFromWgs84Position,
     toPosition,
 } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/utils/coordinate-rows.ts";
@@ -25,17 +25,21 @@ import {
 import type { ComputedRef, Ref } from "vue";
 import type { Feature, Geometry, Position } from "geojson";
 
-import type {
-    CoordinateEntryKind,
-    CoordinateRow,
-} from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/types.ts";
+import type { CoordinateRow } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/types.ts";
 import type {
     CoordinateSystem,
+    DrawMode,
     MapContext,
 } from "@/arches_vue_components/components/MapComponent/types.ts";
 
+const MINIMUM_VERTICES: Record<DrawMode, number> = {
+    point: 1,
+    line: 2,
+    polygon: 3,
+};
+
 interface CoordinateDraft {
-    kind: CoordinateEntryKind;
+    kind: DrawMode;
     srid: string;
     rows: CoordinateRow[];
     properties: Record<string, unknown>;
@@ -43,7 +47,7 @@ interface CoordinateDraft {
 
 export interface UseCoordinateEditorReturn {
     editingFeature: Feature | null;
-    kind: ComputedRef<CoordinateEntryKind>;
+    kind: ComputedRef<DrawMode>;
     srid: ComputedRef<string>;
     rows: ComputedRef<CoordinateRow[]>;
     properties: ComputedRef<Record<string, unknown>>;
@@ -55,7 +59,7 @@ export interface UseCoordinateEditorReturn {
     areAllRowsComplete: ComputedRef<boolean>;
     previewGeometry: ComputedRef<Geometry | null>;
     completeGeometry: ComputedRef<Geometry | null>;
-    setKind: (newKind: CoordinateEntryKind) => void;
+    setKind: (newKind: DrawMode) => void;
     setSrid: (newSrid: string) => void;
     updateRow: (
         index: number,
@@ -74,7 +78,7 @@ export interface UseCoordinateEditorReturn {
 export function useCoordinateEditor(
     context: MapContext,
     editingFeatureId: string | null,
-    defaultKind: CoordinateEntryKind,
+    defaultKind: DrawMode,
 ): UseCoordinateEditorReturn {
     const { $gettext } = useGettext();
 
@@ -165,9 +169,9 @@ export function useCoordinateEditor(
         );
     }
 
-    function getInitialKind(): CoordinateEntryKind {
+    function getInitialKind(): DrawMode {
         if (editingFeature) {
-            return KIND_BY_GEOMETRY_TYPE[editingFeature.geometry.type];
+            return DRAW_MODE_BY_GEOMETRY_TYPE[editingFeature.geometry.type];
         }
         return defaultKind;
     }
@@ -198,7 +202,7 @@ export function useCoordinateEditor(
         errorMessage.value = null;
     }
 
-    function setKind(newKind: CoordinateEntryKind): void {
+    function setKind(newKind: DrawMode): void {
         const minimum = MINIMUM_VERTICES[newKind];
         draft.value.kind = newKind;
         draft.value.properties = {};
@@ -225,9 +229,16 @@ export function useCoordinateEditor(
             findCoordinateSystem(newSrid),
         );
 
-        draft.value.rows = draft.value.rows.map((row) =>
-            reprojectRow(row, previousSrid, newSrid, newDecimalPlaces),
-        );
+        draft.value.rows = draft.value.rows.map((row) => {
+            if (!isRowComplete(row)) {
+                return row;
+            }
+            return rowFromWgs84Position(
+                toWgs84(previousSrid, toPosition(row)),
+                newSrid,
+                newDecimalPlaces,
+            );
+        });
         draft.value.srid = newSrid;
         history.commit();
     }
@@ -261,7 +272,7 @@ export function useCoordinateEditor(
 
     function loadFeature(feature: Feature): void {
         const loadedDraft: CoordinateDraft = {
-            kind: KIND_BY_GEOMETRY_TYPE[feature.geometry.type],
+            kind: DRAW_MODE_BY_GEOMETRY_TYPE[feature.geometry.type],
             srid: srid.value,
             rows: positionsFromGeometry(feature.geometry).map((position) =>
                 rowFromWgs84Position(position, srid.value, decimalPlaces.value),

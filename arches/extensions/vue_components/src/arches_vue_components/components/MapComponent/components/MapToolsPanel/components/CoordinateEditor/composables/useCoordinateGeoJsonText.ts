@@ -1,12 +1,12 @@
 import { useGettext } from "vue3-gettext";
 
+import { DRAW_MODE_BY_GEOMETRY_TYPE } from "@/arches_vue_components/components/MapComponent/constants.ts";
 import { findGeoJsonIssues } from "@/arches_vue_components/components/MapComponent/utils/geometry-import.ts";
-import { KIND_BY_GEOMETRY_TYPE } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/utils/coordinate-rows.ts";
 
 import type { GeoJSON } from "geojson";
 
 import type { UseCoordinateEditorReturn } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/composables/useCoordinateEditor.ts";
-import type { CoordinateEntryKind } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/types.ts";
+import type { DrawMode } from "@/arches_vue_components/components/MapComponent/types.ts";
 import type { GeoJsonIssue } from "@/arches_vue_components/components/MapComponent/utils/geometry-import.ts";
 
 export interface UseCoordinateGeoJsonTextReturn {
@@ -22,7 +22,7 @@ export function useCoordinateGeoJsonText(
     const { editingFeature, kind, properties, completeGeometry, loadFeature } =
         coordinateEditor;
 
-    function getKindLabel(entryKind: CoordinateEntryKind): string {
+    function getKindLabel(entryKind: DrawMode): string {
         if (entryKind === "point") {
             return $gettext("Point");
         }
@@ -61,7 +61,7 @@ export function useCoordinateGeoJsonText(
             ];
         }
 
-        const parsedKind = KIND_BY_GEOMETRY_TYPE[parsed.geometry.type];
+        const parsedKind = DRAW_MODE_BY_GEOMETRY_TYPE[parsed.geometry.type];
         if (!parsedKind) {
             return [
                 {

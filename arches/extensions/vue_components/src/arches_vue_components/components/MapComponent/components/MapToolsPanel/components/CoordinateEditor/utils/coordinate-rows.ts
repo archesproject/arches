@@ -1,27 +1,12 @@
-import {
-    fromWgs84,
-    toWgs84,
-} from "@/arches_vue_components/components/MapComponent/utils/coordinate-systems.ts";
+import { fromWgs84 } from "@/arches_vue_components/components/MapComponent/utils/coordinate-systems.ts";
 
 import type { Geometry, Position } from "geojson";
 
 import type {
     CompleteCoordinateRow,
-    CoordinateEntryKind,
     CoordinateRow,
 } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/types.ts";
-
-export const MINIMUM_VERTICES: Record<CoordinateEntryKind, number> = {
-    point: 1,
-    line: 2,
-    polygon: 3,
-};
-
-export const KIND_BY_GEOMETRY_TYPE: Record<string, CoordinateEntryKind> = {
-    Point: "point",
-    LineString: "line",
-    Polygon: "polygon",
-};
+import type { DrawMode } from "@/arches_vue_components/components/MapComponent/types.ts";
 
 export function createEmptyRows(count: number): CoordinateRow[] {
     return Array.from({ length: count }, () => ({ x: null, y: null }));
@@ -30,12 +15,7 @@ export function createEmptyRows(count: number): CoordinateRow[] {
 export function isRowComplete(
     row: CoordinateRow,
 ): row is CompleteCoordinateRow {
-    return (
-        row.x !== null &&
-        row.y !== null &&
-        Number.isFinite(row.x) &&
-        Number.isFinite(row.y)
-    );
+    return Number.isFinite(row.x) && Number.isFinite(row.y);
 }
 
 export function toPosition(row: CompleteCoordinateRow): Position {
@@ -54,22 +34,6 @@ export function rowFromWgs84Position(
     };
 }
 
-export function reprojectRow(
-    row: CoordinateRow,
-    fromSrid: string,
-    toSrid: string,
-    decimalPlaces: number,
-): CoordinateRow {
-    if (!isRowComplete(row)) {
-        return row;
-    }
-    return rowFromWgs84Position(
-        toWgs84(fromSrid, toPosition(row)),
-        toSrid,
-        decimalPlaces,
-    );
-}
-
 export function positionsFromGeometry(geometry: Geometry): Position[] {
     if (geometry.type === "Point") {
         return [geometry.coordinates];
@@ -78,15 +42,12 @@ export function positionsFromGeometry(geometry: Geometry): Position[] {
         return geometry.coordinates;
     }
     if (geometry.type === "Polygon") {
-        return (geometry.coordinates[0] ?? []).slice(0, -1);
+        return geometry.coordinates[0].slice(0, -1);
     }
     return [];
 }
 
-export function buildGeometry(
-    kind: CoordinateEntryKind,
-    positions: Position[],
-): Geometry {
+export function buildGeometry(kind: DrawMode, positions: Position[]): Geometry {
     if (kind === "point") {
         return { type: "Point", coordinates: positions[0] };
     }
