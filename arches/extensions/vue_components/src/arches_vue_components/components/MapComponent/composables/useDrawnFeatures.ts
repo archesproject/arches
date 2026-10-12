@@ -142,7 +142,7 @@ export function useDrawnFeatures(
                 return;
             }
 
-            updateDrawnFeatures();
+            updateDrawnFeatures({ shouldFitBounds: true });
         });
         onDrawEvent(map.value!, DRAW_UPDATE_EVENT, (drawEvent: DrawEvent) => {
             selectedDrawnFeature.value = drawEvent.features[0] ?? null;
