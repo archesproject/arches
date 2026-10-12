@@ -6,7 +6,7 @@ import * as maplibregl from "maplibre-gl";
 
 import { useGettext } from "vue3-gettext";
 
-import { nominatimGeocoderApi } from "@/arches_vue_components/components/MapComponent/utils/geocoder-api.ts";
+import { geocoderApi } from "@/arches_vue_components/components/MapComponent/utils/geocoder-api.ts";
 
 import type { Ref, ShallowRef } from "vue";
 import type { IControl, Map as MaplibreMap } from "maplibre-gl";
@@ -35,7 +35,7 @@ export function useMapControls(
 
             orderedControls = [
                 {
-                    control: new MaplibreGeocoder(nominatimGeocoderApi, {
+                    control: new MaplibreGeocoder(geocoderApi, {
                         maplibregl,
                         placeholder:
                             settings.value.geocoderPlaceholder ??

@@ -12,18 +12,15 @@ const DEFAULT_RESULT_LIMIT = 5;
 export const OPENSTREETMAP_CREDIT =
     '<a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>';
 
-interface NominatimProperties {
-    place_id: number;
-    name?: string;
-    display_name: string;
-    type: string;
-}
-
-interface NominatimFeature extends Feature<Point, NominatimProperties> {
+interface PlaceSearchResult
+    extends Feature<
+        Point,
+        { place_id: number; name?: string; display_name: string; type: string }
+    > {
     bbox?: [number, number, number, number];
 }
 
-function toCarmenFeature(feature: NominatimFeature): CarmenGeojsonFeature {
+function toGeocoderFeature(feature: PlaceSearchResult): CarmenGeojsonFeature {
     const [longitude, latitude] = feature.geometry.coordinates;
 
     return {
@@ -57,10 +54,11 @@ async function forwardGeocode(
         const response = await fetch(
             `${NOMINATIM_SEARCH_URL}?${params.toString()}`,
         );
-        const geojson: { features: NominatimFeature[] } = await response.json();
+        const geojson: { features: PlaceSearchResult[] } =
+            await response.json();
         return {
             type: "FeatureCollection",
-            features: geojson.features.map(toCarmenFeature),
+            features: geojson.features.map(toGeocoderFeature),
         };
     } catch (error) {
         console.error(error);
@@ -68,4 +66,4 @@ async function forwardGeocode(
     }
 }
 
-export const nominatimGeocoderApi: MaplibreGeocoderApi = { forwardGeocode };
+export const geocoderApi: MaplibreGeocoderApi = { forwardGeocode };
