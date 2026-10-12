@@ -19,9 +19,9 @@ export type GeometryImportErrorCode =
 
 export class GeometryImportError extends Error {
     code: GeometryImportErrorCode;
-    reason: string;
+    reason?: string;
 
-    constructor(code: GeometryImportErrorCode, reason = "") {
+    constructor(code: GeometryImportErrorCode, reason?: string) {
         super(code);
         this.code = code;
         this.reason = reason;
@@ -92,11 +92,10 @@ export async function parseGeometryFile(file: File): Promise<Feature[]> {
     try {
         collections = await parseFeatureCollections(file, extension);
     } catch (error) {
-        let reason = "";
         if (error instanceof Error) {
-            reason = error.message;
+            throw new GeometryImportError("parse-failed", error.message);
         }
-        throw new GeometryImportError("parse-failed", reason);
+        throw new GeometryImportError("parse-failed");
     }
 
     const features = collections

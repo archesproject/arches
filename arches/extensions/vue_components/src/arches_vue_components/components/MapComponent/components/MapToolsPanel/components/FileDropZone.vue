@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef } from "vue";
+import { ref, useTemplateRef } from "vue";
 
 import { useGettext } from "vue3-gettext";
 
@@ -19,10 +19,9 @@ import { useResolvedMapContext } from "@/arches_vue_components/components/MapCom
 import type { MapContext } from "@/arches_vue_components/components/MapComponent/types.ts";
 import type { GeometryImportErrorCode } from "@/arches_vue_components/components/MapComponent/utils/geometry-import.ts";
 
-const UPLOAD_LINK_PLACEHOLDER = "%{uploadLink}";
-const ACCEPTED_FILE_TYPES = ACCEPTED_GEOMETRY_FILE_EXTENSIONS.map(
+const ACCEPTED_FILE_EXTENSIONS = ACCEPTED_GEOMETRY_FILE_EXTENSIONS.map(
     (extension) => `.${extension}`,
-).join(",");
+);
 
 const { context = undefined } = defineProps<{
     context?: MapContext;
@@ -38,24 +37,15 @@ const { $gettext } = useGettext();
 const isLoading = ref(false);
 const errorMessage = ref<string | null>(null);
 
-const dropZoneTextParts = computed(() => {
-    const template = $gettext(
-        "Drag and drop a GeoJSON, KML, or shapefile here to add its geometry, or %{uploadLink}.",
-        { uploadLink: UPLOAD_LINK_PLACEHOLDER },
-    );
-    const [before, after = ""] = template.split(UPLOAD_LINK_PLACEHOLDER);
-    return { before, after };
-});
-
 function getErrorMessage(
     code: GeometryImportErrorCode,
     fileName: string,
-    reason = "",
+    reason?: string,
 ): string {
     if (code === "unsupported-file-type") {
         return $gettext(
-            'Unsupported file type "%{fileName}". Drop a .geojson, .json, .kml, .zip, or .shp file.',
-            { fileName },
+            'Unsupported file type "%{fileName}". Accepted file types: %{fileTypes}.',
+            { fileName, fileTypes: ACCEPTED_FILE_EXTENSIONS.join(", ") },
         );
     }
     if (code === "no-features") {
@@ -108,7 +98,7 @@ function openFileChooser(): void {
     <div class="file-drop-zone">
         <FileUpload
             ref="fileUpload"
-            :accept="ACCEPTED_FILE_TYPES"
+            :accept="ACCEPTED_FILE_EXTENSIONS.join(',')"
             :multiple="false"
             :show-cancel-button="false"
             :show-upload-button="false"
@@ -128,16 +118,19 @@ function openFileChooser(): void {
                         aria-hidden="true"
                     />
                     <span class="drop-zone-text">
-                        <span>{{ dropZoneTextParts.before }}</span>
-                        <Button
-                            class="drop-zone-upload-button"
-                            size="small"
-                            :label="$gettext('Upload file')"
-                            :link="true"
-                            @click="openFileChooser"
-                        />
-                        <span>{{ dropZoneTextParts.after }}</span>
+                        {{
+                            $gettext(
+                                "Drag and drop a GeoJSON, KML, or shapefile here to add its geometry.",
+                            )
+                        }}
                     </span>
+                    <Button
+                        class="drop-zone-upload-button"
+                        size="small"
+                        :label="$gettext('Upload file')"
+                        :link="true"
+                        @click="openFileChooser"
+                    />
                 </div>
             </template>
         </FileUpload>
