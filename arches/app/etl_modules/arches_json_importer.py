@@ -300,6 +300,7 @@ class ArchesJsonImporter(BaseImportModule):
         seen_resourceids = {}
         legacyids = {}
         tile_owners = {}
+        seen_tiles = set()
         file_owners = {}
         constraint_candidates = {}
         cardinality_keys = {}
@@ -331,11 +332,12 @@ class ArchesJsonImporter(BaseImportModule):
                     cardinality_keys,
                     counts,
                     tile_owners,
+                    seen_tiles,
                     file_owners,
                 )
                 failures.extend(errors)
-                # Checked as they stream: holding every tile id of a 200k-resource
-                # load would cost hundreds of MB.
+                # tile_owners carries each tile's resource and source, too much to
+                # hold for a whole load; seen_tiles keeps only the id, for duplicates.
                 if len(tile_owners) >= DB_CHECK_BATCH_SIZE:
                     failures.extend(self._check_existing_tiles(tile_owners))
                     tile_owners.clear()
@@ -373,6 +375,7 @@ class ArchesJsonImporter(BaseImportModule):
         cardinality_keys,
         counts,
         tile_owners,
+        seen_tiles,
         file_owners,
     ):
         failures = []
@@ -417,24 +420,30 @@ class ArchesJsonImporter(BaseImportModule):
 
         for tile in resource.get("tiles") or []:
             bucket["tiles"] += 1
-            tileid = str(tile.get("tileid") or "").lower()
-            if not tileid:
+            try:
+                tileid = uuid.UUID(str(tile.get("tileid")))
+            except ValueError:
                 failures.append(
                     self._failure(
                         source,
-                        _("Resource {} has a tile with no tileid").format(resourceid),
-                    )
-                )
-            elif tileid in tile_owners:
-                failures.append(
-                    self._failure(
-                        source,
-                        _("Tile {} is used more than once in the import").format(
-                            tileid
+                        _("Resource {} has a tile with no valid tileid").format(
+                            resourceid
                         ),
                     )
                 )
-            tile_owners[tileid] = (resourceid, source)
+            else:
+                if tileid.int in seen_tiles:
+                    failures.append(
+                        self._failure(
+                            source,
+                            _("Tile {} is used more than once in the import").format(
+                                tileid
+                            ),
+                        )
+                    )
+                else:
+                    seen_tiles.add(tileid.int)
+                    tile_owners[str(tileid)] = (resourceid, source)
             for file_id in self._file_ids(tile.get("data") or {}, graph):
                 if file_id in file_owners:
                     failures.append(

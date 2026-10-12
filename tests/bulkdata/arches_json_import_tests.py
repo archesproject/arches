@@ -598,6 +598,30 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
         self.assertIn("already belongs to resource", self._errors(loadid))
         self.assertFalse(ResourceInstance.objects.filter(pk=site).exists())
 
+    def test_a_tile_repeated_after_a_batch_is_checked_still_fails(self):
+        tile = uuid.uuid4()
+        with patch(
+            "arches.app.etl_modules.arches_json_importer.DB_CHECK_BATCH_SIZE", 2
+        ):
+            loadid = self._load(
+                _resource(uuid.uuid4(), _tile(STRING_NODE, _text("Monument"), tile)),
+                _resource(uuid.uuid4(), _tile(STRING_NODE, _text("Site"))),
+                _resource(uuid.uuid4(), _tile(STRING_NODE, _text("Area"), tile)),
+                status="failed",
+            )
+
+        self.assertIn("more than once", self._errors(loadid))
+
+    def test_a_tile_without_a_valid_tileid_fails(self):
+        loadid = self._load(
+            _resource(
+                uuid.uuid4(), _tile(STRING_NODE, _text("Monument"), "not-a-uuid")
+            ),
+            status="failed",
+        )
+
+        self.assertIn("no valid tileid", self._errors(loadid))
+
     def test_a_tile_used_twice_in_one_import_fails(self):
         tile = uuid.uuid4()
         loadid = self._load(
