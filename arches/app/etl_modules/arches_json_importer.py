@@ -1093,7 +1093,7 @@ class ArchesJsonImporter(BaseImportModule):
                 },
             }
 
-        written, failing, removed = 0, None, False
+        written, failing, removed, cleanup_failed = 0, None, False, False
         try:
             log_event_details(cursor, loadid, "done|Saving the tiles...")
             # The etl-manager badge reads load_event.status alone, and "running"
@@ -1111,11 +1111,18 @@ class ArchesJsonImporter(BaseImportModule):
                 self._post_process(loadid)
             except Exception:
                 if not self._overwrite:
-                    self._remove_written(loadid)
-                    removed = True
+                    try:
+                        self._remove_written(loadid)
+                        removed = True
+                    except Exception:
+                        logger.exception("Could not remove what load %s wrote", loadid)
+                        cleanup_failed = True
+                try:
+                    reenable_tile_triggers(cursor, loadid)
+                except Exception:
+                    logger.exception("Could not re-enable the tile triggers")
                 raise
-            finally:
-                reenable_tile_triggers(cursor, loadid)
+            reenable_tile_triggers(cursor, loadid)
         except Exception as e:
             logger.exception(e)
             message = str(e)
@@ -1127,6 +1134,11 @@ class ArchesJsonImporter(BaseImportModule):
                 ).format(written, total, failing, written + 1, e)
             if removed:
                 message += " " + _("Nothing from this load was kept.")
+            elif cleanup_failed:
+                message += " " + _(
+                    "Reversing the write also failed, so part of this load may "
+                    "remain."
+                )
             elif written:
                 message += " " + _("Run the same file again to finish.")
             # This branch returns a dict rather than raising, so nothing else
@@ -1482,13 +1494,22 @@ class ArchesJsonImporter(BaseImportModule):
                 with transaction.atomic():
                     removed = self._delete_load(cursor, loadid, resourceids)
             except Exception as e:
-                LoadEvent.objects.filter(loadid=loadid).update(
-                    status=previous, error_message=_("Not undone: {}").format(e)
-                )
-                raise
-            finally:
-                reenable_tile_triggers(cursor, loadid)
+                try:
+                    LoadEvent.objects.filter(loadid=loadid).update(
+                        status=previous, error_message=_("Not undone: {}").format(e)
+                    )
+                except Exception:
+                    logger.exception(
+                        "Could not record why load %s was not undone", loadid
+                    )
+                try:
+                    reenable_tile_triggers(cursor, loadid)
+                except Exception:
+                    logger.exception("Could not re-enable the tile triggers")
                 self._release_trigger_lock(cursor)
+                raise
+            reenable_tile_triggers(cursor, loadid)
+            self._release_trigger_lock(cursor)
             cursor.execute("SELECT __arches_refresh_spatial_views()")
             cursor.execute(
                 """UPDATE load_event SET status = %s, load_details = load_details::jsonb || ('{"resources_removed":' || %s || '}')::jsonb WHERE loadid = %s""",

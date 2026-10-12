@@ -36,6 +36,7 @@ from arches.app.etl_modules.arches_json_importer import (
     DB_CHECK_BATCH_SIZE,
     MEMO_MAX_VALUES_PER_NODE,
 )
+from arches.app.etl_modules.save import reenable_tile_triggers
 
 # these tests can be run from the command line via
 # python manage.py test tests.bulkdata.arches_json_import_tests --settings="tests.test_settings"
@@ -415,6 +416,7 @@ FILE_NODE = "1d1bfbea-c8bf-11ed-bf64-0242ac130009"
 IMAGE_NODE = "f85dab40-791d-11ee-88a6-0242ac130007"
 RESOURCE_NODE = "402c95f2-c8c1-11ed-87a7-0242ac130009"
 GEOMETRY_NODE = "be25bdf0-c8bf-11ed-a172-0242ac130009"
+REENABLE = "arches.app.etl_modules.arches_json_importer.reenable_tile_triggers"
 
 
 def _resource(resourceid, *tiles):
@@ -1047,3 +1049,48 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
         self.assertEqual(
             ResourceInstance.objects.filter(pk__in=[first, second, third]).count(), 3
         )
+
+    def test_a_failed_cleanup_does_not_hide_the_write_failure(self):
+        def write_fails(importer, *args):
+            raise RuntimeError("disk full")
+
+        def cleanup_fails(*args):
+            raise RuntimeError("connection lost")
+
+        with (
+            patch.object(ArchesJsonImporter, "_write_chunk", write_fails),
+            patch.object(ArchesJsonImporter, "_remove_written", cleanup_fails),
+            patch(REENABLE, self._reenable_then_fail),
+        ):
+            loadid = self._load(
+                _resource(uuid.uuid4(), _tile(STRING_NODE, _text("Monument"))),
+                status="failed",
+            )
+
+        message = LoadEvent.objects.get(loadid=loadid).error_message
+        self.assertIn("failed: disk full", message)
+        self.assertIn("part of this load may remain", message)
+        self.assertNotIn("Nothing from this load was kept", message)
+
+    def test_a_failed_cleanup_does_not_hide_the_undo_failure(self):
+        monument = uuid.uuid4()
+        loadid = self._load(_resource(monument, _tile(STRING_NODE, _text("Monument"))))
+
+        def delete_fails(*args):
+            raise RuntimeError("disk full")
+
+        with (
+            patch.object(ArchesJsonImporter, "_delete_load", delete_fails),
+            patch(REENABLE, self._reenable_then_fail),
+        ):
+            response = self._reverse(loadid)
+
+        self.assertFalse(response["success"])
+        self.assertEqual(response["data"]["message"], "disk full")
+        self.assertEqual(LoadEvent.objects.get(loadid=loadid).status, "completed")
+        self.assertTrue(ResourceInstance.objects.filter(pk=monument).exists())
+
+    @staticmethod
+    def _reenable_then_fail(cursor, loadid):
+        reenable_tile_triggers(cursor, loadid)
+        raise RuntimeError("connection lost")
