@@ -1,10 +1,10 @@
-from datetime import datetime
 import json
 from urllib.parse import urlsplit, parse_qs
 from django.contrib.auth.models import User
 from django.core.validators import URLValidator
 from django.db import connection
 from django.http import HttpRequest
+from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.urls import reverse, resolve, get_script_prefix
 from arches.app.etl_modules.staging_to_tile import staging_to_tile
@@ -40,7 +40,7 @@ def save_to_tiles(
             logger.error(e)
             cursor.execute(
                 """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                ("failed", datetime.now(), loadid),
+                ("failed", timezone.now(), loadid),
             )
             error = {
                 "status": 400,
@@ -143,7 +143,7 @@ def _update_load_details(cursor, loadid):
     )
     cursor.execute(
         """UPDATE load_event SET (status, load_end_time, load_details) = (%s, %s, load_details || %s::JSONB) WHERE loadid = %s""",
-        ("completed", datetime.now(), number_of_import, loadid),
+        ("completed", timezone.now(), number_of_import, loadid),
     )
     logger.debug("load_event marked completed for loadid=%s", loadid)
 
@@ -212,7 +212,7 @@ def _post_save_edit_log(
             final_status = "indexed" if index else "completed"
             cursor.execute(
                 """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
-                (final_status, datetime.now(), True, True, loadid),
+                (final_status, timezone.now(), True, True, loadid),
             )
         logger.debug(
             "_post_save_edit_log complete: loadid=%s status=%s", loadid, final_status
@@ -223,7 +223,7 @@ def _post_save_edit_log(
         with connection.cursor() as cursor:
             cursor.execute(
                 """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
-                ("unindexed", datetime.now(), loadid),
+                ("unindexed", timezone.now(), loadid),
             )
         logger.debug(
             "_post_save_edit_log failed for loadid=%s; status=unindexed, data saved",

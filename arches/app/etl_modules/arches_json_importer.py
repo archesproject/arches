@@ -1183,17 +1183,9 @@ class ArchesJsonImporter(BaseImportModule):
         LoadEvent.objects.filter(loadid=loadid).update(
             status="completed", load_end_time=timezone.now()
         )
-        response = _post_save_edit_log(
+        return _post_save_edit_log(
             userid, loadid, multiprocessing, max_subprocesses, index=index
         )
-
-        # _post_save_edit_log stamps its finish through raw SQL with a naive
-        # datetime, which lands an hour out from the ORM-written start under BST.
-        stamped = (
-            "indexed_time" if response.get("data") == "indexed" else "load_end_time"
-        )
-        LoadEvent.objects.filter(loadid=loadid).update(**{stamped: timezone.now()})
-        return response
 
     # Chunks break on resource boundaries: the tile FKs are DEFERRABLE INITIALLY
     # DEFERRED, so a whole resource needs no parent-before-child ordering, but a
