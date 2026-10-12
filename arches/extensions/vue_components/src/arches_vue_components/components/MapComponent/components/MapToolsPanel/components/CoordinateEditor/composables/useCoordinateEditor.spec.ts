@@ -170,43 +170,4 @@ describe("useCoordinateEditor", () => {
         expect(editor.rows.value).toEqual([{ x: null, y: null }]);
         expect(editor.canUndo.value).toBe(false);
     });
-
-    it("applies valid GeoJSON text to the rows", () => {
-        const editor = useCoordinateEditor(buildContext(), null, "point");
-        const errors = editor.applyGeoJsonText(
-            JSON.stringify({
-                type: "Feature",
-                properties: { name: "Typed" },
-                geometry: {
-                    type: "LineString",
-                    coordinates: [
-                        [5, 5],
-                        [6, 6],
-                    ],
-                },
-            }),
-        );
-
-        expect(errors).toEqual([]);
-        expect(editor.kind.value).toBe("line");
-        expect(editor.rows.value).toEqual([
-            { x: 5, y: 5 },
-            { x: 6, y: 6 },
-        ]);
-    });
-
-    it("reports GeoJSON that is not a supported feature", () => {
-        const editor = useCoordinateEditor(buildContext(), null, "point");
-
-        expect(editor.applyGeoJsonText("{ broken")).not.toEqual([]);
-        expect(
-            editor.applyGeoJsonText(
-                JSON.stringify({
-                    type: "Feature",
-                    properties: {},
-                    geometry: { type: "MultiPoint", coordinates: [[1, 1]] },
-                }),
-            ),
-        ).toHaveLength(1);
-    });
 });

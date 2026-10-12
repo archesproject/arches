@@ -29,6 +29,7 @@ import { useDrawnFeatureLabels } from "@/arches_vue_components/components/MapCom
 import { useGeometryKindOptions } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/composables/useGeometryKindOptions.ts";
 import { useResolvedMapContext } from "@/arches_vue_components/components/MapComponent/composables/useMapContext.ts";
 import { useCoordinateEditor } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/composables/useCoordinateEditor.ts";
+import { useCoordinateGeoJsonText } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/composables/useCoordinateGeoJsonText.ts";
 import { useCoordinatePreview } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/composables/useCoordinatePreview.ts";
 
 import type { Geometry } from "geojson";
@@ -73,6 +74,11 @@ const {
 const kindOptions = useGeometryKindOptions(allowedGeometryTypes);
 const labelsByFeatureId = useDrawnFeatureLabels(drawnFeatures);
 const defaultKind = kindOptions.value[0]?.value ?? POINT;
+const coordinateEditor = useCoordinateEditor(
+    resolvedContext,
+    editingFeatureId,
+    defaultKind,
+);
 const {
     editingFeature,
     kind,
@@ -93,10 +99,10 @@ const {
     commitRowEdit,
     undo,
     getRowWgs84Position,
-    buildGeoJsonText,
-    applyGeoJsonText,
     submit,
-} = useCoordinateEditor(resolvedContext, editingFeatureId, defaultKind);
+} = coordinateEditor;
+const { buildGeoJsonText, applyGeoJsonText } =
+    useCoordinateGeoJsonText(coordinateEditor);
 const { showPreviewGeometry, showVertexHighlight } = useCoordinatePreview(map);
 
 const sridSelectId = useId();

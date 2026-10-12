@@ -1,3 +1,8 @@
+import {
+    fromWgs84,
+    toWgs84,
+} from "@/arches_vue_components/components/MapComponent/utils/coordinate-systems.ts";
+
 import type { Geometry, Position } from "geojson";
 
 import type {
@@ -35,6 +40,34 @@ export function isRowComplete(
 
 export function toPosition(row: CompleteCoordinateRow): Position {
     return [row.x, row.y];
+}
+
+export function rowFromWgs84Position(
+    position: Position,
+    srid: string,
+    decimalPlaces: number,
+): CoordinateRow {
+    const [xCoordinate, yCoordinate] = fromWgs84(srid, position);
+    return {
+        x: Number(xCoordinate.toFixed(decimalPlaces)),
+        y: Number(yCoordinate.toFixed(decimalPlaces)),
+    };
+}
+
+export function reprojectRow(
+    row: CoordinateRow,
+    fromSrid: string,
+    toSrid: string,
+    decimalPlaces: number,
+): CoordinateRow {
+    if (!isRowComplete(row)) {
+        return row;
+    }
+    return rowFromWgs84Position(
+        toWgs84(fromSrid, toPosition(row)),
+        toSrid,
+        decimalPlaces,
+    );
 }
 
 export function positionsFromGeometry(geometry: Geometry): Position[] {
