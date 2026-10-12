@@ -81,12 +81,13 @@ class AddNodeToTiles(_ChunkedTileOperation):
 
 
 class RemoveNodeFromTiles(_ChunkedTileOperation):
-    """Strip a node's key from every tile in its nodegroup. Irreversible.
+    """Strip a node's key from every tile in its nodegroup. Reversing leaves the key out:
+    it would run before the node is recreated, and a key without a node breaks Tile.save().
 
     Must run after the node is deleted, or the next TileModel.save() re-adds the key.
     """
 
-    reversible = False
+    reversible = True
 
     def __init__(self, nodegroup_id, nodeid, batch_size=DEFAULT_BATCH_SIZE):
         self.nodegroup_id = nodegroup_id
@@ -135,6 +136,9 @@ class RemoveNodeFromTiles(_ChunkedTileOperation):
         for tileids in keyset_batches(pending, "tileid", self.batch_size):
             pending.filter(tileid__in=tileids).update(provisionaledits=expression)
 
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        return 0
+
     def describe(self):
         return f"Remove node {self.nodeid} from tiles in nodegroup {self.nodegroup_id}"
 
@@ -144,9 +148,9 @@ class RemoveNodeFromTiles(_ChunkedTileOperation):
 
 
 class DeleteTilesForNodeGroup(_ChunkedTileOperation):
-    """Remove tiles left behind by a deleted nodegroup. Irreversible."""
+    """Remove tiles left behind by a deleted nodegroup. Reversing does not restore them."""
 
-    reversible = False
+    reversible = True
 
     def __init__(self, nodegroup_id, batch_size=DEFAULT_BATCH_SIZE):
         self.nodegroup_id = nodegroup_id
@@ -167,6 +171,9 @@ class DeleteTilesForNodeGroup(_ChunkedTileOperation):
             total += len(tileids)
         return total
 
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        return 0
+
     def describe(self):
         return f"Delete tiles for nodegroup {self.nodegroup_id}"
 
@@ -177,9 +184,9 @@ class DeleteTilesForNodeGroup(_ChunkedTileOperation):
 
 class DeleteMisparentedTiles(_ChunkedTileOperation):
     """Remove tiles whose parent tile is not in the nodegroup's parent nodegroup,
-    as publishing in the Graph Designer does. Irreversible."""
+    as publishing in the Graph Designer does. Reversing does not restore them."""
 
-    reversible = False
+    reversible = True
 
     def __init__(self, nodegroup_id, batch_size=DEFAULT_BATCH_SIZE):
         self.nodegroup_id = nodegroup_id
@@ -207,6 +214,9 @@ class DeleteMisparentedTiles(_ChunkedTileOperation):
             models.TileModel.objects.using(alias).filter(tileid__in=tileids).delete()
             total += len(tileids)
         return total
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        return 0
 
     def describe(self):
         return f"Delete misparented tiles in nodegroup {self.nodegroup_id}"

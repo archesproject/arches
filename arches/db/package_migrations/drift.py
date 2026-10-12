@@ -15,11 +15,16 @@ from arches.db.package_migrations.operations.base import (
 )
 from arches.db.package_migrations.operations.graph import CreateGraph, PublishGraph
 from arches.db.package_migrations.operations.nodegroup import CreateNodeGroup
+from arches.db.package_migrations.operations.tile import (
+    DeleteMisparentedTiles,
+    DeleteTilesForNodeGroup,
+    RemoveNodeFromTiles,
+)
 from arches.db.package_migrations.state import COLLECTIONS
 
 GRAPH_ROW_MODELS = {entry[2] for entry in COLLECTIONS} | {models.GraphModel}
 
-# kind: "present", "missing", "reference", "destructive" or "orphans".
+# kind: "present", "missing", "reference", "destructive", "orphans" or "unrestored".
 Problem = collections.namedtuple("Problem", "kind message")
 
 # position: how many migrations the database already has, or None.
@@ -86,7 +91,7 @@ def missing_references(plan, using):
 
 
 def reverse_problems(plan, using):
-    """What unapplying the plan would destroy."""
+    """What unapplying the plan would destroy or leave unrestored."""
     found = []
     for migration, backwards in plan:
         if not backwards:
@@ -113,6 +118,16 @@ def reverse_problems(plan, using):
                             f"{label}: nodegroup {operation._pk} has {tile_count} tiles",
                         )
                     )
+            elif isinstance(operation, DeleteMisparentedTiles):
+                found.append(
+                    Problem(
+                        "unrestored",
+                        f"{label}: {operation.describe()}. Its remaining tiles hang off "
+                        "the new parent nodegroup, so they will not fit once it moves back",
+                    )
+                )
+            elif isinstance(operation, (DeleteTilesForNodeGroup, RemoveNodeFromTiles)):
+                found.append(Problem("unrestored", f"{label}: {operation.describe()}"))
     return found
 
 

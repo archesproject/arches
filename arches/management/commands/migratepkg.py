@@ -99,6 +99,7 @@ class Command(BaseCommand):
             self._refuse_destructive_reversals(plan)
             self._refuse_discarding_unpublished_drafts(plan)
             self._refuse_misfit_database(plan)
+            self._warn_about_unrestored_data(plan)
 
         self.completed = []
         try:
@@ -190,19 +191,30 @@ class Command(BaseCommand):
                 + "\nKeep the graph by unapplying only the migrations after the one that creates it."
             )
         orphans = [problem for problem in problems if problem.kind == "orphans"]
-        if not orphans:
-            return
-        message = (
-            "Unapplying these package migrations would delete nodegroups that hold "
-            "tiles, leaving those tiles with nothing to belong to:\n  "
-            + "\n  ".join(problem.message for problem in orphans)
-        )
-        if self.force:
+        if orphans:
+            message = (
+                "Unapplying these package migrations would delete nodegroups that hold "
+                "tiles, leaving those tiles with nothing to belong to:\n  "
+                + "\n  ".join(problem.message for problem in orphans)
+            )
+            if not self.force:
+                self._refuse(
+                    f"{message}\nUnapply them anyway by running the following:\n  {self._command(self.app_label, self.target, force=True)}"
+                )
             self._warn(message)
-            return
-        self._refuse(
-            f"{message}\nUnapply them anyway by running the following:\n  {self._command(self.app_label, self.target, force=True)}"
-        )
+
+    def _warn_about_unrestored_data(self, plan):
+        unrestored = [
+            problem
+            for problem in drift.reverse_problems(plan, self.database)
+            if problem.kind == "unrestored"
+        ]
+        if unrestored:
+            self._warn(
+                "Unapplying these package migrations restores the graph rows, but not "
+                "the tiles or values they deleted:\n  "
+                + "\n  ".join(problem.message for problem in unrestored)
+            )
 
     def _refuse_discarding_unpublished_drafts(self, plan):
         slugs = sorted(
@@ -557,15 +569,12 @@ class Command(BaseCommand):
             if not irreversible:
                 continue
             operation = irreversible[0]
+            message = f"{migration.app_label}.{migration.name} cannot be unapplied: {operation.describe()} is irreversible."
             if isinstance(operation, (PublishGraph, SetResourcePublication)):
-                reason = "Unapplying the migrations after it would leave the graph and its resources on different publications."
+                message += " Unapplying the migrations after it would leave the graph and its resources on different publications."
             elif isinstance(operation, RunPackagePython):
-                reason = "It has no reverse_code."
-            else:
-                reason = "It deletes data that is not recorded anywhere, so reversing it cannot bring that data back."
-            raise CommandError(
-                f"{migration.app_label}.{migration.name} cannot be unapplied: {operation.describe()} is irreversible. {reason}"
-            )
+                message += " It has no reverse_code."
+            raise CommandError(message)
 
     def _print_plan(self, plan):
         if not plan:

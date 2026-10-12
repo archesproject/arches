@@ -441,6 +441,38 @@ class MigratePkgTests(PackageMigrationOperationTests):
             self._migratepkg(APP_NAME, "zero", force=True, verbosity=0)
         self.assertFalse(models.NodeGroup.objects.filter(pk=nodegroup_id).exists())
 
+    def test_reversing_a_nodegroup_deletion_restores_it_and_warns_about_its_tiles(
+        self,
+    ):
+        nodegroup_id = str(uuid.uuid4())
+        self._write_migrations(
+            (
+                "0001_graph_nodegroup",
+                True,
+                [
+                    f'CreateNodeGroup(graphid="{self.graphid}", fields={{"nodegroupid": "{nodegroup_id}", "cardinality": "n"}})'
+                ],
+            ),
+            (
+                "0002_graph_delete_nodegroup",
+                True,
+                [f'DeleteNodeGroup(graphid="{self.graphid}", pk="{nodegroup_id}")'],
+            ),
+            (
+                "0003_data_delete_tiles",
+                False,
+                [f'DeleteTilesForNodeGroup(nodegroup_id="{nodegroup_id}")'],
+            ),
+        )
+        with self._installed():
+            self._migratepkg(APP_NAME, verbosity=0)
+            self.assertFalse(models.NodeGroup.objects.filter(pk=nodegroup_id).exists())
+
+            _stdout, stderr = self._migratepkg(APP_NAME, "0001_graph_nodegroup")
+
+        self.assertTrue(models.NodeGroup.objects.filter(pk=nodegroup_id).exists())
+        self.assertIn("not the tiles or values they deleted", stderr)
+
     def test_missing_reference_data_names_the_package_to_install(self):
         graphid = str(uuid.uuid4())
         ontology_id = str(uuid.uuid4())

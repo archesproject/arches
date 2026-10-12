@@ -151,3 +151,28 @@ class DeleteMisparentedTilesTests(PackageMigrationOperationTests):
         )
         self.assertEqual(remaining_tile_ids, {fitting_tile.tileid})
         self.assertFalse(operation.has_pending_work("default"))
+
+
+class TileOperationBackwardsTests(PackageMigrationOperationTests):
+    def test_tile_operations_reverse_without_touching_tiles(self):
+        tile = self._make_tile()
+        nodeid = str(self.string_node.nodeid)
+        nodegroup_id = str(self.nodegroup_id)
+        operations = [
+            RemoveNodeFromTiles(nodegroup_id=nodegroup_id, nodeid=nodeid),
+            DeleteTilesForNodeGroup(nodegroup_id=nodegroup_id),
+            DeleteMisparentedTiles(nodegroup_id=nodegroup_id),
+        ]
+
+        for operation in operations:
+            with self.subTest(operation=type(operation).__name__):
+                self.assertTrue(operation.reversible)
+                self.assertEqual(
+                    operation.database_backwards(
+                        "arches", self.schema_editor, None, None
+                    ),
+                    0,
+                )
+
+        tile.refresh_from_db()
+        self.assertIn(nodeid, tile.data)

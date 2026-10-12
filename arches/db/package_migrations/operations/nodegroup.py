@@ -21,12 +21,12 @@ class AlterNodeGroup(_AlterRowOperation):
 class DeleteNodeGroup(_DeleteRowOperation):
     """Cascades to the nodegroup's nodes, cards, widgets and edges, but not tiles.
 
-    Irreversible: the cascade destroys rows this operation does not record.
+    Reversing recreates only the nodegroup row. Generated migrations delete those rows
+    explicitly first, so their own reversals bring them back.
     """
 
     model = models.NodeGroup
     verbose_name = "nodegroup"
-    reversible = False
 
     def state_forwards(self, app_label, state):
         graph = state.graph_for_write(self.graphid)
