@@ -59,17 +59,17 @@ watch(
             return;
         }
 
-        let isStale = false;
+        const abortController = new AbortController();
         onWatcherCleanup(() => {
-            isStale = true;
+            abortController.abort();
         });
 
         isLoading.value = true;
         try {
-            const fetchedDescriptor = await fetchResourceDescriptor(id);
-            if (isStale) {
-                return;
-            }
+            const fetchedDescriptor = await fetchResourceDescriptor(
+                id,
+                abortController.signal,
+            );
             descriptor.value = fetchedDescriptor;
             resolvedContext?.showFeatureHighlight(
                 fetchedDescriptor.geometries.flatMap((descriptorGeometry) =>
@@ -79,17 +79,14 @@ watch(
                 ),
             );
         } catch (error) {
-            if (isStale) {
+            if (abortController.signal.aborted) {
                 return;
             }
             descriptor.value = null;
             resolvedContext?.clearFeatureHighlight();
             console.error("Error fetching resource descriptor:", error);
-        } finally {
-            if (!isStale) {
-                isLoading.value = false;
-            }
         }
+        isLoading.value = false;
     },
     { immediate: true },
 );

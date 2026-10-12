@@ -11,7 +11,9 @@ export async function fetchMapData(): Promise<Record<string, unknown>> {
         generateArchesURL("arches_vue_components:api-map-data"),
     );
     const parsed = await response.json();
-    if (!response.ok) throw new Error(parsed.message ?? response.statusText);
+    if (!response.ok) {
+        throw new Error(parsed.message ?? response.statusText);
+    }
     return parsed;
 }
 
@@ -27,20 +29,26 @@ export async function fetchDrawnFeaturesBuffer(
         },
     );
     const parsed = await response.json();
-    if (!response.ok) throw new Error(parsed.message ?? response.statusText);
+    if (!response.ok) {
+        throw new Error(parsed.message ?? response.statusText);
+    }
     return parsed;
 }
 
 export async function fetchResourceDescriptor(
     resourceId: string,
+    signal: AbortSignal,
 ): Promise<ResourceDescriptor> {
     const response = await fetch(
         generateArchesURL("arches:resource_descriptors", {
             resourceid: resourceId,
         }),
+        { signal },
     );
     const parsed = await response.json();
-    if (!response.ok) throw new Error(parsed.message ?? response.statusText);
+    if (!response.ok) {
+        throw new Error(parsed.message ?? response.statusText);
+    }
     return parsed;
 }
 
@@ -53,7 +61,9 @@ export async function fetchClusterResourceIds(
         `${generateArchesURL("arches_vue_components:api-cluster-resources")}?${query}`,
     );
     const parsed = await response.json();
-    if (!response.ok) throw new Error(parsed.message ?? response.statusText);
+    if (!response.ok) {
+        throw new Error(parsed.message ?? response.statusText);
+    }
     return parsed.resourceinstanceids;
 }
 
@@ -69,6 +79,8 @@ export async function fetchGeoJSONBounds(
         },
     );
     const parsed = await response.json();
-    if (!response.ok) throw new Error(parsed.message ?? response.statusText);
+    if (!response.ok) {
+        throw new Error(parsed.message ?? response.statusText);
+    }
     return parsed;
 }
