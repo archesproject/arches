@@ -9,6 +9,7 @@ import zipfile
 from pathlib import Path
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.core.files import File as DjangoFile
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -387,6 +388,12 @@ class ArchesJsonImporter(BaseImportModule):
         graphid = instance.get("graph_id")
         if not resourceid:
             return [self._failure(source, _("Resource is missing resourceinstanceid"))]
+        if not self._is_uuid(resourceid):
+            return [
+                self._failure(
+                    source, _("Resource {} is not a valid uuid").format(resourceid)
+                )
+            ]
         if not graphid:
             return [
                 self._failure(
@@ -407,13 +414,13 @@ class ArchesJsonImporter(BaseImportModule):
 
         try:
             graph = self._graph_info(graphid)
-        except GraphModel.DoesNotExist:
+        except (GraphModel.DoesNotExist, ValidationError):
             return [self._failure(source, _("Graph {} does not exist").format(graphid))]
         except ValueError as unpublished:
             return [self._failure(source, str(unpublished))]
 
         if instance.get("legacyid"):
-            legacyids.setdefault(instance["legacyid"], (resourceid, source))
+            legacyids.setdefault(str(instance["legacyid"]), (resourceid, source))
 
         bucket = counts.setdefault(graphid, {"resources": 0, "tiles": 0})
         bucket["resources"] += 1
@@ -444,7 +451,24 @@ class ArchesJsonImporter(BaseImportModule):
                 else:
                     seen_tiles.add(tileid.int)
                     tile_owners[str(tileid)] = (resourceid, source)
+            if tile.get("parenttile_id") and not self._is_uuid(tile["parenttile_id"]):
+                failures.append(
+                    self._failure(
+                        source,
+                        _("Tile {} has no valid parenttile_id").format(
+                            tile.get("tileid")
+                        ),
+                    )
+                )
+                continue
             for file_id in self._file_ids(tile.get("data") or {}, graph):
+                if not self._is_uuid(file_id):
+                    failures.append(
+                        self._failure(
+                            source, _("File id {} is not valid").format(file_id)
+                        )
+                    )
+                    continue
                 if file_id in file_owners:
                     failures.append(
                         self._failure(
@@ -1235,6 +1259,14 @@ class ArchesJsonImporter(BaseImportModule):
             TileModel.objects.bulk_create(tiles)
             EditLog.objects.bulk_create(created + edits)
         return len(resources)
+
+    @staticmethod
+    def _is_uuid(value):
+        try:
+            uuid.UUID(str(value))
+        except ValueError:
+            return False
+        return True
 
     @staticmethod
     def _file_ids(data, graph):

@@ -622,6 +622,42 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
 
         self.assertIn("no valid tileid", self._errors(loadid))
 
+    def test_malformed_ids_are_each_reported(self):
+        bad_resource = _resource("not-a-uuid", _tile(STRING_NODE, _text("A")))
+        bad_graph = _resource(uuid.uuid4(), _tile(STRING_NODE, _text("B")))
+        bad_graph["resourceinstance"]["graph_id"] = "not-a-graph"
+        bad_parent = _tile(STRING_NODE, _text("C"))
+        bad_parent["parenttile_id"] = "not-a-tile"
+        bad_file = _tile(FILE_NODE, [_file("not-a-file", "plan.pdf")])
+
+        loadid = self._load(
+            bad_resource,
+            bad_graph,
+            _resource(uuid.uuid4(), bad_parent),
+            _resource(uuid.uuid4(), bad_file),
+            status="failed",
+        )
+
+        errors = self._errors(loadid)
+        for expected in (
+            "is not a valid uuid",
+            "Graph not-a-graph does not exist",
+            "no valid parenttile_id",
+            "File id not-a-file is not valid",
+        ):
+            self.assertIn(expected, errors)
+
+    def test_a_numeric_legacyid_is_checked_against_existing_ones(self):
+        first = _resource(uuid.uuid4(), _tile(STRING_NODE, _text("Monument")))
+        first["resourceinstance"]["legacyid"] = "123"
+        self._load(first)
+        second = _resource(uuid.uuid4(), _tile(STRING_NODE, _text("Site")))
+        second["resourceinstance"]["legacyid"] = 123
+
+        loadid = self._load(second, status="failed")
+
+        self.assertIn("already belongs", self._errors(loadid))
+
     def test_a_tile_used_twice_in_one_import_fails(self):
         tile = uuid.uuid4()
         loadid = self._load(
