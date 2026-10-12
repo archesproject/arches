@@ -63,9 +63,9 @@ LOCALIZED_FILE_KEYS = ("altText", "attribution", "description", "title")
 # retains every distinct string it has ever seen.
 MEMO_MAX_VALUES_PER_NODE = 5000
 
-# Advisory lock key.  disable_tile_triggers() is an ALTER TABLE -- database-wide,
-# not session-scoped -- so two concurrent bulk loads would race, the first to
-# finish re-enabling triggers while the second is still inserting.
+# Held by this importer's load and undo, so two of them never race on
+# disable_tile_triggers(), an ALTER TABLE that is database-wide. Other ETL modules
+# disable the triggers without it.
 TILE_TRIGGER_LOCK_KEY = 8202514
 # How many rows a set-based existence check may ask about at once. Keeps the IN
 # clause under Postgres' 65,535 bind parameters and the unnest arrays small
@@ -1103,20 +1103,17 @@ class ArchesJsonImporter(BaseImportModule):
         log_tile_values = bool(self.config.get("logTileValues", False))
 
         if not self._acquire_trigger_lock(cursor):
-            contention = _(
-                "Another bulk load is already running; only one may hold the "
-                "tile triggers at a time."
-            )
+            contention = _("Another Arches JSON load or undo was already running.")
             LoadEvent.objects.filter(loadid=loadid).update(
                 status="failed", load_end_time=timezone.now(), error_message=contention
             )
             return {
                 "success": False,
                 "data": {
-                    "title": _("Another bulk load is running"),
+                    "title": _("Another Arches JSON load is running"),
                     "message": _(
-                        "Tile triggers are disabled database-wide during a bulk load, "
-                        "so only one may run at a time. Try again when it finishes."
+                        "Only one Arches JSON load or undo can run at a time. "
+                        "Try again when it finishes."
                     ),
                 },
             }
@@ -1511,7 +1508,10 @@ class ArchesJsonImporter(BaseImportModule):
             if not self._acquire_trigger_lock(cursor):
                 LoadEvent.objects.filter(loadid=loadid).update(status=previous)
                 raise RuntimeError(
-                    _("Another bulk load is running. Try again when it finishes.")
+                    _(
+                        "Another Arches JSON load or undo is running. "
+                        "Try again when it finishes."
+                    )
                 )
             try:
                 disable_tile_triggers(cursor, loadid)

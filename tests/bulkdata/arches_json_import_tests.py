@@ -389,7 +389,7 @@ class TriggerLockContentionTests(TestCase):
         result = importer.save_to_tiles(None, user.id, event.loadid)
 
         self.assertFalse(result["success"])
-        self.assertEqual(result["data"]["title"], "Another bulk load is running")
+        self.assertEqual(result["data"]["title"], "Another Arches JSON load is running")
         event.refresh_from_db()
         self.assertEqual(event.status, "failed")
         self.assertTrue(event.error_message)
