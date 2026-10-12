@@ -1432,7 +1432,7 @@ class ArchesJsonImporter(BaseImportModule):
             }
         try:
             if task_management.check_if_celery_available():
-                tasks.reverse_arches_json_load.apply_async([loadid])
+                tasks.reverse_arches_json_load.apply_async([loadid, request.user.id])
             else:
                 self.reverse_load(loadid)
         except Exception as e:

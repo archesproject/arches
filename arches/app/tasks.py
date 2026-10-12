@@ -458,10 +458,23 @@ def load_json_ld(userid, files, summary, result, temp_dir, loadid, moduleid):
 
 
 @shared_task
-def reverse_arches_json_load(loadid):
+def reverse_arches_json_load(loadid, userid):
     from arches.app.etl_modules import arches_json_importer
 
-    arches_json_importer.ArchesJsonImporter(loadid=loadid).reverse_load(loadid)
+    logger = logging.getLogger(__name__)
+
+    status = _("Failed")
+    try:
+        arches_json_importer.ArchesJsonImporter(loadid=loadid).reverse_load(loadid)
+        status = _("Completed")
+    except Exception as e:
+        logger.error(e, exc_info=True)
+        status = _("Failed: {}").format(e)
+    finally:
+        load_details = models.LoadEvent.objects.get(loadid=loadid).load_details
+        name = load_details.get("summary", {}).get("name", loadid)
+        msg = _("Arches JSON Undo: {} [{}]").format(name, status)
+        notify_completion(msg, User.objects.get(id=userid))
 
 
 @shared_task

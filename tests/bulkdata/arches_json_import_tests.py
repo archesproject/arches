@@ -12,6 +12,7 @@ from django.core.files.storage import default_storage
 from django.http import HttpRequest
 from django.test import SimpleTestCase, TestCase
 
+from arches.app import tasks
 from arches.app.models.graph import Graph
 from arches.app.models.system_settings import settings
 from arches.app.models.models import (
@@ -28,6 +29,7 @@ from arches.app.models.models import (
     ResourceInstance,
     ResourceXResource,
     TileModel,
+    UserXNotification,
 )
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import (
@@ -395,6 +397,34 @@ class TriggerLockContentionTests(TestCase):
         event.refresh_from_db()
         self.assertEqual(event.status, "failed")
         self.assertTrue(event.error_message)
+
+
+class UndoTaskNotificationTests(TestCase):
+    def _undo(self, reverse_load):
+        user = User.objects.create_user("undo-notification-tester")
+        module = ETLModule.objects.get(slug="arches-json-importer")
+        event = LoadEvent.objects.create(
+            user=user,
+            etl_module=module,
+            status="indexed",
+            load_details={"summary": {"name": "monuments.jsonl"}},
+        )
+        with patch.object(ArchesJsonImporter, "reverse_load", reverse_load):
+            tasks.reverse_arches_json_load(str(event.loadid), user.id)
+        return UserXNotification.objects.get(recipient=user).notif.message
+
+    def test_a_finished_undo_notifies_the_user(self):
+        message = self._undo(lambda importer, loadid: None)
+        self.assertEqual(message, "Arches JSON Undo: monuments.jsonl [Completed]")
+
+    def test_a_failed_undo_notifies_the_user_with_the_reason(self):
+        def reverse_load(importer, loadid):
+            raise RuntimeError("disk full")
+
+        message = self._undo(reverse_load)
+        self.assertEqual(
+            message, "Arches JSON Undo: monuments.jsonl [Failed: disk full]"
+        )
 
 
 # The parser's module choices come from the ETLModule table, so this also
