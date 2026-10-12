@@ -24,11 +24,3 @@ export function onDrawEvent(
         listener(event as DrawEvent),
     );
 }
-
-export function fireDrawEvent(
-    map: MaplibreMap,
-    drawEventName: string,
-    drawEvent?: DrawEvent,
-): void {
-    map.fire(toMapEventName(drawEventName), drawEvent);
-}

@@ -6,10 +6,7 @@ import geojsonExtent from "@mapbox/geojson-extent";
 import { useToast } from "openvue/usetoast";
 import { useGettext } from "vue3-gettext";
 
-import {
-    fetchDrawnFeaturesBuffer,
-    fetchGeoJSONBounds,
-} from "@/arches_vue_components/components/MapComponent/api.ts";
+import { fetchDrawnFeaturesBuffer } from "@/arches_vue_components/components/MapComponent/api.ts";
 
 import {
     BUFFER_FILL_COLOR,
@@ -28,10 +25,7 @@ import {
     METERS,
     SIMPLE_SELECT,
 } from "@/arches_vue_components/components/MapComponent/constants.ts";
-import {
-    fireDrawEvent,
-    onDrawEvent,
-} from "@/arches_vue_components/components/MapComponent/utils/draw-events.ts";
+import { onDrawEvent } from "@/arches_vue_components/components/MapComponent/utils/draw-events.ts";
 
 import type { Ref, ShallowRef } from "vue";
 import type { Feature, FeatureCollection } from "geojson";
@@ -154,10 +148,7 @@ export function useDrawnFeatures(
             selectedDrawnFeature.value = drawEvent.features[0] ?? null;
             updateDrawnFeatures();
         });
-        onDrawEvent(map.value!, DRAW_DELETE_EVENT, () => {
-            selectedDrawnFeature.value = null;
-            updateDrawnFeatures();
-        });
+        onDrawEvent(map.value!, DRAW_DELETE_EVENT, handleDrawnFeaturesDeleted);
         onDrawEvent(map.value!, DRAW_SELECTION_CHANGE_EVENT, () => {
             selectedDrawnFeature.value = draw.getSelected().features[0] ?? null;
         });
@@ -197,6 +188,11 @@ export function useDrawnFeatures(
         });
     }
 
+    function handleDrawnFeaturesDeleted(): void {
+        selectedDrawnFeature.value = null;
+        updateDrawnFeatures();
+    }
+
     async function updateDrawnFeatures({
         shouldEmitValueChange = true,
         shouldFitBounds = false,
@@ -207,67 +203,47 @@ export function useDrawnFeatures(
         const updateToken = ++latestUpdateDrawnFeaturesToken;
 
         const drawnFeatureCollection = draw.getAll() as FeatureCollection;
-        drawnFeatures.value = drawnFeatureCollection.features as Feature[];
+        drawnFeatures.value = drawnFeatureCollection.features;
 
         for (const feature of drawnFeatureCollection.features) {
             feature.properties!.buffer_distance ??= 0;
             feature.properties!.buffer_units ??= METERS;
         }
 
+        const featuresToBuffer = drawnFeatureCollection.features.filter(
+            (feature) => feature.properties!.buffer_distance,
+        );
+        let bufferedFeatures: Feature[] = [];
         try {
-            const featuresToBuffer: FeatureCollection = {
-                ...drawnFeatureCollection,
-                features: drawnFeatureCollection.features.filter(
-                    (feature) => feature.properties!.buffer_distance,
-                ),
-            };
-
-            let bufferedFeatures: FeatureCollection = {
-                type: "FeatureCollection",
-                features: [],
-            };
-            if (featuresToBuffer.features.length) {
-                bufferedFeatures =
-                    await fetchDrawnFeaturesBuffer(featuresToBuffer);
-            }
-
-            if (updateToken !== latestUpdateDrawnFeaturesToken) {
-                return;
-            }
-
-            currentBufferData = bufferedFeatures;
-            (map.value!.getSource(BUFFER_LAYER_ID) as GeoJSONSource)?.setData(
-                currentBufferData,
-            );
-
-            if (shouldFitBounds && drawnFeatureCollection.features.length) {
-                const allFeatures: FeatureCollection = {
-                    type: "FeatureCollection",
-                    features: [
-                        ...drawnFeatureCollection.features,
-                        ...bufferedFeatures.features,
-                    ],
-                };
-
-                const [west, south, east, north] =
-                    await fetchGeoJSONBounds(allFeatures);
-
-                if (updateToken !== latestUpdateDrawnFeaturesToken) {
-                    return;
-                }
-
-                map.value!.fitBounds(
-                    [
-                        [west, south],
-                        [east, north],
-                    ],
-                    {
-                        padding: { top: 50, right: 100, bottom: 50, left: 50 },
-                    },
-                );
+            if (featuresToBuffer.length) {
+                const bufferedFeatureCollection =
+                    await fetchDrawnFeaturesBuffer({
+                        type: "FeatureCollection",
+                        features: featuresToBuffer,
+                    });
+                bufferedFeatures = bufferedFeatureCollection.features;
             }
         } catch (error) {
-            console.error("Error updating drawn features:", error);
+            console.error("Error buffering drawn features:", error);
+        }
+
+        if (updateToken !== latestUpdateDrawnFeaturesToken) {
+            return;
+        }
+
+        currentBufferData = {
+            type: "FeatureCollection",
+            features: bufferedFeatures,
+        };
+        map
+            .value!.getSource<GeoJSONSource>(BUFFER_LAYER_ID)
+            ?.setData(currentBufferData);
+
+        if (shouldFitBounds) {
+            fitToFeatures([
+                ...drawnFeatureCollection.features,
+                ...bufferedFeatures,
+            ]);
         }
 
         if (shouldEmitValueChange) {
@@ -318,7 +294,7 @@ export function useDrawnFeatures(
 
     function deleteDrawnFeature(feature: Feature): void {
         draw.delete(String(feature.id));
-        fireDrawEvent(map.value!, DRAW_DELETE_EVENT);
+        handleDrawnFeaturesDeleted();
     }
 
     function deleteSelectedDrawnFeature(): void {
@@ -329,7 +305,7 @@ export function useDrawnFeatures(
         const selectedFeatures = draw.getSelected();
         if (selectedFeatures.features.length) {
             draw.delete(selectedFeatures.features[0].id as string);
-            fireDrawEvent(map.value!, DRAW_DELETE_EVENT);
+            handleDrawnFeaturesDeleted();
         }
     }
 
@@ -339,23 +315,16 @@ export function useDrawnFeatures(
         }
 
         draw.deleteAll();
-        fireDrawEvent(map.value!, DRAW_DELETE_EVENT);
+        handleDrawnFeaturesDeleted();
     }
 
     function setBufferForSelectedFeature(
         distance: number,
         units: string,
     ): void {
-        const feature = selectedDrawnFeature.value;
-        if (!feature || !draw) {
-            return;
+        if (selectedDrawnFeature.value) {
+            setBufferForFeature(selectedDrawnFeature.value, distance, units);
         }
-
-        feature.properties!.buffer_distance = distance;
-        feature.properties!.buffer_units = units;
-
-        draw.add(feature);
-        fireDrawEvent(map.value!, DRAW_UPDATE_EVENT, { features: [feature] });
     }
 
     function setBufferForFeature(

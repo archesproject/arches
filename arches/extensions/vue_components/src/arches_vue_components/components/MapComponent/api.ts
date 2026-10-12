@@ -66,21 +66,3 @@ export async function fetchClusterResourceIds(
     }
     return parsed.resourceinstanceids;
 }
-
-export async function fetchGeoJSONBounds(
-    features: FeatureCollection,
-): Promise<[number, number, number, number]> {
-    const response = await fetch(
-        generateArchesURL("arches_vue_components:api-geojson-bounds"),
-        {
-            method: "POST",
-            headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") as string },
-            body: JSON.stringify(features),
-        },
-    );
-    const parsed = await response.json();
-    if (!response.ok) {
-        throw new Error(parsed.message ?? response.statusText);
-    }
-    return parsed;
-}
