@@ -483,25 +483,32 @@ var CardViewModel = function(params) {
         return false;
     };
 
+    // updates the shared selection synchronously; `selected` is throttled, so reading it here can be stale
     this.selectChildCards = function(value) {
-        if (value !== undefined){
-            this.selected(value);
-        } else {
-            if (this.selected() === false) {
-                value = true;
-                this.selected(true);
-            } else {
-                value = false;
-                this.selected(false);
+        var cards = [];
+        var collect = function(card) {
+            cards.push(card);
+            if (card.cards().length > 0) {
+                card.expanded(true);
+                card.cards().forEach(collect);
             }
-        }
-        if (this.cards().length > 0) {
-            this.expanded(true);
+        };
+        collect(this);
 
-            this.cards().forEach(function(childCard){
-                childCard.selectChildCards(value);
-            }, this);
+        if (!multiselect) {
+            if (value !== false) {
+                selection(this);
+            }
+            return;
         }
+
+        var current = selection();
+        if (value === undefined) {
+            value = !cards.every(function(card) {
+                return _.contains(current, card);
+            });
+        }
+        selection(value ? _.union(current, cards) : _.difference(current, cards));
     };
 
     var higlightSubscription = this.highlight.subscribe(function(highlight) {

@@ -65,7 +65,7 @@ ELASTICSEARCH_HTTP_PORT = (
 )
 SEARCH_BACKEND = "arches.app.search.search.SearchEngine"
 SEARCH_THUMBNAILS = False
-# see http://elasticsearch-py.readthedocs.org/en/master/api.html#elasticsearch.Elasticsearch
+# see http://elasticsearch-py.readthedocs.org/en/stable/api.html#elasticsearch.Elasticsearch
 ELASTICSEARCH_HOSTS = [
     {"scheme": "https", "host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}
 ]
@@ -682,7 +682,7 @@ RELATED_RESOURCES_EXPORT_LIMIT = 10000
 SEARCH_DROPDOWN_LENGTH = 100
 
 # a lower number will give more "Fuzzy" matches, recomend between 0-4,
-# see "prefix_length" at https://www.elastic.co/guide/en/elasticsearch/reference/6.7/query-dsl-fuzzy-query.html#_parameters_7
+# see "prefix_length" at https://www.elastic.co/docs/reference/query-languages/query-dsl/query-dsl-fuzzy-query
 SEARCH_TERM_SENSITIVITY = 3
 
 WORDS_PER_SEARCH_TERM = (
