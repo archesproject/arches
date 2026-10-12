@@ -858,6 +858,17 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
         self.assertFalse(ResourceInstance.objects.filter(pk=monument).exists())
         self.assertEqual(LoadEvent.objects.get(loadid=loadid).status, "unloaded")
 
+    def test_a_reload_of_undone_resources_can_be_undone(self):
+        monument = uuid.uuid4()
+        resource = _resource(monument, _tile(STRING_NODE, _text("Monument 17")))
+        self._reverse(self._load(resource))
+        loadid = self._load(resource)
+
+        response = self._reverse(loadid)
+
+        self.assertTrue(response["success"], response)
+        self.assertFalse(ResourceInstance.objects.filter(pk=monument).exists())
+
     def test_undo_removes_what_the_load_wrote_and_nothing_else(self):
         site, monument = uuid.uuid4(), uuid.uuid4()
         self._load(_resource(site, _tile(STRING_NODE, _text("Site 4"))))

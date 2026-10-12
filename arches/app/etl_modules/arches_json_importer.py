@@ -1429,8 +1429,11 @@ class ArchesJsonImporter(BaseImportModule):
         created = EditLog.objects.filter(
             transactionid=loadid, edittype="create"
         ).values("resourceinstanceid")
+        started = LoadEvent.objects.get(loadid=loadid).load_start_time
         changed = (
-            EditLog.objects.filter(resourceinstanceid__in=created)
+            EditLog.objects.filter(
+                resourceinstanceid__in=created, timestamp__gt=started
+            )
             .exclude(transactionid=loadid)
             .values("resourceinstanceid")
             .distinct()
