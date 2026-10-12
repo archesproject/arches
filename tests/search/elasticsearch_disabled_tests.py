@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from unittest import mock
 
 from django.contrib.auth.models import User
 from django.core.management import call_command
@@ -11,6 +12,7 @@ from arches.app.models.system_settings import settings as arches_settings
 from arches.app.permissions.arches_default_deny import (
     ArchesDefaultDenyPermissionFramework,
 )
+from arches.app.utils import permission_backend
 from arches.app.search.null_search_engine import NullSearchEngine
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.decorators import requires_elasticsearch
@@ -153,6 +155,17 @@ class ResourceLookupFromDbTests(TestCase):
     The resource-instance widget looks up resources through the search_results url.
     They must be drawn from the database with ES disabled.
     """
+
+    def setUp(self):
+        # Default allow does not implement filter_resource_queryset, and is rejected
+        # by the system check when Elasticsearch is disabled, so use default deny.
+        self.enterContext(
+            mock.patch.object(
+                permission_backend,
+                "_PERMISSION_FRAMEWORK",
+                ArchesDefaultDenyPermissionFramework(),
+            )
+        )
 
     def test_lookup_returns_the_shape_the_widget_expects(self):
         admin = User.objects.get(username="admin")
