@@ -261,6 +261,26 @@ class ValidationMemoTests(SimpleTestCase):
         self.assertEqual(first, second)
         self.assertEqual(len(calls), 1, "second call should be served from the memo")
 
+    def test_equal_values_of_different_types_are_validated_separately(self):
+        importer = _bare_importer()
+        node = {"datatype": "number", "config": {}}
+        calls = []
+
+        class _CountingDatatype:
+            def validate(self, value, **kwargs):
+                calls.append(value)
+                return []
+
+        class _Factory:
+            def get_instance(self, datatype):
+                return _CountingDatatype()
+
+        importer.datatype_factory = _Factory()
+
+        for value in (1, 1.0, True):
+            importer._validate_value(node, self.NODE, value)
+        self.assertEqual(len(calls), 3)
+
 
 class BatchedDbCheckTests(SimpleTestCase):
     def test_batches_cover_everything_in_order(self):

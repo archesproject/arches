@@ -597,7 +597,7 @@ class ArchesJsonImporter(BaseImportModule):
         if nodeid not in self._memo_disabled_nodes:
             try:
                 hash(value)
-                memo_key = value
+                memo_key = (type(value).__name__, value)
             except TypeError:
                 memo_key = json.dumps(value, sort_keys=True, default=str)
             cached = self.validated_data.get(nodeid, {}).get(memo_key)
