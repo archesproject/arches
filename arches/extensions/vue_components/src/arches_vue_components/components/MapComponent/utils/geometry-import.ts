@@ -40,57 +40,15 @@ export function findGeoJsonIssues(text: string): GeoJsonIssue[] {
     }));
 }
 
-function toFeatureCollection(geojson: GeoJSON): FeatureCollection {
-    if (geojson.type === "FeatureCollection") {
-        return geojson;
-    }
-    if (geojson.type === "Feature") {
-        return { type: "FeatureCollection", features: [geojson] };
-    }
-    return {
-        type: "FeatureCollection",
-        features: [{ type: "Feature", properties: {}, geometry: geojson }],
-    };
-}
-
-function asCollections(
-    parsed: FeatureCollection | FeatureCollection[],
-): FeatureCollection[] {
-    return Array.isArray(parsed) ? parsed : [parsed];
-}
-
-async function parseFeatureCollections(
-    file: File,
-    extension: string,
-): Promise<FeatureCollection[]> {
-    if (extension === "zip") {
-        return asCollections(await shp(await file.arrayBuffer()));
-    }
-    if (extension === "shp") {
-        return asCollections(await shp({ shp: await file.arrayBuffer() }));
-    }
-
-    const text = await file.text();
-
-    if (extension === "kml") {
-        return [kml(new DOMParser().parseFromString(text, "text/xml"))];
-    }
-    const [firstIssue] = findGeoJsonIssues(text);
-    if (firstIssue) {
-        throw new Error(firstIssue.message);
-    }
-    return [toFeatureCollection(JSON.parse(text))];
-}
-
 export async function parseGeometryFile(file: File): Promise<Feature[]> {
     const extension = file.name.split(".").pop()?.toLowerCase() ?? "";
     if (!ACCEPTED_GEOMETRY_FILE_EXTENSIONS.includes(extension)) {
         throw new GeometryImportError("unsupported-file-type");
     }
 
-    let collections: FeatureCollection[];
+    let features: Feature[];
     try {
-        collections = await parseFeatureCollections(file, extension);
+        features = await readFeatures(file, extension);
     } catch (error) {
         if (error instanceof Error) {
             throw new GeometryImportError("parse-failed", error.message);
@@ -98,12 +56,49 @@ export async function parseGeometryFile(file: File): Promise<Feature[]> {
         throw new GeometryImportError("parse-failed");
     }
 
-    const features = collections
-        .flatMap((collection) => collection.features)
-        .filter((feature) => feature.geometry !== null);
-
-    if (!features.length) {
+    const featuresWithGeometry = features.filter(
+        (feature) => feature.geometry !== null,
+    );
+    if (!featuresWithGeometry.length) {
         throw new GeometryImportError("no-features");
     }
-    return features;
+    return featuresWithGeometry;
+}
+
+async function readFeatures(file: File, extension: string): Promise<Feature[]> {
+    if (extension === "zip") {
+        return featuresFromShapefile(await shp(await file.arrayBuffer()));
+    }
+    if (extension === "shp") {
+        return featuresFromShapefile(
+            await shp({ shp: await file.arrayBuffer() }),
+        );
+    }
+
+    const text = await file.text();
+    if (extension === "kml") {
+        return kml(new DOMParser().parseFromString(text, "text/xml")).features;
+    }
+
+    const [firstIssue] = findGeoJsonIssues(text);
+    if (firstIssue) {
+        throw new Error(firstIssue.message);
+    }
+    return featuresFromGeoJson(JSON.parse(text));
+}
+
+function featuresFromShapefile(
+    parsed: FeatureCollection | FeatureCollection[],
+): Feature[] {
+    return [parsed].flat().flatMap((collection) => collection.features);
+}
+
+function featuresFromGeoJson(geojson: GeoJSON): Feature[] {
+    if (geojson.type === "FeatureCollection") {
+        return geojson.features;
+    }
+    if (geojson.type === "Feature") {
+        return [geojson];
+    }
+    return [{ type: "Feature", properties: {}, geometry: geojson }];
 }
