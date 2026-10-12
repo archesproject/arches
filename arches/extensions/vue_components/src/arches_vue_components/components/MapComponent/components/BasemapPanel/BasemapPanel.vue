@@ -1,14 +1,11 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from "vue";
+import { onMounted, ref, useTemplateRef } from "vue";
 
 import { useGettext } from "vue3-gettext";
 
 import Button from "openvue/button";
 
-import {
-    getCachedBasemapThumbnail,
-    renderBasemapThumbnail,
-} from "@/arches_vue_components/components/MapComponent/components/BasemapPanel/basemap-thumbnails.ts";
+import { renderBasemapThumbnail } from "@/arches_vue_components/components/MapComponent/components/BasemapPanel/utils/basemap-thumbnail.ts";
 import { useResolvedMapContext } from "@/arches_vue_components/components/MapComponent/composables/useMapContext.ts";
 
 import type {
@@ -24,16 +21,10 @@ const { map, basemaps } = useResolvedMapContext(context, "BasemapPanel");
 
 const { $gettext } = useGettext();
 
-const thumbnailsByUrl = ref<Record<string, string | null>>(
-    Object.fromEntries(
-        basemaps.value.flatMap((basemap) => {
-            const cachedThumbnail = getCachedBasemapThumbnail(basemap.url);
-            return cachedThumbnail ? [[basemap.url, cachedThumbnail]] : [];
-        }),
-    ),
+const thumbnailRenderContainer = useTemplateRef<HTMLDivElement>(
+    "thumbnailRenderContainer",
 );
-
-let isUnmounted = false;
+const thumbnailsByUrl = ref<Record<string, string | null>>({});
 
 onMounted(async () => {
     if (!map.value) {
@@ -44,21 +35,16 @@ onMounted(async () => {
     const zoom = map.value.getZoom();
 
     for (const basemap of basemaps.value) {
-        if (isUnmounted) {
+        if (!thumbnailRenderContainer.value) {
             return;
         }
-        if (thumbnailsByUrl.value[basemap.url] === undefined) {
-            thumbnailsByUrl.value[basemap.url] = await renderBasemapThumbnail(
-                basemap.url,
-                center,
-                zoom,
-            );
-        }
+        thumbnailsByUrl.value[basemap.url] = await renderBasemapThumbnail(
+            thumbnailRenderContainer.value,
+            basemap.url,
+            center,
+            zoom,
+        );
     }
-});
-
-onUnmounted(() => {
-    isUnmounted = true;
 });
 
 function selectBasemap(selectedBasemap: Basemap): void {
@@ -107,6 +93,15 @@ function selectBasemap(selectedBasemap: Basemap): void {
             </span>
             <span class="basemap-name">{{ basemap.name }}</span>
         </Button>
+        <div
+            class="basemap-thumbnail-renderer"
+            aria-hidden="true"
+        >
+            <div
+                ref="thumbnailRenderContainer"
+                class="basemap-thumbnail-render-container"
+            />
+        </div>
     </div>
 </template>
 
@@ -177,5 +172,17 @@ function selectBasemap(selectedBasemap: Basemap): void {
     font-size: 1.25rem;
     font-weight: 600;
     text-align: center;
+}
+
+.basemap-thumbnail-renderer {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+}
+
+.basemap-thumbnail-render-container {
+    width: 24rem;
+    height: 16rem;
 }
 </style>

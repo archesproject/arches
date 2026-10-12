@@ -147,7 +147,7 @@ export function useFeaturePopup(
         activePopup?.remove();
 
         const container = document.createElement("div");
-        container.style.height = "100%";
+        container.className = "feature-info-popup-container";
 
         activePopup = new maplibregl.Popup({
             maxWidth: "none",

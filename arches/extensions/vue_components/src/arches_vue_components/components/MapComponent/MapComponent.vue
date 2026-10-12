@@ -253,6 +253,10 @@ function handleDocumentClick(event: MouseEvent): void {
     background: var(--p-content-background);
     color: var(--p-content-color);
 }
+
+.feature-info-popup-container {
+    height: 100%;
+}
 </style>
 
 <style scoped>

@@ -47,8 +47,6 @@ export const COORDINATE_PREVIEW_SOURCE_ID = "map-component-coordinate-preview";
 export const VERTEX_HIGHLIGHT_SOURCE_ID = "map-component-vertex-highlight";
 export const COMPONENT_LAYER_ID_PREFIX = "map-component-";
 export const WGS84_SRID = "4326";
-export const THUMBNAIL_WIDTH_PIXELS = 240;
-export const THUMBNAIL_HEIGHT_PIXELS = 160;
 
 export const GEOMETRY_ICON_BY_TYPE: Record<string, string> = {
     Point: "pi pi-map-marker",
