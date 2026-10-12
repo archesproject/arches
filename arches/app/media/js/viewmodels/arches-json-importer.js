@@ -66,11 +66,13 @@ const ArchesJsonImportViewModel = function(params) {
             formData.append('overwrite', self.overwrite());
             formData.append('index', self.index());
             const response = await self.submit('start', formData);
-            params.activeTab("import");
+            const data = await response.json();
             if (response.ok) {
-                const data = await response.json();
+                params.activeTab("import");
                 self.response(data);
-                self.write();
+                await self.write();
+            } else {
+                self.showAlert(data);
             }
         } finally {
             self.loading(false);
