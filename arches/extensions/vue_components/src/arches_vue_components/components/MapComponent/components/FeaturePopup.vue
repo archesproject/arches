@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, onUnmounted, ref, watch } from "vue";
+import { computed, inject, onWatcherCleanup, ref, watch } from "vue";
 
 import { useGettext } from "vue3-gettext";
 
@@ -31,8 +31,6 @@ const index = ref(0);
 const isLoading = ref(false);
 const descriptor = ref<ResourceDescriptor | null>(null);
 
-let isUnmounted = false;
-
 const feature = computed(() => features[index.value]);
 const resourceId = computed(
     () => feature.value?.properties?.resourceinstanceid ?? null,
@@ -60,10 +58,16 @@ watch(
             resolvedContext?.clearFeatureHighlight();
             return;
         }
+
+        let isStale = false;
+        onWatcherCleanup(() => {
+            isStale = true;
+        });
+
         isLoading.value = true;
         try {
             const fetchedDescriptor = await fetchResourceDescriptor(id);
-            if (isUnmounted || id !== resourceId.value) {
+            if (isStale) {
                 return;
             }
             descriptor.value = fetchedDescriptor;
@@ -75,21 +79,20 @@ watch(
                 ),
             );
         } catch (error) {
+            if (isStale) {
+                return;
+            }
             descriptor.value = null;
             resolvedContext?.clearFeatureHighlight();
             console.error("Error fetching resource descriptor:", error);
         } finally {
-            if (id === resourceId.value) {
+            if (!isStale) {
                 isLoading.value = false;
             }
         }
     },
     { immediate: true },
 );
-
-onUnmounted(() => {
-    isUnmounted = true;
-});
 
 function navigateToPreviousFeature(): void {
     index.value = (index.value - 1 + total.value) % total.value;
