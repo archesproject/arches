@@ -807,8 +807,8 @@ class ArchesJsonImporter(BaseImportModule):
             self._failure(
                 resourceids.get(str(pk)),
                 _(
-                    "Resource {} already exists. Tick Replace resources that already "
-                    "exist to replace it."
+                    "Resource {} already exists. Tick Overwrite existing resources, or "
+                    "use -ow on the command line, to replace it."
                 ).format(pk),
             )
             for pk in existing
