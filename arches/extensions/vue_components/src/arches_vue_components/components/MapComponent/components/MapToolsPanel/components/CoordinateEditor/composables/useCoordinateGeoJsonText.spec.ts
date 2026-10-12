@@ -1,4 +1,4 @@
-import { computed, ref, shallowRef } from "vue";
+import { computed, effectScope, ref, shallowRef } from "vue";
 import { describe, expect, it, vi } from "vitest";
 
 import { useCoordinateEditor } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/composables/useCoordinateEditor.ts";
@@ -27,43 +27,54 @@ function buildContext(drawnFeatures: Feature[] = []): MapContext {
 
 describe("useCoordinateGeoJsonText", () => {
     it("applies valid GeoJSON text to the rows", () => {
-        const editor = useCoordinateEditor(buildContext(), null, "point");
-        const { applyGeoJsonText } = useCoordinateGeoJsonText(editor);
-        const errors = applyGeoJsonText(
-            JSON.stringify({
-                type: "Feature",
-                properties: { name: "Typed" },
-                geometry: {
-                    type: "LineString",
-                    coordinates: [
-                        [5, 5],
-                        [6, 6],
-                    ],
-                },
-            }),
-        );
+        effectScope().run(() => {
+            const editor = useCoordinateEditor(buildContext(), null, "point");
+            const { geoJsonErrors, updateGeoJsonText, flushGeoJsonText } =
+                useCoordinateGeoJsonText(editor);
 
-        expect(errors).toEqual([]);
-        expect(editor.kind.value).toBe("line");
-        expect(editor.rows.value).toEqual([
-            { x: 5, y: 5 },
-            { x: 6, y: 6 },
-        ]);
+            updateGeoJsonText(
+                JSON.stringify({
+                    type: "Feature",
+                    properties: { name: "Typed" },
+                    geometry: {
+                        type: "LineString",
+                        coordinates: [
+                            [5, 5],
+                            [6, 6],
+                        ],
+                    },
+                }),
+            );
+            flushGeoJsonText();
+
+            expect(geoJsonErrors.value).toEqual([]);
+            expect(editor.kind.value).toBe("line");
+            expect(editor.rows.value).toEqual([
+                { x: 5, y: 5 },
+                { x: 6, y: 6 },
+            ]);
+        });
     });
 
     it("reports GeoJSON that is not a supported feature", () => {
-        const editor = useCoordinateEditor(buildContext(), null, "point");
-        const { applyGeoJsonText } = useCoordinateGeoJsonText(editor);
+        effectScope().run(() => {
+            const editor = useCoordinateEditor(buildContext(), null, "point");
+            const { geoJsonErrors, updateGeoJsonText, flushGeoJsonText } =
+                useCoordinateGeoJsonText(editor);
 
-        expect(applyGeoJsonText("{ broken")).not.toEqual([]);
-        expect(
-            applyGeoJsonText(
+            updateGeoJsonText("{ broken");
+            flushGeoJsonText();
+            expect(geoJsonErrors.value).not.toEqual([]);
+
+            updateGeoJsonText(
                 JSON.stringify({
                     type: "Feature",
                     properties: {},
                     geometry: { type: "MultiPoint", coordinates: [[1, 1]] },
                 }),
-            ),
-        ).toHaveLength(1);
+            );
+            flushGeoJsonText();
+            expect(geoJsonErrors.value).toHaveLength(1);
+        });
     });
 });

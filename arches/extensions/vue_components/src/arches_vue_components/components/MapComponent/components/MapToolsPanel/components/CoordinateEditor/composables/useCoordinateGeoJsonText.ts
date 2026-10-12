@@ -1,17 +1,26 @@
+import { onScopeDispose, ref } from "vue";
+
+import { debounce } from "es-toolkit";
 import { useGettext } from "vue3-gettext";
 
 import { DRAW_MODE_BY_GEOMETRY_TYPE } from "@/arches_vue_components/components/MapComponent/constants.ts";
 import { findGeoJsonIssues } from "@/arches_vue_components/components/MapComponent/utils/geometry-import.ts";
 
+import type { Ref } from "vue";
 import type { GeoJSON } from "geojson";
 
 import type { UseCoordinateEditorReturn } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/composables/useCoordinateEditor.ts";
 import type { DrawMode } from "@/arches_vue_components/components/MapComponent/types.ts";
 import type { GeoJsonIssue } from "@/arches_vue_components/components/MapComponent/utils/geometry-import.ts";
 
+const APPLY_DEBOUNCE_MILLISECONDS = 200;
+
 export interface UseCoordinateGeoJsonTextReturn {
-    buildGeoJsonText: () => string;
-    applyGeoJsonText: (text: string) => GeoJsonIssue[];
+    geoJsonText: Ref<string>;
+    geoJsonErrors: Ref<GeoJsonIssue[]>;
+    resetGeoJsonText: () => void;
+    updateGeoJsonText: (text: string) => void;
+    flushGeoJsonText: () => void;
 }
 
 export function useCoordinateGeoJsonText(
@@ -22,18 +31,20 @@ export function useCoordinateGeoJsonText(
     const { editingFeature, kind, properties, completeGeometry, loadFeature } =
         coordinateEditor;
 
-    function getKindLabel(entryKind: DrawMode): string {
-        if (entryKind === "point") {
-            return $gettext("Point");
-        }
-        if (entryKind === "line") {
-            return $gettext("Line");
-        }
-        return $gettext("Polygon");
-    }
+    const geoJsonText = ref("");
+    const geoJsonErrors = ref<GeoJsonIssue[]>([]);
 
-    function buildGeoJsonText(): string {
-        return JSON.stringify(
+    const applyGeoJsonTextDebounced = debounce(() => {
+        geoJsonErrors.value = applyGeoJsonText(geoJsonText.value);
+    }, APPLY_DEBOUNCE_MILLISECONDS);
+
+    onScopeDispose(() => {
+        applyGeoJsonTextDebounced.cancel();
+    });
+
+    function resetGeoJsonText(): void {
+        applyGeoJsonTextDebounced.cancel();
+        geoJsonText.value = JSON.stringify(
             {
                 type: "Feature",
                 properties: properties.value,
@@ -42,6 +53,26 @@ export function useCoordinateGeoJsonText(
             null,
             2,
         );
+        geoJsonErrors.value = [];
+    }
+
+    function updateGeoJsonText(text: string): void {
+        geoJsonText.value = text;
+        applyGeoJsonTextDebounced();
+    }
+
+    function flushGeoJsonText(): void {
+        applyGeoJsonTextDebounced.flush();
+    }
+
+    function getKindLabel(entryKind: DrawMode): string {
+        if (entryKind === "point") {
+            return $gettext("Point");
+        }
+        if (entryKind === "line") {
+            return $gettext("Line");
+        }
+        return $gettext("Polygon");
     }
 
     function applyGeoJsonText(text: string): GeoJsonIssue[] {
@@ -87,5 +118,11 @@ export function useCoordinateGeoJsonText(
         return [];
     }
 
-    return { buildGeoJsonText, applyGeoJsonText };
+    return {
+        geoJsonText,
+        geoJsonErrors,
+        resetGeoJsonText,
+        updateGeoJsonText,
+        flushGeoJsonText,
+    };
 }

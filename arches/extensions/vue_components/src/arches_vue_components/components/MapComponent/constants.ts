@@ -47,7 +47,6 @@ export const FEATURE_HIGHLIGHT_POINT_LAYER_ID =
 export const FEATURE_HIGHLIGHT_OUTLINE_LAYER_ID =
     "map-component-feature-highlight-outline";
 export const COORDINATE_PREVIEW_SOURCE_ID = "map-component-coordinate-preview";
-export const VERTEX_HIGHLIGHT_SOURCE_ID = "map-component-vertex-highlight";
 export const COMPONENT_LAYER_ID_PREFIX = "map-component-";
 export const WGS84_SRID = "4326";
 

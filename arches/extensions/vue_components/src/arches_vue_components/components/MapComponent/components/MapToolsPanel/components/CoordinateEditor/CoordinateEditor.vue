@@ -1,15 +1,6 @@
 <script setup lang="ts">
-import {
-    computed,
-    nextTick,
-    onUnmounted,
-    ref,
-    useId,
-    useTemplateRef,
-    watch,
-} from "vue";
+import { computed, nextTick, ref, useId, useTemplateRef } from "vue";
 
-import { debounce } from "es-toolkit";
 import { useGettext } from "vue3-gettext";
 
 import Button from "openvue/button";
@@ -32,20 +23,13 @@ import { useCoordinateEditor } from "@/arches_vue_components/components/MapCompo
 import { useCoordinateGeoJsonText } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/composables/useCoordinateGeoJsonText.ts";
 import { useCoordinatePreview } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/composables/useCoordinatePreview.ts";
 
-import type { Geometry } from "geojson";
-
 import type { CoordinateRow } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/types.ts";
 import type {
     DrawMode,
     MapContext,
 } from "@/arches_vue_components/components/MapComponent/types.ts";
-import type { GeoJsonIssue } from "@/arches_vue_components/components/MapComponent/utils/geometry-import.ts";
 
 const CLOSE_EVENT = "close" as const;
-const PREVIEW_DEBOUNCE_MILLISECONDS = 300;
-const GEOJSON_APPLY_DEBOUNCE_MILLISECONDS = 200;
-const VERTEX_FOCUS_ZOOM = 17;
-const EDITING_LABEL_PLACEHOLDER = "%{label}";
 
 type DisplayMode = "vertices" | "geojson";
 
@@ -64,20 +48,14 @@ const vertexTable =
 const { $gettext } = useGettext();
 
 const resolvedContext = useResolvedMapContext(context, "CoordinateEditor");
-const {
-    map,
-    coordinateSystems,
-    drawnFeatures,
-    allowedGeometryTypes,
-    fitToFeatures,
-} = resolvedContext;
+const { coordinateSystems, drawnFeatures, allowedGeometryTypes } =
+    resolvedContext;
 const kindOptions = useGeometryKindOptions(allowedGeometryTypes);
 const labelsByFeatureId = useDrawnFeatureLabels(drawnFeatures);
-const defaultKind = kindOptions.value[0]?.value ?? POINT;
 const coordinateEditor = useCoordinateEditor(
     resolvedContext,
     editingFeatureId,
-    defaultKind,
+    kindOptions.value[0]?.value ?? POINT,
 );
 const {
     editingFeature,
@@ -89,7 +67,6 @@ const {
     decimalPlaces,
     axisLabels,
     minimumVertices,
-    areAllRowsComplete,
     previewGeometry,
     setKind,
     setSrid,
@@ -98,58 +75,40 @@ const {
     removeRow,
     commitRowEdit,
     undo,
-    getRowWgs84Position,
     submit,
 } = coordinateEditor;
-const { buildGeoJsonText, applyGeoJsonText } =
-    useCoordinateGeoJsonText(coordinateEditor);
-const { showPreviewGeometry, showVertexHighlight } = useCoordinatePreview(map);
+const {
+    geoJsonText,
+    geoJsonErrors,
+    resetGeoJsonText,
+    updateGeoJsonText,
+    flushGeoJsonText,
+} = useCoordinateGeoJsonText(coordinateEditor);
 
 const sridSelectId = useId();
 
 const displayMode = ref<DisplayMode>("vertices");
 const focusedRowIndex = ref<number | null>(null);
-const geoJsonText = ref("");
-const geoJsonErrors = ref<GeoJsonIssue[]>([]);
 
-let hasFittedDraft = false;
-
-const refreshPreviewDebounced = debounce(
-    refreshPreview,
-    PREVIEW_DEBOUNCE_MILLISECONDS,
-);
-const followFocusedRowDebounced = debounce(
+const {
+    focusedRowPosition,
     followFocusedRow,
-    PREVIEW_DEBOUNCE_MILLISECONDS,
-);
-const applyPendingGeoJsonText = debounce(() => {
-    geoJsonErrors.value = applyGeoJsonText(geoJsonText.value);
-}, GEOJSON_APPLY_DEBOUNCE_MILLISECONDS);
+    followFocusedRowDebounced,
+    fitToPreview,
+} = useCoordinatePreview(resolvedContext, coordinateEditor, focusedRowIndex);
 
 const displayModeOptions = [
     { value: "vertices", label: $gettext("Vertices"), icon: "pi pi-list" },
     { value: "geojson", label: $gettext("GeoJSON"), icon: "pi pi-code" },
 ];
 
-const coordinateSystemOptions = computed(() =>
-    coordinateSystems.value.map((coordinateSystem) => ({
-        label: coordinateSystem.name,
-        value: coordinateSystem.srid,
-    })),
-);
-
-const editingIconClass = computed(() => {
-    if (!editingFeature) {
+const editingLabelHtml = computed(() => {
+    if (editingFeatureId === null) {
         return "";
     }
-    return GEOMETRY_ICON_BY_TYPE[editingFeature.geometry.type];
-});
-
-const focusedRowPosition = computed(() => {
-    if (focusedRowIndex.value === null) {
-        return null;
-    }
-    return getRowWgs84Position(focusedRowIndex.value);
+    return $gettext("Editing <strong>%{label}</strong>", {
+        label: labelsByFeatureId.value[editingFeatureId],
+    });
 });
 
 const canCenter = computed(() => {
@@ -159,66 +118,29 @@ const canCenter = computed(() => {
     return previewGeometry.value !== null;
 });
 
-const editingFeatureLabel = computed(() => {
-    if (editingFeatureId === null) {
-        return "";
-    }
-    return labelsByFeatureId.value[editingFeatureId];
-});
-
-const editingLabelParts = computed(() => {
-    const template = $gettext("Editing %{label}", {
-        label: EDITING_LABEL_PLACEHOLDER,
-    });
-    const [before, after = ""] = template.split(EDITING_LABEL_PLACEHOLDER);
-    return { before, after };
-});
-
-const centerTitle = computed(() => {
+const modeLabels = computed(() => {
     if (displayMode.value === "vertices") {
-        return $gettext("Center map on the focused vertex");
+        return {
+            listHeader: $gettext("Vertices"),
+            centerTitle: $gettext("Center map on the focused vertex"),
+            undoTitle: $gettext("Undo the last vertex edit"),
+        };
     }
-    return $gettext("Center map on this geometry");
+    return {
+        listHeader: $gettext("GeoJSON"),
+        centerTitle: $gettext("Center map on this geometry"),
+        undoTitle: $gettext("Undo the last edit"),
+    };
 });
 
-const undoTitle = computed(() => {
-    if (displayMode.value === "vertices") {
-        return $gettext("Undo the last vertex edit");
-    }
-    return $gettext("Undo the last edit");
-});
-
-const listHeaderLabel = computed(() => {
-    if (displayMode.value === "vertices") {
-        return $gettext("Vertices");
-    }
-    return $gettext("GeoJSON");
-});
-
-const cancelLabel = computed(() => {
+const actionLabels = computed(() => {
     if (editingFeature) {
-        return $gettext("Cancel");
+        return {
+            cancel: $gettext("Cancel"),
+            submit: $gettext("Update geometry"),
+        };
     }
-    return $gettext("Done");
-});
-
-const submitLabel = computed(() => {
-    if (editingFeature) {
-        return $gettext("Update geometry");
-    }
-    return $gettext("Add geometry");
-});
-
-watch(previewGeometry, refreshPreviewDebounced);
-
-watch(focusedRowPosition, (position) => {
-    showVertexHighlight(position);
-});
-
-onUnmounted(() => {
-    refreshPreviewDebounced.cancel();
-    followFocusedRowDebounced.cancel();
-    applyPendingGeoJsonText.cancel();
+    return { cancel: $gettext("Done"), submit: $gettext("Add geometry") };
 });
 
 function selectKind(newKind: DrawMode): void {
@@ -228,15 +150,9 @@ function selectKind(newKind: DrawMode): void {
 
 function setDisplayMode(mode: DisplayMode): void {
     if (mode === "geojson") {
-        geoJsonText.value = buildGeoJsonText();
-        geoJsonErrors.value = [];
+        resetGeoJsonText();
     }
     displayMode.value = mode;
-}
-
-function updateGeoJsonText(text: string): void {
-    geoJsonText.value = text;
-    applyPendingGeoJsonText();
 }
 
 function handleRowUpdate(
@@ -246,10 +162,6 @@ function handleRowUpdate(
 ): void {
     updateRow(index, axis, value);
     followFocusedRowDebounced();
-}
-
-function handleRowFocus(index: number): void {
-    focusedRowIndex.value = index;
 }
 
 function handleRowRemove(index: number): void {
@@ -267,45 +179,8 @@ async function handleAddRow(): Promise<void> {
 }
 
 function handleUndo(): void {
-    applyPendingGeoJsonText.cancel();
     undo();
-    if (displayMode.value === "geojson") {
-        geoJsonText.value = buildGeoJsonText();
-        geoJsonErrors.value = [];
-    }
-}
-
-function refreshPreview(geometry: Geometry | null): void {
-    showPreviewGeometry(geometry);
-
-    if (!geometry || !areAllRowsComplete.value || kind.value === POINT) {
-        hasFittedDraft = false;
-        return;
-    }
-    if (editingFeature || hasFittedDraft) {
-        return;
-    }
-
-    hasFittedDraft = true;
-    followFocusedRowDebounced.cancel();
-    fitToGeometry(geometry);
-}
-
-function followFocusedRow(): void {
-    if (!focusedRowPosition.value) {
-        return;
-    }
-
-    const [longitude, latitude] = focusedRowPosition.value;
-    map.value?.flyTo({
-        center: [longitude, latitude],
-        zoom: Math.max(map.value.getZoom(), VERTEX_FOCUS_ZOOM),
-        essential: true,
-    });
-}
-
-function fitToGeometry(geometry: Geometry): void {
-    fitToFeatures([{ type: "Feature", properties: {}, geometry }]);
+    resetGeoJsonText();
 }
 
 function centerMap(): void {
@@ -313,14 +188,12 @@ function centerMap(): void {
         followFocusedRow();
         return;
     }
-    if (previewGeometry.value) {
-        fitToGeometry(previewGeometry.value);
-    }
+    fitToPreview();
 }
 
 function handleSubmit(): void {
     if (displayMode.value === "geojson") {
-        applyPendingGeoJsonText.flush();
+        flushGeoJsonText();
         if (geoJsonErrors.value.length) {
             return;
         }
@@ -333,7 +206,6 @@ function handleSubmit(): void {
     }
     focusedRowIndex.value = null;
     displayMode.value = "vertices";
-    geoJsonErrors.value = [];
 }
 </script>
 
@@ -356,13 +228,11 @@ function handleSubmit(): void {
             >
                 <i
                     aria-hidden="true"
-                    :class="editingIconClass"
+                    :class="GEOMETRY_ICON_BY_TYPE[editingFeature.geometry.type]"
                 />
-                <span>
-                    {{ editingLabelParts.before
-                    }}<strong>{{ editingFeatureLabel }}</strong
-                    >{{ editingLabelParts.after }}
-                </span>
+                <!-- eslint-disable vue/no-v-html -->
+                <span v-html="editingLabelHtml" />
+                <!-- eslint-enable vue/no-v-html -->
             </div>
             <SelectButton
                 class="coordinate-editor-mode-toggle"
@@ -390,13 +260,13 @@ function handleSubmit(): void {
                     {{ $gettext("Spatial reference system") }}
                 </label>
                 <Select
-                    option-label="label"
-                    option-value="value"
+                    option-label="name"
+                    option-value="srid"
                     append-to="self"
                     size="small"
                     :model-value="srid"
                     :input-id="sridSelectId"
-                    :options="coordinateSystemOptions"
+                    :options="coordinateSystems"
                     :fluid="true"
                     @update:model-value="setSrid"
                 />
@@ -406,13 +276,13 @@ function handleSubmit(): void {
         <div class="coordinate-editor-section coordinate-editor-scroll-section">
             <div class="coordinate-editor-list-header">
                 <span class="coordinate-editor-label">
-                    {{ listHeaderLabel }}
+                    {{ modeLabels.listHeader }}
                 </span>
                 <div class="coordinate-editor-list-actions">
                     <Button
                         icon="pi pi-search-plus"
                         size="small"
-                        :title="centerTitle"
+                        :title="modeLabels.centerTitle"
                         :label="$gettext('Center')"
                         :link="true"
                         :disabled="!canCenter"
@@ -421,7 +291,7 @@ function handleSubmit(): void {
                     <Button
                         icon="pi pi-undo"
                         size="small"
-                        :title="undoTitle"
+                        :title="modeLabels.undoTitle"
                         :label="$gettext('Undo')"
                         :link="true"
                         :disabled="!canUndo"
@@ -438,7 +308,7 @@ function handleSubmit(): void {
                     :minimum-vertices="minimumVertices"
                     :highlighted-row-index="focusedRowIndex"
                     @update-row="handleRowUpdate"
-                    @focus-row="handleRowFocus"
+                    @focus-row="focusedRowIndex = $event"
                     @blur-row="commitRowEdit"
                     @remove-row="handleRowRemove"
                 />
@@ -471,13 +341,13 @@ function handleSubmit(): void {
         <div class="coordinate-editor-actions">
             <Button
                 size="small"
-                :label="cancelLabel"
+                :label="actionLabels.cancel"
                 :link="true"
                 @click="emit(CLOSE_EVENT)"
             />
             <Button
                 size="small"
-                :label="submitLabel"
+                :label="actionLabels.submit"
                 @click="handleSubmit"
             />
         </div>

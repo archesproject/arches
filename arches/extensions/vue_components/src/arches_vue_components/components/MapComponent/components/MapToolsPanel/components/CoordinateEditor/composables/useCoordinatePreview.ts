@@ -1,156 +1,189 @@
-import { onUnmounted } from "vue";
+import { computed, onUnmounted, watch } from "vue";
+
+import { debounce } from "es-toolkit";
 
 import {
     COORDINATE_PREVIEW_SOURCE_ID,
-    FEATURE_HIGHLIGHT_COLOR,
-    VERTEX_HIGHLIGHT_SOURCE_ID,
+    POINT,
 } from "@/arches_vue_components/components/MapComponent/constants.ts";
 import { geometriesToFeatureCollection } from "@/arches_vue_components/components/MapComponent/utils/feature-collection.ts";
 
-import type { ShallowRef } from "vue";
+import type { ComputedRef, Ref } from "vue";
 import type { Geometry, Position } from "geojson";
-import type { GeoJSONSource, Map as MaplibreMap } from "maplibre-gl";
+import type { AddLayerObject, GeoJSONSource } from "maplibre-gl";
 
+import type { UseCoordinateEditorReturn } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/CoordinateEditor/composables/useCoordinateEditor.ts";
+import type { MapContext } from "@/arches_vue_components/components/MapComponent/types.ts";
+
+const PREVIEW_DEBOUNCE_MILLISECONDS = 300;
+const VERTEX_FOCUS_ZOOM = 17;
 const PREVIEW_COLOR = "#3bb2d0";
-const PREVIEW_FILL_OPACITY = 0.15;
-const PREVIEW_LINE_WIDTH = 2;
-const PREVIEW_POINT_RADIUS = 5;
-const VERTEX_HIGHLIGHT_RADIUS = 9;
-const VERTEX_HIGHLIGHT_STROKE_WIDTH = 3;
 
-const PREVIEW_FILL_LAYER_ID = `${COORDINATE_PREVIEW_SOURCE_ID}-fill`;
-const PREVIEW_LINE_LAYER_ID = `${COORDINATE_PREVIEW_SOURCE_ID}-line`;
-const PREVIEW_POINT_LAYER_ID = `${COORDINATE_PREVIEW_SOURCE_ID}-point`;
-const VERTEX_HIGHLIGHT_LAYER_ID = `${VERTEX_HIGHLIGHT_SOURCE_ID}-point`;
-
-const LAYER_IDS = [
-    PREVIEW_FILL_LAYER_ID,
-    PREVIEW_LINE_LAYER_ID,
-    PREVIEW_POINT_LAYER_ID,
-    VERTEX_HIGHLIGHT_LAYER_ID,
+const PREVIEW_LAYERS: AddLayerObject[] = [
+    {
+        id: `${COORDINATE_PREVIEW_SOURCE_ID}-fill`,
+        type: "fill",
+        source: COORDINATE_PREVIEW_SOURCE_ID,
+        filter: ["==", ["geometry-type"], "Polygon"],
+        paint: { "fill-color": PREVIEW_COLOR, "fill-opacity": 0.15 },
+    },
+    {
+        id: `${COORDINATE_PREVIEW_SOURCE_ID}-line`,
+        type: "line",
+        source: COORDINATE_PREVIEW_SOURCE_ID,
+        paint: {
+            "line-color": PREVIEW_COLOR,
+            "line-width": 2,
+            "line-dasharray": [2, 2],
+        },
+    },
+    {
+        id: `${COORDINATE_PREVIEW_SOURCE_ID}-point`,
+        type: "circle",
+        source: COORDINATE_PREVIEW_SOURCE_ID,
+        filter: ["in", ["geometry-type"], ["literal", ["Point", "MultiPoint"]]],
+        paint: { "circle-radius": 5, "circle-color": PREVIEW_COLOR },
+    },
 ];
-const SOURCE_IDS = [COORDINATE_PREVIEW_SOURCE_ID, VERTEX_HIGHLIGHT_SOURCE_ID];
 
 export interface UseCoordinatePreviewReturn {
-    showPreviewGeometry: (geometry: Geometry | null) => void;
-    showVertexHighlight: (position: Position | null) => void;
+    focusedRowPosition: ComputedRef<Position | null>;
+    followFocusedRow: () => void;
+    followFocusedRowDebounced: () => void;
+    fitToPreview: () => void;
 }
 
 export function useCoordinatePreview(
-    map: ShallowRef<MaplibreMap | null>,
+    context: MapContext,
+    coordinateEditor: UseCoordinateEditorReturn,
+    focusedRowIndex: Ref<number | null>,
 ): UseCoordinatePreviewReturn {
-    onUnmounted(removePreviewLayers);
+    const { map, fitToFeatures, showFeatureHighlight, clearFeatureHighlight } =
+        context;
+    const {
+        editingFeature,
+        kind,
+        areAllRowsComplete,
+        previewGeometry,
+        getRowWgs84Position,
+    } = coordinateEditor;
 
-    function ensurePreviewLayers(): void {
-        const previewMap = map.value!;
-        for (const sourceId of SOURCE_IDS) {
-            if (!previewMap.getSource(sourceId)) {
-                previewMap.addSource(sourceId, {
-                    type: "geojson",
-                    data: geometriesToFeatureCollection([]),
-                });
-            }
+    let hasFittedDraft = false;
+
+    const refreshPreviewDebounced = debounce(
+        refreshPreview,
+        PREVIEW_DEBOUNCE_MILLISECONDS,
+    );
+    const followFocusedRowDebounced = debounce(
+        followFocusedRow,
+        PREVIEW_DEBOUNCE_MILLISECONDS,
+    );
+
+    const focusedRowPosition = computed(() => {
+        if (focusedRowIndex.value === null) {
+            return null;
         }
-        if (!previewMap.getLayer(PREVIEW_FILL_LAYER_ID)) {
-            previewMap.addLayer({
-                id: PREVIEW_FILL_LAYER_ID,
-                type: "fill",
-                source: COORDINATE_PREVIEW_SOURCE_ID,
-                filter: ["==", ["geometry-type"], "Polygon"],
-                paint: {
-                    "fill-color": PREVIEW_COLOR,
-                    "fill-opacity": PREVIEW_FILL_OPACITY,
-                },
-            });
+        return getRowWgs84Position(focusedRowIndex.value);
+    });
+
+    watch(previewGeometry, refreshPreviewDebounced);
+
+    watch(focusedRowPosition, (position) => {
+        if (!position) {
+            clearFeatureHighlight();
+            return;
         }
-        if (!previewMap.getLayer(PREVIEW_LINE_LAYER_ID)) {
-            previewMap.addLayer({
-                id: PREVIEW_LINE_LAYER_ID,
-                type: "line",
-                source: COORDINATE_PREVIEW_SOURCE_ID,
-                paint: {
-                    "line-color": PREVIEW_COLOR,
-                    "line-width": PREVIEW_LINE_WIDTH,
-                    "line-dasharray": [2, 2],
-                },
-            });
+        showFeatureHighlight([{ type: "Point", coordinates: position }]);
+    });
+
+    onUnmounted(() => {
+        refreshPreviewDebounced.cancel();
+        followFocusedRowDebounced.cancel();
+        clearFeatureHighlight();
+        removePreview();
+    });
+
+    function refreshPreview(geometry: Geometry | null): void {
+        showPreview(geometry);
+
+        if (!geometry || !areAllRowsComplete.value || kind.value === POINT) {
+            hasFittedDraft = false;
+            return;
         }
-        if (!previewMap.getLayer(PREVIEW_POINT_LAYER_ID)) {
-            previewMap.addLayer({
-                id: PREVIEW_POINT_LAYER_ID,
-                type: "circle",
-                source: COORDINATE_PREVIEW_SOURCE_ID,
-                filter: [
-                    "in",
-                    ["geometry-type"],
-                    ["literal", ["Point", "MultiPoint"]],
-                ],
-                paint: {
-                    "circle-radius": PREVIEW_POINT_RADIUS,
-                    "circle-color": PREVIEW_COLOR,
-                },
-            });
+        if (editingFeature || hasFittedDraft) {
+            return;
         }
-        if (!previewMap.getLayer(VERTEX_HIGHLIGHT_LAYER_ID)) {
-            previewMap.addLayer({
-                id: VERTEX_HIGHLIGHT_LAYER_ID,
-                type: "circle",
-                source: VERTEX_HIGHLIGHT_SOURCE_ID,
-                paint: {
-                    "circle-radius": VERTEX_HIGHLIGHT_RADIUS,
-                    "circle-color": "rgba(0, 0, 0, 0)",
-                    "circle-stroke-color": FEATURE_HIGHLIGHT_COLOR,
-                    "circle-stroke-width": VERTEX_HIGHLIGHT_STROKE_WIDTH,
-                },
-            });
-        }
+
+        hasFittedDraft = true;
+        followFocusedRowDebounced.cancel();
+        fitToPreview();
     }
 
-    function setSourceGeometries(
-        sourceId: string,
-        geometries: Geometry[],
-    ): void {
+    function followFocusedRow(): void {
+        if (!focusedRowPosition.value) {
+            return;
+        }
+
+        const [longitude, latitude] = focusedRowPosition.value;
+        map.value?.flyTo({
+            center: [longitude, latitude],
+            zoom: Math.max(map.value.getZoom(), VERTEX_FOCUS_ZOOM),
+            essential: true,
+        });
+    }
+
+    function fitToPreview(): void {
+        if (!previewGeometry.value) {
+            return;
+        }
+        fitToFeatures([
+            {
+                type: "Feature",
+                properties: {},
+                geometry: previewGeometry.value,
+            },
+        ]);
+    }
+
+    function showPreview(geometry: Geometry | null): void {
         if (!map.value) {
             return;
         }
 
-        ensurePreviewLayers();
-        (map.value.getSource(sourceId) as GeoJSONSource).setData(
-            geometriesToFeatureCollection(geometries),
-        );
-    }
-
-    function showPreviewGeometry(geometry: Geometry | null): void {
-        setSourceGeometries(
+        const geometries = geometry ? [geometry] : [];
+        const previewData = geometriesToFeatureCollection(geometries);
+        const previewSource = map.value.getSource<GeoJSONSource>(
             COORDINATE_PREVIEW_SOURCE_ID,
-            geometry ? [geometry] : [],
         );
-    }
-
-    function showVertexHighlight(position: Position | null): void {
-        setSourceGeometries(
-            VERTEX_HIGHLIGHT_SOURCE_ID,
-            position ? [{ type: "Point", coordinates: position }] : [],
-        );
-    }
-
-    function removePreviewLayers(): void {
-        const previewMap = map.value;
-        if (!previewMap) {
+        if (previewSource) {
+            previewSource.setData(previewData);
             return;
         }
 
-        for (const layerId of LAYER_IDS) {
-            if (previewMap.getLayer(layerId)) {
-                previewMap.removeLayer(layerId);
-            }
-        }
-        for (const sourceId of SOURCE_IDS) {
-            if (previewMap.getSource(sourceId)) {
-                previewMap.removeSource(sourceId);
-            }
+        map.value.addSource(COORDINATE_PREVIEW_SOURCE_ID, {
+            type: "geojson",
+            data: previewData,
+        });
+        for (const layer of PREVIEW_LAYERS) {
+            map.value.addLayer(layer);
         }
     }
 
-    return { showPreviewGeometry, showVertexHighlight };
+    function removePreview(): void {
+        if (!map.value || !map.value.getSource(COORDINATE_PREVIEW_SOURCE_ID)) {
+            return;
+        }
+
+        for (const layer of PREVIEW_LAYERS) {
+            map.value.removeLayer(layer.id);
+        }
+        map.value.removeSource(COORDINATE_PREVIEW_SOURCE_ID);
+    }
+
+    return {
+        focusedRowPosition,
+        followFocusedRow,
+        followFocusedRowDebounced,
+        fitToPreview,
+    };
 }
