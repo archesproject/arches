@@ -939,7 +939,7 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
             "Monument, renamed",
         )
 
-    def test_undo_removes_links_into_the_load_from_outside_it(self):
+    def test_a_load_linked_to_from_outside_cannot_be_undone(self):
         monument, site = uuid.uuid4(), uuid.uuid4()
         loadid = self._load(_resource(monument, _tile(STRING_NODE, _text("Monument"))))
         link = {
@@ -949,14 +949,16 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
         }
         self._load(_resource(site, _tile(RESOURCE_NODE, [link])))
 
-        self._reverse(loadid)
+        response = self._reverse(loadid)
 
-        self.assertFalse(ResourceInstance.objects.filter(pk=monument).exists())
+        self.assertFalse(response["success"])
+        self.assertIn("1 resources outside this load", response["data"]["message"])
+        self.assertTrue(ResourceInstance.objects.filter(pk=monument).exists())
         self.assertEqual(
-            TileModel.objects.get(resourceinstance_id=site).data[RESOURCE_NODE], []
-        )
-        self.assertFalse(
-            ResourceXResource.objects.filter(to_resource_id=monument).exists()
+            TileModel.objects.get(resourceinstance_id=site).data[RESOURCE_NODE][0][
+                "resourceId"
+            ],
+            str(monument),
         )
 
     def test_an_overwrite_load_cannot_be_undone(self):

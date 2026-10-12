@@ -40,10 +40,8 @@ from arches.app.models.models import (
     NodeGroup,
     ResourceInstance,
     ResourceInstanceLifecycleState,
-    ResourceXResource,
     TileModel,
 )
-from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.search.elasticsearch_dsl_builder import Bool, Query, Terms
 from arches.app.search.mappings import RESOURCES_INDEX, TERMS_INDEX
@@ -1443,6 +1441,21 @@ class ArchesJsonImporter(BaseImportModule):
                 "{} resources from this load have been changed since, by another load "
                 "or an edit. This undo cannot be performed."
             ).format(changed)
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f"""
+                SELECT count(DISTINCT resourceinstanceidfrom) FROM resource_x_resource
+                WHERE resourceinstanceidto IN ({CREATED_BY_LOAD})
+                  AND resourceinstanceidfrom NOT IN ({CREATED_BY_LOAD})
+                """,
+                [loadid, loadid],
+            )
+            linking = cursor.fetchone()[0]
+        if linking:
+            return _(
+                "{} resources outside this load link to resources in it. "
+                "This undo cannot be performed."
+            ).format(linking)
         return None
 
     # The inverse of the load: batched deletes with the tile triggers off, and the
@@ -1464,7 +1477,6 @@ class ArchesJsonImporter(BaseImportModule):
             try:
                 disable_tile_triggers(cursor, loadid)
                 with transaction.atomic():
-                    linking_resources = self._unlink_from_outside(cursor, loadid)
                     removed = self._delete_load(cursor, loadid, resourceids)
             except Exception as e:
                 LoadEvent.objects.filter(loadid=loadid).update(
@@ -1482,7 +1494,7 @@ class ArchesJsonImporter(BaseImportModule):
         # arches_search's rows went with the delete above; Elasticsearch may be absent,
         # so failing to clean it is not a failed undo.
         try:
-            self._remove_from_index(resourceids, linking_resources)
+            self._remove_from_index(resourceids)
         except Exception as e:
             logger.warning(
                 "Load %s was undone but Elasticsearch was not updated (%s); "
@@ -1490,26 +1502,6 @@ class ArchesJsonImporter(BaseImportModule):
                 loadid,
                 e,
             )
-
-    # Links into the load from resources outside it, made after the load: core's
-    # ResourceXResource.delete strips the reference from the outside tile's JSON.
-    @staticmethod
-    def _unlink_from_outside(cursor, loadid):
-        cursor.execute(
-            f"""
-            SELECT resourcexid FROM resource_x_resource
-            WHERE resourceinstanceidto IN ({CREATED_BY_LOAD})
-              AND resourceinstanceidfrom NOT IN ({CREATED_BY_LOAD})
-            """,
-            [loadid, loadid],
-        )
-        linking_resources = set()
-        for link in ResourceXResource.objects.filter(
-            pk__in=[row[0] for row in cursor.fetchall()]
-        ):
-            linking_resources.add(str(link.from_resource_id))
-            link.delete(deletedResourceId=link.to_resource_id)
-        return linking_resources
 
     # Django's cascade, in batches, rather than a list of tables: it also clears what
     # other apps keep against tiles and resources, as a resource delete in the UI does.
@@ -1540,7 +1532,7 @@ class ArchesJsonImporter(BaseImportModule):
             removed += deleted.get(ResourceInstance._meta.label, 0)
         return removed
 
-    def _remove_from_index(self, resourceids, linking_resources):
+    def _remove_from_index(self, resourceids):
         custom_indexes = [
             import_class_from_string(index["module"])(index["name"])
             for index in settings.ELASTICSEARCH_CUSTOM_INDEXES
@@ -1556,9 +1548,6 @@ class ArchesJsonImporter(BaseImportModule):
                 custom_index.delete_resources(
                     resources=[ResourceInstance(pk=resourceid) for resourceid in batch]
                 )
-        for resource in Resource.objects.filter(pk__in=linking_resources):
-            resource.load_tiles()
-            resource.index()
 
     # ------------------------------------------------------------------ async
 
