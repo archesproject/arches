@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import copy
 import json
 import uuid
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from django.conf import settings
@@ -28,7 +29,7 @@ from arches.app.datatypes.datatypes import (
     DataTypeFactory,
     ResourceInstanceListDataType,
 )
-from arches.app.models.graph import Graph
+from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.models.models import (
     DDataType,
     GraphModel,
@@ -355,6 +356,41 @@ class ResourceInstanceLegacyKeysTests(ArchesTestCase):
         self.assertEqual(
             ri.rename_legacy_relationship_keys(value), [{"relationship": "new"}]
         )
+
+
+class ResourceInstanceValidateNodeTests(ArchesTestCase):
+    def validate_node(self, config, datatype="resource-instance"):
+        ri = DataTypeFactory().get_instance(datatype)
+        ri.validate_node(SimpleNamespace(config=config))
+
+    def test_relationship_sources_are_valid(self):
+        for datatype in ("resource-instance", "resource-instance-list"):
+            for relationship_source in ("ontology", "concept", "reference"):
+                with self.subTest(datatype=datatype, source=relationship_source):
+                    self.validate_node(
+                        {"graphs": [{"relationshipSource": relationship_source}]},
+                        datatype,
+                    )
+
+    def test_invalid_relationship_source_is_rejected(self):
+        invalid_configs = {
+            "unknown source": {"graphs": [{"relationshipSource": "ontology-property"}]},
+            "missing source": {"graphs": [{"graphid": "abc"}]},
+            "empty source": {"graphs": [{"relationshipSource": ""}]},
+            "null source": {"graphs": [{"relationshipSource": None}]},
+            "one invalid entry": {
+                "graphs": [
+                    {"relationshipSource": "concept"},
+                    {"relationshipSource": "bogus"},
+                ]
+            },
+            "entry is not a dict": {"graphs": ["concept"]},
+            "no config": None,
+        }
+        for name, config in invalid_configs.items():
+            with self.subTest(name):
+                with self.assertRaises(GraphValidationError):
+                    self.validate_node(config)
 
 
 class LanguageDataTypeTests(ArchesTestCase):
