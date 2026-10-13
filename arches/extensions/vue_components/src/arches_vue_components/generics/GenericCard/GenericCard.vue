@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, useTemplateRef, watchEffect } from "vue";
+import { computed, ref, useTemplateRef, watch, watchEffect } from "vue";
 
 import Message from "openvue/message";
 import Skeleton from "openvue/skeleton";
@@ -47,6 +47,18 @@ const aliasedTileData = ref<AliasedTileData>();
 
 const defaultCardEditor = useTemplateRef("defaultCardEditor");
 
+const shouldFetchTile = computed(() => tileData === undefined);
+
+watch(
+    () => tileData,
+    (newTileData) => {
+        if (newTileData !== undefined) {
+            aliasedTileData.value = newTileData;
+        }
+    },
+    { immediate: true },
+);
+
 watchEffect(async () => {
     isLoading.value = true;
 
@@ -57,9 +69,7 @@ watchEffect(async () => {
                 nodegroupAlias,
             );
 
-        if (tileData) {
-            aliasedTileData.value = tileData;
-        } else {
+        if (shouldFetchTile.value) {
             aliasedTileData.value = await fetchTileData(
                 graphSlug,
                 nodegroupAlias,

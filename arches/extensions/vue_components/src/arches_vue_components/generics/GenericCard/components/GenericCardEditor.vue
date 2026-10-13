@@ -9,7 +9,7 @@ import {
     computed,
 } from "vue";
 import { useGettext } from "vue3-gettext";
-import { cloneDeep } from "es-toolkit";
+import { cloneDeep, isEqual } from "es-toolkit";
 
 import { Form } from "@openvue/forms";
 import Button from "openvue/button";
@@ -74,6 +74,7 @@ const originalAliasedNodeDataMap = cloneDeep(
 const aliasedNodeDataMap = reactive<Record<string, AliasedNodeData>>(
     cloneDeep(originalAliasedNodeDataMap),
 );
+const nodeRevisions = reactive<Record<string, number>>({});
 
 const localWidgetDirtyStates = reactive(
     cardXNodeXWidgetData.reduce<Record<string, boolean>>(
@@ -103,6 +104,29 @@ const areButtonsDisabled = computed(() => {
         (isWidgetDirty) => !isWidgetDirty,
     );
 });
+
+watch(
+    () => tileData,
+    (newTileData) => {
+        const incomingNodeDataMap = extractAliasedNodeDataEntries(
+            (newTileData?.aliased_data as Record<string, unknown>) || {},
+        );
+        for (const [nodeAlias, incomingNodeData] of Object.entries(
+            incomingNodeDataMap,
+        )) {
+            if (
+                isEqual(
+                    incomingNodeData.node_value,
+                    aliasedNodeDataMap[nodeAlias]?.node_value,
+                )
+            ) {
+                continue;
+            }
+            aliasedNodeDataMap[nodeAlias] = cloneDeep(incomingNodeData);
+            nodeRevisions[nodeAlias] = (nodeRevisions[nodeAlias] ?? 0) + 1;
+        }
+    },
+);
 
 watch(
     () => selectedNodeAlias,
@@ -289,7 +313,7 @@ function onUpdateWidgetAliasedNodeData(
         >
             <template
                 v-for="cardXNodeXWidgetDatum in cardXNodeXWidgetData"
-                :key="cardXNodeXWidgetDatum.id"
+                :key="`${cardXNodeXWidgetDatum.id}-${nodeRevisions[cardXNodeXWidgetDatum.node.alias] ?? 0}`"
             >
                 <GenericWidget
                     v-if="cardXNodeXWidgetDatum.visible"
