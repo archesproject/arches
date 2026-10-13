@@ -701,6 +701,7 @@ class TileTree(TileModel, AliasedDataMixin):
                 "Did you mistakenly provide node data directly under a nodegroup alias?"
             )
         attrs = {**tile_dict}
+        attrs.setdefault("sortorder", None)
         if (tile_id := attrs.pop("tileid", None)) and isinstance(tile_id, str):
             attrs["tileid"] = uuid.UUID(tile_id)
         if (resourceinstance_id := attrs.pop("resourceinstance", None)) and isinstance(

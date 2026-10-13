@@ -126,11 +126,11 @@ def _handle_nested_aliased_data(data, *, fields_map) -> AliasedData:
             if validated_data:
                 if getattr(serializer, "many", False):
                     tile_or_tiles = [
-                        TileTree(**validated_tile_data)
+                        TileTree(**{"sortorder": None, **validated_tile_data})
                         for validated_tile_data in validated_data
                     ]
                 else:
-                    tile_or_tiles = TileTree(**validated_data)
+                    tile_or_tiles = TileTree(**{"sortorder": None, **validated_data})
                 setattr(all_data, field_name, tile_or_tiles)
         else:
             setattr(all_data, field_name, serializer.to_internal_value(field_data))

@@ -254,8 +254,9 @@ class TileTreeOperation:
             if existing_tile is NOT_PROVIDED:
                 new_tile.nodegroup_id = grouping_node.nodegroup_id
                 new_tile.resourceinstance_id = self.resourceid
-                new_tile.sortorder = next_sort_order
-                next_sort_order += 1
+                if new_tile.sortorder is None:
+                    new_tile.sortorder = next_sort_order
+                    next_sort_order += 1
                 for node in grouping_node.nodegroup.node_set.all():
                     if node.datatype != "semantic":
                         new_tile.data[str(node.pk)] = new_tile.get_default_value(node)
