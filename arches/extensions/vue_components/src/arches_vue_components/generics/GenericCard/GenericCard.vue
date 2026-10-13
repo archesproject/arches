@@ -94,6 +94,13 @@ defineExpose({
             defaultCardEditor.value.save();
         }
     },
+    focusWidgetInputForNodeAlias: async function (nodeAlias: string) {
+        if (defaultCardEditor.value) {
+            await defaultCardEditor.value.focusWidgetInputForNodeAlias(
+                nodeAlias,
+            );
+        }
+    },
 });
 </script>
 

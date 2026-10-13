@@ -56,7 +56,7 @@ const emit = defineEmits([
 ]);
 
 defineOptions({ inheritAttrs: false });
-defineExpose({ save });
+defineExpose({ save, focusWidgetInputForNodeAlias });
 
 const { $gettext } = useGettext();
 
