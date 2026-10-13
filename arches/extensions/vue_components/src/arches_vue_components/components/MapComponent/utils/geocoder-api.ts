@@ -6,10 +6,10 @@ import type {
     MaplibreGeocoderFeatureResults,
 } from "@maplibre/maplibre-gl-geocoder";
 
-const NOMINATIM_SEARCH_URL = "https://nominatim.openstreetmap.org/search";
+const GEOCODER_PROVIDER_URL = "https://nominatim.openstreetmap.org/search";
 const DEFAULT_RESULT_LIMIT = 5;
 
-export const OPENSTREETMAP_CREDIT =
+export const GEOCODER_ATTRIBUTION =
     '<a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>';
 
 interface PlaceSearchResult
@@ -52,7 +52,7 @@ async function forwardGeocode(
 
     try {
         const response = await fetch(
-            `${NOMINATIM_SEARCH_URL}?${params.toString()}`,
+            `${GEOCODER_PROVIDER_URL}?${params.toString()}`,
         );
         const geojson: { features: PlaceSearchResult[] } =
             await response.json();
