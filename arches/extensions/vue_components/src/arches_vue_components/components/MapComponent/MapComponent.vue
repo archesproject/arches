@@ -171,6 +171,15 @@ async function closePanel(): Promise<void> {
                 class="map-loading-skeleton"
             />
             <div
+                v-if="$slots.overlay && context.map.value"
+                class="map-overlay-layer"
+            >
+                <slot
+                    name="overlay"
+                    :context="context"
+                />
+            </div>
+            <div
                 v-if="activeTool && context.map.value"
                 class="floating-panel-layer"
             >
@@ -278,6 +287,23 @@ async function closePanel(): Promise<void> {
     flex: 1;
     min-width: 0;
     min-height: 0;
+}
+
+.map-overlay-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    pointer-events: none;
+}
+
+.map-overlay-layer > :slotted(*) {
+    pointer-events: auto;
+}
+
+.map-body-with-status-bar .map-overlay-layer {
+    inset-block-end: var(--map-component-status-bar-height);
 }
 
 .floating-panel-layer {
