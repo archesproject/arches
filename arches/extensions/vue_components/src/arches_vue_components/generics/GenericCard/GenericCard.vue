@@ -8,6 +8,7 @@ import GenericCardEditor from "@/arches_vue_components/generics/GenericCard/comp
 import GenericCardViewer from "@/arches_vue_components/generics/GenericCard/components/GenericCardViewer.vue";
 
 import { fetchTileData } from "@/arches_vue_components/generics/GenericCard/api.ts";
+import { useLanguageStore } from "@/arches_vue_components/stores/useLanguageStore.ts";
 import { useNodegroupWidgetConfigStore } from "@/arches_vue_components/stores/useNodegroupWidgetConfigStore.ts";
 
 import { EDIT, VIEW } from "@/arches_vue_components/widgets/constants.ts";
@@ -68,6 +69,10 @@ watchEffect(async () => {
                 graphSlug,
                 nodegroupAlias,
             );
+
+        if (mode === EDIT) {
+            await useLanguageStore().fetchAllLanguages();
+        }
 
         if (shouldFetchTile.value) {
             aliasedTileData.value = await fetchTileData(
