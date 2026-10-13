@@ -82,6 +82,17 @@ def build_card_x_node_x_widgets_by_nodegroup_id(
     return serialized_widgets_by_nodegroup_id
 
 
+def user_can_read_nodegroup(user, nodegroup_id):
+    return nodegroup_id in get_nodegroups_by_perm(user, "models.read_nodegroup")
+
+
+def nodegroup_permission_error_response():
+    return JSONErrorResponse(
+        message=_("You do not have permission to read this nodegroup."),
+        status=403,
+    )
+
+
 def widget_mapping_error_response():
     return JSONErrorResponse(
         message=_("Database error occurred while fetching widget mapping."),
@@ -103,12 +114,18 @@ class CardXNodeXWidgetView(View):
             .first()
         )
 
+        if card_x_node_x_widget:
+            node = card_x_node_x_widget.node
+        else:
+            node = models.Node.objects.filter(
+                graph__slug=graph_slug, alias=node_alias, source_identifier=None
+            ).get()
+
+        if not user_can_read_nodegroup(request.user, node.nodegroup_id):
+            return nodegroup_permission_error_response()
+
         if not card_x_node_x_widget:
             # Supply default widget configuration.
-            nodes = models.Node.objects.filter(
-                graph__slug=graph_slug, alias=node_alias, source_identifier=None
-            )
-            node = nodes.get()
             datatype_factory = DataTypeFactory()
             d_data_type = datatype_factory.datatypes[node.datatype]
             default_widget = d_data_type.defaultwidget
@@ -153,6 +170,9 @@ class CardXNodeXWidgetListFromNodegroupView(View):
                 source_identifier=None,
             )
         )
+        if nodes and not user_can_read_nodegroup(request.user, nodes[0].nodegroup_id):
+            return nodegroup_permission_error_response()
+
         saved_widgets = models.CardXNodeXWidget.objects.filter(
             node__graph__slug=graph_slug,
             node__nodegroup__node__alias=nodegroup_alias,

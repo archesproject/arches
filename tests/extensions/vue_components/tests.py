@@ -225,3 +225,23 @@ class CardXNodeXWidgetPermissionTests(GraphTestCase):
             nodegroup_response.json(),
             graph_response.json()["datatypes_n"]["card_x_node_x_widgets"],
         )
+
+    def test_node_and_nodegroup_widgets_require_read_permission(self):
+        for url_name, url_kwargs in (
+            (
+                "api-card-x-node-x-widget-list-from-nodegroup",
+                {"graph_slug": "datatype_lookups", "nodegroup_alias": "datatypes_n"},
+            ),
+            (
+                "api-card-x-node-x-widget",
+                {
+                    "graph_slug": "datatype_lookups",
+                    "node_alias": "non_localized_string_alias_n",
+                },
+            ),
+        ):
+            with self.subTest(url_name=url_name):
+                response = self.get_with_permissions(
+                    url_name, url_kwargs, readable_nodegroups=[self.nodegroup_1]
+                )
+                self.assertEqual(response.status_code, 403)
