@@ -50,38 +50,15 @@ const optionsError = ref<string | null>(null);
 const expandedKeys: Ref<TreeExpandedKeys> = ref({});
 
 const initialValueFromTileData = computed(() => {
-    if (aliasedNodeData?.node_value?.length) {
-        return aliasedNodeData.node_value.reduce<Record<string, boolean>>(
-            (accumulator, item) => {
-                const listItemId = item.labels?.[0]?.list_item_id;
-                if (listItemId) {
-                    accumulator[listItemId] = true;
-                }
-                return accumulator;
-            },
-            {},
-        );
-    }
-
-    const defaultValueFromWidgetConfig = cardXNodeXWidgetData?.config
-        ?.defaultValue as ReferenceSelectNodeValue[] | undefined;
-
-    if (
-        !defaultValueFromWidgetConfig ||
-        defaultValueFromWidgetConfig.length === 0
-    ) {
+    if (!aliasedNodeData?.node_value?.length) {
         return undefined;
     }
-
-    return defaultValueFromWidgetConfig?.reduce<Record<string, boolean>>(
-        (accumulator, defaultValueItem) => {
-            const listItemIdentifier =
-                defaultValueItem?.labels?.[0]?.list_item_id;
-
-            if (listItemIdentifier) {
-                accumulator[listItemIdentifier] = true;
+    return aliasedNodeData.node_value.reduce<Record<string, boolean>>(
+        (accumulator, item) => {
+            const listItemId = item.labels?.[0]?.list_item_id;
+            if (listItemId) {
+                accumulator[listItemId] = true;
             }
-
             return accumulator;
         },
         {},
