@@ -31,7 +31,6 @@ from arches.app.const import ExtensionType
 from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.core.util import get_value_from_jsonld
 from arches.app.models import models
-from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.models.fields.i18n import I18n_JSONField, I18n_String
 from arches.app.models.system_settings import settings
 from arches.app.search.elasticsearch_dsl_builder import (
@@ -56,6 +55,9 @@ from arches.app.utils.file_validator import FileValidator
 from arches.app.utils.i18n import get_localized_value
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.permission_backend import user_is_resource_reviewer
+from arches.app.utils.resource_relationship_utils import (
+    get_resource_relationship_type_label,
+)
 from arches.app.utils.string_utils import str_to_bool, deserialize_json_like_string
 
 # do not delete, used by module importer
@@ -2349,12 +2351,18 @@ class ResourceInstanceDataType(BaseDataType):
             return ", ".join(items)
         return ""
 
-    def get_relationship_display_value(self, relationship_valueid):
-        preflabel = get_preflabel_from_valueid(relationship_valueid, get_language())
-        if preflabel:
-            return preflabel["value"]
-        else:
-            return None
+    def get_relationship_labels(self, nodevalue):
+        return get_resource_relationship_type_label(
+            {
+                relationship
+                for related_resource in nodevalue
+                for relationship in (
+                    related_resource.get("relationship"),
+                    related_resource.get("inverseRelationship"),
+                )
+                if relationship
+            }
+        )
 
     def to_json(self, tile, node):
         data = self.get_tile_data(tile)
@@ -2373,8 +2381,8 @@ class ResourceInstanceDataType(BaseDataType):
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         nodevalue = self.get_nodevalues(nodevalue)
+        relationship_labels = self.get_relationship_labels(nodevalue)
         for relatedResourceItem in nodevalue:
-            relationship = None
             document["ids"].append(
                 {
                     "id": relatedResourceItem["resourceId"],
@@ -2395,17 +2403,11 @@ class ResourceInstanceDataType(BaseDataType):
                 relatedResourceItem.get("inverseRelationship", ""),
             ]:
                 if relationship_item:
-                    try:
-                        uuid.UUID(relationship_item)
-                        relationship = (
-                            self.get_relationship_display_value(relationship_item)
-                            or relationship_item
-                        )
-                    except ValueError:
-                        relationship = relationship_item
                     document["strings"].append(
                         {
-                            "string": relationship,
+                            "string": relationship_labels.get(
+                                relationship_item, relationship_item
+                            ),
                             "nodegroup_id": tile.nodegroup_id,
                             "provisional": provisional,
                         }
@@ -2414,6 +2416,7 @@ class ResourceInstanceDataType(BaseDataType):
     def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
         nodevalue = self.get_nodevalues(nodevalue)
+        relationship_labels = self.get_relationship_labels(nodevalue)
         for relatedResourceItem in nodevalue:
             if relatedResourceItem.get("resourceName", "") != "":
                 terms.append(
@@ -2424,15 +2427,14 @@ class ResourceInstanceDataType(BaseDataType):
                 relatedResourceItem.get("inverseRelationship", ""),
             ]:
                 if relationship_item:
-                    try:
-                        uuid.UUID(relationship_item)
-                        relationship = (
-                            self.get_relationship_display_value(relationship_item)
-                            or relationship_item
+                    terms.append(
+                        SearchTerm(
+                            value=relationship_labels.get(
+                                relationship_item, relationship_item
+                            ),
+                            lang="",
                         )
-                        terms.append(SearchTerm(value=relationship, lang=""))
-                    except ValueError:
-                        terms.append(SearchTerm(value=relationship_item, lang=""))
+                    )
 
         return terms
 
