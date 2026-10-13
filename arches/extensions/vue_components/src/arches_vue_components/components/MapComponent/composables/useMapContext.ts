@@ -27,6 +27,11 @@ import {
     BUFFER_FILL_COLOR,
     BUFFER_FILL_OPACITY,
     BUFFER_LAYER_ID,
+    DEFAULT_FEATURE_COLOR,
+    DEFAULT_FEATURE_FILL_OPACITY,
+    DEFAULT_FEATURE_LINE_WIDTH,
+    DEFAULT_FEATURE_POINT_FILL,
+    DEFAULT_FEATURE_POINT_SIZE,
     DIRECT_SELECT,
     DRAW_CREATE_EVENT,
     DRAW_DELETE_EVENT,
@@ -37,10 +42,14 @@ import {
     DRAW_SELECTION_CHANGE_EVENT,
     DRAW_UPDATE_EVENT,
     GEOMETRY_TYPE_LINESTRING,
+    GEOMETRY_TYPE_MULTI_POINT,
+    GEOMETRY_TYPE_MULTI_POLYGON,
     GEOMETRY_TYPE_POINT,
     GEOMETRY_TYPE_POLYGON,
     IDLE,
     METERS,
+    READ_ONLY_MAXIMUM_FIT_ZOOM,
+    READ_ONLY_VALUE_SOURCE_ID,
     SIMPLE_SELECT,
     STYLE_LOAD_EVENT,
 } from "@/arches_vue_components/components/MapComponent/constants.ts";
@@ -167,6 +176,7 @@ export function useMapContext(
             candidateOverlayLayers: MapLayer[],
         ) => MapLayer[];
         maxFeatures?: number;
+        isReadOnly?: boolean;
     },
     emit: MapComponentEmit,
     mapContainer: Readonly<Ref<HTMLDivElement | null>>,
@@ -258,17 +268,11 @@ export function useMapContext(
         map.value.on("mousemove", handleMapMousemove);
 
         map.value.once(STYLE_LOAD_EVENT, () => {
-            setupDraw();
-
-            if (defaultBounds) {
-                const [west, south, east, north] = defaultBounds;
-                map.value!.fitBounds(
-                    [
-                        [west, south],
-                        [east, north],
-                    ],
-                    { padding: 20 },
-                );
+            if (props.isReadOnly) {
+                fitToReadOnlyValue();
+            } else {
+                setupDraw();
+                fitToDefaultBounds();
             }
 
             emit("ready");
@@ -277,6 +281,9 @@ export function useMapContext(
             map.value!.resize();
 
             addBufferLayer();
+            if (props.isReadOnly) {
+                addReadOnlyValueLayers();
+            }
             updateMapOverlays(overlays.value);
 
             emit("update:overlays");
@@ -474,6 +481,99 @@ export function useMapContext(
         });
         map.value!.on(DRAW_SELECTION_CHANGE_EVENT as any, () => {
             selectedDrawnFeature.value = draw.getSelected().features[0] ?? null;
+        });
+    }
+
+    function fitToDefaultBounds(): void {
+        if (!defaultBounds) {
+            return;
+        }
+        const [west, south, east, north] = defaultBounds;
+        map.value!.fitBounds(
+            [
+                [west, south],
+                [east, north],
+            ],
+            { padding: 20 },
+        );
+    }
+
+    function fitToReadOnlyValue(): void {
+        if (!props.value?.features.length) {
+            fitToDefaultBounds();
+            return;
+        }
+        const [west, south, east, north] = geojsonExtent(props.value);
+        map.value!.fitBounds(
+            [
+                [west, south],
+                [east, north],
+            ],
+            {
+                padding: 50,
+                maxZoom: props.maxZoom ?? READ_ONLY_MAXIMUM_FIT_ZOOM,
+                animate: false,
+            },
+        );
+    }
+
+    function addReadOnlyValueLayers(): void {
+        if (!props.value || map.value!.getSource(READ_ONLY_VALUE_SOURCE_ID)) {
+            return;
+        }
+        map.value!.addSource(READ_ONLY_VALUE_SOURCE_ID, {
+            type: "geojson",
+            data: props.value,
+        });
+        map.value!.addLayer({
+            id: `${READ_ONLY_VALUE_SOURCE_ID}-fill`,
+            type: "fill",
+            source: READ_ONLY_VALUE_SOURCE_ID,
+            filter: [
+                "match",
+                ["geometry-type"],
+                [GEOMETRY_TYPE_POLYGON, GEOMETRY_TYPE_MULTI_POLYGON],
+                true,
+                false,
+            ],
+            paint: {
+                "fill-color": DEFAULT_FEATURE_COLOR,
+                "fill-opacity": DEFAULT_FEATURE_FILL_OPACITY,
+            },
+        });
+        map.value!.addLayer({
+            id: `${READ_ONLY_VALUE_SOURCE_ID}-line`,
+            type: "line",
+            source: READ_ONLY_VALUE_SOURCE_ID,
+            filter: [
+                "match",
+                ["geometry-type"],
+                [GEOMETRY_TYPE_POINT, GEOMETRY_TYPE_MULTI_POINT],
+                false,
+                true,
+            ],
+            paint: {
+                "line-color": DEFAULT_FEATURE_COLOR,
+                "line-width": DEFAULT_FEATURE_LINE_WIDTH,
+            },
+        });
+        map.value!.addLayer({
+            id: `${READ_ONLY_VALUE_SOURCE_ID}-point`,
+            type: "circle",
+            source: READ_ONLY_VALUE_SOURCE_ID,
+            filter: [
+                "match",
+                ["geometry-type"],
+                [GEOMETRY_TYPE_POINT, GEOMETRY_TYPE_MULTI_POINT],
+                true,
+                false,
+            ],
+            paint: {
+                "circle-color": DEFAULT_FEATURE_POINT_FILL,
+                "circle-radius": DEFAULT_FEATURE_POINT_SIZE,
+                "circle-stroke-color": DEFAULT_FEATURE_COLOR,
+                "circle-stroke-width": DEFAULT_FEATURE_LINE_WIDTH,
+            },
         });
     }
 

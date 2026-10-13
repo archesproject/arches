@@ -37,6 +37,7 @@ const {
     interactionTools = undefined,
     maxFeatures = undefined,
     featurePopupComponent = undefined,
+    isReadOnly = false,
 } = defineProps<{
     value?: FeatureCollection | null;
     zoom?: number;
@@ -52,6 +53,7 @@ const {
     interactionTools?: MapInteractionTool[];
     maxFeatures?: number;
     featurePopupComponent?: Component;
+    isReadOnly?: boolean;
 }>();
 
 const emit = defineEmits<MapComponentEmit>();
@@ -72,6 +74,7 @@ const { context, popupContainer, popupFeatures } = useMapContext(
         allowedGeometryTypes,
         resolveOverlayLayers,
         maxFeatures,
+        isReadOnly,
     },
     emit,
     mapContainer,
