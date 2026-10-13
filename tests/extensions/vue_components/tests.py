@@ -4,8 +4,10 @@ from uuid import uuid4
 from django.test import SimpleTestCase, TestCase
 from django.core import management
 from django.test.utils import captured_stdout
+from django.urls import reverse
 
 from arches.app.models.models import Widget
+from arches.extensions.querysets.utils.tests import GraphTestCase
 from arches.extensions.vue_components.models import WidgetMapping
 from arches.extensions.vue_components.utils.widget_synchronizer import (
     WidgetSynchronizer,
@@ -151,3 +153,75 @@ class EnsureAbsoluteTileURLsTests(SimpleTestCase):
         with self.stub_settings("http://localhost:8000/"):
             map_api.MapDataAPI._ensure_absolute_tile_urls(source)
         self.assertEqual(source, {"type": "raster"})
+
+
+class CardXNodeXWidgetPermissionTests(GraphTestCase):
+    def get_with_permissions(
+        self, url_name, url_kwargs, readable_nodegroups, writable_nodegroups=()
+    ):
+        def nodegroups_by_perm(user, perm):
+            if perm == "models.write_nodegroup":
+                return [nodegroup.pk for nodegroup in writable_nodegroups]
+            return [nodegroup.pk for nodegroup in readable_nodegroups]
+
+        with mock.patch(
+            "arches.extensions.vue_components.views.api.card_x_node_x_widget.get_nodegroups_by_perm",
+            side_effect=nodegroups_by_perm,
+        ):
+            return self.client.get(
+                reverse(f"arches_vue_components:{url_name}", kwargs=url_kwargs)
+            )
+
+    def test_graph_list_returns_readable_nodegroup_tree_with_widgets(self):
+        response = self.get_with_permissions(
+            "api-card-x-node-x-widget-list-from-graph",
+            {"graph_slug": "datatype_lookups"},
+            readable_nodegroups=[
+                self.nodegroup_1,
+                self.nodegroup_1_child,
+                self.nodegroup_1_n_child,
+            ],
+            writable_nodegroups=[self.nodegroup_1],
+        )
+        self.assertEqual(response.status_code, 200)
+        nodegroups_by_alias = response.json()
+
+        self.assertEqual(
+            set(nodegroups_by_alias),
+            {"datatypes_1", "datatypes_1_child", "datatypes_1_n_child"},
+        )
+        top_level = nodegroups_by_alias["datatypes_1"]
+        self.assertIsNone(top_level["parent_nodegroup_alias"])
+        self.assertTrue(top_level["is_writable"])
+        self.assertEqual(top_level["card"]["nodegroup_id"], str(self.nodegroup_1.pk))
+        self.assertCountEqual(
+            [widget["node"]["alias"] for widget in top_level["card_x_node_x_widgets"]],
+            [node.alias for node in self.data_nodes_1],
+        )
+
+        child = nodegroups_by_alias["datatypes_1_n_child"]
+        self.assertEqual(child["parent_nodegroup_alias"], "datatypes_1")
+        self.assertEqual(child["cardinality"], "n")
+        self.assertFalse(child["is_writable"])
+        self.assertEqual(
+            [widget["node"]["alias"] for widget in child["card_x_node_x_widgets"]],
+            ["non_localized_string_alias_1_n_child"],
+        )
+        self.assertTrue(child["card_x_node_x_widgets"][0]["widget"]["component"])
+
+    def test_nodegroup_list_matches_graph_entry(self):
+        graph_response = self.get_with_permissions(
+            "api-card-x-node-x-widget-list-from-graph",
+            {"graph_slug": "datatype_lookups"},
+            readable_nodegroups=[self.nodegroup_n],
+        )
+        nodegroup_response = self.get_with_permissions(
+            "api-card-x-node-x-widget-list-from-nodegroup",
+            {"graph_slug": "datatype_lookups", "nodegroup_alias": "datatypes_n"},
+            readable_nodegroups=[self.nodegroup_n],
+        )
+
+        self.assertEqual(
+            nodegroup_response.json(),
+            graph_response.json()["datatypes_n"]["card_x_node_x_widgets"],
+        )

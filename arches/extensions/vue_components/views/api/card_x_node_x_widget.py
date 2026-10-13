@@ -6,6 +6,7 @@ from django.views.generic import View
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
+from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 
 
@@ -28,6 +29,64 @@ def serialize_card_x_node_x_widget(widget, datatype_factory):
     del data["widget_id"]
 
     return data
+
+
+def first_cards_by_nodegroup_id(nodegroup_ids):
+    cards_by_nodegroup_id = {}
+    for card in models.CardModel.objects.filter(nodegroup_id__in=nodegroup_ids):
+        cards_by_nodegroup_id.setdefault(card.nodegroup_id, card)
+    return cards_by_nodegroup_id
+
+
+def build_card_x_node_x_widgets_by_nodegroup_id(
+    nodes, saved_widgets, default_cards_by_nodegroup_id
+):
+    datatype_factory = DataTypeFactory()
+    saved_widgets_by_node_id = {
+        saved_widget.node_id: saved_widget for saved_widget in saved_widgets
+    }
+
+    widget_instances = []
+    for node in nodes:
+        if node.pk in saved_widgets_by_node_id:
+            widget_instances.append(saved_widgets_by_node_id[node.pk])
+            continue
+        default_widget_definition = datatype_factory.datatypes[
+            node.datatype
+        ].defaultwidget
+        if default_widget_definition is not None:  # handle semantic nodes
+            widget_instances.append(
+                models.CardXNodeXWidget(
+                    node=node,
+                    card=default_cards_by_nodegroup_id.get(node.nodegroup_id),
+                    widget=default_widget_definition,
+                    config=default_widget_definition.defaultconfig,
+                    label=node.name,
+                )
+            )
+
+    serialized_widgets_by_nodegroup_id = {}
+    for widget_instance in widget_instances:
+        serialized_widget = serialize_card_x_node_x_widget(
+            widget_instance, datatype_factory
+        )
+        serialized_widget["widget"][
+            "component"
+        ] = widget_instance.widget.widgetmapping.component
+        serialized_widgets_by_nodegroup_id.setdefault(
+            widget_instance.node.nodegroup_id, []
+        ).append(serialized_widget)
+
+    for serialized_widgets in serialized_widgets_by_nodegroup_id.values():
+        serialized_widgets.sort(key=lambda item: item["sortorder"] or 0)
+    return serialized_widgets_by_nodegroup_id
+
+
+def widget_mapping_error_response():
+    return JSONErrorResponse(
+        message=_("Database error occurred while fetching widget mapping."),
+        status=503,
+    )
 
 
 class CardXNodeXWidgetView(View):
@@ -87,65 +146,96 @@ class CardXNodeXWidgetView(View):
 
 class CardXNodeXWidgetListFromNodegroupView(View):
     def get(self, request, graph_slug, nodegroup_alias):
-        card_x_node_x_widgets_query = Q(
+        nodes = list(
+            models.Node.objects.filter(
+                graph__slug=graph_slug,
+                nodegroup__node__alias=nodegroup_alias,
+                source_identifier=None,
+            )
+        )
+        saved_widgets = models.CardXNodeXWidget.objects.filter(
             node__graph__slug=graph_slug,
             node__nodegroup__node__alias=nodegroup_alias,
             node__source_identifier_id__isnull=True,
-        )
-
-        saved_widget_queryset = models.CardXNodeXWidget.objects.filter(
-            card_x_node_x_widgets_query
         ).select_related()
 
-        datatype_factory = DataTypeFactory()
-
-        saved_widgets_by_node_id = {
-            saved_widget.node_id: saved_widget for saved_widget in saved_widget_queryset
-        }
-
-        node_queryset = models.Node.objects.filter(
-            graph__slug=graph_slug,
-            nodegroup__node__alias=nodegroup_alias,
-            source_identifier=None,
-        )
-
-        widget_instances = []
-        for node in node_queryset:
-            if node.pk in saved_widgets_by_node_id:
-                widget_instances.append(saved_widgets_by_node_id[node.pk])
-            else:
-                datatype_for_node = datatype_factory.datatypes[node.datatype]
-                default_widget_definition = datatype_for_node.defaultwidget
-
-                if default_widget_definition is not None:  # handle semantic nodes
-                    widget_instances.append(
-                        models.CardXNodeXWidget(
-                            node=node,
-                            card=node.nodegroup.cardmodel_set.first(),
-                            widget=default_widget_definition,
-                            config=default_widget_definition.defaultconfig,
-                            label=node.name,
-                        )
-                    )
-
-        serialized_widgets = []
-        for widget_instance in widget_instances:
-            serialized_widget = serialize_card_x_node_x_widget(
-                widget_instance, datatype_factory
-            )
-
-            try:
-                serialized_widget["widget"][
-                    "component"
-                ] = widget_instance.widget.widgetmapping.component
-            except ObjectDoesNotExist:
-                return JSONErrorResponse(
-                    message=_("Database error occurred while fetching widget mapping."),
-                    status=503,
+        try:
+            serialized_widgets_by_nodegroup_id = (
+                build_card_x_node_x_widgets_by_nodegroup_id(
+                    nodes,
+                    saved_widgets,
+                    first_cards_by_nodegroup_id({node.nodegroup_id for node in nodes}),
                 )
-
-            serialized_widgets.append(serialized_widget)
+            )
+        except ObjectDoesNotExist:
+            return widget_mapping_error_response()
 
         return JSONResponse(
-            sorted(serialized_widgets, key=lambda item: item["sortorder"] or 0)
+            [
+                serialized_widget
+                for serialized_widgets in serialized_widgets_by_nodegroup_id.values()
+                for serialized_widget in serialized_widgets
+            ]
         )
+
+
+class CardXNodeXWidgetListFromGraphView(View):
+    def get(self, request, graph_slug):
+        readable_nodegroup_ids = set(
+            get_nodegroups_by_perm(request.user, "models.read_nodegroup")
+        )
+        writable_nodegroup_ids = set(
+            get_nodegroups_by_perm(request.user, "models.write_nodegroup")
+        )
+
+        graph_nodes = list(
+            models.Node.objects.filter(
+                graph__slug=graph_slug,
+                source_identifier=None,
+                nodegroup__isnull=False,
+            ).select_related("nodegroup")
+        )
+        nodegroup_aliases_by_id = {
+            node.nodegroup_id: node.alias
+            for node in graph_nodes
+            if node.pk == node.nodegroup_id
+        }
+        readable_nodes = [
+            node for node in graph_nodes if node.nodegroup_id in readable_nodegroup_ids
+        ]
+        saved_widgets = models.CardXNodeXWidget.objects.filter(
+            node__in=readable_nodes
+        ).select_related("card", "node", "widget__widgetmapping")
+        cards_by_nodegroup_id = first_cards_by_nodegroup_id(
+            {node.nodegroup_id for node in readable_nodes}
+        )
+
+        try:
+            serialized_widgets_by_nodegroup_id = (
+                build_card_x_node_x_widgets_by_nodegroup_id(
+                    readable_nodes, saved_widgets, cards_by_nodegroup_id
+                )
+            )
+        except ObjectDoesNotExist:
+            return widget_mapping_error_response()
+
+        nodegroups_by_alias = {}
+        for node in readable_nodes:
+            if node.pk != node.nodegroup_id:
+                continue
+            nodegroups_by_alias[node.alias] = {
+                "parent_nodegroup_alias": nodegroup_aliases_by_id.get(
+                    node.nodegroup.parentnodegroup_id
+                ),
+                "cardinality": node.nodegroup.cardinality,
+                "is_writable": node.nodegroup_id in writable_nodegroup_ids,
+                "card": JSONDeserializer().deserialize(
+                    JSONSerializer().serialize(
+                        cards_by_nodegroup_id.get(node.nodegroup_id)
+                    )
+                ),
+                "card_x_node_x_widgets": serialized_widgets_by_nodegroup_id.get(
+                    node.nodegroup_id, []
+                ),
+            }
+        return JSONResponse(nodegroups_by_alias)
