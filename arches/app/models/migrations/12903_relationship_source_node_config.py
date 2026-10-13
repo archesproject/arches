@@ -1,4 +1,97 @@
+import re
 from django.db import migrations
+
+RESOURCE_INSTANCE_DATATYPES = ("resource-instance", "resource-instance-list")
+UUID_PATTERN = re.compile(
+    r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.IGNORECASE
+)
+
+
+def _update_published_graphs(apps, graph_transformer):
+    PublishedGraph = apps.get_model("models", "PublishedGraph")
+    batch_size = 25
+    graphs_to_update = []
+
+    queryset = PublishedGraph.objects.exclude(serialized_graph__isnull=True)
+    for published_graph in queryset.iterator(chunk_size=batch_size):
+        if graph_transformer(published_graph.serialized_graph):
+            graphs_to_update.append(published_graph)
+            if len(graphs_to_update) == batch_size:
+                PublishedGraph.objects.bulk_update(
+                    graphs_to_update, ["serialized_graph"]
+                )
+                graphs_to_update = []
+
+    if graphs_to_update:
+        PublishedGraph.objects.bulk_update(graphs_to_update, ["serialized_graph"])
+
+
+def _resource_instance_graph_configs(serialized_graph):
+    for node in serialized_graph.get("nodes") or []:
+        if node.get("datatype") not in RESOURCE_INSTANCE_DATATYPES:
+            continue
+        graphs = (node.get("config") or {}).get("graphs")
+        if isinstance(graphs, list):
+            for graph_config in graphs:
+                if isinstance(graph_config, dict):
+                    yield graph_config
+
+
+def convert_published_graph_configs(serialized_graph):
+    changed = False
+    for graph_config in _resource_instance_graph_configs(serialized_graph):
+        if "relationshipSource" in graph_config:
+            continue
+
+        use_ontology = graph_config.get("useOntologyRelationship") is True
+        ontology_property = graph_config.pop("ontologyProperty", None)
+        inverse_ontology_property = graph_config.pop("inverseOntologyProperty", None)
+        relationship_concept = graph_config.pop("relationshipConcept", None)
+        inverse_relationship_concept = graph_config.pop(
+            "inverseRelationshipConcept", None
+        )
+        graph_config.pop("useOntologyRelationship", None)
+
+        if use_ontology:
+            relationship_source = "ontology"
+            relationship = ontology_property
+            inverse_relationship = inverse_ontology_property
+        else:
+            relationship = relationship_concept
+            inverse_relationship = inverse_relationship_concept
+            value = relationship_concept or inverse_relationship_concept
+            relationship_source = (
+                "concept" if not value or UUID_PATTERN.match(value) else "reference"
+            )
+
+        graph_config["relationshipSource"] = relationship_source
+        graph_config["relationship"] = relationship
+        graph_config["inverseRelationship"] = inverse_relationship
+        changed = True
+    return changed
+
+
+def revert_published_graph_configs(serialized_graph):
+    changed = False
+    for graph_config in _resource_instance_graph_configs(serialized_graph):
+        if "relationshipSource" not in graph_config:
+            continue
+
+        use_ontology = graph_config.pop("relationshipSource") == "ontology"
+        relationship = graph_config.pop("relationship", None)
+        inverse_relationship = graph_config.pop("inverseRelationship", None)
+
+        graph_config["useOntologyRelationship"] = use_ontology
+        graph_config["ontologyProperty"] = relationship if use_ontology else None
+        graph_config["inverseOntologyProperty"] = (
+            inverse_relationship if use_ontology else None
+        )
+        graph_config["relationshipConcept"] = None if use_ontology else relationship
+        graph_config["inverseRelationshipConcept"] = (
+            None if use_ontology else inverse_relationship
+        )
+        changed = True
+    return changed
 
 
 # Renames the relationship keys on each entry of every resource-instance value in
@@ -54,7 +147,7 @@ def rename_tile_data_keys(old_key, new_key, old_inverse_key, new_inverse_key):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("models", "12913_remove_geocoders"),
+        ("models", "13001_spatialview_dbroles"),
     ]
 
     # Collapse the four relationship keys on each entry of a resource-instance node's
@@ -486,8 +579,15 @@ class Migration(migrations.Migration):
         $function$
     """
 
+    def update_published_graphs(apps, schema_editor):
+        _update_published_graphs(apps, convert_published_graph_configs)
+
+    def reverse_published_graphs(apps, schema_editor):
+        _update_published_graphs(apps, revert_published_graph_configs)
+
     operations = [
         migrations.RunSQL(update_node_configs, reverse_node_configs),
+        migrations.RunPython(update_published_graphs, reverse_published_graphs),
         migrations.RunSQL(update_tile_data, reverse_tile_data),
         migrations.RunSQL(update_relationship_function, reverse_relationship_function),
         migrations.RunSQL(update_refresh_function, reverse_refresh_function),
