@@ -15,6 +15,7 @@ import {
     DIRECT_SELECT,
     DRAW_LAYER_ID_PREFIX,
     DRAW_LINE_STRING,
+    DRAW_MODE_CHANGE_EVENT,
     DRAW_POINT,
     DRAW_POLYGON,
     DRAW_CREATE_EVENT,
@@ -50,6 +51,7 @@ export interface UseDrawnFeaturesReturn
         MapContext,
         | "drawnFeatures"
         | "selectedDrawnFeature"
+        | "activeDrawMode"
         | "setDrawMode"
         | "selectDrawnFeature"
         | "deselectDrawnFeature"
@@ -82,6 +84,7 @@ export function useDrawnFeatures(
 
     const selectedDrawnFeature: Ref<Feature | null> = ref(null);
     const drawnFeatures = shallowRef<Feature[]>([]);
+    const activeDrawMode = ref<DrawMode | null>(null);
 
     let draw: InstanceType<typeof MapboxDraw>;
     let currentBufferData: FeatureCollection = {
@@ -151,6 +154,10 @@ export function useDrawnFeatures(
         onDrawEvent(map.value!, DRAW_DELETE_EVENT, handleDrawnFeaturesDeleted);
         onDrawEvent(map.value!, DRAW_SELECTION_CHANGE_EVENT, () => {
             selectedDrawnFeature.value = draw.getSelected().features[0] ?? null;
+        });
+        onDrawEvent(map.value!, DRAW_MODE_CHANGE_EVENT, () => {
+            activeDrawMode.value = null;
+            map.value!.getCanvas().style.cursor = "";
         });
     }
 
@@ -253,6 +260,7 @@ export function useDrawnFeatures(
 
     function setDrawMode(mode: DrawMode | null): void {
         if (!mode || !draw) {
+            activeDrawMode.value = null;
             if (map.value) {
                 map.value.getCanvas().style.cursor = "";
             }
@@ -260,6 +268,7 @@ export function useDrawnFeatures(
             return;
         }
 
+        activeDrawMode.value = mode;
         map.value!.getCanvas().style.cursor = "crosshair";
 
         if (mode === "point") {
@@ -387,6 +396,7 @@ export function useDrawnFeatures(
     return {
         drawnFeatures,
         selectedDrawnFeature,
+        activeDrawMode,
         setupDraw,
         addBufferLayer,
         isActivelyDrawingOrEditing,

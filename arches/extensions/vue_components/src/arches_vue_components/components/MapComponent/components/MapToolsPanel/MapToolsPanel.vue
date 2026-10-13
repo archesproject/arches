@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, onUnmounted, ref } from "vue";
 
 import { useGettext } from "vue3-gettext";
 
@@ -9,16 +9,12 @@ import GeometryList from "@/arches_vue_components/components/MapComponent/compon
 import ToolButtonGroup from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/components/ToolButtonGroup.vue";
 
 import {
-    DRAW_CREATE_EVENT,
     LINE,
     POINT,
     POLYGON,
 } from "@/arches_vue_components/components/MapComponent/constants.ts";
 import { useGeometryKindOptions } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/composables/useGeometryKindOptions.ts";
 import { useResolvedMapContext } from "@/arches_vue_components/components/MapComponent/composables/useMapContext.ts";
-import { onDrawEvent } from "@/arches_vue_components/components/MapComponent/utils/draw-events.ts";
-
-import type { Subscription } from "maplibre-gl";
 
 import type {
     DrawMode,
@@ -35,8 +31,8 @@ const { context = undefined } = defineProps<{
 
 const resolvedContext = useResolvedMapContext(context, "MapToolsPanel");
 const {
-    map,
     drawnFeatures,
+    activeDrawMode,
     allowedGeometryTypes,
     setDrawMode,
     deselectDrawnFeature,
@@ -47,10 +43,7 @@ const { $gettext } = useGettext();
 const geometryKindOptions = useGeometryKindOptions(allowedGeometryTypes);
 
 const activeView = ref<MapToolsView>("draw");
-const activeDrawMode = ref<DrawMode | null>(null);
 const editingFeatureId = ref<string | null>(null);
-
-let drawCreateSubscription: Subscription | null = null;
 
 const drawToolOptions = computed(() => [
     ...geometryKindOptions.value,
@@ -84,18 +77,7 @@ const drawHint = computed(() => {
     );
 });
 
-onMounted(() => {
-    if (map.value) {
-        drawCreateSubscription = onDrawEvent(
-            map.value,
-            DRAW_CREATE_EVENT,
-            handleDrawCreate,
-        );
-    }
-});
-
 onUnmounted(() => {
-    drawCreateSubscription?.unsubscribe();
     setDrawMode(null);
     deselectDrawnFeature();
 });
@@ -106,28 +88,14 @@ function selectTool(tool: DrawMode | typeof COORDINATES_TOOL): void {
         return;
     }
     if (activeDrawMode.value === tool) {
-        clearActiveDrawMode();
         setDrawMode(null);
         return;
     }
     deselectDrawnFeature();
-    activeDrawMode.value = tool;
     setDrawMode(tool);
 }
 
-function clearActiveDrawMode(): void {
-    activeDrawMode.value = null;
-}
-
-function handleDrawCreate(): void {
-    clearActiveDrawMode();
-    if (map.value) {
-        map.value.getCanvas().style.cursor = "";
-    }
-}
-
 function openCoordinateEditor(featureId: string | null): void {
-    clearActiveDrawMode();
     setDrawMode(null);
     deselectDrawnFeature();
     editingFeatureId.value = featureId;

@@ -326,6 +326,7 @@ export function useMapContext(
         coordinateSystems,
         drawnFeatures: drawnFeatureControls.drawnFeatures,
         selectedDrawnFeature: drawnFeatureControls.selectedDrawnFeature,
+        activeDrawMode: drawnFeatureControls.activeDrawMode,
         allowedGeometryTypes,
         setDrawMode: drawnFeatureControls.setDrawMode,
         selectDrawnFeature: drawnFeatureControls.selectDrawnFeature,

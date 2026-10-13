@@ -17,6 +17,7 @@ export const DRAW_CREATE_EVENT = "draw.create";
 export const DRAW_DELETE_EVENT = "draw.delete";
 export const DRAW_LAYER_ID_PREFIX = "gl-draw-";
 export const DRAW_LINE_STRING = "draw_line_string";
+export const DRAW_MODE_CHANGE_EVENT = "draw.modechange";
 export const DRAW_POINT = "draw_point";
 export const DRAW_POLYGON = "draw_polygon";
 export const DRAW_SELECTION_CHANGE_EVENT = "draw.selectionchange";

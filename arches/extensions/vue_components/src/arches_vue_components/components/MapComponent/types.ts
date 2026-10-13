@@ -105,6 +105,7 @@ export interface MapContext {
     coordinateSystems: Ref<CoordinateSystem[]>;
     drawnFeatures: ShallowRef<Feature[]>;
     selectedDrawnFeature: Ref<Feature | null>;
+    activeDrawMode: Readonly<Ref<DrawMode | null>>;
     allowedGeometryTypes: ComputedRef<string[] | null>;
     setDrawMode: (mode: DrawMode | null) => void;
     selectDrawnFeature: (feature: Feature) => void;
