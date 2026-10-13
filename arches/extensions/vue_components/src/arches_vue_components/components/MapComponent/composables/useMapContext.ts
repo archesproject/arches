@@ -47,8 +47,8 @@ import {
     GEOMETRY_TYPE_POINT,
     GEOMETRY_TYPE_POLYGON,
     IDLE,
+    MAXIMUM_VALUE_FIT_ZOOM,
     METERS,
-    READ_ONLY_MAXIMUM_FIT_ZOOM,
     READ_ONLY_VALUE_SOURCE_ID,
     SIMPLE_SELECT,
     STYLE_LOAD_EVENT,
@@ -268,12 +268,10 @@ export function useMapContext(
         map.value.on("mousemove", handleMapMousemove);
 
         map.value.once(STYLE_LOAD_EVENT, () => {
-            if (props.isReadOnly) {
-                fitToReadOnlyValue();
-            } else {
+            if (!props.isReadOnly) {
                 setupDraw();
-                fitToDefaultBounds();
             }
+            fitToValue();
 
             emit("ready");
         });
@@ -449,7 +447,10 @@ export function useMapContext(
                 draw.add(feature);
             }
 
-            updateDrawnFeatures({ shouldEmitValueChange: false });
+            updateDrawnFeatures({
+                shouldEmitValueChange: false,
+                shouldFitToFeatures: false,
+            });
         }
 
         // "draw.*" are custom events fired by @mapbox/mapbox-gl-draw, not part
@@ -494,11 +495,11 @@ export function useMapContext(
                 [west, south],
                 [east, north],
             ],
-            { padding: 20 },
+            { padding: 20, animate: false },
         );
     }
 
-    function fitToReadOnlyValue(): void {
+    function fitToValue(): void {
         if (!props.value?.features.length) {
             fitToDefaultBounds();
             return;
@@ -511,7 +512,7 @@ export function useMapContext(
             ],
             {
                 padding: 50,
-                maxZoom: props.maxZoom ?? READ_ONLY_MAXIMUM_FIT_ZOOM,
+                maxZoom: props.maxZoom ?? MAXIMUM_VALUE_FIT_ZOOM,
                 animate: false,
             },
         );
@@ -628,8 +629,12 @@ export function useMapContext(
     }
 
     async function updateDrawnFeatures(
-        { shouldEmitValueChange }: { shouldEmitValueChange: boolean } = {
+        {
+            shouldEmitValueChange,
+            shouldFitToFeatures,
+        }: { shouldEmitValueChange: boolean; shouldFitToFeatures: boolean } = {
             shouldEmitValueChange: true,
+            shouldFitToFeatures: true,
         },
     ): Promise<void> {
         const updateToken = ++latestUpdateDrawnFeaturesToken;
@@ -668,7 +673,7 @@ export function useMapContext(
                 currentBufferData,
             );
 
-            if (drawnFeatureCollection.features.length) {
+            if (shouldFitToFeatures && drawnFeatureCollection.features.length) {
                 const allFeatures: FeatureCollection = {
                     type: "FeatureCollection",
                     features: [
