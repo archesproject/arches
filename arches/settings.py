@@ -378,7 +378,12 @@ JWT_ALGORITHM = "HS256"
 
 # OAuth settings
 # https://django-oauth-toolkit.readthedocs.io/en/latest/settings.html
-OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 36000}
+OAUTH2_PROVIDER = {
+    "ACCESS_TOKEN_EXPIRE_SECONDS": 604800,  # one week
+    # Where a device sign-in sends the user to enter their code. Relative, so
+    # clients resolve it against the instance's URL.
+    "OAUTH_DEVICE_VERIFICATION_URI": "/o/device/",
+}
 
 # This is the client id you get when you register a new application
 # see https://arches.readthedocs.io/en/stable/api/#authentication
@@ -674,13 +679,6 @@ API_MAX_PAGE_SIZE = 500
 UUID_REGEX = (
     "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
 )
-
-OAUTH2_PROVIDER = {
-    "ACCESS_TOKEN_EXPIRE_SECONDS": 604800,  # one week
-    # Where a device sign-in sends the user to enter their code. Relative, so
-    # clients resolve it against the instance's URL.
-    "OAUTH_DEVICE_VERIFICATION_URI": "/o/device/",
-}
 
 #######################################
 ###       END STATIC SETTINGS       ###
