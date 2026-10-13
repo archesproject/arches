@@ -384,6 +384,12 @@ OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 36000}
 # see https://arches.readthedocs.io/en/stable/api/#authentication
 OAUTH_CLIENT_ID = ""  # '9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
 
+# The client id of a public application with the "Device Code" grant type, for
+# clients such as desktop GIS plugins that sign users in through a browser
+# (RFC 8628). Desktop clients read it from auth/device_client_id. Leave empty
+# to turn device sign-in off.
+OAUTH_DEVICE_CLIENT_ID = ""
+
 AUTHENTICATION_BACKENDS = (
     "arches.app.utils.email_auth_backend.EmailAuthenticationBackend",
     "oauth2_provider.backends.OAuth2Backend",
@@ -669,7 +675,12 @@ UUID_REGEX = (
     "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
 )
 
-OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 604800}  # one week
+OAUTH2_PROVIDER = {
+    "ACCESS_TOKEN_EXPIRE_SECONDS": 604800,  # one week
+    # Where a device sign-in sends the user to enter their code. Relative, so
+    # clients resolve it against the instance's URL.
+    "OAUTH_DEVICE_VERIFICATION_URI": "/o/device/",
+}
 
 #######################################
 ###       END STATIC SETTINGS       ###

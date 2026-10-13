@@ -27,6 +27,11 @@ class ArchesAppConfig(AppConfig):
     def ready(self):
         import arches.app.signals
 
+        # Imported here: django-oauth-toolkit's models need the app registry.
+        from arches.app.utils.oauth_device_grant import patch_device_grant_expiry
+
+        patch_device_grant_expiry()
+
         os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arches.settings")
         generate_frontend_configuration()
 
