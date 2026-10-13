@@ -7,6 +7,7 @@ export interface GenericCardProps {
     graphSlug: string;
     resourceInstanceId?: string | null;
     selectedNodeAlias?: string | null;
+    shouldShowCardName?: boolean;
     shouldShowFormButtons?: boolean;
     tileData?: AliasedTileData;
     tileId?: string | null;

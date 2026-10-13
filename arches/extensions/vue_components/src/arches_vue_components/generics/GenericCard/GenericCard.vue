@@ -25,6 +25,7 @@ const {
     graphSlug,
     resourceInstanceId,
     selectedNodeAlias,
+    shouldShowCardName = true,
     shouldShowFormButtons = true,
     tileData,
     tileId,
@@ -99,9 +100,12 @@ defineExpose({
             {{ configurationError.message }}
         </Message>
         <template v-else>
-            <span class="card-name">{{
-                cardXNodeXWidgetData[0].card.name
-            }}</span>
+            <span
+                v-if="shouldShowCardName"
+                class="card-name"
+            >
+                {{ cardXNodeXWidgetData[0].card.name }}
+            </span>
 
             <GenericCardEditor
                 v-if="mode === EDIT"
