@@ -90,7 +90,7 @@ class GraphModelQuerySet(models.QuerySet):
         return self.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
 
     def get_current_graphs(self, exclude_system_settings=True, exclude_inactive=True):
-        query_set = self.filter(isresource=True).filter_drafts(is_draft=False)
+        query_set = self.filter_drafts(is_draft=False)
         if exclude_system_settings:
             query_set = query_set.exclude_system_settings()
         if exclude_inactive:
