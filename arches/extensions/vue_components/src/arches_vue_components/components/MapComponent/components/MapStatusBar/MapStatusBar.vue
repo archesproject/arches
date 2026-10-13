@@ -1,16 +1,9 @@
 <script setup lang="ts">
-import {
-    computed,
-    onMounted,
-    onUnmounted,
-    ref,
-    useTemplateRef,
-    watch,
-} from "vue";
-
-import * as maplibregl from "maplibre-gl";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 
 import { useGettext } from "vue3-gettext";
+
+import MapScaleBar from "@/arches_vue_components/components/MapComponent/components/MapStatusBar/components/MapScaleBar.vue";
 
 import { formatDegreesMinutesSeconds } from "@/arches_vue_components/components/MapComponent/utils/coordinate-format.ts";
 import {
@@ -18,12 +11,7 @@ import {
     isGeographicCoordinateSystem,
 } from "@/arches_vue_components/components/MapComponent/utils/coordinate-systems.ts";
 
-import type {
-    LngLat,
-    Map as MaplibreMap,
-    MapMouseEvent,
-    ScaleControl,
-} from "maplibre-gl";
+import type { LngLat, Map as MaplibreMap, MapMouseEvent } from "maplibre-gl";
 
 import type {
     CoordinateSystem,
@@ -33,7 +21,6 @@ import type {
 const ZOOM_DECIMAL_PLACES = 1;
 const DECIMAL_DEGREE_PLACES = 4;
 const PROJECTED_DECIMAL_PLACES = 2;
-const SCALE_MAX_WIDTH_PIXELS = 100;
 const NO_COORDINATES_PLACEHOLDER = "—";
 
 const { map, settings, coordinateSystems } = defineProps<{
@@ -44,12 +31,8 @@ const { map, settings, coordinateSystems } = defineProps<{
 
 const { $gettext } = useGettext();
 
-const scaleContainer = useTemplateRef<HTMLDivElement>("scaleContainer");
 const zoomLevel = ref(map.getZoom());
 const cursorLngLat = ref<LngLat | null>(null);
-
-let scaleControl: ScaleControl | null = null;
-let scaleElement: HTMLElement | null = null;
 
 const isVisible = computed(
     () =>
@@ -95,27 +78,7 @@ const coordinateText = computed(() => {
     return `${lngLat.lat.toFixed(DECIMAL_DEGREE_PLACES)}°, ${lngLat.lng.toFixed(DECIMAL_DEGREE_PLACES)}°`;
 });
 
-watch(scaleContainer, (container) => {
-    if (container && scaleElement) {
-        container.appendChild(scaleElement);
-    }
-});
-
-watch(
-    () => settings.mapScaleUnit,
-    (unit) => {
-        scaleControl?.setUnit(unit);
-    },
-);
-
 onMounted(() => {
-    scaleControl = new maplibregl.ScaleControl({
-        maxWidth: SCALE_MAX_WIDTH_PIXELS,
-        unit: settings.mapScaleUnit,
-    });
-    scaleElement = scaleControl.onAdd(map);
-    scaleContainer.value?.appendChild(scaleElement);
-
     map.on("zoom", handleZoom);
     map.on("mousemove", handleMouseMove);
     map.on("mouseout", handleMouseOut);
@@ -125,7 +88,6 @@ onUnmounted(() => {
     map.off("zoom", handleZoom);
     map.off("mousemove", handleMouseMove);
     map.off("mouseout", handleMouseOut);
-    scaleControl?.onRemove();
 });
 
 function handleZoom(): void {
@@ -146,10 +108,10 @@ function handleMouseOut(): void {
         v-if="isVisible"
         class="map-status-bar"
     >
-        <div
+        <MapScaleBar
             v-if="settings.showMapScale"
-            ref="scaleContainer"
-            class="map-status-scale"
+            :map="map"
+            :unit="settings.mapScaleUnit"
         />
         <span
             v-if="settings.showZoomLevel"
@@ -182,21 +144,6 @@ function handleMouseOut(): void {
     color: var(--p-text-muted-color);
     font-size: 1.15rem;
     pointer-events: none;
-}
-
-.map-status-scale {
-    display: flex;
-    align-items: center;
-}
-
-.map-status-scale :deep(.maplibregl-ctrl-scale) {
-    padding-block: 0.5rem 0;
-    padding-inline: 0.5rem;
-    background: none;
-    border: none;
-    border-block-start: 0.1rem solid var(--p-text-muted-color);
-    color: var(--p-text-muted-color);
-    font-size: 1.1rem;
 }
 
 .map-status-item {

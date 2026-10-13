@@ -7,7 +7,7 @@ import Toast from "openvue/toast";
 import FeaturePopup from "@/arches_vue_components/components/MapComponent/components/FeaturePopup.vue";
 import FloatingPanel from "@/arches_vue_components/components/MapComponent/components/FloatingPanel.vue";
 import MapHeader from "@/arches_vue_components/components/MapComponent/components/MapHeader.vue";
-import MapStatusBar from "@/arches_vue_components/components/MapComponent/components/MapStatusBar.vue";
+import MapStatusBar from "@/arches_vue_components/components/MapComponent/components/MapStatusBar/MapStatusBar.vue";
 
 import {
     mapContextKey,

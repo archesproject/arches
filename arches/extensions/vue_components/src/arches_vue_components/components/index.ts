@@ -8,7 +8,7 @@ export { default as GeometryRow } from "@/arches_vue_components/components/MapCo
 export { default as LegendPanel } from "@/arches_vue_components/components/MapComponent/components/LegendPanel.vue";
 export { default as MapComponent } from "@/arches_vue_components/components/MapComponent/MapComponent.vue";
 export { default as MapHeader } from "@/arches_vue_components/components/MapComponent/components/MapHeader.vue";
-export { default as MapStatusBar } from "@/arches_vue_components/components/MapComponent/components/MapStatusBar.vue";
+export { default as MapStatusBar } from "@/arches_vue_components/components/MapComponent/components/MapStatusBar/MapStatusBar.vue";
 export { default as MapToolsPanel } from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/MapToolsPanel.vue";
 export { default as OverlayPanel } from "@/arches_vue_components/components/MapComponent/components/OverlayPanel/OverlayPanel.vue";
 export { default as OverlayRow } from "@/arches_vue_components/components/MapComponent/components/OverlayPanel/components/OverlayRow.vue";
