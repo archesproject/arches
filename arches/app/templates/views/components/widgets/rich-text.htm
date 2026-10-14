@@ -55,21 +55,14 @@
             </div>
         </div>
         <div class="col-xs-12">
-            <textarea
-                rows="10"
-                cols="80"
+            <div
                 data-bind="
-                    ckeditor: currentText,
-                    language: currentLanguage.code,
+                    tiptap: currentText,
                     direction: currentDirection,
                     placeholder: currentPlaceholder,
-                    ckeditorOptions: {
-                        entities_latin: false,
-                        entities_greek: false
-                    },
-                    valueUpdate: 'afterkeydown',
+                    ariaLabel: label,
                     attr: {disabled: disabled}
-                "></textarea>
+                "></div>
         </div>
     </div>
 </div>
@@ -80,21 +73,16 @@
     <span data-bind="text: $root.translations.placeholder"></span>
 </div>
 
-<textarea
-    rows="10"
-    cols="80"
-    class="form-control input-md widget-input"
+<div
     data-bind="
-        ckeditor: defaultText,
+        tiptap: defaultText,
         isConfigForm: true,
-        language: currentLanguage.code,
         direction: currentDirection,
         placeholder: currentPlaceholder,
-        ckeditorOptions: {},
-        valueUpdate: 'afterkeydown',
+        ariaLabel: $root.translations.placeholder,
         attr: {disabled: disabled}
     "
-></textarea>
+></div>
 {% endblock config_form %}
 
 {% block report %}
