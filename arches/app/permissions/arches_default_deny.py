@@ -89,6 +89,11 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
             query=Terms(field="permissions.users_read", terms=[str(user.id)]),
         )
 
+        nested_principal_user = Nested(
+            path="permissions",
+            query=Terms(field="permissions.principal_user", terms=[str(user.id)]),
+        )
+
         if not all:
             if resources is not None:
                 subset_query = Bool()
@@ -100,10 +105,11 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
                     )
                     .should(nested_users_read)
                     .should(nested_groups_read)
+                    .should(nested_principal_user)
                 )
                 query.add_query(subset_query)
             else:
-                query.add_query(Bool().should(nested_groups_read).should(nested_users_read))  # type: ignore
+                query.add_query(Bool().should(nested_groups_read).should(nested_users_read).should(nested_principal_user))  # type: ignore
 
         results = query.search(index=RESOURCES_INDEX, scroll="1m")  # type: ignore
         scroll_id = results["_scroll_id"]
