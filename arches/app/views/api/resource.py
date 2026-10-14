@@ -623,7 +623,8 @@ class ResourceInstanceLifecycleState(APIBase):
         return JSONResponse(resource_instance.resource_instance_lifecycle_state)
 
     def post(self, request, resourceid):
-        if not user_is_resource_reviewer(request.user):
+        resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+        if not user_is_resource_reviewer(request.user, resource=resource_instance):
             return JSONErrorResponse(
                 _("Request Failed"), _("Permission Denied"), status=403
             )
