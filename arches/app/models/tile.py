@@ -731,6 +731,24 @@ class Tile(models.TileModel):
         return tile
 
     @staticmethod
+    def find_tile_without_value(nodeid, resourceinstanceid):
+        """
+        The resource's first tile in the node's nodegroup whose value for the node is
+        empty, as left when a value is cleared or a card is saved without it.
+
+        """
+        if not resourceinstanceid:
+            return None
+        node = models.Node.objects.only("nodegroup_id").get(pk=nodeid)
+        candidate_tiles = Tile.objects.filter(
+            resourceinstance_id=resourceinstanceid, nodegroup_id=node.nodegroup_id
+        ).order_by("sortorder")
+        return next(
+            (tile for tile in candidate_tiles if not tile.data.get(str(nodeid))),
+            None,
+        )
+
+    @staticmethod
     def update_node_value(
         nodeid,
         value,
@@ -741,8 +759,9 @@ class Tile(models.TileModel):
         transaction_id=None,
     ):
         """
-        Updates the value of a node in a tile. Creates the tile and parent tiles if they do not yet
-        exist.
+        Updates the value of a node in a tile. Without a tileid, fills the resource's tile
+        that has no value for the node yet, if there is one. Creates the tile and parent
+        tiles if they do not yet exist.
 
         """
         if tileid and models.TileModel.objects.filter(pk=tileid).exists():
@@ -758,6 +777,9 @@ class Tile(models.TileModel):
             tile = Tile.objects.filter(
                 Q(resourceinstance_id=resourceinstanceid), Q(nodegroup_id=nodegroupid)
             )[0]
+            tile.data[nodeid] = value
+            tile.save(request=request, transaction_id=transaction_id)
+        elif tile := Tile.find_tile_without_value(nodeid, resourceinstanceid):
             tile.data[nodeid] = value
             tile.save(request=request, transaction_id=transaction_id)
         else:
