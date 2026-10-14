@@ -1014,7 +1014,9 @@ class ResourceDescriptors(View):
             .exists()
         ):
             try:
-                resource = Resource.objects.get(pk=resourceid)
+                resource = Resource.objects.select_related(
+                    "graph", "resource_instance_lifecycle_state"
+                ).get(pk=resourceid)
                 if settings.ELASTICSEARCH_ENABLED:
                     se = SearchEngineFactory().create()
                     document = se.search(index=RESOURCES_INDEX, id=resourceid)
@@ -1024,6 +1026,10 @@ class ResourceDescriptors(View):
                     {
                         "graphid": document["_source"]["graph_id"],
                         "graph_name": resource.graph.name,
+                        "graph_iconclass": resource.graph.iconclass,
+                        "lifecycle_state": str(
+                            resource.resource_instance_lifecycle_state.name
+                        ),
                         "displaydescription": self.get_localized_descriptor(
                             document, "displaydescription"
                         ),

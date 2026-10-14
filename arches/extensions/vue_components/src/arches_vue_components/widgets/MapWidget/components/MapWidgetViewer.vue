@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import MapComponent from "@/arches_vue_components/components/MapComponent/MapComponent.vue";
-import DrawPanel from "@/arches_vue_components/components/MapComponent/components/InteractionsDrawer/components/DrawPanel/DrawPanel.vue";
+import MapToolsPanel from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/MapToolsPanel.vue";
 
-import { useDefaultMapInteractionTools } from "@/arches_vue_components/components/MapComponent/useDefaultMapInteractionTools.ts";
+import { useDefaultMapInteractionTools } from "@/arches_vue_components/components/MapComponent/composables/useDefaultMapInteractionTools.ts";
 
 import type { GeoJSONFeatureCollectionAliasedNodeData } from "@/arches_vue_components/datatypes/geojson-feature-collection/types.ts";
 import type { MapCardXNodeXWidgetData } from "@/arches_vue_components/widgets/MapWidget/types.ts";
@@ -17,7 +17,7 @@ const emit = defineEmits<{
 }>();
 
 const viewerInteractionTools = useDefaultMapInteractionTools().filter(
-    (interactionTool) => interactionTool.component !== DrawPanel,
+    (interactionTool) => interactionTool.component !== MapToolsPanel,
 );
 </script>
 
