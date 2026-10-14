@@ -1,11 +1,59 @@
 import django_migrate_sql.operations
 from django.db import migrations
 
+from arches.app.models.utils import get_slugified_alias_renames
+
+
+def slugify_node_aliases(apps, schema_editor):
+    Node = apps.get_model("models", "Node")
+    PublishedGraph = apps.get_model("models", "PublishedGraph")
+
+    aliases_by_nodeid_by_graphid = {}
+    for graph_id, nodeid, alias in Node.objects.exclude(alias="").values_list(
+        "graph_id", "nodeid", "alias"
+    ):
+        aliases_by_nodeid_by_graphid.setdefault(graph_id, {})[nodeid] = alias
+
+    new_aliases_by_nodeid = {}
+    for graph_id, aliases_by_nodeid in aliases_by_nodeid_by_graphid.items():
+        for nodeid, new_alias in get_slugified_alias_renames(aliases_by_nodeid).items():
+            print(
+                f"Renamed node alias '{aliases_by_nodeid[nodeid]}' to '{new_alias}' in graph {graph_id}"
+            )
+            new_aliases_by_nodeid[nodeid] = new_alias
+
+    if not new_aliases_by_nodeid:
+        return
+
+    nodes_to_rename = list(Node.objects.filter(nodeid__in=new_aliases_by_nodeid))
+    for node in nodes_to_rename:
+        node.alias = new_aliases_by_nodeid[node.nodeid]
+    Node.objects.bulk_update(nodes_to_rename, ["alias"])
+
+    new_aliases_by_serialized_nodeid = {
+        str(nodeid): new_alias for nodeid, new_alias in new_aliases_by_nodeid.items()
+    }
+    renamed_graph_ids = {node.graph_id for node in nodes_to_rename}
+    published_graphs_to_update = {}
+    for published_graph in PublishedGraph.objects.filter(
+        publication__graph_id__in=renamed_graph_ids
+    ):
+        serialized_nodes = (published_graph.serialized_graph or {}).get("nodes", [])
+        for serialized_node in serialized_nodes:
+            if new_alias := new_aliases_by_serialized_nodeid.get(
+                serialized_node.get("nodeid")
+            ):
+                serialized_node["alias"] = new_alias
+                published_graphs_to_update[published_graph.pk] = published_graph
+    PublishedGraph.objects.bulk_update(
+        published_graphs_to_update.values(), ["serialized_graph"]
+    )
+
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "12779_add_multicard_resource_descriptor"),
+        ("models", "13001_spatialview_dbroles"),
     ]
 
     operations = [
@@ -338,4 +386,5 @@ $$ language plpgsql volatile;
                 ("models", "__arches_slugify"),
             ],
         ),
+        migrations.RunPython(slugify_node_aliases, migrations.RunPython.noop),
     ]

@@ -109,6 +109,7 @@ def import_graph(graphs, overwrite_graphs=True, user=None):
 
             try:
                 graph = Graph(resource)
+                graph.slugify_node_aliases()
 
                 ontology_classes = [
                     str(f["source"])
