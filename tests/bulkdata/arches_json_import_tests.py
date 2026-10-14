@@ -1183,6 +1183,19 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
             )
             self.assertEqual([row[0] for row in cursor.fetchall()], ["O", "O"])
 
+    def test_a_load_that_cannot_turn_the_triggers_back_on_says_so(self):
+        monument = uuid.uuid4()
+        with patch(REENABLE, self._reenable_then_fail):
+            loadid = self._load(
+                _resource(monument, _tile(STRING_NODE, _text("Monument"))),
+            )
+
+        self.assertTrue(ResourceInstance.objects.filter(pk=monument).exists())
+        self.assertIn(
+            "tile triggers could not be turned back on",
+            LoadEvent.objects.get(loadid=loadid).error_message,
+        )
+
     def test_a_failed_cleanup_does_not_hide_the_undo_failure(self):
         monument = uuid.uuid4()
         loadid = self._load(_resource(monument, _tile(STRING_NODE, _text("Monument"))))

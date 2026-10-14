@@ -1118,6 +1118,7 @@ class ArchesJsonImporter(BaseImportModule):
             }
 
         written, failing, removed, cleanup_failed = 0, None, False, False
+        triggers_left_off = False
         try:
             log_event_details(cursor, loadid, "done|Saving the tiles...")
             # The etl-manager badge reads load_event.status alone, and "running"
@@ -1147,6 +1148,7 @@ class ArchesJsonImporter(BaseImportModule):
                     reenable_tile_triggers(cursor, loadid)
                 except Exception:
                     logger.exception("Could not re-enable the tile triggers")
+                    triggers_left_off = True
         except Exception as e:
             logger.exception(e)
             message = str(e)
@@ -1182,6 +1184,14 @@ class ArchesJsonImporter(BaseImportModule):
         LoadEvent.objects.filter(loadid=loadid).update(
             status="completed", load_end_time=timezone.now()
         )
+        if triggers_left_off:
+            LoadEvent.objects.filter(loadid=loadid).update(
+                error_message=_(
+                    "The data was saved, but the tile triggers could not be turned "
+                    "back on, so they are off for the whole database. Running any "
+                    "bulk load turns them back on, or contact an administrator."
+                )
+            )
         return _post_save_edit_log(
             userid, loadid, multiprocessing, max_subprocesses, index=index
         )
