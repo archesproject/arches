@@ -694,7 +694,7 @@ class Resource(models.ResourceInstance):
 
         permit_deletion = False
         if user != {}:
-            user_is_reviewer = user_is_resource_reviewer(user)
+            user_is_reviewer = user_is_resource_reviewer(user, resource=self)
             if user_is_reviewer is False:
                 tiles = list(models.TileModel.objects.filter(resourceinstance=self))
                 resource_is_provisional = (
@@ -847,13 +847,7 @@ class Resource(models.ResourceInstance):
             return result["value"]
 
         if not graphs:
-            graphs = list(
-                models.GraphModel.objects.all()
-                .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-                .exclude(isresource=False)
-                .exclude(is_active=False)
-                .exclude(source_identifier__isnull=False)
-            )
+            graphs = list(models.GraphModel.objects.get_resource_models())
 
         graph_lookup = {
             str(graph.graphid): {
@@ -1211,7 +1205,7 @@ class Resource(models.ResourceInstance):
     def update_resource_instance_lifecycle_state(
         self, user, resource_instance_lifecycle_state
     ):
-        if not user_is_resource_reviewer(user):
+        if not user_is_resource_reviewer(user, resource=self):
             raise PermissionDenied
 
         if (

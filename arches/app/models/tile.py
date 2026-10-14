@@ -397,7 +397,9 @@ class Tile(models.TileModel):
         if user_id is not None:
             user_id = str(user_id)
             user = User.objects.get(pk=user_id)
-            user_is_reviewer = user_is_resource_reviewer(user)
+            user_is_reviewer = user_is_resource_reviewer(
+                user, resource=self.resourceinstance
+            )
             if (
                 user_is_reviewer is False
                 and self.provisionaledits is not None
@@ -454,7 +456,9 @@ class Tile(models.TileModel):
         try:
             if user is None and request is not None:
                 user = request.user
-            user_is_reviewer = user_is_resource_reviewer(user)
+            user_is_reviewer = user_is_resource_reviewer(
+                user, resource=self.resourceinstance
+            )
         except AttributeError:  # no user - probably importing data
             user = None
 
@@ -577,7 +581,9 @@ class Tile(models.TileModel):
             tile.delete(*args, request=request, **kwargs)
         try:
             user = request.user
-            user_is_reviewer = user_is_resource_reviewer(user)
+            user_is_reviewer = user_is_resource_reviewer(
+                user, resource=self.resourceinstance
+            )
         except AttributeError:  # no user
             user = None
             user_is_reviewer = True

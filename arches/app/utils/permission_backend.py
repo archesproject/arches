@@ -126,13 +126,13 @@ class PermissionFramework(metaclass=ABCMeta):
     def user_can_read_concepts(self, user): ...
 
     @abstractmethod
-    def user_is_resource_editor(self, user): ...
+    def user_is_resource_editor(self, user, *, resource=None, graph=None): ...
 
     @abstractmethod
-    def user_is_resource_reviewer(self, user): ...
+    def user_is_resource_reviewer(self, user, *, resource=None, graph=None): ...
 
     @abstractmethod
-    def user_is_resource_exporter(self, user): ...
+    def user_is_resource_exporter(self, user, *, resource=None, graph=None): ...
 
     @abstractmethod
     def get_resource_types_by_perm(self, user, perms): ...
@@ -366,16 +366,22 @@ def user_can_read_concepts(user):
     return _get_permission_framework().user_can_read_concepts(user)
 
 
-def user_is_resource_editor(user):
-    return _get_permission_framework().user_is_resource_editor(user)
+def user_is_resource_editor(user, *, resource=None, graph=None):
+    return _get_permission_framework().user_is_resource_editor(
+        user, resource=resource, graph=graph
+    )
 
 
-def user_is_resource_reviewer(user):
-    return _get_permission_framework().user_is_resource_reviewer(user)
+def user_is_resource_reviewer(user, *, resource=None, graph=None):
+    return _get_permission_framework().user_is_resource_reviewer(
+        user, resource=resource, graph=graph
+    )
 
 
-def user_is_resource_exporter(user):
-    return _get_permission_framework().user_is_resource_exporter(user)
+def user_is_resource_exporter(user, *, resource=None, graph=None):
+    return _get_permission_framework().user_is_resource_exporter(
+        user, resource=resource, graph=graph
+    )
 
 
 def get_resource_types_by_perm(user, perms):

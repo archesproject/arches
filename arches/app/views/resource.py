@@ -211,7 +211,9 @@ class ResourceEditorView(MapBaseManagerView):
             if len(primary_descriptor_functions) > 0
             else None
         )
-        user_is_reviewer = user_is_resource_reviewer(request.user)
+        user_is_reviewer = user_is_resource_reviewer(
+            request.user, resource=resource_instance, graph=graph
+        )
         is_system_settings = False
         if resource_instance is None:
             tiles = []
@@ -304,14 +306,7 @@ class ResourceEditorView(MapBaseManagerView):
             graphiconclass=graph.iconclass,
             graphname=graph.name,
             ontologyclass=ontologyclass,
-            resource_graphs=(
-                models.GraphModel.objects.exclude(
-                    pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
-                )
-                .exclude(isresource=False)
-                .exclude(is_active=False)
-                .exclude(source_identifier__isnull=False)
-            ),
+            resource_graphs=models.GraphModel.objects.get_resource_models(),
             relationship_types=get_resource_relationship_types(),
             widgets=updated_widgets,
             widgets_json=JSONSerializer().serialize(updated_widgets),
@@ -488,7 +483,8 @@ class ResourcePermissionDataView(View):
                     user, resource_instance
                 ),
                 "is_editor_or_reviewer": bool(
-                    user_is_resource_editor(user) or user_is_resource_reviewer(user)
+                    user_is_resource_editor(user, resource=resource_instance)
+                    or user_is_resource_reviewer(user, resource=resource_instance)
                 ),
             }
             for user in User.objects.prefetch_related("groups")
@@ -1018,7 +1014,9 @@ class ResourceDescriptors(View):
             .exists()
         ):
             try:
-                resource = Resource.objects.get(pk=resourceid)
+                resource = Resource.objects.select_related(
+                    "graph", "resource_instance_lifecycle_state"
+                ).get(pk=resourceid)
                 if settings.ELASTICSEARCH_ENABLED:
                     se = SearchEngineFactory().create()
                     document = se.search(index=RESOURCES_INDEX, id=resourceid)
@@ -1028,6 +1026,10 @@ class ResourceDescriptors(View):
                     {
                         "graphid": document["_source"]["graph_id"],
                         "graph_name": resource.graph.name,
+                        "graph_iconclass": resource.graph.iconclass,
+                        "lifecycle_state": str(
+                            resource.resource_instance_lifecycle_state.name
+                        ),
                         "displaydescription": self.get_localized_descriptor(
                             document, "displaydescription"
                         ),
