@@ -25,6 +25,7 @@
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
+                tabindex="-1"
                 title="{% trans 'Copy' %}"
                 aria-label="{% trans 'Copy' %}"
                 data-bind="
@@ -37,6 +38,7 @@
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
+                tabindex="-1"
                 title="{% trans 'Paste' %}"
                 aria-label="{% trans 'Paste' %}"
                 data-bind="
@@ -49,6 +51,7 @@
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
+                tabindex="-1"
                 title="{% trans 'Paste as plain text' %}"
                 aria-label="{% trans 'Paste as plain text' %}"
                 data-bind="
@@ -61,6 +64,7 @@
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
+                tabindex="-1"
                 title="{% trans 'Undo' %}"
                 aria-label="{% trans 'Undo' %}"
                 data-bind="
@@ -73,6 +77,7 @@
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
+                tabindex="-1"
                 title="{% trans 'Redo' %}"
                 aria-label="{% trans 'Redo' %}"
                 data-bind="
@@ -88,6 +93,7 @@
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
+                tabindex="-1"
                 title="{% trans 'Link' %}"
                 aria-label="{% trans 'Link' %}"
                 data-bind="
@@ -100,6 +106,7 @@
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
+                tabindex="-1"
                 title="{% trans 'Unlink' %}"
                 aria-label="{% trans 'Unlink' %}"
                 data-bind="
@@ -115,6 +122,7 @@
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
+                tabindex="-1"
                 title="{% trans 'Image' %}"
                 aria-label="{% trans 'Image' %}"
                 data-bind="
@@ -128,6 +136,7 @@
                 <button
                     type="button"
                     class="rich-text-editor-toolbar-button"
+                    tabindex="-1"
                     title="{% trans 'Table' %}"
                     aria-label="{% trans 'Table' %}"
                     data-bind="
@@ -243,6 +252,7 @@
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
+                tabindex="-1"
                 title="{% trans 'Insert horizontal line' %}"
                 aria-label="{% trans 'Insert horizontal line' %}"
                 data-bind="
@@ -258,6 +268,7 @@
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
+                tabindex="-1"
                 title="{% trans 'Bold' %}"
                 aria-label="{% trans 'Bold' %}"
                 data-bind="
@@ -270,6 +281,7 @@
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
+                tabindex="-1"
                 title="{% trans 'Italic' %}"
                 aria-label="{% trans 'Italic' %}"
                 data-bind="
@@ -282,6 +294,7 @@
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
+                tabindex="-1"
                 title="{% trans 'Underline' %}"
                 aria-label="{% trans 'Underline' %}"
                 data-bind="
@@ -294,6 +307,7 @@
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
+                tabindex="-1"
                 title="{% trans 'Strikethrough' %}"
                 aria-label="{% trans 'Strikethrough' %}"
                 data-bind="
@@ -306,6 +320,7 @@
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
+                tabindex="-1"
                 title="{% trans 'Remove format' %}"
                 aria-label="{% trans 'Remove format' %}"
                 data-bind="
@@ -321,6 +336,7 @@
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
+                tabindex="-1"
                 title="{% trans 'Numbered list' %}"
                 aria-label="{% trans 'Numbered list' %}"
                 data-bind="
@@ -333,6 +349,7 @@
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
+                tabindex="-1"
                 title="{% trans 'Bulleted list' %}"
                 aria-label="{% trans 'Bulleted list' %}"
                 data-bind="
@@ -345,6 +362,7 @@
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
+                tabindex="-1"
                 title="{% trans 'Decrease indent' %}"
                 aria-label="{% trans 'Decrease indent' %}"
                 data-bind="
@@ -357,6 +375,7 @@
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
+                tabindex="-1"
                 title="{% trans 'Increase indent' %}"
                 aria-label="{% trans 'Increase indent' %}"
                 data-bind="
@@ -369,6 +388,7 @@
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
+                tabindex="-1"
                 title="{% trans 'Block quote' %}"
                 aria-label="{% trans 'Block quote' %}"
                 data-bind="
@@ -383,6 +403,7 @@
         <div class="rich-text-editor-toolbar-group">
             <select
                 class="rich-text-editor-toolbar-select"
+                tabindex="-1"
                 aria-label="{% trans 'Format' %}"
                 data-bind="
                     value: format,
@@ -402,5 +423,5 @@
         </div>
     </div>
 
-    <div class="rich-text-editor-content" data-bind="attr: {dir: direction}"></div>
+    <div class="rich-text-editor-content" data-bind="tiptap: editor, attr: {dir: direction}"></div>
 </div>
