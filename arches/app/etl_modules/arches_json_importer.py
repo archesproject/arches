@@ -1518,6 +1518,15 @@ class ArchesJsonImporter(BaseImportModule):
                         "Try again when it finishes."
                     )
                 )
+            # Checked again here because with Celery the undo runs some time after
+            # reverse() checked, and a link or edit made in between must still stop it.
+            refusal = self._undo_refusal(loadid)
+            if refusal:
+                self._release_trigger_lock(cursor)
+                LoadEvent.objects.filter(loadid=loadid).update(
+                    status=previous, error_message=refusal
+                )
+                raise RuntimeError(refusal)
             try:
                 disable_tile_triggers(cursor, loadid)
                 with transaction.atomic():

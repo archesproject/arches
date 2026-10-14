@@ -1098,6 +1098,24 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
             str(monument),
         )
 
+    def test_a_link_made_after_undo_was_requested_still_stops_it(self):
+        monument, site = uuid.uuid4(), uuid.uuid4()
+        loadid = self._load(_resource(monument, _tile(STRING_NODE, _text("Monument"))))
+        link = {
+            "resourceId": str(monument),
+            "ontologyProperty": "",
+            "inverseOntologyProperty": "",
+        }
+        self._load(_resource(site, _tile(RESOURCE_NODE, [link])))
+
+        with self.assertRaisesMessage(RuntimeError, "link to resources in it"):
+            ArchesJsonImporter(loadid=loadid).reverse_load(loadid)
+
+        self.assertTrue(ResourceInstance.objects.filter(pk=monument).exists())
+        event = LoadEvent.objects.get(loadid=loadid)
+        self.assertEqual(event.status, "completed")
+        self.assertIn("link to resources in it", event.error_message)
+
     def test_an_overwrite_load_cannot_be_undone(self):
         monument = uuid.uuid4()
         self._load(_resource(monument, _tile(STRING_NODE, _text("Monument 17"))))
