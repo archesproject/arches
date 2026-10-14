@@ -1,6 +1,7 @@
 import ko from 'knockout';
 import arches from 'arches';
-import richTextEditorToolbarTemplate from 'templates/views/components/rich-text-editor-toolbar.htm';
+import createRichTextEditor from 'utils/rich-text-editor';
+import richTextEditorTemplate from 'templates/views/components/rich-text-editor.htm';
 
 
 const writeToClipboard = async (editor, isCut) => {
@@ -95,109 +96,123 @@ const toolbarItems = {
 const textFormats = ['paragraph', 'heading1', 'heading2', 'heading3', 'heading4', 'heading5', 'heading6', 'codeBlock'];
 
 /**
-* The Tiptap rich text editor toolbar.
+* registers a rich-text-editor component: a Tiptap editor with a toolbar
+* @function external:"ko.components".rich-text-editor
 * @param {object} params
-* @param {Editor} params.editor - the Tiptap editor
-* @param {ko.observable<boolean>} params.disabled - when true, the toolbar is inert: it can't be clicked or focused
-* @param {HTMLElement} element - the component's element
+* @param {ko.observable<string>} params.value - the HTML being edited
+* @param {ko.observable<string>} [params.direction] - 'ltr' or 'rtl'; defaults to the active language's direction
+* @param {string} [params.placeholder] - shown when the editor is empty
+* @param {ko.observable<boolean>} [params.disabled] - when true, the editor is read-only and the toolbar is inert
 */
-const RichTextEditorToolbar = function(params, element) {
-    const editor = params.editor;
+export default ko.components.register('views/components/rich-text-editor', {
+    viewModel: function(params) {
+        const { editor, getValue, setContent } = createRichTextEditor({
+            content: ko.unwrap(params.value),
+            editable: !ko.unwrap(params.disabled),
+            placeholder: ko.unwrap(params.placeholder),
+        });
+        let element;
 
-    this.disabled = params.disabled;
-    this.isTableMenuOpen = ko.observable(false);
+        this.direction = params.direction || arches.activeLanguageDir;
+        this.disabled = params.disabled;
+        this.isTableMenuOpen = ko.observable(false);
 
-    // get isDisabled and isActive for each item name
-    const getState = () => Object.fromEntries(Object.entries(toolbarItems).map(([name, item]) => [name, {
-        isDisabled: item.isDisabled?.(editor) ?? false,
-        isActive: item.isActive?.(editor) ?? false,
-    }]));
-
-    // updated after every change to the editor's content or selection
-    this.state = ko.observable(getState());
-    const onTransaction = () => this.state(getState());
-    editor.on('transaction', onTransaction);
-
-    this.format = ko.pureComputed(() => textFormats.find(name => this.state()[name].isActive) ?? '');
-    console.log(this.format);
-
-    this.run = name => () => {
-        const item = toolbarItems[name];
-        console.log(item, name);
-        this.isTableMenuOpen(false);
-        if (item.action) {
-            item.action(editor);
-        } else {
-            item.command(editor.chain().focus()).run();
+        // keep the value and the editor in sync
+        editor.on('update', () => params.value(getValue()));
+        const subscriptions = [params.value.subscribe(setContent)];
+        if (ko.isObservable(params.disabled)) {
+            subscriptions.push(params.disabled.subscribe(disabled => editor.setEditable(!disabled, false)));
         }
-    };
 
-    this.onTextFormatChange = (_data, event) => {
-        this.run(event.target.value)();
-    };
+        // get isDisabled and isActive for each item name
+        const getState = () => Object.fromEntries(Object.entries(toolbarItems).map(([name, item]) => [name, {
+            isDisabled: item.isDisabled?.(editor) ?? false,
+            isActive: item.isActive?.(editor) ?? false,
+        }]));
 
-    // roving tabindex: only the most recently focused control is in the tab order
-    const getControls = () => Array.from(element.querySelectorAll('.rich-text-editor-toolbar-button, .rich-text-editor-toolbar-select'));
+        // updated after every change to the editor's content or selection
+        this.state = ko.observable(getState());
+        editor.on('transaction', () => this.state(getState()));
 
-    const setCurrentControl = (control) => {
-        getControls().forEach((c) => { c.tabIndex = c === control ? 0 : -1; });
-    };
+        this.format = ko.pureComputed(() => textFormats.find(name => this.state()[name].isActive) ?? '');
+        console.log(this.format);
 
-    this.onFocusIn = (_data, event) => {
-        if (getControls().includes(event.target)) {
-            setCurrentControl(event.target);
-        }
-        return true;
-    };
-
-    this.onKeydown = (_data, event) => {
-        const controls = getControls();
-        const index = controls.indexOf(document.activeElement);
-        const moveTo = index === -1 ? undefined : {
-            ArrowRight: (index + 1) % controls.length,
-            ArrowLeft: (index - 1 + controls.length) % controls.length,
-            Home: 0,
-            End: controls.length - 1,
-        }[event.key];
-        if (moveTo !== undefined) {
-            controls[moveTo].focus();
-        } else if (event.key === 'Escape' && this.isTableMenuOpen()) {
+        this.run = name => () => {
+            const item = toolbarItems[name];
+            console.log(item, name);
             this.isTableMenuOpen(false);
-            element.querySelector('.rich-text-editor-toolbar-menu > button').focus();
-        } else if (event.key === 'Escape') {
-            editor.commands.focus();
-        } else {
+            if (item.action) {
+                item.action(editor);
+            } else {
+                item.command(editor.chain().focus()).run();
+            }
+        };
+
+        this.onTextFormatChange = (_data, event) => {
+            this.run(event.target.value)();
+        };
+
+        // roving tabindex: only the most recently focused control is in the tab order
+        const getControls = () => Array.from(element.querySelectorAll('.rich-text-editor-toolbar-button, .rich-text-editor-toolbar-select'));
+
+        const setCurrentControl = (control) => {
+            getControls().forEach((c) => { c.tabIndex = c === control ? 0 : -1; });
+        };
+
+        this.onFocusIn = (_data, event) => {
+            if (getControls().includes(event.target)) {
+                setCurrentControl(event.target);
+            }
             return true;
-        }
-    };
+        };
 
-    // the table menu is a disclosure: a button showing a list of buttons, closed when focus or a click leaves it
-    this.toggleTableMenu = () => {
-        this.isTableMenuOpen(!this.isTableMenuOpen());
-    };
+        this.onKeydown = (_data, event) => {
+            const controls = getControls();
+            const index = controls.indexOf(document.activeElement);
+            const moveTo = index === -1 ? undefined : {
+                ArrowRight: (index + 1) % controls.length,
+                ArrowLeft: (index - 1 + controls.length) % controls.length,
+                Home: 0,
+                End: controls.length - 1,
+            }[event.key];
+            if (moveTo !== undefined) {
+                controls[moveTo].focus();
+            } else if (event.key === 'Escape' && this.isTableMenuOpen()) {
+                this.isTableMenuOpen(false);
+                element.querySelector('.rich-text-editor-toolbar-menu > button').focus();
+            } else if (event.key === 'Escape') {
+                editor.commands.focus();
+            } else {
+                return true;
+            }
+        };
 
-    const closeTableMenuIfOutside = (event) => {
-        if (!element.querySelector('.rich-text-editor-toolbar-menu')?.contains(event.target)) {
-            this.isTableMenuOpen(false);
-        }
-    };
-    document.addEventListener('focusin', closeTableMenuIfOutside);
-    document.addEventListener('pointerdown', closeTableMenuIfOutside);
+        // the table menu is a disclosure: a button showing a list of buttons, closed when focus or a click leaves it
+        this.toggleTableMenu = () => {
+            this.isTableMenuOpen(!this.isTableMenuOpen());
+        };
 
-    this.koDescendantsComplete = () => {
-        setCurrentControl(getControls()[0]);
-    };
+        const closeTableMenuIfOutside = (event) => {
+            if (!element?.querySelector('.rich-text-editor-toolbar-menu').contains(event.target)) {
+                this.isTableMenuOpen(false);
+            }
+        };
+        document.addEventListener('focusin', closeTableMenuIfOutside);
+        document.addEventListener('pointerdown', closeTableMenuIfOutside);
 
-    this.dispose = () => {
-        editor.off('transaction', onTransaction);
-        document.removeEventListener('focusin', closeTableMenuIfOutside);
-        document.removeEventListener('pointerdown', closeTableMenuIfOutside);
-    };
-};
+        // once the template is rendered, attach the editor to its editing area
+        this.koDescendantsComplete = (node) => {
+            element = node;
+            editor.mount(element.querySelector('.rich-text-editor-content'));
+            setCurrentControl(getControls()[0]);
+        };
 
-export default ko.components.register('views/components/rich-text-editor-toolbar', {
-    viewModel: {
-        createViewModel: (params, componentInfo) => new RichTextEditorToolbar(params, componentInfo.element),
+        this.dispose = () => {
+            subscriptions.forEach(subscription => subscription.dispose());
+            editor.destroy();
+            document.removeEventListener('focusin', closeTableMenuIfOutside);
+            document.removeEventListener('pointerdown', closeTableMenuIfOutside);
+        };
     },
-    template: richTextEditorToolbarTemplate,
+    template: richTextEditorTemplate,
 });

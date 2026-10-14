@@ -5,7 +5,7 @@ import _ from 'underscore';
 import WidgetViewModel from 'viewmodels/widget';
 import arches from 'arches';
 import richTextWidgetTemplate from 'templates/views/components/widgets/rich-text.htm';
-import 'bindings/tiptap';
+import 'views/components/rich-text-editor';
 import 'bindings/chosen';
 
 
