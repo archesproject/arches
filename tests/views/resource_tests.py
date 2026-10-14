@@ -377,6 +377,40 @@ class ResourceViewTests(ArchesTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
+    def test_resource_descriptors_include_graph_icon_and_lifecycle_state(self):
+        self.client.login(username="admin", password="admin")
+        resource = ResourceInstance.objects.select_related(
+            "graph", "resource_instance_lifecycle_state"
+        ).get(pk=self.resource_instance_id)
+        localized_value = [{"language": "en", "value": "Value"}]
+        document = {
+            "_source": {
+                "graph_id": str(resource.graph_id),
+                "displayname": localized_value,
+                "displaydescription": localized_value,
+                "map_popup": localized_value,
+                "geometries": [],
+                "permissions": {},
+            }
+        }
+        url = reverse(
+            "resource_descriptors", kwargs={"resourceid": self.resource_instance_id}
+        )
+
+        with patch(
+            "arches.app.views.resource.SearchEngineFactory.create"
+        ) as create_search_engine:
+            create_search_engine.return_value.search.return_value = document
+            response = self.client.get(url)
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        descriptors = response.json()
+        self.assertEqual(descriptors["graph_iconclass"], resource.graph.iconclass)
+        self.assertEqual(
+            descriptors["lifecycle_state"],
+            str(resource.resource_instance_lifecycle_state.name),
+        )
+
     def test_resource_report_missing_resource(self):
         self.client.login(username="sam", password="Test12345!")
         response = self.client.get(

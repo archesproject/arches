@@ -4,7 +4,11 @@ import type { FeatureCollection } from "geojson";
 import type { CardXNodeXWidgetData } from "@/arches_vue_components/types.ts";
 import type { BaseWidgetProps } from "@/arches_vue_components/widgets/types.ts";
 import type { GeoJSONFeatureCollectionAliasedNodeData } from "@/arches_vue_components/datatypes/geojson-feature-collection/types.ts";
-import type { MapInteractionTool } from "@/arches_vue_components/components/MapComponent/types.ts";
+import type {
+    CoordinateReadoutFormat,
+    MapInteractionTool,
+    MapScaleUnit,
+} from "@/arches_vue_components/components/MapComponent/types.ts";
 
 export interface GeometryTypeConfig {
     id: string;
@@ -26,6 +30,16 @@ export interface MapWidgetConfig {
     geometryTypes?: GeometryTypeConfig[];
     geocoderVisible?: boolean;
     geocodePlaceholder?: string;
+    showCursorCoordinates?: boolean;
+    coordinateReadoutSrid?: string;
+    coordinateReadoutFormat?: CoordinateReadoutFormat;
+    showMapScale?: boolean;
+    mapScaleUnit?: MapScaleUnit;
+    showZoomLevel?: boolean;
+    scrollZoomRequiresKey?: boolean;
+    allow3d?: boolean;
+    showNavigationControl?: boolean;
+    showFullscreenControl?: boolean;
     overlayConfigs?: unknown[];
     overlayOpacity?: number;
     maxDrawnFeatures?: number;
