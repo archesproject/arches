@@ -24,6 +24,10 @@ from django.utils.translation import gettext_lazy as _
 
 from arches.app.const import ExtensionType
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
+from arches.app.models.fields.database_managed_fields import (
+    DatabaseTimestampField,
+    NonPrimaryIdentityField,
+)
 from arches.app.models.mixins import SaveSupportsBlindOverwriteMixin
 from arches.app.models.query_expressions import UUID4
 from arches.app.models.querysets.graph import GraphModelQuerySet
@@ -1455,6 +1459,7 @@ class ResourceXResource(SaveSupportsBlindOverwriteMixin, models.Model):
 
 
 class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
+    id = NonPrimaryIdentityField(sequence_name="resource_instances_id_seq")
     resourceinstanceid = models.UUIDField(
         primary_key=True, blank=True, default=uuid.uuid4, db_default=UUID4()
     )
@@ -1471,7 +1476,7 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
     name = I18n_TextField(blank=True, null=True, editable=False)
     descriptors = models.JSONField(blank=True, null=True, editable=False)
     legacyid = models.TextField(blank=True, unique=True, null=True, editable=False)
-    createdtime = models.DateTimeField(auto_now_add=True)
+    createdtime = DatabaseTimestampField()
     resource_instance_lifecycle_state = models.ForeignKey(
         blank=True,
         on_delete=models.PROTECT,
@@ -1489,6 +1494,7 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
     principaluser = models.ForeignKey(
         User, on_delete=models.SET_NULL, blank=True, null=True, editable=False
     )
+    updated = DatabaseTimestampField()
 
     class Meta:
         managed = True
@@ -1557,6 +1563,7 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
 
         kwargs = add_to_update_fields(kwargs, "resource_instance_lifecycle_state")
         kwargs = add_to_update_fields(kwargs, "graph_publication")
+        kwargs = add_to_update_fields(kwargs, "updated")
         super(ResourceInstance, self).save(**kwargs)
 
         if should_update_resource_instance_lifecycle_state:
@@ -1952,6 +1959,7 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
 
     """
 
+    id = NonPrimaryIdentityField(sequence_name="tiles_id_seq")
     tileid = models.UUIDField(
         primary_key=True, blank=True, default=uuid.uuid4, db_default=UUID4()
     )
@@ -1980,6 +1988,8 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
     )
     sortorder = models.IntegerField(blank=True, null=True, default=0)
     provisionaledits = JSONField(blank=True, null=True, db_column="provisionaledits")
+    createdtime = DatabaseTimestampField()
+    updated = DatabaseTimestampField()
 
     class Meta:
         managed = True
@@ -2029,6 +2039,7 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
         if not self.tileid:
             self.tileid = uuid.uuid4()
             kwargs = add_to_update_fields(kwargs, "tileid")
+        kwargs = add_to_update_fields(kwargs, "updated")
 
         # Query for this first instead of during a transaction rollback.
         nodegroup_alias = self.find_nodegroup_alias()
