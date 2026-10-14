@@ -56,13 +56,16 @@
         </div>
         <div class="col-xs-12">
             <div
-                data-bind="
-                    tiptap: currentText,
-                    direction: currentDirection,
-                    placeholder: currentPlaceholder,
-                    ariaLabel: label,
-                    attr: {disabled: disabled}
-                "></div>
+                data-bind="component: {
+                    name: 'views/components/rich-text-editor',
+                    params: {
+                        value: currentText,
+                        direction: currentDirection,
+                        placeholder: currentPlaceholder,
+                        disabled: disabled
+                    }
+                }"
+            ></div>
         </div>
     </div>
 </div>
@@ -74,14 +77,15 @@
 </div>
 
 <div
-    data-bind="
-        tiptap: defaultText,
-        isConfigForm: true,
-        direction: currentDirection,
-        placeholder: currentPlaceholder,
-        ariaLabel: $root.translations.placeholder,
-        attr: {disabled: disabled}
-    "
+    data-bind="component: {
+        name: 'views/components/rich-text-editor',
+        params: {
+            value: defaultText,
+            direction: currentDirection,
+            placeholder: currentPlaceholder,
+            disabled: disabled
+        }
+    }"
 ></div>
 {% endblock config_form %}
 
