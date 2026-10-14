@@ -79,6 +79,7 @@ var ConceptSelectViewModel = function(params) {
     this.select2Config = {
         value: self.value,
         clickBubble: true,
+        disabled: self.disable,
         multiple: self.multiple,
         closeOnSelect: true,
         placeholder: self.placeholder,

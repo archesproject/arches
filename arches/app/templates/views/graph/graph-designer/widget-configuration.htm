@@ -51,6 +51,28 @@
             </div>
         </div>
 
+        <!-- ko if: $data.config.uneditable !== undefined -->
+        <div class="node-config-item">
+            <div class="control-label">
+                {% trans "Disabled" %}
+            </div>
+            <div class="pad-no">
+                <div
+                    data-bind="component: {
+                        name: 'views/components/simple-switch',
+                        params: {
+                            value: $data.config.uneditable,
+                            config: {
+                                label: {% quoted_trans _("Disable Editing") %},
+                                subtitle: {% quoted_trans _("Prevent users from editing value") %}
+                            }
+                        }
+                    }"
+                ></div>
+            </div>
+        </div>
+        <!-- /ko -->
+
         <!-- ko if: ko.unwrap($data.widget_id)  -->
         <div class="widget-config-container" style="margin-top: 5px;" data-bind='component: {
             name: $data.widgetLookup[ko.unwrap($data.widget_id)].name,

@@ -93,6 +93,7 @@ var NodeValueSelectViewModel = function(params) {
     this.select2Config = {
         value: this.value,
         clickBubble: true,
+        disabled: this.disable,
         multiple: this.multiple,
         placeholder: this.placeholder,
         allowClear: true,
