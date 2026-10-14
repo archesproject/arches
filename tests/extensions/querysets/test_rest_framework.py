@@ -369,6 +369,45 @@ class RestFrameworkTests(GraphTestCase):
             "Child tile aliased_data must be refreshed after resource PUT, not stale",
         )
 
+    def test_resource_put_keeps_tiles_the_user_cannot_read(self):
+        readable_nodegroup_ids = {
+            str(nodegroup_id)
+            for nodegroup_id in Node.objects.filter(graph=self.graph)
+            .exclude(nodegroup=None)
+            .values_list("nodegroup_id", flat=True)
+        }
+        readable_nodegroup_ids.discard(str(self.nodegroup_n.pk))
+        unreadable_tiles = TileModel.objects.filter(
+            resourceinstance=self.resource_42, nodegroup=self.nodegroup_n
+        )
+        readable_tiles = TileModel.objects.filter(
+            resourceinstance=self.resource_42, nodegroup=self.nodegroup_1
+        )
+        unreadable_tile_count = unreadable_tiles.count()
+        self.assertGreater(unreadable_tile_count, 0)
+        self.assertGreater(readable_tiles.count(), 0)
+
+        self.client.login(username="dev", password="dev")
+        with patch(
+            "arches.app.models.models.UserProfile.viewable_nodegroups",
+            readable_nodegroup_ids,
+        ):
+            response = self.client.put(
+                reverse(
+                    "arches_querysets:api-resource",
+                    kwargs={
+                        "graph": "datatype_lookups",
+                        "pk": str(self.resource_42.pk),
+                    },
+                ),
+                {"aliased_data": {}},
+                content_type="application/json",
+            )
+
+        self.assertEqual(response.status_code, HTTPStatus.OK, response.json())
+        self.assertEqual(unreadable_tiles.count(), unreadable_tile_count)
+        self.assertEqual(readable_tiles.count(), 0)
+
     def test_resource_put_keeps_incoming_sortorder_for_new_tiles(self):
         next_sortorder = (
             max(
