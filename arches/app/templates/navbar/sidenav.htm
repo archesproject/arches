@@ -40,6 +40,7 @@
         {% endif %}
 
         <!-- Search -->
+        {% if app_settings.ELASTICSEARCH_ENABLED %}
         <li {% if "views/search" in main_script %} class="active-sub" {% endif %}>
             <a href="{% url 'search_home' %}" aria-labelledby="search-link-label"
                 data-bind="click:function () { navigate('{% url 'search_home' %}') }">
@@ -49,6 +50,7 @@
                 </span>
             </a>
         </li>
+        {% endif %}
 
         <!-- New Resource -->
         {% if user_can_edit %}

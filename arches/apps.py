@@ -76,6 +76,32 @@ def check_cache_backend(app_configs, **kwargs):
 
 
 @register(Tags.compatibility)
+def check_elasticsearch_disabled_permission_framework(app_configs, **kwargs):
+    """
+    The default allow permission framework resolves per-user restrictions against
+    the Elasticsearch resource index and has no database equivalent, so it cannot
+    be used with Elasticsearch disabled.
+    """
+    errors = []
+    if settings.ELASTICSEARCH_ENABLED:
+        return errors
+    if "arches_default_allow" in settings.PERMISSION_FRAMEWORK:
+        errors.append(
+            Error(
+                "PERMISSION_FRAMEWORK is incompatible with ELASTICSEARCH_ENABLED = False",
+                hint=(
+                    "The default allow framework requires Elasticsearch. Use "
+                    "'arches_default_deny.ArchesDefaultDenyPermissionFramework', or set "
+                    "ELASTICSEARCH_ENABLED = True."
+                ),
+                obj=settings.APP_NAME,
+                id="arches.E004",
+            )
+        )
+    return errors
+
+
+@register(Tags.compatibility)
 def check_arches_compatibility(app_configs, **kwargs):
     def read_project_requirements_from_toml_file(config: AppConfig):
         with open(Path(config.path).parent / "pyproject.toml", "rb") as f:

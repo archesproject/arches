@@ -16,6 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+from django.contrib.gis.db.models import Extent
+from django.contrib.gis.db.models.functions import Transform
 from django.db import transaction
 from django.shortcuts import render
 from django.http import Http404
@@ -34,15 +36,11 @@ from arches.app.utils.permission_backend import (
     get_users_with_permission_for_object,
     get_groups_with_permission_for_object,
 )
-from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Query, Bool, GeoBoundsAgg, Term
-from arches.app.search.mappings import RESOURCES_INDEX
 
 
 @method_decorator(group_required("Application Administrator"), name="dispatch")
 class MapLayerManagerView(MapBaseManagerView):
     def get(self, request):
-        se = SearchEngineFactory().create()
         datatype_factory = DataTypeFactory()
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
@@ -58,18 +56,17 @@ class MapLayerManagerView(MapBaseManagerView):
         )
 
         def get_resource_bounds(node):
-            query = Query(se, start=0, limit=0)
-            search_query = Bool()
-            query.add_query(search_query)
-            query.add_aggregation(GeoBoundsAgg(field="points.point", name="bounds"))
-            query.add_query(Term(field="graph_id", term=str(node.graph.graphid)))
-            results = query.search(index=RESOURCES_INDEX)
-            bounds = (
-                results["aggregations"]["bounds"]["bounds"]
-                if "bounds" in results["aggregations"]["bounds"]
-                else None
-            )
-            return bounds
+            # Same shape as an Elasticsearch geo_bounds aggregation, which the front end expects.
+            extent = models.GeoJSONGeometry.objects.filter(node=node).aggregate(
+                extent=Extent(Transform("geom", 4326))
+            )["extent"]
+            if extent is None:
+                return None
+            west, south, east, north = extent
+            return {
+                "top_left": {"lat": north, "lon": west},
+                "bottom_right": {"lat": south, "lon": east},
+            }
 
         context["geom_nodes_json"] = JSONSerializer().serialize(context["geom_nodes"])
         resource_layers = []

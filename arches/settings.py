@@ -63,9 +63,20 @@ ANONYMOUS_USER_NAME = None
 ELASTICSEARCH_HTTP_PORT = (
     9200  # this should be in increments of 200, eg: 9400, 9600, 9800
 )
+
+# Set to False to run Arches without an Elasticsearch instance. Intended for
+# projects that supply their own search implementation (e.g. a PostgreSQL-backed
+# Arches application). When False:
+#   - SearchEngineFactory returns a no-op engine and all indexing is discarded
+#   - the core search views return 404 and the core search nav links are hidden
+#   - RDM/concept search and term autocomplete return no results
+#   - Elasticsearch snapshot/restore is unavailable
+#   - the default allow permission framework cannot be used
+ELASTICSEARCH_ENABLED = True
+
 SEARCH_BACKEND = "arches.app.search.search.SearchEngine"
 SEARCH_THUMBNAILS = False
-# see http://elasticsearch-py.readthedocs.org/en/master/api.html#elasticsearch.Elasticsearch
+# see http://elasticsearch-py.readthedocs.org/en/stable/api.html#elasticsearch.Elasticsearch
 ELASTICSEARCH_HOSTS = [
     {"scheme": "https", "host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}
 ]
@@ -682,7 +693,7 @@ RELATED_RESOURCES_EXPORT_LIMIT = 10000
 SEARCH_DROPDOWN_LENGTH = 100
 
 # a lower number will give more "Fuzzy" matches, recomend between 0-4,
-# see "prefix_length" at https://www.elastic.co/guide/en/elasticsearch/reference/6.7/query-dsl-fuzzy-query.html#_parameters_7
+# see "prefix_length" at https://www.elastic.co/docs/reference/query-languages/query-dsl/query-dsl-fuzzy-query
 SEARCH_TERM_SENSITIVITY = 3
 
 WORDS_PER_SEARCH_TERM = (
@@ -783,6 +794,8 @@ ENABLE_TWO_FACTOR_AUTHENTICATION = False
 
 # If True, users cannot log in unless they have enabled two-factor authentication
 FORCE_TWO_FACTOR_AUTHENTICATION = False
+
+LOGIN_REDIRECT_URL = "home"
 
 # bounds for search results hex binning fabric (search grid).
 # a smaller bbox will give you less distortion in hexes and better performance

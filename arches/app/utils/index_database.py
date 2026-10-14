@@ -49,6 +49,10 @@ def index_db(
     recalculate_descriptors - forces the primary descriptors to be recalculated before (re)indexing
     """
 
+    if not settings.ELASTICSEARCH_ENABLED:
+        logger.info("Elasticsearch is disabled; skipping database indexing.")
+        return
+
     index_concepts(clear_index=clear_index, batch_size=batch_size)
     index_resources(
         clear_index=clear_index,

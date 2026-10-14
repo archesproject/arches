@@ -211,7 +211,9 @@ class ResourceEditorView(MapBaseManagerView):
             if len(primary_descriptor_functions) > 0
             else None
         )
-        user_is_reviewer = user_is_resource_reviewer(request.user)
+        user_is_reviewer = user_is_resource_reviewer(
+            request.user, resource=resource_instance, graph=graph
+        )
         is_system_settings = False
         if resource_instance is None:
             tiles = []
@@ -304,14 +306,7 @@ class ResourceEditorView(MapBaseManagerView):
             graphiconclass=graph.iconclass,
             graphname=graph.name,
             ontologyclass=ontologyclass,
-            resource_graphs=(
-                models.GraphModel.objects.exclude(
-                    pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
-                )
-                .exclude(isresource=False)
-                .exclude(is_active=False)
-                .exclude(source_identifier__isnull=False)
-            ),
+            resource_graphs=models.GraphModel.objects.get_resource_models(),
             relationship_types=get_resource_relationship_types(),
             widgets=updated_widgets,
             widgets_json=JSONSerializer().serialize(updated_widgets),
@@ -488,7 +483,8 @@ class ResourcePermissionDataView(View):
                     user, resource_instance
                 ),
                 "is_editor_or_reviewer": bool(
-                    user_is_resource_editor(user) or user_is_resource_reviewer(user)
+                    user_is_resource_editor(user, resource=resource_instance)
+                    or user_is_resource_reviewer(user, resource=resource_instance)
                 ),
             }
             for user in User.objects.prefetch_related("groups")
@@ -954,6 +950,63 @@ class ResourceDescriptors(View):
                     return entry["value"]
         return result["value"]
 
+    def get_source_from_db(self, resource):
+        """
+        Rebuilds the subset of the resource index document this view needs, using
+        only the database. Used when settings.ELASTICSEARCH_ENABLED is False.
+        """
+        descriptor_keys = {
+            "displayname": "name",
+            "displaydescription": "description",
+            "map_popup": "map_popup",
+        }
+        source = {document_key: [] for document_key in descriptor_keys}
+        for language, values in (resource.descriptors or {}).items():
+            for document_key, descriptor_key in descriptor_keys.items():
+                value = values.get(descriptor_key)
+                if value:
+                    source[document_key].append({"value": value, "language": language})
+
+        # mirrors the permissions section built by Resource.get_documents_to_index()
+        permissions = {
+            "principal_user": (
+                [int(resource.principaluser_id)] if resource.principaluser_id else []
+            )
+        }
+        permissions.update(apb.get_index_values(resource))
+
+        source["graph_id"] = str(resource.graph_id)
+        source["permissions"] = permissions
+        source["geometries"] = self.get_geometries_from_db(resource)
+        return source
+
+    def get_geometries_from_db(self, resource):
+        """
+        Builds the index document's "geometries" section from the resource's tiles,
+        reusing the geojson datatype so the shape matches the indexed document.
+        """
+        geojson_nodes = models.Node.objects.filter(
+            graph_id=resource.graph_id, datatype="geojson-feature-collection"
+        )
+        nodeids = {str(node.nodeid) for node in geojson_nodes}
+        if not nodeids:
+            return []
+
+        document = {"geometries": [], "points": []}
+        datatype_instance = DataTypeFactory().get_instance("geojson-feature-collection")
+        tiles = models.TileModel.objects.filter(
+            resourceinstance_id=resource.pk,
+            nodegroup_id__in={node.nodegroup_id for node in geojson_nodes},
+        )
+        for tile in tiles:
+            for nodeid, nodevalue in tile.data.items():
+                if nodeid in nodeids and nodevalue:
+                    datatype_instance.append_to_document(
+                        document, nodevalue, nodeid, tile
+                    )
+
+        return document["geometries"]
+
     def get(self, request, resourceid=None):
         if (
             Resource.objects.filter(pk=resourceid)
@@ -962,8 +1015,11 @@ class ResourceDescriptors(View):
         ):
             try:
                 resource = Resource.objects.get(pk=resourceid)
-                se = SearchEngineFactory().create()
-                document = se.search(index=RESOURCES_INDEX, id=resourceid)
+                if settings.ELASTICSEARCH_ENABLED:
+                    se = SearchEngineFactory().create()
+                    document = se.search(index=RESOURCES_INDEX, id=resourceid)
+                else:
+                    document = {"_source": self.get_source_from_db(resource)}
                 return JSONResponse(
                     {
                         "graphid": document["_source"]["graph_id"],
