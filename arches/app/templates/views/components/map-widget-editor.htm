@@ -85,7 +85,7 @@
                                             options: widget.drawTools,
                                             optionsText: 'text',
                                             optionsValue: 'value',
-                                                disable: disable,
+                                                disable: disabled,
                                             chosen: {
                                                 'width': '100%',
                                                 'disable_search_threshold': 10,
@@ -138,7 +138,7 @@
                                             <td>
                                                 <span class="map-card-feature-name" data-bind="text: feature.geometry.type"></span>
                                             </td>
-                                            <td class="map-card-feature-tool" data-bind="css: {'state-disabled': self.disable()}">
+                                            <td class="map-card-feature-tool" data-bind="css: {'state-disabled': self.disabled()}">
                                                 <a href="javascript:void(0);" role="button" data-bind="click: function() { self.editFeature(feature) }, clickBubble: false,
                                                     attr: {'aria-label': $root.translations.editFeature}
                                                 ">
@@ -146,7 +146,7 @@
                                                     <span data-bind="text: $root.translations.edit"></span>
                                                 </a>
                                             </td>
-                                            <td class="map-card-feature-tool" data-bind="css: {'state-disabled': self.disable()}">
+                                            <td class="map-card-feature-tool" data-bind="css: {'state-disabled': self.disabled()}">
                                                 <a href="javascript:void(0);" role="button" data-bind="click: function() { self.deleteFeature(feature) }, clickBubble: false,
                                                     attr: {'aria-label': $root.translations.deleteFeature}
                                                 ">

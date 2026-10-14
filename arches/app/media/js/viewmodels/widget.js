@@ -45,7 +45,7 @@ var WidgetViewModel = function(params) {
             return ko.unwrap(self.value);
         }
     });
-    this.disabled = params.disabled || ko.observable(false);
+    const _disabled = params.disabled || ko.observable(false);
     this.node = params.node || null;
     this.configForm = params.configForm || false;
     this.config = params.config || ko.observable({});
@@ -121,8 +121,8 @@ var WidgetViewModel = function(params) {
         this.defaultValue = ko.observable(null);
     }
 
-    this.disable = ko.pureComputed(function() {
-        return ko.unwrap(self.disabled) || !!ko.unwrap(self.uneditable);
+    this.disabled = ko.pureComputed(function() {
+        return ko.unwrap(_disabled) || !!ko.unwrap(self.uneditable);
     });
 
     if (ko.isObservable(this.value) && ko.isObservable(this.defaultValue)) {

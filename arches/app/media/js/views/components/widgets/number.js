@@ -44,7 +44,7 @@ var NumberWidget = function(params) {
         return val || self.value() || null;
     }, self).extend({throttle: 600});
 
-    if (!this.preview && !ko.unwrap(this.disable)) {
+    if (!this.preview && !ko.unwrap(this.disabled)) {
         this.value(Number(this.updateVal()));
     }
 

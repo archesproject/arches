@@ -41,7 +41,7 @@
                         name="language"
                         data-bind="
                             value: currentDirection,
-                            disable: disable,
+                            disable: disabled,
                             chosen: {'width':'100%'},
                             optionsText: 'text',
                             optionsValue: 'value',
@@ -68,7 +68,7 @@
                         entities_greek: false
                     },
                     valueUpdate: 'afterkeydown',
-                    attr: {disabled: disable}
+                    attr: {disabled: disabled}
                 "></textarea>
         </div>
     </div>

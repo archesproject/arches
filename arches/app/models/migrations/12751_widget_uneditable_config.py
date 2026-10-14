@@ -22,7 +22,7 @@ def add_uneditable_to_widgets(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("models", "12779_add_multicard_resource_descriptor"),
+        ("models", "13001_spatialview_dbroles"),
     ]
 
     operations = [

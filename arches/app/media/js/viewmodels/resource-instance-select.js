@@ -307,7 +307,7 @@ var ResourceInstanceSelectViewModel = function(params) {
     this.resourceToAdd = ko.observable(null);
 
     // also lock the widget while graphs download or the form is locked.
-    // widget.js's self.disable reads self.disabled, so it picks up these conditions too.
+    // widget.js's self.disabled reads _disabled, so it picks up these conditions too.
     const widgetDisabled = this.disabled;
     this.disabled = ko.pureComputed(function() {
         return ko.unwrap(self.waitingForGraphToDownload)
@@ -325,7 +325,7 @@ var ResourceInstanceSelectViewModel = function(params) {
     this.select2Config = {
         value: self.onlyManageResourceIds ? self.value : self.resourceToAdd,
         clickBubble: true,
-        disabled: this.disable,
+        disabled: this.disabled,
         multiple: !self.displayOntologyTable ? params.multiple : false,
         placeholder: this.placeholder() || arches.translations.riSelectPlaceholder,
         closeOnSelect: true,
