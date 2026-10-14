@@ -2,6 +2,7 @@ import ko from 'knockout';
 import arches from 'arches';
 import createRichTextEditor from 'utils/rich-text-editor';
 import richTextEditorTemplate from 'templates/views/components/rich-text-editor.htm';
+import 'bindings/tiptap';
 
 
 const writeToClipboard = async (editor, isCut) => {
@@ -111,8 +112,8 @@ export default ko.components.register('views/components/rich-text-editor', {
             editable: !ko.unwrap(params.disabled),
             placeholder: ko.unwrap(params.placeholder),
         });
-        let element;
 
+        this.editor = editor;
         this.direction = params.direction || arches.activeLanguageDir;
         this.disabled = params.disabled;
         this.isTableMenuOpen = ko.observable(false);
@@ -153,21 +154,18 @@ export default ko.components.register('views/components/rich-text-editor', {
         };
 
         // roving tabindex: only the most recently focused control is in the tab order
-        const getControls = () => Array.from(element.querySelectorAll('.rich-text-editor-toolbar-button, .rich-text-editor-toolbar-select'));
-
-        const setCurrentControl = (control) => {
-            getControls().forEach((c) => { c.tabIndex = c === control ? 0 : -1; });
-        };
+        const getControls = toolbar => Array.from(toolbar.querySelectorAll('.rich-text-editor-toolbar-button, .rich-text-editor-toolbar-select'));
 
         this.onFocusIn = (_data, event) => {
-            if (getControls().includes(event.target)) {
-                setCurrentControl(event.target);
+            const controls = getControls(event.currentTarget);
+            if (controls.includes(event.target)) {
+                controls.forEach((control) => { control.tabIndex = control === event.target ? 0 : -1; });
             }
             return true;
         };
 
         this.onKeydown = (_data, event) => {
-            const controls = getControls();
+            const controls = getControls(event.currentTarget);
             const index = controls.indexOf(document.activeElement);
             const moveTo = index === -1 ? undefined : {
                 ArrowRight: (index + 1) % controls.length,
@@ -179,7 +177,7 @@ export default ko.components.register('views/components/rich-text-editor', {
                 controls[moveTo].focus();
             } else if (event.key === 'Escape' && this.isTableMenuOpen()) {
                 this.isTableMenuOpen(false);
-                element.querySelector('.rich-text-editor-toolbar-menu > button').focus();
+                event.currentTarget.querySelector('.rich-text-editor-toolbar-menu > button').focus();
             } else if (event.key === 'Escape') {
                 editor.commands.focus();
             } else {
@@ -193,19 +191,12 @@ export default ko.components.register('views/components/rich-text-editor', {
         };
 
         const closeTableMenuIfOutside = (event) => {
-            if (!element?.querySelector('.rich-text-editor-toolbar-menu').contains(event.target)) {
+            if (!event.target.closest('.rich-text-editor-toolbar-menu')) {
                 this.isTableMenuOpen(false);
             }
         };
         document.addEventListener('focusin', closeTableMenuIfOutside);
         document.addEventListener('pointerdown', closeTableMenuIfOutside);
-
-        // once the template is rendered, attach the editor to its editing area
-        this.koDescendantsComplete = (node) => {
-            element = node;
-            editor.mount(element.querySelector('.rich-text-editor-content'));
-            setCurrentControl(getControls()[0]);
-        };
 
         this.dispose = () => {
             subscriptions.forEach(subscription => subscription.dispose());
