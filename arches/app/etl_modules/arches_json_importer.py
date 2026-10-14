@@ -1324,7 +1324,9 @@ class ArchesJsonImporter(BaseImportModule):
         for nodeid, value in data.items():
             if graph["nodes"].get(nodeid, {}).get("datatype") != "file-list":
                 continue
-            for item in value or []:
+            if not isinstance(value, list):
+                continue
+            for item in value:
                 if isinstance(item, dict) and item.get("file_id"):
                     file_ids.append(str(item["file_id"]).lower())
         return file_ids

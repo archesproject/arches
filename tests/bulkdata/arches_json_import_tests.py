@@ -651,6 +651,14 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
         self.assertIn("already belongs to resource", self._errors(loadid))
         self.assertFalse(ResourceInstance.objects.filter(pk=site).exists())
 
+    def test_a_file_list_that_is_not_a_list_is_reported(self):
+        loadid = self._load(
+            _resource(uuid.uuid4(), _tile(FILE_NODE, 5)),
+            status="failed",
+        )
+
+        self.assertIn("file-list value must be a list", self._errors(loadid))
+
     def test_an_overwrite_can_move_a_unique_value_off_a_replaced_resource(self):
         constraint = ConstraintModel.objects.create(
             card=CardModel.objects.get(nodegroup_id=STRING_NODE),
