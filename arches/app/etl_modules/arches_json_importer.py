@@ -423,7 +423,7 @@ class ArchesJsonImporter(BaseImportModule):
                     source, _("Resource {} is missing graph_id").format(resourceid)
                 )
             ]
-        resourceid = str(resourceid).lower()
+        resourceid = str(uuid.UUID(str(resourceid)))
         if resourceid in seen_resourceids:
             return [
                 self._failure(
@@ -441,8 +441,9 @@ class ArchesJsonImporter(BaseImportModule):
             return [self._failure(source, _("Graph {} does not exist").format(graphid))]
         except ValueError as unpublished:
             return [self._failure(source, str(unpublished))]
+        graphid = str(uuid.UUID(str(graphid)))
         if self._overwrite:
-            resource_graphs[resourceid] = (str(graphid).lower(), source)
+            resource_graphs[resourceid] = (graphid, source)
 
         if instance.get("legacyid"):
             legacyids.setdefault(str(instance["legacyid"]), (resourceid, source))
@@ -494,6 +495,7 @@ class ArchesJsonImporter(BaseImportModule):
                         )
                     )
                     continue
+                file_id = str(uuid.UUID(file_id))
                 if file_id in file_owners:
                     failures.append(
                         self._failure(

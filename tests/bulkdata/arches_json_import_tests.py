@@ -651,6 +651,32 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
         self.assertIn("already belongs to resource", self._errors(loadid))
         self.assertFalse(ResourceInstance.objects.filter(pk=site).exists())
 
+    def test_an_overwrite_matches_ids_written_without_hyphens(self):
+        monument, tile = uuid.uuid4(), uuid.uuid4()
+        self._load(_resource(monument, _tile(STRING_NODE, _text("Monument"), tile)))
+        resource = _resource(
+            monument.hex.upper(),
+            _tile(STRING_NODE, _text("Monument, renamed"), tile.hex),
+        )
+        resource["resourceinstance"]["graph_id"] = uuid.UUID(ALL_DATATYPES).hex
+
+        self._load(resource, overwrite=True)
+
+        self.assertEqual(
+            TileModel.objects.get(pk=tile).data[STRING_NODE]["en"]["value"],
+            "Monument, renamed",
+        )
+
+    def test_one_id_written_two_ways_is_a_duplicate(self):
+        monument = uuid.uuid4()
+        loadid = self._load(
+            _resource(monument, _tile(STRING_NODE, _text("Monument"))),
+            _resource(monument.hex.upper(), _tile(STRING_NODE, _text("Monument"))),
+            status="failed",
+        )
+
+        self.assertIn("Duplicate resourceinstanceid", self._errors(loadid))
+
     def test_a_file_list_that_is_not_a_list_is_reported(self):
         loadid = self._load(
             _resource(uuid.uuid4(), _tile(FILE_NODE, 5)),
