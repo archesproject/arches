@@ -27,7 +27,9 @@ from django.contrib.auth.models import User, Group, AnonymousUser
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory
 from django.test.client import Client
-from oauth2_provider.models import AccessToken
+from django.test.utils import override_settings
+from django.utils.http import urlencode
+from oauth2_provider.models import AccessToken, Application
 
 from arches.app.models.models import UserProfile
 from arches.app.models.system_settings import settings
@@ -35,6 +37,7 @@ from arches.app.views.auth import LoginView
 from arches.app.views.concept import RDMView
 from arches.app.utils.external_oauth_backend import ExternalOauthAuthenticationBackend
 from arches.app.utils.middleware import SetAnonymousUser
+from arches.test.utils import sync_overridden_test_settings_to_arches
 from tests.base_test import ArchesTestCase, OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET
 
 # these tests can be run from the command line via
@@ -451,3 +454,70 @@ def set_anonymous_user(request):
 
 def strip_response_location(response):
     return response.get("location").replace("http://testserver", "").split("?")[0]
+
+
+# django-oauth-toolkit's endpoints only accept form-encoded bodies.
+FORM_ENCODED = "application/x-www-form-urlencoded"
+
+
+class DeviceSignInTests(ArchesTestCase):
+    device_client_id = "device-sign-in-test-client"
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.add_users()
+        Application.objects.create(
+            name="Device sign-in test",
+            client_id=cls.device_client_id,
+            client_type=Application.CLIENT_PUBLIC,
+            authorization_grant_type=Application.GRANT_DEVICE_CODE,
+        )
+
+    def test_device_code_page_requires_a_signed_in_user(self):
+        response = self.client.get(reverse("oauth2:device"))
+        self.assertRedirects(
+            response,
+            f"{reverse('auth')}?next={reverse('oauth2:device')}",
+            fetch_redirect_response=False,
+        )
+
+    def test_device_client_id_is_not_found_when_device_sign_in_is_off(self):
+        response = self.client.get(reverse("device_client_id"))
+        self.assertEqual(response.status_code, 404)
+
+    @override_settings(OAUTH_DEVICE_CLIENT_ID=device_client_id)
+    def test_device_sign_in_issues_a_token_once_the_user_approves(self):
+        with sync_overridden_test_settings_to_arches():
+            client_id = self.client.get(reverse("device_client_id")).json()["clientid"]
+        device_client = Client()
+        authorization = device_client.post(
+            reverse("oauth2:device-authorization"),
+            urlencode({"client_id": client_id}),
+            content_type=FORM_ENCODED,
+        ).json()
+        self.assertEqual(authorization["verification_uri"], "/o/device/")
+
+        self.client.force_login(User.objects.get(username="ben"))
+        confirm_response = self.client.post(
+            authorization["verification_uri"],
+            {"user_code": authorization["user_code"]},
+        )
+        self.client.post(confirm_response["Location"], {"action": "accept"})
+
+        token_response = device_client.post(
+            reverse("oauth2:token"),
+            urlencode(
+                {
+                    "grant_type": Application.GRANT_DEVICE_CODE,
+                    "device_code": authorization["device_code"],
+                    "client_id": client_id,
+                }
+            ),
+            content_type=FORM_ENCODED,
+        )
+        self.assertEqual(token_response.status_code, 200)
+        access_token = AccessToken.objects.get(
+            token=token_response.json()["access_token"]
+        )
+        self.assertEqual(access_token.user.username, "ben")

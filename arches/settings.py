@@ -378,11 +378,22 @@ JWT_ALGORITHM = "HS256"
 
 # OAuth settings
 # https://django-oauth-toolkit.readthedocs.io/en/latest/settings.html
-OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 36000}
+OAUTH2_PROVIDER = {
+    "ACCESS_TOKEN_EXPIRE_SECONDS": 604800,  # one week
+    # Where a device sign-in sends the user to enter their code. Relative, so
+    # clients resolve it against the instance's URL.
+    "OAUTH_DEVICE_VERIFICATION_URI": "/o/device/",
+}
 
 # This is the client id you get when you register a new application
 # see https://arches.readthedocs.io/en/stable/api/#authentication
 OAUTH_CLIENT_ID = ""  # '9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
+
+# The client id of a public application with the "Device Code" grant type, for
+# clients such as desktop GIS plugins that sign users in through a browser
+# (RFC 8628). Desktop clients read it from auth/device_client_id. Leave empty
+# to turn device sign-in off.
+OAUTH_DEVICE_CLIENT_ID = ""
 
 AUTHENTICATION_BACKENDS = (
     "arches.app.utils.email_auth_backend.EmailAuthenticationBackend",
@@ -668,8 +679,6 @@ API_MAX_PAGE_SIZE = 500
 UUID_REGEX = (
     "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
 )
-
-OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 604800}  # one week
 
 #######################################
 ###       END STATIC SETTINGS       ###
