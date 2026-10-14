@@ -71,7 +71,7 @@ watchEffect(async () => {
             );
 
         if (mode === EDIT) {
-            await useLanguageStore().fetchAllLanguages();
+            await Promise.allSettled([useLanguageStore().fetchAllLanguages()]);
         }
 
         if (shouldFetchTile.value) {
