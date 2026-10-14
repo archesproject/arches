@@ -114,12 +114,26 @@ class GetProvisionalEditsForUserTests(GraphTestCase):
         """user_is_resource_reviewer is checked before the user_id lookup,
         so a reviewer never sees provisional data even if they authored an edit."""
         tile = self._tile({"5": {"value": {"n": "v"}, "status": "review"}})
+        user = self._user(5)
         with patch(
             "arches.extensions.querysets.utils.models.user_is_resource_reviewer",
             return_value=True,
         ) as mock_reviewer:
-            result = get_provisional_edits_for_user(tile, self._user(5))
-        mock_reviewer.assert_called_once()
+            result = get_provisional_edits_for_user(tile, user)
+        mock_reviewer.assert_called_once_with(user, resource=None)
+        self.assertIsNone(result)
+
+    def test_resource_kwarg_forwarded_to_reviewer_check(self):
+        """The resource kwarg is forwarded to user_is_resource_reviewer."""
+        tile = self._tile({"5": {"value": {"n": "v"}, "status": "review"}})
+        user = self._user(5)
+        mock_resource = MagicMock()
+        with patch(
+            "arches.extensions.querysets.utils.models.user_is_resource_reviewer",
+            return_value=True,
+        ) as mock_reviewer:
+            result = get_provisional_edits_for_user(tile, user, resource=mock_resource)
+        mock_reviewer.assert_called_once_with(user, resource=mock_resource)
         self.assertIsNone(result)
 
     # ------------------------------------------------------------------

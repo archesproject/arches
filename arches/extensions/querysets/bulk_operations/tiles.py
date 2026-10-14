@@ -419,7 +419,10 @@ class TileTreeOperation:
         # For a non-reviewer with an existing provisional edit, compare incoming
         # against their provisional values rather than the authoritative data.
         user = getattr(self.request, "user", None)
-        provisional_data = get_provisional_edits_for_user(original_tile, user)
+        resource = self.entry if isinstance(self.entry, ResourceInstance) else None
+        provisional_data = get_provisional_edits_for_user(
+            original_tile, user, resource=resource
+        )
         existing_data = provisional_data or original_tile["data"]
 
         incoming_aliased = incoming.aliased_data
@@ -632,7 +635,9 @@ class TileTreeOperation:
                     user=self.request.user,
                 )
 
-                if not user_is_resource_reviewer(self.request.user):
+                if not user_is_resource_reviewer(
+                    self.request.user, resource=upsert_proxy.resourceinstance
+                ):
                     if upsert_proxy._state.adding:
                         vanilla_instance.data = {}
                         upsert_proxy.data = {}

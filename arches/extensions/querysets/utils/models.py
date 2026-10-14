@@ -266,7 +266,7 @@ def append_tiles_recursively(resource_or_tile):
                 tile.fill_blanks()
 
 
-def get_provisional_edits_for_user(tile, user):
+def get_provisional_edits_for_user(tile, user, *, resource=None):
     """Return the user's own provisional edit value, or None for authoritative data."""
     provisionaledits = (
         tile.get("provisionaledits")
@@ -276,7 +276,7 @@ def get_provisional_edits_for_user(tile, user):
     if user is None or not provisionaledits:
         return None
 
-    if user_is_resource_reviewer(user):
+    if user_is_resource_reviewer(user, resource=resource):
         return None
 
     user_id_str = str(user.pk)

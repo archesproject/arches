@@ -1035,8 +1035,6 @@ class TileTree(TileModel, AliasedDataMixin):
     def _tile_update_is_noop(self, original_tile, *, request=None):
         """Skipping no-op tile saves avoids regenerating RxR rows, at least
         given the current implementation that doesn't serialize them."""
-        from arches.app.utils.permission_backend import user_is_resource_reviewer
-
         datatype_factory = DataTypeFactory()
         if self.sortorder != original_tile["sortorder"]:
             return False
@@ -1076,7 +1074,9 @@ class TileTree(TileModel, AliasedDataMixin):
             {**existing_provisional_edits} if existing_provisional_edits else None
         )
         existing_instance._state.adding = creating_new_tile
-        if user is not None and not user_is_resource_reviewer(user):
+        if user is not None and not user_is_resource_reviewer(
+            user, resource=proxy.resourceinstance
+        ):
             if creating_new_tile:
                 # the user has previously edited this tile
                 proxy.apply_provisional_edit(
