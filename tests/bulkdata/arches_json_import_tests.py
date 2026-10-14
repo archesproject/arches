@@ -9,6 +9,7 @@ from unittest.mock import patch
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
+from django.db import connection
 from django.http import HttpRequest
 from django.test import SimpleTestCase, TestCase
 
@@ -1160,6 +1161,27 @@ class ArchesJsonImportWriteTests(ArchesTransactionTestCase):
         self.assertIn("failed: disk full", message)
         self.assertIn("part of this load may remain", message)
         self.assertNotIn("Nothing from this load was kept", message)
+
+    def test_a_cancelled_load_turns_the_tile_triggers_back_on(self):
+        class Cancelled(BaseException):
+            pass
+
+        def write_cancelled(importer, *args):
+            raise Cancelled()
+
+        with patch.object(ArchesJsonImporter, "_write_chunk", write_cancelled):
+            with self.assertRaises(Cancelled):
+                self._cli(
+                    _resource(uuid.uuid4(), _tile(STRING_NODE, _text("Monument")))
+                )
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT tgenabled FROM pg_trigger WHERE tgname IN "
+                "('__arches_check_excess_tiles_trigger', "
+                "'__arches_trg_update_spatial_attributes')"
+            )
+            self.assertEqual([row[0] for row in cursor.fetchall()], ["O", "O"])
 
     def test_a_failed_cleanup_does_not_hide_the_undo_failure(self):
         monument = uuid.uuid4()

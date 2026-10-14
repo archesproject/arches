@@ -1141,12 +1141,12 @@ class ArchesJsonImporter(BaseImportModule):
                     except Exception:
                         logger.exception("Could not remove what load %s wrote", loadid)
                         cleanup_failed = True
+                raise
+            finally:
                 try:
                     reenable_tile_triggers(cursor, loadid)
                 except Exception:
                     logger.exception("Could not re-enable the tile triggers")
-                raise
-            reenable_tile_triggers(cursor, loadid)
         except Exception as e:
             logger.exception(e)
             message = str(e)
@@ -1517,14 +1517,13 @@ class ArchesJsonImporter(BaseImportModule):
                     logger.exception(
                         "Could not record why load %s was not undone", loadid
                     )
+                raise
+            finally:
                 try:
                     reenable_tile_triggers(cursor, loadid)
                 except Exception:
                     logger.exception("Could not re-enable the tile triggers")
                 self._release_trigger_lock(cursor)
-                raise
-            reenable_tile_triggers(cursor, loadid)
-            self._release_trigger_lock(cursor)
             cursor.execute("SELECT __arches_refresh_spatial_views()")
             cursor.execute(
                 """UPDATE load_event SET status = %s, load_details = load_details::jsonb || ('{"resources_removed":' || %s || '}')::jsonb WHERE loadid = %s""",
