@@ -21,7 +21,7 @@ from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.core import management
 from django.test.utils import captured_stdout
-from arches.app.models.models import DDataType
+from arches.app.models.models import DDataType, Node
 from arches.app.models.graph import Graph
 from django.db import connection
 
@@ -108,3 +108,25 @@ class RelationalDataModelTests(ArchesTestCase):
             row = cursor.fetchone()
 
         assert row is not None and row[0] == expected_datatype
+
+    def test_views_named_by_node_alias(self):
+        Node.objects.filter(pk="80bf3bd0-936d-11ed-be68-5254004d77d3").update(
+            alias="aliased_group"
+        )
+        Node.objects.filter(pk="9712762c-936d-11ed-b671-5254004d77d3").update(
+            alias="aliased_string"
+        )
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "select __arches_create_resource_model_views(%s::uuid);",
+                [RelationalDataModelTests.custom_data_type_graphid],
+            )
+            cursor.execute("""
+                select table_name, column_name from information_schema.columns
+                where table_schema = 'relational_data_model_tests'
+                and column_name = 'aliased_string'
+                """)
+            rows = cursor.fetchall()
+
+        self.assertEqual(rows, [("aliased_group", "aliased_string")])

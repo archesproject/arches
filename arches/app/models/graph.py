@@ -31,7 +31,7 @@ from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.querysets.graph import GraphQuerySet
 from arches.app.models.system_settings import settings
-from arches.app.models.utils import make_name_unique
+from arches.app.models.utils import get_slugified_alias_renames, make_name_unique
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.bulk_data_deletion import BulkDataDeletion
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -2230,6 +2230,17 @@ class Graph(models.GraphModel):
                 node.alias = make_name_unique(row[0], aliases, "_n")
                 node.hascustomalias = False
         return node.alias
+
+    def slugify_node_aliases(self):
+        """
+        Renames any node alias that is not a valid slug, e.g. one serialized
+        before hyphens were replaced by __arches_slugify.
+        """
+        aliases_by_nodeid = {
+            nodeid: node.alias for nodeid, node in self.nodes.items() if node.alias
+        }
+        for nodeid, new_alias in get_slugified_alias_renames(aliases_by_nodeid).items():
+            self.nodes[nodeid].alias = new_alias
 
     def validate(self):
         """
