@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.urls import reverse, resolve, get_script_prefix
 from arches.app.etl_modules.staging_to_tile import staging_to_tile
+from arches.app.models.models import EditLog, Function, FunctionXGraph
 from arches.app.models.system_settings import settings
 from arches.app.utils.index_database import index_resources_by_transaction
 import logging
@@ -177,6 +178,9 @@ def _post_save_edit_log(
         else:
             logger.debug("Skipping indexing for loadid=%s (index=False)", loadid)
 
+        logger.debug("Calling function post_import hooks for loadid=%s", loadid)
+        _call_post_import_functions(loadid)
+
         user = User.objects.get(id=userid)
         user_email = getattr(user, "email", "")
         user_firstname = getattr(user, "first_name", "")
@@ -230,6 +234,36 @@ def _post_save_edit_log(
             loadid,
         )
         return {"success": False, "data": "saved"}
+
+
+def _call_post_import_functions(loadid):
+    """
+    Bulk loads write tiles without calling Tile.save, so functions never see
+    post_save. Instead, give functions a chance to act on the whole load by its
+    transaction id.
+    """
+    graphids = (
+        EditLog.objects.filter(transactionid=loadid)
+        .values_list("resourceclassid", flat=True)
+        .distinct()
+    )
+    functions = [
+        functionXgraph.function.get_class_module()(functionXgraph.config)
+        for functionXgraph in FunctionXGraph.objects.filter(
+            graph_id__in=[graphid for graphid in graphids if graphid]
+        )
+        .exclude(function__functiontype="primarydescriptors")
+        .select_related("function")
+    ]
+    functions += [
+        function.get_class_module()()
+        for function in Function.objects.filter(functiontype="global")
+    ]
+    for function in functions:
+        try:
+            function.post_import(loadid)
+        except NotImplementedError:
+            pass
 
 
 def get_resourceids_from_search_url(search_url, user=None):
