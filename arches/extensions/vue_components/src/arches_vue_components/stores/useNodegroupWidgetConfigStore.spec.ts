@@ -13,6 +13,7 @@ const NAMES_CONFIG: NodegroupWidgetConfig = {
     parent_nodegroup_alias: null,
     cardinality: "n",
     is_writable: true,
+    card: null,
     card_x_node_x_widgets: [],
 };
 
