@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 import logging
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from arches.app.models.system_settings import settings
 from arches.app.search.base_index import get_index
 from arches.app.search.mappings import (
@@ -204,6 +204,11 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        if not settings.ELASTICSEARCH_ENABLED:
+            raise CommandError(
+                "The 'es' command requires Elasticsearch, but ELASTICSEARCH_ENABLED is False."
+            )
+
         if options["operation"] == "setup_indexes":
             self.setup_indexes(name=options["name"])
 

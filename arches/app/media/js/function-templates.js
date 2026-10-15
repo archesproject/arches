@@ -1,4 +1,4 @@
-import { loadComponentDependencies } from "utils/load-component-dependencies";
+import { registerComponentPaths } from "utils/load-component-dependencies";
 
 function removeTrailingCommaFromObject(string) {
     return string.replace(/,\s*}*$/, "}");
@@ -10,14 +10,7 @@ try {
     const functionTemplateData = functionTemplateDataHTML.getAttribute('functionTemplates');
     functionTemplates = JSON.parse(removeTrailingCommaFromObject(functionTemplateData));
 
-    loadComponentDependencies(
-        Object.values(functionTemplates).reduce((acc, value) => {
-            if (value['component']) {
-                acc.push(value['component']);
-            }
-            return acc;
-        }, [])
-    );
+    registerComponentPaths(functionTemplates, 'component', 'component');
 } catch (error) {
     console.error(error);
 }

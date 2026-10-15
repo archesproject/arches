@@ -343,12 +343,8 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         """
         nodegroups = self.get_nodegroups_by_perm(user, perms)
         graphs = (
-            GraphModel.objects.filter(
-                node__nodegroup__in=nodegroups,
-                isresource=True,
-                source_identifier__isnull=True,
-            )
-            .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            GraphModel.objects.get_resource_models(exclude_inactive=False)
+            .filter(node__nodegroup__in=nodegroups)
             .values_list("pk", flat=True)
         )
 
@@ -532,23 +528,39 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
             return self.user_in_group_by_name(user, ["RDM Administrator"])
         return False
 
-    def user_is_resource_editor(self, user: User) -> bool:
+    def user_is_resource_editor(self, user: User, *, resource=None, graph=None) -> bool:
         """
-        Single test for whether a user is in the Resource Editor group
+        Single test for whether a user is in the Resource Editor group.
+
+        Subclasses may use the optional ``resource`` (ResourceInstance) and
+        ``graph`` (GraphModel) arguments to implement per-instance or
+        per-graph granularity. The base implementation ignores them.
         """
 
         return self.user_in_group_by_name(user, ["Resource Editor"])
 
-    def user_is_resource_reviewer(self, user: User) -> bool:
+    def user_is_resource_reviewer(
+        self, user: User, *, resource=None, graph=None
+    ) -> bool:
         """
-        Single test for whether a user is in the Resource Reviewer group
+        Single test for whether a user is in the Resource Reviewer group.
+
+        Subclasses may use the optional ``resource`` (ResourceInstance) and
+        ``graph`` (GraphModel) arguments to implement per-instance or
+        per-graph granularity. The base implementation ignores them.
         """
 
         return self.user_in_group_by_name(user, ["Resource Reviewer"])
 
-    def user_is_resource_exporter(self, user: User) -> bool:
+    def user_is_resource_exporter(
+        self, user: User, *, resource=None, graph=None
+    ) -> bool:
         """
-        Single test for whether a user is in the Resource Exporter group
+        Single test for whether a user is in the Resource Exporter group.
+
+        Subclasses may use the optional ``resource`` (ResourceInstance) and
+        ``graph`` (GraphModel) arguments to implement per-instance or
+        per-graph granularity. The base implementation ignores them.
         """
 
         return self.user_in_group_by_name(user, ["Resource Exporter"])

@@ -18,7 +18,6 @@ const viewModel = function() {
         "geometryTypes": [],
         "overlayConfigs": [],
         "overlayOpacity": 0,
-        "geocodeProvider": "10000000-0000-0000-0000-010000000000",
         "geocoderVisible": true,
         "defaultValueType": "",
         "featureLineWidth": 1,

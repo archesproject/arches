@@ -76,3 +76,13 @@ class SystemCheckTests(SimpleTestCase):
             with mock.patch("arches.apps.requires", lambda _: ["arches>=8.1.0"]):
                 with self.assertRaisesMessage(SystemCheckError, "arches>=8.1.0"):
                     call_command("check", tag=[Tags.compatibility])
+
+    def test_mapbox_api_key_deprecated(self):
+        from arches.apps import warn_mapbox_api_key_deprecated
+
+        with override_settings(MAPBOX_API_KEY=""):
+            self.assertEqual(warn_mapbox_api_key_deprecated(None), [])
+
+        with override_settings(MAPBOX_API_KEY="pk.test"):
+            warnings = warn_mapbox_api_key_deprecated(None)
+            self.assertEqual([w.id for w in warnings], ["arches.W004"])

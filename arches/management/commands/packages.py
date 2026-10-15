@@ -395,7 +395,11 @@ class Command(BaseCommand):
                 prevent_indexing=prevent_indexing,
             )
 
-            if defer_indexing and not prevent_indexing:
+            if (
+                defer_indexing
+                and not prevent_indexing
+                and settings.ELASTICSEARCH_ENABLED
+            ):
                 # index concepts if new concepts created
                 if concept_count != models.Value.objects.count():
                     management.call_command("es", "index_concepts")
@@ -1253,7 +1257,7 @@ class Command(BaseCommand):
         load_users(package_location, "users")
         print("loading templates")
         load_templates(package_location)
-        if defer_indexing is True:
+        if defer_indexing is True and settings.ELASTICSEARCH_ENABLED:
             print("indexing database")
             management.call_command(
                 "es", "reindex_database", recalculate_descriptors=True, quiet=self.quiet
@@ -1336,9 +1340,15 @@ class Command(BaseCommand):
         management.call_command("setup_db", force=True)
 
     def setup_indexes(self):
+        if not settings.ELASTICSEARCH_ENABLED:
+            print("Elasticsearch is disabled; skipping index setup.")
+            return
         management.call_command("es", operation="setup_indexes")
 
     def delete_indexes(self):
+        if not settings.ELASTICSEARCH_ENABLED:
+            print("Elasticsearch is disabled; skipping index deletion.")
+            return
         management.call_command("es", operation="delete_indexes")
 
     def export_business_data(
@@ -1354,10 +1364,8 @@ class Command(BaseCommand):
         if graphid is False and file_format == "json":
             graphids = [
                 str(graph.graphid)
-                for graph in (
-                    models.GraphModel.objects.filter(isresource=True)
-                    .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-                    .exclude(source_identifier__isnull=False)
+                for graph in models.GraphModel.objects.get_resource_models(
+                    exclude_inactive=False
                 )
             ]
         if graphid is False and file_format != "json":
@@ -1616,29 +1624,33 @@ class Command(BaseCommand):
             data_source = [data_source]
 
         errors = []
-        for path in data_source:
-            if os.path.isfile(os.path.join(path)):
-                print(os.path.join(path))
-                with open(path, "r") as f:
-                    archesfile = JSONDeserializer().deserialize(f)
-                    errs, importer = ResourceGraphImporter(
-                        archesfile["graph"], overwrite_graphs
-                    )
-                    errors.extend(errs)
-            else:
-                file_paths = [
-                    file_path
-                    for file_path in os.listdir(path)
-                    if file_path.endswith(".json")
-                ]
-                for file_path in file_paths:
-                    print(os.path.join(path, file_path))
-                    with open(os.path.join(path, file_path), "r") as f:
+        # One transaction for the whole batch: nodes may reference another
+        # graph's publication (sourcebranchpublication) via a deferred FK, so
+        # every graph in the batch must be present before anything commits.
+        with transaction.atomic():
+            for path in data_source:
+                if os.path.isfile(os.path.join(path)):
+                    print(os.path.join(path))
+                    with open(path, "r") as f:
                         archesfile = JSONDeserializer().deserialize(f)
                         errs, importer = ResourceGraphImporter(
                             archesfile["graph"], overwrite_graphs
                         )
                         errors.extend(errs)
+                else:
+                    file_paths = sorted(
+                        file_path
+                        for file_path in os.listdir(path)
+                        if file_path.endswith(".json")
+                    )
+                    for file_path in file_paths:
+                        print(os.path.join(path, file_path))
+                        with open(os.path.join(path, file_path), "r") as f:
+                            archesfile = JSONDeserializer().deserialize(f)
+                            errs, importer = ResourceGraphImporter(
+                                archesfile["graph"], overwrite_graphs
+                            )
+                            errors.extend(errs)
         for e in errors:
             utils.print_message(e)
 

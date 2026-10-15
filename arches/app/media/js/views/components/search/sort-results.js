@@ -4,6 +4,7 @@ import ko from 'knockout';
 import BaseFilter from 'views/components/search/base-filter';
 import sortResultsTemplate from 'templates/views/components/search/sort-results.htm';
 import 'chosen';
+import 'bindings/select2-query';
 
 
 var componentName = 'sort-results';

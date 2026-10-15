@@ -244,6 +244,14 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
             )
             return all_restricted_instances
         else:
+            if not settings.ELASTICSEARCH_ENABLED:
+                raise Exception("""
+                The default allow permission framework requires Elasticsearch, because
+                per-user restrictions are resolved against the resource index. Either set
+                ELASTICSEARCH_ENABLED = True, or switch to the default deny framework,
+                which resolves them against the database.
+                """)
+
             terms = Terms(field="permissions.users_with_no_access", terms=[str(user.id)])  # type: ignore
             query = Query(search_engine, start=0, limit=settings.SEARCH_RESULT_LIMIT)  # type: ignore
             has_access = Bool()  # type: ignore

@@ -7,6 +7,7 @@ import IIIFAnnotationViewmodel from 'views/components/iiif-annotation';
 import geojsonExtent from 'geojson-extent';
 import iiifWidgetTemplate from 'templates/views/components/widgets/iiif.htm';
 import 'leaflet-fullscreen';
+import 'bindings/chosen';
 
 
 const viewModel = function(params) {

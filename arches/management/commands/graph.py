@@ -135,9 +135,9 @@ class Command(BaseCommand):
 
             graphids.append(str(graph.pk))
         if self.update_instances:
-            graphids = tuple(graphids)
+            graphids = list(graphids)
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "update resource_instances r set graphpublicationid = publicationid from graphs g where r.graphid = g.graphid and g.graphid in %s;",
+                    "update resource_instances r set graphpublicationid = publicationid from graphs g where r.graphid = g.graphid and g.graphid = ANY(%s);",
                     (graphids,),
                 )

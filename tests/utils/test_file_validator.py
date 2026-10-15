@@ -142,7 +142,7 @@ class FileValidatorTests(SimpleTestCase):
         self.assertEqual(errors, ["Invalid docx file"])
 
     @patch("filetype.guess", Mock(return_value=None))
-    @patch("arches.app.utils.file_validator.load_workbook", lambda file, **kwargs: None)
+    @patch("arches.app.utils.file_validator.load_workbook", Mock(return_value=None))
     def test_valid_xlsx(self):
         errors = self.validator.validate_file_type(self.mock_file, extension="xlsx")
         self.assertEqual(errors, [])

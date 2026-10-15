@@ -1,4 +1,4 @@
-import { palette } from "@primeuix/themes";
+import { palette } from "@openvue/themes";
 import { ArchesPreset, DEFAULT_THEME } from "@/arches/themes/default.ts";
 
 describe("ArchesPreset", () => {

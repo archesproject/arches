@@ -22,7 +22,10 @@ from unittest.mock import patch
 from django.conf import settings
 
 from arches.app.datatypes.base import BaseDataType
-from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.datatypes.datatypes import (
+    DataTypeFactory,
+    ResourceInstanceListDataType,
+)
 from arches.app.models.graph import Graph
 from arches.app.models.models import (
     DDataType,
@@ -266,7 +269,13 @@ class ResourceInstanceListDataTypeTests(ArchesTestCase):
 
     @patch("arches.app.models.resource.Resource.displayname", displayname)
     def test_to_json(self):
-        ri_list = DataTypeFactory().get_instance("resource-instance-list")
+        # The bundled querysets application ships its own resource-instance
+        # datatypes, which DataTypeFactory prefers over these whenever it is
+        # installed (as it is in tests.test_settings). Instantiate arches' own
+        # implementation so this test keeps asserting arches' own contract.
+        ri_list = ResourceInstanceListDataType(
+            DDataType.objects.get(datatype="resource-instance-list")
+        )
 
         dummy_node = Node(pk=uuid.uuid4())
         graph = GraphModel.objects.create(isresource=True)

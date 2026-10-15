@@ -35,6 +35,16 @@ LOCMEM_USER_PERMISSION_CACHE = {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         "LOCATION": "test-user-permission-cache",
     },
+    # Named by ARCHES_QUERYSETS_* in arches.settings; setUpTestData loads a test
+    # package that indexes concepts, which requires these caches to exist.
+    "querysets_concepts": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "test-querysets-concepts-cache",
+    },
+    "querysets_resource_instances": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "test-querysets-resource-instances-cache",
+    },
 }
 
 

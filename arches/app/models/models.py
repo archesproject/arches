@@ -26,6 +26,7 @@ from arches.app.const import ExtensionType
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
 from arches.app.models.mixins import SaveSupportsBlindOverwriteMixin
 from arches.app.models.query_expressions import UUID4
+from arches.app.models.querysets.graph import GraphModelQuerySet
 from arches.app.models.utils import (
     add_to_update_fields,
     format_file_into_sql,
@@ -482,6 +483,8 @@ class FunctionXGraph(SaveSupportsBlindOverwriteMixin, models.Model):
 
 
 class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
+    objects = GraphModelQuerySet.as_manager()
+
     graphid = models.UUIDField(primary_key=True, default=uuid.uuid4, db_default=UUID4())
     name = I18n_TextField(blank=True, null=True)
     description = I18n_TextField(blank=True, null=True)
@@ -1631,7 +1634,10 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
         """
         from arches.app.datatypes.datatypes import DataTypeFactory
 
-        original_tiles = self.tilemodel_set.prefetch_related("nodegroup__node_set")
+        # order deterministically; sortorder can be null so tileid breaks ties
+        original_tiles = self.tilemodel_set.order_by(
+            "sortorder", "tileid"
+        ).prefetch_related("nodegroup__node_set")
         datatype_factory = DataTypeFactory()
 
         new_resource = copy.copy(self)
@@ -2167,22 +2173,6 @@ class Widget(SaveSupportsBlindOverwriteMixin, models.Model):
         db_table = "widgets"
 
 
-class Geocoder(SaveSupportsBlindOverwriteMixin, models.Model):
-    geocoderid = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, db_default=UUID4()
-    )
-    name = models.TextField(unique=True)
-    component = models.TextField(unique=True)
-    api_key = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        managed = True
-        db_table = "geocoders"
-
-
 class MapSource(models.Model):
     name = models.TextField(unique=True)
     source = JSONField(blank=True, null=True, db_column="source")
@@ -2704,6 +2694,8 @@ class SpatialView(models.Model):
     isactive = models.BooleanField(
         default=True
     )  # the view is not created in the DB until set to active.
+    # database roles granted SELECT on the views; roles that don't exist are skipped
+    dbroles = JSONField(default=list, db_default=[], blank=True)
 
     def __str__(self):
         return f"{self.schema}.{self.slug}"
@@ -2746,6 +2738,11 @@ class SpatialView(models.Model):
         """
         Validate the spatial view before saving it to the database as the database triggers have proved hard to test.
         """
+        if not isinstance(self.dbroles, list) or not all(
+            isinstance(role, str) for role in self.dbroles
+        ):
+            raise ValidationError("dbroles must be a list of role names")
+
         if not self.geometrynode_id:
             return
         graph = self.geometrynode.graph
@@ -2792,6 +2789,7 @@ class SpatialView(models.Model):
             "language": self.language.code,
             "attributenodes": self.attributenodes,
             "isactive": self.isactive,
+            "dbroles": self.dbroles,
         }
 
 

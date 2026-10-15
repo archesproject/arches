@@ -1,11 +1,11 @@
-import PrimeVue from 'primevue/config';
-import AnimateOnScroll from 'primevue/animateonscroll';
-import ConfirmationService from 'primevue/confirmationservice';
-import DialogService from 'primevue/dialogservice';
-import FocusTrap from 'primevue/focustrap';
-import StyleClass from 'primevue/styleclass';
-import ToastService from 'primevue/toastservice';
-import Tooltip from 'primevue/tooltip';
+import OpenVue from 'openvue/config';
+import AnimateOnScroll from 'openvue/animateonscroll';
+import ConfirmationService from 'openvue/confirmationservice';
+import DialogService from 'openvue/dialogservice';
+import FocusTrap from 'openvue/focustrap';
+import StyleClass from 'openvue/styleclass';
+import ToastService from 'openvue/toastservice';
+import Tooltip from 'openvue/tooltip';
 
 import { createApp } from 'vue';
 import { createGettext } from "vue3-gettext";
@@ -70,7 +70,7 @@ export default async function createVueApplication(
             document.documentElement.classList.add(darkModeClass);
         }
 
-        app.use(PrimeVue, themeConfiguration);
+        app.use(OpenVue, themeConfiguration);
         app.use(gettext);
         app.use(ConfirmationService);
         app.use(DialogService);

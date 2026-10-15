@@ -18,6 +18,8 @@ from tests.permissions.base_permissions_framework_test import (
     ArchesPermissionFrameworkTestCase,
 )
 from arches.app.models.models import Node, ResourceInstance
+from arches.app.search.mappings import RESOURCES_INDEX
+from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.permissions.arches_default_deny import (
     ArchesDefaultDenyPermissionFramework,
 )
@@ -77,6 +79,21 @@ class ArchesDefaultDenyPermissionTests(ArchesPermissionFrameworkTestCase):
         self.assertFalse(implicit_permission)
         self.assertFalse(can_access_without_view_permission)
         self.assertTrue(can_access_with_view_permission)
+
+    def test_principal_user_is_among_allowed_instances(self):
+        search_engine = SearchEngineFactory().create()
+        ResourceInstance.objects.filter(pk=self.resource_instance_id).update(
+            principaluser=self.user
+        )
+        self.resource.refresh_from_db()
+        self.resource.index()
+        search_engine.refresh(index=RESOURCES_INDEX)
+
+        _is_exclusive, allowed_instances = self.framework.get_filtered_instances(
+            self.user, search_engine
+        )
+
+        self.assertIn(self.resource_instance_id, allowed_instances)
 
     def test_user_has_resource_model_permissions(self):
         """

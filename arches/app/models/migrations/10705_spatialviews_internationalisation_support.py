@@ -594,8 +594,6 @@ class Migration(migrations.Migration):
                                         where geo.nodeid = ''%s''
                                             %s;
 
-                                        grant select on table %s to arches_spatial_views;
-
                                         comment on view %s is ''%s'';
 
                                         ',
@@ -603,7 +601,6 @@ class Migration(migrations.Migration):
                                         att_table_name,
                                         geometry_node_id::text,
                                         geom_type_filter,
-                                        sv_name_slug_with_geom,
                                         sv_name_slug_with_geom,
                                         spv_description);
 
@@ -1532,8 +1529,6 @@ class Migration(migrations.Migration):
                             where geo.nodeid = ''%s''
                                 %s;
 
-                            grant select on table %s to arches_spatial_views;
-
                             comment on view %s is ''%s'';
 
                             ',
@@ -1541,7 +1536,6 @@ class Migration(migrations.Migration):
                             att_table_name,
                             geometry_node_id::text,
                             geom_type_filter,
-                            sv_name_slug_with_geom,
                             sv_name_slug_with_geom,
                             spv_description);
 

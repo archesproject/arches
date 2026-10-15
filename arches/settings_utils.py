@@ -25,12 +25,52 @@ def list_arches_app_names():
     ]
 
 
+def list_arches_app_labels():
+    """Stable public identifiers for Arches applications.
+
+    Used for URL namespaces and frontend asset paths, which must not change
+    when an application's Python module path does. For applications installed
+    as their own top-level package the label equals the module name; bundled
+    applications under arches.extensions pin it to their former name.
+    """
+    return [
+        config.label
+        for config in apps.get_app_configs()
+        if getattr(config, "is_arches_application", False)
+    ]
+
+
 def list_arches_app_paths():
     return [
         os.path.realpath(config.module.__path__[0])
         for config in apps.get_app_configs()
         if getattr(config, "is_arches_application", False)
     ]
+
+
+def list_arches_app_labels_and_paths():
+    """Label to source path for every Arches application, installed or bundled.
+
+    Bundled applications are included whether or not a project enables them.
+    Their source always ships with arches, so their frontend path aliases are
+    always resolvable, and arches' own type checking needs them even though no
+    project has put them in INSTALLED_APPS.
+
+    This is for path resolution only. Webpack entry points, templates and
+    static files still come from installed applications alone, so that a
+    disabled application contributes nothing to a build.
+    """
+    from arches.extensions import BUNDLED_APPLICATIONS
+
+    lookup = dict(zip(list_arches_app_labels(), list_arches_app_paths(), strict=True))
+    extensions_dir = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "extensions"
+    )
+    for label, dotted_path in BUNDLED_APPLICATIONS.items():
+        lookup.setdefault(
+            label, os.path.join(extensions_dir, dotted_path.rpartition(".")[2])
+        )
+    return lookup
 
 
 def build_staticfiles_dirs(*, app_root=None, additional_directories=None):

@@ -305,7 +305,9 @@ def set_related_graph_has_unpublished_changes_to_true(sender, instance, **kwargs
 
 @receiver(post_save, sender=models.NodeGroup)
 @receiver(post_delete, sender=models.NodeGroup)
-def set_related_graph_has_unpublished_changes_to_true(sender, instance, **kwargs):
+def set_related_graph_has_unpublished_changes_to_true_for_nodegroup(
+    sender, instance, **kwargs
+):
     # NodeGroups have no direct relation to the GraphModel objects,
     # so this signal can fail to find the node when deleting a Graphs
     if not instance.grouping_node_id:
@@ -320,7 +322,9 @@ def set_related_graph_has_unpublished_changes_to_true(sender, instance, **kwargs
 
 @receiver(post_save, sender=models.CardXNodeXWidget)
 @receiver(post_delete, sender=models.CardXNodeXWidget)
-def set_related_graph_has_unpublished_changes_to_true(sender, instance, **kwargs):
+def set_related_graph_has_unpublished_changes_to_true_for_cardxnodexwidget(
+    sender, instance, **kwargs
+):
     # CardXNodeXWidgets have no direct relation to the GraphModel objects,
     # so this signal can fail to find the node when deleting a Graphs
     if not instance.node_id:

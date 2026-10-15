@@ -1,0 +1,62 @@
+// CSS-only tooltip, replacing Bootstrap 3's tooltip plugin. Markup is
+// `data-tooltip="text"`, where Bootstrap 3 read `data-original-title`, with
+// `data-placement="top"` flipping it above the element. Bottom is the default.
+//
+// Everything is drawn on ::after. Several templates attach a tooltip directly to an
+// icon, and icon fonts render their glyph through ::before at the same specificity as
+// `[data-tooltip]::before`, so claiming ::before here would erase the icon. That rules
+// out drawing the arrow Bootstrap had.
+
+$tooltip-background: rgba(0, 0, 0, 0.9);
+$tooltip-gap: 0.6rem;
+$tooltip-font-stack: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+[data-tooltip] {
+    position: relative;
+
+    // A pseudo-element inherits the host's typography, and tooltips sit on icons whose
+    // font carries no letters, so every inherited property is restated here. Bootstrap's
+    // own `.tooltip` reset the same set for the same reason.
+    &::after {
+        content: attr(data-tooltip);
+        background-color: $tooltip-background;
+        border-radius: 0.4rem;
+        color: #fff;
+        font-family: $tooltip-font-stack;
+        font-size: 1.2rem;
+        font-style: normal;
+        font-weight: 400;
+        letter-spacing: normal;
+        line-height: 1.42857143;
+        text-align: start;
+        text-decoration: none;
+        text-shadow: none;
+        text-transform: none;
+        word-spacing: normal;
+        inset-block-start: calc(100% + #{$tooltip-gap});
+        inset-inline-start: 50%;
+        opacity: 0;
+        padding: 0.6rem 0.8rem;
+        pointer-events: none;
+        position: absolute;
+        transform: translateX(-50%);
+        transition: opacity 0.15s;
+        white-space: nowrap;
+        z-index: 1070;
+    }
+
+    &:hover::after,
+    &:focus-visible::after {
+        opacity: 1;
+    }
+
+    // An empty attribute should not render an empty black box.
+    &[data-tooltip='']::after {
+        content: none;
+    }
+
+    &[data-placement='top']::after {
+        inset-block-start: auto;
+        inset-block-end: calc(100% + #{$tooltip-gap});
+    }
+}
