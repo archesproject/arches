@@ -22,6 +22,8 @@ import {
     DRAW_DELETE_EVENT,
     DRAW_SELECTION_CHANGE_EVENT,
     DRAW_UPDATE_EVENT,
+    FIT_TO_FEATURES_MAX_ZOOM,
+    FIT_TO_FEATURES_PADDING,
     GEOMETRY_TYPE_POINT,
     METERS,
     SIMPLE_SELECT,
@@ -42,9 +44,6 @@ import type {
     DrawMode,
     MapContext,
 } from "@/arches_vue_components/components/MapComponent/types.ts";
-
-const FIT_TO_FEATURES_MAX_ZOOM = 17;
-const FIT_TO_FEATURES_PADDING = 80;
 
 export interface UseDrawnFeaturesReturn
     extends Pick<

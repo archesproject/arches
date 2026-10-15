@@ -21,11 +21,12 @@ import {
     DEFAULT_FEATURE_POINT_FILL,
     DEFAULT_FEATURE_POINT_SIZE,
     DEFAULT_MAP_SETTINGS,
+    FIT_TO_FEATURES_MAX_ZOOM,
+    FIT_TO_FEATURES_PADDING,
     GEOMETRY_TYPE_MULTI_POINT,
     GEOMETRY_TYPE_MULTI_POLYGON,
     GEOMETRY_TYPE_POINT,
     GEOMETRY_TYPE_POLYGON,
-    MAXIMUM_VALUE_FIT_ZOOM,
     READ_ONLY_VALUE_SOURCE_ID,
     STYLE_LOAD_EVENT,
 } from "@/arches_vue_components/components/MapComponent/constants.ts";
@@ -282,8 +283,8 @@ export function useMapContext(
                 [east, north],
             ],
             {
-                padding: 50,
-                maxZoom: props.maxZoom ?? MAXIMUM_VALUE_FIT_ZOOM,
+                padding: FIT_TO_FEATURES_PADDING,
+                maxZoom: FIT_TO_FEATURES_MAX_ZOOM,
                 animate: false,
             },
         );
