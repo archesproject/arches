@@ -7121,6 +7121,11 @@ div.hide-file-list>div>div>div>div>form>div>div:nth-child(3) {
     background: rgba(214, 214, 214, 0.3);
 }
 
+.state-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
 .wizard-card-tools {
     float: right;
     padding-left: 10px;
@@ -7417,6 +7422,67 @@ a.mega-dropdown-toggle.disabled {
 
 .rr-table-row-panel .node-config-item {
     margin: 5px 0px 15px -7.5px;
+}
+
+.rr-relationship-config {
+    .rr-relationship-field {
+        margin-bottom: 15px;
+    }
+
+    .rr-relationship-field:last-child {
+        margin-bottom: 0px;
+    }
+
+    .rr-relationship-source {
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .rr-relationship-label,
+    .node-config-item .control-label {
+        display: block;
+        margin: 0px 0px 5px 0px;
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .rr-relationship-ontology-class {
+        margin: 3px 0px;
+        color: #666;
+    }
+
+    .rr-relationship-select {
+        width: 100%;
+    }
+
+    .select2-container {
+        display: block;
+        width: 100% !important;
+    }
+
+    .node-config-item {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    div.row.widget-wrapper {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    .form-group {
+        margin: 0px;
+    }
+
+    .resource-instance-wrapper {
+        padding: 0px;
+    }
+
+    .widget-wrapper .widget-input-label {
+        display: none;
+    }
 }
 
 .rr-table-column {
@@ -12876,6 +12942,122 @@ a.filter-tools:hover {
 
 .etl-module-component-block label {
     margin-bottom: 0px;
+}
+
+.arches-json-importer {
+    .r-select-icon {
+        color: #000;
+    }
+
+    .upload-actions {
+        text-align: center;
+        padding: 1.5rem 2.5rem;
+
+        .dropzone-photo-upload {
+            display: inline-flex;
+
+            > .btn {
+                border-top: 1px solid #c4c4c4;
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        #hidden-dz-previews {
+            display: none;
+        }
+    }
+
+    .branch-xl-metadata-container > div {
+        height: 100%;
+        overflow: auto;
+        padding: 1.5rem 2rem;
+
+        > section {
+            margin-top: 2rem;
+
+            > h4 {
+                margin-bottom: 0.8rem;
+            }
+        }
+    }
+
+    .file-summary,
+    .file-list {
+        > div + div {
+            margin-top: 0.4rem;
+        }
+
+        > div > span:first-child {
+            display: inline-block;
+            margin-right: 1rem;
+        }
+    }
+
+    .file-summary > div > span:first-child {
+        min-width: 4rem;
+    }
+
+    .file-list {
+        max-height: 26rem;
+        overflow-y: auto;
+
+        > div > span:first-child {
+            min-width: 20rem;
+        }
+
+        > .total {
+            margin-top: 1rem;
+        }
+    }
+
+    .import-option {
+        display: flex;
+        align-items: baseline;
+        gap: 0.8rem;
+
+        + .import-option {
+            margin-top: 1.2rem;
+        }
+
+        input,
+        label {
+            margin: 0;
+        }
+
+        .text-warning {
+            font-size: 1.5rem;
+        }
+    }
+
+    &.loading-panel {
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        padding: 4rem;
+    }
+
+    &.load-status {
+        justify-content: flex-start;
+        height: fit-content;
+        margin-top: -0.5rem;
+    }
+
+    &.etl-error-report {
+        > table {
+            margin-top: 0.5rem;
+            border: 1px solid rgba(0, 0, 0, 0.14);
+        }
+
+        .details-toggle {
+            text-align: right;
+            vertical-align: top;
+        }
+
+        .details-value {
+            min-width: 8rem;
+        }
+    }
 }
 
 .etl-module-body p.pad-btm {

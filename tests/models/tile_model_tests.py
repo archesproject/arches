@@ -608,6 +608,73 @@ class TileTests(ArchesTestCase):
 
         self.assertEqual(len(Tile.objects.all()), 1)
 
+    def test_default_relationship_comes_from_the_node_config(self):
+        """
+        A relationship a tile value leaves empty defaults to the one in the node config,
+        whatever it is drawn from: an RDM concept or a controlled list item.
+        """
+
+        graph_id = "c35fe0a1-df30-11e8-b280-a4d18cec433a"
+        nodegroup_id = "487154e3-e222-11e8-be46-a4d18cec433a"
+        node_id = "eb115780-e222-11e8-aaed-a4d18cec433a"
+        item_uri = "https://example.org/plugins/controlled-list-manager/item/"
+        configured_relationships = {
+            "concept": (
+                "ac41d9be-79db-4256-b368-2f4559cfbe55",
+                "ac41d9be-79db-4256-b368-2f4559cfbe55",
+            ),
+            "reference": (
+                item_uri + "6e0f0a3e-6fd4-4a4d-9f0f-0ffb8e2c1b0b",
+                item_uri + "0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
+            ),
+        }
+
+        related_resource = Resource(pk=uuid4(), graph_id=graph_id)
+        related_resource.save(index=False)
+
+        for source, (relationship, inverse) in configured_relationships.items():
+            with self.subTest(relationship_source=source):
+                Node.objects.filter(pk=node_id).update(
+                    config={
+                        "graphs": [
+                            {
+                                "graphid": graph_id,
+                                "relationshipSource": source,
+                                "relationship": relationship,
+                                "inverseRelationship": inverse,
+                            }
+                        ]
+                    }
+                )
+                main_resource = Resource(pk=uuid4(), graph_id=graph_id)
+                main_resource.save(index=False)
+
+                tile = Tile(
+                    {
+                        "data": {
+                            node_id: [
+                                {
+                                    "resourceId": str(related_resource.pk),
+                                    "relationship": "",
+                                    "inverseRelationship": "",
+                                    "resourceXresourceId": "",
+                                }
+                            ]
+                        },
+                        "nodegroup_id": nodegroup_id,
+                        "parenttile_id": None,
+                        "provisionaledits": None,
+                        "resourceinstance_id": str(main_resource.pk),
+                        "sortorder": 0,
+                        "tileid": "",
+                    }
+                )
+                tile.save(index=False)
+
+                resource_x_resource = ResourceXResource.objects.get(tile=tile.tileid)
+                self.assertEqual(resource_x_resource.relationshiptype, relationship)
+                self.assertEqual(resource_x_resource.inverserelationshiptype, inverse)
+
     def test_related_resources_managed(self):
         """
         Test that related resource data is managed correctly and that the accompanying table is
@@ -622,14 +689,14 @@ class TileTests(ArchesTestCase):
                 "a4157df0-e222-11e8-9acb-a4d18cec433a": None,
                 "eb115780-e222-11e8-aaed-a4d18cec433a": [
                     {
-                        "inverseOntologyProperty": "",
-                        "ontologyProperty": "",
+                        "inverseRelationship": "",
+                        "relationship": "",
                         "resourceId": "92b2db6a-d13f-4cc7-aec7-e4caf91b45f8",
                         "resourceXresourceId": "",
                     },
                     {
-                        "inverseOntologyProperty": "http://www.cidoc-crm.org/cidoc-crm/P62i_is_depicted_by",
-                        "ontologyProperty": "http://www.cidoc-crm.org/cidoc-crm/P62_depicts",
+                        "inverseRelationship": "http://www.cidoc-crm.org/cidoc-crm/P62i_is_depicted_by",
+                        "relationship": "http://www.cidoc-crm.org/cidoc-crm/P62_depicts",
                         "resourceId": "e72844fc-7bc0-4851-89ca-5bb1c6b3ba22",
                         "resourceXresourceId": "5f418480-534a-4dba-87d9-67eb27f0cc6a",
                     },
@@ -716,8 +783,8 @@ class TileTests(ArchesTestCase):
                 "a4157df0-e222-11e8-9acb-a4d18cec433a": None,
                 "eb115780-e222-11e8-aaed-a4d18cec433a": [
                     {
-                        "inverseOntologyProperty": "",
-                        "ontologyProperty": "http://www.cidoc-crm.org/cidoc-crm/P62_depicts",
+                        "inverseRelationship": "",
+                        "relationship": "http://www.cidoc-crm.org/cidoc-crm/P62_depicts",
                         "resourceId": "85b2db6a-d13f-4cc7-aec7-e4caf91b45f7",
                         "resourceXresourceId": "",
                     }

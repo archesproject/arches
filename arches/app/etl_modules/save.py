@@ -1,13 +1,14 @@
-from datetime import datetime
 import json
 from urllib.parse import urlsplit, parse_qs
 from django.contrib.auth.models import User
 from django.core.validators import URLValidator
 from django.db import connection
 from django.http import HttpRequest
+from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.urls import reverse, resolve, get_script_prefix
 from arches.app.etl_modules.staging_to_tile import staging_to_tile
+from arches.app.models.models import EditLog, Function, FunctionXGraph
 from arches.app.models.system_settings import settings
 from arches.app.utils.index_database import index_resources_by_transaction
 import logging
@@ -40,7 +41,7 @@ def save_to_tiles(
             logger.error(e)
             cursor.execute(
                 """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                ("failed", datetime.now(), loadid),
+                ("failed", timezone.now(), loadid),
             )
             error = {
                 "status": 400,
@@ -143,7 +144,7 @@ def _update_load_details(cursor, loadid):
     )
     cursor.execute(
         """UPDATE load_event SET (status, load_end_time, load_details) = (%s, %s, load_details || %s::JSONB) WHERE loadid = %s""",
-        ("completed", datetime.now(), number_of_import, loadid),
+        ("completed", timezone.now(), number_of_import, loadid),
     )
     logger.debug("load_event marked completed for loadid=%s", loadid)
 
@@ -176,6 +177,9 @@ def _post_save_edit_log(
             )
         else:
             logger.debug("Skipping indexing for loadid=%s (index=False)", loadid)
+
+        logger.debug("Calling function post_import hooks for loadid=%s", loadid)
+        _call_post_import_functions(loadid)
 
         user = User.objects.get(id=userid)
         user_email = getattr(user, "email", "")
@@ -212,7 +216,7 @@ def _post_save_edit_log(
             final_status = "indexed" if index else "completed"
             cursor.execute(
                 """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
-                (final_status, datetime.now(), True, True, loadid),
+                (final_status, timezone.now(), True, True, loadid),
             )
         logger.debug(
             "_post_save_edit_log complete: loadid=%s status=%s", loadid, final_status
@@ -223,13 +227,43 @@ def _post_save_edit_log(
         with connection.cursor() as cursor:
             cursor.execute(
                 """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
-                ("unindexed", datetime.now(), loadid),
+                ("unindexed", timezone.now(), loadid),
             )
         logger.debug(
             "_post_save_edit_log failed for loadid=%s; status=unindexed, data saved",
             loadid,
         )
         return {"success": False, "data": "saved"}
+
+
+def _call_post_import_functions(loadid):
+    """
+    Bulk loads write tiles without calling Tile.save, so functions never see
+    post_save. Instead, give functions a chance to act on the whole load by its
+    transaction id.
+    """
+    graphids = (
+        EditLog.objects.filter(transactionid=loadid)
+        .values_list("resourceclassid", flat=True)
+        .distinct()
+    )
+    functions = [
+        functionXgraph.function.get_class_module()(functionXgraph.config)
+        for functionXgraph in FunctionXGraph.objects.filter(
+            graph_id__in=[graphid for graphid in graphids if graphid]
+        )
+        .exclude(function__functiontype="primarydescriptors")
+        .select_related("function")
+    ]
+    functions += [
+        function.get_class_module()()
+        for function in Function.objects.filter(functiontype="global")
+    ]
+    for function in functions:
+        try:
+            function.post_import(loadid)
+        except NotImplementedError:
+            pass
 
 
 def get_resourceids_from_search_url(search_url, user=None):

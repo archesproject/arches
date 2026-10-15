@@ -96,6 +96,7 @@ export default function (params) {
         value: self.selectionValue,
         minimumInputLength: 0,
         clickBubble: true,
+        disabled: self.disabled,
         multiple: this.multiple,
         closeOnSelect: true,
         placeholder: self.placeholder,

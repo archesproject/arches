@@ -44,7 +44,7 @@ class BuildTileDataTests(TestCase):
         self.assertIsNone(_build_tile_data(staged)["node-1"])
 
     def test_resource_instance_list_adds_rxr_id(self):
-        item = {"resourceId": "abc", "ontologyProperty": ""}
+        item = {"resourceId": "abc", "relationship": ""}
         staged = {"node-1": {"value": [item], "datatype": "resource-instance-list"}}
         result = _build_tile_data(staged)
         self.assertEqual(len(result["node-1"]), 1)
