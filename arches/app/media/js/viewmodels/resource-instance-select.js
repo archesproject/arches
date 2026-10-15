@@ -4,6 +4,7 @@ import _ from 'underscore';
 import arches from 'arches';
 import WidgetViewModel from 'viewmodels/widget';
 import ontologyUtils from 'utils/ontology';
+import controlledListUtils from 'utils/controlled-list';
 import resourceUtils from 'utils/resource';
 import 'select-woo';
 import 'views/components/resource-report-abstract';
@@ -124,6 +125,7 @@ var ResourceInstanceSelectViewModel = function(params) {
                 self.downloadGraph(graph.graphid);
             }, this);
             this.resourceTypesToDisplayInDropDown(ko.unwrap(params.node.config.graphs).map(function(graph){return graph.graphid;}));
+            this.relationship(ko.unwrap(params.node.config.graphs).length > 0);
         }
     } else if(this.resourceTypesToDisplayInDropDown().length > 0) {
         this.resourceTypesToDisplayInDropDown().forEach(function(graphid){
@@ -134,6 +136,7 @@ var ResourceInstanceSelectViewModel = function(params) {
     this.resourceInstanceDisplayName = params.form && params.form.displayname ? params.form.displayname() : '';
     this.makeFriendly = ontologyUtils.makeFriendly;
     this.getSelect2ConfigForOntologyProperties = ontologyUtils.getSelect2ConfigForOntologyProperties;
+    this.getSelect2ConfigForControlledListItems = controlledListUtils.getSelect2ConfigForControlledListItems;
     self.newResourceInstance = ko.observable();
     this.resourceReportUrl = arches.urls.resource_report;
     this.resourceEditorUrl = arches.urls.resource_editor;
@@ -142,8 +145,25 @@ var ResourceInstanceSelectViewModel = function(params) {
     this.reportGraphId = ko.observable(null);
     this.filter = ko.observable('');
 
+    this.relationshipConfigForGraph = function(graphid) {
+        const graphs = self.node ? ko.unwrap(self.node.config.graphs) : null;
+        const nodeConfigGraph = (graphs || []).find(function(nodeConfigGraph) {
+            return nodeConfigGraph.graphid === graphid;
+        });
+        if (!nodeConfigGraph) {
+            return null;
+        }
+        return {
+            source: ko.unwrap(nodeConfigGraph.relationshipSource),
+            relationship: ko.unwrap(nodeConfigGraph.relationship),
+            inverseRelationship: ko.unwrap(nodeConfigGraph.inverseRelationship),
+            relationshipCollection: ko.unwrap(nodeConfigGraph.relationshipCollection),
+            relationshipControlledList: ko.unwrap(nodeConfigGraph.relationshipControlledList)
+        };
+    };
+
     this.toggleSelectedResourceRelationship = function(resourceRelationship) {
-        if(self.graphIsSemantic){
+        if(self.relationship()){
             if (self.selectedResourceRelationship() === resourceRelationship) {
                 self.selectedResourceRelationship(null);
             } else {
@@ -164,14 +184,14 @@ var ResourceInstanceSelectViewModel = function(params) {
         self.defaultResourceInstance().forEach(function(val){
             var ri = {
                 "resourceId": ko.observable(val.resourceId),
-                "ontologyProperty": ko.observable(val.ontologyProperty),
-                "inverseOntologyProperty": ko.observable(val.inverseOntologyProperty),
+                "relationship": ko.observable(val.relationship ?? val.ontologyProperty),
+                "inverseRelationship": ko.observable(val.inverseRelationship ?? val.inverseOntologyProperty),
                 "resourceXresourceId": ""
             };
-            ri.ontologyProperty.subscribe(function(){
+            ri.relationship.subscribe(function(){
                 self.defaultResourceInstance(self.value());
             });
-            ri.inverseOntologyProperty.subscribe(function(){
+            ri.inverseRelationship.subscribe(function(){
                 self.defaultResourceInstance(self.value());
             });
             ret.push(ri);
@@ -214,6 +234,13 @@ var ResourceInstanceSelectViewModel = function(params) {
             if(!!value) {
                 value.forEach(function(val) {
                     if (val) {
+                        // tile values saved before the keys were renamed
+                        if(val.relationship === undefined && val.ontologyProperty !== undefined) {
+                            val.relationship = val.ontologyProperty;
+                        }
+                        if(val.inverseRelationship === undefined && val.inverseOntologyProperty !== undefined) {
+                            val.inverseRelationship = val.inverseOntologyProperty;
+                        }
                         if(!val.resourceName) {
                             Object.defineProperty(val, 'resourceName', {value: ko.observable()});
                         }
@@ -223,6 +250,13 @@ var ResourceInstanceSelectViewModel = function(params) {
                         if(!val.iconClass) {
                             Object.defineProperty(val, 'iconClass', {value: ko.observable()});
                         }
+                        // these describe which picker the widget should render for this row
+                        // and must not be saved back into the tile value
+                        if(!val.relationshipSource) {
+                            Object.defineProperty(val, 'relationshipSource', {value: ko.observable()});
+                            Object.defineProperty(val, 'relationshipCollection', {value: ko.observable()});
+                            Object.defineProperty(val, 'relationshipControlledList', {value: ko.observable()});
+                        }
                         resourceUtils.lookupResourceInstanceData(ko.unwrap(val.resourceId), self.resourceLookup)
                             .then(function(resourceInstance) {
                                 if (resourceInstance) {
@@ -231,6 +265,14 @@ var ResourceInstanceSelectViewModel = function(params) {
                                     val.resourceName(resourceInstance["_source"].displayname);
                                     val?.iconClass(self.graphLookup[resourceInstance["_source"].graph_id]?.iconclass || 'fa fa-question');
                                     val.ontologyClass(resourceInstance["_source"].root_ontology_class);
+
+                                    const relationshipConfig = self.relationshipConfigForGraph(resourceInstance["_source"].graph_id);
+                                    if (relationshipConfig) {
+                                        self.relationship(true);
+                                        val.relationshipSource(relationshipConfig.source);
+                                        val.relationshipCollection(relationshipConfig.relationshipCollection);
+                                        val.relationshipControlledList(relationshipConfig.relationshipControlledList);
+                                    }
                                 }
                             });
                     }
@@ -256,26 +298,25 @@ var ResourceInstanceSelectViewModel = function(params) {
         var graph = self.graphLookup[esSource.graph_id];
         var iconClass = graph?.iconclass  || 'fa fa-question';
 
-        var ontologyProperty;
-        var inverseOntologyProperty;
+        var relationship;
+        var inverseRelationship;
+        let relationshipConfig;
 
         if (graph) {
-            ontologyProperty = graph.config.ontologyProperty;
-            inverseOntologyProperty = graph.config.inverseOntologyProperty;
+            relationship = graph.config.relationship;
+            inverseRelationship = graph.config.inverseRelationship;
 
-            if (self.node && (!ontologyProperty || !inverseOntologyProperty) ) {
-                self.relationship(!!self.node.ontologyclass());
-                var ontologyProperties = self.node.config.graphs().find(function(nodeConfigGraph) {
-                    return nodeConfigGraph.graphid === graph.graphid;
-                });
+            if (self.node && (!relationship || !inverseRelationship) ) {
+                relationshipConfig = self.relationshipConfigForGraph(graph.graphid);
 
-                if (ontologyProperties) {
-                    if (ontologyProperties.useOntologyRelationship) {
-                        ontologyProperty = ontologyProperty || ontologyProperties.ontologyProperty;
-                        inverseOntologyProperty = inverseOntologyProperty || ontologyProperties.inverseOntologyProperty;
+                if (relationshipConfig) {
+                    self.relationship(true);
+                    if (relationshipConfig.source === 'ontology') {
+                        relationship = relationship || relationshipConfig.relationship;
+                        inverseRelationship = inverseRelationship || relationshipConfig.inverseRelationship;
                     } else {
-                        ontologyProperty = ontologyProperties.relationshipConcept;
-                        inverseOntologyProperty = ontologyProperties.inverseRelationshipConcept;
+                        relationship = relationshipConfig.relationship;
+                        inverseRelationship = relationshipConfig.inverseRelationship;
                     }
                 }
             }
@@ -283,18 +324,23 @@ var ResourceInstanceSelectViewModel = function(params) {
 
         var ret = {
             "resourceId": ko.observable(id),
-            "ontologyProperty": ko.observable(ontologyProperty || ""),
-            "inverseOntologyProperty": ko.observable(inverseOntologyProperty || ""),
+            "relationship": ko.observable(relationship || ""),
+            "inverseRelationship": ko.observable(inverseRelationship || ""),
             "resourceXresourceId": ""
         };
         Object.defineProperty(ret, 'resourceName', {value: ko.observable(esSource.displayname)});
         Object.defineProperty(ret, 'ontologyClass', {value: ko.observable(esSource.root_ontology_class)});
         Object.defineProperty(ret, 'iconClass', {value: ko.observable(iconClass)});
+        // these describe which picker the widget should render for this row and must not
+        // be saved back into the tile value
+        Object.defineProperty(ret, 'relationshipSource', {value: ko.observable(relationshipConfig?.source)});
+        Object.defineProperty(ret, 'relationshipCollection', {value: ko.observable(relationshipConfig?.relationshipCollection)});
+        Object.defineProperty(ret, 'relationshipControlledList', {value: ko.observable(relationshipConfig?.relationshipControlledList)});
         if (!!params.configForm) {
-            ret.ontologyProperty.subscribe(function(){
+            ret.relationship.subscribe(function(){
                 self.defaultResourceInstance(self.value());
             });
-            ret.inverseOntologyProperty.subscribe(function(){
+            ret.inverseRelationship.subscribe(function(){
                 self.defaultResourceInstance(self.value());
             });
         }

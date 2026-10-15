@@ -209,8 +209,8 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
             graph_config = {}
         return {
             "resourceId": uuid_string,
-            "ontologyProperty": graph_config.get("ontologyProperty", ""),
-            "inverseOntologyProperty": graph_config.get("inverseOntologyProperty", ""),
+            "relationship": graph_config.get("relationship", ""),
+            "inverseRelationship": graph_config.get("inverseRelationship", ""),
         }
 
     @staticmethod

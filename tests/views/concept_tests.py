@@ -1,3 +1,5 @@
+import uuid
+
 from django.urls import reverse
 from django.test.client import Client
 from arches.app.models.concept import get_preflabel_from_valueid
@@ -27,3 +29,20 @@ class ConceptTests(ArchesTestCase):
         preflabel = get_preflabel_from_valueid(value_id, "en")["value"]
 
         self.assertEqual(preflabel, "is related to")
+
+    def test_get_pref_label_view(self):
+        client = Client()
+        client.login(username="admin", password="admin")
+        url = reverse("get_pref_label")
+
+        response = client.get(url, {"valueid": "ac41d9be-79db-4256-b368-2f4559cfbe55"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["value"], "is related to")
+
+        for params in (
+            {"valueid": str(uuid.uuid4())},
+            {"valueid": "https://example.org/controlled-list-manager/item/6e0f0a3e"},
+            {},
+        ):
+            with self.subTest(params):
+                self.assertEqual(client.get(url, params).status_code, 404)
