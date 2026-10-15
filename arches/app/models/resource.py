@@ -694,7 +694,7 @@ class Resource(models.ResourceInstance):
 
         permit_deletion = False
         if user != {}:
-            user_is_reviewer = user_is_resource_reviewer(user)
+            user_is_reviewer = user_is_resource_reviewer(user, resource=self)
             if user_is_reviewer is False:
                 tiles = list(models.TileModel.objects.filter(resourceinstance=self))
                 resource_is_provisional = (
@@ -847,13 +847,7 @@ class Resource(models.ResourceInstance):
             return result["value"]
 
         if not graphs:
-            graphs = list(
-                models.GraphModel.objects.all()
-                .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-                .exclude(isresource=False)
-                .exclude(is_active=False)
-                .exclude(source_identifier__isnull=False)
-            )
+            graphs = list(models.GraphModel.objects.get_resource_models())
 
         graph_lookup = {
             str(graph.graphid): {
@@ -979,13 +973,30 @@ class Resource(models.ResourceInstance):
             instanceids.remove(str(self.resourceinstanceid))
 
         if len(instanceids) > 0:
-            related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
-            if related_resources:
+            if settings.ELASTICSEARCH_ENABLED:
+                related_resources = se.search(
+                    index=RESOURCES_INDEX, id=list(instanceids)
+                )
+                related_resource_ids = (
+                    [
+                        resource["_id"]
+                        for resource in related_resources["docs"]
+                        if resource["found"]
+                    ]
+                    if related_resources
+                    else None
+                )
+            else:
+                # the index lookup above only establishes which ids actually exist
+                related_resources = True
                 related_resource_ids = [
-                    resource["_id"]
-                    for resource in related_resources["docs"]
-                    if resource["found"]
+                    str(pk)
+                    for pk in models.ResourceInstance.objects.filter(
+                        pk__in=instanceids
+                    ).values_list("pk", flat=True)
                 ]
+
+            if related_resources:
                 if include_rr_count:
                     to_counts = (
                         models.ResourceXResource.objects.filter(
@@ -1194,7 +1205,7 @@ class Resource(models.ResourceInstance):
     def update_resource_instance_lifecycle_state(
         self, user, resource_instance_lifecycle_state
     ):
-        if not user_is_resource_reviewer(user):
+        if not user_is_resource_reviewer(user, resource=self):
             raise PermissionDenied
 
         if (

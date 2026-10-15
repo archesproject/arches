@@ -398,7 +398,11 @@ $.ajax({
         'paging-filter': 1
     },
     success: function(results) {
-        results.results.aggregations['geo_aggs'] = results.results.aggregations['geo_aggs'].inner.buckets[0];
+        // the database-backed search_results (ELASTICSEARCH_ENABLED = False) returns no aggregations
+        if (!results.results.aggregations) {
+            return;
+        }
+        results.results.aggregations['geo_aggs'] =results.results.aggregations['geo_aggs'].inner.buckets[0];
         searchAggregations(results.results.aggregations);
         searchResults(results);
     }

@@ -63,6 +63,17 @@ ANONYMOUS_USER_NAME = None
 ELASTICSEARCH_HTTP_PORT = (
     9200  # this should be in increments of 200, eg: 9400, 9600, 9800
 )
+
+# Set to False to run Arches without an Elasticsearch instance. Intended for
+# projects that supply their own search implementation (e.g. a PostgreSQL-backed
+# Arches application). When False:
+#   - SearchEngineFactory returns a no-op engine and all indexing is discarded
+#   - the core search views return 404 and the core search nav links are hidden
+#   - RDM/concept search and term autocomplete return no results
+#   - Elasticsearch snapshot/restore is unavailable
+#   - the default allow permission framework cannot be used
+ELASTICSEARCH_ENABLED = True
+
 SEARCH_BACKEND = "arches.app.search.search.SearchEngine"
 SEARCH_THUMBNAILS = False
 # see http://elasticsearch-py.readthedocs.org/en/stable/api.html#elasticsearch.Elasticsearch
@@ -367,11 +378,22 @@ JWT_ALGORITHM = "HS256"
 
 # OAuth settings
 # https://django-oauth-toolkit.readthedocs.io/en/latest/settings.html
-OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 36000}
+OAUTH2_PROVIDER = {
+    "ACCESS_TOKEN_EXPIRE_SECONDS": 604800,  # one week
+    # Where a device sign-in sends the user to enter their code. Relative, so
+    # clients resolve it against the instance's URL.
+    "OAUTH_DEVICE_VERIFICATION_URI": "/o/device/",
+}
 
 # This is the client id you get when you register a new application
 # see https://arches.readthedocs.io/en/stable/api/#authentication
 OAUTH_CLIENT_ID = ""  # '9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
+
+# The client id of a public application with the "Device Code" grant type, for
+# clients such as desktop GIS plugins that sign users in through a browser
+# (RFC 8628). Desktop clients read it from auth/device_client_id. Leave empty
+# to turn device sign-in off.
+OAUTH_DEVICE_CLIENT_ID = ""
 
 AUTHENTICATION_BACKENDS = (
     "arches.app.utils.email_auth_backend.EmailAuthenticationBackend",
@@ -658,8 +680,6 @@ UUID_REGEX = (
     "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
 )
 
-OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 604800}  # one week
-
 #######################################
 ###       END STATIC SETTINGS       ###
 #######################################
@@ -783,6 +803,8 @@ ENABLE_TWO_FACTOR_AUTHENTICATION = False
 
 # If True, users cannot log in unless they have enabled two-factor authentication
 FORCE_TWO_FACTOR_AUTHENTICATION = False
+
+LOGIN_REDIRECT_URL = "home"
 
 # bounds for search results hex binning fabric (search grid).
 # a smaller bbox will give you less distortion in hexes and better performance

@@ -623,7 +623,8 @@ class ResourceInstanceLifecycleState(APIBase):
         return JSONResponse(resource_instance.resource_instance_lifecycle_state)
 
     def post(self, request, resourceid):
-        if not user_is_resource_reviewer(request.user):
+        resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+        if not user_is_resource_reviewer(request.user, resource=resource_instance):
             return JSONErrorResponse(
                 _("Request Failed"), _("Permission Denied"), status=403
             )
@@ -731,12 +732,7 @@ class ResourceReport(APIBase):
             resp["template"] = template
 
         if "related_resources" not in exclude:
-            resource_models = (
-                models.GraphModel.objects.filter(isresource=True)
-                .exclude(is_active=False)
-                .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-                .exclude(source_identifier__isnull=False)
-            )
+            resource_models = models.GraphModel.objects.get_resource_models()
 
             get_params = request.GET.copy()
             get_params.update({"paginate": "false"})

@@ -11,7 +11,9 @@ export async function fetchMapData(): Promise<Record<string, unknown>> {
         generateArchesURL("arches_vue_components:api-map-data"),
     );
     const parsed = await response.json();
-    if (!response.ok) throw new Error(parsed.message ?? response.statusText);
+    if (!response.ok) {
+        throw new Error(parsed.message ?? response.statusText);
+    }
     return parsed;
 }
 
@@ -27,35 +29,40 @@ export async function fetchDrawnFeaturesBuffer(
         },
     );
     const parsed = await response.json();
-    if (!response.ok) throw new Error(parsed.message ?? response.statusText);
+    if (!response.ok) {
+        throw new Error(parsed.message ?? response.statusText);
+    }
     return parsed;
 }
 
 export async function fetchResourceDescriptor(
     resourceId: string,
+    signal: AbortSignal,
 ): Promise<ResourceDescriptor> {
     const response = await fetch(
         generateArchesURL("arches:resource_descriptors", {
             resourceid: resourceId,
         }),
+        { signal },
     );
     const parsed = await response.json();
-    if (!response.ok) throw new Error(parsed.message ?? response.statusText);
+    if (!response.ok) {
+        throw new Error(parsed.message ?? response.statusText);
+    }
     return parsed;
 }
 
-export async function fetchGeoJSONBounds(
-    features: FeatureCollection,
-): Promise<[number, number, number, number]> {
+export async function fetchClusterResourceIds(
+    nodeId: string,
+    extent: string,
+): Promise<string[]> {
+    const query = new URLSearchParams({ nodeid: nodeId, extent });
     const response = await fetch(
-        generateArchesURL("arches_vue_components:api-geojson-bounds"),
-        {
-            method: "POST",
-            headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") as string },
-            body: JSON.stringify(features),
-        },
+        `${generateArchesURL("arches_vue_components:api-cluster-resources")}?${query}`,
     );
     const parsed = await response.json();
-    if (!response.ok) throw new Error(parsed.message ?? response.statusText);
-    return parsed;
+    if (!response.ok) {
+        throw new Error(parsed.message ?? response.statusText);
+    }
+    return parsed.resourceinstanceids;
 }
