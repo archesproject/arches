@@ -1062,12 +1062,17 @@ class ResourceInstanceLifecycleStateTest(ArchesTestCase):
         self.assertEqual(response.json()["name"], "State 1")
 
     @patch("arches.app.models.resource.Resource.objects.get")
+    @patch("arches.app.models.models.ResourceInstance.objects.get")
     @patch("arches.app.models.models.ResourceInstanceLifecycleState.objects.get")
     @patch(
         "arches.app.models.resource.Resource.update_resource_instance_lifecycle_state"
     )
     def test_post_lifecycle_state(
-        self, mock_update, mock_get_lifecycle_state, mock_get_resource
+        self,
+        mock_update,
+        mock_get_lifecycle_state,
+        mock_get_resource_instance,
+        mock_get_resource,
     ):
         self.client.login(username="admin", password="admin")
 

@@ -9,7 +9,10 @@ import type { Component } from "vue";
 import type { FeatureCollection } from "geojson";
 
 import type { GeoJSONFeatureCollectionAliasedNodeData } from "@/arches_vue_components/datatypes/geojson-feature-collection/types.ts";
-import type { MapInteractionTool } from "@/arches_vue_components/components/MapComponent/types.ts";
+import type {
+    MapInteractionTool,
+    MapSettings,
+} from "@/arches_vue_components/components/MapComponent/types.ts";
 import type { MapCardXNodeXWidgetData } from "@/arches_vue_components/widgets/MapWidget/types.ts";
 
 const {
@@ -50,6 +53,27 @@ const resolvedAllowedGeometryTypes = computed(
         ) ?? undefined,
 );
 
+const mapSettings = computed<Partial<MapSettings>>(() => {
+    const config = cardXNodeXWidgetData?.config;
+    const hasCameraTilt =
+        (config?.pitch ?? 0) !== 0 || (config?.bearing ?? 0) !== 0;
+
+    return {
+        showCursorCoordinates: config?.showCursorCoordinates,
+        coordinateReadoutSrid: config?.coordinateReadoutSrid,
+        coordinateReadoutFormat: config?.coordinateReadoutFormat,
+        showMapScale: config?.showMapScale,
+        mapScaleUnit: config?.mapScaleUnit,
+        showZoomLevel: config?.showZoomLevel,
+        geocoderVisible: config?.geocoderVisible,
+        geocoderPlaceholder: config?.geocodePlaceholder,
+        scrollZoomRequiresKey: config?.scrollZoomRequiresKey,
+        showNavigationControl: config?.showNavigationControl,
+        showFullscreenControl: config?.showFullscreenControl,
+        allow3d: config?.allow3d ?? hasCameraTilt,
+    };
+});
+
 const componentRef =
     useTemplateRef<InstanceType<typeof MapComponent>>("component");
 
@@ -83,6 +107,7 @@ function onValueUpdate(updatedValue: FeatureCollection): void {
         :interaction-tools="interactionTools"
         :max-features="cardXNodeXWidgetData?.config?.maxDrawnFeatures"
         :feature-popup-component="featurePopupComponent"
+        :settings="mapSettings"
         @update:is-loading="emit('update:isLoading', $event)"
         @update:value="onValueUpdate"
         @update:overlays="emit('update:overlays')"

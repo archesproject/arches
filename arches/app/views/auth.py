@@ -48,7 +48,11 @@ from django.core.exceptions import ValidationError
 import django.contrib.auth.password_validation as validation
 from django_ratelimit.decorators import ratelimit
 from arches import __version__
-from arches.app.utils.response import JSONResponse, Http401Response
+from arches.app.utils.response import (
+    Http401Response,
+    JSONErrorResponse,
+    JSONResponse,
+)
 from arches.app.utils.forms import (
     ArchesUserCreationForm,
     ArchesPasswordResetForm,
@@ -449,6 +453,22 @@ class UserProfileView(View):
             response = Http401Response()
 
         return response
+
+
+class DeviceClientIdView(View):
+    """
+    The client id for device sign-in (RFC 8628). A public client id isn't a
+    secret, and a desktop client needs it before anyone has signed in.
+    """
+
+    def get(self, request):
+        if not settings.OAUTH_DEVICE_CLIENT_ID:
+            return JSONErrorResponse(
+                _("Device sign-in is not enabled"),
+                _("Set OAUTH_DEVICE_CLIENT_ID to enable it."),
+                status=404,
+            )
+        return JSONResponse({"clientid": settings.OAUTH_DEVICE_CLIENT_ID})
 
 
 @method_decorator(csrf_exempt, name="dispatch")
