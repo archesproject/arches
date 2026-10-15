@@ -264,12 +264,18 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         # causes no additional queries beyond actual depth):
         # https://forum.djangoproject.com/t/prefetching-relations-to-arbitrary-depth/39328
         if depth:
-            child_tile_query = self.model.objects.get_queryset().get_tiles(
-                graph_slug=graph_slug,
-                as_representation=as_representation,
-                depth=depth - 1,
-                nodes=resolved_nodes,
-                graph_query=graph_query,
+            child_tile_query = (
+                self.model.objects.get_queryset()
+                .get_tiles(
+                    graph_slug=graph_slug,
+                    as_representation=as_representation,
+                    depth=depth - 1,
+                    nodes=resolved_nodes,
+                    graph_query=graph_query,
+                )
+                .filter(
+                    nodegroup__parentnodegroup_id=models.F("parenttile__nodegroup_id")
+                )
             )
 
             qs = qs.prefetch_related(

@@ -526,6 +526,35 @@ class RestFrameworkTests(GraphTestCase):
         ]
         self.assertCountEqual(new_sortorders, [next_sortorder, next_sortorder + 1])
 
+    def test_resource_put_leaves_tiles_parented_in_their_own_nodegroup(self):
+        misparented_tile = TileModel.objects.create(
+            nodegroup=self.nodegroup_1,
+            resourceinstance=self.resource_42,
+            data={},
+            parenttile=self.cardinality_1_tile,
+        )
+        resource_url = reverse(
+            "arches_querysets:api-resource",
+            kwargs={"graph": "datatype_lookups", "pk": str(self.resource_42.pk)},
+        )
+
+        self.client.login(username="dev", password="dev")
+        response = self.client.put(
+            resource_url,
+            {
+                "aliased_data": {
+                    "datatypes_1": {
+                        "tileid": str(self.cardinality_1_tile.pk),
+                        "resourceinstance": str(self.resource_42.pk),
+                        "aliased_data": {},
+                    },
+                },
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, HTTPStatus.OK, response.json())
+        self.assertTrue(TileModel.objects.filter(pk=misparented_tile.pk).exists())
+
     # ------------------------------------------------------------------ #
     # PATCH tile endpoint — parent + child, all cardinality combinations
     # ------------------------------------------------------------------ #
