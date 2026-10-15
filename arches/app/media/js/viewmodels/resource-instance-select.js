@@ -352,8 +352,13 @@ var ResourceInstanceSelectViewModel = function(params) {
     this.url = ko.observable(arches.urls.search_results);
     this.resourceToAdd = ko.observable(null);
 
-    this.disabled = ko.computed(function() {
-        return ko.unwrap(self.waitingForGraphToDownload) || ko.unwrap(params.disabled) || !!ko.unwrap(params.form?.locked);
+    // also lock the widget while graphs download or the form is locked.
+    // widget.js's self.disabled reads _disabled, so it picks up these conditions too.
+    const widgetDisabled = this.disabled;
+    this.disabled = ko.pureComputed(function() {
+        return ko.unwrap(self.waitingForGraphToDownload)
+            || ko.unwrap(widgetDisabled)
+            || !!ko.unwrap(params.form?.locked);
     });
 
     // this is a hack to get the dropdown to clear properly
