@@ -3,6 +3,7 @@ import { computed, onMounted, ref, watchEffect } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import InputText from "openvue/inputtext";
+import Message from "openvue/message";
 import Select from "openvue/select";
 import Textarea from "openvue/textarea";
 
@@ -45,6 +46,7 @@ const languageStore = useLanguageStore();
 const selectedLanguage = ref<Language | undefined>(resolveInitialLanguage());
 const managedNodeValue = ref<Record<string, LanguageValue>>();
 const singleInputValue = ref<string>();
+const fetchError = ref<string | null>(null);
 
 const languages = computed(() => languageStore.languages);
 
@@ -52,9 +54,13 @@ watchEffect(async () => {
     if (selectedLanguage.value) {
         return;
     }
-    await languageStore.fetchAllLanguages();
-    selectedLanguage.value = resolveInitialLanguage();
-    if (selectedLanguage.value) {
+    try {
+        await languageStore.fetchAllLanguages();
+        selectedLanguage.value = resolveInitialLanguage();
+    } catch (error) {
+        fetchError.value =
+            error instanceof Error ? error.message : String(error);
+    } finally {
         emit("ready");
     }
 });
@@ -124,7 +130,24 @@ function onUpdateModelValue(updatedValue: string | undefined) {
 </script>
 
 <template>
-    <div class="widget-language-inputs">
+    <Message
+        v-if="fetchError"
+        severity="error"
+        size="small"
+        variant="simple"
+    >
+        <span>
+            {{
+                $gettext("Unable to load languages: %{message}", {
+                    message: fetchError,
+                })
+            }}
+        </span>
+    </Message>
+    <div
+        v-else
+        class="widget-language-inputs"
+    >
         <Select
             v-model="selectedLanguage"
             class="language-selector"
