@@ -66,7 +66,7 @@ drop_triggers = "\n".join(
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "13001_spatialview_dbroles"),
+        ("models", "12903_relationship_source_node_config"),
     ]
 
     operations = [
