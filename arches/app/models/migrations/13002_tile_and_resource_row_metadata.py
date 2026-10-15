@@ -66,7 +66,7 @@ drop_triggers = "\n".join(
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "12903_relationship_source_node_config"),
+        ("models", "12751_widget_uneditable_config"),
     ]
 
     operations = [
