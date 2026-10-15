@@ -147,7 +147,7 @@ def rename_tile_data_keys(old_key, new_key, old_inverse_key, new_inverse_key):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("models", "13001_spatialview_dbroles"),
+        ("models", "12773_fix_relational_view_node_naming"),
     ]
 
     # Collapse the four relationship keys on each entry of a resource-instance node's
