@@ -555,6 +555,31 @@ class RestFrameworkTests(GraphTestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK, response.json())
         self.assertTrue(TileModel.objects.filter(pk=misparented_tile.pk).exists())
 
+    def test_update_tile_rejects_a_related_resource_without_a_resource_id(self):
+        update_url = reverse(
+            "arches_querysets:api-tile",
+            kwargs={
+                "graph": "datatype_lookups",
+                "nodegroup_alias": "datatypes_1",
+                "pk": self.cardinality_1_tile.pk,
+            },
+        )
+        request_body = {
+            "aliased_data": {
+                "resource_instance_alias": [
+                    {"tileid": str(self.cardinality_1_tile.pk)}
+                ],
+            },
+            "resourceinstance": str(self.resource_42.pk),
+        }
+
+        self.client.login(username="dev", password="dev")
+        response = self.client.patch(
+            update_url, request_body, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertIn("resource_instance_alias", response.json())
+
     # ------------------------------------------------------------------ #
     # PATCH tile endpoint — parent + child, all cardinality combinations
     # ------------------------------------------------------------------ #
