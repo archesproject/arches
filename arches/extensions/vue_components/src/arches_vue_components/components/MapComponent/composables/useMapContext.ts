@@ -21,6 +21,7 @@ import {
     DEFAULT_FEATURE_POINT_FILL,
     DEFAULT_FEATURE_POINT_SIZE,
     DEFAULT_MAP_SETTINGS,
+    EMPTY_FEATURE_COLLECTION,
     FIT_TO_FEATURES_MAX_ZOOM,
     FIT_TO_FEATURES_PADDING,
     GEOMETRY_TYPE_MULTI_POINT,
@@ -40,7 +41,7 @@ import { registerCoordinateSystems } from "@/arches_vue_components/components/Ma
 
 import type { InjectionKey, Ref } from "vue";
 import type { FeatureCollection } from "geojson";
-import type { Map as MaplibreMap } from "maplibre-gl";
+import type { GeoJSONSource, Map as MaplibreMap } from "maplibre-gl";
 
 import type { UseFeaturePopupReturn } from "@/arches_vue_components/components/MapComponent/composables/useFeaturePopup.ts";
 
@@ -213,6 +214,21 @@ export function useMapContext(
         emit("update:isLoading", newValue);
     });
 
+    watch(
+        () => props.value,
+        () => {
+            const readOnlyValueSource = map.value?.getSource<GeoJSONSource>(
+                READ_ONLY_VALUE_SOURCE_ID,
+            );
+            if (readOnlyValueSource) {
+                readOnlyValueSource.setData(
+                    props.value ?? EMPTY_FEATURE_COLLECTION,
+                );
+                fitToValue();
+            }
+        },
+    );
+
     onMounted(async () => {
         await waitForNonZeroContainerSize(mapContainer.value!);
 
@@ -291,12 +307,12 @@ export function useMapContext(
     }
 
     function addReadOnlyValueLayers(): void {
-        if (!props.value || map.value!.getSource(READ_ONLY_VALUE_SOURCE_ID)) {
+        if (map.value!.getSource(READ_ONLY_VALUE_SOURCE_ID)) {
             return;
         }
         map.value!.addSource(READ_ONLY_VALUE_SOURCE_ID, {
             type: "geojson",
-            data: props.value,
+            data: props.value ?? EMPTY_FEATURE_COLLECTION,
         });
         map.value!.addLayer({
             id: `${READ_ONLY_VALUE_SOURCE_ID}-fill`,

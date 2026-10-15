@@ -1,4 +1,5 @@
 import type { InjectionKey, ShallowRef } from "vue";
+import type { FeatureCollection } from "geojson";
 
 import type {
     DrawMode,
@@ -10,6 +11,10 @@ export const BUFFER_FILL_OPACITY = 0.3;
 export const BUFFER_LAYER_ID = "buffer-layer";
 export const DEFAULT_FEATURE_COLOR = "#c12";
 export const DEFAULT_FEATURE_FILL_OPACITY = 0.25;
+export const EMPTY_FEATURE_COLLECTION: FeatureCollection = {
+    type: "FeatureCollection",
+    features: [],
+};
 export const FIT_TO_FEATURES_MAX_ZOOM = 17;
 export const FIT_TO_FEATURES_PADDING = 80;
 export const DEFAULT_FEATURE_LINE_WIDTH = 2;
