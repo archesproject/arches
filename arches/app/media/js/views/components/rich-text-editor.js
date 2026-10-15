@@ -5,6 +5,7 @@ import StarterKit from '@tiptap/starter-kit';
 import { Placeholder } from '@tiptap/extensions';
 import { Image } from '@tiptap/extension-image';
 import { TableKit } from '@tiptap/extension-table';
+import { dropdown } from 'bootstrap';
 import richTextEditorTemplate from 'templates/views/components/rich-text-editor.htm';
 import 'bindings/tiptap';
 
@@ -98,8 +99,6 @@ const toolbarItems = {
     codeBlock: { command: chain => chain.setCodeBlock(), isActive: editor => editor.isActive('codeBlock') },
 };
 
-const textFormats = ['paragraph', 'heading1', 'heading2', 'heading3', 'heading4', 'heading5', 'heading6', 'codeBlock'];
-
 /**
 * registers a rich-text-editor component: a Tiptap editor with a toolbar
 * @function external:"ko.components".rich-text-editor
@@ -130,7 +129,6 @@ export default ko.components.register('views/components/rich-text-editor', {
         this.editor = editor;
         this.direction = params.direction || arches.activeLanguageDir;
         this.disabled = params.disabled;
-        this.isTableMenuOpen = ko.observable(false);
 
         // keep the value and the editor in sync
         editor.on('update', () => params.value(getValue()));
@@ -157,13 +155,9 @@ export default ko.components.register('views/components/rich-text-editor', {
         this.state = ko.observable(getState());
         editor.on('transaction', () => this.state(getState()));
 
-        this.format = ko.pureComputed(() => textFormats.find(name => this.state()[name].isActive) ?? '');
-        console.log(this.format);
-
         this.run = name => () => {
             const item = toolbarItems[name];
-            console.log(item, name);
-            this.isTableMenuOpen(false);
+            // dropdown.hideAll(); hide dropdown after click - is this a bug?
             if (item.action) {
                 item.action(editor);
             } else {
@@ -171,12 +165,8 @@ export default ko.components.register('views/components/rich-text-editor', {
             }
         };
 
-        this.onTextFormatChange = (_data, event) => {
-            this.run(event.target.value)();
-        };
-
         // roving tabindex: only the most recently focused control is in the tab order
-        const getControls = toolbar => Array.from(toolbar.querySelectorAll('.rich-text-editor-toolbar-button, .rich-text-editor-toolbar-select'));
+        const getControls = toolbar => Array.from(toolbar.querySelectorAll('.rich-text-editor-toolbar-button'));
 
         this.onFocusIn = (_data, event) => {
             const controls = getControls(event.currentTarget);
@@ -197,9 +187,6 @@ export default ko.components.register('views/components/rich-text-editor', {
             }[event.key];
             if (moveTo !== undefined) {
                 controls[moveTo].focus();
-            } else if (event.key === 'Escape' && this.isTableMenuOpen()) {
-                this.isTableMenuOpen(false);
-                event.currentTarget.querySelector('.rich-text-editor-toolbar-menu > button').focus();
             } else if (event.key === 'Escape') {
                 editor.commands.focus();
             } else {
@@ -207,24 +194,9 @@ export default ko.components.register('views/components/rich-text-editor', {
             }
         };
 
-        // the table menu is a disclosure: a button showing a list of buttons, closed when focus or a click leaves it
-        this.toggleTableMenu = () => {
-            this.isTableMenuOpen(!this.isTableMenuOpen());
-        };
-
-        const closeTableMenuIfOutside = (event) => {
-            if (!event.target.closest('.rich-text-editor-toolbar-menu')) {
-                this.isTableMenuOpen(false);
-            }
-        };
-        document.addEventListener('focusin', closeTableMenuIfOutside);
-        document.addEventListener('pointerdown', closeTableMenuIfOutside);
-
         this.dispose = () => {
             subscriptions.forEach(subscription => subscription.dispose());
             editor.destroy();
-            document.removeEventListener('focusin', closeTableMenuIfOutside);
-            document.removeEventListener('pointerdown', closeTableMenuIfOutside);
         };
     },
     template: richTextEditorTemplate,
