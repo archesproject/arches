@@ -744,3 +744,89 @@ class TileTreeSaveWithProvisionalEditsTests(GraphTestCase):
         tile.save(force_admin=True)
 
         self.assertEqual(self._number_value(tile), self.AUTHORITATIVE_NUMBER)
+
+
+# ---------------------------------------------------------------------------
+# Regression tests — provisional_edits_for_user kwarg on save()
+# ---------------------------------------------------------------------------
+
+
+class ResourceTileTreeSaveProvisionalEditsForUserTests(GraphTestCase):
+    """Regression: provisional_edits_for_user passed to save() must not leak to
+    Django's Model.save() as an unexpected keyword argument.
+
+    Before the fix, _save_aliased_data forwarded all **kwargs verbatim into
+    TileTreeOperation.save_kwargs, which were then passed directly to
+    Model.save(), raising:
+        TypeError: Model.save() got an unexpected keyword argument
+        'provisional_edits_for_user'
+
+    The fix pops provisional_edits_for_user in _save_aliased_data and stores it
+    as self._provisional_edits_user so that the post-save refresh picks it up.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        call_command("add_test_users", verbosity=0)
+
+    def setUp(self):
+        self.provisional_editor = User.objects.get(username="tester3")
+
+    def _load_resource(self):
+        return ResourceTileTree.get_tiles(
+            "datatype_lookups", as_representation=False
+        ).get(pk=self.resource_42.pk)
+
+    def test_save_does_not_raise_with_provisional_edits_for_user(self):
+        """Regression: must not raise TypeError: Model.save() got an unexpected
+        keyword argument 'provisional_edits_for_user'."""
+        resource = self._load_resource()
+        tile = resource.aliased_data.datatypes_1
+        tile.aliased_data.non_localized_string_alias = "regression-check"
+        resource.save(
+            force_admin=True, provisional_edits_for_user=self.provisional_editor
+        )
+
+    def test_save_sets_provisional_edits_user_on_instance(self):
+        """provisional_edits_for_user is stored as _provisional_edits_user so
+        the post-save refresh_from_db() applies the provisional overlay."""
+        resource = self._load_resource()
+        tile = resource.aliased_data.datatypes_1
+        tile.aliased_data.non_localized_string_alias = "attr-check"
+        resource.save(
+            force_admin=True, provisional_edits_for_user=self.provisional_editor
+        )
+        self.assertIs(resource._provisional_edits_user, self.provisional_editor)
+
+
+class TileTreeSaveProvisionalEditsForUserTests(GraphTestCase):
+    """Same regression coverage for the TileTree.save() path."""
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        call_command("add_test_users", verbosity=0)
+
+    def setUp(self):
+        self.provisional_editor = User.objects.get(username="tester3")
+
+    def _load_tile(self):
+        return TileTree.get_tiles("datatype_lookups", "datatypes_1").get(
+            pk=self.cardinality_1_tile.pk
+        )
+
+    def test_save_does_not_raise_with_provisional_edits_for_user(self):
+        """Regression: must not raise TypeError: Model.save() got an unexpected
+        keyword argument 'provisional_edits_for_user'."""
+        tile = self._load_tile()
+        tile.aliased_data.non_localized_string_alias = "tile-regression-check"
+        tile.save(force_admin=True, provisional_edits_for_user=self.provisional_editor)
+
+    def test_save_sets_provisional_edits_user_on_instance(self):
+        """provisional_edits_for_user is stored as _provisional_edits_user so
+        the post-save refresh_from_db() applies the provisional overlay."""
+        tile = self._load_tile()
+        tile.aliased_data.non_localized_string_alias = "tile-attr-check"
+        tile.save(force_admin=True, provisional_edits_for_user=self.provisional_editor)
+        self.assertIs(tile._provisional_edits_user, self.provisional_editor)

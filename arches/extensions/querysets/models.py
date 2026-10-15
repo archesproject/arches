@@ -306,6 +306,9 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         **kwargs,
     ):
         """Raises a compound ValidationError with any failing tile values."""
+        provisional_edits_for_user = kwargs.pop("provisional_edits_for_user", None)
+        if provisional_edits_for_user is not None:
+            self._provisional_edits_user = provisional_edits_for_user
         request = ensure_request(request, force_admin)
         operation = TileTreeOperation(
             entry=self, request=request, partial=partial, save_kwargs=kwargs
@@ -980,6 +983,9 @@ class TileTree(TileModel, AliasedDataMixin):
     def _save_aliased_data(
         self, *, request=None, index=True, partial=True, force_admin=False, **kwargs
     ):
+        provisional_edits_for_user = kwargs.pop("provisional_edits_for_user", None)
+        if provisional_edits_for_user is not None:
+            self._provisional_edits_user = provisional_edits_for_user
         request = ensure_request(request, force_admin)
         # The `entry` for the TileTreeOperation is usually self, but it could
         # be a higher parent tile in the tree if blank parents were backfilled.
