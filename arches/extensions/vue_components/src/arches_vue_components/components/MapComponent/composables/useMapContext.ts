@@ -22,8 +22,6 @@ import {
     DEFAULT_FEATURE_POINT_SIZE,
     DEFAULT_MAP_SETTINGS,
     EMPTY_FEATURE_COLLECTION,
-    FIT_TO_FEATURES_MAX_ZOOM,
-    FIT_TO_FEATURES_PADDING,
     GEOMETRY_TYPE_MULTI_POINT,
     GEOMETRY_TYPE_MULTI_POLYGON,
     GEOMETRY_TYPE_POINT,
@@ -183,11 +181,7 @@ export function useMapContext(
         () => props.allowedGeometryTypes ?? null,
     );
 
-    const drawnFeatureControls = useDrawnFeatures(
-        map,
-        { value: props.value, maxFeatures: props.maxFeatures },
-        emit,
-    );
+    const drawnFeatureControls = useDrawnFeatures(map, props, emit);
     const {
         overlayOpacities,
         overlayLayerIds,
@@ -292,18 +286,9 @@ export function useMapContext(
             fitToDefaultBounds();
             return;
         }
-        const [west, south, east, north] = geojsonExtent(props.value);
-        map.value!.fitBounds(
-            [
-                [west, south],
-                [east, north],
-            ],
-            {
-                padding: FIT_TO_FEATURES_PADDING,
-                maxZoom: FIT_TO_FEATURES_MAX_ZOOM,
-                animate: false,
-            },
-        );
+        drawnFeatureControls.fitToFeatures(props.value.features, {
+            animate: false,
+        });
     }
 
     function addReadOnlyValueLayers(): void {

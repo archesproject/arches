@@ -11,12 +11,6 @@ export const BUFFER_FILL_OPACITY = 0.3;
 export const BUFFER_LAYER_ID = "buffer-layer";
 export const DEFAULT_FEATURE_COLOR = "#c12";
 export const DEFAULT_FEATURE_FILL_OPACITY = 0.25;
-export const EMPTY_FEATURE_COLLECTION: FeatureCollection = {
-    type: "FeatureCollection",
-    features: [],
-};
-export const FIT_TO_FEATURES_MAX_ZOOM = 17;
-export const FIT_TO_FEATURES_PADDING = 80;
 export const DEFAULT_FEATURE_LINE_WIDTH = 2;
 export const DEFAULT_FEATURE_POINT_FILL = "#ffffff";
 export const DEFAULT_FEATURE_POINT_SIZE = 6;
@@ -30,7 +24,13 @@ export const DRAW_POINT = "draw_point";
 export const DRAW_POLYGON = "draw_polygon";
 export const DRAW_SELECTION_CHANGE_EVENT = "draw.selectionchange";
 export const DRAW_UPDATE_EVENT = "draw.update";
+export const EMPTY_FEATURE_COLLECTION: FeatureCollection = {
+    type: "FeatureCollection",
+    features: [],
+};
 export const FEET = "feet";
+export const FIT_TO_FEATURES_MAX_ZOOM = 17;
+export const FIT_TO_FEATURES_PADDING = 80;
 export const GEOMETRY_TYPE_LINESTRING = "LineString";
 export const GEOMETRY_TYPE_MULTI_POINT = "MultiPoint";
 export const GEOMETRY_TYPE_MULTI_POLYGON = "MultiPolygon";

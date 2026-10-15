@@ -368,7 +368,10 @@ export function useDrawnFeatures(
         updateDrawnFeatures({ shouldFitBounds: true });
     }
 
-    function fitToFeatures(features: Feature[]): void {
+    function fitToFeatures(
+        features: Feature[],
+        { animate = true }: { animate?: boolean } = {},
+    ): void {
         if (!features.length) {
             return;
         }
@@ -385,6 +388,7 @@ export function useDrawnFeatures(
             {
                 padding: FIT_TO_FEATURES_PADDING,
                 maxZoom: FIT_TO_FEATURES_MAX_ZOOM,
+                animate,
             },
         );
     }

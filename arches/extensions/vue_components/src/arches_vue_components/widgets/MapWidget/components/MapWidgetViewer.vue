@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import MapComponent from "@/arches_vue_components/components/MapComponent/MapComponent.vue";
-import MapToolsPanel from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/MapToolsPanel.vue";
+import { computed } from "vue";
 
-import { useDefaultMapInteractionTools } from "@/arches_vue_components/components/MapComponent/composables/useDefaultMapInteractionTools.ts";
+import MapComponent from "@/arches_vue_components/components/MapComponent/MapComponent.vue";
+
+import { buildMapSettings } from "@/arches_vue_components/widgets/MapWidget/utils.ts";
 
 import type { GeoJSONFeatureCollectionAliasedNodeData } from "@/arches_vue_components/datatypes/geojson-feature-collection/types.ts";
 import type { MapCardXNodeXWidgetData } from "@/arches_vue_components/widgets/MapWidget/types.ts";
@@ -16,8 +17,8 @@ const emit = defineEmits<{
     "update:isLoading": [isLoading: boolean];
 }>();
 
-const viewerInteractionTools = useDefaultMapInteractionTools().filter(
-    (interactionTool) => interactionTool.component !== MapToolsPanel,
+const mapSettings = computed(() =>
+    buildMapSettings(cardXNodeXWidgetData?.config),
 );
 </script>
 
@@ -32,8 +33,8 @@ const viewerInteractionTools = useDefaultMapInteractionTools().filter(
         :min-zoom="cardXNodeXWidgetData?.config?.minZoom"
         :max-zoom="cardXNodeXWidgetData?.config?.maxZoom"
         :basemap="cardXNodeXWidgetData?.config?.basemap"
-        :interaction-tools="viewerInteractionTools"
         :is-read-only="true"
+        :settings="mapSettings"
         @update:is-loading="emit('update:isLoading', $event)"
     />
 </template>
