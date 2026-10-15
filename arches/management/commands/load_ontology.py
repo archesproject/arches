@@ -29,8 +29,6 @@ from django.core.files import File
 from django.db import transaction
 from arches.app.models import models
 
-from arches.app.models.system_settings import settings
-
 # from rdflib import *
 from rdflib import Graph, RDF, RDFS
 from rdflib.resource import Resource
@@ -54,22 +52,6 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        def choose_ontology(message):
-            available_ontologies = []
-            for ontology in models.Ontology.objects.filter(parentontology=None):
-                available_ontologies.append(ontology)
-
-            if len(available_ontologies) > 0:
-                selections = []
-                for index, ontology in enumerate(available_ontologies, start=1):
-                    selections.append(
-                        ("%s. %s (%s)") % (index, ontology.name, ontology.pk)
-                    )
-                selected_ontology = input(message + "\n".join(selections) + "\n")
-                return available_ontologies[int(selected_ontology) - 1]
-            else:
-                return None
-
         ontology_version = None
         ontology_src = None
 
@@ -264,22 +246,3 @@ class Command(BaseCommand):
                 )
             ]
         return self.subclass_cache[ontology_class]
-
-    def get_relative_path(self, data_source):
-        """
-        get's a relative path where the ontology file is located
-
-        """
-
-        ret = None
-        try:
-            if settings.ONTOLOGY_DIR in os.path.abspath(data_source):
-                ret = (
-                    os.path.abspath(data_source)
-                    .replace(settings.ONTOLOGY_DIR, "")
-                    .lstrip(os.sep)
-                )
-        except Exception as e:
-            print("Something went wrong in getting the path to the ontology file", e)
-
-        return ret

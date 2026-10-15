@@ -17,10 +17,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import json
-from datetime import datetime
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 import django.contrib.auth.password_validation as validation
 from django.shortcuts import render
 from django.template.loader import render_to_string
@@ -46,63 +45,6 @@ logger = logging.getLogger(__name__)
 
 class UserManagerView(BaseManagerView):
     action = ""
-
-    def get_last_login(self, date):
-        result = _("Not yet logged in")
-        try:
-            result = datetime.strftime(date, "%Y-%m-%d %H:%M")
-        except TypeError as e:
-            pass
-        return result
-
-    def get_user_details(self, user):
-        identities = []
-        for group in Group.objects.all():
-            groupUsers = [
-                {
-                    "id": user.id,
-                    "first_name": user.first_name,
-                    "last_name": user.last_name,
-                    "email": user.email,
-                    "last_login": self.get_last_login(user.last_login),
-                    "username": user.username,
-                    "groups": [gp.id for gp in user.groups.all()],
-                }
-                for user in group.user_set.all()
-            ]
-            identities.append(
-                {
-                    "name": group.name,
-                    "type": "group",
-                    "id": group.pk,
-                    "users": groupUsers,
-                    "default_permissions": group.permissions.all(),
-                }
-            )
-        for user in User.objects.filter():
-            groups = []
-            group_ids = []
-            default_perms = []
-            for group in user.groups.all():
-                groups.append(group.name)
-                group_ids.append(group.id)
-                default_perms = default_perms + list(group.permissions.all())
-            identities.append(
-                {
-                    "name": user.email or user.username,
-                    "groups": ", ".join(groups),
-                    "type": "user",
-                    "id": user.pk,
-                    "default_permissions": set(default_perms),
-                    "is_superuser": user.is_superuser,
-                    "group_ids": group_ids,
-                    "first_name": user.first_name,
-                    "last_name": user.last_name,
-                    "email": user.email,
-                }
-            )
-
-        return {"identities": identities}
 
     def get(self, request):
 

@@ -194,21 +194,6 @@ def get_nodegroups_here_and_below(start_nodegroup):
     return accumulator
 
 
-def filter_nodes_by_highest_parent(nodes, aliases):
-    filtered_nodes = set()
-    for alias in aliases:
-        for node in nodes:
-            if node.alias == alias:
-                break
-        else:
-            raise ValueError("Node alias {alias} not found in nodes.")
-        nodegroups = get_nodegroups_here_and_below(node.nodegroup)
-        for nodegroup in nodegroups:
-            filtered_nodes |= set(nodegroup.node_set.all())
-
-    return filtered_nodes
-
-
 def any_nodegroup_in_hierarchy_is_cardinality_n(nodegroup, graph_nodes):
     # Avoid verbose prefetching by just building a lookup locally.
     parent_nodegroup_lookup = {

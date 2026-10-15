@@ -1225,46 +1225,6 @@ class GraphTests(ArchesTestCase):
                 graph.nodes[card["nodegroup_id"]].description,
             )
 
-    def test_get_root_nodegroup(self):
-        """
-        test we can get the right parent NodeGroup
-
-        """
-
-        graph = Graph.objects.create_graph(
-            name="TEST",
-            is_resource=False,
-        )
-        graph.append_branch(
-            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
-            graphid=self.NODE_NODETYPE_GRAPHID,
-        )
-
-        for node in list(graph.nodes.values()):
-            if node.is_collector:
-                if node.nodegroup.parentnodegroup is None:
-                    self.assertEqual(graph.get_root_nodegroup(), node.nodegroup)
-
-    def test_get_root_card(self):
-        """
-        test we can get the right parent card
-
-        """
-
-        graph = Graph.objects.create_graph(
-            name="TEST",
-            is_resource=False,
-        )
-        graph.append_branch(
-            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
-            graphid=self.NODE_NODETYPE_GRAPHID,
-        )
-        graph.publish()
-
-        for card in list(graph.cards.values()):
-            if card.nodegroup.parentnodegroup is None:
-                self.assertEqual(graph.get_root_card(), card)
-
     def test_graph_validation_of_null_ontology_class(self):
         """
         test to make sure null ontology classes aren't allowed

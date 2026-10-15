@@ -1406,91 +1406,6 @@ class Graph(models.GraphModel):
                 ret.append(edge)
         return ret
 
-    def is_node_in_child_group(self, node):
-        """
-        test to see if the node is in a group that is a child to another group
-
-        return true if the node is in a child group, false otherwise
-
-        Arguments:
-        node -- the node to test
-
-        """
-
-        hasParentGroup = False
-        nodegroup_id = node.nodegroup_id
-        if not nodegroup_id:
-            return False
-
-        for node in self.get_parent_nodes_and_edges(node)["nodes"]:
-            if node.nodegroup is not None and node.nodegroup_id != nodegroup_id:
-                hasParentGroup = True
-
-        return hasParentGroup
-
-    def get_parent_nodes_and_edges(self, node):
-        """
-        given a node, get all the parent nodes and edges
-
-        returns an object with a list of nodes and edges
-
-        Arguments:
-        node -- the node from which to get the node's parents
-
-        """
-
-        nodes = []
-        edges = []
-        for edge in self.edges.values():
-            if edge.rangenode_id == node.nodeid:
-                edges.append(edge)
-                nodes.append(edge.domainnode)
-
-                nodesAndEdges = self.get_parent_nodes_and_edges(edge.domainnode)
-                nodes.extend(nodesAndEdges["nodes"])
-                edges.extend(nodesAndEdges["edges"])
-
-        return {"nodes": nodes, "edges": edges}
-
-    def is_group_semantic(self, node):
-        """
-        test to see if all the nodes in a group are semantic
-
-        returns true if the group contains only semantic nodes, otherwise false
-
-        Arguments:
-        node -- the node to use as a basis of finding the group
-
-        """
-
-        for node in self.get_grouped_nodes(node):
-            if node.datatype != "semantic":
-                return False
-
-        return True
-
-    def get_grouped_nodes(self, node):
-        """
-        given a node, get any other nodes that share the same group
-
-        returns a list of nodes
-
-        Arguments:
-        node -- the node to use as a basis of finding the group
-
-        """
-
-        ret = []
-        nodegroup_id = node.nodegroup_id
-        if nodegroup_id == "":
-            return [node]
-
-        for node in self.nodes.values():
-            if node.nodegroup_id == nodegroup_id:
-                ret.append(node)
-
-        return ret
-
     def get_valid_domain_ontology_classes(self, nodeid=None):
         """
         gets the ontology properties (and related classes) this graph can have with a parent node
@@ -1933,26 +1848,6 @@ class Graph(models.GraphModel):
 
         found.grouping_node_id = found.nodegroupid
         return found
-
-    def get_root_nodegroup(self):
-        """
-        gets the top level nodegroup (the first nodegroup that doesn't have a parentnodegroup)
-
-        """
-
-        for nodegroup in self.get_nodegroups():
-            if nodegroup.parentnodegroup is None:
-                return nodegroup
-
-    def get_root_card(self):
-        """
-        gets the top level card/card container
-
-        """
-
-        for card in self.cards.values():
-            if card.nodegroup.parentnodegroup is None:
-                return card
 
     def get_cards(self, use_raw_i18n_json=False, force_recalculation=False):
         """

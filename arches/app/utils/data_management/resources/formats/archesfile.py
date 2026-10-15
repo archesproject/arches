@@ -33,11 +33,9 @@ from arches.app.utils.data_management.resource_graphs.importer import (
 from arches.app.models.tile import Tile, TileValidationError
 from arches.app.models.resource import Resource
 from arches.app.models.models import ResourceInstance
-from arches.app.models.models import FunctionXGraph
 from arches.app.models.models import NodeGroup
 from arches.app.models.models import GraphModel
 from arches.app.models.system_settings import settings
-from django.core.exceptions import ValidationError
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from .format import Writer
 from .format import Reader
@@ -112,39 +110,6 @@ class ArchesFileWriter(Writer):
 
 
 class ArchesFileReader(Reader):
-    def pre_import(self, tile, graph_id):
-        for function in self.get_function_class_instances(tile, graph_id):
-            try:
-                function.on_import(tile)
-            except NotImplementedError:
-                pass
-        return tile
-
-    def get_function_class_instances(self, tile, graph_id):
-        ret = []
-        functionXgraphs = FunctionXGraph.objects.filter(
-            graph_id=graph_id,
-            config__triggering_nodegroups__contains=[tile["nodegroup_id"]],
-        )
-        for functionXgraph in functionXgraphs:
-            func = functionXgraph.function.get_class_module()(
-                functionXgraph.config, tile["nodegroup_id"]
-            )
-            ret.append(func)
-        return ret
-
-    def validate_business_data(self, business_data):
-        errors = []
-        if type(business_data) == dict and business_data["resources"]:
-            for resource in business_data["resources"]:
-                graph_id = resource["resourceinstance"]["graph_id"]
-                for tile in resource["tiles"]:
-                    try:
-                        self.pre_import(tile, graph_id)
-                    except ValidationError as e:
-                        errors.append(e.args)
-        return errors
-
     def import_graphs(self):
         """
         Wrapper around arches.app.utils.data_management.resource_graphs.importer method.
@@ -590,18 +555,3 @@ class ArchesFileReader(Reader):
         this_resource.save_descriptors()
         this_resource.index()
         return this_resource
-
-    def import_all(self):
-        errors = []
-        conceptImporter(self.reference_data)
-        resource_graph_errors, resource_graph_reporter = resourceGraphImporter(
-            self.graphs
-        )
-        resource_graph_reporter.report_results()
-        errors = self.validate_business_data(self.business_data)
-        if len(errors) == 0:
-            if self.business_data not in ("", []):
-                self.import_business_data(self.business_data, self.mapping)
-        else:
-            for error in errors:
-                print("{0} {1}".format(error[0], error[1]))

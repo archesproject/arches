@@ -80,7 +80,3 @@ class TokenMiddleware(MiddlewareMixin):
     def process_request(self, request):
         token = self.get_authorization_header(request)
         request.token = token
-
-
-class AuthenticationFailed(Exception):
-    pass

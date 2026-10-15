@@ -301,15 +301,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             ]
             return feature_collections
 
-    def get_bounds(self, tile, node):
-        bounds = None
-        try:
-            node_data = tile.data[str(node.pk)]
-            bounds = self.get_bounds_from_value(node_data)
-        except KeyError as e:
-            print(e)
-        return bounds
-
     def get_bounds_from_value(self, node_data):
         bounds = None
         for feature in node_data["features"]:
