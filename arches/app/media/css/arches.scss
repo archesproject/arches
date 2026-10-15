@@ -13370,6 +13370,7 @@ table.csv-mapping-table td {
 
 .rich-text-editor-content {
     height: 250px;
+    min-height: 250px;
     overflow-y: auto;
     resize: vertical;
 }
