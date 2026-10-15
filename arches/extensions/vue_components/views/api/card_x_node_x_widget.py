@@ -40,6 +40,19 @@ def first_cards_by_nodegroup_id(nodegroup_ids):
     return cards_by_nodegroup_id
 
 
+def default_card_x_node_x_widget(node, card, datatype_factory):
+    default_widget_definition = datatype_factory.datatypes[node.datatype].defaultwidget
+    if default_widget_definition is None:  # handle semantic nodes
+        return None
+    return models.CardXNodeXWidget(
+        node=node,
+        card=card,
+        widget=default_widget_definition,
+        config=default_widget_definition.defaultconfig,
+        label=node.name,
+    )
+
+
 def build_card_x_node_x_widgets_by_nodegroup_id(
     nodes, saved_widgets, default_cards_by_nodegroup_id
 ):
@@ -53,19 +66,13 @@ def build_card_x_node_x_widgets_by_nodegroup_id(
         if node.pk in saved_widgets_by_node_id:
             widget_instances.append(saved_widgets_by_node_id[node.pk])
             continue
-        default_widget_definition = datatype_factory.datatypes[
-            node.datatype
-        ].defaultwidget
-        if default_widget_definition is not None:  # handle semantic nodes
-            widget_instances.append(
-                models.CardXNodeXWidget(
-                    node=node,
-                    card=default_cards_by_nodegroup_id.get(node.nodegroup_id),
-                    widget=default_widget_definition,
-                    config=default_widget_definition.defaultconfig,
-                    label=node.name,
-                )
-            )
+        default_widget = default_card_x_node_x_widget(
+            node,
+            default_cards_by_nodegroup_id.get(node.nodegroup_id),
+            datatype_factory,
+        )
+        if default_widget is not None:
+            widget_instances.append(default_widget)
 
     serialized_widgets_by_nodegroup_id = {}
     for widget_instance in widget_instances:
@@ -129,24 +136,14 @@ class CardXNodeXWidgetView(View):
             return nodegroup_permission_error_response()
 
         if not card_x_node_x_widget:
-            # Supply default widget configuration.
-            datatype_factory = DataTypeFactory()
-            d_data_type = datatype_factory.datatypes[node.datatype]
-            default_widget = d_data_type.defaultwidget
-
-            if default_widget is None:  # handle semantic nodes
+            card_x_node_x_widget = default_card_x_node_x_widget(
+                node, node.nodegroup.cardmodel_set.first(), DataTypeFactory()
+            )
+            if card_x_node_x_widget is None:
                 return JSONErrorResponse(
                     message=_("No widget is configured for this node."),
                     status=404,
                 )
-
-            card_x_node_x_widget = models.CardXNodeXWidget(
-                node=node,
-                card=node.nodegroup.cardmodel_set.first(),
-                widget=default_widget,
-                config=default_widget.defaultconfig,
-                label=node.name,
-            )
 
         serialized_widget = serialize_card_x_node_x_widget(
             card_x_node_x_widget, DataTypeFactory()
@@ -157,10 +154,7 @@ class CardXNodeXWidgetView(View):
                 "component"
             ] = card_x_node_x_widget.widget.widgetmapping.component
         except ObjectDoesNotExist:
-            return JSONErrorResponse(
-                message=_("Database error occurred while fetching widget mapping."),
-                status=503,
-            )
+            return widget_mapping_error_response()
 
         return JSONResponse(serialized_widget)
 
