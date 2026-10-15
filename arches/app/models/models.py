@@ -1494,7 +1494,7 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
     principaluser = models.ForeignKey(
         User, on_delete=models.SET_NULL, blank=True, null=True, editable=False
     )
-    updated = DatabaseTimestampField()
+    last_updated = DatabaseTimestampField()
 
     class Meta:
         managed = True
@@ -1563,7 +1563,7 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
 
         kwargs = add_to_update_fields(kwargs, "resource_instance_lifecycle_state")
         kwargs = add_to_update_fields(kwargs, "graph_publication")
-        kwargs = add_to_update_fields(kwargs, "updated")
+        kwargs = add_to_update_fields(kwargs, "last_updated")
         super(ResourceInstance, self).save(**kwargs)
 
         if should_update_resource_instance_lifecycle_state:
@@ -1989,7 +1989,7 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
     sortorder = models.IntegerField(blank=True, null=True, default=0)
     provisionaledits = JSONField(blank=True, null=True, db_column="provisionaledits")
     createdtime = DatabaseTimestampField()
-    updated = DatabaseTimestampField()
+    last_updated = DatabaseTimestampField()
 
     class Meta:
         managed = True
@@ -2039,7 +2039,7 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
         if not self.tileid:
             self.tileid = uuid.uuid4()
             kwargs = add_to_update_fields(kwargs, "tileid")
-        kwargs = add_to_update_fields(kwargs, "updated")
+        kwargs = add_to_update_fields(kwargs, "last_updated")
 
         # Query for this first instead of during a transaction rollback.
         nodegroup_alias = self.find_nodegroup_alias()

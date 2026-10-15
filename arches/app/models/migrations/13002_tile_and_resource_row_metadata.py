@@ -21,12 +21,13 @@ disown_sequences = "\n".join(
     f"ALTER SEQUENCE {sequence} OWNED BY NONE;" for _, sequence in TABLES
 )
 
-# id, createdtime and updated are owned by the database, regardless of whether
-# a row arrives via the ORM, raw SQL (e.g. the ETL loaders), or COPY.
+# id, createdtime and last_updated are owned by the database, regardless of
+# whether a row arrives via the ORM, raw SQL (e.g. the ETL loaders), or COPY.
 #   INSERT: fill in anything not supplied (explicit values are kept so that
 #           dumps/restores and legacy imports round-trip).
-#   UPDATE: id and createdtime can never change; updated is bumped only when
-#           some other column actually changed, so blind re-saves are no-ops.
+#   UPDATE: id and createdtime can never change; last_updated is bumped only
+#           when some other column actually changed, so blind re-saves are
+#           no-ops.
 create_trigger_function = """
     CREATE OR REPLACE FUNCTION __arches_manage_row_metadata()
     RETURNS trigger AS $$
@@ -34,15 +35,15 @@ create_trigger_function = """
         IF TG_OP = 'INSERT' THEN
             NEW.id := COALESCE(NEW.id, nextval(TG_ARGV[0]::regclass));
             NEW.createdtime := COALESCE(NEW.createdtime, statement_timestamp());
-            NEW.updated := COALESCE(NEW.updated, statement_timestamp());
+            NEW.last_updated := COALESCE(NEW.last_updated, statement_timestamp());
             RETURN NEW;
         END IF;
 
         NEW.id := OLD.id;
         NEW.createdtime := OLD.createdtime;
-        NEW.updated := OLD.updated;
+        NEW.last_updated := OLD.last_updated;
         IF NEW IS DISTINCT FROM OLD THEN
-            NEW.updated := statement_timestamp();
+            NEW.last_updated := statement_timestamp();
         END IF;
         RETURN NEW;
     END;
@@ -84,7 +85,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name="resourceinstance",
-            name="updated",
+            name="last_updated",
             field=arches.app.models.fields.database_managed_fields.DatabaseTimestampField(),
         ),
         migrations.AddField(
@@ -101,7 +102,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name="tilemodel",
-            name="updated",
+            name="last_updated",
             field=arches.app.models.fields.database_managed_fields.DatabaseTimestampField(),
         ),
         migrations.RunSQL(own_sequences, disown_sequences),
