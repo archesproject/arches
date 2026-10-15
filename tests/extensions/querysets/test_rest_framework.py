@@ -123,6 +123,31 @@ class RestFrameworkTests(GraphTestCase):
             },
         )
 
+    def test_create_tile_without_sortorder_appends(self):
+        next_sortorder = (
+            max(
+                TileModel.objects.filter(
+                    resourceinstance=self.resource_42, nodegroup=self.nodegroup_n
+                ).values_list("sortorder", flat=True)
+            )
+            + 1
+        )
+        create_url = reverse(
+            "arches_querysets:api-tiles",
+            kwargs={"graph": "datatype_lookups", "nodegroup_alias": "datatypes_n"},
+        )
+        self.client.login(username="dev", password="dev")
+        response = self.client.post(
+            create_url,
+            {
+                "aliased_data": {"string_alias_n": "appended"},
+                "resourceinstance": str(self.resource_42.pk),
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, HTTPStatus.CREATED)
+        self.assertEqual(response.json()["sortorder"], next_sortorder)
+
     def test_create_nested_tiles_for_new_resource(self):
         self.client.login(username="dev", password="dev")
         create_url = reverse(
@@ -456,6 +481,50 @@ class RestFrameworkTests(GraphTestCase):
         }
         self.assertEqual(sortorders_by_value["explicitly-placed"], next_sortorder + 5)
         self.assertEqual(sortorders_by_value["appended"], next_sortorder)
+
+    def test_resource_put_skips_incoming_sortorders_for_new_tiles(self):
+        next_sortorder = (
+            max(
+                TileModel.objects.filter(
+                    resourceinstance=self.resource_42, nodegroup=self.nodegroup_n
+                ).values_list("sortorder", flat=True)
+            )
+            + 1
+        )
+        update_url = reverse(
+            "arches_querysets:api-resource",
+            kwargs={"graph": "datatype_lookups", "pk": str(self.resource_42.pk)},
+        )
+        request_body = {
+            "aliased_data": {
+                "datatypes_n": [
+                    {
+                        "resourceinstance": str(self.resource_42.pk),
+                        "aliased_data": {"non_localized_string_alias_n": "appended"},
+                    },
+                    {
+                        "resourceinstance": str(self.resource_42.pk),
+                        "sortorder": next_sortorder,
+                        "aliased_data": {
+                            "non_localized_string_alias_n": "explicitly-placed"
+                        },
+                    },
+                ],
+            },
+        }
+
+        self.client.login(username="dev", password="dev")
+        response = self.client.put(
+            update_url, request_body, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, HTTPStatus.OK, response.json())
+
+        new_sortorders = [
+            tile["sortorder"]
+            for tile in response.json()["aliased_data"]["datatypes_n"]
+            if tile["sortorder"] >= next_sortorder
+        ]
+        self.assertCountEqual(new_sortorders, [next_sortorder, next_sortorder + 1])
 
     # ------------------------------------------------------------------ #
     # PATCH tile endpoint — parent + child, all cardinality combinations

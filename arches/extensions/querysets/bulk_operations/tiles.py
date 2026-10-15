@@ -233,6 +233,11 @@ class TileTreeOperation:
             next_sort_order = 0
         else:
             next_sort_order = max(t.sortorder or 0 for t in existing_tiles) + 1
+        incoming_sort_orders = {
+            new_tile.sortorder
+            for new_tile in new_tiles
+            if new_tile.sortorder is not None
+        }
 
         if self.for_new_resource or (
             isinstance(self.entry, ResourceInstance) and self.entry._state.adding
@@ -257,6 +262,8 @@ class TileTreeOperation:
                 new_tile.nodegroup_id = grouping_node.nodegroup_id
                 new_tile.resourceinstance_id = self.resourceid
                 if new_tile.sortorder is None:
+                    while next_sort_order in incoming_sort_orders:
+                        next_sort_order += 1
                     new_tile.sortorder = next_sort_order
                     next_sort_order += 1
                 for node in grouping_node.nodegroup.node_set.all():

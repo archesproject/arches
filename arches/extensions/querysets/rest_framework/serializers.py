@@ -656,6 +656,7 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         return field_names
 
     def create(self, validated_data):
+        validated_data.setdefault("sortorder", None)
         # Provide some additional context to TileTree.__init__()
         validated_data["__request"] = self.context["request"]
         validated_data["__as_representation"] = True
