@@ -23,10 +23,13 @@ disown_sequences = "\n".join(
 
 # id, createdtime and last_updated are owned by the database, regardless of
 # whether a row arrives via the ORM, raw SQL (e.g. the ETL loaders), or COPY.
-#   INSERT: fill in anything not supplied (explicit values are kept so that
-#           dumps/restores and legacy imports round-trip).
-#           After loading explicit IDs from fixtures or COPY, run
-#           `python manage.py reseed_metadata_sequences`.
+#   INSERT: always assigned here; any supplied values are discarded, so ids
+#           stay in insertion order (keyset paging relies on it) and
+#           timestamps can't be backdated. Loads that must keep original
+#           values (e.g. pg_restore --data-only, historical migrations) need
+#           the trigger bypassed (session_replication_role = replica or
+#           ALTER TABLE ... DISABLE TRIGGER), followed by
+#           `SELECT setval('tiles_id_seq', (SELECT max(id) FROM tiles));`
 #   UPDATE: id and createdtime can never change; last_updated is bumped only
 #           when some other column actually changed, so blind re-saves are
 #           no-ops.
@@ -35,9 +38,9 @@ create_trigger_function = """
     RETURNS trigger AS $$
     BEGIN
         IF TG_OP = 'INSERT' THEN
-            NEW.id := COALESCE(NEW.id, nextval(TG_ARGV[0]::regclass));
-            NEW.createdtime := COALESCE(NEW.createdtime, statement_timestamp());
-            NEW.last_updated := COALESCE(NEW.last_updated, statement_timestamp());
+            NEW.id := nextval(TG_ARGV[0]::regclass);
+            NEW.createdtime := statement_timestamp();
+            NEW.last_updated := statement_timestamp();
             RETURN NEW;
         END IF;
 

@@ -92,10 +92,3 @@ class DatabaseTimestampField(DatabaseManagedFieldMixin, models.DateTimeField):
     def __init__(self, *args, **kwargs):
         kwargs["db_default"] = Now()
         super().__init__(*args, **kwargs)
-
-    def pre_save(self, model_instance, add):
-        # Unlike ids, an explicit timestamp is kept on insert (matching the
-        # trigger), so imports can preserve original creation times.
-        if add and (value := getattr(model_instance, self.attname)) is not None:
-            return value
-        return super().pre_save(model_instance, add)
