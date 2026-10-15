@@ -25,6 +25,8 @@ disown_sequences = "\n".join(
 # whether a row arrives via the ORM, raw SQL (e.g. the ETL loaders), or COPY.
 #   INSERT: fill in anything not supplied (explicit values are kept so that
 #           dumps/restores and legacy imports round-trip).
+#           After loading explicit IDs from fixtures or COPY, run
+#           `python manage.py reseed_metadata_sequences`.
 #   UPDATE: id and createdtime can never change; last_updated is bumped only
 #           when some other column actually changed, so blind re-saves are
 #           no-ops.
