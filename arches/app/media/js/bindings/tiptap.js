@@ -1,7 +1,7 @@
 import ko from 'knockout';
 
 
-// attaches our Tiptap rich text editor to an element
+// Points Tiptap rich text editor to a DOM element to draw editing area into
 ko.bindingHandlers.tiptap = {
     init: (element, valueAccessor) => {
         valueAccessor().mount(element);
