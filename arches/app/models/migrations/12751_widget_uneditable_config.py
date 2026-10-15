@@ -22,7 +22,7 @@ def add_uneditable_to_widgets(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("models", "12773_fix_relational_view_node_naming"),
+        ("models", "12903_relationship_source_node_config"),
     ]
 
     operations = [
