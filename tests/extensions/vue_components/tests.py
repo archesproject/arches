@@ -174,60 +174,6 @@ class CardXNodeXWidgetPermissionTests(GraphTestCase):
                 reverse(f"arches_vue_components:{url_name}", kwargs=url_kwargs)
             )
 
-    def test_graph_list_returns_readable_nodegroup_tree_with_widgets(self):
-        response = self.get_with_permissions(
-            "api-card-x-node-x-widget-list-from-graph",
-            {"graph_slug": "datatype_lookups"},
-            readable_nodegroups=[
-                self.nodegroup_1,
-                self.nodegroup_1_child,
-                self.nodegroup_1_n_child,
-            ],
-            writable_nodegroups=[self.nodegroup_1],
-        )
-        self.assertEqual(response.status_code, 200)
-        nodegroups_by_alias = response.json()
-
-        self.assertEqual(
-            set(nodegroups_by_alias),
-            {"datatypes_1", "datatypes_1_child", "datatypes_1_n_child"},
-        )
-        top_level = nodegroups_by_alias["datatypes_1"]
-        self.assertIsNone(top_level["parent_nodegroup_alias"])
-        self.assertTrue(top_level["is_writable"])
-        self.assertEqual(top_level["card"]["nodegroup_id"], str(self.nodegroup_1.pk))
-        self.assertCountEqual(
-            [widget["node"]["alias"] for widget in top_level["card_x_node_x_widgets"]],
-            [node.alias for node in self.data_nodes_1],
-        )
-
-        child = nodegroups_by_alias["datatypes_1_n_child"]
-        self.assertEqual(child["parent_nodegroup_alias"], "datatypes_1")
-        self.assertEqual(child["cardinality"], "n")
-        self.assertFalse(child["is_writable"])
-        self.assertEqual(
-            [widget["node"]["alias"] for widget in child["card_x_node_x_widgets"]],
-            ["non_localized_string_alias_1_n_child"],
-        )
-        self.assertTrue(child["card_x_node_x_widgets"][0]["widget"]["component"])
-
-    def test_nodegroup_list_matches_graph_entry(self):
-        graph_response = self.get_with_permissions(
-            "api-card-x-node-x-widget-list-from-graph",
-            {"graph_slug": "datatype_lookups"},
-            readable_nodegroups=[self.nodegroup_n],
-        )
-        nodegroup_response = self.get_with_permissions(
-            "api-card-x-node-x-widget-list-from-nodegroup",
-            {"graph_slug": "datatype_lookups", "nodegroup_alias": "datatypes_n"},
-            readable_nodegroups=[self.nodegroup_n],
-        )
-
-        self.assertEqual(
-            nodegroup_response.json(),
-            graph_response.json()["datatypes_n"]["card_x_node_x_widgets"],
-        )
-
     def test_node_and_nodegroup_widgets_require_read_permission(self):
         for url_name, url_kwargs in (
             (

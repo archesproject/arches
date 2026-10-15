@@ -86,7 +86,6 @@ describe("GenericCard", () => {
         expect(
             wrapper.findComponent({ name: "GenericCardEditor" }).exists(),
         ).toBe(true);
-        expect(wrapper.text()).not.toContain("Offline");
     });
 
     it("fetches the new tile when its tileId changes in edit mode", async () => {

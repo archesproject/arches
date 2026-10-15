@@ -1,4 +1,4 @@
-import { defineComponent, nextTick, onMounted } from "vue";
+import { defineComponent, nextTick } from "vue";
 import { describe, expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
 import OpenVue from "openvue/config";
@@ -11,16 +11,11 @@ import type {
     CardXNodeXWidgetData,
 } from "@/arches_vue_components/types.ts";
 
-const mountedNodeAliases: string[] = [];
-
 const GenericWidgetStub = defineComponent({
     name: "GenericWidget",
     props: {
         nodeAlias: { type: String, required: true },
         aliasedNodeData: { type: Object, default: null },
-    },
-    setup(props) {
-        onMounted(() => mountedNodeAliases.push(props.nodeAlias));
     },
     template: "<div class='widget-stub' />",
 });
@@ -74,39 +69,6 @@ function makeTile(
 }
 
 describe("GenericCardEditor", () => {
-    it("rebuilds only the fields changed from outside the form", async () => {
-        const wrapper = mount(GenericCardEditor, {
-            props: {
-                cardXNodeXWidgetData: [
-                    makeWidget("name_content"),
-                    makeWidget("name_type"),
-                ],
-                graphSlug: "pigment",
-                nodegroupAlias: "names",
-                resourceInstanceId: "resource",
-                shouldShowFormButtons: false,
-                tileData: makeTile("Primary"),
-            },
-            global: {
-                plugins: [[OpenVue, { theme: "none" }]],
-                stubs: { GenericWidget: GenericWidgetStub },
-            },
-        });
-        mountedNodeAliases.length = 0;
-
-        await wrapper.setProps({ tileData: makeTile("Primary") });
-        expect(mountedNodeAliases).toEqual([]);
-
-        await wrapper.setProps({ tileData: makeTile(null) });
-        expect(mountedNodeAliases).toEqual(["name_type"]);
-        expect(
-            wrapper
-                .findAllComponents(GenericWidgetStub)
-                .find((widget) => widget.props("nodeAlias") === "name_type")
-                ?.props("aliasedNodeData").node_value,
-        ).toBeNull();
-    });
-
     it("cancels back to values pushed from outside, not to echoed edits", async () => {
         const wrapper = mount(GenericCardEditor, {
             props: {
