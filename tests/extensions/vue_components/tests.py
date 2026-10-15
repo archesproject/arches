@@ -167,7 +167,7 @@ class CardXNodeXWidgetPermissionTests(GraphTestCase):
             return [nodegroup.pk for nodegroup in readable_nodegroups]
 
         with mock.patch(
-            "arches.extensions.vue_components.views.api.card_x_node_x_widget.get_nodegroups_by_perm",
+            "arches.extensions.vue_components.utils.nodegroup_permissions.get_nodegroups_by_perm",
             side_effect=nodegroups_by_perm,
         ):
             return self.client.get(
@@ -247,6 +247,38 @@ class CardXNodeXWidgetPermissionTests(GraphTestCase):
                     url_name, url_kwargs, readable_nodegroups=[self.nodegroup_1]
                 )
                 self.assertEqual(response.status_code, 403)
+
+    def test_nodegroups_under_a_hidden_parent_are_hidden_and_read_only(self):
+        graph_response = self.get_with_permissions(
+            "api-card-x-node-x-widget-list-from-graph",
+            {"graph_slug": "datatype_lookups"},
+            readable_nodegroups=[
+                self.nodegroup_1_child,
+                self.nodegroup_1_n_child,
+                self.nodegroup_n,
+            ],
+            writable_nodegroups=[self.nodegroup_1_n_child, self.nodegroup_n],
+        )
+        self.assertEqual(set(graph_response.json()), {"datatypes_n"})
+        self.assertTrue(graph_response.json()["datatypes_n"]["is_writable"])
+
+        child_response = self.get_with_permissions(
+            "api-card-x-node-x-widget-list-from-nodegroup",
+            {
+                "graph_slug": "datatype_lookups",
+                "nodegroup_alias": "datatypes_1_n_child",
+            },
+            readable_nodegroups=[self.nodegroup_1_n_child],
+        )
+        self.assertEqual(child_response.status_code, 403)
+
+        writable_response = self.get_with_permissions(
+            "api-card-x-node-x-widget-list-from-graph",
+            {"graph_slug": "datatype_lookups"},
+            readable_nodegroups=[self.nodegroup_1, self.nodegroup_1_n_child],
+            writable_nodegroups=[self.nodegroup_1_n_child],
+        )
+        self.assertFalse(writable_response.json()["datatypes_1_n_child"]["is_writable"])
 
 
 class ClusterResourcesAPITests(ArchesTestCase):

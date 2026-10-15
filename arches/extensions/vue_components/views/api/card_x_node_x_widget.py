@@ -6,8 +6,10 @@ from django.views.generic import View
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
-from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
+from arches.extensions.vue_components.utils.nodegroup_permissions import (
+    nodegroup_ids_with_inherited_permission,
+)
 
 
 def serialize_card_x_node_x_widget(widget, datatype_factory):
@@ -83,7 +85,9 @@ def build_card_x_node_x_widgets_by_nodegroup_id(
 
 
 def user_can_read_nodegroup(user, nodegroup_id):
-    return nodegroup_id in get_nodegroups_by_perm(user, "models.read_nodegroup")
+    return nodegroup_id in nodegroup_ids_with_inherited_permission(
+        user, "models.read_nodegroup"
+    )
 
 
 def nodegroup_permission_error_response():
@@ -201,11 +205,11 @@ class CardXNodeXWidgetListFromNodegroupView(View):
 
 class CardXNodeXWidgetListFromGraphView(View):
     def get(self, request, graph_slug):
-        readable_nodegroup_ids = set(
-            get_nodegroups_by_perm(request.user, "models.read_nodegroup")
+        readable_nodegroup_ids = nodegroup_ids_with_inherited_permission(
+            request.user, "models.read_nodegroup"
         )
-        writable_nodegroup_ids = set(
-            get_nodegroups_by_perm(request.user, "models.write_nodegroup")
+        writable_nodegroup_ids = nodegroup_ids_with_inherited_permission(
+            request.user, "models.write_nodegroup"
         )
 
         graph_nodes = list(
