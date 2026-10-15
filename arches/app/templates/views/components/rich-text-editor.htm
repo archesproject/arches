@@ -141,130 +141,118 @@
             >
                 <i class="fa fa-picture-o" aria-hidden="true"></i>
             </button>
-            <div class="rich-text-editor-toolbar-menu">
+            <div class="dropdown">
                 <button
                     type="button"
                     class="rich-text-editor-toolbar-button"
                     tabindex="-1"
                     title="{% trans 'Table' %}"
                     aria-label="{% trans 'Table' %}"
-                    data-bind="
-                        click: toggleTableMenu,
-                        css: {active: isTableMenuOpen},
-                        attr: {'aria-expanded': isTableMenuOpen().toString()}
-                    "
+                    aria-expanded="false"
+                    data-toggle="dropdown"
                 >
                     <i class="fa fa-table" aria-hidden="true"></i>
                     <i class="fa fa-caret-down" aria-hidden="true"></i>
                 </button>
-                <ul class="rich-text-editor-toolbar-menu-list" data-bind="visible: isTableMenuOpen">
-                    <li>
-                        <button
-                            type="button"
+                <ul class="dropdown-menu">
+                    <li data-bind="css: {disabled: state().insertTable.isDisabled}">
+                        <a
+                            href="javascript:void(0);"
                             data-bind="
                                 click: run('insertTable'),
-                                css: {disabled: state().insertTable.isDisabled},
                                 attr: {'aria-disabled': state().insertTable.isDisabled}
                             "
                         >
                             {% trans "Insert table" %}
-                        </button>
+                        </a>
                     </li>
-                    <li>
-                        <button
-                            type="button"
+                    <li data-bind="css: {disabled: state().addRowBefore.isDisabled}">
+                        <a
+                            href="javascript:void(0);"
                             data-bind="
                                 click: run('addRowBefore'),
-                                css: {disabled: state().addRowBefore.isDisabled},
                                 attr: {'aria-disabled': state().addRowBefore.isDisabled}
                             "
                         >
                             {% trans "Insert row above" %}
-                        </button>
+                        </a>
                     </li>
-                    <li>
-                        <button
-                            type="button"
+                    <li data-bind="css: {disabled: state().addRowAfter.isDisabled}">
+                        <a
+                            href="javascript:void(0);"
                             data-bind="
                                 click: run('addRowAfter'),
-                                css: {disabled: state().addRowAfter.isDisabled},
                                 attr: {'aria-disabled': state().addRowAfter.isDisabled}
                             "
                         >
                             {% trans "Insert row below" %}
-                        </button>
+                        </a>
                     </li>
-                    <li>
-                        <button
-                            type="button"
+                    <li data-bind="css: {disabled: state().deleteRow.isDisabled}">
+                        <a
+                            href="javascript:void(0);"
                             data-bind="
                                 click: run('deleteRow'),
-                                css: {disabled: state().deleteRow.isDisabled},
                                 attr: {'aria-disabled': state().deleteRow.isDisabled}
                             "
                         >
                             {% trans "Delete row" %}
-                        </button>
+                        </a>
                     </li>
-                    <li>
-                        <button
-                            type="button"
+                    <li data-bind="css: {disabled: state().addColumnBefore.isDisabled}">
+                        <a
+                            href="javascript:void(0);"
                             data-bind="
                                 click: run('addColumnBefore'),
-                                css: {disabled: state().addColumnBefore.isDisabled},
                                 attr: {'aria-disabled': state().addColumnBefore.isDisabled}
                             "
                         >
                             {% trans "Insert column before" %}
-                        </button>
+                        </a>
                     </li>
-                    <li>
-                        <button
-                            type="button"
+                    <li data-bind="css: {disabled: state().addColumnAfter.isDisabled}">
+                        <a
+                            href="javascript:void(0);"
                             data-bind="
                                 click: run('addColumnAfter'),
-                                css: {disabled: state().addColumnAfter.isDisabled},
                                 attr: {'aria-disabled': state().addColumnAfter.isDisabled}
                             "
                         >
                             {% trans "Insert column after" %}
-                        </button>
+                        </a>
                     </li>
-                    <li>
-                        <button
-                            type="button"
+                    <li data-bind="css: {disabled: state().deleteColumn.isDisabled}">
+                        <a
+                            href="javascript:void(0);"
                             data-bind="
                                 click: run('deleteColumn'),
-                                css: {disabled: state().deleteColumn.isDisabled},
                                 attr: {'aria-disabled': state().deleteColumn.isDisabled}
                             "
                         >
                             {% trans "Delete column" %}
-                        </button>
+                        </a>
                     </li>
-                    <li>
-                        <button
-                            type="button"
+                    <li data-bind="css: {disabled: state().toggleHeaderRow.isDisabled}">
+                        <a
+                            href="javascript:void(0);"
                             data-bind="
                                 click: run('toggleHeaderRow'),
-                                css: {disabled: state().toggleHeaderRow.isDisabled},
                                 attr: {'aria-disabled': state().toggleHeaderRow.isDisabled}
                             "
                         >
                             {% trans "Toggle header row" %}
-                        </button>
+                        </a>
                     </li>
-                    <li>
-                        <button
-                            type="button"
+                    <li data-bind="css: {disabled: state().deleteTable.isDisabled}">
+                        <a
+                            href="javascript:void(0);"
                             data-bind="
                                 click: run('deleteTable'),
-                                css: {disabled: state().deleteTable.isDisabled},
                                 attr: {'aria-disabled': state().deleteTable.isDisabled}
                             "
                         >
                             {% trans "Delete table" %}
-                        </button>
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -431,25 +419,110 @@
         </div>
 
         <div class="rich-text-editor-toolbar-group">
-            <select
-                class="rich-text-editor-toolbar-select"
-                tabindex="-1"
-                aria-label="{% trans 'Format' %}"
-                data-bind="
-                    value: format,
-                    event: {change: onTextFormatChange}
-                "
-            >
-                <option disabled hidden selected value>{% trans "Format" %}</option>
-                <option value="paragraph">{% trans "Paragraph" %}</option>
-                <option value="heading1">{% trans "Heading 1" %}</option>
-                <option value="heading2">{% trans "Heading 2" %}</option>
-                <option value="heading3">{% trans "Heading 3" %}</option>
-                <option value="heading4">{% trans "Heading 4" %}</option>
-                <option value="heading5">{% trans "Heading 5" %}</option>
-                <option value="heading6">{% trans "Heading 6" %}</option>
-                <option value="codeBlock">{% trans "Formatted" %}</option>
-            </select>
+            <div class="dropdown">
+                <button
+                    type="button"
+                    class="rich-text-editor-toolbar-button"
+                    tabindex="-1"
+                    title="{% trans 'Format' %}"
+                    aria-label="{% trans 'Format' %}"
+                    aria-expanded="false"
+                    data-toggle="dropdown"
+                >
+                    {% trans 'Format' %}
+                    <i class="fa fa-caret-down" aria-hidden="true"></i>
+                </button>
+                <ul class="dropdown-menu">
+                    <li data-bind="css: {disabled: state().paragraph.isDisabled, active: state().paragraph.isActive}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('paragraph'),
+                                attr: {'aria-disabled': state().paragraph.isDisabled}
+                            "
+                        >
+                            {% trans "Paragraph" %}
+                        </a>
+                    </li>
+                    <li data-bind="css: {disabled: state().heading1.isDisabled, active: state().heading1.isActive}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('heading1'),
+                                attr: {'aria-disabled': state().heading1.isDisabled}
+                            "
+                        >
+                            {% trans "Heading 1" %}
+                        </a>
+                    </li>
+                    <li data-bind="css: {disabled: state().heading2.isDisabled, active: state().heading2.isActive}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('heading2'),
+                                attr: {'aria-disabled': state().heading2.isDisabled}
+                            "
+                        >
+                            {% trans "Heading 2" %}
+                        </a>
+                    </li>
+                    <li data-bind="css: {disabled: state().heading3.isDisabled, active: state().heading3.isActive}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('heading3'),
+                                attr: {'aria-disabled': state().heading3.isDisabled}
+                            "
+                        >
+                            {% trans "Heading 3" %}
+                        </a>
+                    </li>
+                    <li data-bind="css: {disabled: state().heading4.isDisabled, active: state().heading4.isActive}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('heading4'),
+                                attr: {'aria-disabled': state().heading4.isDisabled}
+                            "
+                        >
+                            {% trans "Heading 4" %}
+                        </a>
+                    </li>
+                    <li data-bind="css: {disabled: state().heading5.isDisabled, active: state().heading5.isActive}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('heading5'),
+                                attr: {'aria-disabled': state().heading5.isDisabled}
+                            "
+                        >
+                            {% trans "Heading 5" %}
+                        </a>
+                    </li>
+                    <li data-bind="css: {disabled: state().heading6.isDisabled, active: state().heading6.isActive}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('heading6'),
+                                attr: {'aria-disabled': state().heading6.isDisabled}
+                            "
+                        >
+                            {% trans "Heading 6" %}
+                        </a>
+                    </li>
+                    <li data-bind="css: {disabled: state().codeBlock.isDisabled, active: state().codeBlock.isActive}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('codeBlock'),
+                                attr: {'aria-disabled': state().codeBlock.isDisabled}
+                            "
+                        >
+                            {% trans "Formatted" %}
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 
