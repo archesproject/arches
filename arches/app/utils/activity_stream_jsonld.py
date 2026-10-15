@@ -19,7 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from django.utils.feedgenerator import rfc3339_date
 from django.urls import reverse
 from arches.app.models.resource import Resource
-from arches.app.models.system_settings import settings
 from django.core.exceptions import ObjectDoesNotExist
 import json
 
@@ -162,15 +161,6 @@ class ActivityStreamCollectionPage(object):
 
             return obj
 
-        def add_tile(editlog_object, perm_level=perm_level):
-            obj = {"type": "Object"}  # Tile?
-            obj["url"] = "{0}node/{1}/tile/{2}".format(
-                settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT,
-                editlog_object.nodegroupid,
-                editlog_object.tileinstanceid,
-            )
-            return obj
-
         item = {"type": self.type_mapping.get(editlog_object.edittype, "Activity")}
 
         # what's the correct attr here?
@@ -186,7 +176,6 @@ class ActivityStreamCollectionPage(object):
             # If a Tile associated with a resource is altered, bubble that
             # change up to be about the Resource, and mark it as an 'Update'
             item["actor"] = add_actor(editlog_object)
-            # item["object"] = add_tile(editlog_object)
             item["object"] = add_resource(editlog_object)
 
         return item

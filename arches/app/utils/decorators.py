@@ -30,8 +30,6 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.permission_backend import user_can_read_resource
 from arches.app.utils.permission_backend import user_can_edit_resource
-from arches.app.utils.permission_backend import user_can_delete_resource
-from arches.app.utils.permission_backend import user_can_read_concepts
 from arches.app.utils.permission_backend import user_created_transaction
 from arches.app.utils.permission_backend import (
     group_required as permission_group_required,
@@ -129,32 +127,6 @@ def can_read_resource_instance(function):
         return function(request, *args, **kwargs)
 
     return wrapper
-
-
-def can_delete_resource_instance(function):
-    """
-    Requires that a user be able to edit or delete a single nodegroup of a resource
-
-    """
-
-    @functools.wraps(function)
-    def wrapper(request, *args, **kwargs):
-        resourceid = kwargs["resourceid"] if "resourceid" in kwargs else None
-        if user_can_delete_resource(request.user, resourceid=resourceid):
-            return function(request, *args, **kwargs)
-        else:
-            raise PermissionDenied
-
-    return wrapper
-
-
-def can_read_concept():
-    """
-    Requires that a user be able to edit or delete a single nodegroup of a resource
-
-    """
-
-    return user_passes_test(user_can_read_concepts)
 
 
 def requires_elasticsearch(function):

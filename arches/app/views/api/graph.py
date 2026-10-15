@@ -71,23 +71,6 @@ class Graphs(APIBase):
             return JSONResponse(JSONSerializer().serializeToPython(graphs))
 
 
-class GraphHasUnpublishedChanges(APIBase):
-    def get(self, request, graph_id=None):
-        graph = models.GraphModel.objects.get(pk=graph_id)
-        return JSONResponse(graph.has_unpublished_changes)
-
-    def post(self, request, graph_id=None):
-        has_unpublished_changes = bool(
-            request.POST.get("has_unpublished_changes") == "true"
-        )
-        graph = models.GraphModel.objects.filter(
-            pk=graph_id
-        )  # need filter here for `update` to work
-        graph.update(has_unpublished_changes=has_unpublished_changes)
-
-        return JSONResponse({"has_unpublished_changes": has_unpublished_changes})
-
-
 class GraphIsActive(APIBase):
     def get(self, request, graph_id=None):
         graph = Graph.objects.get(pk=graph_id)

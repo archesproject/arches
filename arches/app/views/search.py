@@ -133,16 +133,6 @@ class SearchView(MapBaseManagerView):
         return render(request, "views/search.htm", context)
 
 
-def home_page(request):
-    return render(
-        request,
-        "views/search.htm",
-        {
-            "main_script": "views/search",
-        },
-    )
-
-
 @requires_elasticsearch
 def search_terms(request):
     lang = request.GET.get("lang", request.LANGUAGE_CODE)

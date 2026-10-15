@@ -98,12 +98,6 @@ class BaseDataType(object):
         """
         return value
 
-    def get_bounds(self, tile, node):
-        """
-        Gets the bounds of a geometry if the datatype is spatial
-        """
-        return None
-
     def get_map_layer(self, node=None):
         """
         Gets the array of map layers to add to the map for a given node

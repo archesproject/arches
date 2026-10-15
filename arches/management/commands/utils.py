@@ -1,7 +1,6 @@
 import importlib.util
 import os
 import sys
-import codecs
 
 
 def get_yn_input(msg="are you sure you want to continue?", default="Y"):
@@ -31,19 +30,6 @@ def get_yn_input(msg="are you sure you want to continue?", default="Y"):
             ret = True
 
     return ret
-
-
-def write_to_file(fileName, contents, mode="w", encoding="utf-8", **kwargs):
-    ensure_dir(fileName)
-    file = codecs.open(fileName, mode=mode, encoding=encoding, **kwargs)
-    file.write(contents)
-    file.close()
-
-
-def ensure_dir(f):
-    d = os.path.dirname(f)
-    if not os.path.exists(d):
-        os.makedirs(d)
 
 
 def get_valid_path(path):

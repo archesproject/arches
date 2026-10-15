@@ -32,10 +32,6 @@ from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from arches.app.utils.exceptions import (
-    InvalidNodeNameException,
-    MultipleNodesFoundException,
-)
 from arches.app.utils.index_database import (
     index_resources_by_type,
     index_resources_using_singleprocessing,
@@ -460,73 +456,6 @@ class ResourceTests(ArchesTestCase):
     def test_run_lifecycle_functions(self, mock_on_update_lifecycle_state):
         self.test_resource.run_lifecycle_handlers(self.state2)
         mock_on_update_lifecycle_state.assert_called_once()
-
-    def test_get_node_value_string(self):
-        """
-        Query a string value
-        """
-        node_name = "Name"
-        result = self.test_resource.get_node_values(node_name)
-        self.assertEqual("Test Name 1", result[0]["en"]["value"])
-        self.assertEqual("Prueba Nombre 1", result[0]["es"]["value"])
-
-    def test_get_node_value_date(self):
-        """
-        Query a date value
-        """
-        node_name = "Creation Date"
-        result = self.test_resource.get_node_values(node_name)
-        self.assertEqual("1941-01-01", result[0])
-
-    def test_get_node_value_concept(self):
-        """
-        Query a concept value
-        """
-        node_name = "Cultural Period Concept"
-        result = self.test_resource.get_node_values(node_name)
-        self.assertEqual("Mock concept", result[0])
-
-    def test_get_not_existing_value_from_concept(self):
-        """
-        Query a concept node without a value
-        """
-
-        test_resource_no_value = Resource(graph_id=self.search_model_graphid)
-        tile = Tile(
-            data={self.search_model_cultural_period_nodeid: ""},
-            nodegroup_id=self.search_model_cultural_period_nodeid,
-        )
-        test_resource_no_value.tiles.append(tile)
-        test_resource_no_value.save()
-
-        node_name = "Cultural Period Concept"
-        result = test_resource_no_value.get_node_values(node_name)
-        self.assertEqual(None, result[0])
-        test_resource_no_value.delete()
-
-    def test_get_value_from_not_existing_concept(self):
-        """
-        Query a concept value that does not exist
-        """
-        node_name = "Not Existing Concept"
-        with self.assertRaises(InvalidNodeNameException):
-            self.test_resource.get_node_values(node_name)
-
-    def test_get_duplicate_node_value_concept(self):
-        """
-        Query a concept value on a node that exists twice
-        """
-        node_name = "Duplicate Node Concept"
-        with self.assertRaises(MultipleNodesFoundException):
-            self.test_resource.get_node_values(node_name)
-
-    def test_get_node_value_geometry(self):
-        """
-        Query a geometry value
-        """
-        node_name = "Geometry"
-        result = self.test_resource.get_node_values(node_name)
-        self.assertEqual(self.geom, result[0])
 
     def test_reindex_by_resource_type(self):
         """

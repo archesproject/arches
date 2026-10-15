@@ -2159,16 +2159,6 @@ class FileValue(SaveSupportsBlindOverwriteMixin, models.Model):
         managed = False
         db_table = "values"
 
-    def geturl(self):
-        if self.value is not None:
-            return self.value.url
-        return ""
-
-    def getname(self):
-        if self.value is not None:
-            return self.value.name
-        return ""
-
 
 class Widget(SaveSupportsBlindOverwriteMixin, models.Model):
     widgetid = models.UUIDField(

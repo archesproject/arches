@@ -46,18 +46,6 @@ def can_create_resource_instance(user):
     return len(get_createable_resource_types(user)) > 0
 
 
-@register.filter(name="can_create_graph")
-def can_create_graph(user):
-    return (
-        len(
-            get_resource_types_by_perm(
-                user, ["models.write_nodegroup", "models.delete_nodegroup"]
-            )
-        )
-        > 0
-    )
-
-
 @register.filter(name="has_key")
 def has_dict_key(the_dict, key):
     """

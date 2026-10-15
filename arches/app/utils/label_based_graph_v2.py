@@ -5,7 +5,6 @@ from arches.app.models import models
 from django.utils import translation
 from types import SimpleNamespace
 
-RESOURCE_ID_KEY = "@resource_id"
 NODE_ID_KEY = "@node_id"
 TILE_ID_KEY = "@tile_id"
 
@@ -351,32 +350,6 @@ class LabelBasedGraph(object):
             }
         else:  # pragma: no cover
             return root_label_based_node
-
-    @classmethod
-    def from_resources(
-        cls, resources, compact=False, hide_empty_nodes=False, as_json=True
-    ):
-        """
-        Generates a list of label-based graph from given resources
-        """
-
-        datatype_factory = DataTypeFactory()
-
-        resource_label_based_graphs = []
-
-        for resource in resources:
-            resource_label_based_graph = cls.from_resource(
-                resource=resource,
-                datatype_factory=datatype_factory,
-                compact=compact,
-                hide_empty_nodes=hide_empty_nodes,
-                as_json=as_json,
-            )
-
-            resource_label_based_graph[RESOURCE_ID_KEY] = str(resource.pk)
-            resource_label_based_graphs.append(resource_label_based_graph)
-
-        return resource_label_based_graphs
 
     @classmethod
     def _get_display_value(cls, tile, serialized_node, datatype_factory):
