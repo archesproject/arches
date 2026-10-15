@@ -64,10 +64,13 @@ def _get_concept_labels(relationship_types, lang):
 
 def _get_list_item_labels(relationship_types, lang):
     """Labels for relationship types stored as a controlled list item, which the
-    node config records as the item's uri (see utils/controlled-list.js). A uri is
-    generated from PUBLIC_SERVER_ADDRESS or supplied by an import, so one stored in
-    a node config can be stale or belong to another environment. Fall back to
-    matching the item id, which is the trailing segment of a generated uri.
+    node config records as the item's uri (see utils/controlled-list.js). Since the URI
+    should point to an external resource that not have a corresponding local representation
+    in the Controlled List Manager, let's check if the CLM has a corresponding record.
+    If there is a list item, return it's prefLabel. If not, fall back on the raw URI.
+
+    Since some Arches instances may create only locally available list items with an Arches
+    generated URI, also check if the CLM has a corresponding record based on the item id.
 
     Returns nothing when the controlled_lists application isn't installed,
     the same soft dependency the frontend takes (see utils/controlled-list.js).
