@@ -134,7 +134,15 @@ export default ko.components.register('etl-manager', {
                     },
                 }).then(function(response) {
                     return response.json();
-                }).then(function() {
+                }).then(function(result) {
+                    if (result.success === false) {
+                        const error = result.data || {};
+                        self.alert(new AlertViewModel(
+                            'ep-alert-red',
+                            error.title || arches.translations.requestFailed.title,
+                            error.message || arches.translations.requestFailed.text
+                        ));
+                    }
                     self.fetchLoadEvent();
                     event.loading(false);
                 });

@@ -253,6 +253,9 @@ class BaseImportModule:
                 try:
                     self.stage_files(files, summary, cursor)
                 except Exception as e:
+                    # The generic message below replaces the original, so
+                    # without this a failed load reports no reason at all.
+                    logger.exception(e)
                     load_event = LoadEvent.objects.get(loadid=loadid)
                     load_event.status = "failed"
                     load_event.successful = False
@@ -266,9 +269,23 @@ class BaseImportModule:
                 self.check_tile_cardinality(cursor)
                 result["validation"] = self.validate(loadid)
                 if len(result["validation"]["data"]) == 0:
-                    self.save_to_tiles(
+                    written = self.save_to_tiles(
                         cursor, userid, loadid, multiprocessing, max_subprocesses, index
                     )
+                    # "saved" is save.py's index failure: the data is in, so the refreshes still run
+                    if (
+                        written
+                        and written.get("success") is False
+                        and written.get("data") != "saved"
+                    ):
+                        return {
+                            "success": False,
+                            "data": written.get("data")
+                            or {
+                                "title": written.get("title"),
+                                "message": written.get("message"),
+                            },
+                        }
                     # Multiprocessed indexing calls connections.close_all(), which
                     # invalidates the cursor opened above. Re-acquire one (Django
                     # reconnects lazily) for the post-index refresh.
