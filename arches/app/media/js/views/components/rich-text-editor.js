@@ -1,6 +1,10 @@
 import ko from 'knockout';
 import arches from 'arches';
-import createRichTextEditor from 'utils/rich-text-editor';
+import { Editor } from '@tiptap/core';
+import StarterKit from '@tiptap/starter-kit';
+import { Placeholder } from '@tiptap/extensions';
+import { Image } from '@tiptap/extension-image';
+import { TableKit } from '@tiptap/extension-table';
 import richTextEditorTemplate from 'templates/views/components/rich-text-editor.htm';
 import 'bindings/tiptap';
 
@@ -107,11 +111,21 @@ const textFormats = ['paragraph', 'heading1', 'heading2', 'heading3', 'heading4'
 */
 export default ko.components.register('views/components/rich-text-editor', {
     viewModel: function(params) {
-        const { editor, getValue, setContent } = createRichTextEditor({
-            content: ko.unwrap(params.value),
+        const editor = new Editor({
+            content: ko.unwrap(params.value) || '',
             editable: !ko.unwrap(params.disabled),
-            placeholder: ko.unwrap(params.placeholder),
+            extensions: [
+                StarterKit.configure({
+                    link: { openOnClick: false, HTMLAttributes: { target: null, rel: null } },
+                    // don't add an empty paragraph to the end of saved content
+                    trailingNode: false,
+                }),
+                Image.configure({ inline: true, allowBase64: false }),
+                TableKit,
+                Placeholder.configure({ placeholder: ko.unwrap(params.placeholder) || '' }),
+            ],
         });
+        const getValue = () => editor.isEmpty ? '' : editor.getHTML();
 
         this.editor = editor;
         this.direction = params.direction || arches.activeLanguageDir;
@@ -120,7 +134,15 @@ export default ko.components.register('views/components/rich-text-editor', {
 
         // keep the value and the editor in sync
         editor.on('update', () => params.value(getValue()));
-        const subscriptions = [params.value.subscribe(setContent)];
+        // a change from outside replaces the content without an update event, or an undo step
+        const subscriptions = [params.value.subscribe((value) => {
+            if ((value || '') !== getValue()) {
+                editor.chain()
+                    .command(({ tr }) => tr.setMeta('addToHistory', false))
+                    .setContent(value || '', { emitUpdate: false })
+                    .run();
+            }
+        })];
         if (ko.isObservable(params.disabled)) {
             subscriptions.push(params.disabled.subscribe(disabled => editor.setEditable(!disabled, false)));
         }
