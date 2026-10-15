@@ -4,6 +4,7 @@ import OpenVue from "openvue/config";
 
 import GenericCard from "@/arches_vue_components/generics/GenericCard/GenericCard.vue";
 
+import { fetchTileData } from "@/arches_vue_components/generics/GenericCard/api.ts";
 import { EDIT } from "@/arches_vue_components/widgets/constants.ts";
 
 import type {
@@ -56,6 +57,10 @@ vi.mock(
     }),
 );
 
+vi.mock("@/arches_vue_components/generics/GenericCard/api.ts", () => ({
+    fetchTileData: vi.fn(() => Promise.resolve(TILE)),
+}));
+
 vi.mock("@/arches_vue_components/stores/useLanguageStore.ts", () => ({
     useLanguageStore: () => ({
         fetchAllLanguages: () => Promise.reject(new Error("Offline")),
@@ -82,5 +87,30 @@ describe("GenericCard", () => {
             wrapper.findComponent({ name: "GenericCardEditor" }).exists(),
         ).toBe(true);
         expect(wrapper.text()).not.toContain("Offline");
+    });
+
+    it("fetches the new tile when its tileId changes in edit mode", async () => {
+        const wrapper = mount(GenericCard, {
+            props: {
+                mode: EDIT,
+                graphSlug: "pigment",
+                nodegroupAlias: "names",
+                tileId: "smalt",
+            },
+            global: {
+                plugins: [[OpenVue, { theme: "none" }]],
+                stubs: { GenericCardEditor: true },
+            },
+        });
+        await flushPromises();
+
+        await wrapper.setProps({ tileId: "cobalt" });
+        await flushPromises();
+
+        expect(vi.mocked(fetchTileData)).toHaveBeenLastCalledWith(
+            "pigment",
+            "names",
+            "cobalt",
+        );
     });
 });

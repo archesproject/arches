@@ -60,36 +60,52 @@ watch(
     { immediate: true },
 );
 
-watchEffect(async () => {
+watchEffect(async (onCleanup) => {
+    let isStale = false;
+    onCleanup(() => {
+        isStale = true;
+    });
     isLoading.value = true;
 
+    let tileDataPromise: Promise<AliasedTileData | undefined> =
+        Promise.resolve(undefined);
+    if (shouldFetchTile.value) {
+        tileDataPromise = fetchTileData(graphSlug, nodegroupAlias, tileId);
+    }
+    let languagesPromise: Promise<unknown> = Promise.resolve();
+    if (mode === EDIT) {
+        languagesPromise = useLanguageStore()
+            .fetchAllLanguages()
+            .catch(() => undefined);
+    }
+
     try {
-        const cardXNodeXWidgetDataPromise =
+        const [loadedCardXNodeXWidgetData, loadedTileData] = await Promise.all([
             useNodegroupWidgetConfigStore().fetchNodegroupWidgetConfigs(
                 graphSlug,
                 nodegroupAlias,
-            );
-
-        if (mode === EDIT) {
-            await Promise.allSettled([useLanguageStore().fetchAllLanguages()]);
+            ),
+            tileDataPromise,
+            languagesPromise,
+        ]);
+        if (isStale) {
+            return;
         }
-
-        if (shouldFetchTile.value) {
-            aliasedTileData.value = await fetchTileData(
-                graphSlug,
-                nodegroupAlias,
-                tileId,
-            );
+        if (loadedTileData) {
+            aliasedTileData.value = loadedTileData;
             if (!tileId && resourceInstanceId) {
                 aliasedTileData.value.resourceinstance = resourceInstanceId;
             }
         }
-
-        cardXNodeXWidgetData.value = await cardXNodeXWidgetDataPromise;
+        cardXNodeXWidgetData.value = loadedCardXNodeXWidgetData;
     } catch (error) {
-        configurationError.value = error;
+        if (!isStale) {
+            configurationError.value = error;
+        }
     } finally {
-        isLoading.value = false;
+        if (!isStale) {
+            isLoading.value = false;
+        }
     }
 });
 
@@ -99,7 +115,9 @@ defineExpose({
             defaultCardEditor.value.save();
         }
     },
-    focusWidgetInputForNodeAlias: async function (nodeAlias: string) {
+    focusWidgetInputForNodeAlias: async function (
+        nodeAlias: string,
+    ): Promise<void> {
         if (defaultCardEditor.value) {
             await defaultCardEditor.value.focusWidgetInputForNodeAlias(
                 nodeAlias,

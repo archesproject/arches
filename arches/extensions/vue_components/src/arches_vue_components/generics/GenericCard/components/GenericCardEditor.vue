@@ -123,6 +123,8 @@ watch(
                 continue;
             }
             aliasedNodeDataMap[nodeAlias] = cloneDeep(incomingNodeData);
+            originalAliasedNodeDataMap[nodeAlias] = cloneDeep(incomingNodeData);
+            localWidgetDirtyStates[nodeAlias] = false;
             nodeRevisions[nodeAlias] = (nodeRevisions[nodeAlias] ?? 0) + 1;
         }
     },
@@ -233,7 +235,7 @@ async function save() {
     }
 }
 
-async function focusWidgetInputForNodeAlias(nodeAlias: string) {
+async function focusWidgetInputForNodeAlias(nodeAlias: string): Promise<void> {
     for (let attemptCount = 0; attemptCount < 5; attemptCount += 1) {
         const widgetComponentRefs = genericWidgetRefs.value;
         if (!Array.isArray(widgetComponentRefs)) {
@@ -287,6 +289,11 @@ function onWidgetInitialized(
     }
 }
 
+function widgetKey(cardXNodeXWidgetDatum: CardXNodeXWidgetData): string {
+    const revision = nodeRevisions[cardXNodeXWidgetDatum.node.alias] ?? 0;
+    return `${cardXNodeXWidgetDatum.id}-${revision}`;
+}
+
 function onUpdateWidgetAliasedNodeData(
     nodeAlias: string,
     nodeData: AliasedNodeData,
@@ -313,7 +320,7 @@ function onUpdateWidgetAliasedNodeData(
         >
             <template
                 v-for="cardXNodeXWidgetDatum in cardXNodeXWidgetData"
-                :key="`${cardXNodeXWidgetDatum.id}-${nodeRevisions[cardXNodeXWidgetDatum.node.alias] ?? 0}`"
+                :key="widgetKey(cardXNodeXWidgetDatum)"
             >
                 <GenericWidget
                     v-if="cardXNodeXWidgetDatum.visible"
