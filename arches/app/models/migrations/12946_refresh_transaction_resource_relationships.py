@@ -7,7 +7,7 @@ from arches.app.models.utils import format_file_into_sql
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "12913_remove_geocoders"),
+        ("models", "12773_fix_relational_view_node_naming"),
     ]
 
     operations = [
