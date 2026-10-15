@@ -50,6 +50,24 @@ class DatabaseManagedFieldMixin:
         return name, path, args, kwargs
 
 
+class DatabaseManagedFieldsModelMixin:
+    """
+    Skips ORM uniqueness checks on database-managed fields. The ORM never
+    writes their values, so e.g. a copied instance still carrying the
+    original's id would otherwise fail full_clean() despite saving fine.
+    """
+
+    def validate_unique(self, exclude=None):
+        database_managed_field_names = {
+            field.name
+            for field in self._meta.concrete_fields
+            if isinstance(field, DatabaseManagedFieldMixin)
+        }
+        super().validate_unique(
+            exclude={*(exclude or ()), *database_managed_field_names}
+        )
+
+
 class NonPrimaryIdentityField(DatabaseManagedFieldMixin, models.BigIntegerField):
     """
     A unique, sequence-backed bigint that behaves like an AutoField but is not

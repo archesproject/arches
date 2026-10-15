@@ -25,6 +25,7 @@ from django.utils.translation import gettext_lazy as _
 from arches.app.const import ExtensionType
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
 from arches.app.models.fields.database_managed_fields import (
+    DatabaseManagedFieldsModelMixin,
     DatabaseTimestampField,
     NonPrimaryIdentityField,
 )
@@ -1458,11 +1459,15 @@ class ResourceXResource(SaveSupportsBlindOverwriteMixin, models.Model):
         db_table = "resource_x_resource"
 
 
-class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
-    id = NonPrimaryIdentityField(sequence_name="resource_instances_id_seq")
+class ResourceInstance(
+    DatabaseManagedFieldsModelMixin, SaveSupportsBlindOverwriteMixin, models.Model
+):
     resourceinstanceid = models.UUIDField(
         primary_key=True, blank=True, default=uuid.uuid4, db_default=UUID4()
     )
+    # Declared after the primary key: positional construction, e.g.
+    # Resource(resourceinstanceid), assigns arguments in field order.
+    id = NonPrimaryIdentityField(sequence_name="resource_instances_id_seq")
     graph = models.ForeignKey(
         GraphModel, blank=True, db_column="graphid", on_delete=models.CASCADE
     )
@@ -1896,7 +1901,9 @@ class SearchExportHistory(SaveSupportsBlindOverwriteMixin, models.Model):
         db_table = "search_export_history"
 
 
-class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
+class TileModel(
+    DatabaseManagedFieldsModelMixin, SaveSupportsBlindOverwriteMixin, models.Model
+):  # Tile
     """
     the data JSONField has this schema:
 
@@ -1959,10 +1966,12 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
 
     """
 
-    id = NonPrimaryIdentityField(sequence_name="tiles_id_seq")
     tileid = models.UUIDField(
         primary_key=True, blank=True, default=uuid.uuid4, db_default=UUID4()
     )
+    # Declared after the primary key: positional construction, e.g.
+    # Resource(resourceinstanceid), assigns arguments in field order.
+    id = NonPrimaryIdentityField(sequence_name="tiles_id_seq")
     resourceinstance = models.ForeignKey(
         ResourceInstance, db_column="resourceinstanceid", on_delete=models.CASCADE
     )
