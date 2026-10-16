@@ -13330,7 +13330,8 @@ table.csv-mapping-table td {
     border-left: 1px solid #e9e9e9;
 }
 
-.rich-text-editor-toolbar-button {
+.rich-text-editor-toolbar-button,
+.rich-text-editor-link-menu button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -13344,7 +13345,8 @@ table.csv-mapping-table td {
     color: #666;
 }
 
-.rich-text-editor-toolbar-button:hover {
+.rich-text-editor-toolbar-button:hover,
+.rich-text-editor-link-menu button:hover {
     background: #f2f2f2;
     color: #333;
 }
@@ -13363,9 +13365,23 @@ table.csv-mapping-table td {
     background: none;
 }
 
-.rich-text-editor-toolbar-button:focus-visible {
+.rich-text-editor-toolbar-button:focus-visible,
+.rich-text-editor-link-menu button:focus-visible {
     outline: 2px solid #54abd9;
     outline-offset: 1px;
+}
+
+.open > .rich-text-editor-link-menu {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 4px;
+}
+
+.rich-text-editor-link-input {
+    width: 240px;
+    height: 32px;
+    padding: 0 8px;
 }
 
 .rich-text-editor-content {
@@ -13392,6 +13408,12 @@ table.csv-mapping-table td {
     line-height: 1.6;
     color: #aaa;
     pointer-events: none;
+}
+
+// links, which the theme otherwise styles like plain text
+.rich-text-editor .tiptap a {
+    color: #2a7ab8;
+    text-decoration: underline;
 }
 
 // tiptap table

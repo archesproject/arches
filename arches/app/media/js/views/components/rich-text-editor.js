@@ -38,15 +38,6 @@ const pasteFromClipboard = async (editor, asPlainText) => {
     }
 };
 
-const setLink = (editor) => {
-    const href = window.prompt(arches.translations.linkUrl, editor.getAttributes('link').href ?? '');
-    if (href === null) {
-        return;
-    }
-    const chain = editor.chain().focus().extendMarkRange('link');
-    (href ? chain.setLink({ href }) : chain.unsetLink()).run();
-};
-
 const insertImage = (editor) => {
     const src = window.prompt(arches.translations.imageUrl);
     if (src) {
@@ -65,8 +56,7 @@ const toolbarItems = {
     pasteText: { action: editor => pasteFromClipboard(editor, true) },
     undo: { command: chain => chain.undo() },
     redo: { command: chain => chain.redo() },
-    link: { action: setLink, isActive: editor => editor.isActive('link') },
-    unlink: { command: chain => chain.extendMarkRange('link').unsetLink(), isDisabled: editor => !editor.isActive('link') },
+    link: { isActive: editor => editor.isActive('link') },
     image: { action: insertImage },
     insertTable: { command: chain => chain.insertTable({ rows: 3, cols: 3, withHeaderRow: false }) },
     addRowBefore: { command: chain => chain.addRowBefore() },
@@ -160,12 +150,40 @@ export default ko.components.register('views/components/rich-text-editor', {
 
         this.run = name => () => {
             const item = toolbarItems[name];
-            // dropdown.hideAll(); hide dropdown after click - is this a bug?
             if (item.action) {
                 item.action(editor);
             } else {
                 item.command(editor.chain().focus()).run();
             }
+        };
+
+        // link url popup
+        this.linkUrl = ko.observable('');
+
+        this.editLink = () => {
+            this.linkUrl(editor.getAttributes('link').href ?? '');
+        };
+
+        this.applyLink = () => {
+            const href = this.linkUrl().trim();
+            const chain = editor.chain().focus().extendMarkRange('link');
+            if (!href) {
+                chain.unsetLink().run();
+            } else if (editor.state.selection.empty && !editor.isActive('link')) {
+                chain.insertContent({ type: 'text', text: href, marks: [{ type: 'link', attrs: { href } }] }).run();
+            } else {
+                chain.setLink({ href }).run();
+            }
+        };
+
+        this.openLink = () => {
+            if (this.linkUrl()) {
+                window.open(this.linkUrl(), '_blank', 'noopener');
+            }
+        };
+
+        this.removeLink = () => {
+            editor.chain().focus().extendMarkRange('link').unsetLink().run();
         };
 
         // roving tabindex: only the most recently focused control is in the tab order
