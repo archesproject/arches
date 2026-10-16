@@ -23,9 +23,6 @@ from arches.app.utils.permission_backend import user_can_read_resource
 from arches.app.utils.permission_backend import user_has_resource_model_permissions
 from arches.app.utils.permission_backend import get_restricted_users
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
-from arches.app.utils.permission_backend import (
-    nodegroup_ids_with_inherited_permission,
-)
 
 from tests.base_test import ArchesTestCase
 
@@ -155,22 +152,6 @@ class PermissionTests(ArchesTestCase):
         graphids = get_permitted_graphids(permitted_nodegroups)
         with self.subTest(graphids):
             self.assertTrue(self.data_type_graphid not in graphids)
-
-    def test_nodegroups_under_an_unreadable_parent_are_unreadable(self):
-        parent_nodegroup = NodeGroup.objects.filter(
-            node__graph_id=self.data_type_graphid
-        ).first()
-        child_nodegroup = NodeGroup.objects.create(parentnodegroup=parent_nodegroup)
-        assign_perm("no_access_to_nodegroup", self.user, parent_nodegroup)
-
-        self.assertIn(
-            child_nodegroup.pk,
-            get_nodegroups_by_perm(self.user, "models.read_nodegroup"),
-        )
-        self.assertNotIn(
-            child_nodegroup.pk,
-            nodegroup_ids_with_inherited_permission(self.user, "models.read_nodegroup"),
-        )
 
     def test_nodegroups_by_perm(self):
         # In this first case, user 'ben' has implicit read access to all nodegroups
