@@ -1,3 +1,4 @@
+from arches.app.utils.decorators import deprecated
 from arches.app.utils.permission_backend import get_editable_resource_types
 from arches.app.utils.permission_backend import get_createable_resource_types
 from arches.app.utils.permission_backend import get_resource_types_by_perm
@@ -44,6 +45,19 @@ def can_read_resource_instance(user):
 @register.filter(name="can_create_resource_instance")
 def can_create_resource_instance(user):
     return len(get_createable_resource_types(user)) > 0
+
+
+@register.filter(name="can_create_graph")
+@deprecated
+def can_create_graph(user):
+    return (
+        len(
+            get_resource_types_by_perm(
+                user, ["models.write_nodegroup", "models.delete_nodegroup"]
+            )
+        )
+        > 0
+    )
 
 
 @register.filter(name="has_key")

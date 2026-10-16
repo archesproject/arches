@@ -23,6 +23,7 @@ from arches import __version__ as _arches_version_str
 from packaging.version import Version
 
 arches_version = Version(_arches_version_str)
+from arches.app.utils.decorators import deprecated
 from arches.app.models.models import ResourceInstance, TileModel
 
 from arches.extensions.querysets.datatypes.datatypes import DataTypeFactory
@@ -192,6 +193,22 @@ def get_nodegroups_here_and_below(start_nodegroup):
 
     accumulate(start_nodegroup)
     return accumulator
+
+
+@deprecated
+def filter_nodes_by_highest_parent(nodes, aliases):
+    filtered_nodes = set()
+    for alias in aliases:
+        for node in nodes:
+            if node.alias == alias:
+                break
+        else:
+            raise ValueError("Node alias {alias} not found in nodes.")
+        nodegroups = get_nodegroups_here_and_below(node.nodegroup)
+        for nodegroup in nodegroups:
+            filtered_nodes |= set(nodegroup.node_set.all())
+
+    return filtered_nodes
 
 
 def any_nodegroup_in_hierarchy_is_cardinality_n(nodegroup, graph_nodes):

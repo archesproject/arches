@@ -2,6 +2,7 @@ import os
 import uuid
 import shutil
 import datetime
+from arches.app.utils.decorators import deprecated
 from arches.app.models.concept import Concept
 from arches.app.models import models
 from arches.app.models.models import ResourceXResource
@@ -55,6 +56,13 @@ class ResourceImportReporter:
     def update_tiles_saved(self, count=1):
         self.tiles_saved += count
 
+    @deprecated
+    def update_relations_saved(self, count=1):
+        self.relations_saved += count
+        print(
+            _("{0} of {1} relations saved".format(self.relations_saved, self.relations))
+        )
+
     def report_results(self):
         if self.resources > 0:
             result = "Resources for Import: {0}, Resources Saved: {1}, Tiles for Import: {2}, Tiles Saved: {3}, Relations for Import: {4}, Relations Saved: {5}"
@@ -74,6 +82,10 @@ class Reader(object):
     def __init__(self, *args, **kwargs):
         self.errors = []
         self.datatype_factory = DataTypeFactory()
+
+    @deprecated
+    def validate_datatypes(self, record):
+        pass
 
     def import_business_data(self):
         pass

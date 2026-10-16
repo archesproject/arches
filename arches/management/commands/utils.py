@@ -1,6 +1,9 @@
 import importlib.util
 import os
 import sys
+import codecs
+
+from arches.app.utils.decorators import deprecated
 
 
 def get_yn_input(msg="are you sure you want to continue?", default="Y"):
@@ -30,6 +33,21 @@ def get_yn_input(msg="are you sure you want to continue?", default="Y"):
             ret = True
 
     return ret
+
+
+@deprecated
+def write_to_file(fileName, contents, mode="w", encoding="utf-8", **kwargs):
+    ensure_dir(fileName)
+    file = codecs.open(fileName, mode=mode, encoding=encoding, **kwargs)
+    file.write(contents)
+    file.close()
+
+
+@deprecated
+def ensure_dir(f):
+    d = os.path.dirname(f)
+    if not os.path.exists(d):
+        os.makedirs(d)
 
 
 def get_valid_path(path):
