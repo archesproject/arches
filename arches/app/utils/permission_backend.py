@@ -4,7 +4,7 @@ from typing import Iterable
 from django.contrib.auth.models import User
 
 from arches.app.const import ExtensionType
-from arches.app.models.models import EditLog, GraphModel
+from arches.app.models.models import EditLog, GraphModel, NodeGroup
 from arches.app.models.system_settings import settings
 from arches.app.utils.module_importer import get_class_from_modulename
 
@@ -262,6 +262,26 @@ def get_nodegroups_by_perm(user, perms, any_perm=True):
     return _get_permission_framework().get_nodegroups_by_perm(
         user, perms, any_perm=any_perm
     )
+
+
+def nodegroup_ids_with_inherited_permission(user, permission):
+    permitted_nodegroup_ids = set(get_nodegroups_by_perm(user, permission))
+    parent_nodegroup_ids_by_id = dict(
+        NodeGroup.objects.values_list("pk", "parentnodegroup_id")
+    )
+
+    def is_permitted_with_ancestors(nodegroup_id):
+        while nodegroup_id is not None:
+            if nodegroup_id not in permitted_nodegroup_ids:
+                return False
+            nodegroup_id = parent_nodegroup_ids_by_id.get(nodegroup_id)
+        return True
+
+    return {
+        nodegroup_id
+        for nodegroup_id in permitted_nodegroup_ids
+        if is_permitted_with_ancestors(nodegroup_id)
+    }
 
 
 def get_map_layers_by_perm(user, perms, any_perm=True):

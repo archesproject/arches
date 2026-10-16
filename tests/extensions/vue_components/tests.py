@@ -167,7 +167,7 @@ class CardXNodeXWidgetPermissionTests(GraphTestCase):
             return [nodegroup.pk for nodegroup in readable_nodegroups]
 
         with mock.patch(
-            "arches.extensions.vue_components.utils.nodegroup_permissions.get_nodegroups_by_perm",
+            "arches.app.utils.permission_backend.get_nodegroups_by_perm",
             side_effect=nodegroups_by_perm,
         ):
             return self.client.get(

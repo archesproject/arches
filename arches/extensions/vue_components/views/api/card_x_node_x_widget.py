@@ -7,9 +7,7 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
-from arches.extensions.vue_components.utils.nodegroup_permissions import (
-    nodegroup_ids_with_inherited_permission,
-)
+from arches.app.utils.permission_backend import nodegroup_ids_with_inherited_permission
 
 
 def serialize_card_x_node_x_widget(widget, datatype_factory):
