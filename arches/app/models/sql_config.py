@@ -94,4 +94,42 @@ sql_items = [
         ],
         replace=True,
     ),
+    # Sequences are replace=True: dropping one to recreate it would fail
+    # while the id column's default still references it.
+    SQLItem(
+        "resource_instances_id_seq",
+        format_file_into_sql("resource_instances_id_seq.sql", "sql/sequences"),
+        reverse_sql="drop sequence if exists resource_instances_id_seq;",
+        replace=True,
+    ),
+    SQLItem(
+        "tiles_id_seq",
+        format_file_into_sql("tiles_id_seq.sql", "sql/sequences"),
+        reverse_sql="drop sequence if exists tiles_id_seq;",
+        replace=True,
+    ),
+    SQLItem(
+        "__arches_manage_row_metadata",
+        format_file_into_sql("__arches_manage_row_metadata.sql", "sql/functions"),
+        reverse_sql="drop function __arches_manage_row_metadata;",
+        replace=True,
+    ),
+    # Not replace=True: CREATE TRIGGER has no OR REPLACE before PostgreSQL 14,
+    # so changes drop (reverse_sql) and recreate the triggers.
+    SQLItem(
+        "__arches_manage_row_metadata_trigger",
+        format_file_into_sql(
+            "__arches_manage_row_metadata_trigger.sql", "sql/triggers"
+        ),
+        reverse_sql=(
+            "drop trigger if exists __arches_manage_row_metadata_trigger"
+            " on resource_instances;"
+            "drop trigger if exists __arches_manage_row_metadata_trigger on tiles;"
+        ),
+        dependencies=[
+            ("models", "__arches_manage_row_metadata"),
+            ("models", "resource_instances_id_seq"),
+            ("models", "tiles_id_seq"),
+        ],
+    ),
 ]

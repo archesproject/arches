@@ -1,71 +1,7 @@
+import django_migrate_sql.operations
 from django.db import migrations
 
 import arches.app.models.fields.database_managed_fields
-
-TABLES = (
-    ("resource_instances", "resource_instances_id_seq"),
-    ("tiles", "tiles_id_seq"),
-)
-
-create_sequences = "\n".join(
-    f"CREATE SEQUENCE IF NOT EXISTS {sequence} AS bigint;" for _, sequence in TABLES
-)
-drop_sequences = "\n".join(
-    f"DROP SEQUENCE IF EXISTS {sequence};" for _, sequence in TABLES
-)
-
-own_sequences = "\n".join(
-    f"ALTER SEQUENCE {sequence} OWNED BY {table}.id;" for table, sequence in TABLES
-)
-disown_sequences = "\n".join(
-    f"ALTER SEQUENCE {sequence} OWNED BY NONE;" for _, sequence in TABLES
-)
-
-# id, createdtime and last_updated are owned by the database, regardless of
-# whether a row arrives via the ORM, raw SQL (e.g. the ETL loaders), or COPY.
-#   INSERT: always assigned here; any supplied values are discarded, so ids
-#           stay in insertion order (keyset paging relies on it) and
-#           timestamps can't be backdated. Loads that must keep original
-#           values (e.g. pg_restore --data-only, historical migrations) need
-#           the trigger bypassed (session_replication_role = replica or
-#           ALTER TABLE ... DISABLE TRIGGER), followed by
-#           `SELECT setval('tiles_id_seq', (SELECT max(id) FROM tiles));`
-#   UPDATE: id and createdtime can never change; last_updated is bumped only
-#           when some other column actually changed, so blind re-saves are
-#           no-ops.
-create_trigger_function = """
-    CREATE OR REPLACE FUNCTION __arches_manage_row_metadata()
-    RETURNS trigger AS $$
-    BEGIN
-        IF TG_OP = 'INSERT' THEN
-            NEW.id := nextval(TG_ARGV[0]::regclass);
-            NEW.createdtime := statement_timestamp();
-            NEW.last_updated := statement_timestamp();
-            RETURN NEW;
-        END IF;
-
-        NEW.id := OLD.id;
-        NEW.createdtime := OLD.createdtime;
-        NEW.last_updated := OLD.last_updated;
-        IF NEW IS DISTINCT FROM OLD THEN
-            NEW.last_updated := statement_timestamp();
-        END IF;
-        RETURN NEW;
-    END;
-    $$ LANGUAGE plpgsql;
-"""
-drop_trigger_function = "DROP FUNCTION IF EXISTS __arches_manage_row_metadata();"
-
-create_triggers = "\n".join(f"""
-    CREATE TRIGGER __arches_manage_row_metadata_trigger
-        BEFORE INSERT OR UPDATE ON {table}
-        FOR EACH ROW
-        EXECUTE FUNCTION __arches_manage_row_metadata('{sequence}');
-    """ for table, sequence in TABLES)
-drop_triggers = "\n".join(
-    f"DROP TRIGGER IF EXISTS __arches_manage_row_metadata_trigger ON {table};"
-    for table, _ in TABLES
-)
 
 
 class Migration(migrations.Migration):
@@ -75,7 +11,17 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL(create_sequences, drop_sequences),
+        # The id columns' defaults reference these, so they come first.
+        django_migrate_sql.operations.CreateSQL(
+            name="resource_instances_id_seq",
+            sql="\ncreate sequence if not exists resource_instances_id_seq as bigint;\n",
+            reverse_sql="drop sequence if exists resource_instances_id_seq;",
+        ),
+        django_migrate_sql.operations.CreateSQL(
+            name="tiles_id_seq",
+            sql="\ncreate sequence if not exists tiles_id_seq as bigint;\n",
+            reverse_sql="drop sequence if exists tiles_id_seq;",
+        ),
         migrations.AddField(
             model_name="resourceinstance",
             name="id",
@@ -110,7 +56,23 @@ class Migration(migrations.Migration):
             name="last_updated",
             field=arches.app.models.fields.database_managed_fields.DatabaseTimestampField(),
         ),
-        migrations.RunSQL(own_sequences, disown_sequences),
-        migrations.RunSQL(create_trigger_function, drop_trigger_function),
-        migrations.RunSQL(create_triggers, drop_triggers),
+        django_migrate_sql.operations.CreateSQL(
+            name="__arches_manage_row_metadata",
+            sql="\n-- id, createdtime and last_updated are owned by the database, regardless of\n-- whether a row arrives via the ORM, raw SQL (e.g. the ETL loaders), or COPY.\n--   INSERT: always assigned here; any supplied values are discarded, so ids\n--           stay in insertion order (keyset paging relies on it) and\n--           timestamps can't be backdated. Loads that must keep original\n--           values (e.g. pg_restore --data-only, historical migrations) need\n--           the trigger bypassed (session_replication_role = replica or\n--           ALTER TABLE ... DISABLE TRIGGER), followed by\n--           `SELECT setval('tiles_id_seq', (SELECT max(id) FROM tiles));`\n--   UPDATE: id and createdtime can never change; last_updated is bumped only\n--           when some other column actually changed, so blind re-saves are\n--           no-ops.\n-- TG_ARGV[0] is the sequence that supplies the table's ids.\ncreate or replace function __arches_manage_row_metadata()\nreturns trigger as $$\nbegin\n    if tg_op = 'INSERT' then\n        new.id := nextval(tg_argv[0]::regclass);\n        new.createdtime := statement_timestamp();\n        new.last_updated := statement_timestamp();\n        return new;\n    end if;\n\n    new.id := old.id;\n    new.createdtime := old.createdtime;\n    new.last_updated := old.last_updated;\n    if new is distinct from old then\n        new.last_updated := statement_timestamp();\n    end if;\n    return new;\nend;\n$$ language plpgsql;\n",
+            reverse_sql="drop function __arches_manage_row_metadata;",
+        ),
+        django_migrate_sql.operations.CreateSQL(
+            name="__arches_manage_row_metadata_trigger",
+            sql="\n-- See __arches_manage_row_metadata(); each table passes its own id sequence.\ncreate trigger __arches_manage_row_metadata_trigger\n    before insert or update on resource_instances\n    for each row\n    execute function __arches_manage_row_metadata('resource_instances_id_seq');\n\ncreate trigger __arches_manage_row_metadata_trigger\n    before insert or update on tiles\n    for each row\n    execute function __arches_manage_row_metadata('tiles_id_seq');\n",
+            reverse_sql=(
+                "drop trigger if exists __arches_manage_row_metadata_trigger"
+                " on resource_instances;"
+                "drop trigger if exists __arches_manage_row_metadata_trigger on tiles;"
+            ),
+            dependencies=[
+                ("models", "__arches_manage_row_metadata"),
+                ("models", "resource_instances_id_seq"),
+                ("models", "tiles_id_seq"),
+            ],
+        ),
     ]
