@@ -7,8 +7,19 @@ import type {
     NodegroupWidgetConfig,
 } from "@/arches_vue_components/types.ts";
 
-async function requestJson<T>(url: string): Promise<T> {
-    const response = await fetch(url);
+async function requestNodegroupWidgetConfigs(
+    graphSlug: string,
+    nodegroupAlias: string,
+): Promise<CardXNodeXWidgetData[]> {
+    const response = await fetch(
+        generateArchesURL(
+            "arches_vue_components:api-card-x-node-x-widget-list-from-nodegroup",
+            {
+                graph_slug: graphSlug,
+                nodegroup_alias: nodegroupAlias,
+            },
+        ),
+    );
 
     const parsed = await response.json();
 
@@ -19,30 +30,23 @@ async function requestJson<T>(url: string): Promise<T> {
     return parsed;
 }
 
-function requestNodegroupWidgetConfigs(
-    graphSlug: string,
-    nodegroupAlias: string,
-): Promise<CardXNodeXWidgetData[]> {
-    return requestJson(
-        generateArchesURL(
-            "arches_vue_components:api-card-x-node-x-widget-list-from-nodegroup",
-            {
-                graph_slug: graphSlug,
-                nodegroup_alias: nodegroupAlias,
-            },
-        ),
-    );
-}
-
-function requestGraphWidgetConfigs(
+async function requestGraphWidgetConfigs(
     graphSlug: string,
 ): Promise<Record<string, NodegroupWidgetConfig>> {
-    return requestJson(
+    const response = await fetch(
         generateArchesURL(
             "arches_vue_components:api-card-x-node-x-widget-list-from-graph",
             { graph_slug: graphSlug },
         ),
     );
+
+    const parsed = await response.json();
+
+    if (!response.ok) {
+        throw new Error(parsed.message ?? response.statusText);
+    }
+
+    return parsed;
 }
 
 export const useNodegroupWidgetConfigStore = defineStore(
