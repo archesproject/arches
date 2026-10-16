@@ -138,9 +138,11 @@ function onUpdateModelValue(updatedValue: string | undefined) {
     >
         <span>
             {{
-                $gettext("Unable to load languages: %{message}", {
-                    message: fetchError,
-                })
+                $gettext(
+                    "Unable to load languages: %{message}",
+                    { message: fetchError },
+                    true,
+                )
             }}
         </span>
     </Message>
