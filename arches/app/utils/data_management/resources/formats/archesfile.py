@@ -92,7 +92,15 @@ class ArchesFileWriter(Writer):
         for resource_data in export["business_data"]["resources"]:
             resource_instance_data = resource_data.get("resourceinstance")
 
+            # Row metadata is local to this database, not part of the
+            # interchange format (resources have always carried createdtime).
+            for tile_data in resource_data.get("tiles") or []:
+                for field_name in ("id", "createdtime", "last_updated"):
+                    tile_data.pop(field_name, None)
+
             if resource_instance_data:
+                for field_name in ("id", "last_updated"):
+                    resource_instance_data.pop(field_name, None)
                 resource_data["resourceinstance"]["publication_id"] = (
                     graph_id_to_publication_id.get(resource_instance_data["graph_id"])
                 )

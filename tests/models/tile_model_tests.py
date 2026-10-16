@@ -60,14 +60,14 @@ class TileTests(ArchesTestCase):
                 pk=CardinalityTestGraph.RESOURCE1.value,
                 legacyid=CardinalityTestGraph.RESOURCE1.value,
                 graph_id=CardinalityTestGraph.GRAPH_ID.value,
-                createdtime="1/1/2000",
+                createdtime="2000-01-01",
                 resource_instance_lifecycle_state_id=DefaultLifecycleStates.PERPETUAL.value,
             ),
             ResourceInstance(
                 pk=AllDatatypesTestGraph.RESOURCE1.value,
                 legacyid=AllDatatypesTestGraph.RESOURCE1.value,
                 graph_id=AllDatatypesTestGraph.GRAPH_ID.value,
-                createdtime="1/1/2000",
+                createdtime="2000-01-01",
                 resource_instance_lifecycle_state_id=DefaultLifecycleStates.PERPETUAL.value,
             ),
         ]
