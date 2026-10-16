@@ -40,14 +40,6 @@ const pasteFromClipboard = async (editor, asPlainText) => {
     }
 };
 
-const insertImage = (editor) => {
-    const src = window.prompt(arches.translations.imageUrl);
-    if (src) {
-        const alt = window.prompt(arches.translations.imageDescription) ?? '';
-        editor.chain().focus().setImage({ src, alt }).run();
-    }
-};
-
 // Defines each option within the toolbar.
 // - command(chain) - adds Tiptap commands to a chain
 // - action(editor) - additional, bespoke functions 
@@ -59,7 +51,7 @@ const toolbarItems = {
     undo: { command: chain => chain.undo() },
     redo: { command: chain => chain.redo() },
     link: { isActive: editor => editor.isActive('link') },
-    image: { action: insertImage },
+    image: { isActive: editor => editor.isActive('image') },
     insertTable: { command: chain => chain.insertTable({ rows: 3, cols: 3, withHeaderRow: false }) },
     addRowBefore: { command: chain => chain.addRowBefore() },
     addRowAfter: { command: chain => chain.addRowAfter() },
@@ -167,7 +159,7 @@ export default ko.components.register('views/components/rich-text-editor', {
         this.linkUrl = ko.observable('');
 
         this.editLink = () => {
-            this.linkUrl(editor.getAttributes('link').href ?? '');
+            this.linkUrl(editor.getAttributes('link').href || '');
         };
 
         this.applyLink = () => {
@@ -190,6 +182,28 @@ export default ko.components.register('views/components/rich-text-editor', {
 
         this.removeLink = () => {
             editor.chain().focus().extendMarkRange('link').unsetLink().run();
+        };
+
+        this.imageUrl = ko.observable('');
+        this.imageAlt = ko.observable('');
+
+        this.editImage = () => {
+            const { src, alt } = editor.getAttributes('image');
+            this.imageUrl(src || '');
+            this.imageAlt(alt || '');
+        };
+
+        this.applyImage = () => {
+            const src = this.imageUrl().trim();
+            if (src) {
+                editor.chain().focus().setImage({ src, alt: this.imageAlt().trim() }).run();
+            }
+        };
+
+        this.removeImage = () => {
+            if (editor.isActive('image')) {
+                editor.chain().focus().deleteSelection().run();
+            }
         };
 
         // roving tabindex: only the most recently focused control is in the tab order
