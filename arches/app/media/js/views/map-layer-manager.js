@@ -11,6 +11,7 @@ import binFeatureCollection from 'views/components/widgets/map/bin-feature-colle
 import data from 'views/map-layer-manager-data';
 import 'bindings/maplibre-gl';
 import 'bindings/codemirror';
+import 'views/components/rich-text-editor';
 import 'codemirror/mode/javascript/javascript';
 import 'datatype-config-components';
 import 'views/components/icon-selector';
