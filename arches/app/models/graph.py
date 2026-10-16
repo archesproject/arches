@@ -2857,7 +2857,7 @@ class Graph(models.GraphModel):
 
             return Graph.objects.get(pk=updated_graph.pk)
 
-    def publish(self, user=None, notes=None):
+    def publish(self, user=None, notes=None, *, publication_id=None):
         """
         Adds a corresponding entry to the GraphXPublishedGraph table,
         and creates a PublishedGraph entry for every active language
@@ -2872,8 +2872,11 @@ class Graph(models.GraphModel):
                 update_published_graphs=False
             )
 
+            publication_fields = {}
+            if publication_id is not None:
+                publication_fields["publicationid"] = publication_id
             publication = models.GraphXPublishedGraph.objects.create(
-                graph=self, notes=notes, user=user
+                graph=self, notes=notes, user=user, **publication_fields
             )
 
             self.publication = publication
