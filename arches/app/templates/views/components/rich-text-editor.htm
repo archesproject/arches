@@ -340,6 +340,34 @@
                 type="button"
                 class="rich-text-editor-toolbar-button"
                 tabindex="-1"
+                title="{% trans 'Subscript' %}"
+                aria-label="{% trans 'Subscript' %}"
+                data-bind="
+                    click: run('subscript'),
+                    css: {disabled: state().subscript.isDisabled, active: state().subscript.isActive},
+                    attr: {'aria-disabled': state().subscript.isDisabled, 'aria-pressed': state().subscript.isActive.toString()}
+                "
+            >
+                <i class="fa fa-subscript" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Superscript' %}"
+                aria-label="{% trans 'Superscript' %}"
+                data-bind="
+                    click: run('superscript'),
+                    css: {disabled: state().superscript.isDisabled, active: state().superscript.isActive},
+                    attr: {'aria-disabled': state().superscript.isDisabled, 'aria-pressed': state().superscript.isActive.toString()}
+                "
+            >
+                <i class="fa fa-superscript" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
                 title="{% trans 'Remove format' %}"
                 aria-label="{% trans 'Remove format' %}"
                 data-bind="
