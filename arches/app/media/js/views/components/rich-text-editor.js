@@ -2,7 +2,6 @@ import ko from 'knockout';
 import arches from 'arches';
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
-import { Placeholder } from '@tiptap/extensions';
 import { Image } from '@tiptap/extension-image';
 import { TableKit } from '@tiptap/extension-table';
 import { dropdown } from 'bootstrap';
@@ -121,7 +120,6 @@ export default ko.components.register('views/components/rich-text-editor', {
                 }),
                 Image.configure({ inline: true, allowBase64: false }),
                 TableKit,
-                Placeholder.configure({ placeholder: ko.unwrap(params.placeholder) || '' }),
             ],
         });
         const getValue = () => editor.isEmpty ? '' : editor.getHTML();
@@ -129,6 +127,7 @@ export default ko.components.register('views/components/rich-text-editor', {
         this.editor = editor;
         this.direction = params.direction || arches.activeLanguageDir;
         this.disabled = params.disabled;
+        this.placeholder = params.placeholder;
 
         // keep the value and the editor in sync
         editor.on('update', () => params.value(getValue()));
@@ -153,7 +152,11 @@ export default ko.components.register('views/components/rich-text-editor', {
 
         // updated after every change to the editor's content or selection
         this.state = ko.observable(getState());
-        editor.on('transaction', () => this.state(getState()));
+        this.isEmpty = ko.observable(editor.isEmpty);
+        editor.on('transaction', () => {
+            this.state(getState());
+            this.isEmpty(editor.isEmpty);
+        });
 
         this.run = name => () => {
             const item = toolbarItems[name];

@@ -13369,6 +13369,7 @@ table.csv-mapping-table td {
 }
 
 .rich-text-editor-content {
+    position: relative;
     height: 250px;
     min-height: 250px;
     overflow-y: auto;
@@ -13382,11 +13383,13 @@ table.csv-mapping-table td {
     outline: none;
 }
 
-// required by tiptap to show widget placeholder
-.rich-text-editor .tiptap p.is-editor-empty:first-child::before {
-    content: attr(data-placeholder);
-    float: left;
-    height: 0;
+.rich-text-editor-placeholder {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    padding: 12px 16px;
+    line-height: 1.6;
     color: #aaa;
     pointer-events: none;
 }

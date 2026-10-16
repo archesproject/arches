@@ -64,13 +64,6 @@ const viewModel = function(params) {
         self.currentPlaceholder(self.placeholder()[self.currentLanguage().code]);
     }
 
-    self.defaultText = ko.observable();
-    self.defaultText.subscribe(newValue => {
-        const config = self.config();
-        config.placeholder = newValue;
-        self.config(config);
-    });
-
     const valueLeaf = self.value?.[arches.activeLanguage]?.value || self.value;
     valueLeaf?.subscribe(newValue => {
         const currentLanguage = self.currentLanguage();
