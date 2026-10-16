@@ -112,10 +112,10 @@
                 >
                     <i class="fa fa-link" aria-hidden="true"></i>
                 </button>
-                <div class="dropdown-menu rich-text-editor-link-menu">
+                <div class="dropdown-menu rich-text-editor-popup">
                     <input
                         type="url"
-                        class="rich-text-editor-link-input"
+                        class="rich-text-editor-popup-input"
                         placeholder="{% trans 'Paste a link' %}"
                         aria-label="{% trans 'Link URL' %}"
                         data-bind="textInput: linkUrl"
@@ -131,20 +131,45 @@
                     </button>
                 </div>
             </div>
-            <button
-                type="button"
-                class="rich-text-editor-toolbar-button"
-                tabindex="-1"
-                title="{% trans 'Image' %}"
-                aria-label="{% trans 'Image' %}"
-                data-bind="
-                    click: run('image'),
-                    css: {disabled: state().image.isDisabled},
-                    attr: {'aria-disabled': state().image.isDisabled}
-                "
-            >
-                <i class="fa fa-picture-o" aria-hidden="true"></i>
-            </button>
+            <div class="dropdown">
+                <button
+                    type="button"
+                    class="rich-text-editor-toolbar-button"
+                    tabindex="-1"
+                    title="{% trans 'Image' %}"
+                    aria-label="{% trans 'Image' %}"
+                    aria-expanded="false"
+                    data-toggle="dropdown"
+                    data-bind="
+                        click: editImage,
+                        css: {active: state().image.isActive}
+                    "
+                >
+                    <i class="fa fa-picture-o" aria-hidden="true"></i>
+                </button>
+                <div class="dropdown-menu rich-text-editor-popup">
+                    <input
+                        type="url"
+                        class="rich-text-editor-popup-input"
+                        placeholder="{% trans 'Image URL' %}"
+                        aria-label="{% trans 'Image URL' %}"
+                        data-bind="textInput: imageUrl"
+                    >
+                    <input
+                        type="text"
+                        class="rich-text-editor-popup-input"
+                        placeholder="{% trans 'Alt text' %}"
+                        aria-label="{% trans 'Alt text)' %}"
+                        data-bind="textInput: imageAlt"
+                    >
+                    <button type="button" title="{% trans 'Apply image' %}" aria-label="{% trans 'Apply image' %}" data-bind="click: applyImage">
+                        <i class="fa fa-check" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" title="{% trans 'Remove image' %}" aria-label="{% trans 'Remove image' %}" data-bind="click: removeImage">
+                        <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
             <div class="dropdown">
                 <button
                     type="button"
