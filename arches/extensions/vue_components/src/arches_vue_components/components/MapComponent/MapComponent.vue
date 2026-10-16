@@ -70,9 +70,7 @@ const mapHeader = useTemplateRef<InstanceType<typeof MapHeader>>("mapHeader");
 
 const { context, popupContainer, popupFeatures } = useMapContext(
     {
-        get value() {
-            return value ?? null;
-        },
+        value: () => value ?? null,
         zoom,
         pitch,
         bearing,

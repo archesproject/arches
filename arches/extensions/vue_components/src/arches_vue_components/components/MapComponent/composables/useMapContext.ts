@@ -5,6 +5,7 @@ import {
     onUnmounted,
     ref,
     shallowRef,
+    toValue,
     watch,
 } from "vue";
 
@@ -15,18 +16,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { fetchMapData } from "@/arches_vue_components/components/MapComponent/api.ts";
 
 import {
-    DEFAULT_FEATURE_COLOR,
-    DEFAULT_FEATURE_FILL_OPACITY,
-    DEFAULT_FEATURE_LINE_WIDTH,
-    DEFAULT_FEATURE_POINT_FILL,
-    DEFAULT_FEATURE_POINT_SIZE,
     DEFAULT_MAP_SETTINGS,
-    EMPTY_FEATURE_COLLECTION,
-    GEOMETRY_TYPE_MULTI_POINT,
-    GEOMETRY_TYPE_MULTI_POLYGON,
-    GEOMETRY_TYPE_POINT,
-    GEOMETRY_TYPE_POLYGON,
-    READ_ONLY_VALUE_SOURCE_ID,
     STYLE_LOAD_EVENT,
 } from "@/arches_vue_components/components/MapComponent/constants.ts";
 import { useBasemapStyle } from "@/arches_vue_components/components/MapComponent/composables/useBasemapStyle.ts";
@@ -37,9 +27,9 @@ import { useOverlayLayers } from "@/arches_vue_components/components/MapComponen
 import { GEOCODER_ATTRIBUTION } from "@/arches_vue_components/components/MapComponent/utils/geocoder-api.ts";
 import { registerCoordinateSystems } from "@/arches_vue_components/components/MapComponent/utils/coordinate-systems.ts";
 
-import type { InjectionKey, Ref } from "vue";
+import type { InjectionKey, MaybeRefOrGetter, Ref } from "vue";
 import type { FeatureCollection } from "geojson";
-import type { GeoJSONSource, Map as MaplibreMap } from "maplibre-gl";
+import type { Map as MaplibreMap } from "maplibre-gl";
 
 import type { UseFeaturePopupReturn } from "@/arches_vue_components/components/MapComponent/composables/useFeaturePopup.ts";
 
@@ -139,7 +129,7 @@ export interface UseMapContextReturn
 
 export function useMapContext(
     props: {
-        value: FeatureCollection | null;
+        value: MaybeRefOrGetter<FeatureCollection | null>;
         zoom?: number;
         pitch?: number;
         bearing?: number;
@@ -209,15 +199,10 @@ export function useMapContext(
     });
 
     watch(
-        () => props.value,
-        () => {
-            const readOnlyValueSource = map.value?.getSource<GeoJSONSource>(
-                READ_ONLY_VALUE_SOURCE_ID,
-            );
-            if (readOnlyValueSource) {
-                readOnlyValueSource.setData(
-                    props.value ?? EMPTY_FEATURE_COLLECTION,
-                );
+        () => toValue(props.value),
+        (featureCollection) => {
+            if (props.isReadOnly && map.value) {
+                drawnFeatureControls.replaceDrawnFeatures(featureCollection);
                 fitToValue();
             }
         },
@@ -241,9 +226,7 @@ export function useMapContext(
         });
 
         map.value.once(STYLE_LOAD_EVENT, () => {
-            if (!props.isReadOnly) {
-                drawnFeatureControls.setupDraw();
-            }
+            drawnFeatureControls.setupDraw();
             fitToValue();
 
             emit("ready");
@@ -252,9 +235,6 @@ export function useMapContext(
             map.value!.resize();
 
             drawnFeatureControls.addBufferLayer();
-            if (props.isReadOnly) {
-                addReadOnlyValueLayers();
-            }
             updateMapOverlays(overlays.value);
 
             emit("update:overlays");
@@ -282,72 +262,13 @@ export function useMapContext(
     }
 
     function fitToValue(): void {
-        if (!props.value?.features.length) {
+        const featureCollection = toValue(props.value);
+        if (!featureCollection?.features.length) {
             fitToDefaultBounds();
             return;
         }
-        drawnFeatureControls.fitToFeatures(props.value.features, {
+        drawnFeatureControls.fitToFeatures(featureCollection.features, {
             animate: false,
-        });
-    }
-
-    function addReadOnlyValueLayers(): void {
-        if (map.value!.getSource(READ_ONLY_VALUE_SOURCE_ID)) {
-            return;
-        }
-        map.value!.addSource(READ_ONLY_VALUE_SOURCE_ID, {
-            type: "geojson",
-            data: props.value ?? EMPTY_FEATURE_COLLECTION,
-        });
-        map.value!.addLayer({
-            id: `${READ_ONLY_VALUE_SOURCE_ID}-fill`,
-            type: "fill",
-            source: READ_ONLY_VALUE_SOURCE_ID,
-            filter: [
-                "match",
-                ["geometry-type"],
-                [GEOMETRY_TYPE_POLYGON, GEOMETRY_TYPE_MULTI_POLYGON],
-                true,
-                false,
-            ],
-            paint: {
-                "fill-color": DEFAULT_FEATURE_COLOR,
-                "fill-opacity": DEFAULT_FEATURE_FILL_OPACITY,
-            },
-        });
-        map.value!.addLayer({
-            id: `${READ_ONLY_VALUE_SOURCE_ID}-line`,
-            type: "line",
-            source: READ_ONLY_VALUE_SOURCE_ID,
-            filter: [
-                "match",
-                ["geometry-type"],
-                [GEOMETRY_TYPE_POINT, GEOMETRY_TYPE_MULTI_POINT],
-                false,
-                true,
-            ],
-            paint: {
-                "line-color": DEFAULT_FEATURE_COLOR,
-                "line-width": DEFAULT_FEATURE_LINE_WIDTH,
-            },
-        });
-        map.value!.addLayer({
-            id: `${READ_ONLY_VALUE_SOURCE_ID}-point`,
-            type: "circle",
-            source: READ_ONLY_VALUE_SOURCE_ID,
-            filter: [
-                "match",
-                ["geometry-type"],
-                [GEOMETRY_TYPE_POINT, GEOMETRY_TYPE_MULTI_POINT],
-                true,
-                false,
-            ],
-            paint: {
-                "circle-color": DEFAULT_FEATURE_POINT_FILL,
-                "circle-radius": DEFAULT_FEATURE_POINT_SIZE,
-                "circle-stroke-color": DEFAULT_FEATURE_COLOR,
-                "circle-stroke-width": DEFAULT_FEATURE_LINE_WIDTH,
-            },
         });
     }
 
