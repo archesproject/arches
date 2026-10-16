@@ -22,7 +22,7 @@ import 'views/components/simple-switch';
 import 'views/components/icon-selector';
 import 'utils/set-csrf-token';
 import 'datatype-config-components';
-import 'bindings/ckeditor';
+import 'views/components/rich-text-editor';
 
 
 var GraphDesignerView = BaseManagerView.extend({
