@@ -49,10 +49,13 @@ export function install(root = document) {
             return;
         }
         // Bootstrap 3 parity: selecting a menu item closes the menu, but interacting
-        // with a form control or form inside a dropdown does not.
+        // with a form control or form inside a dropdown does not. The form must be
+        // inside the menu, since dropdowns can themselves live within a form.
+        const menu = event.target.closest('.dropdown-menu');
+        const form = event.target.closest('form');
         const isFormInteraction =
-            event.target.closest('.dropdown-menu') &&
-            (/^(INPUT|TEXTAREA)$/.test(event.target.tagName) || event.target.closest('form'));
+            menu &&
+            (/^(INPUT|TEXTAREA)$/.test(event.target.tagName) || (form && menu.contains(form)));
         if (!isFormInteraction) {
             closeAll();
         }
