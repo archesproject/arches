@@ -13424,3 +13424,7 @@ table.csv-mapping-table td {
     border: 1px solid #e0e0e0;
 }
 
+// ensures quotes inherit tiptap format, and not bootstrap large style
+.rich-text-editor .tiptap blockquote {
+    font-size: inherit;
+}
