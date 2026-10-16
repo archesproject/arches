@@ -96,34 +96,41 @@
         </div>
 
         <div class="rich-text-editor-toolbar-group">
-            <button
-                type="button"
-                class="rich-text-editor-toolbar-button"
-                tabindex="-1"
-                title="{% trans 'Link' %}"
-                aria-label="{% trans 'Link' %}"
-                data-bind="
-                    click: run('link'),
-                    css: {disabled: state().link.isDisabled, active: state().link.isActive},
-                    attr: {'aria-disabled': state().link.isDisabled, 'aria-pressed': state().link.isActive.toString()}
-                "
-            >
-                <i class="fa fa-link" aria-hidden="true"></i>
-            </button>
-            <button
-                type="button"
-                class="rich-text-editor-toolbar-button"
-                tabindex="-1"
-                title="{% trans 'Unlink' %}"
-                aria-label="{% trans 'Unlink' %}"
-                data-bind="
-                    click: run('unlink'),
-                    css: {disabled: state().unlink.isDisabled},
-                    attr: {'aria-disabled': state().unlink.isDisabled}
-                "
-            >
-                <i class="fa fa-chain-broken" aria-hidden="true"></i>
-            </button>
+            <div class="dropdown">
+                <button
+                    type="button"
+                    class="rich-text-editor-toolbar-button"
+                    tabindex="-1"
+                    title="{% trans 'Link' %}"
+                    aria-label="{% trans 'Link' %}"
+                    aria-expanded="false"
+                    data-toggle="dropdown"
+                    data-bind="
+                        click: editLink,
+                        css: {active: state().link.isActive}
+                    "
+                >
+                    <i class="fa fa-link" aria-hidden="true"></i>
+                </button>
+                <form class="dropdown-menu rich-text-editor-link-menu" data-bind="submit: applyLink">
+                    <input
+                        type="url"
+                        class="rich-text-editor-link-input"
+                        placeholder="{% trans 'Paste a link' %}"
+                        aria-label="{% trans 'Link URL' %}"
+                        data-bind="textInput: linkUrl"
+                    >
+                    <button type="button" title="{% trans 'Open link' %}" aria-label="{% trans 'Open link' %}" data-bind="click: openLink">
+                        <i class="fa fa-external-link" aria-hidden="true"></i>
+                    </button>
+                    <button type="submit" title="{% trans 'Apply link' %}" aria-label="{% trans 'Apply link' %}">
+                        <i class="fa fa-check" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" title="{% trans 'Remove link' %}" aria-label="{% trans 'Remove link' %}" data-bind="click: removeLink">
+                        <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                </form>
+            </div>
         </div>
 
         <div class="rich-text-editor-toolbar-group">
