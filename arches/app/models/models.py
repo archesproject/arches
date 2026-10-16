@@ -24,6 +24,11 @@ from django.utils.translation import gettext_lazy as _
 
 from arches.app.const import ExtensionType
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
+from arches.app.models.fields.database_managed_fields import (
+    DatabaseManagedFieldsModelMixin,
+    DatabaseTimestampField,
+    NonPrimaryIdentityField,
+)
 from arches.app.models.mixins import SaveSupportsBlindOverwriteMixin
 from arches.app.models.query_expressions import UUID4
 from arches.app.models.querysets.graph import GraphModelQuerySet
@@ -1454,10 +1459,15 @@ class ResourceXResource(SaveSupportsBlindOverwriteMixin, models.Model):
         db_table = "resource_x_resource"
 
 
-class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
+class ResourceInstance(
+    DatabaseManagedFieldsModelMixin, SaveSupportsBlindOverwriteMixin, models.Model
+):
     resourceinstanceid = models.UUIDField(
         primary_key=True, blank=True, default=uuid.uuid4, db_default=UUID4()
     )
+    # Declared after the primary key: positional construction, e.g.
+    # Resource(resourceinstanceid), assigns arguments in field order.
+    id = NonPrimaryIdentityField(sequence_name="resource_instances_id_seq")
     graph = models.ForeignKey(
         GraphModel, blank=True, db_column="graphid", on_delete=models.CASCADE
     )
@@ -1471,7 +1481,7 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
     name = I18n_TextField(blank=True, null=True, editable=False)
     descriptors = models.JSONField(blank=True, null=True, editable=False)
     legacyid = models.TextField(blank=True, unique=True, null=True, editable=False)
-    createdtime = models.DateTimeField(auto_now_add=True)
+    createdtime = DatabaseTimestampField()
     resource_instance_lifecycle_state = models.ForeignKey(
         blank=True,
         on_delete=models.PROTECT,
@@ -1489,6 +1499,7 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
     principaluser = models.ForeignKey(
         User, on_delete=models.SET_NULL, blank=True, null=True, editable=False
     )
+    last_updated = DatabaseTimestampField()
 
     class Meta:
         managed = True
@@ -1557,6 +1568,7 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
 
         kwargs = add_to_update_fields(kwargs, "resource_instance_lifecycle_state")
         kwargs = add_to_update_fields(kwargs, "graph_publication")
+        kwargs = add_to_update_fields(kwargs, "last_updated")
         super(ResourceInstance, self).save(**kwargs)
 
         if should_update_resource_instance_lifecycle_state:
@@ -1889,7 +1901,9 @@ class SearchExportHistory(SaveSupportsBlindOverwriteMixin, models.Model):
         db_table = "search_export_history"
 
 
-class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
+class TileModel(
+    DatabaseManagedFieldsModelMixin, SaveSupportsBlindOverwriteMixin, models.Model
+):  # Tile
     """
     the data JSONField has this schema:
 
@@ -1955,6 +1969,9 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
     tileid = models.UUIDField(
         primary_key=True, blank=True, default=uuid.uuid4, db_default=UUID4()
     )
+    # Declared after the primary key: positional construction, e.g.
+    # Resource(resourceinstanceid), assigns arguments in field order.
+    id = NonPrimaryIdentityField(sequence_name="tiles_id_seq")
     resourceinstance = models.ForeignKey(
         ResourceInstance, db_column="resourceinstanceid", on_delete=models.CASCADE
     )
@@ -1980,6 +1997,8 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
     )
     sortorder = models.IntegerField(blank=True, null=True, default=0)
     provisionaledits = JSONField(blank=True, null=True, db_column="provisionaledits")
+    createdtime = DatabaseTimestampField()
+    last_updated = DatabaseTimestampField()
 
     class Meta:
         managed = True
@@ -2029,6 +2048,7 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
         if not self.tileid:
             self.tileid = uuid.uuid4()
             kwargs = add_to_update_fields(kwargs, "tileid")
+        kwargs = add_to_update_fields(kwargs, "last_updated")
 
         # Query for this first instead of during a transaction rollback.
         nodegroup_alias = self.find_nodegroup_alias()
