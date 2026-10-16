@@ -166,7 +166,12 @@
                                                 <span data-bind="text: $root.translations.legendContent + ':'"></span> 
                                             </div>
                                             <div class="row">
-                                                <textarea rows="10" cols="80" data-bind="ckeditor: config.layerLegend, ckeditorOptions: {},  valueUpdate: 'afterkeydown'"></textarea>
+                                                <div
+                                                    data-bind="component: {
+                                                        name: 'views/components/rich-text-editor',
+                                                        params: {value: config.layerLegend}
+                                                    }"
+                                                ></div>
                                             </div>
                                         </div>
                                     </div>
