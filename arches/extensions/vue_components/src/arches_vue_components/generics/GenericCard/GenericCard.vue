@@ -41,6 +41,9 @@ const emit = defineEmits<{
     initialized: [aliasedNodeData: Record<string, AliasedNodeData>];
 }>();
 
+const languageStore = useLanguageStore();
+const nodegroupWidgetConfigStore = useNodegroupWidgetConfigStore();
+
 const isLoading = ref(true);
 const configurationError = ref();
 const cardXNodeXWidgetData = ref<CardXNodeXWidgetData[]>([]);
@@ -74,14 +77,14 @@ watchEffect(async (onCleanup) => {
     }
     let languagesPromise: Promise<unknown> = Promise.resolve();
     if (mode === EDIT) {
-        languagesPromise = useLanguageStore()
+        languagesPromise = languageStore
             .fetchAllLanguages()
             .catch(() => undefined);
     }
 
     try {
         const [loadedCardXNodeXWidgetData, loadedTileData] = await Promise.all([
-            useNodegroupWidgetConfigStore().fetchNodegroupWidgetConfigs(
+            nodegroupWidgetConfigStore.fetchNodegroupWidgetConfigs(
                 graphSlug,
                 nodegroupAlias,
             ),
