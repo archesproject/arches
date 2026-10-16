@@ -13331,7 +13331,7 @@ table.csv-mapping-table td {
 }
 
 .rich-text-editor-toolbar-button,
-.rich-text-editor-link-menu button {
+.rich-text-editor-popup button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -13346,7 +13346,7 @@ table.csv-mapping-table td {
 }
 
 .rich-text-editor-toolbar-button:hover,
-.rich-text-editor-link-menu button:hover {
+.rich-text-editor-popup button:hover {
     background: #f2f2f2;
     color: #333;
 }
@@ -13366,19 +13366,19 @@ table.csv-mapping-table td {
 }
 
 .rich-text-editor-toolbar-button:focus-visible,
-.rich-text-editor-link-menu button:focus-visible {
+.rich-text-editor-popup button:focus-visible {
     outline: 2px solid #54abd9;
     outline-offset: 1px;
 }
 
-.open > .rich-text-editor-link-menu {
+.open > .rich-text-editor-popup {
     display: flex;
     align-items: center;
     gap: 2px;
     padding: 4px;
 }
 
-.rich-text-editor-link-input {
+.rich-text-editor-popup-input {
     width: 240px;
     height: 32px;
     padding: 0 8px;
