@@ -526,5 +526,7 @@
         </div>
     </div>
 
-    <div class="rich-text-editor-content" data-bind="tiptap: editor, attr: {dir: direction}"></div>
+    <div class="rich-text-editor-content" data-bind="tiptap: editor, attr: {dir: direction}">
+        <div class="rich-text-editor-placeholder" data-bind="html: placeholder, visible: isEmpty"></div>
+    </div>
 </div>
