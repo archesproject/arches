@@ -48,8 +48,12 @@ export function install(root = document) {
             toggle(trigger);
             return;
         }
-        // A click inside an open menu should not close it; anywhere else should.
-        if (!event.target.closest('.dropdown-menu')) {
+        // Bootstrap 3 parity: selecting a menu item closes the menu, but interacting
+        // with a form control or form inside a dropdown does not.
+        const isFormInteraction =
+            event.target.closest('.dropdown-menu') &&
+            (/^(INPUT|TEXTAREA)$/.test(event.target.tagName) || event.target.closest('form'));
+        if (!isFormInteraction) {
             closeAll();
         }
     });
