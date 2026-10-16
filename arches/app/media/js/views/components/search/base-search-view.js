@@ -49,8 +49,8 @@ export default Backbone.View.extend({
 
     doQuery: function() {
         const queryObj = JSON.parse(this.queryString());
-        if (self.updateRequest) { self.updateRequest.abort(); }
-        self.updateRequest = $.ajax({
+        if (this.updateRequest) { this.updateRequest.abort(); }
+        const request = this.updateRequest = $.ajax({
             type: "GET",
             url: arches.urls.search_results,
             data: queryObj,
@@ -72,17 +72,22 @@ export default Backbone.View.extend({
                 this.sharedStateObject.total(response.total_results);
                 this.sharedStateObject.hits(response.results.hits.hits.length);
                 this.sharedStateObject.alert(false);
+
+                // only record history for completed queries, and skip duplicates
+                const newSearch = '?' + $.param(queryObj).split('+').join('%20');
+                if (newSearch !== window.location.search) {
+                    window.history.pushState({}, '', newSearch);
+                }
             },
             error: function(response, status, error) {
                 const alert = new AlertViewModel('ep-alert-red', arches.translations.requestFailed.title, response.responseJSON?.message);
-                if(self.updateRequest.statusText !== 'abort'){
+                if(status !== 'abort'){
                     this.alert(alert);
                 }
                 this.sharedStateObject.loading(false);
             },
-            complete: function(request, status) {
-                self.updateRequest = undefined;
-                window.history.pushState({}, '', '?' + $.param(queryObj).split('+').join('%20'));
+            complete: function() {
+                if (this.updateRequest === request) { this.updateRequest = undefined; }
                 this.sharedStateObject.loading(false);
             }
         });
