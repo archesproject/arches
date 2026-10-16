@@ -3,6 +3,8 @@ import arches from 'arches';
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import { Image } from '@tiptap/extension-image';
+import { Subscript } from '@tiptap/extension-subscript';
+import { Superscript } from '@tiptap/extension-superscript';
 import { TableKit } from '@tiptap/extension-table';
 import { dropdown } from 'bootstrap';
 import richTextEditorTemplate from 'templates/views/components/rich-text-editor.htm';
@@ -72,6 +74,8 @@ const toolbarItems = {
     italic: { command: chain => chain.toggleItalic(), isActive: editor => editor.isActive('italic') },
     underline: { command: chain => chain.toggleUnderline(), isActive: editor => editor.isActive('underline') },
     strike: { command: chain => chain.toggleStrike(), isActive: editor => editor.isActive('strike') },
+    subscript: { command: chain => chain.toggleSubscript(), isActive: editor => editor.isActive('subscript') },
+    superscript: { command: chain => chain.toggleSuperscript(), isActive: editor => editor.isActive('superscript') },
     removeFormat: { command: chain => chain.unsetAllMarks().clearNodes() },
     orderedList: { command: chain => chain.toggleOrderedList(), isActive: editor => editor.isActive('orderedList') },
     bulletList: { command: chain => chain.toggleBulletList(), isActive: editor => editor.isActive('bulletList') },
@@ -110,6 +114,8 @@ export default ko.components.register('views/components/rich-text-editor', {
                 }),
                 Image.configure({ inline: true, allowBase64: false }),
                 TableKit,
+                Subscript,
+                Superscript,
             ],
         });
         const getValue = () => editor.isEmpty ? '' : editor.getHTML();
