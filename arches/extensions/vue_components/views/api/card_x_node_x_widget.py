@@ -6,8 +6,8 @@ from django.views.generic import View
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
-from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.utils.permission_backend import nodegroup_ids_with_inherited_permission
+from arches.app.utils.response import JSONResponse, JSONErrorResponse
 
 
 def serialize_card_x_node_x_widget(widget, datatype_factory):
@@ -33,7 +33,9 @@ def serialize_card_x_node_x_widget(widget, datatype_factory):
 
 def first_cards_by_nodegroup_id(nodegroup_ids):
     cards_by_nodegroup_id = {}
-    for card in models.CardModel.objects.filter(nodegroup_id__in=nodegroup_ids):
+    for card in models.CardModel.objects.filter(
+        nodegroup_id__in=nodegroup_ids
+    ).order_by("pk"):
         cards_by_nodegroup_id.setdefault(card.nodegroup_id, card)
     return cards_by_nodegroup_id
 
