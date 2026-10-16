@@ -112,7 +112,7 @@
                 >
                     <i class="fa fa-link" aria-hidden="true"></i>
                 </button>
-                <form class="dropdown-menu rich-text-editor-link-menu" data-bind="submit: applyLink">
+                <div class="dropdown-menu rich-text-editor-link-menu">
                     <input
                         type="url"
                         class="rich-text-editor-link-input"
@@ -123,13 +123,13 @@
                     <button type="button" title="{% trans 'Open link' %}" aria-label="{% trans 'Open link' %}" data-bind="click: openLink">
                         <i class="fa fa-external-link" aria-hidden="true"></i>
                     </button>
-                    <button type="submit" title="{% trans 'Apply link' %}" aria-label="{% trans 'Apply link' %}">
+                    <button type="button" title="{% trans 'Apply link' %}" aria-label="{% trans 'Apply link' %}" data-bind="click: applyLink">
                         <i class="fa fa-check" aria-hidden="true"></i>
                     </button>
                     <button type="button" title="{% trans 'Remove link' %}" aria-label="{% trans 'Remove link' %}" data-bind="click: removeLink">
                         <i class="fa fa-trash" aria-hidden="true"></i>
                     </button>
-                </form>
+                </div>
             </div>
         </div>
 
