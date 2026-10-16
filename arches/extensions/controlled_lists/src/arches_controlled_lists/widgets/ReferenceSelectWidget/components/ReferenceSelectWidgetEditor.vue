@@ -43,6 +43,8 @@ const emit = defineEmits<{
 
 const { current: preferredLanguageCode } = useGettext();
 
+const referenceSelectOptionsStore = useReferenceSelectOptionsStore();
+
 const options = ref<ReferenceSelectTreeNode[]>();
 const isLoading = ref(false);
 const optionsLoaded = ref(false);
@@ -107,7 +109,7 @@ async function getOptions() {
         isLoading.value = true;
 
         const widgetOptions =
-            await useReferenceSelectOptionsStore().fetchWidgetOptions(
+            await referenceSelectOptionsStore.fetchWidgetOptions(
                 graphSlug,
                 nodeAlias,
             );
