@@ -29,6 +29,7 @@ from django.forms.models import model_to_dict
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.utils.translation import gettext as _
 from django.utils.translation import get_language
+from arches.app.utils.decorators import deprecated
 from arches.app.models import models
 from arches.app.models.models import EditLog
 from arches.app.models.models import TileModel
@@ -43,8 +44,15 @@ from arches.app.utils import import_class_from_string, task_management
 from arches.app.utils import permission_backend
 from arches.app.utils.label_based_graph import LabelBasedGraph
 from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedGraphV2
-from arches.app.utils.permission_backend import remove_perm
+from arches.app.utils.permission_backend import (
+    assign_perm,
+    remove_perm,
+)
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.exceptions import (
+    InvalidNodeNameException,
+    MultipleNodesFoundException,
+)
 from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
     get_filtered_instances,
@@ -85,6 +93,21 @@ class Resource(models.ResourceInstance):
             except AttributeError:
                 self.serialized_graph = None
         return self.serialized_graph
+
+    @deprecated
+    def set_serialized_graph(self, serialized_graph):
+        self.serialized_graph = serialized_graph
+
+    @deprecated
+    def get_node_datatypes(self):
+        if not self.node_datatypes:
+            self.node_datatypes = {
+                str(nodeid): datatype
+                for nodeid, datatype in models.Node.objects.values_list(
+                    "nodeid", "datatype"
+                )
+            }
+        return self.node_datatypes
 
     def set_node_datatypes(self, node_datatypes):
         self.node_datatypes = node_datatypes
@@ -1118,6 +1141,57 @@ class Resource(models.ResourceInstance):
                 hide_hidden_nodes=hide_hidden_nodes,
             )
 
+    @staticmethod
+    @deprecated
+    def to_json__bulk(resources, compact=True, hide_empty_nodes=False, version=None):
+        """
+        Returns list of resources represented as disambiguated JSON graphs
+
+        Keyword Arguments:
+        resources -- list of Resource
+        compact -- type bool: hide superfluous node data
+        hide_empty_nodes -- type bool: hide nodes without data
+        """
+
+        if version is None:
+            return LabelBasedGraph.from_resources(
+                resources=resources, compact=compact, hide_empty_nodes=hide_empty_nodes
+            )
+        elif version == "beta":
+            return LabelBasedGraphV2.from_resources(
+                resources=resources, compact=compact, hide_empty_nodes=hide_empty_nodes
+            )
+
+    @deprecated
+    def get_node_values(self, node_name):
+        """
+        Take a node_name (string) as an argument and return a list of values.
+        If an invalid node_name is used, or if multiple nodes with the same
+        name are found, the method returns False.
+        Current supported (tested) node types are: string, date, concept, geometry
+        """
+
+        nodes = models.Node.objects.filter(name=node_name, graph_id=self.graph_id)
+        if len(nodes) > 1:
+            raise MultipleNodesFoundException(node_name, nodes)
+
+        if len(nodes) == 0:
+            raise InvalidNodeNameException(node_name)
+
+        tiles = self.tilemodel_set.filter(nodegroup_id=nodes[0].nodegroup_id)
+
+        values = []
+        for tile in tiles:
+            for node_id, value in tile.data.items():
+                if node_id == str(nodes[0].nodeid):
+                    if type(value) is list:
+                        for v in value:
+                            values.append(parse_node_value(v))
+                    else:
+                        values.append(parse_node_value(value))
+
+        return values
+
     def remove_resource_instance_permissions(self):
         groups = list(Group.objects.all())
         users = list(User.objects.all())
@@ -1129,6 +1203,14 @@ class Resource(models.ResourceInstance):
                 "delete_resourceinstance",
             ]:
                 remove_perm(perm, identity, self)
+        self.index()
+
+    @deprecated
+    def add_permission_to_all(self, permission):
+        groups = list(Group.objects.all())
+        users = [user for user in User.objects.all() if user.is_superuser is False]
+        for identity in groups + users:
+            assign_perm(permission, identity, self)
         self.index()
 
     def update_resource_instance_lifecycle_state(
@@ -1163,3 +1245,22 @@ class Resource(models.ResourceInstance):
             )
 
         return self.resource_instance_lifecycle_state
+
+
+@deprecated
+def parse_node_value(value):
+    if is_uuid(value):
+        try:
+            return models.Value.objects.get(pk=value).value
+        except ObjectDoesNotExist:
+            pass
+    return value
+
+
+@deprecated
+def is_uuid(value_to_test):
+    try:
+        UUID(value_to_test)
+        return True
+    except Exception:
+        return False

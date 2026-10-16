@@ -7,6 +7,7 @@ from arches.app.models import models
 from arches.app.models.card import Card as CardProxyModel
 from arches.app.models.graph import Graph
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.utils.decorators import deprecated
 from arches.app.utils.response import JSONResponse
 from arches.app.views.api import APIBase
 
@@ -69,6 +70,25 @@ class Graphs(APIBase):
         elif self.action == "get_graph_models":
             graphs = models.GraphModel.objects.all()
             return JSONResponse(JSONSerializer().serializeToPython(graphs))
+
+
+class GraphHasUnpublishedChanges(APIBase):
+    @deprecated
+    def get(self, request, graph_id=None):
+        graph = models.GraphModel.objects.get(pk=graph_id)
+        return JSONResponse(graph.has_unpublished_changes)
+
+    @deprecated
+    def post(self, request, graph_id=None):
+        has_unpublished_changes = bool(
+            request.POST.get("has_unpublished_changes") == "true"
+        )
+        graph = models.GraphModel.objects.filter(
+            pk=graph_id
+        )  # need filter here for `update` to work
+        graph.update(has_unpublished_changes=has_unpublished_changes)
+
+        return JSONResponse({"has_unpublished_changes": has_unpublished_changes})
 
 
 class GraphIsActive(APIBase):

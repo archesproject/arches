@@ -10,6 +10,7 @@ from django.utils.translation import gettext as _
 from rdflib import ConjunctiveGraph as Graph
 from rdflib import Literal, URIRef
 
+from arches.app.utils.decorators import deprecated
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
 from arches.app.models.system_settings import settings
@@ -300,6 +301,16 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 for geometry in smaller_chunks
             ]
             return feature_collections
+
+    @deprecated
+    def get_bounds(self, tile, node):
+        bounds = None
+        try:
+            node_data = tile.data[str(node.pk)]
+            bounds = self.get_bounds_from_value(node_data)
+        except KeyError as e:
+            print(e)
+        return bounds
 
     def get_bounds_from_value(self, node_data):
         bounds = None

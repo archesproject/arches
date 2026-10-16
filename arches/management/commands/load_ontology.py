@@ -28,6 +28,9 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.files import File
 from django.db import transaction
 from arches.app.models import models
+from arches.app.utils.decorators import deprecated
+
+from arches.app.models.system_settings import settings
 
 # from rdflib import *
 from rdflib import Graph, RDF, RDFS
@@ -246,3 +249,23 @@ class Command(BaseCommand):
                 )
             ]
         return self.subclass_cache[ontology_class]
+
+    @deprecated
+    def get_relative_path(self, data_source):
+        """
+        get's a relative path where the ontology file is located
+
+        """
+
+        ret = None
+        try:
+            if settings.ONTOLOGY_DIR in os.path.abspath(data_source):
+                ret = (
+                    os.path.abspath(data_source)
+                    .replace(settings.ONTOLOGY_DIR, "")
+                    .lstrip(os.sep)
+                )
+        except Exception as e:
+            print("Something went wrong in getting the path to the ontology file", e)
+
+        return ret

@@ -16,10 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import warnings
 import functools
 import logging
-import datetime
 
 from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import PermissionDenied
@@ -30,44 +28,17 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.permission_backend import user_can_read_resource
 from arches.app.utils.permission_backend import user_can_edit_resource
+from arches.app.utils.permission_backend import user_can_delete_resource
+from arches.app.utils.permission_backend import user_can_read_concepts
 from arches.app.utils.permission_backend import user_created_transaction
 from arches.app.utils.permission_backend import (
     group_required as permission_group_required,
 )
 from arches.app.utils.response import JSONResponse
+from arches.app.utils.deprecation import deprecated
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
-
-
-def deprecated(func):
-    """This is a decorator which can be used to mark functions
-    as deprecated. It will result in a warning being emitted
-    when the function is used.
-    """
-
-    @functools.wraps(func)
-    def new_func(*args, **kwargs):
-        warnings.simplefilter("always", DeprecationWarning)  # turn off filter
-        warnings.warn_explicit(
-            "Call to deprecated function {}.".format(func.__name__),
-            category=DeprecationWarning,
-            filename=func.__code__.co_filename,
-            lineno=func.__code__.co_firstlineno + 1,
-        )
-        warnings.simplefilter("default", DeprecationWarning)  # reset filter
-        logger.warning(
-            "%s - DeprecationWarning: Call to deprecated function %s. %s:%s"
-            % (
-                datetime.datetime.now(),
-                func.__name__,
-                func.__code__.co_filename,
-                func.__code__.co_firstlineno + 1,
-            )
-        )
-        return func(*args, **kwargs)
-
-    return new_func
 
 
 def group_required(*group_names, raise_exception=False):
@@ -127,6 +98,34 @@ def can_read_resource_instance(function):
         return function(request, *args, **kwargs)
 
     return wrapper
+
+
+@deprecated
+def can_delete_resource_instance(function):
+    """
+    Requires that a user be able to edit or delete a single nodegroup of a resource
+
+    """
+
+    @functools.wraps(function)
+    def wrapper(request, *args, **kwargs):
+        resourceid = kwargs["resourceid"] if "resourceid" in kwargs else None
+        if user_can_delete_resource(request.user, resourceid=resourceid):
+            return function(request, *args, **kwargs)
+        else:
+            raise PermissionDenied
+
+    return wrapper
+
+
+@deprecated
+def can_read_concept():
+    """
+    Requires that a user be able to edit or delete a single nodegroup of a resource
+
+    """
+
+    return user_passes_test(user_can_read_concepts)
 
 
 def requires_elasticsearch(function):
