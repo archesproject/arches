@@ -8,7 +8,7 @@ import 'bindings/maplibre-gl';
 import 'bindings/codemirror';
 import 'bindings/key-events-click';
 import 'codemirror/mode/javascript/javascript';
-import 'bindings/ckeditor';
+import 'views/components/rich-text-editor';
 import 'views/components/icon-selector';
 import 'bindings/select2-query';
 
