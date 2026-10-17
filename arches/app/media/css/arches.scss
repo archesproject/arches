@@ -59,10 +59,6 @@ img {
     border-right: 1px solid rgba(0,0,0,0.07);
 }*/
 
-.cke_notification_warning {
-    display: none;
-}
-
 .btn:not(.disabled):not(:disabled).active {
     box-shadow: none;
 }
@@ -13297,6 +13293,163 @@ table.csv-mapping-table td {
     }
 }
 
-.cke_screen_reader_only {
-    position: fixed !important;
+.rich-text-editor {
+    border: 1px solid #e9e9e9;
+    background: #fff;
+}
+
+.rich-text-editor-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 8px;
+    border-bottom: 1px solid #e9e9e9;
+    background: #fff;
+}
+
+.rich-text-editor-toolbar[inert] .rich-text-editor-toolbar-group,
+.rich-text-editor-toolbar-group[inert] {
+    opacity: 0.4;
+}
+
+.rich-text-editor-toolbar-group {
+    display: flex;
+    align-items: center;
+}
+
+.rich-text-editor-toolbar-group + .rich-text-editor-toolbar-group {
+    padding-left: 6px;
+    border-left: 1px solid #e9e9e9;
+}
+
+.rich-text-editor-toolbar-button,
+.rich-text-editor-popup button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    border: none;
+    border-radius: 4px;
+    background: none;
+    color: #666;
+}
+
+.rich-text-editor-toolbar-button:hover,
+.rich-text-editor-popup button:hover {
+    background: #f2f2f2;
+    color: #333;
+}
+
+.rich-text-editor-toolbar-button.active {
+    background: #e3f0fa;
+    color: #2a7ab8;
+}
+
+.rich-text-editor-toolbar-button.disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.rich-text-editor-toolbar-button.disabled:hover {
+    background: none;
+}
+
+.rich-text-editor-toolbar-button:focus-visible,
+.rich-text-editor-popup button:focus-visible {
+    outline: 2px solid #54abd9;
+    outline-offset: 1px;
+}
+
+.open > .rich-text-editor-popup {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 4px;
+}
+
+.rich-text-editor-popup-input {
+    width: 240px;
+    height: 32px;
+    padding: 0 8px;
+}
+
+.rich-text-editor-content,
+.rich-text-editor-source {
+    height: 250px;
+    min-height: 250px;
+    resize: vertical;
+}
+
+.rich-text-editor.max {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 9995;
+    display: flex;
+    flex-direction: column;
+}
+
+.rich-text-editor.max .rich-text-editor-content,
+.rich-text-editor.max .rich-text-editor-source {
+    flex: 1;
+    height: auto;
+    resize: none;
+}
+
+.rich-text-editor-content {
+    position: relative;
+    overflow-y: auto;
+}
+
+.rich-text-editor-source {
+    display: block;
+    width: 100%;
+    border: none;
+    font-family: monospace;
+}
+
+.rich-text-editor .tiptap,
+.rich-text-editor-placeholder,
+.rich-text-editor-source {
+    padding: 12px 16px;
+    line-height: 1.6;
+}
+
+.rich-text-editor .tiptap {
+    min-height: 100%;
+    outline: none;
+}
+
+.rich-text-editor-placeholder {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    color: #aaa;
+    pointer-events: none;
+}
+
+// links, which the theme otherwise styles like plain text
+.rich-text-editor .tiptap a {
+    color: #2a7ab8;
+    text-decoration: underline;
+}
+
+// tiptap table
+.rich-text-editor .tiptap td,
+.rich-text-editor .tiptap th {
+    min-width: 2em;
+    padding: 6px 8px;
+    border: 1px solid #e0e0e0;
+}
+
+// ensures quotes inherit tiptap format, and not bootstrap large style
+.rich-text-editor .tiptap blockquote {
+    font-size: inherit;
 }

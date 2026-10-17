@@ -55,21 +55,17 @@
             </div>
         </div>
         <div class="col-xs-12">
-            <textarea
-                rows="10"
-                cols="80"
-                data-bind="
-                    ckeditor: currentText,
-                    language: currentLanguage.code,
-                    direction: currentDirection,
-                    placeholder: currentPlaceholder,
-                    ckeditorOptions: {
-                        entities_latin: false,
-                        entities_greek: false
-                    },
-                    valueUpdate: 'afterkeydown',
-                    attr: {disabled: disabled}
-                "></textarea>
+            <div
+                data-bind="component: {
+                    name: 'views/components/rich-text-editor',
+                    params: {
+                        value: currentText,
+                        direction: currentDirection,
+                        placeholder: currentPlaceholder,
+                        disabled: disabled
+                    }
+                }"
+            ></div>
         </div>
     </div>
 </div>
@@ -80,21 +76,16 @@
     <span data-bind="text: $root.translations.placeholder"></span>
 </div>
 
-<textarea
-    rows="10"
-    cols="80"
-    class="form-control input-md widget-input"
-    data-bind="
-        ckeditor: defaultText,
-        isConfigForm: true,
-        language: currentLanguage.code,
-        direction: currentDirection,
-        placeholder: currentPlaceholder,
-        ckeditorOptions: {},
-        valueUpdate: 'afterkeydown',
-        attr: {disabled: disabled}
-    "
-></textarea>
+<div
+    data-bind="component: {
+        name: 'views/components/rich-text-editor',
+        params: {
+            value: currentPlaceholder,
+            direction: currentDirection,
+            disabled: disabled
+        }
+    }"
+></div>
 {% endblock config_form %}
 
 {% block report %}
