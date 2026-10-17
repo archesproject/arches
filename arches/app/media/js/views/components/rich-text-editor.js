@@ -6,7 +6,7 @@ import { Image } from '@tiptap/extension-image';
 import { Subscript } from '@tiptap/extension-subscript';
 import { Superscript } from '@tiptap/extension-superscript';
 import { TableKit } from '@tiptap/extension-table';
-import { dropdown } from 'bootstrap';
+import 'bootstrap';
 import richTextEditorTemplate from 'templates/views/components/rich-text-editor.htm';
 import 'bindings/tiptap';
 
