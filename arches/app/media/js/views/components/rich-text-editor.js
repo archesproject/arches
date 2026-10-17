@@ -206,8 +206,28 @@ export default ko.components.register('views/components/rich-text-editor', {
             }
         };
 
+        // source mode enables html editing, 
+        this.isSourceMode = ko.observable(false);
+        this.source = ko.observable('');
+
+        this.toggleSource = () => {
+            if (!this.isSourceMode()) {
+                this.source(getValue());
+            }
+            this.isSourceMode(!this.isSourceMode());
+        };
+
+        subscriptions.push(this.source.subscribe((html) => {
+            if (this.isSourceMode()) {
+                editor.chain()
+                    .command(({ tr }) => tr.setMeta('addToHistory', false))
+                    .setContent(html)
+                    .run();
+            }
+        }));
+
         // roving tabindex: only the most recently focused control is in the tab order
-        const getControls = toolbar => Array.from(toolbar.querySelectorAll('.rich-text-editor-toolbar-button'));
+        const getControls = toolbar => Array.from(toolbar.querySelectorAll('.rich-text-editor-toolbar-group:not([inert]) .rich-text-editor-toolbar-button'));
 
         this.onFocusIn = (_data, event) => {
             const controls = getControls(event.currentTarget);

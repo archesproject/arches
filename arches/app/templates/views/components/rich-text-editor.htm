@@ -9,7 +9,7 @@
             event: {keydown: onKeydown, focusin: onFocusIn}
         "
     >
-        <div class="rich-text-editor-toolbar-group">
+        <div class="rich-text-editor-toolbar-group" data-bind="attr: {inert: isSourceMode}">
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
@@ -95,7 +95,7 @@
             </button>
         </div>
 
-        <div class="rich-text-editor-toolbar-group">
+        <div class="rich-text-editor-toolbar-group" data-bind="attr: {inert: isSourceMode}">
             <div class="dropdown">
                 <button
                     type="button"
@@ -301,7 +301,7 @@
             </button>
         </div>
 
-        <div class="rich-text-editor-toolbar-group">
+        <div class="rich-text-editor-toolbar-group" data-bind="attr: {inert: isSourceMode}">
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
@@ -402,7 +402,7 @@
             </button>
         </div>
 
-        <div class="rich-text-editor-toolbar-group">
+        <div class="rich-text-editor-toolbar-group" data-bind="attr: {inert: isSourceMode}">
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
@@ -475,7 +475,7 @@
             </button>
         </div>
 
-        <div class="rich-text-editor-toolbar-group">
+        <div class="rich-text-editor-toolbar-group" data-bind="attr: {inert: isSourceMode}">
             <div class="dropdown">
                 <button
                     type="button"
@@ -581,9 +581,31 @@
                 </ul>
             </div>
         </div>
+
+        <div class="rich-text-editor-toolbar-group">
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Source' %}"
+                aria-label="{% trans 'Source' %}"
+                data-bind="
+                    click: toggleSource,
+                    css: {active: isSourceMode},
+                    attr: {'aria-pressed': isSourceMode().toString()}
+                "
+            >
+                <i class="fa fa-code" aria-hidden="true"></i>
+            </button>
+        </div>
     </div>
 
-    <div class="rich-text-editor-content" data-bind="tiptap: editor, attr: {dir: direction}">
+    <div class="rich-text-editor-content" data-bind="tiptap: editor, visible: !isSourceMode(), attr: {dir: direction}">
         <div class="rich-text-editor-placeholder" data-bind="html: placeholder, visible: isEmpty"></div>
     </div>
+    <textarea
+        class="rich-text-editor-source"
+        aria-label="{% trans 'HTML source' %}"
+        data-bind="visible: isSourceMode, textInput: source"
+    ></textarea>
 </div>
