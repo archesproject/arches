@@ -13308,7 +13308,8 @@ table.csv-mapping-table td {
     background: #fff;
 }
 
-.rich-text-editor-toolbar[inert] .rich-text-editor-toolbar-group {
+.rich-text-editor-toolbar[inert] .rich-text-editor-toolbar-group,
+.rich-text-editor-toolbar-group[inert] {
     opacity: 0.4;
 }
 
@@ -13376,18 +13377,34 @@ table.csv-mapping-table td {
     padding: 0 8px;
 }
 
-.rich-text-editor-content {
-    position: relative;
+.rich-text-editor-content,
+.rich-text-editor-source {
     height: 250px;
     min-height: 250px;
-    overflow-y: auto;
     resize: vertical;
+}
+
+.rich-text-editor-content {
+    position: relative;
+    overflow-y: auto;
+}
+
+.rich-text-editor-source {
+    display: block;
+    width: 100%;
+    border: none;
+    font-family: monospace;
+}
+
+.rich-text-editor .tiptap,
+.rich-text-editor-placeholder,
+.rich-text-editor-source {
+    padding: 12px 16px;
+    line-height: 1.6;
 }
 
 .rich-text-editor .tiptap {
     min-height: 100%;
-    padding: 12px 16px;
-    line-height: 1.6;
     outline: none;
 }
 
@@ -13396,8 +13413,6 @@ table.csv-mapping-table td {
     top: 0;
     right: 0;
     left: 0;
-    padding: 12px 16px;
-    line-height: 1.6;
     color: #aaa;
     pointer-events: none;
 }
