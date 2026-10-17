@@ -209,7 +209,6 @@ export default ko.components.register('views/components/rich-text-editor', {
         // source mode enables html editing, 
         this.isSourceMode = ko.observable(false);
         this.source = ko.observable('');
-
         this.toggleSource = () => {
             if (!this.isSourceMode()) {
                 this.source(getValue());
@@ -225,6 +224,12 @@ export default ko.components.register('views/components/rich-text-editor', {
                     .run();
             }
         }));
+
+        // maximise the editor to fill the browser window
+        this.isMax = ko.observable(false);
+        this.toggleMax = () => {
+            this.isMax(!this.isMax());
+        };
 
         // roving tabindex: only the most recently focused control is in the tab order
         const getControls = toolbar => Array.from(toolbar.querySelectorAll('.rich-text-editor-toolbar-group:not([inert]) .rich-text-editor-toolbar-button'));

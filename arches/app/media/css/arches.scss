@@ -13384,6 +13384,24 @@ table.csv-mapping-table td {
     resize: vertical;
 }
 
+.rich-text-editor.max {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 9995;
+    display: flex;
+    flex-direction: column;
+}
+
+.rich-text-editor.max .rich-text-editor-content,
+.rich-text-editor.max .rich-text-editor-source {
+    flex: 1;
+    height: auto;
+    resize: none;
+}
+
 .rich-text-editor-content {
     position: relative;
     overflow-y: auto;

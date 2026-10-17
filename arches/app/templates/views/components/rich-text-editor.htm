@@ -1,5 +1,5 @@
 {% load i18n %}
-<div class="rich-text-editor">
+<div class="rich-text-editor" data-bind="css: {max: isMax}">
     <div
         class="rich-text-editor-toolbar"
         role="toolbar"
@@ -596,6 +596,20 @@
                 "
             >
                 <i class="fa fa-code" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Maximise' %}"
+                aria-label="{% trans 'Maximise' %}"
+                data-bind="
+                    click: toggleMax,
+                    css: {active: isMax},
+                    attr: {'aria-pressed': isMax().toString()}
+                "
+            >
+                <i class="fa fa-expand" aria-hidden="true"></i>
             </button>
         </div>
     </div>
