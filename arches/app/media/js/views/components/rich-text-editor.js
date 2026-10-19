@@ -186,17 +186,26 @@ export default ko.components.register('views/components/rich-text-editor', {
 
         this.imageUrl = ko.observable('');
         this.imageAlt = ko.observable('');
+        this.imageWidth = ko.observable('');
+        this.imageHeight = ko.observable('');
 
         this.editImage = () => {
-            const { src, alt } = editor.getAttributes('image');
+            const { src, alt, width, height } = editor.getAttributes('image');
             this.imageUrl(src || '');
             this.imageAlt(alt || '');
+            this.imageWidth(width || '');
+            this.imageHeight(height || '');
         };
 
         this.applyImage = () => {
             const src = this.imageUrl().trim();
             if (src) {
-                editor.chain().focus().setImage({ src, alt: this.imageAlt().trim() }).run();
+                editor.chain().focus().setImage({
+                    src,
+                    alt: this.imageAlt().trim(),
+                    width: this.imageWidth() || null,
+                    height: this.imageHeight() || null,
+                }).run();
             }
         };
 

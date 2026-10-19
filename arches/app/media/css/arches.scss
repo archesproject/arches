@@ -13377,6 +13377,21 @@ table.csv-mapping-table td {
     padding: 0 8px;
 }
 
+.open > .rich-text-editor-image-popup {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.rich-text-editor-popup-row {
+    display: flex;
+    gap: 2px;
+}
+
+.rich-text-editor-popup-row .rich-text-editor-popup-input {
+    flex: 1;
+    width: 0;
+}
+
 .rich-text-editor-content,
 .rich-text-editor-source {
     height: 250px;
