@@ -588,6 +588,7 @@ class TileTreeOperation:
 
         with transaction.atomic(durable=True):
             if not self.for_new_resource:
+                self.save_kwargs.pop("provisional_edits_user", None)
                 if isinstance(self.entry, ResourceTileTree):
                     super(ResourceTileTree, self.entry).save(**self.save_kwargs)
                 elif isinstance(self.entry, ResourceInstance):
