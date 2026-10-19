@@ -147,7 +147,7 @@
                 >
                     <i class="fa fa-picture-o" aria-hidden="true"></i>
                 </button>
-                <div class="dropdown-menu rich-text-editor-popup">
+                <div class="dropdown-menu rich-text-editor-popup rich-text-editor-image-popup">
                     <input
                         type="url"
                         class="rich-text-editor-popup-input"
@@ -159,15 +159,35 @@
                         type="text"
                         class="rich-text-editor-popup-input"
                         placeholder="{% trans 'Alt text' %}"
-                        aria-label="{% trans 'Alt text)' %}"
+                        aria-label="{% trans 'Alt text' %}"
                         data-bind="textInput: imageAlt"
                     >
-                    <button type="button" title="{% trans 'Apply image' %}" aria-label="{% trans 'Apply image' %}" data-bind="click: applyImage">
-                        <i class="fa fa-check" aria-hidden="true"></i>
-                    </button>
-                    <button type="button" title="{% trans 'Remove image' %}" aria-label="{% trans 'Remove image' %}" data-bind="click: removeImage">
-                        <i class="fa fa-trash" aria-hidden="true"></i>
-                    </button>
+                    <div class="rich-text-editor-popup-row">
+                        <input
+                            type="number"
+                            min="1"
+                            class="rich-text-editor-popup-input"
+                            placeholder="{% trans 'Width' %}"
+                            aria-label="{% trans 'Width' %}"
+                            data-bind="textInput: imageWidth"
+                        >
+                        <input
+                            type="number"
+                            min="1"
+                            class="rich-text-editor-popup-input"
+                            placeholder="{% trans 'Height' %}"
+                            aria-label="{% trans 'Height' %}"
+                            data-bind="textInput: imageHeight"
+                        >
+                    </div>
+                    <div class="rich-text-editor-popup-row">
+                        <button type="button" title="{% trans 'Apply image' %}" aria-label="{% trans 'Apply image' %}" data-bind="click: applyImage">
+                            <i class="fa fa-check" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" title="{% trans 'Remove image' %}" aria-label="{% trans 'Remove image' %}" data-bind="click: removeImage">
+                            <i class="fa fa-trash" aria-hidden="true"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="dropdown">
