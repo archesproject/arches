@@ -830,3 +830,37 @@ class TileTreeSaveProvisionalEditsForUserTests(GraphTestCase):
         tile.aliased_data.non_localized_string_alias = "tile-attr-check"
         tile.save(force_admin=True, provisional_edits_for_user=self.provisional_editor)
         self.assertIs(tile._provisional_edits_user, self.provisional_editor)
+
+    def test_save_does_not_raise_with_provisional_edits_user(self):
+        """Regression: provisional_edits_user passed to save() must not leak to
+        Model.save() as an unexpected keyword argument.  This is a defensive
+        guard: _perform_transaction pops provisional_edits_user from save_kwargs
+        before forwarding them to Django's Model.save()."""
+        tile = self._load_tile()
+        tile.aliased_data.non_localized_string_alias = "prov-user-regression"
+        tile.save(force_admin=True, provisional_edits_user=self.provisional_editor)
+
+
+class ResourceTileTreeSaveProvisionalEditsUserTests(GraphTestCase):
+    """Same defensive regression for the ResourceTileTree.save() path."""
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        call_command("add_test_users", verbosity=0)
+
+    def setUp(self):
+        self.provisional_editor = User.objects.get(username="tester3")
+
+    def _load_resource(self):
+        return ResourceTileTree.get_tiles(
+            "datatype_lookups", as_representation=False
+        ).get(pk=self.resource_42.pk)
+
+    def test_save_does_not_raise_with_provisional_edits_user(self):
+        """Regression: provisional_edits_user passed to save() must not leak to
+        Model.save() as an unexpected keyword argument."""
+        resource = self._load_resource()
+        tile = resource.aliased_data.datatypes_1
+        tile.aliased_data.non_localized_string_alias = "prov-user-regression"
+        resource.save(force_admin=True, provisional_edits_user=self.provisional_editor)
