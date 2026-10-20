@@ -26,6 +26,7 @@ from io import StringIO
 from time import time
 from copy import deepcopy
 from os.path import isfile, join
+from arches.app.utils.decorators import deprecated
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import (
     import_graph as resourceGraphImporter,
@@ -92,7 +93,15 @@ class ArchesFileWriter(Writer):
         for resource_data in export["business_data"]["resources"]:
             resource_instance_data = resource_data.get("resourceinstance")
 
+            # Row metadata is local to this database, not part of the
+            # interchange format (resources have always carried createdtime).
+            for tile_data in resource_data.get("tiles") or []:
+                for field_name in ("id", "createdtime", "last_updated"):
+                    tile_data.pop(field_name, None)
+
             if resource_instance_data:
+                for field_name in ("id", "last_updated"):
+                    resource_instance_data.pop(field_name, None)
                 resource_data["resourceinstance"]["publication_id"] = (
                     graph_id_to_publication_id.get(resource_instance_data["graph_id"])
                 )
@@ -104,6 +113,7 @@ class ArchesFileWriter(Writer):
 
 
 class ArchesFileReader(Reader):
+    @deprecated
     def pre_import(self, tile, graph_id):
         for function in self.get_function_class_instances(tile, graph_id):
             try:
@@ -112,6 +122,7 @@ class ArchesFileReader(Reader):
                 pass
         return tile
 
+    @deprecated
     def get_function_class_instances(self, tile, graph_id):
         ret = []
         functionXgraphs = FunctionXGraph.objects.filter(
@@ -125,6 +136,7 @@ class ArchesFileReader(Reader):
             ret.append(func)
         return ret
 
+    @deprecated
     def validate_business_data(self, business_data):
         errors = []
         if type(business_data) == dict and business_data["resources"]:
@@ -583,6 +595,7 @@ class ArchesFileReader(Reader):
         this_resource.index()
         return this_resource
 
+    @deprecated
     def import_all(self):
         errors = []
         conceptImporter(self.reference_data)

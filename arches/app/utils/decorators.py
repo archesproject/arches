@@ -16,17 +16,16 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import warnings
 import functools
 import logging
-import datetime
 
 from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse
 
 from arches.app.models import models
+from arches.app.models.system_settings import settings
 from arches.app.utils.permission_backend import user_can_read_resource
 from arches.app.utils.permission_backend import user_can_edit_resource
 from arches.app.utils.permission_backend import user_can_delete_resource
@@ -36,39 +35,10 @@ from arches.app.utils.permission_backend import (
     group_required as permission_group_required,
 )
 from arches.app.utils.response import JSONResponse
+from arches.app.utils.deprecation import deprecated
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
-
-
-def deprecated(func):
-    """This is a decorator which can be used to mark functions
-    as deprecated. It will result in a warning being emitted
-    when the function is used.
-    """
-
-    @functools.wraps(func)
-    def new_func(*args, **kwargs):
-        warnings.simplefilter("always", DeprecationWarning)  # turn off filter
-        warnings.warn_explicit(
-            "Call to deprecated function {}.".format(func.__name__),
-            category=DeprecationWarning,
-            filename=func.__code__.co_filename,
-            lineno=func.__code__.co_firstlineno + 1,
-        )
-        warnings.simplefilter("default", DeprecationWarning)  # reset filter
-        logger.warning(
-            "%s - DeprecationWarning: Call to deprecated function %s. %s:%s"
-            % (
-                datetime.datetime.now(),
-                func.__name__,
-                func.__code__.co_filename,
-                func.__code__.co_firstlineno + 1,
-            )
-        )
-        return func(*args, **kwargs)
-
-    return new_func
 
 
 def group_required(*group_names, raise_exception=False):
@@ -130,6 +100,7 @@ def can_read_resource_instance(function):
     return wrapper
 
 
+@deprecated
 def can_delete_resource_instance(function):
     """
     Requires that a user be able to edit or delete a single nodegroup of a resource
@@ -147,6 +118,7 @@ def can_delete_resource_instance(function):
     return wrapper
 
 
+@deprecated
 def can_read_concept():
     """
     Requires that a user be able to edit or delete a single nodegroup of a resource
@@ -154,6 +126,24 @@ def can_read_concept():
     """
 
     return user_passes_test(user_can_read_concepts)
+
+
+def requires_elasticsearch(function):
+    """
+    Makes a view unavailable when settings.ELASTICSEARCH_ENABLED is False.
+
+    The url stays registered so that {% url %} tags and arches.urls entries used by
+    other applications keep resolving, but the view itself 404s rather than failing
+    against an absent search index.
+    """
+
+    @functools.wraps(function)
+    def wrapper(request, *args, **kwargs):
+        if not settings.ELASTICSEARCH_ENABLED:
+            raise Http404("This view requires Elasticsearch, which is disabled.")
+        return function(request, *args, **kwargs)
+
+    return wrapper
 
 
 # Checks whether current user is the one who created a particular transaction ID

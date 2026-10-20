@@ -1,5 +1,6 @@
 import json, urllib
 from django.urls import reverse
+from arches.app.utils.decorators import deprecated
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.search.elasticsearch_dsl_builder import Dsl, Bool, Terms, Exists, Nested
@@ -98,6 +99,7 @@ class BaseDataType(object):
         """
         return value
 
+    @deprecated
     def get_bounds(self, tile, node):
         """
         Gets the bounds of a geometry if the datatype is spatial

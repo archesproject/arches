@@ -513,6 +513,7 @@ class MigrateConceptNodesToReferenceDatatypeTests(TestCase):
                 "placeholder",
                 "i18n_properties",
                 "defaultValue",
+                "uneditable",
             ]
         )
         for node in reference_nodes:
@@ -781,6 +782,7 @@ class MigrateDomainNodesToReferenceDatatypeTests(
                 "placeholder",
                 "i18n_properties",
                 "defaultValue",
+                "uneditable",
             ]
         )
 

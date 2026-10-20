@@ -293,8 +293,8 @@ var viewModel = function(params) {
         zoomToData = false;
         var graphconfig = widget.node.config.graphs().find(function(graph){return graph.graphid === ko.unwrap(resourceData.graphid);});
         var val = [{
-            ontologyProperty: ko.observable(graphconfig?.ontologyProperty || ''),
-            inverseOntologyProperty: ko.observable(graphconfig?.ontologyProperty || ''),
+            relationship: ko.observable(ko.unwrap(graphconfig?.relationship) || ''),
+            inverseRelationship: ko.observable(ko.unwrap(graphconfig?.inverseRelationship) || ''),
             resourceId: resourceinstanceid,
             resourceXresourceId: "",
         }];

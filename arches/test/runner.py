@@ -34,6 +34,9 @@ class ArchesTestRunner(DiscoverRunner):
             return ret
 
         app_settings()  # adds languages to system
+        if not settings.ELASTICSEARCH_ENABLED:
+            return ret
+
         prepare_terms_index(create=True)
         prepare_concepts_index(create=True)
         prepare_search_index(create=True)
@@ -43,10 +46,11 @@ class ArchesTestRunner(DiscoverRunner):
         return ret
 
     def teardown_databases(self, old_config, **kwargs):
-        delete_terms_index()
-        delete_concepts_index()
-        delete_search_index()
-        for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
-            get_index(index["name"]).delete_index()
+        if settings.ELASTICSEARCH_ENABLED:
+            delete_terms_index()
+            delete_concepts_index()
+            delete_search_index()
+            for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
+                get_index(index["name"]).delete_index()
 
         super().teardown_databases(old_config, **kwargs)

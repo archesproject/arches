@@ -387,7 +387,7 @@ class Tile(models.TileModel):
                         )
             if errors is not None:
                 errors += error
-        if not raise_early:
+        if not raise_early and tile_errors:
             raise TileValidationError(tile_errors)
         return errors
 
@@ -397,7 +397,9 @@ class Tile(models.TileModel):
         if user_id is not None:
             user_id = str(user_id)
             user = User.objects.get(pk=user_id)
-            user_is_reviewer = user_is_resource_reviewer(user)
+            user_is_reviewer = user_is_resource_reviewer(
+                user, resource=self.resourceinstance
+            )
             if (
                 user_is_reviewer is False
                 and self.provisionaledits is not None
@@ -454,7 +456,9 @@ class Tile(models.TileModel):
         try:
             if user is None and request is not None:
                 user = request.user
-            user_is_reviewer = user_is_resource_reviewer(user)
+            user_is_reviewer = user_is_resource_reviewer(
+                user, resource=self.resourceinstance
+            )
         except AttributeError:  # no user - probably importing data
             user = None
 
@@ -577,7 +581,9 @@ class Tile(models.TileModel):
             tile.delete(*args, request=request, **kwargs)
         try:
             user = request.user
-            user_is_reviewer = user_is_resource_reviewer(user)
+            user_is_reviewer = user_is_resource_reviewer(
+                user, resource=self.resourceinstance
+            )
         except AttributeError:  # no user
             user = None
             user_is_reviewer = True
@@ -758,7 +764,11 @@ class Tile(models.TileModel):
             new_resource_created = False
             if not resourceinstanceid:
                 graph = models.Node.objects.get(pk=nodeid).graph
-                resource_instance = models.ResourceInstance(graph=graph)
+                user = getattr(request, "user", None)
+                resource_instance = models.ResourceInstance(
+                    graph=graph,
+                    principaluser=user if user and user.is_authenticated else None,
+                )
                 resource_instance.save()
                 resourceinstanceid = str(resource_instance.resourceinstanceid)
                 new_resource_created = True

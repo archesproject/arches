@@ -69,6 +69,7 @@ from arches.app.views.auth import (
     SignupView,
     ConfirmSignupView,
     ChangePasswordView,
+    DeviceClientIdView,
     GetClientIdView,
     UserProfileView,
     ServerSettingView,
@@ -101,6 +102,11 @@ urlpatterns = [
         r"^auth/confirm_signup$", ConfirmSignupView.as_view(), name="confirm_signup"
     ),
     re_path(r"^auth/get_client_id$", GetClientIdView.as_view(), name="get_client_id"),
+    re_path(
+        r"^auth/device_client_id$",
+        DeviceClientIdView.as_view(),
+        name="device_client_id",
+    ),
     re_path(r"^auth/user_profile$", UserProfileView.as_view(), name="user_profile"),
     re_path(
         r"^auth/server_settings$", ServerSettingView.as_view(), name="server_settings"
@@ -738,6 +744,11 @@ urlpatterns = [
     re_path(r"^iiifserver/(?P<path>.*)$", IIIFServerProxyView.as_view()),
     re_path(
         r"^iiifannotations$", api.IIIFAnnotations.as_view(), name="iiifannotations"
+    ),
+    re_path(
+        r"^iiifannotations/batch$",
+        api.IIIFAnnotationsBatch.as_view(),
+        name="iiifannotations_batch",
     ),
     re_path(
         r"^iiifannotationnodes$",
