@@ -446,6 +446,12 @@ module.exports = () => {
                         },
                     },
                     {
+                        // Keep maplibre-gl's runtime `new URL(expression, import.meta.url)` intact
+                        // instead of becoming an empty context that throws (maplibre/maplibre-gl-js#8060).
+                        test: /maplibre-gl(-dev)?\.mjs$/,
+                        parser: { dynamicUrl: false },
+                    },
+                    {
                         test: /\.mjs$/,
                         include: /node_modules/,
                         exclude: /maplibre-gl-worker(-dev)?\.mjs$/,
