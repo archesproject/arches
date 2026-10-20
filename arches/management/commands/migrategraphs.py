@@ -45,7 +45,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--force",
             action="store_true",
-            help="Go ahead where a refusal offers --force: skip rows missing here, discard unpublished Graph Designer drafts, unapply nodegroups that hold tiles, record data work with --fake, or start from the earliest point a database fits.",
+            help="Go ahead where a refusal offers --force: skip changes to what is no longer here, discard unpublished Graph Designer changes, unapply nodegroups that still have tiles, mark tile changes as applied without running them, or start from the earliest migration this database's graph matches.",
         )
         parser.add_argument(
             "--plan",
@@ -71,7 +71,7 @@ class Command(BaseCommand):
                 f"{app}: {', '.join(names)}" for app, names in conflicts.items()
             )
             raise CommandError(
-                f"Conflicting graph migrations detected; multiple leaf nodes in the migration graph ({described}). Resolve them before migrating."
+                f"More than one graph migration is the latest in its app ({described}), usually because two branches each added one. Make one depend on the other, then run this command again."
             )
 
         self._warn_about_missing_files(executor.loader)
@@ -158,7 +158,7 @@ class Command(BaseCommand):
         )
         self.stderr.write(
             self.style.WARNING(
-                f"These graph migrations are recorded as applied on this database, but their files are missing:\n  {missing_names}\nRestore them, for example by checking out the branch that has them."
+                f"This database has applied these graph migrations, but their files are missing:\n  {missing_names}\nRestore them, for example by checking out the branch that has them."
             )
         )
 
@@ -172,10 +172,11 @@ class Command(BaseCommand):
             for app_label in app_labels
         )
         self._refuse(
-            "These graph migrations point at things this database does not have, "
-            "which come from installing the package rather than from graph migrations:\n  "
+            "These graph migrations use records this database does not have:\n  "
             + "\n  ".join(problem.message for problem in problems)
-            + f"\nInstall them, then run this command again:\n  {install_commands}\n  {self._command(self.app_label, self.target, fake=self.fake)}"
+            + "\nGraph migrations do not create ontologies, widgets, card components and "
+            "the like; installing the application's package does. To install it and try "
+            f"again, run:\n  {install_commands}\n  {self._command(self.app_label, self.target, fake=self.fake)}"
         )
 
     def _refuse_destructive_reversals(self, plan):
@@ -186,18 +187,18 @@ class Command(BaseCommand):
                 "Unapplying these graph migrations would delete a graph that has "
                 "resources, along with every resource and tile on it:\n  "
                 + "\n  ".join(problem.message for problem in destructive)
-                + "\nKeep the graph by unapplying only the migrations after the one that creates it."
+                + "\nTo keep the graph, unapply only the migrations after the one that creates it."
             )
         orphans = [problem for problem in problems if problem.kind == "orphans"]
         if orphans:
             message = (
-                "Unapplying these graph migrations would delete nodegroups that hold "
-                "tiles, leaving those tiles with nothing to belong to:\n  "
+                "Unapplying these graph migrations would delete nodegroups that still "
+                "have tiles, leaving those tiles orphaned:\n  "
                 + "\n  ".join(problem.message for problem in orphans)
             )
             if not self.force:
                 self._refuse(
-                    f"{message}\nUnapply them anyway by running the following:\n  {self._command(self.app_label, self.target, force=True)}"
+                    f"{message}\nTo unapply them anyway, run:\n  {self._command(self.app_label, self.target, force=True)}"
                 )
             self._warn(message)
 
@@ -209,7 +210,7 @@ class Command(BaseCommand):
         ]
         if unrestored:
             self._warn(
-                "Unapplying these graph migrations restores the graph rows, but not "
+                "Unapplying these graph migrations puts the graph back, but not "
                 "the tiles or values they deleted:\n  "
                 + "\n  ".join(problem.message for problem in unrestored)
             )
@@ -226,14 +227,14 @@ class Command(BaseCommand):
         if not slugs:
             return
         message = (
-            "These graphs have changes in the Graph Designer that are not published, "
-            "and this run would discard them:\n  " + "\n  ".join(slugs)
+            "These graphs have unpublished changes in the Graph Designer, which this "
+            "run would discard:\n  " + "\n  ".join(slugs)
         )
         if self.force:
             self._warn(message)
             return
         self._refuse(
-            f"{message}\nPublish or revert them in the Graph Designer, then run this command again, or discard them by running the following:\n  {self._command(self.app_label, self.target, force=True)}"
+            f"{message}\nPublish or revert them in the Graph Designer, then run this command again. To discard them instead, run:\n  {self._command(self.app_label, self.target, force=True)}"
         )
 
     def _refuse_faking_work(self, plan):
@@ -247,15 +248,15 @@ class Command(BaseCommand):
             if not with_data:
                 return
             message = (
-                "Recording these graph migrations as unapplied would leave their "
-                "business data changes in place:\n  "
+                "Marking these graph migrations as unapplied without reversing them "
+                "would leave the changes they made to tiles and resources in place:\n  "
                 + "\n  ".join(self._label(migration) for migration in with_data)
             )
             if self.force:
                 self._warn(message)
                 return
             self._refuse(
-                f"{message}\nUnapply them instead by running the following:\n  {self._command(self.app_label, self.target)}"
+                f"{message}\nTo undo those changes as well, run:\n  {self._command(self.app_label, self.target)}"
             )
             return
 
@@ -264,8 +265,9 @@ class Command(BaseCommand):
             fit = self._fit(migrations)
             if fit.position is None:
                 message = (
-                    "This database does not match these graph migrations, so they "
-                    "cannot be recorded as applied:\n  "
+                    "This database's graph does not match the graph as it was after "
+                    "any of these graph migrations, so they cannot be marked as applied "
+                    "without running them:\n  "
                     + "\n  ".join(problem.message for problem in fit.problems)
                 )
                 if self.force:
@@ -286,9 +288,9 @@ class Command(BaseCommand):
         if self.app_label is None:
             commands.append(self._command(fake=True, force=self.force))
         message = (
-            "Some of these graph migrations still have work to do in this "
-            "database, so recording them without running them would skip it:\n  "
-            + "\n  ".join(reasons)
+            "Some of these graph migrations still have changes to make to this "
+            "database. Marking them as applied without running them would skip those "
+            "changes for good:\n  " + "\n  ".join(reasons)
         )
         if self.force:
             self._warn(message)
@@ -331,7 +333,7 @@ class Command(BaseCommand):
         )
         if to_apply:
             message += (
-                "\nThese still have changes to make here, so they must be applied:\n  "
+                "\nThese still have changes to make here, so they need to run:\n  "
                 + "\n  ".join(to_apply)
             )
         self._refuse(
@@ -341,8 +343,8 @@ class Command(BaseCommand):
     def _refuse_diverged(self, problems):
         if all(problem.kind == "missing" for problem in problems):
             message = (
-                "This database's graph has changed since these graph migrations "
-                "were made. Some rows they change or delete are no longer here, so "
+                "This database's graph has been edited since these graph migrations "
+                "were made. Some of what they change or delete is no longer here, so "
                 "those changes would be skipped:\n  "
                 + "\n  ".join(problem.message for problem in problems)
             )
@@ -350,10 +352,11 @@ class Command(BaseCommand):
                 self._warn(message)
                 return
             self._refuse(
-                f"{message}\nRestore those rows in the Graph Designer and run this command again, or apply everything else anyway by running the following:\n  {self._command(self.app_label, self.target, force=True)}"
+                f"{message}\nRestore them in the Graph Designer, then run this command again. To apply everything else anyway, run:\n  {self._command(self.app_label, self.target, force=True)}"
             )
         self._refuse(
-            "This database's graph matches no point in these graph migrations:\n  "
+            "This database's graph has been edited since these graph migrations were "
+            "made, and no longer matches the graph as it was after any of them:\n  "
             + "\n  ".join(problem.message for problem in problems)
             + "\nUndo those edits in the Graph Designer so the graph matches, then run this command again."
         )
@@ -370,18 +373,19 @@ class Command(BaseCommand):
         candidates = []
         for position in fit.ambiguous:
             if position == 0:
-                where = "before all of them"
+                where = "none of them"
             else:
-                where = f"at {self._label(migrations[position - 1])}"
+                where = f"up to {self._label(migrations[position - 1])}"
             commands = self._commands(
                 app_label, self._steps(migrations, position), force=position == 0
             )
-            candidates.append(f"If it is {where}:\n  " + "\n  ".join(commands))
+            candidates.append(f"If it had {where}:\n  " + "\n  ".join(commands))
         self._refuse(
-            "This database fits more than one point in these graph migrations, "
-            "and the migrations between them delete and recreate the same rows, so "
-            "running from the wrong one would destroy data. Run the commands for the "
-            "point this database is actually at.\n" + "\n".join(candidates)
+            "This database's graph matches the graph as it was after more than one of "
+            "these graph migrations, because the ones in between delete and recreate "
+            "the same rows. Running from the wrong one would destroy data, so run the "
+            "commands for the last migration this database actually had.\n"
+            + "\n".join(candidates)
         )
 
     def _steps(self, migrations, position):
@@ -399,7 +403,7 @@ class Command(BaseCommand):
             elif "schema" in scopes:
                 if applying or self._has_pending_work(migration):
                     self._refuse(
-                        f"{self._label(migration)} is already partly applied here: its schema changes are present, but it also has data work to do. It was written by hand, so resolve it by hand."
+                        f"{self._label(migration)} is partly applied to this database: its graph changes are here, but its changes to tiles and resources are not. It mixes both, so it was written by hand; finish or undo it by hand."
                     )
                 action = "record"
             elif applying or self._has_pending_work(migration):
@@ -447,10 +451,12 @@ class Command(BaseCommand):
 
     def _directions(self, commands):
         if all(" --fake" in command for command in commands):
-            return "Record them instead of applying them by running the following:"
+            return "To mark them as applied without running them, run:"
         if any(" --fake" in command for command in commands):
-            return "Record the ones already applied and apply the rest by running the following in order:"
-        return "Apply them instead by running the following:"
+            return (
+                "To mark the ones already applied and run the rest, run these in order:"
+            )
+        return "To apply them instead, run:"
 
     def _reason(self, migration, beyond):
         if beyond:
@@ -521,7 +527,7 @@ class Command(BaseCommand):
         ):
             self.stdout.write(
                 self.style.NOTICE(
-                    "These graph migrations changed data that cannot be traced to particular resource models. Reindex by running the following:\n  python manage.py es reindex_database"
+                    "Search results may be out of date for any resource model: these graph migrations changed data that is not tied to particular ones. To reindex everything, run:\n  python manage.py es reindex_database"
                 )
             )
             return
@@ -540,7 +546,7 @@ class Command(BaseCommand):
         graphids = ",".join(str(graphid) for graphid, _slug in resource_models)
         self.stdout.write(
             self.style.NOTICE(
-                f"Search results for these resource models are now out of date:\n  {slugs}\nReindex them by running the following:\n  python manage.py es index_resources_by_type -rt {graphids}"
+                f"Search results for these resource models are now out of date:\n  {slugs}\nTo reindex them, run:\n  python manage.py es index_resources_by_type -rt {graphids}"
             )
         )
 

@@ -190,7 +190,7 @@ class MigrateGraphsTests(GraphMigrationOperationTests):
             with self.assertRaises(CommandError) as refusal:
                 self._migrategraphs(APP_NAME)
             message = str(refusal.exception)
-            self.assertIn("Record them instead of applying them", message)
+            self.assertIn("To mark them as applied without running them, run:", message)
             self.assertIn(f"python manage.py migrategraphs {APP_NAME} --fake", message)
 
             self._migrategraphs(APP_NAME, fake=True, verbosity=0)
@@ -202,7 +202,7 @@ class MigrateGraphsTests(GraphMigrationOperationTests):
             with self.assertRaises(CommandError) as refusal:
                 self._migrategraphs(APP_NAME, fake=True)
         message = str(refusal.exception)
-        self.assertIn("Apply them instead", message)
+        self.assertIn("To apply them instead, run:", message)
         self.assertIn(f"python manage.py migrategraphs {APP_NAME}", message)
         self.assertNotIn("--fake", message)
         self.assertEqual(self._recorded(), set())
@@ -215,7 +215,7 @@ class MigrateGraphsTests(GraphMigrationOperationTests):
             with self.assertRaises(CommandError) as refusal:
                 self._migrategraphs(APP_NAME, fake=True)
         message = str(refusal.exception)
-        self.assertIn("still have work to do", message)
+        self.assertIn("still have changes to make", message)
         self.assertIn(
             "0002_data_add: Add node survey_date to tiles in nodegroup spike_group",
             message,
@@ -261,7 +261,9 @@ class MigrateGraphsTests(GraphMigrationOperationTests):
             with self.assertRaises(CommandError) as refusal:
                 self._migrategraphs(APP_NAME)
         message = str(refusal.exception)
-        self.assertIn("matches no point", message)
+        self.assertIn(
+            "no longer matches the graph as it was after any of them", message
+        )
         self.assertNotIn("--force", message)
 
     def test_reversal_leaves_the_graph_as_a_designer_publish_would(self):
@@ -630,10 +632,10 @@ class MigrateGraphsTests(GraphMigrationOperationTests):
             with self.assertRaises(CommandError) as refusal:
                 self._migrategraphs(APP_NAME)
             message = str(refusal.exception)
-            self.assertIn("fits more than one point", message)
-            self.assertIn("If it is before all of them", message)
+            self.assertIn("after more than one of these graph migrations", message)
+            self.assertIn("If it had none of them", message)
             self.assertIn(
-                f"If it is at {APP_NAME}.0002_schema_recreate:\n  python manage.py migrategraphs {APP_NAME} --fake",
+                f"If it had up to {APP_NAME}.0002_schema_recreate:\n  python manage.py migrategraphs {APP_NAME} --fake",
                 message,
             )
             self.assertIn(f"python manage.py migrategraphs {APP_NAME} --force", message)

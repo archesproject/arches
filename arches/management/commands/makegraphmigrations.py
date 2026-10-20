@@ -85,7 +85,7 @@ class Command(BaseCommand):
         )
         if not graphids:
             raise CommandError(
-                f"{app_label} has no graph migrations yet, so nothing says which graphs belong to it. Name them:\n  python manage.py makegraphmigrations {app_label} --graph <graph id or slug>"
+                f"{app_label} has no graph migrations yet, so there is no record of which graphs it owns. To bring a graph under it, run this once per graph, or repeat --graph:\n  python manage.py makegraphmigrations {app_label} --graph <graph id or slug>"
             )
 
         # Replay only this app's leaf, or other apps' graphs join the diff.
@@ -95,7 +95,7 @@ class Command(BaseCommand):
             present = self._lock(graphids)
             for graphid in sorted(graphids - present):
                 self._warn(
-                    f"Graph {graphid} is in {app_label}'s migration history but not in this database. Graph migrations will not delete a graph, because that removes every resource instance on it."
+                    f"Graph {graphid} belongs to {app_label}'s graph migrations but is not in this database. Graph migrations never delete a graph, because that would delete every resource on it, so this graph is left out."
                 )
             self._refuse_unpublished(present, writing)
 
@@ -115,7 +115,7 @@ class Command(BaseCommand):
             if options["check"]:
                 self._describe(operations)
                 raise CommandError(
-                    "This database has graph changes that no graph migration describes. Run makegraphmigrations."
+                    f"This database has graph changes that no graph migration describes yet. To make one, run:\n  python manage.py makegraphmigrations {app_label}"
                 )
 
             if options["dry_run"]:
@@ -160,7 +160,7 @@ class Command(BaseCommand):
             return
         missing_names = "\n  ".join(missing)
         self._refuse_or_warn(
-            f"These graph migrations are recorded as applied on this database, but their files are not in {app_label}:\n  {missing_names}\nA migration made now would fold whatever they changed into a new one. Restore the files, for example by checking out the branch that has them. To drop them instead, restore them and record them as unapplied with `migrategraphs {app_label} <the migration before them> --fake`.",
+            f"This database has applied these graph migrations, but their files are not in {app_label}:\n  {missing_names}\nA migration made now would repeat their changes. Restore the files, for example by checking out the branch that has them, then run this command again. To have the new migration carry their changes instead, restore the files and mark them as unapplied with --fake:\n  python manage.py migrategraphs {app_label} <the migration before them> --fake",
             writing,
         )
 
@@ -177,7 +177,7 @@ class Command(BaseCommand):
         self._refuse_or_warn(
             "This database has not applied these graph migrations:\n  "
             + "\n  ".join(f"{label}.{name}" for label, name in unapplied)
-            + f"\nA migration made now would be built on changes this database does not have. Apply them, then run this command again:\n  python manage.py migrategraphs {app_label}\n  python manage.py makegraphmigrations {app_label}",
+            + f"\nA migration made now would be built on changes this database does not have. To apply them and then make the migration, run:\n  python manage.py migrategraphs {app_label}\n  python manage.py makegraphmigrations {app_label}",
             writing,
         )
 
@@ -200,7 +200,7 @@ class Command(BaseCommand):
             for other_app_label, graphids in graphids_by_app.items():
                 if other_app_label != app_label and graphid in graphids:
                     raise CommandError(
-                        f"Graph {graph.slug} already belongs to {other_app_label}'s graph migrations. Make its migrations there:\n  python manage.py makegraphmigrations {other_app_label}"
+                        f"Graph {graph.slug} already belongs to {other_app_label}'s graph migrations. To make its migrations there, run:\n  python manage.py makegraphmigrations {other_app_label}"
                     )
             requested.add(graphid)
         return requested
@@ -255,11 +255,12 @@ class Command(BaseCommand):
         if not unpublished and not never_published:
             return
         lines = [
-            f"{slug} has changes in the Graph Designer that are not published"
+            f"{slug} has unpublished changes in the Graph Designer"
             for slug in sorted(unpublished)
         ] + [f"{slug} has never been published" for slug in sorted(never_published)]
         self._refuse_or_warn(
-            "These graphs are not published as they are:\n  "
+            "Graph migrations are made from published graphs, but these have changes "
+            "that are not published:\n  "
             + "\n  ".join(lines)
             + "\nPublish them in the Graph Designer, then run this command again.",
             writing,
@@ -315,7 +316,7 @@ class Command(BaseCommand):
             if "datatype" in operation.changes:
                 new_datatype = operation.changes["datatype"]
                 self._warn(
-                    f"Node {name} ({operation.pk}) is changing datatype to '{new_datatype}'. Values already stored for it keep the old shape, and tile JSONB is cast straight to the node's declared datatype when it is read: write a RunGraphPython migration in the same release to convert them."
+                    f"Node {name} ({operation.pk}) is changing datatype to '{new_datatype}'. Values already stored for it keep the old datatype's format but will be read as the new datatype: write a RunGraphPython migration in the same release to convert them."
                 )
 
             if "config" in operation.changes:
@@ -408,7 +409,7 @@ class Command(BaseCommand):
             )
         if len(recorded) < len(written):
             self.stdout.write(
-                f"Bring this database's tiles and resources in line with them:\n  python manage.py migrategraphs {app_label}"
+                f"To bring this database's tiles and resources in line with them, run:\n  python manage.py migrategraphs {app_label}"
             )
 
     def _warn(self, message):
@@ -424,7 +425,7 @@ class Command(BaseCommand):
         if len(leaves) > 1:
             conflicting_names = ", ".join(name for _app_label, name in leaves)
             raise CommandError(
-                f"Conflicting graph migrations in {app_label}: {conflicting_names}. Merge them by hand before generating another."
+                f"More than one graph migration is the latest in {app_label} ({conflicting_names}), usually because two branches each added one. Make one depend on the other, then run this command again."
             )
         return leaves[0] if leaves else None
 

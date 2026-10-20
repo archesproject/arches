@@ -59,7 +59,7 @@ class Command(BaseCommand):
             self.stdout.write(app_label, self.style.MIGRATE_LABEL)
             for node in group:
                 if node in missing_files:
-                    line = f" [X] {node[1]} (recorded here, but its file is missing)"
+                    line = f" [X] {node[1]} (applied here, but its file is missing)"
                 elif node in applied:
                     line = f" [X] {node[1]}"
                 else:

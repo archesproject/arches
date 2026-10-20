@@ -83,7 +83,7 @@ class SetResourcePublication(GraphOperation):
             raise GraphMigrationError(
                 f"Graph {self.graphid} cannot go back to publication "
                 f"{self.previous_publication_id}: this database never had it, "
-                "because the migration that created it was recorded with --fake here."
+                "because the migration that created it was marked as applied with --fake here."
             )
         return self._move(
             self._pending(alias, self.previous_publication_id),

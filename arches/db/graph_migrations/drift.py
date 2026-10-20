@@ -122,7 +122,7 @@ def reverse_problems(plan, using):
                 found.append(
                     Problem(
                         "unrestored",
-                        f"{label}: {operation.describe()}. Its remaining tiles hang off "
+                        f"{label}: {operation.describe()}. Its remaining tiles have parents in "
                         "the new parent nodegroup, so they will not fit once it moves back",
                     )
                 )
