@@ -7,6 +7,7 @@ import { Subscript } from '@tiptap/extension-subscript';
 import { Superscript } from '@tiptap/extension-superscript';
 import { TableKit } from '@tiptap/extension-table';
 import 'bootstrap';
+import dispose from 'utils/dispose';
 import richTextEditorTemplate from 'templates/views/components/rich-text-editor.htm';
 import 'bindings/tiptap';
 
@@ -120,7 +121,7 @@ export default ko.components.register('views/components/rich-text-editor', {
         // keep the value and the editor in sync
         editor.on('update', () => params.value(getValue()));
         // a change from outside replaces the content without an update event, or an undo step
-        const subscriptions = [params.value.subscribe((value) => {
+        this.disposables = [params.value.subscribe((value) => {
             if ((value || '') !== getValue()) {
                 editor.chain()
                     .command(({ tr }) => tr.setMeta('addToHistory', false))
@@ -129,7 +130,7 @@ export default ko.components.register('views/components/rich-text-editor', {
             }
         })];
         if (ko.isObservable(params.disabled)) {
-            subscriptions.push(params.disabled.subscribe(disabled => editor.setEditable(!disabled, false)));
+            this.disposables.push(params.disabled.subscribe(disabled => editor.setEditable(!disabled, false)));
         }
 
         // get isDisabled and isActive for each item name
@@ -225,14 +226,14 @@ export default ko.components.register('views/components/rich-text-editor', {
             this.isSourceMode(!this.isSourceMode());
         };
 
-        subscriptions.push(this.source.subscribe((html) => {
+        this.source.subscribe((html) => {
             if (this.isSourceMode()) {
                 editor.chain()
                     .command(({ tr }) => tr.setMeta('addToHistory', false))
                     .setContent(html)
                     .run();
             }
-        }));
+        });
 
         // maximise the editor to fill the browser window
         this.isMax = ko.observable(false);
@@ -270,7 +271,7 @@ export default ko.components.register('views/components/rich-text-editor', {
         };
 
         this.dispose = () => {
-            subscriptions.forEach(subscription => subscription.dispose());
+            dispose(this);
             editor.destroy();
         };
     },
