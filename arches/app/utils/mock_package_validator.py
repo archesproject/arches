@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+from arches.app.utils.decorators import deprecated
 from arches.management.commands import utils
 
 
@@ -42,6 +43,7 @@ validation_errors = Validation_Errors()
 # 	error_type_list.append(text)
 
 
+@deprecated
 def validate_resource(resource):
     pass
     # Use this function to call specific validation functions.

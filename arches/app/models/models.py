@@ -22,6 +22,7 @@ from django.utils import translation
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
+from arches.app.utils.deprecation import deprecated
 from arches.app.const import ExtensionType
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
 from arches.app.models.fields.database_managed_fields import (
@@ -2159,11 +2160,13 @@ class FileValue(SaveSupportsBlindOverwriteMixin, models.Model):
         managed = False
         db_table = "values"
 
+    @deprecated
     def geturl(self):
         if self.value is not None:
             return self.value.url
         return ""
 
+    @deprecated
     def getname(self):
         if self.value is not None:
             return self.value.name

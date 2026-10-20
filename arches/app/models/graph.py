@@ -26,6 +26,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connection
 from django.db.models import Q, FETCH_RAISE, prefetch_related_objects
 from django.db.utils import IntegrityError
+from arches.app.utils.decorators import deprecated
 from arches.app.const import IntegrityCheck
 from arches.app.models import models
 from arches.app.models.card import Card
@@ -1406,6 +1407,7 @@ class Graph(models.GraphModel):
                 ret.append(edge)
         return ret
 
+    @deprecated
     def is_node_in_child_group(self, node):
         """
         test to see if the node is in a group that is a child to another group
@@ -1428,6 +1430,7 @@ class Graph(models.GraphModel):
 
         return hasParentGroup
 
+    @deprecated
     def get_parent_nodes_and_edges(self, node):
         """
         given a node, get all the parent nodes and edges
@@ -1452,6 +1455,7 @@ class Graph(models.GraphModel):
 
         return {"nodes": nodes, "edges": edges}
 
+    @deprecated
     def is_group_semantic(self, node):
         """
         test to see if all the nodes in a group are semantic
@@ -1469,6 +1473,7 @@ class Graph(models.GraphModel):
 
         return True
 
+    @deprecated
     def get_grouped_nodes(self, node):
         """
         given a node, get any other nodes that share the same group
@@ -1934,6 +1939,7 @@ class Graph(models.GraphModel):
         found.grouping_node_id = found.nodegroupid
         return found
 
+    @deprecated
     def get_root_nodegroup(self):
         """
         gets the top level nodegroup (the first nodegroup that doesn't have a parentnodegroup)
@@ -1944,6 +1950,7 @@ class Graph(models.GraphModel):
             if nodegroup.parentnodegroup is None:
                 return nodegroup
 
+    @deprecated
     def get_root_card(self):
         """
         gets the top level card/card container

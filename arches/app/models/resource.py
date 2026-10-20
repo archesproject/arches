@@ -29,6 +29,7 @@ from django.forms.models import model_to_dict
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.utils.translation import gettext as _
 from django.utils.translation import get_language
+from arches.app.utils.decorators import deprecated
 from arches.app.models import models
 from arches.app.models.models import EditLog
 from arches.app.models.models import TileModel
@@ -93,9 +94,11 @@ class Resource(models.ResourceInstance):
                 self.serialized_graph = None
         return self.serialized_graph
 
+    @deprecated
     def set_serialized_graph(self, serialized_graph):
         self.serialized_graph = serialized_graph
 
+    @deprecated
     def get_node_datatypes(self):
         if not self.node_datatypes:
             self.node_datatypes = {
@@ -1139,6 +1142,7 @@ class Resource(models.ResourceInstance):
             )
 
     @staticmethod
+    @deprecated
     def to_json__bulk(resources, compact=True, hide_empty_nodes=False, version=None):
         """
         Returns list of resources represented as disambiguated JSON graphs
@@ -1158,6 +1162,7 @@ class Resource(models.ResourceInstance):
                 resources=resources, compact=compact, hide_empty_nodes=hide_empty_nodes
             )
 
+    @deprecated
     def get_node_values(self, node_name):
         """
         Take a node_name (string) as an argument and return a list of values.
@@ -1200,6 +1205,7 @@ class Resource(models.ResourceInstance):
                 remove_perm(perm, identity, self)
         self.index()
 
+    @deprecated
     def add_permission_to_all(self, permission):
         groups = list(Group.objects.all())
         users = [user for user in User.objects.all() if user.is_superuser is False]
@@ -1241,6 +1247,7 @@ class Resource(models.ResourceInstance):
         return self.resource_instance_lifecycle_state
 
 
+@deprecated
 def parse_node_value(value):
     if is_uuid(value):
         try:
@@ -1250,6 +1257,7 @@ def parse_node_value(value):
     return value
 
 
+@deprecated
 def is_uuid(value_to_test):
     try:
         UUID(value_to_test)

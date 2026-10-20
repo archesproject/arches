@@ -12,6 +12,7 @@ from django.db.models import F, Q
 from django.http import HttpRequest
 from django.utils import timezone
 from django.utils.translation import gettext as _
+from arches.app.utils.decorators import deprecated
 from arches.app.models import models
 from arches.app.utils import import_class_from_string
 from arches.app.utils.message_contexts import return_message_context
@@ -638,6 +639,7 @@ def bulk_data_deletion(userid, load_id, graph_id, nodegroup_id, resourceids):
 
 
 @shared_task
+@deprecated
 def run_task(module_name=None, class_name=None, method_to_run=None, **kwargs):
     """
     this allows the user to run any method as a celery task
@@ -651,6 +653,7 @@ def run_task(module_name=None, class_name=None, method_to_run=None, **kwargs):
 
 
 @shared_task
+@deprecated
 def run_etl_task(**kwargs):
     """
     this allows the user to run the custom etl module

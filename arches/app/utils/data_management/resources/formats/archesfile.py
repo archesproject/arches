@@ -26,6 +26,7 @@ from io import StringIO
 from time import time
 from copy import deepcopy
 from os.path import isfile, join
+from arches.app.utils.decorators import deprecated
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import (
     import_graph as resourceGraphImporter,
@@ -112,6 +113,7 @@ class ArchesFileWriter(Writer):
 
 
 class ArchesFileReader(Reader):
+    @deprecated
     def pre_import(self, tile, graph_id):
         for function in self.get_function_class_instances(tile, graph_id):
             try:
@@ -120,6 +122,7 @@ class ArchesFileReader(Reader):
                 pass
         return tile
 
+    @deprecated
     def get_function_class_instances(self, tile, graph_id):
         ret = []
         functionXgraphs = FunctionXGraph.objects.filter(
@@ -133,6 +136,7 @@ class ArchesFileReader(Reader):
             ret.append(func)
         return ret
 
+    @deprecated
     def validate_business_data(self, business_data):
         errors = []
         if type(business_data) == dict and business_data["resources"]:
@@ -591,6 +595,7 @@ class ArchesFileReader(Reader):
         this_resource.index()
         return this_resource
 
+    @deprecated
     def import_all(self):
         errors = []
         conceptImporter(self.reference_data)
