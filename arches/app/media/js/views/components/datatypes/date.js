@@ -1,5 +1,7 @@
 import ko from 'knockout';
 import dateDatatypeTemplate from 'templates/views/components/datatypes/date.htm';
+import 'bindings/datepicker';
+import 'bindings/select2-query';
 
 
 var name = 'date-datatype-config';

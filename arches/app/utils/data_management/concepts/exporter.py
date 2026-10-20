@@ -18,10 +18,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import uuid
+from arches.app.utils.decorators import deprecated
 from arches.app.models.concept import Concept, ConceptValue
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 
+@deprecated
 def get_reference_data_for_export(conceptids=None):
     reference_data_dict = {}
     reference_data = []

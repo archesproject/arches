@@ -19,8 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import os
 from tempfile import NamedTemporaryFile
 
-from django.utils.translation import gettext as _
-
 
 class ThumbnailGenerator(object):
 
@@ -73,18 +71,3 @@ class ThumbnailGenerator(object):
                 binary_data = thumbnail.read()
 
         return binary_data
-
-
-class ThumbnailGenerationError(Exception):
-    def __init__(
-        self,
-        message=_("Unable to generate a thumbnail from the supplied file."),
-        code=None,
-    ):
-        self.title = _("Thumbnail Generation Error")
-        self.message = message
-        self.code = code
-        super().__init__(self.message)
-
-    def __str__(self):
-        return repr(self.message)

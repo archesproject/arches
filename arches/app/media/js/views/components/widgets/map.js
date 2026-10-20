@@ -10,9 +10,10 @@ import 'bindings/chosen';
 import 'bindings/codemirror';
 import 'select-woo';
 import 'bindings/fadeVisible';
-import 'bindings/mapbox-gl';
+import 'bindings/maplibre-gl';
 import 'bindings/color-picker';
 import 'bindings/key-events-click';
+import 'bindings/select2-query';
 
 
 var viewModel = function(params) {

@@ -82,13 +82,9 @@ class BaseBulkEditor:
 
     def get_graphs(self, request):
         graph_name_i18n = "name__" + settings.LANGUAGE_CODE
-        graphs = (
-            GraphModel.objects.all()
-            .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-            .exclude(isresource=False)
-            .exclude(source_identifier__isnull=False)
-            .order_by(graph_name_i18n)
-        )
+        graphs = GraphModel.objects.get_resource_models(
+            exclude_inactive=False
+        ).order_by(graph_name_i18n)
         return {"success": True, "data": graphs}
 
     def get_nodes(self, request):
@@ -430,7 +426,7 @@ class BulkStringEditor(BaseBulkEditor):
                     },
                 }
         if resourceids:
-            resourceids = tuple(resourceids)
+            resourceids = list(resourceids)
 
         pattern = old_text
         if operation == "replace":
@@ -570,7 +566,7 @@ class BulkStringEditor(BaseBulkEditor):
                     search_url, self.request.user
                 )
             if resourceids:
-                resourceids = tuple(resourceids)
+                resourceids = list(resourceids)
             response = self.run_load_task(
                 self.userid,
                 self.loadid,

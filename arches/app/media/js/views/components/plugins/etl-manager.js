@@ -4,7 +4,7 @@ import Cookies from 'js-cookie';
 import arches from 'arches';
 import AlertViewModel from 'viewmodels/alert';
 import ETLManagerTemplate from 'templates/views/components/plugins/etl-manager.htm';
-import { loadComponentDependencies } from 'utils/load-component-dependencies';
+import { registerComponentPaths } from 'utils/load-component-dependencies';
 
 
 export default ko.components.register('etl-manager', {
@@ -134,7 +134,15 @@ export default ko.components.register('etl-manager', {
                     },
                 }).then(function(response) {
                     return response.json();
-                }).then(function() {
+                }).then(function(result) {
+                    if (result.success === false) {
+                        const error = result.data || {};
+                        self.alert(new AlertViewModel(
+                            'ep-alert-red',
+                            error.title || arches.translations.requestFailed.title,
+                            error.message || arches.translations.requestFailed.text
+                        ));
+                    }
                     self.fetchLoadEvent();
                     event.loading(false);
                 });
@@ -229,10 +237,8 @@ export default ko.components.register('etl-manager', {
                     return response.json();
                 }
             }).then(function(data){
-                self.etlModules = data.map(function(etl){
-                    loadComponentDependencies([`${etl.component}`]);
-                    return etl;
-                });
+                registerComponentPaths(data, 'componentname', 'component');
+                self.etlModules = data;
                 self.loading(false);
             });
             this.activeTab("start");

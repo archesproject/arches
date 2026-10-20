@@ -64,14 +64,12 @@ def map_info(request):
             "map_filter_auto_zoom": (
                 "true" if settings.MAP_FILTER_AUTO_ZOOM_ENABLED else "false"
             ),
-            "mapbox_api_key": settings.MAPBOX_API_KEY,
             "hex_bin_size": (
                 settings.HEX_BIN_SIZE if settings.HEX_BIN_SIZE is not None else 100
             ),
-            "mapbox_sprites": settings.MAPBOX_SPRITES,
-            "mapbox_glyphs": settings.MAPBOX_GLYPHS,
+            "maplibre_sprites": settings.MAPLIBRE_SPRITES,
+            "maplibre_glyphs": settings.MAPLIBRE_GLYPHS,
             "hex_bin_bounds": json.dumps(hex_bin_bounds),
-            "geocoder_default": settings.DEFAULT_GEOCODER,
             "preferred_coordinate_systems": JSONSerializer().serialize(
                 settings.PREFERRED_COORDINATE_SYSTEMS
             ),
@@ -87,6 +85,7 @@ def app_settings(request=None):
             "APP_VERSION": settings.APP_VERSION,
             "APP_NAME": settings.APP_NAME,
             "SEARCH_THUMBNAILS": settings.SEARCH_THUMBNAILS,
+            "ELASTICSEARCH_ENABLED": settings.ELASTICSEARCH_ENABLED,
             "GOOGLE_ANALYTICS_TRACKING_ID": settings.GOOGLE_ANALYTICS_TRACKING_ID,
             "USE_SEMANTIC_RESOURCE_RELATIONSHIPS": settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS,
             "SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD": settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD,

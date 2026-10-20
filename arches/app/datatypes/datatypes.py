@@ -31,7 +31,6 @@ from arches.app.const import ExtensionType
 from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.core.util import get_value_from_jsonld
 from arches.app.models import models
-from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.models.fields.i18n import I18n_JSONField, I18n_String
 from arches.app.models.system_settings import settings
 from arches.app.search.elasticsearch_dsl_builder import (
@@ -56,6 +55,9 @@ from arches.app.utils.file_validator import FileValidator
 from arches.app.utils.i18n import get_localized_value
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.permission_backend import user_is_resource_reviewer
+from arches.app.utils.resource_relationship_utils import (
+    get_resource_relationship_type_label,
+)
 from arches.app.utils.string_utils import str_to_bool, deserialize_json_like_string
 
 # do not delete, used by module importer
@@ -1351,7 +1353,9 @@ class FileListDataType(BaseDataType):
             # this does not get called when saving data from the mobile app
             previously_saved_tile = models.TileModel.objects.filter(pk=tile.tileid)
             user = request.user
-            user_is_reviewer = user_is_resource_reviewer(request.user)
+            user_is_reviewer = user_is_resource_reviewer(
+                request.user, resource=tile.resourceinstance
+            )
             current_tile_data = self.get_tile_data(tile)
             if previously_saved_tile.count() == 1:
                 previously_saved_tile_data = self.get_tile_data(
@@ -2198,11 +2202,41 @@ class ResourceInstanceDataType(BaseDataType):
     tile data comes from the client looking like this:
     {
         "resourceId": "",
-        "ontologyProperty": "",
-        "inverseOntologyProperty": ""
+        "relationship": "",
+        "inverseRelationship": ""
     }
 
     """
+
+    RELATIONSHIP_SOURCES = ("ontology", "concept", "reference")
+
+    def rename_legacy_relationship_keys(self, value):
+        legacy_relationship_keys = {
+            "ontologyProperty": "relationship",
+            "inverseOntologyProperty": "inverseRelationship",
+        }
+        items = value if isinstance(value, list) else [value]
+        for item in items:
+            if isinstance(item, dict):
+                for legacy_key, key in legacy_relationship_keys.items():
+                    if legacy_key in item:
+                        legacy_value = item.pop(legacy_key)
+                        item.setdefault(key, legacy_value)
+        return value
+
+    def validate_node(self, node):
+        from arches.app.models.graph import GraphValidationError
+
+        try:
+            for graph in node.config.get("graphs") or []:
+                if graph["relationshipSource"] not in self.RELATIONSHIP_SOURCES:
+                    raise ValueError
+        except (AttributeError, KeyError, TypeError, ValueError):
+            raise GraphValidationError(
+                _(
+                    "A resource instance node's relationshipSource must be one of: {sources}"
+                ).format(sources=", ".join(self.RELATIONSHIP_SOURCES))
+            )
 
     def validate(
         self,
@@ -2317,12 +2351,18 @@ class ResourceInstanceDataType(BaseDataType):
             return ", ".join(items)
         return ""
 
-    def get_relationship_display_value(self, relationship_valueid):
-        preflabel = get_preflabel_from_valueid(relationship_valueid, get_language())
-        if preflabel:
-            return preflabel["value"]
-        else:
-            return None
+    def get_relationship_labels(self, nodevalue):
+        return get_resource_relationship_type_label(
+            {
+                relationship
+                for related_resource in nodevalue
+                for relationship in (
+                    related_resource.get("relationship"),
+                    related_resource.get("inverseRelationship"),
+                )
+                if relationship
+            }
+        )
 
     def to_json(self, tile, node):
         data = self.get_tile_data(tile)
@@ -2341,8 +2381,8 @@ class ResourceInstanceDataType(BaseDataType):
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         nodevalue = self.get_nodevalues(nodevalue)
+        relationship_labels = self.get_relationship_labels(nodevalue)
         for relatedResourceItem in nodevalue:
-            relationship = None
             document["ids"].append(
                 {
                     "id": relatedResourceItem["resourceId"],
@@ -2358,22 +2398,16 @@ class ResourceInstanceDataType(BaseDataType):
                         "provisional": provisional,
                     }
                 )
-            for ontology_property_item in [
-                relatedResourceItem.get("ontologyProperty", ""),
-                relatedResourceItem.get("inverseOntologyProperty", ""),
+            for relationship_item in [
+                relatedResourceItem.get("relationship", ""),
+                relatedResourceItem.get("inverseRelationship", ""),
             ]:
-                if ontology_property_item != "":
-                    try:
-                        uuid.UUID(ontology_property_item)
-                        relationship = (
-                            self.get_relationship_display_value(ontology_property_item)
-                            or ontology_property_item
-                        )
-                    except ValueError:
-                        relationship = ontology_property_item
+                if relationship_item:
                     document["strings"].append(
                         {
-                            "string": relationship,
+                            "string": relationship_labels.get(
+                                relationship_item, relationship_item
+                            ),
                             "nodegroup_id": tile.nodegroup_id,
                             "provisional": provisional,
                         }
@@ -2382,41 +2416,42 @@ class ResourceInstanceDataType(BaseDataType):
     def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
         nodevalue = self.get_nodevalues(nodevalue)
+        relationship_labels = self.get_relationship_labels(nodevalue)
         for relatedResourceItem in nodevalue:
             if relatedResourceItem.get("resourceName", "") != "":
                 terms.append(
                     SearchTerm(value=relatedResourceItem["resourceName"], lang="")
                 )
-            for ontology_property_item in [
-                relatedResourceItem.get("ontologyProperty", ""),
-                relatedResourceItem.get("inverseOntologyProperty", ""),
+            for relationship_item in [
+                relatedResourceItem.get("relationship", ""),
+                relatedResourceItem.get("inverseRelationship", ""),
             ]:
-                if ontology_property_item != "":
-                    try:
-                        uuid.UUID(ontology_property_item)
-                        relationship = (
-                            self.get_relationship_display_value(ontology_property_item)
-                            or ontology_property_item
+                if relationship_item:
+                    terms.append(
+                        SearchTerm(
+                            value=relationship_labels.get(
+                                relationship_item, relationship_item
+                            ),
+                            lang="",
                         )
-                        terms.append(SearchTerm(value=relationship, lang=""))
-                    except ValueError:
-                        terms.append(SearchTerm(value=ontology_property_item, lang=""))
+                    )
 
         return terms
 
     def transform_value_for_tile(self, value, **kwargs):
         try:
-            return json.loads(value)
+            value = json.loads(value)
         except ValueError:
             # do this if json (invalid) is formatted with single quotes, re #6390
             try:
-                return ast.literal_eval(value)
+                value = ast.literal_eval(value)
             except:
-                return value
+                pass
         except TypeError:
             # data should come in as json but python list is accepted as well
-            if isinstance(value, list):
-                return value
+            if not isinstance(value, list):
+                return None
+        return self.rename_legacy_relationship_keys(value)
 
     def transform_export_values(self, value, *args, **kwargs):
         return json.dumps(value)
@@ -2511,8 +2546,8 @@ class ResourceInstanceDataType(BaseDataType):
             return [
                 {
                     "resourceId": m.groupdict()["r"],
-                    "ontologyProperty": "",
-                    "inverseOntologyProperty": "",
+                    "relationship": "",
+                    "inverseRelationship": "",
                     "resourceXresourceId": "",
                 }
             ]
@@ -2536,11 +2571,11 @@ class ResourceInstanceDataType(BaseDataType):
                     "type": "text",
                     "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}},
                 },
-                "ontologyProperty": {
+                "relationship": {
                     "type": "text",
                     "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}},
                 },
-                "inverseOntologyProperty": {
+                "inverseRelationship": {
                     "type": "text",
                     "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}},
                 },

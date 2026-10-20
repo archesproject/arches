@@ -26,12 +26,13 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connection
 from django.db.models import Q, FETCH_RAISE, prefetch_related_objects
 from django.db.utils import IntegrityError
+from arches.app.utils.decorators import deprecated
 from arches.app.const import IntegrityCheck
 from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.querysets.graph import GraphQuerySet
 from arches.app.models.system_settings import settings
-from arches.app.models.utils import make_name_unique
+from arches.app.models.utils import get_slugified_alias_renames, make_name_unique
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.bulk_data_deletion import BulkDataDeletion
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -40,6 +41,8 @@ from arches.app.utils.i18n import LanguageSynchronizer
 from django.utils.translation import gettext as _
 from pyld.jsonld import compact, JsonLdError
 from django.utils import translation
+from django.contrib.auth.models import Group, Permission, User
+from django.contrib.contenttypes.models import ContentType
 from guardian.models import GroupObjectPermission, UserObjectPermission
 
 from arches.app.models.fields.i18n import I18n_JSON
@@ -430,12 +433,15 @@ class Graph(models.GraphModel):
         self.resource_instance_lifecycle = resource_instance_lifecycle_query.first()
 
         if not self.resource_instance_lifecycle:
-            self.resource_instance_lifecycle = models.ResourceInstanceLifecycle(
-                id=resource_instance_lifecycle["id"],
-                name=resource_instance_lifecycle["name"],
+            self.resource_instance_lifecycle = (
+                models.ResourceInstanceLifecycle.objects.create(
+                    id=resource_instance_lifecycle["id"],
+                    name=resource_instance_lifecycle["name"],
+                )
             )
 
             resource_instance_lifecycle_states = []
+            pending_next_and_previous_states = []
             for resource_instance_lifecycle_state_json in resource_instance_lifecycle[
                 "resource_instance_lifecycle_states"
             ]:
@@ -456,20 +462,35 @@ class Graph(models.GraphModel):
                     )
                 )
 
+                resource_instance_lifecycle_states.append(
+                    resource_instance_lifecycle_state
+                )
+                pending_next_and_previous_states.append(
+                    (
+                        resource_instance_lifecycle_state,
+                        next_resource_instance_lifecycle_states,
+                        previous_resource_instance_lifecycle_states,
+                    )
+                )
+
+            # states must be saved before their next/previous M2M relations can
+            # be set, since those relations are inserted directly into the
+            # through table without a pre-check that the referenced rows exist
+            self.resource_instance_lifecycle.resource_instance_lifecycle_states.set(
+                resource_instance_lifecycle_states, bulk=False
+            )
+
+            for (
+                resource_instance_lifecycle_state,
+                next_resource_instance_lifecycle_states,
+                previous_resource_instance_lifecycle_states,
+            ) in pending_next_and_previous_states:
                 resource_instance_lifecycle_state.next_resource_instance_lifecycle_states.set(
                     next_resource_instance_lifecycle_states
                 )
                 resource_instance_lifecycle_state.previous_resource_instance_lifecycle_states.set(
                     previous_resource_instance_lifecycle_states
                 )
-
-                resource_instance_lifecycle_states.append(
-                    resource_instance_lifecycle_state
-                )
-
-            self.resource_instance_lifecycle.resource_instance_lifecycle_states.set(
-                resource_instance_lifecycle_states, bulk=False
-            )
 
         self.has_unpublished_changes = True
 
@@ -617,19 +638,20 @@ class Graph(models.GraphModel):
                     )
 
             # edge case for instantiating a serialized_graph that has a resource_instance_lifecycle not already in the system
-            if self.resource_instance_lifecycle and not len(
-                models.ResourceInstanceLifecycle.objects.filter(
+            if (
+                self.resource_instance_lifecycle
+                and not models.ResourceInstanceLifecycle.objects.filter(
                     pk=self.resource_instance_lifecycle.pk
-                )
+                ).exists()
             ):
+                self.resource_instance_lifecycle.save()
+
                 for (
                     resource_instance_lifecycle_state
                 ) in (
                     self.resource_instance_lifecycle.resource_instance_lifecycle_states.all()
                 ):
                     resource_instance_lifecycle_state.save()
-
-                self.resource_instance_lifecycle.save()
 
             for nodegroup in self._nodegroups_to_delete:
                 nodegroup.delete()
@@ -1385,6 +1407,7 @@ class Graph(models.GraphModel):
                 ret.append(edge)
         return ret
 
+    @deprecated
     def is_node_in_child_group(self, node):
         """
         test to see if the node is in a group that is a child to another group
@@ -1407,6 +1430,7 @@ class Graph(models.GraphModel):
 
         return hasParentGroup
 
+    @deprecated
     def get_parent_nodes_and_edges(self, node):
         """
         given a node, get all the parent nodes and edges
@@ -1431,6 +1455,7 @@ class Graph(models.GraphModel):
 
         return {"nodes": nodes, "edges": edges}
 
+    @deprecated
     def is_group_semantic(self, node):
         """
         test to see if all the nodes in a group are semantic
@@ -1448,6 +1473,7 @@ class Graph(models.GraphModel):
 
         return True
 
+    @deprecated
     def get_grouped_nodes(self, node):
         """
         given a node, get any other nodes that share the same group
@@ -1651,111 +1677,150 @@ class Graph(models.GraphModel):
 
     def update_permissions_from_serialized_graph(self, serialized_graph):
         if (
-            "user_permissions" in serialized_graph
-            or "group_permissions" in serialized_graph
+            "user_permissions" not in serialized_graph
+            and "group_permissions" not in serialized_graph
         ):
-            graph_from_database = Graph.objects.filter(pk=self.pk).first()
+            return
 
-            if graph_from_database:
-                # update user permissions
-                if "user_permissions" in serialized_graph:
-                    # first, delete all existing user permissions for graph
-                    user_permissions = graph_from_database.get_user_permissions(
+        graph_from_database = Graph.objects.filter(pk=self.pk).first()
+        if not graph_from_database:
+            return
+
+        for key, permission_model, identity_field, identity_model in (
+            ("user_permissions", UserObjectPermission, "user_id", User),
+            ("group_permissions", GroupObjectPermission, "group_id", Group),
+        ):
+            if key not in serialized_graph:
+                continue
+
+            if key == "user_permissions":
+                existing_permissions = graph_from_database.get_user_permissions(
+                    force_recalculation=True
+                )
+            else:
+                existing_permissions = graph_from_database.get_group_permissions(
+                    force_recalculation=True
+                )
+
+            # first, delete all existing permissions for graph
+            permission_ids_to_delete = [
+                permission.pk
+                for permission_list in existing_permissions.values()
+                for permission in permission_list
+            ]
+            if permission_ids_to_delete:
+                permission_model.objects.filter(
+                    pk__in=permission_ids_to_delete
+                ).delete()
+
+            # then, create permissions from serialized permissions
+            serialized_permissions = [
+                permission
+                for permission_list in serialized_graph[key].values()
+                for permission in permission_list
+            ]
+            permissions_to_create = self._build_object_permissions(
+                serialized_permissions,
+                permission_model,
+                identity_field,
+                identity_model,
+            )
+            permission_model.objects.bulk_create(permissions_to_create)
+
+        transaction.on_commit(lambda: caches["user_permission"].clear())
+
+    @staticmethod
+    def _build_object_permissions(
+        serialized_permissions, permission_model, identity_field, identity_model
+    ):
+        """
+        Builds unsaved guardian object permissions, skipping any whose
+        nodegroup, permission, or user/group does not exist locally.
+        """
+        if not serialized_permissions:
+            return []
+
+        nodegroup_content_type = ContentType.objects.get_for_model(models.NodeGroup)
+        nodegroups = {
+            str(nodegroup.pk): nodegroup
+            for nodegroup in models.NodeGroup.objects.filter(
+                pk__in={perm["object_pk"] for perm in serialized_permissions}
+            )
+        }
+        permission_ids = set(
+            Permission.objects.filter(
+                pk__in={perm["permission_id"] for perm in serialized_permissions},
+                content_type=nodegroup_content_type,
+            ).values_list("pk", flat=True)
+        )
+        identity_ids = set(
+            identity_model.objects.filter(
+                pk__in={perm[identity_field] for perm in serialized_permissions}
+            ).values_list("pk", flat=True)
+        )
+
+        permissions_to_create = []
+        for serialized_permission in serialized_permissions:
+            nodegroup = nodegroups.get(str(serialized_permission["object_pk"]))
+            if (
+                nodegroup is None
+                or serialized_permission["permission_id"] not in permission_ids
+                or serialized_permission[identity_field] not in identity_ids
+            ):
+                logger.warning(
+                    "Skipping nodegroup permission %s: referenced nodegroup, "
+                    "permission, or %s does not exist.",
+                    serialized_permission,
+                    identity_field.removesuffix("_id"),
+                )
+                continue
+
+            permissions_to_create.append(
+                permission_model(
+                    content_object=nodegroup,
+                    permission_id=serialized_permission["permission_id"],
+                    **{identity_field: serialized_permission[identity_field]},
+                )
+            )
+        return permissions_to_create
+
+    def get_serialized_permissions(self):
+        """
+        Live (database) nodegroup permissions, in the same shape `serialize` emits.
+        """
+        return JSONDeserializer().deserialize(
+            JSONSerializer().serialize(
+                {
+                    "user_permissions": self.get_user_permissions(
                         force_recalculation=True
-                    )
-
-                    user_permission_ids_to_delete = []
-                    for user_permission_list in user_permissions.values():
-                        for user_permission in user_permission_list:
-                            user_permission_ids_to_delete.append(user_permission.pk)
-
-                    if user_permission_ids_to_delete:
-                        UserObjectPermission.objects.filter(
-                            pk__in=user_permission_ids_to_delete
-                        ).delete()
-
-                    # then, create permissions from serialized permissions
-                    user_permissions = []
-                    for user_permission_list in serialized_graph[
-                        "user_permissions"
-                    ].values():
-                        user_permissions.extend(user_permission_list)
-
-                    user_permission_nodegroups = models.NodeGroup.objects.filter(
-                        pk__in={
-                            user_permission["object_pk"]
-                            for user_permission in user_permissions
-                        }
-                    )
-                    user_permission_nodegroup_id_to_nodegroup = {
-                        str(nodegroup.pk): nodegroup
-                        for nodegroup in user_permission_nodegroups
-                    }
-
-                    user_permissions_to_create = []
-                    for user_permission in user_permissions:
-                        user_permission["content_object"] = (
-                            user_permission_nodegroup_id_to_nodegroup[
-                                user_permission["object_pk"]
-                            ]
-                        )
-                        user_permissions_to_create.append(
-                            UserObjectPermission(**user_permission)
-                        )
-
-                    UserObjectPermission.objects.bulk_create(user_permissions_to_create)
-
-                # update group permissions
-                if "group_permissions" in serialized_graph:
-                    # first, delete all existing group permissions for graph
-                    group_permissions = graph_from_database.get_group_permissions(
+                    ),
+                    "group_permissions": self.get_group_permissions(
                         force_recalculation=True
-                    )
+                    ),
+                }
+            )
+        )
 
-                    group_permission_ids_to_delete = []
-                    for group_permission_list in group_permissions.values():
-                        for group_permission in group_permission_list:
-                            group_permission_ids_to_delete.append(group_permission.pk)
+    def sync_published_graph_permissions(self):
+        """
+        Writes live nodegroup permissions into this graph's published snapshots,
+        leaving every other snapshot key untouched.
+        """
+        if not self.publication_id or self.source_identifier_id:
+            return
 
-                    if group_permission_ids_to_delete:
-                        GroupObjectPermission.objects.filter(
-                            pk__in=group_permission_ids_to_delete
-                        ).delete()
+        permissions = self.get_serialized_permissions()
+        for published_graph in models.PublishedGraph.objects.filter(
+            publication_id=self.publication_id
+        ):
+            published_graph.serialized_graph = {
+                **(published_graph.serialized_graph or {}),
+                **permissions,
+            }
+            published_graph.save(update_fields=["serialized_graph"])
 
-                    # then, create permissions from serialized permissions
-                    group_permissions = []
-                    for group_permission_list in serialized_graph[
-                        "group_permissions"
-                    ].values():
-                        group_permissions.extend(group_permission_list)
-
-                    group_permission_nodegroups = models.NodeGroup.objects.filter(
-                        pk__in={
-                            group_permission["object_pk"]
-                            for group_permission in group_permissions
-                        }
-                    )
-                    group_permission_nodegroup_id_to_nodegroup = {
-                        str(nodegroup.pk): nodegroup
-                        for nodegroup in group_permission_nodegroups
-                    }
-
-                    group_permissions_to_create = []
-                    for group_permission in group_permissions:
-                        group_permission["content_object"] = (
-                            group_permission_nodegroup_id_to_nodegroup[
-                                group_permission["object_pk"]
-                            ]
-                        )
-                        group_permissions_to_create.append(
-                            GroupObjectPermission(**group_permission)
-                        )
-
-                    GroupObjectPermission.objects.bulk_create(
-                        group_permissions_to_create
-                    )
-
-                transaction.on_commit(lambda: caches["user_permission"].clear())
+        if hasattr(self.publication, "_published_graph_cache"):
+            del self.publication._published_graph_cache
 
     def get_user_permissions(self, force_recalculation=False):
         """
@@ -1874,6 +1939,7 @@ class Graph(models.GraphModel):
         found.grouping_node_id = found.nodegroupid
         return found
 
+    @deprecated
     def get_root_nodegroup(self):
         """
         gets the top level nodegroup (the first nodegroup that doesn't have a parentnodegroup)
@@ -1884,6 +1950,7 @@ class Graph(models.GraphModel):
             if nodegroup.parentnodegroup is None:
                 return nodegroup
 
+    @deprecated
     def get_root_card(self):
         """
         gets the top level card/card container
@@ -2170,6 +2237,17 @@ class Graph(models.GraphModel):
                 node.alias = make_name_unique(row[0], aliases, "_n")
                 node.hascustomalias = False
         return node.alias
+
+    def slugify_node_aliases(self):
+        """
+        Renames any node alias that is not a valid slug, e.g. one serialized
+        before hyphens were replaced by __arches_slugify.
+        """
+        aliases_by_nodeid = {
+            nodeid: node.alias for nodeid, node in self.nodes.items() if node.alias
+        }
+        for nodeid, new_alias in get_slugified_alias_renames(aliases_by_nodeid).items():
+            self.nodes[nodeid].alias = new_alias
 
     def validate(self):
         """
@@ -2656,17 +2734,15 @@ class Graph(models.GraphModel):
         )
         serialized_draft_graph["source_identifier_id"] = None
 
-        # update permissions
-        serialized_draft_graph["group_permissions"] = {
-            key: value
-            for key, value in serialized_source_graph["group_permissions"].items()
-            if key in node_id_to_node_source_identifier_id.values()
-        }
-        serialized_draft_graph["user_permissions"] = {
-            key: value
-            for key, value in serialized_source_graph["user_permissions"].items()
-            if key in node_id_to_node_source_identifier_id.values()
-        }
+        # update permissions from the database; the published snapshot may be stale
+        live_permissions = self.get_serialized_permissions()
+        source_nodegroup_ids = set(node_id_to_node_source_identifier_id.values())
+        for permissions_key in ("group_permissions", "user_permissions"):
+            serialized_draft_graph[permissions_key] = {
+                key: value
+                for key, value in live_permissions[permissions_key].items()
+                if key in source_nodegroup_ids
+            }
 
         serialized_draft_graph["relatable_resource_model_ids"] = [
             (

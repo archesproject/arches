@@ -1,6 +1,6 @@
 import _ from 'underscore';
 import ko from 'knockout';
-import MapboxDraw from 'mapbox-gl-draw';
+import MapboxDraw from '@mapbox/mapbox-gl-draw';
 
 
 /**

@@ -22,10 +22,17 @@ from django.utils import translation
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
+from arches.app.utils.deprecation import deprecated
 from arches.app.const import ExtensionType
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
+from arches.app.models.fields.database_managed_fields import (
+    DatabaseManagedFieldsModelMixin,
+    DatabaseTimestampField,
+    NonPrimaryIdentityField,
+)
 from arches.app.models.mixins import SaveSupportsBlindOverwriteMixin
 from arches.app.models.query_expressions import UUID4
+from arches.app.models.querysets.graph import GraphModelQuerySet
 from arches.app.models.utils import (
     add_to_update_fields,
     format_file_into_sql,
@@ -482,6 +489,8 @@ class FunctionXGraph(SaveSupportsBlindOverwriteMixin, models.Model):
 
 
 class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
+    objects = GraphModelQuerySet.as_manager()
+
     graphid = models.UUIDField(primary_key=True, default=uuid.uuid4, db_default=UUID4())
     name = I18n_TextField(blank=True, null=True)
     description = I18n_TextField(blank=True, null=True)
@@ -1451,10 +1460,15 @@ class ResourceXResource(SaveSupportsBlindOverwriteMixin, models.Model):
         db_table = "resource_x_resource"
 
 
-class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
+class ResourceInstance(
+    DatabaseManagedFieldsModelMixin, SaveSupportsBlindOverwriteMixin, models.Model
+):
     resourceinstanceid = models.UUIDField(
         primary_key=True, blank=True, default=uuid.uuid4, db_default=UUID4()
     )
+    # Declared after the primary key: positional construction, e.g.
+    # Resource(resourceinstanceid), assigns arguments in field order.
+    id = NonPrimaryIdentityField(sequence_name="resource_instances_id_seq")
     graph = models.ForeignKey(
         GraphModel, blank=True, db_column="graphid", on_delete=models.CASCADE
     )
@@ -1468,7 +1482,7 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
     name = I18n_TextField(blank=True, null=True, editable=False)
     descriptors = models.JSONField(blank=True, null=True, editable=False)
     legacyid = models.TextField(blank=True, unique=True, null=True, editable=False)
-    createdtime = models.DateTimeField(auto_now_add=True)
+    createdtime = DatabaseTimestampField()
     resource_instance_lifecycle_state = models.ForeignKey(
         blank=True,
         on_delete=models.PROTECT,
@@ -1486,6 +1500,7 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
     principaluser = models.ForeignKey(
         User, on_delete=models.SET_NULL, blank=True, null=True, editable=False
     )
+    last_updated = DatabaseTimestampField()
 
     class Meta:
         managed = True
@@ -1554,6 +1569,7 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
 
         kwargs = add_to_update_fields(kwargs, "resource_instance_lifecycle_state")
         kwargs = add_to_update_fields(kwargs, "graph_publication")
+        kwargs = add_to_update_fields(kwargs, "last_updated")
         super(ResourceInstance, self).save(**kwargs)
 
         if should_update_resource_instance_lifecycle_state:
@@ -1631,7 +1647,10 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
         """
         from arches.app.datatypes.datatypes import DataTypeFactory
 
-        original_tiles = self.tilemodel_set.prefetch_related("nodegroup__node_set")
+        # order deterministically; sortorder can be null so tileid breaks ties
+        original_tiles = self.tilemodel_set.order_by(
+            "sortorder", "tileid"
+        ).prefetch_related("nodegroup__node_set")
         datatype_factory = DataTypeFactory()
 
         new_resource = copy.copy(self)
@@ -1883,7 +1902,9 @@ class SearchExportHistory(SaveSupportsBlindOverwriteMixin, models.Model):
         db_table = "search_export_history"
 
 
-class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
+class TileModel(
+    DatabaseManagedFieldsModelMixin, SaveSupportsBlindOverwriteMixin, models.Model
+):  # Tile
     """
     the data JSONField has this schema:
 
@@ -1949,6 +1970,9 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
     tileid = models.UUIDField(
         primary_key=True, blank=True, default=uuid.uuid4, db_default=UUID4()
     )
+    # Declared after the primary key: positional construction, e.g.
+    # Resource(resourceinstanceid), assigns arguments in field order.
+    id = NonPrimaryIdentityField(sequence_name="tiles_id_seq")
     resourceinstance = models.ForeignKey(
         ResourceInstance, db_column="resourceinstanceid", on_delete=models.CASCADE
     )
@@ -1974,6 +1998,8 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
     )
     sortorder = models.IntegerField(blank=True, null=True, default=0)
     provisionaledits = JSONField(blank=True, null=True, db_column="provisionaledits")
+    createdtime = DatabaseTimestampField()
+    last_updated = DatabaseTimestampField()
 
     class Meta:
         managed = True
@@ -2023,6 +2049,7 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
         if not self.tileid:
             self.tileid = uuid.uuid4()
             kwargs = add_to_update_fields(kwargs, "tileid")
+        kwargs = add_to_update_fields(kwargs, "last_updated")
 
         # Query for this first instead of during a transaction rollback.
         nodegroup_alias = self.find_nodegroup_alias()
@@ -2133,11 +2160,13 @@ class FileValue(SaveSupportsBlindOverwriteMixin, models.Model):
         managed = False
         db_table = "values"
 
+    @deprecated
     def geturl(self):
         if self.value is not None:
             return self.value.url
         return ""
 
+    @deprecated
     def getname(self):
         if self.value is not None:
             return self.value.name
@@ -2165,22 +2194,6 @@ class Widget(SaveSupportsBlindOverwriteMixin, models.Model):
     class Meta:
         managed = True
         db_table = "widgets"
-
-
-class Geocoder(SaveSupportsBlindOverwriteMixin, models.Model):
-    geocoderid = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, db_default=UUID4()
-    )
-    name = models.TextField(unique=True)
-    component = models.TextField(unique=True)
-    api_key = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        managed = True
-        db_table = "geocoders"
 
 
 class MapSource(models.Model):
@@ -2704,6 +2717,8 @@ class SpatialView(models.Model):
     isactive = models.BooleanField(
         default=True
     )  # the view is not created in the DB until set to active.
+    # database roles granted SELECT on the views; roles that don't exist are skipped
+    dbroles = JSONField(default=list, db_default=[], blank=True)
 
     def __str__(self):
         return f"{self.schema}.{self.slug}"
@@ -2746,6 +2761,11 @@ class SpatialView(models.Model):
         """
         Validate the spatial view before saving it to the database as the database triggers have proved hard to test.
         """
+        if not isinstance(self.dbroles, list) or not all(
+            isinstance(role, str) for role in self.dbroles
+        ):
+            raise ValidationError("dbroles must be a list of role names")
+
         if not self.geometrynode_id:
             return
         graph = self.geometrynode.graph
@@ -2792,6 +2812,7 @@ class SpatialView(models.Model):
             "language": self.language.code,
             "attributenodes": self.attributenodes,
             "isactive": self.isactive,
+            "dbroles": self.dbroles,
         }
 
 

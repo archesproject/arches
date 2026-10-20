@@ -1,0 +1,69 @@
+/**
+ * Dropdown behaviour, replacing Bootstrap 3's dropdown plugin. Toggles `.open` on the
+ * trigger's parent, which is what the vendored Bootstrap 3 stylesheet styles.
+ */
+
+const TRIGGER_SELECTOR = '[data-toggle="dropdown"]';
+const PARENT_SELECTOR = '.dropdown, .btn-group, .dropup, .input-group-btn';
+const OPEN_CLASS = 'open';
+
+function parentOf(trigger) {
+    return trigger.closest(PARENT_SELECTOR) || trigger.parentElement;
+}
+
+function closeAll(except = null) {
+    for (const trigger of document.querySelectorAll(TRIGGER_SELECTOR)) {
+        // `.open` is a generic enough class name that arches uses it elsewhere,
+        // including containers that wrap dropdowns (e.g. search filters), so
+        // start from each trigger and only close its parent.
+        const parent = parentOf(trigger);
+        if (!parent || parent === except || !parent.classList.contains(OPEN_CLASS)) {
+            continue;
+        }
+        parent.classList.remove(OPEN_CLASS);
+        trigger.setAttribute('aria-expanded', 'false');
+    }
+}
+
+export function toggle(trigger) {
+    const parent = parentOf(trigger);
+    if (!parent) {
+        return;
+    }
+    const willOpen = !parent.classList.contains(OPEN_CLASS);
+    closeAll(willOpen ? parent : null);
+    parent.classList.toggle(OPEN_CLASS, willOpen);
+    trigger.setAttribute('aria-expanded', String(willOpen));
+}
+
+export function hideAll() {
+    closeAll();
+}
+
+export function install(root = document) {
+    root.addEventListener('click', function (event) {
+        const trigger = event.target.closest(TRIGGER_SELECTOR);
+        if (trigger) {
+            event.preventDefault();
+            toggle(trigger);
+            return;
+        }
+        // Bootstrap 3 parity: selecting a menu item closes the menu, but interacting
+        // with a form control or form inside a dropdown does not. The form must be
+        // inside the menu, since dropdowns can themselves live within a form.
+        const menu = event.target.closest('.dropdown-menu');
+        const form = event.target.closest('form');
+        const isFormInteraction =
+            menu &&
+            (/^(INPUT|TEXTAREA)$/.test(event.target.tagName) || (form && menu.contains(form)));
+        if (!isFormInteraction) {
+            closeAll();
+        }
+    });
+
+    root.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            closeAll();
+        }
+    });
+}

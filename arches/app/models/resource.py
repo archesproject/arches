@@ -29,6 +29,7 @@ from django.forms.models import model_to_dict
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.utils.translation import gettext as _
 from django.utils.translation import get_language
+from arches.app.utils.decorators import deprecated
 from arches.app.models import models
 from arches.app.models.models import EditLog
 from arches.app.models.models import TileModel
@@ -93,9 +94,11 @@ class Resource(models.ResourceInstance):
                 self.serialized_graph = None
         return self.serialized_graph
 
+    @deprecated
     def set_serialized_graph(self, serialized_graph):
         self.serialized_graph = serialized_graph
 
+    @deprecated
     def get_node_datatypes(self):
         if not self.node_datatypes:
             self.node_datatypes = {
@@ -694,7 +697,7 @@ class Resource(models.ResourceInstance):
 
         permit_deletion = False
         if user != {}:
-            user_is_reviewer = user_is_resource_reviewer(user)
+            user_is_reviewer = user_is_resource_reviewer(user, resource=self)
             if user_is_reviewer is False:
                 tiles = list(models.TileModel.objects.filter(resourceinstance=self))
                 resource_is_provisional = (
@@ -847,13 +850,7 @@ class Resource(models.ResourceInstance):
             return result["value"]
 
         if not graphs:
-            graphs = list(
-                models.GraphModel.objects.all()
-                .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-                .exclude(isresource=False)
-                .exclude(is_active=False)
-                .exclude(source_identifier__isnull=False)
-            )
+            graphs = list(models.GraphModel.objects.get_resource_models())
 
         graph_lookup = {
             str(graph.graphid): {
@@ -957,9 +954,10 @@ class Resource(models.ResourceInstance):
 
         # Fetch pref labels for relationship types in bulk.
         relationship_types = {
-            relation["relationshiptype"]
+            relation[key]
             for relation in permitted_relation_dicts
-            if relation["relationshiptype"]
+            for key in ("relationshiptype", "inverserelationshiptype")
+            if relation[key]
         }
 
         preflabel_lookup = get_resource_relationship_type_label(
@@ -970,6 +968,10 @@ class Resource(models.ResourceInstance):
             relation["relationshiptype_label"] = preflabel_lookup.get(
                 relation["relationshiptype"], relation["relationshiptype"] or ""
             )
+            relation["inverserelationshiptype_label"] = preflabel_lookup.get(
+                relation["inverserelationshiptype"],
+                relation["inverserelationshiptype"] or "",
+            )
 
             ret["resource_relationships"].append(relation)
             instanceids.add(str(relation["to_resource"]))
@@ -979,13 +981,30 @@ class Resource(models.ResourceInstance):
             instanceids.remove(str(self.resourceinstanceid))
 
         if len(instanceids) > 0:
-            related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
-            if related_resources:
+            if settings.ELASTICSEARCH_ENABLED:
+                related_resources = se.search(
+                    index=RESOURCES_INDEX, id=list(instanceids)
+                )
+                related_resource_ids = (
+                    [
+                        resource["_id"]
+                        for resource in related_resources["docs"]
+                        if resource["found"]
+                    ]
+                    if related_resources
+                    else None
+                )
+            else:
+                # the index lookup above only establishes which ids actually exist
+                related_resources = True
                 related_resource_ids = [
-                    resource["_id"]
-                    for resource in related_resources["docs"]
-                    if resource["found"]
+                    str(pk)
+                    for pk in models.ResourceInstance.objects.filter(
+                        pk__in=instanceids
+                    ).values_list("pk", flat=True)
                 ]
+
+            if related_resources:
                 if include_rr_count:
                     to_counts = (
                         models.ResourceXResource.objects.filter(
@@ -1123,6 +1142,7 @@ class Resource(models.ResourceInstance):
             )
 
     @staticmethod
+    @deprecated
     def to_json__bulk(resources, compact=True, hide_empty_nodes=False, version=None):
         """
         Returns list of resources represented as disambiguated JSON graphs
@@ -1142,6 +1162,7 @@ class Resource(models.ResourceInstance):
                 resources=resources, compact=compact, hide_empty_nodes=hide_empty_nodes
             )
 
+    @deprecated
     def get_node_values(self, node_name):
         """
         Take a node_name (string) as an argument and return a list of values.
@@ -1184,6 +1205,7 @@ class Resource(models.ResourceInstance):
                 remove_perm(perm, identity, self)
         self.index()
 
+    @deprecated
     def add_permission_to_all(self, permission):
         groups = list(Group.objects.all())
         users = [user for user in User.objects.all() if user.is_superuser is False]
@@ -1194,7 +1216,7 @@ class Resource(models.ResourceInstance):
     def update_resource_instance_lifecycle_state(
         self, user, resource_instance_lifecycle_state
     ):
-        if not user_is_resource_reviewer(user):
+        if not user_is_resource_reviewer(user, resource=self):
             raise PermissionDenied
 
         if (
@@ -1225,6 +1247,7 @@ class Resource(models.ResourceInstance):
         return self.resource_instance_lifecycle_state
 
 
+@deprecated
 def parse_node_value(value):
     if is_uuid(value):
         try:
@@ -1234,6 +1257,7 @@ def parse_node_value(value):
     return value
 
 
+@deprecated
 def is_uuid(value_to_test):
     try:
         UUID(value_to_test)

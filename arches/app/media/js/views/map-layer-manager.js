@@ -9,7 +9,7 @@ import NodeModel from 'models/node';
 import AlertViewModel from 'viewmodels/alert';
 import binFeatureCollection from 'views/components/widgets/map/bin-feature-collection';
 import data from 'views/map-layer-manager-data';
-import 'bindings/mapbox-gl';
+import 'bindings/maplibre-gl';
 import 'bindings/codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'datatype-config-components';
@@ -291,8 +291,8 @@ vm.mapStyle = {
         "mapbox:type": "template"
     },
     "sources": sources,
-    "sprite": arches.mapboxSprites,
-    "glyphs": arches.mapboxGlyphs,
+    "sprite": arches.maplibreSprites,
+    "glyphs": arches.maplibreGlyphs,
     "layers": basemapLayers.concat(displayLayers)
 };
 
@@ -398,7 +398,11 @@ $.ajax({
         'paging-filter': 1
     },
     success: function(results) {
-        results.results.aggregations['geo_aggs'] = results.results.aggregations['geo_aggs'].inner.buckets[0];
+        // the database-backed search_results (ELASTICSEARCH_ENABLED = False) returns no aggregations
+        if (!results.results.aggregations) {
+            return;
+        }
+        results.results.aggregations['geo_aggs'] =results.results.aggregations['geo_aggs'].inner.buckets[0];
         searchAggregations(results.results.aggregations);
         searchResults(results);
     }

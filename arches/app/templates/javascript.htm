@@ -70,6 +70,25 @@
             "title": "{% trans "Draft Deleted" %}",
             "text": "{% trans "The draft has been successfully deleted." %}"
         }'
+        graph-designer-permissions-applied='{
+            "title": "{% jsescaped_trans "Permissions Applied" %}",
+            "text": "{% jsescaped_trans "The permissions are now in effect." %}"
+        }'
+        graph-designer-permissions-reset='{
+            "title": "{% jsescaped_trans "Permissions Reset" %}",
+            "text": "{% jsescaped_trans "The selected cards now use default permissions for this group or account." %}"
+        }'
+        graph-designer-permissions-reset-confirm='{
+            "title": "{% jsescaped_trans "Reset to Default?" %}",
+            "text": "{% jsescaped_trans "This removes the explicit permissions for the selected group or account on the selected cards. They will fall back to inherited or default permissions." %}"
+        }'
+        graph-designer-permissions-load-error='{
+            "title": "{% jsescaped_trans "Unable to Load Permissions" %}",
+            "text": "{% jsescaped_trans "Sorry! The request failed. Please try again. Contact your system administrator if the problem persists." %}"
+        }'
+        permissions-source-default='"{% jsescaped_trans "implicit" %}"'
+        permissions-source-group='"{% jsescaped_trans "inherited from" %}"'
+        permissions-source-explicit='"{% jsescaped_trans "explicit" %}"'
         resource-report-redirect-from-resource-editor-not-permissioned='{
             "title": "{% trans "Redirected from the Resource Editor" %}",
             "text": "{% trans "The current user does not have permission to edit this resource. You have been redirected to the appropriate page." %}"
@@ -621,9 +640,16 @@
         default-relationship-to-resource='(resource) => {return {% trans "Default relationship to ${resource}" as defaultRelationshipToResource %} `{{ defaultRelationshipToResource|escapejs }}` }'
         default-inverse-relationship-to='{% trans "Default inverse relationship to" as defaultInverseRelationshipTo %} "{{ defaultInverseRelationshipTo|escapejs }}"'
         default-inverse-relationship-to-resource='(resource) => {return {% trans "Default inverse relationship to ${resource}" as defaultInverseRelationshipToResource %} `{{ defaultInverseRelationshipToResource|escapejs }}` }'
-        relationship-concept='{% trans "Relationship Concept" as relationshipConcept %} "{{ relationshipConcept|escapejs }}"'
-        inverse-relationship-concept='{% trans "Inverse Relationship Concept" as inverseRelationshipConcept %} "{{ inverseRelationshipConcept|escapejs }}"'
-        use-ontology='{% trans "Define Relationship using Ontology Property" as useOntology %} "{{ useOntology|escapejs }}"'
+        inverse-relationship='{% trans "Inverse Relationship" as inverseRelationship %} "{{ inverseRelationship|escapejs }}"'
+        relationship-source='{% trans "Relationship Source" as relationshipSource %} "{{ relationshipSource|escapejs }}"'
+        select-a-relationship-source='{% trans "Select a relationship source" as selectARelationshipSource %} "{{ selectARelationshipSource|escapejs }}"'
+        ontology-property-source='{% trans "Ontology Property" as ontologyPropertySource %} "{{ ontologyPropertySource|escapejs }}"'
+        concept-source='{% trans "Concept" as conceptSource %} "{{ conceptSource|escapejs }}"'
+        concept-source-deprecation='{% trans "* Concept relationships will be discontinued in Arches 9.0. Use a controlled list instead." as conceptSourceDeprecation %} "{{ conceptSourceDeprecation|escapejs }}"'
+        reference-source='{% trans "Controlled List Reference" as referenceSource %} "{{ referenceSource|escapejs }}"'
+        controlled-list='{% trans "Controlled List" as controlledList %} "{{ controlledList|escapejs }}"'
+        select-a-controlled-list='{% trans "Select a controlled list" as selectAControlledList %} "{{ selectAControlledList|escapejs }}"'
+        select-a-reference='{% trans "Select a reference" as selectAReference %} "{{ selectAReference|escapejs }}"'
         references-any='{% trans "References Any of" as referencesAny %} "{{ referencesAny|escapejs }}"'
         references-all='{% trans "References All of" as referencesAll %} "{{ referencesAll|escapejs }}"'
         does-not-reference='{% trans "Does not reference" as doesNotReference %} "{{ doesNotReference|escapejs }}"'
@@ -825,6 +851,16 @@
         branch-excel='{% trans "Branch Excel" as branchExcel %} "{{ branchExcel|escapejs }}"'
         tile-excel-cap='{% trans "Tile Excel" as tileExcelCap %} "{{ tileExcelCap|escapejs }}"'
         jsonld-cap='{% trans "JSON-LD" as jsonldCap %} "{{ jsonldCap|escapejs }}"'
+        arches-json-cap='{% trans "Arches JSON" as archesJsonCap %} "{{ archesJsonCap|escapejs }}"'
+        upload-arches-json-file='{% trans "Upload .json, .jsonl or .zip File" as uploadArchesJsonFile %} "{{ uploadArchesJsonFile|escapejs }}"'
+        import-arches-json-summary='{% trans "Import Arches JSON Summary" as importArchesJsonSummary %} "{{ importArchesJsonSummary|escapejs }}"'
+        import-options='{% trans "Options" as importOptions %} "{{ importOptions|escapejs }}"'
+        overwrite-existing-resources='{% trans "Overwrite existing resources" as overwriteExistingResources %} "{{ overwriteExistingResources|escapejs }}"'
+        replace-existing-resources-help='{% trans "Each resource in the file completely replaces the existing one. Any of its tiles not in the file will be deleted. This process cannot be undone." as replaceExistingResourcesHelp %} "{{ replaceExistingResourcesHelp|escapejs }}"'
+        existing-resources-fail='{% trans "A resource that already exists will fail the load." as existingResourcesFail %} "{{ existingResourcesFail|escapejs }}"'
+        index-after-import='{% trans "Index the data after import" as indexAfterImport %} "{{ indexAfterImport|escapejs }}"'
+        reindex-later='{% trans "Data will be saved but not searchable until reindexed" as reindexLater %} "{{ reindexLater|escapejs }}"'
+        resources='{% trans "Resources" as resources %} "{{ resources|escapejs }}"'
         file-upload-summary='{% trans "File Upload Summary" as fileUploadSummary %} "{{ fileUploadSummary|escapejs }}"'
         file='{% trans "File" as file %} "{{ file|escapejs }}"'
         size='{% trans "Size" as size %} "{{ size|escapejs }}"'
@@ -988,13 +1024,6 @@
             "id": "{{ concept_collection.id }}"
         },{% endfor %}]'
         export-html-templates='[{% for template in export_html_templates %} "{{ template }}", {% endfor %}]'
-        geocoder-default="{{ map_info.geocoder_default }}"
-        geocoding-providers='[{% for provider in geocoding_providers %}{
-            "name": "{{ provider.name }}",
-            "geocoderid": "{{ provider.geocoderid }}",
-            "api_key": {% if provider.api_key != None %} "{{ provider.api_key }}" {% elif provider.api_key == None %} null {% endif %},
-            "component": "{{ provider.component }}"
-        },{% endfor %}]'
         graphs="{{graphs|default:'[]'}}"
         hex-bin-size="{{ map_info.hex_bin_size | unlocalize }}"
         hex-bin-bounds="{{ map_info.hex_bin_bounds }}"
@@ -1002,9 +1031,8 @@
         active-language-dir="{{ app_settings.ACTIVE_LANGUAGE_DIR }}"
         languages='{{ app_settings.LANGUAGES }}'
         search-thumbnails='{{ app_settings.SEARCH_THUMBNAILS }}'
-        mapbox-api-key="{{ map_info.mapbox_api_key }}"
-        mapbox-glyphs="{{ map_info.mapbox_glyphs }}"
-        mapbox-sprites="{{ map_info.mapbox_sprites }}"
+        maplibre-glyphs="{{ map_info.maplibre_glyphs }}"
+        maplibre-sprites="{{ map_info.maplibre_sprites }}"
         map-default-x="{{ map_info.x|unlocalize }}"
         map-default-y="{{ map_info.y|unlocalize }}"
         map-default-zoom="{{ map_info.zoom | unlocalize }}"
@@ -1139,20 +1167,6 @@
                 "modulename": "{{ template.modulename }}",
                 "description": "{{ template.description }}",
                 "defaultconfig": "{{ template.defaultconfig }}"
-            },
-        {% endfor %}}'
-    ></div>
-
-
-    <!-- consumed by media/js/geocoder-templates.js -->
-    <div
-        id="geocoderTemplateData"
-        style="display: none;"
-        geocoderTemplates='{{% for provider in geocoding_providers %}
-            "{{ provider.geocoderid }}": {
-                "component": "{{ provider.component }}",
-                "name": "{{ provider.name }}",
-                "api_key": "{{ provider.api_key }}"
             },
         {% endfor %}}'
     ></div>

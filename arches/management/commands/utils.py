@@ -3,6 +3,8 @@ import os
 import sys
 import codecs
 
+from arches.app.utils.decorators import deprecated
+
 
 def get_yn_input(msg="are you sure you want to continue?", default="Y"):
     """
@@ -33,6 +35,7 @@ def get_yn_input(msg="are you sure you want to continue?", default="Y"):
     return ret
 
 
+@deprecated
 def write_to_file(fileName, contents, mode="w", encoding="utf-8", **kwargs):
     ensure_dir(fileName)
     file = codecs.open(fileName, mode=mode, encoding=encoding, **kwargs)
@@ -40,6 +43,7 @@ def write_to_file(fileName, contents, mode="w", encoding="utf-8", **kwargs):
     file.close()
 
 
+@deprecated
 def ensure_dir(f):
     d = os.path.dirname(f)
     if not os.path.exists(d):
