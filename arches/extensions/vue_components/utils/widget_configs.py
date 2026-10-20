@@ -1,6 +1,6 @@
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
-from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 
 def serialize_node_widget_config(node):
@@ -15,7 +15,7 @@ def serialize_node_widget_config(node):
         )
     if card_x_node_x_widget is None:
         return None
-    return serialize_card_x_node_x_widget(card_x_node_x_widget)
+    return serialize_card_x_node_x_widget(card_x_node_x_widget, {}, {})
 
 
 def serialize_nodegroup_widget_configs(nodes):
@@ -72,11 +72,15 @@ def serialize_graph_widget_configs(
 
 def serialize_widgets_by_nodegroup_id(nodes, cards_by_nodegroup_id):
     datatype_factory = DataTypeFactory()
+    serialized_cards_by_id = {}
+    serialized_widgets_by_id = {}
     saved_widgets_by_node_id = {
         card_x_node_x_widget.node_id: card_x_node_x_widget
         for card_x_node_x_widget in models.CardXNodeXWidget.objects.filter(
             node__in=nodes
-        ).select_related("card", "node", "widget__widgetmapping")
+        )
+        .select_related("widget__widgetmapping")
+        .prefetch_related("card")
     }
     serialized_widgets_by_nodegroup_id = {}
     for node in nodes:
@@ -85,10 +89,14 @@ def serialize_widgets_by_nodegroup_id(nodes, cards_by_nodegroup_id):
             card_x_node_x_widget = default_card_x_node_x_widget(
                 node, cards_by_nodegroup_id.get(node.nodegroup_id), datatype_factory
             )
+        else:
+            card_x_node_x_widget.node = node
         if card_x_node_x_widget is None:
             continue
         serialized_widgets_by_nodegroup_id.setdefault(node.nodegroup_id, []).append(
-            serialize_card_x_node_x_widget(card_x_node_x_widget)
+            serialize_card_x_node_x_widget(
+                card_x_node_x_widget, serialized_cards_by_id, serialized_widgets_by_id
+            )
         )
     for serialized_widgets in serialized_widgets_by_nodegroup_id.values():
         serialized_widgets.sort(
@@ -97,15 +105,24 @@ def serialize_widgets_by_nodegroup_id(nodes, cards_by_nodegroup_id):
     return serialized_widgets_by_nodegroup_id
 
 
-def serialize_card_x_node_x_widget(card_x_node_x_widget):
+def serialize_card_x_node_x_widget(
+    card_x_node_x_widget, serialized_cards_by_id, serialized_widgets_by_id
+):
     data = as_json_data(card_x_node_x_widget)
-    data["card"] = as_json_data(card_x_node_x_widget.card)
-    del data["card_id"]
+    card_id = data.pop("card_id")
+    if card_id not in serialized_cards_by_id:
+        serialized_cards_by_id[card_id] = as_json_data(card_x_node_x_widget.card)
+    data["card"] = serialized_cards_by_id[card_id]
     data["node"] = as_json_data(card_x_node_x_widget.node)
     del data["node_id"]
-    data["widget"] = as_json_data(card_x_node_x_widget.widget)
-    del data["widget_id"]
-    data["widget"]["component"] = card_x_node_x_widget.widget.widgetmapping.component
+    widget_id = data.pop("widget_id")
+    if widget_id not in serialized_widgets_by_id:
+        serialized_widget = as_json_data(card_x_node_x_widget.widget)
+        serialized_widget["component"] = (
+            card_x_node_x_widget.widget.widgetmapping.component
+        )
+        serialized_widgets_by_id[widget_id] = serialized_widget
+    data["widget"] = serialized_widgets_by_id[widget_id]
     return data
 
 
@@ -132,4 +149,4 @@ def first_cards_by_nodegroup_id(nodegroup_ids):
 
 
 def as_json_data(model_instance):
-    return JSONDeserializer().deserialize(JSONSerializer().serialize(model_instance))
+    return JSONSerializer().serializeToPython(model_instance)
