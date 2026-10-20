@@ -695,7 +695,33 @@ class Resource(models.ResourceInstance):
                     if creator_id == user.id:
                         permit_deletion = True
             else:
-                permit_deletion = True
+                # Ask the permission framework about this resource, so
+                # per-resource permissions and lifecycle rules apply to
+                # reviewers too. user_can_delete_resource refuses deletion
+                # when the resource's lifecycle state forbids it, unless the
+                # user holds can_delete_all_resource_instance_lifecycle_states.
+                #
+                # When a site sets neither per-resource nor per-card
+                # permissions, the framework answers "unknown" and falls back
+                # to a nodegroup check, which the reviewer passes. "unknown" is
+                # not itself a grant. In that case, a reviewer is refused only
+                # when the lifecycle state's can_delete_resource_instances flag
+                # forbids deletion.
+                #
+                # Alternative considered but not chosen: checking whether
+                # "delete_resourceinstance" is in get_perms(user, resource). On
+                # a site that sets no per-resource permissions, get_perms
+                # always returns an empty list, so the check always returns
+                # False. Every reviewer is refused, even though the
+                # default-allow framework treats "no permissions set" as
+                # allowed. user_can_delete_resource keeps that rule.
+                #
+                # Alternative considered but not chosen: adding a resource
+                # argument to user_is_resource_reviewer. It has 19 call sites
+                # in core, and 8 of them have no resource to pass.
+                permit_deletion = permission_backend.user_can_delete_resource(
+                    user, resource=self
+                )
         else:
             permit_deletion = True
 
