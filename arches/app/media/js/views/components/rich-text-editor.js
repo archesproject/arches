@@ -241,30 +241,39 @@ export default ko.components.register('views/components/rich-text-editor', {
             this.isMax(!this.isMax());
         };
 
-        // roving tabindex: only the most recently focused control is in the tab order
-        const getControls = toolbar => Array.from(toolbar.querySelectorAll('.rich-text-editor-toolbar-group:not([inert]) .rich-text-editor-toolbar-button'));
+        // accessibility - get the toolbar + buttons for tab and arrow key selection 
+        const getButtons = toolbar => Array.from(toolbar.querySelectorAll('.rich-text-editor-toolbar-group:not([inert]) .rich-text-editor-toolbar-button'));
 
-        this.onFocusIn = (_data, event) => {
-            const controls = getControls(event.currentTarget);
-            if (controls.includes(event.target)) {
-                controls.forEach((control) => { control.tabIndex = control === event.target ? 0 : -1; });
+        this.onFocus = (context, event) => {
+            const buttons = getButtons(event.currentTarget);
+            if (buttons.includes(event.target)) {
+                buttons.forEach((button) => {
+                    if (button === event.target) {
+                        button.tabIndex = 0;
+                    } else {
+                        button.tabIndex = -1;
+                    }
+                });
             }
             return true;
         };
 
-        this.onKeydown = (_data, event) => {
-            const controls = getControls(event.currentTarget);
-            const index = controls.indexOf(document.activeElement);
-            const moveTo = index === -1 ? undefined : {
-                ArrowRight: (index + 1) % controls.length,
-                ArrowLeft: (index - 1 + controls.length) % controls.length,
-                Home: 0,
-                End: controls.length - 1,
-            }[event.key];
-            if (moveTo !== undefined) {
-                controls[moveTo].focus();
-            } else if (event.key === 'Escape') {
-                editor.commands.focus();
+        this.onKeydown = (context, event) => {
+            const buttons = getButtons(event.currentTarget);
+            const index = buttons.indexOf(event.target);
+            // keys pressed outside the toolbar buttons (e.g. in the link URL box) work as normal
+            if (index === -1) {
+                return true;
+            }
+            // the arrow keys wrap round from one end of the toolbar to the other
+            if (event.key === 'ArrowRight') {
+                // after the last button go back to the first
+                const next = buttons[index + 1] || buttons[0];
+                next.focus();
+            } else if (event.key === 'ArrowLeft') {
+                // before the first button go to the last
+                const previous = buttons[index - 1] || buttons[buttons.length - 1];
+                previous.focus();
             } else {
                 return true;
             }
