@@ -1594,6 +1594,8 @@ class ArchesJsonImporter(BaseImportModule):
         return removed
 
     def _remove_from_index(self, resourceids):
+        if not settings.ELASTICSEARCH_ENABLED:
+            return
         custom_indexes = [
             import_class_from_string(index["module"])(index["name"])
             for index in settings.ELASTICSEARCH_CUSTOM_INDEXES
