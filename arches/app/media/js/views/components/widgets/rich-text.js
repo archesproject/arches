@@ -5,7 +5,7 @@ import _ from 'underscore';
 import WidgetViewModel from 'viewmodels/widget';
 import arches from 'arches';
 import richTextWidgetTemplate from 'templates/views/components/widgets/rich-text.htm';
-import 'bindings/ckeditor';
+import 'views/components/rich-text-editor';
 import 'bindings/chosen';
 
 
@@ -63,13 +63,6 @@ const viewModel = function(params) {
         }
         self.currentPlaceholder(self.placeholder()[self.currentLanguage().code]);
     }
-
-    self.defaultText = ko.observable();
-    self.defaultText.subscribe(newValue => {
-        const config = self.config();
-        config.placeholder = newValue;
-        self.config(config);
-    });
 
     const valueLeaf = self.value?.[arches.activeLanguage]?.value || self.value;
     valueLeaf?.subscribe(newValue => {
