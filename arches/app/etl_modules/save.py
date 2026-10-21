@@ -159,6 +159,9 @@ def _post_save_edit_log(
         multiprocessing,
         index,
     )
+    if index and not settings.ELASTICSEARCH_ENABLED:
+        logger.debug("Elasticsearch is disabled; skipping Elasticsearch indexing")
+        index = False
     try:
         if index:
             with connection.cursor() as cursor:
