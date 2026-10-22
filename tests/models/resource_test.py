@@ -346,6 +346,75 @@ class ResourceTests(ArchesTestCase):
             True,
         )
 
+    def test_reviewer_cannot_delete_when_lifecycle_state_forbids_deletion(self):
+        """A Resource Reviewer is refused deletion of a resource whose
+        lifecycle state has can_delete_resource_instances set to False,
+        unless the reviewer also holds
+        can_delete_all_resource_instance_lifecycle_states.
+
+        Arches ships Active and Retired as non-deletable in the default
+        lifecycle. The Bulk Data Deletion module has no permission check of
+        its own, so Resource.delete() is its only gate.
+
+        The test checks that the row still exists, not only the return
+        value. Bulk Data Deletion ignores the return value, so only the
+        surviving row proves the refusal.
+        """
+        self.state1.can_delete_resource_instances = False
+        self.state1.save()
+        self.test_resource.resource_instance_lifecycle_state = self.state1
+        self.test_resource.save()
+
+        reviewer = User.objects.create_user(
+            "reviewer_without_lifecycle_override",
+            "reviewer_without_lifecycle_override@archesproject.org",
+            "password",
+        )
+        reviewer.groups.add(Group.objects.get(name="Resource Reviewer"))
+        self.assertFalse(
+            reviewer.has_perm(
+                "models.can_delete_all_resource_instance_lifecycle_states"
+            )
+        )
+
+        resourceid = self.test_resource.pk
+        permitted = self.test_resource.delete(user=reviewer)
+
+        self.assertTrue(
+            models.ResourceInstance.objects.filter(pk=resourceid).exists(),
+            "the resource row was deleted even though deletion should be refused",
+        )
+        self.assertFalse(permitted)
+
+    def test_reviewer_can_still_delete_when_lifecycle_state_allows_deletion(self):
+        """A Resource Reviewer still deletes a resource whose lifecycle
+        state permits deletion.
+
+        This test pairs with
+        test_reviewer_cannot_delete_when_lifecycle_state_forbids_deletion,
+        which alone also passes if every reviewer is refused. Together they
+        show that the refusal depends on the lifecycle state.
+        """
+        self.assertTrue(self.state2.can_delete_resource_instances)
+        self.test_resource.resource_instance_lifecycle_state = self.state2
+        self.test_resource.save()
+
+        reviewer = User.objects.create_user(
+            "reviewer_without_lifecycle_override",
+            "reviewer_without_lifecycle_override@archesproject.org",
+            "password",
+        )
+        reviewer.groups.add(Group.objects.get(name="Resource Reviewer"))
+
+        resourceid = self.test_resource.pk
+        permitted = self.test_resource.delete(user=reviewer)
+
+        self.assertTrue(permitted)
+        self.assertFalse(
+            models.ResourceInstance.objects.filter(pk=resourceid).exists(),
+            "the resource row survived a permitted deletion",
+        )
+
     @patch("arches.app.functions.base.BaseFunction.on_update_lifecycle_state")
     def test_run_lifecycle_functions(self, mock_on_update_lifecycle_state):
         self.test_resource.run_lifecycle_handlers(self.state2)
