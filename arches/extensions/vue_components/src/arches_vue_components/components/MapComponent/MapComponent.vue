@@ -262,6 +262,13 @@ async function closePanel(): Promise<void> {
     color: var(--p-text-color);
 }
 
+.map-component,
+.map-component :deep(*),
+.map-component :deep(*::before),
+.map-component :deep(*::after) {
+    box-sizing: border-box;
+}
+
 .map-component:fullscreen {
     width: 100%;
     height: 100%;
@@ -326,5 +333,9 @@ async function closePanel(): Promise<void> {
 .map-body-with-status-bar
     :deep(.maplibregl-ctrl-bottom-right .maplibregl-ctrl-attrib) {
     margin-block-end: var(--map-component-status-bar-attribution-inset);
+}
+
+.map-body :deep(.maplibregl-ctrl-geocoder--input) {
+    font-size: 1.3rem;
 }
 </style>
