@@ -61,6 +61,9 @@ const {
 
 const emit = defineEmits<MapComponentEmit>();
 
+// The root renders beside a popup Teleport, so attrs must be bound explicitly.
+defineOptions({ inheritAttrs: false });
+
 const mapShell = useTemplateRef<HTMLDivElement>("mapShell");
 const mapContainer = useTemplateRef<HTMLDivElement>("mapContainer");
 const mapHeader = useTemplateRef<InstanceType<typeof MapHeader>>("mapHeader");
@@ -147,6 +150,7 @@ async function closePanel(): Promise<void> {
     <div
         ref="mapShell"
         class="map-component"
+        v-bind="$attrs"
         @keydown.esc="closePanel"
     >
         <MapHeader
