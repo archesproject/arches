@@ -12,6 +12,7 @@ const { requireVueLoaderWithTypeResolutionPatch } = require('./webpack-utils/pat
 const { VueLoaderPlugin } = requireVueLoaderWithTypeResolutionPatch();
 
 const { buildFilepathLookup } = require('./webpack-utils/build-filepath-lookup');
+const { postcssRemCorrection } = require('./webpack-utils/postcss-rem-correction');
 
 module.exports = () => {
     return new Promise((resolve, _reject) => {
@@ -475,6 +476,16 @@ module.exports = () => {
                             {
                                 'loader': Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'css-loader'),
                             },
+                            {
+                                'loader': Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'postcss-loader'),
+                                options: {
+                                    postcssOptions: {
+                                        config: false,
+                                        // Arches core's Vue styles were written for the chrome's 0.62rem root
+                                        plugins: [postcssRemCorrection({ chromeRootDirectories: [Path.resolve(__dirname, ROOT_DIR)] })],
+                                    },
+                                },
+                            },
                         ],
                     },
                     {
@@ -495,6 +506,14 @@ module.exports = () => {
                             },
                             {
                                 'loader': Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'postcss-loader'),
+                                options: {
+                                    postcssOptions: {
+                                        config: false,
+                                        plugins: [
+                                            postcssRemCorrection(),
+                                        ],
+                                    },
+                                },
                             },
                             {
                                 'loader': Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'sass-loader'),
