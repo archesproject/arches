@@ -8,6 +8,7 @@ from django.core import management
 from django.test import TestCase
 from django.test.utils import captured_stdout
 from django.core.management.base import CommandError
+from rdflib.graph import Graph
 
 from arches.app.models.models import (
     Node,
@@ -26,6 +27,8 @@ from arches.extensions.controlled_lists.etl_modules.migrate_to_reference_datatyp
 from arches.extensions.controlled_lists.management.commands.controlled_lists import (
     Command as ControlledListsCommand,
 )
+
+from arches.extensions.controlled_lists.utils.skos import SKOSReader, SKOSWriter
 
 from .constants import APP_ROOT, PROJECT_TEST_ROOT, TEST_PACKAGE_DIR
 
@@ -296,6 +299,74 @@ class ListImportPackageTests(TestCase):
 
         not_searchable = List.objects.get(name="Not Searchable")
         self.assertEqual(not_searchable.searchable, False)
+
+
+class ListSkosSortOrderTests(TestCase):
+    LIST_ID = "11111111-1111-4111-8111-111111111111"
+    # labels are reverse-alphabetical relative to sortorder
+    ITEMS = {
+        "22222222-2222-4222-8222-222222222222": ("Zebra", 0),
+        "33333333-3333-4333-8333-333333333333": ("Mango", 1),
+        "44444444-4444-4444-8444-444444444444": ("Apple", 2),
+    }
+
+    def build_skos(self, namespace, sortorder_namespace):
+        items = "".join(f"""
+  <rdf:Description rdf:about="{namespace}{item_id}">
+    <rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+    <dcterms:identifier>{namespace}{item_id}</dcterms:identifier>
+    <skos:inScheme rdf:resource="{namespace}{self.LIST_ID}"/>
+    <skos:prefLabel xml:lang="en">{label}</skos:prefLabel>
+    <sortorder xmlns="{sortorder_namespace}" rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">{order}</sortorder>
+  </rdf:Description>""" for item_id, (label, order) in self.ITEMS.items())
+        return f"""<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:dcterms="http://purl.org/dc/terms/">
+  <rdf:Description rdf:about="{namespace}{self.LIST_ID}">
+    <rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#ConceptScheme"/>
+    <dcterms:title>Fruit</dcterms:title>
+  </rdf:Description>{items}
+</rdf:RDF>"""
+
+    def import_skos(self, data):
+        reader = SKOSReader()
+        reader.save_controlled_lists_from_skos(Graph().parse(data=data, format="xml"))
+
+    def assert_order_preserved(self):
+        labels = [
+            item.list_item_values.get().value
+            for item in ListItem.objects.order_by("sortorder")
+        ]
+        self.assertEqual(labels, ["Zebra", "Mango", "Apple"])
+
+    def test_import_foreign_site_namespace(self):
+        foreign = "https://foreign.example/"
+        self.import_skos(self.build_skos(foreign, foreign))
+        self.assert_order_preserved()
+
+    def test_import_fixed_namespace_predicate(self):
+        self.import_skos(
+            self.build_skos(
+                "http://localhost:8000/",
+                "https://archesproject.org/ns/controlled-lists#",
+            )
+        )
+        self.assert_order_preserved()
+
+    def test_export_uses_fixed_namespace_and_round_trips(self):
+        self.import_skos(
+            self.build_skos("https://foreign.example/", "https://foreign.example/")
+        )
+        exported = SKOSWriter().write_controlled_lists(
+            List.objects.all(), ListItem.objects.all(), "xml"
+        )
+        self.assertIn("https://archesproject.org/ns/controlled-lists#", exported)
+        self.assertNotIn("foreign.example/sortorder", exported)
+
+        List.objects.all().delete()
+        self.import_skos(exported)
+        self.assert_order_preserved()
 
 
 class RDMToControlledListsETLTests(TestCase):

@@ -10,6 +10,11 @@ import Tooltip from 'openvue/tooltip';
 import { createApp } from 'vue';
 import { createGettext } from "vue3-gettext";
 
+// The build fences the chrome's stylesheets off from core components, so they bring their own.
+import "font-awesome/css/font-awesome.min.css";
+import "primeicons/primeicons.css";
+import "@/arches_vue_components/application/core-component-base.css";
+
 import { DEFAULT_THEME } from "@/arches/themes/default.ts";
 import { generateArchesURL } from '@/arches/utils/generate-arches-url.ts';
 

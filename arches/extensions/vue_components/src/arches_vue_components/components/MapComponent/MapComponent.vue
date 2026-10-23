@@ -64,6 +64,9 @@ const {
 
 const emit = defineEmits<MapComponentEmit>();
 
+// The root renders beside a popup Teleport, so attrs must be bound explicitly.
+defineOptions({ inheritAttrs: false });
+
 const mapShell = useTemplateRef<HTMLDivElement>("mapShell");
 const mapContainer = useTemplateRef<HTMLDivElement>("mapContainer");
 const mapHeader = useTemplateRef<InstanceType<typeof MapHeader>>("mapHeader");
@@ -155,6 +158,7 @@ async function closePanel(): Promise<void> {
     <div
         ref="mapShell"
         class="map-component"
+        v-bind="$attrs"
         @keydown.esc="closePanel"
     >
         <MapHeader
@@ -263,11 +267,20 @@ async function closePanel(): Promise<void> {
     display: flex;
     flex-direction: column;
     width: 100%;
+    height: 100%;
     flex: 1;
-    min-height: 25rem;
+    /* Header plus a feature popup between the panel insets */
+    min-height: 37.2rem;
     overflow: hidden;
     background: var(--p-content-background);
     color: var(--p-text-color);
+}
+
+.map-component,
+.map-component :deep(*),
+.map-component :deep(*::before),
+.map-component :deep(*::after) {
+    box-sizing: border-box;
 }
 
 .map-component:fullscreen {
@@ -334,5 +347,9 @@ async function closePanel(): Promise<void> {
 .map-body-with-status-bar
     :deep(.maplibregl-ctrl-bottom-right .maplibregl-ctrl-attrib) {
     margin-block-end: var(--map-component-status-bar-attribution-inset);
+}
+
+.map-body :deep(.maplibregl-ctrl-geocoder--input) {
+    font-size: 1.3rem;
 }
 </style>
