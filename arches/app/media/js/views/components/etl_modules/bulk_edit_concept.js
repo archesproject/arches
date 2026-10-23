@@ -160,13 +160,13 @@ const ViewModel = function(params) {
         });
     };
 
-    this.selectedNode.subscribe((nodeid) => {
+    this.selectedNodeDetails.subscribe((node) => {
         self.conceptNew(undefined);
         self.conceptOld(undefined);
         self.rdmCollectionLanguages.removeAll();
 
-        if(!!nodeid){
-            self.rdmCollection = self.selectedNodeDetails().rdmCollection;
+        if(!!node){
+            self.rdmCollection = node.rdmCollection;
 
             self.submit('get_collection_languages').then(data => {
                 self.rdmCollectionLanguages(data.result);
