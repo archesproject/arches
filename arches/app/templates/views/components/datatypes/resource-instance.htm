@@ -10,14 +10,15 @@
     </div>
     <div style="padding-bottom: 10px;">
         <select multiple data-bind="
-            placeholder: $root.translations.selectAResourceModel,
-            selectedOptions: selectedResourceModel,
             options: resourceModels,
             optionsText: 'name',
-            chosen: {
-                width: '100%',
-            },
-            attr: {'aria-label': $root.translations.selectAResourceModel},
+            optionsValue: 'graphid',
+            select2Query: {select2Config: {
+                value: selectedResourceModel,
+                multiple: true,
+                placeholder: $root.translations.selectAResourceModel
+            }},
+            attr: {'data-label': $root.translations.selectAResourceModel},
         "></select>
     </div>
     <div class="rr-table">
