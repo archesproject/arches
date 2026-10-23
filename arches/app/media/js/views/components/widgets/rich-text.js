@@ -7,6 +7,7 @@ import arches from 'arches';
 import richTextWidgetTemplate from 'templates/views/components/widgets/rich-text.htm';
 import 'bindings/ckeditor';
 import 'bindings/chosen';
+import 'bindings/select2-query';
 
 
 /**

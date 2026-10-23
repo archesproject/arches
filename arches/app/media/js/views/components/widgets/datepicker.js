@@ -6,7 +6,7 @@ import moment from 'moment';
 import datePickerWidgetTemplate from 'templates/views/components/widgets/datepicker.htm';
 import 'bindings/datepicker';
 import 'bindings/moment-date';
-import 'bindings/chosen';
+import 'bindings/select2-query';
 import 'bindings/key-events-click';
 
 

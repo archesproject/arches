@@ -1,6 +1,7 @@
 {% extends "base-manager.htm" %}
 {% load static %}
 {% load i18n %}
+{% load template_tags %}
 
 {% block title %}
 {{ block.super }}
@@ -30,7 +31,11 @@
                 {% trans 'Now' %}
             </div>
             <span class="pull-right">
-                <select id="" style="width:135px" class="resources" tabindex="-1" data-bind="chosen: {disable_search: true}, value: sortOrder">
+                <select style="width:135px" class="resources" data-bind="
+                    attr: {'data-label': {% quoted_trans _('Sort order') %}},
+                    select2Query: {select2Config: {
+                        value: sortOrder
+                    }}">
                     <option value="time_desc">{% trans 'Most recent' %}</option>
                     <option value="time_asc">{% trans 'Oldest' %}</option>
                     <option value="editor_asc">{% trans 'By editor' %}</option>

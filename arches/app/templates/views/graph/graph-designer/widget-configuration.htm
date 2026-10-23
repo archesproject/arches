@@ -27,7 +27,15 @@
                 {% trans "Template" %}
             </div>
             <div class="pad-no">
-                <select class="design" data-bind="value: $data.widget_id, options: $data.widgetList && $data.widgetList(), optionsText: 'name', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select class="design" data-bind="
+                    attr: {'data-label': {% quoted_trans _('Template') %}},
+                    options: $data.widgetList && $data.widgetList(),
+                    optionsText: 'name',
+                    optionsValue: 'id',
+                    select2Query: {select2Config: {
+                        value: $data.widget_id,
+                        minimumResultsForSearch: 10
+                    }}"></select>
             </div>
         </div>
 

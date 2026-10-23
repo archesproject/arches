@@ -25,13 +25,17 @@
                     <label for="resource-model-select" data-bind="text: $root.translations.selectAResourceModel"></label>
                 </h3>
                 <select id="resource-model-select" data-bind="
+                    attr: {'data-label': $root.translations.selectAResourceModel},
                     value: selectedGraph,
+                    valueAllowUnset: true,
                     options: graphs,
                     optionsText: 'name',
                     optionsValue: 'graphid',
-                    optionsCaption: $root.translations.select,
-                    valueAllowUnset: true,
-                    chosen: {width: '500px'}"
+                    select2Query: {select2Config: {
+                        value: selectedGraph,
+                        placeholder: $root.translations.select,
+                        allowClear: true
+                    }}"
                 ></select>
 
                 <div style="display: flex; padding-top: 20px; font-size: 15px;">

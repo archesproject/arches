@@ -4,7 +4,7 @@ import Backbone from 'backbone';
 import ko from 'knockout';
 import arches from 'arches';
 import 'views/components/simple-switch';
-import 'bindings/chosen';
+import 'bindings/select2-query';
 
 
 var NodeFormView = Backbone.View.extend({

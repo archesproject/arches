@@ -1,5 +1,6 @@
 {% extends "views/components/etl_modules/base-import.htm" %}
 {% load i18n %}
+{% load template_tags %}
 
 {% block task_details %}
 <div class="etl-module-component-container">
@@ -16,7 +17,16 @@
                 {% trans "Resource Model" %}
             </label>
             <div>
-                <select id="graph-select" data-bind="options: availableGraphs, optionsText: 'graphName', optionsValue: 'graphid', value: selectedGraph, valueAllowUnset: true, optionsCaption: ' ', chosen: {width: '400px'}"></select>
+                <select id="graph-select" data-bind="
+                    attr: {'data-label': {% quoted_trans _('Resource Model') %}},
+                    value: selectedGraph,
+                    valueAllowUnset: true,
+                    options: availableGraphs,
+                    optionsText: 'graphName',
+                    optionsValue: 'graphid',
+                    select2Query: {select2Config: {
+                        value: selectedGraph
+                    }}"></select>
             </div>
         </div>
 
@@ -43,7 +53,16 @@
                 {% trans "Language for Label Fallback" %}
             </label>
             <div>
-                <select id="language-select" data-bind="options: languages, optionsText: 'name', optionsValue: 'code', value: languageCode, valueAllowUnset: true, chosen: {width: '400px'}"></select>
+                <select id="language-select" data-bind="
+                    attr: {'data-label': {% quoted_trans _('Language for Label Fallback') %}},
+                    value: languageCode,
+                    valueAllowUnset: true,
+                    options: languages,
+                    optionsText: 'name',
+                    optionsValue: 'code',
+                    select2Query: {select2Config: {
+                        value: languageCode
+                    }}"></select>
             </div>
         </div>
 

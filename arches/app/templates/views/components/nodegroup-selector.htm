@@ -11,12 +11,15 @@
             <select 
                 multiple 
                 data-bind="
-                    placeholder: $root.translations.selectANodegroup,
-                    chosen: {width: '100%'}, 
-                    selectedOptions: triggering_nodegroups, 
-                    options: cards, 
-                    optionsText: 'name', 
-                    optionsValue: 'nodegroup_id'
+                    attr: {'data-label': $root.translations.triggeringNodegroups},
+                    options: cards,
+                    optionsText: 'name',
+                    optionsValue: 'nodegroup_id',
+                    select2Query: {select2Config: {
+                        value: triggering_nodegroups,
+                        multiple: true,
+                        placeholder: $root.translations.selectANodegroup
+                    }}
                 "
             ></select>
         </div>

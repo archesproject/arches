@@ -51,13 +51,17 @@
                     <label for="resource-model-select" data-bind="text: $root.translations.selectAResourceModel"></label>
                 </h3>
                 <select id="resource-model-select" data-bind="
+                    attr: {'data-label': $root.translations.selectAResourceModel},
                     value: selectedGraph,
+                    valueAllowUnset: true,
                     options: graphs,
                     optionsText: 'name',
                     optionsValue: 'graphid',
-                    optionsCaption: $root.translations.select + '...',
-                    valueAllowUnset: true,
-                    chosen: {width: '500px'}"
+                    select2Query: {select2Config: {
+                        value: selectedGraph,
+                        placeholder: $root.translations.select + '...',
+                        allowClear: true
+                    }}"
                 ></select>
             </div>
             <!-- /ko -->
@@ -67,13 +71,17 @@
                     <label for="nodegroup-select" data-bind="text: $root.translations.selectANodegroup"></label>
                 </h3>
                 <select id="nodegroup-select" data-bind="
+                    attr: {'data-label': $root.translations.selectANodegroup},
                     value: selectedNodegroup,
+                    valueAllowUnset: true,
                     options: nodegroups,
                     optionsText: 'name',
-                    optionsCaption: $root.translations.select + '...',
                     optionsValue: 'nodegroupid',
-                    valueAllowUnset: true,
-                    chosen: {width: '500px'}"
+                    select2Query: {select2Config: {
+                        value: selectedNodegroup,
+                        placeholder: $root.translations.select + '...',
+                        allowClear: true
+                    }}"
                 ></select>
             </div>
             <!-- /ko -->

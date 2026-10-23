@@ -18,6 +18,7 @@ import CardTreeViewModel from 'views/graph/graph-designer/card-tree';
 import PermissionDesigner from 'views/graph/permission-designer';
 import GraphSettingsViewModel from 'viewmodels/graph-settings';
 import 'bindings/resizable-sidepanel';
+import 'bindings/select2-query';
 import 'views/components/simple-switch';
 import 'views/components/icon-selector';
 import 'utils/set-csrf-token';

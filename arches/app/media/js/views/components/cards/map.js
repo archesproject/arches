@@ -3,7 +3,7 @@ import arches from 'arches';
 import CardComponentViewModel from 'viewmodels/card-component';
 import MapEditorViewModel from 'viewmodels/map-editor';
 import mapCardTemplate from 'templates/views/components/cards/map.htm';
-import 'bindings/chosen';
+import 'bindings/select2-query';
 import 'bindings/codemirror';
 import 'views/components/datatypes/geojson-feature-collection';
 
