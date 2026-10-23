@@ -110,11 +110,15 @@
                 <label for="language-select" data-bind="text: $root.translations.language"></label>
             </h3>
             <select id="language-select" data-bind="
+                attr: {'data-label': $root.translations.language},
                 options: languages,
-                optionsCaption: $root.translations.select + '...',
+                optionsValue: 'code',
                 optionsText: function(item){return item.name + ' (' + item.code + ')'},
-                value: selectedLanguage,
-                chosen: {width: '500px'}"
+                select2Query: {select2Config: {
+                    value: selectedLanguage,
+                    placeholder: $root.translations.select + '...',
+                    allowClear: true
+                }}"
             ></select>
         </div>
         <div class="etl-module-component-block" data-bind="if: operation() === 'replace'">
