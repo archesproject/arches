@@ -11,6 +11,7 @@ import 'bindings/datatable';
 import 'bindings/dropzone';
 import 'bindings/resizable-sidepanel';
 import 'bindings/chosen';
+import 'bindings/select2-query';
 
 
 const viewModel = function(params) {

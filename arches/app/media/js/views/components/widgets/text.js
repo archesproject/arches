@@ -5,6 +5,7 @@ import WidgetViewModel from 'viewmodels/widget';
 import arches from 'arches';
 import textWidgetTemplate from 'templates/views/components/widgets/text.htm';
 import 'bindings/chosen';
+import 'bindings/select2-query';
 
 
 /**

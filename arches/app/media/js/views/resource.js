@@ -3,7 +3,7 @@ import _ from 'underscore';
 import ko from 'knockout';
 import arches from 'arches';
 import BaseManagerView from 'views/base-manager';
-import 'bindings/chosen';
+import 'bindings/select2-query';
 
 
 /**

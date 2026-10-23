@@ -25,7 +25,16 @@
                 <label style="font-weight: normal; font-size: 1.5rem; color: #565656;" data-bind="text: $root.translations.selectAResourceModel"></label>
             </h3>
             <div>
-                <select data-bind="options: dropdowngraph, optionsText: 'graphName', optionsValue: 'graphid', value: selectedGraph, valueAllowUnset: true, chosen: {width: '400px'}"></select>
+                <select data-bind="
+                    attr: {'data-label': $root.translations.selectAResourceModel},
+                    value: selectedGraph,
+                    valueAllowUnset: true,
+                    options: dropdowngraph,
+                    optionsText: 'graphName',
+                    optionsValue: 'graphid',
+                    select2Query: {select2Config: {
+                        value: selectedGraph
+                    }}"></select>
             </div>
         </div>
 

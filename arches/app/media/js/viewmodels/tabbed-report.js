@@ -4,7 +4,7 @@ import ko from 'knockout';
 import koMapping from 'knockout-mapping';
 import arches from 'arches';
 import ReportViewModel from 'viewmodels/report';
-import 'bindings/chosen';
+import 'bindings/select2-query';
 
 
 export default function(params) {

@@ -113,7 +113,7 @@
                                 <div class="add-new-feature" data-bind="visible: !self.disableDrawing()">
                                     <select 
                                         data-bind="
-                                            placeholder: $root.translations.addANewFeature + '...',
+                                            attr: {'data-label': $root.translations.addANewFeature},
                                             value: self.featureLookup[widget.node_id()].selectedTool,
                                             valueAllowUnset: true,
                                             options: [
@@ -136,18 +136,19 @@
                                             ],
                                             optionsText: 'text',
                                             optionsValue: 'value',
-                                            chosen: {
-                                                'width': '100%',
-                                                'disable_search_threshold': 10,
-                                                'allow_single_deselect': true
-                                            }
+                                            select2Query: {select2Config: {
+                                                value: self.featureLookup[widget.node_id()].selectedTool,
+                                                placeholder: $root.translations.addANewFeature + '...',
+                                                allowClear: true,
+                                                minimumResultsForSearch: 10
+                                            }}
                                         "   
                                     ></select>
                                 </div>
                                 <div class="add-new-feature" data-bind="visible: self.disableDrawing">
                                     <select 
                                         data-bind="
-                                            placeholder: $root.translations.addANewFeature + '...',
+                                            attr: {'data-label': $root.translations.addANewFeature},
                                             value: self.featureLookup[widget.node_id()].selectedTool,
                                             valueAllowUnset: true,
                                             options: [
@@ -170,12 +171,13 @@
                                             ],
                                             optionsText: 'text',
                                             optionsValue: 'value',
-                                            chosen: {
-                                                'disabled': true,
-                                                'width': '100%',
-                                                'disable_search_threshold': 10,
-                                                'allow_single_deselect': true
-                                            }
+                                            select2Query: {select2Config: {
+                                                value: self.featureLookup[widget.node_id()].selectedTool,
+                                                disabled: true,
+                                                placeholder: $root.translations.addANewFeature + '...',
+                                                allowClear: true,
+                                                minimumResultsForSearch: 10
+                                            }}
                                         "
                                     ></select>
                                 </div>

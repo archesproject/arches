@@ -7,6 +7,7 @@ import baseStringEditorTemplate from 'templates/views/components/etl_modules/bul
 import 'views/components/widgets/concept-select';
 import 'select-woo';
 import 'bindings/chosen';
+import 'bindings/select2-query';
 
 
 const ViewModel = function(params) {

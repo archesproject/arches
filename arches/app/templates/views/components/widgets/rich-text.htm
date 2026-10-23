@@ -40,15 +40,17 @@
                         style="flex:1"
                         name="language"
                         data-bind="
-                            value: currentDirection,
+                            attr: {'data-label': $root.translations.direction},
                             disable: disabled,
-                            chosen: {'width':'100%'},
                             optionsText: 'text',
                             optionsValue: 'value',
                             options: [
                                 { text: $root.translations.leftToRight, value: 'ltr' },
                                 { text: $root.translations.rightToLeft, value: 'rtl' },
                             ],
+                            select2Query: {select2Config: {
+                                value: currentDirection
+                            }}
                         "
                     ></select>
                 </div>

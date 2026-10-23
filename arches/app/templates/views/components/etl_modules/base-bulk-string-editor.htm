@@ -45,13 +45,17 @@
                 <label for="case-operation-select" data-bind="text: $root.translations.selectEditOperation"></label>
             </h3>
             <select id="case-operation-select" data-bind="
+                attr: {'data-label': $root.translations.selectEditOperation},
                 value: selectedCaseOperation,
+                valueAllowUnset: true,
                 options: caseOperations,
                 optionsText: 'label',
                 optionsValue: 'name',
-                optionsCaption: $root.translations.select + '...',
-                valueAllowUnset: true,
-                chosen: {width: '500px'}"
+                select2Query: {select2Config: {
+                    value: selectedCaseOperation,
+                    placeholder: $root.translations.select + '...',
+                    allowClear: true
+                }}"
             ></select>
             <div data-bind="ifnot: ['trim', 'replace'].includes(operation())">
                 <span class="form-check">
@@ -67,13 +71,17 @@
                 <label for="resource-model-select" data-bind="text: $root.translations.selectAResourceModel"></label>
             </h3>
             <select id="resource-model-select" data-bind="
+                attr: {'data-label': $root.translations.selectAResourceModel},
                 value: selectedGraph,
+                valueAllowUnset: true,
                 options: graphs,
                 optionsText: 'name',
                 optionsValue: 'graphid',
-                optionsCaption: $root.translations.select + '...',
-                valueAllowUnset: true,
-                chosen: {width: '500px'}"
+                select2Query: {select2Config: {
+                    value: selectedGraph,
+                    placeholder: $root.translations.select + '...',
+                    allowClear: true
+                }}"
             ></select>
         </div>
         
@@ -83,13 +91,17 @@
                 <label for="node-select" data-bind="text: $root.translations.selectANode"></label>
             </h3>
             <select id="node-select" data-bind="
+                attr: {'data-label': $root.translations.selectANode},
                 value: selectedNode,
+                valueAllowUnset: true,
                 options: nodes,
                 optionsText: 'label',
-                optionsCaption: $root.translations.select + '...',
                 optionsValue: 'nodeid',
-                valueAllowUnset: true,
-                chosen: {width: '500px'}"
+                select2Query: {select2Config: {
+                    value: selectedNode,
+                    placeholder: $root.translations.select + '...',
+                    allowClear: true
+                }}"
             ></select>
         </div>
         <!-- /ko -->

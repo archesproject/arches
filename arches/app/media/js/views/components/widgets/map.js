@@ -6,7 +6,6 @@ import WidgetViewModel from 'viewmodels/widget';
 import MapEditorViewModel from 'viewmodels/map-editor';
 import mapWidgetTemplate from 'templates/views/components/widgets/map.htm';
 import mapWidgetEditorTemplate from 'templates/views/components/map-widget-editor.htm';
-import 'bindings/chosen';
 import 'bindings/codemirror';
 import 'select-woo';
 import 'bindings/fadeVisible';

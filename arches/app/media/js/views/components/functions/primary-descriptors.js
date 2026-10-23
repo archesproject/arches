@@ -4,7 +4,7 @@ import ko from 'knockout';
 import koMapping from 'knockout-mapping';
 import arches from 'arches';
 import FunctionViewModel from 'viewmodels/function-view-model';
-import chosen from 'bindings/chosen';
+import 'bindings/select2-query';
 import primaryDescriptorsFunctionTemplate from 'templates/views/components/functions/primary-descriptors.htm';
 
 

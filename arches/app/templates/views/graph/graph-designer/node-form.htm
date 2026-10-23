@@ -90,7 +90,18 @@
                                 </div>
     
                                 <div class="col-xs-12 crm-selector">
-                                    <select class="design" data-bind="value: node().parentproperty, options: node().validproperties, optionsText: node().getFriendlyOntolgyName.bind(node()), valueAllowUnset: true, optionsCaption: {% quoted_trans _("Choose a property") %}, chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                                    <select class="design" data-bind="
+                                        attr: {'data-label': {% quoted_trans _('Relationship to parent') %}},
+                                        value: node().parentproperty,
+                                        valueAllowUnset: true,
+                                        options: node().validproperties,
+                                        optionsText: node().getFriendlyOntolgyName.bind(node()),
+                                        select2Query: {select2Config: {
+                                            value: node().parentproperty,
+                                            placeholder: {% quoted_trans _('Choose a property') %},
+                                            allowClear: true,
+                                            minimumResultsForSearch: 10
+                                        }}"></select>
                                 </div>
                             </div>
                         </div>
@@ -105,7 +116,18 @@
                                 </div>
     
                                 <div class="col-xs-12 crm-selector">
-                                    <select class="" data-bind="value: node().ontologyclass, options: node().validclasses, optionsText: node().getFriendlyOntolgyName.bind(node()), valueAllowUnset: true, optionsCaption: {% quoted_trans _('Choose a class')%}, chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                                    <select class="" data-bind="
+                                        attr: {'data-label': {% quoted_trans _('Ontology Class') %}},
+                                        value: node().ontologyclass,
+                                        valueAllowUnset: true,
+                                        options: node().validclasses,
+                                        optionsText: node().getFriendlyOntolgyName.bind(node()),
+                                        select2Query: {select2Config: {
+                                            value: node().ontologyclass,
+                                            placeholder: {% quoted_trans _('Choose a class') %},
+                                            allowClear: true,
+                                            minimumResultsForSearch: 10
+                                        }}"></select>
                                 </div>
                             </div>
                         </div>
@@ -176,7 +198,15 @@
                                 </div>
     
                                 <div class="col-xs-12 crm-selector">
-                                    <select class="design" data-bind="disable: disableDatatype(), value: node().datatype, options: datatypes, optionsCaption: {% quoted_trans _('Choose a data type') %}, chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                                    <select class="design" data-bind="
+                                        attr: {'data-label': {% quoted_trans _('Data type') %}},
+                                        options: datatypes,
+                                        select2Query: {select2Config: {
+                                            value: node().datatype,
+                                            disabled: disableDatatype,
+                                            placeholder: {% quoted_trans _('Choose a data type') %},
+                                            minimumResultsForSearch: 10
+                                        }}"></select>
                                 </div>
                             </div>
                         </div>

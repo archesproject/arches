@@ -8,7 +8,7 @@ import AlertViewModel from 'viewmodels/alert';
 import JsonErrorAlertViewModel from 'viewmodels/alert-json';
 import 'bootstrap';
 import 'bindings/hover';
-import 'bindings/chosen';
+import 'bindings/select2-query';
 import 'utils/set-csrf-token';
 
 
