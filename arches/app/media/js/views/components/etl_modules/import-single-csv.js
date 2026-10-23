@@ -11,7 +11,6 @@ import "views/components/simple-switch";
 import "bindings/datatable";
 import "bindings/dropzone";
 import "bindings/resizable-sidepanel";
-import 'bindings/chosen';
 import 'bindings/select2-query';
 
 
@@ -133,9 +132,7 @@ const viewModel = function(params) {
                     return {
                         field: header,
                         node: ko.observable(),
-                        language: ko.observable(
-                            arches.languages.find(lang => lang.code == arches.activeLanguage)
-                        ),
+                        language: ko.observable(arches.activeLanguage),
                     };
                 })
             );
@@ -233,10 +230,19 @@ const viewModel = function(params) {
         });
     };
 
+    this.getFieldMapping = function(){
+        const fieldMapping = koMapping.toJS(self.fieldMapping);
+        // the full language object is required, not just the code
+        fieldMapping.forEach(mapping => {
+            mapping.language = self.languages().find(lang => lang.code === mapping.language);
+        });
+        return fieldMapping;
+    };
+
     this.write = function(){
         if (!self.ready()) { return; }
         const fieldnames = koMapping.toJS(self.fieldMapping).map(fieldname => {return fieldname.node;});
-        const fieldMapping = koMapping.toJS(self.fieldMapping);
+        const fieldMapping = self.getFieldMapping();
         self.formData.append('fieldnames', fieldnames);
         self.formData.append('fieldMapping', JSON.stringify(fieldMapping));
         self.formData.append('hasHeaders', self.hasHeaders());
@@ -267,7 +273,7 @@ const viewModel = function(params) {
     this.validate =function(){
         self.validated(false);
         const fieldnames = koMapping.toJS(self.fieldMapping).map(fieldname => fieldname.node);
-        const fieldMapping = koMapping.toJS(self.fieldMapping);
+        const fieldMapping = self.getFieldMapping();
         self.formData.append('fieldnames', fieldnames);
         self.formData.append('fieldMapping', JSON.stringify(fieldMapping));
         self.formData.append('hasHeaders', self.hasHeaders());
