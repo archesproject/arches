@@ -185,10 +185,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- Menu Item -->
             <div class="graph-selector" data-bind="">
                 <!-- ko if: groupedGraphs -->
-                <select data-bind="template: { name: 'selectGraphTemplate', data: groupedGraphs }, chosen: {width: '100%'}, value: graphid"></select>
+                <select data-bind="
+                    attr: {'data-label': {% quoted_trans _('Resource Model/Branch') %}},
+                    template: { name: 'selectGraphTemplate', data: groupedGraphs },
+                    select2Query: {select2Config: {
+                        value: graphid,
+                        placeholder: {% quoted_trans _('Find a Resource Model/Branch...') %}
+                    }}"></select>
                 <!-- /ko -->
                 <script type="text/html" id="selectGraphTemplate">
-                    <option disabled selected value>{% trans "Find a Resource Model/Branch..." %}</option>
+                    <option disabled selected value></option>
                     <!-- ko foreach: groups -->
                         <optgroup data-bind="attr: { 'label': (name==='Resource Models')?{% quoted_trans _("Resource Models") %}:{% quoted_trans _("Branches") %}}, foreach: items">
                             <option data-bind="value: graphid, text: name"></option>
@@ -443,7 +449,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 {% trans "Template" %}
                             </div>
                             <div class="pad-no">
-                                <select class="design" data-bind="value: report.get('template_id'), options: reportTemplates, optionsText: 'name', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                                <select class="design" data-bind="
+                                    attr: {'data-label': {% quoted_trans _('Template') %}},
+                                    options: reportTemplates,
+                                    optionsText: 'name',
+                                    optionsValue: 'id',
+                                    select2Query: {select2Config: {
+                                        value: report.get('template_id'),
+                                        minimumResultsForSearch: 10
+                                    }}"></select>
                             </div>
                         </div>
 

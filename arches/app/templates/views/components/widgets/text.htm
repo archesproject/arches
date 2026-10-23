@@ -52,16 +52,17 @@
                             style="flex:1"
                             name="language"
                             data-bind="
-                                value: currentDirection,
                                 disable: disabled,
-                                chosen: {'width':'100%'},
                                 optionsText: 'text',
                                 optionsValue: 'value',
                                 options: [
                                     { text: $root.translations.leftToRight, value: 'ltr' },
                                     { text: $root.translations.rightToLeft, value: 'rtl' },
                                 ],
-                                attr: {'aria-label': $root.translations.direction}
+                                select2Query: {select2Config: {
+                                    value: currentDirection
+                                }},
+                                attr: {'data-label': $root.translations.direction}
                             "
                         ></select>
                     </div>
@@ -148,15 +149,16 @@
                     style="flex:1"
                     name="language"
                     data-bind="
-                        value: currentDefaultDirection,
-                        chosen: {'width':'100%'},
                         optionsText: 'text',
                         optionsValue: 'value',
                         options: [
                             { text: $root.translations.leftToRight, value: 'ltr' },
                             { text: $root.translations.rightToLeft, value: 'rtl' },
                         ],
-                        attr: {'aria-label': $root.translations.direction}
+                        select2Query: {select2Config: {
+                            value: currentDefaultDirection
+                        }},
+                        attr: {'data-label': $root.translations.direction}
                     "
                 ></select>
             </div>

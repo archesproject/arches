@@ -4,7 +4,7 @@ import ko from 'knockout';
 import koMapping from 'knockout-mapping';
 import FunctionViewModel from 'viewmodels/function-view-model';
 import GraphModel from 'models/graph';
-import chosen from 'bindings/chosen';
+import 'bindings/select2-query';
 import nodegroupSelectorTemplate from 'templates/views/components/nodegroup-selector.htm';
 
 

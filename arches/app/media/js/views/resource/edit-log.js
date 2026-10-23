@@ -5,7 +5,7 @@ import moment from 'moment';
 import arches from 'arches';
 import BaseManagerView from 'views/base-manager';
 import data from 'views/resource/resource-edit-history-data';
-import 'bindings/chosen';
+import 'bindings/select2-query';
 
 
 var ResourceEditLogView = BaseManagerView.extend({
