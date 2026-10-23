@@ -8,6 +8,7 @@ import FeaturePopup from "@/arches_vue_components/components/MapComponent/compon
 import FloatingPanel from "@/arches_vue_components/components/MapComponent/components/FloatingPanel.vue";
 import MapHeader from "@/arches_vue_components/components/MapComponent/components/MapHeader.vue";
 import MapStatusBar from "@/arches_vue_components/components/MapComponent/components/MapStatusBar/MapStatusBar.vue";
+import MapToolsPanel from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/MapToolsPanel.vue";
 
 import {
     mapContextKey,
@@ -40,6 +41,7 @@ const {
     interactionTools = undefined,
     maxFeatures = undefined,
     featurePopupComponent = undefined,
+    isReadOnly = false,
     settings = undefined,
 } = defineProps<{
     value?: FeatureCollection | null;
@@ -56,6 +58,7 @@ const {
     interactionTools?: MapInteractionTool[];
     maxFeatures?: number;
     featurePopupComponent?: Component;
+    isReadOnly?: boolean;
     settings?: Partial<MapSettings>;
 }>();
 
@@ -70,7 +73,7 @@ const mapHeader = useTemplateRef<InstanceType<typeof MapHeader>>("mapHeader");
 
 const { context, popupContainer, popupFeatures } = useMapContext(
     {
-        value: value ?? null,
+        value: () => value ?? null,
         zoom,
         pitch,
         bearing,
@@ -82,6 +85,7 @@ const { context, popupContainer, popupFeatures } = useMapContext(
         allowedGeometryTypes,
         resolveOverlayLayers,
         maxFeatures,
+        isReadOnly,
         settings,
     },
     emit,
@@ -107,9 +111,13 @@ defineExpose({
 const resolvedFeaturePopupComponent = computed(
     () => featurePopupComponent ?? FeaturePopup,
 );
-const resolvedInteractionTools = computed(
-    () => interactionTools ?? defaultMapInteractionTools,
-);
+const resolvedInteractionTools = computed(() => {
+    const tools = interactionTools ?? defaultMapInteractionTools;
+    if (!isReadOnly) {
+        return tools;
+    }
+    return tools.filter((tool) => tool.component !== MapToolsPanel);
+});
 const isStatusBarVisible = computed(
     () =>
         context.settings.value.showCursorCoordinates ||

@@ -61,6 +61,9 @@ class TileTreeOperation:
         self.deletable_nodegroups: set[str] = (
             self.request.user.userprofile.deletable_nodegroups
         )
+        self.viewable_nodegroups: set[str] = (
+            self.request.user.userprofile.viewable_nodegroups
+        )
 
         if (self.partial and self.request.method == "PUT") or (
             not self.partial and self.request.method == "PATCH"
@@ -221,7 +224,7 @@ class TileTreeOperation:
                 for existing_tile in self.existing_tiles_by_nodegroup_alias[
                     grouping_node.alias
                 ]:
-                    if str(existing_tile.nodegroup_id) in self.deletable_nodegroups:
+                    if self._can_delete_missing_tile(existing_tile):
                         self.to_delete.add(existing_tile)
             return
 
@@ -230,6 +233,11 @@ class TileTreeOperation:
             next_sort_order = 0
         else:
             next_sort_order = max(t.sortorder or 0 for t in existing_tiles) + 1
+        incoming_sort_orders = {
+            new_tile.sortorder
+            for new_tile in new_tiles
+            if new_tile.sortorder is not None
+        }
 
         if self.for_new_resource or (
             isinstance(self.entry, ResourceInstance) and self.entry._state.adding
@@ -244,9 +252,8 @@ class TileTreeOperation:
 
         for existing_tile, new_tile in self._pair_tiles(existing_tiles, new_tiles):
             if new_tile is NOT_PROVIDED:
-                if (
-                    delete_missing_tiles
-                    and str(existing_tile.nodegroup_id) in self.deletable_nodegroups
+                if delete_missing_tiles and self._can_delete_missing_tile(
+                    existing_tile
                 ):
                     to_delete.add(existing_tile)
                 continue
@@ -254,8 +261,11 @@ class TileTreeOperation:
             if existing_tile is NOT_PROVIDED:
                 new_tile.nodegroup_id = grouping_node.nodegroup_id
                 new_tile.resourceinstance_id = self.resourceid
-                new_tile.sortorder = next_sort_order
-                next_sort_order += 1
+                if new_tile.sortorder is None:
+                    while next_sort_order in incoming_sort_orders:
+                        next_sort_order += 1
+                    new_tile.sortorder = next_sort_order
+                    next_sort_order += 1
                 for node in grouping_node.nodegroup.node_set.all():
                     if node.datatype != "semantic":
                         new_tile.data[str(node.pk)] = new_tile.get_default_value(node)
@@ -338,6 +348,13 @@ class TileTreeOperation:
             # are processed within separate _update_tile() calls.
             # print("DEBUG: Removing tile from delete set because it is being upserted, tile id", str(tile.pk))
             self.to_delete.discard(tile)
+
+    def _can_delete_missing_tile(self, tile):
+        nodegroup_id = str(tile.nodegroup_id)
+        return (
+            nodegroup_id in self.deletable_nodegroups
+            and nodegroup_id in self.viewable_nodegroups
+        )
 
     def _extract_incoming_tiles(self, container, grouping_node):
         from arches.extensions.querysets.models import TileTree

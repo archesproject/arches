@@ -550,6 +550,8 @@ class TileTree(TileModel, AliasedDataMixin):
         arches_model_kwargs, other_kwargs = pop_arches_model_kwargs(
             kwargs, self._meta.get_fields()
         )
+        if not args:
+            other_kwargs.setdefault("sortorder", None)
         super().__init__(*args, **other_kwargs)
         self.aliased_data = arches_model_kwargs.pop(
             "aliased_data", None
