@@ -34,7 +34,7 @@ define(['jquery', 'knockout', 'arches'], function($, ko, arches) {
                         return data;
                     },
                     dataType: 'json',
-                    quietMillis: 250,
+                    delay: 250,
                     processResults: function(data, params) {
                         var ret = data;
                         if(!!params.term && params.term !== ""){
