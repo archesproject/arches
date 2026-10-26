@@ -26,8 +26,6 @@ export default ko.components.register('views/components/nodegroup-selector', {
         }, this);
 
         this.triggering_nodegroups = params.triggering_nodegroups;
-
-        window.setTimeout(function(){$("select[data-bind^=chosen]").trigger("chosen:updated");}, 300);
     },
     template: nodegroupSelectorTemplate,
 });
