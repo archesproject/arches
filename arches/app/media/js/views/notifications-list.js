@@ -2,7 +2,6 @@ import $ from 'jquery';
 import arches from 'arches';
 import ListView from 'views/list';
 import 'bindings/datepicker';
-import 'bindings/chosen';
 import 'views/components/simple-switch';
 import 'views/components/notification';
 
