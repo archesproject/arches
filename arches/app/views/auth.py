@@ -33,6 +33,7 @@ from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 from django.utils.html import strip_tags
 from django.utils.translation import gettext as _
 from django.utils.http import urlencode
@@ -625,38 +626,55 @@ class TwoFactorAuthenticationLoginView(View):
 
 @method_decorator(never_cache, name="dispatch")
 class TwoFactorAuthenticationSettingsView(View):
+    @staticmethod
+    def get_user_id_from_link(link):
+        """Returns the user id from a valid, unexpired reset link, else None."""
+        try:
+            decrypted_data = JSONDeserializer().deserialize(
+                AESCipher(settings.SECRET_KEY).decrypt(link)
+            )
+            link_time = datetime.fromtimestamp(int(decrypted_data["ts"]))
+            if link_time + timedelta(minutes=15) < datetime.fromtimestamp(
+                int(time.time())
+            ):
+                return None
+            return int(decrypted_data["user"]["id"])
+        except Exception:
+            return None
+
     def get(self, request):
         link = request.GET.get("link", None)
-        AES = AESCipher(settings.SECRET_KEY)
+        user_id = self.get_user_id_from_link(link)
+        if user_id is None:
+            return HttpResponseForbidden(_("Link invalid or expired"))
 
-        decrypted_data = JSONDeserializer().deserialize(AES.decrypt(link))
-
-        if datetime.fromtimestamp(decrypted_data["ts"]) + timedelta(
-            minutes=15
-        ) >= datetime.fromtimestamp(
-            int(time.time())
-        ):  # if before email expiry
-            user_id = decrypted_data["user"]["id"]
+        try:
             user_profile = models.UserProfile.objects.get(user_id=user_id)
+        except models.UserProfile.DoesNotExist:
+            return HttpResponseForbidden(_("Link invalid or expired"))
 
-            context = {
-                "ENABLE_TWO_FACTOR_AUTHENTICATION": settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
-                "FORCE_TWO_FACTOR_AUTHENTICATION": settings.FORCE_TWO_FACTOR_AUTHENTICATION,
-                "user_has_enabled_two_factor_authentication": bool(
-                    user_profile.encrypted_mfa_hash
-                ),
-                "user_id": user_id,
-            }
-
-        else:
-            raise Exception("Link Expired")
+        context = {
+            "ENABLE_TWO_FACTOR_AUTHENTICATION": settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
+            "FORCE_TWO_FACTOR_AUTHENTICATION": settings.FORCE_TWO_FACTOR_AUTHENTICATION,
+            "user_has_enabled_two_factor_authentication": bool(
+                user_profile.encrypted_mfa_hash
+            ),
+            "link": link,
+        }
 
         return render(request, "two_factor_authentication_settings.htm", context)
 
     def post(self, request):
-        user_id = request.POST.get("user-id")
-        user = models.User.objects.get(pk=int(user_id))
-        user_profile = models.UserProfile.objects.get(user_id=user_id)
+        link = request.POST.get("link", None)
+        user_id = self.get_user_id_from_link(link)
+        if user_id is None:
+            return HttpResponseForbidden(_("Link invalid or expired"))
+
+        try:
+            user = models.User.objects.get(pk=user_id)
+            user_profile = models.UserProfile.objects.get(user_id=user_id)
+        except (models.User.DoesNotExist, models.UserProfile.DoesNotExist):
+            return HttpResponseForbidden(_("Link invalid or expired"))
 
         generate_qr_code = request.POST.get("generate-qr-code-button")
         generate_manual_key = request.POST.get("generate-manual-key-button")
@@ -698,7 +716,8 @@ class TwoFactorAuthenticationSettingsView(View):
 
             user_profile.save()
 
-            for session in Session.objects.all():  # logs user out of all sessions
+            # logs user out of all sessions
+            for session in Session.objects.filter(expire_date__gte=timezone.now()):
                 if str(session.get_decoded().get("_auth_user_id")) == str(user.id):
                     session.delete()
 
@@ -710,7 +729,7 @@ class TwoFactorAuthenticationSettingsView(View):
             ),
             "new_mfa_hash_qr_code": new_mfa_hash_qr_code,
             "new_mfa_hash_manual_entry_data": new_mfa_hash_manual_entry_data,
-            "user_id": user_id,
+            "link": link,
         }
 
         return render(request, "two_factor_authentication_settings.htm", context)

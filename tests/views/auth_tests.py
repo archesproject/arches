@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import base64
+import time
 from tests.base_test import (
     ArchesTestCase,
     OAUTH_CLIENT_ID,
@@ -37,6 +38,8 @@ from arches.app.models.models import UserProfile
 from arches.app.models.system_settings import settings
 from arches.app.views.auth import LoginView
 from arches.app.views.concept import RDMView
+from arches.app.utils.arches_crypto import AESCipher
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.middleware import SetAnonymousUser
 
 # these tests can be run from the command line via
@@ -240,9 +243,17 @@ class AuthTests(ArchesTestCase):
         user_profile = UserProfile.objects.get(user_id=self.user.pk)
         original_mfa_hash = user_profile.encrypted_mfa_hash
 
+        link = (
+            AESCipher(settings.SECRET_KEY)
+            .encrypt(
+                JSONSerializer().serialize({"ts": int(time.time()), "user": self.user})
+            )
+            .decode()
+        )
+
         self.client.post(
             reverse("two-factor-authentication-settings"),
-            {"user-id": self.user.pk, "generate-qr-code-button": True},
+            {"link": link, "generate-qr-code-button": True},
         )
 
         user_profile = UserProfile.objects.get(
