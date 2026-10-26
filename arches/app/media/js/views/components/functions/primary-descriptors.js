@@ -61,7 +61,6 @@ const viewModel =  function(params) {
             }
         });
     };
-    window.setTimeout(function(){$("select[data-bind^=chosen]").trigger("chosen:updated");}, 300);
 };
 
 export default ko.components.register('views/components/functions/primary-descriptors', {
