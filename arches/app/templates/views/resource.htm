@@ -46,7 +46,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div>
                         <select data-bind="
                             attr: {'data-label': {% quoted_trans _('Resource Model') %}},
-                            options: resources,
+                            options: createableResources,
                             optionsText: 'name',
                             optionsValue: 'graphid',
                             optionsAfterRender: setResourceOptionDisable,
