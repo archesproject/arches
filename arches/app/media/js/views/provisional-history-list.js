@@ -5,7 +5,6 @@ import ko from 'knockout';
 import arches from 'arches';
 import ListView from 'views/list';
 import dp from 'bindings/datepicker';
-import ch from 'bindings/chosen';
 import ss from 'views/components/simple-switch';
 
 
