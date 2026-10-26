@@ -21,24 +21,6 @@ h2 {
     background: #041b33;
 }
 
-.lang-switch .chosen-single {
-    border: none;
-    color: #454545;
-    margin-top: 8px;
-    box-shadow: none;
-    border-radius: 3px;
-    display: block;
-    height: 32px;
-    line-height: 1.42857;
-    overflow: hidden;
-    padding: 6px 12px;
-    white-space: nowrap;
-}
-
-.lang-switch .chosen-drop {
-    background: #041b33;
-}
-
 .lang-switch b {
     margin-top: 5px;
 }
