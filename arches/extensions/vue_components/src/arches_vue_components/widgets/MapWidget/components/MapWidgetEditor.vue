@@ -75,6 +75,7 @@ function onValueUpdate(updatedValue: FeatureCollection): void {
 <template>
     <MapComponent
         ref="component"
+        class="map-widget-editor"
         :value="resolvedAliasedNodeData.node_value"
         :zoom="cardXNodeXWidgetData?.config?.zoom"
         :pitch="cardXNodeXWidgetData?.config?.pitch"
@@ -95,3 +96,9 @@ function onValueUpdate(updatedValue: FeatureCollection): void {
         @ready="emit('ready')"
     />
 </template>
+
+<style>
+.map-widget-editor {
+    --map-component-min-height: 56rem;
+}
+</style>

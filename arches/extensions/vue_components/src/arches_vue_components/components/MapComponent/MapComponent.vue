@@ -270,7 +270,7 @@ async function closePanel(): Promise<void> {
     height: 100%;
     flex: 1;
     /* Header plus a feature popup between the panel insets */
-    min-height: 37.2rem;
+    min-height: var(--map-component-min-height, 37.2rem);
     overflow: hidden;
     background: var(--p-content-background);
     color: var(--p-text-color);
@@ -347,6 +347,18 @@ async function closePanel(): Promise<void> {
 .map-body-with-status-bar
     :deep(.maplibregl-ctrl-bottom-right .maplibregl-ctrl-attrib) {
     margin-block-end: var(--map-component-status-bar-attribution-inset);
+}
+
+.map-body :deep(.maplibregl-ctrl-attrib.maplibregl-compact) {
+    box-sizing: content-box;
+}
+
+.map-body-with-status-bar
+    :deep(
+        .maplibregl-ctrl-bottom-right
+            .maplibregl-compact:not(.maplibregl-compact-show)
+    ) {
+    background-color: transparent;
 }
 
 .map-body :deep(.maplibregl-ctrl-geocoder--input) {
