@@ -19,7 +19,20 @@ const ontologyUtils = {
         return '';
     },
 
-    getSelect2ConfigForOntologyProperties: function(value, domain, range, placeholder, allowClear) {
+    /**
+     * getSelect2ConfigForOntologyProperties - select2 config for an ontology property
+     *
+     * @param  {observable} value - the stored property (an ontology URI, or the id
+     *     of a relationship type concept such as Arches' default)
+     * @param  {string} domain - domain ontology class
+     * @param  {string} range - range ontology class
+     * @param  {string} placeholder
+     * @param  {boolean} allowClear
+     * @param  {string|observable} label - optional label of the stored value,
+     *     shown instead of the raw value until another property is chosen
+     * @return {object}
+     */
+    getSelect2ConfigForOntologyProperties: function(value, domain, range, placeholder, allowClear, label) {
         return {
             value: value,
             clickBubble: false,
@@ -61,7 +74,7 @@ const ontologyUtils = {
             },
             initSelection: function(el, callback) {
                 if (!!value()) {
-                    const data = { id: value(), text: value() };
+                    const data = { id: value(), text: ko.unwrap(label) || value() };
                     const option = new Option(data.text, data.id, true, true);
                     $(el).append(option);
                     callback([data]);

@@ -164,7 +164,7 @@
                                         <span class="col-sm-4">
                                             <select style="width:30%; display:inline-block;" data-bind="
                                                 select2Query: {
-                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, $root.translations.selectOntologyProperty)
+                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, $root.translations.selectOntologyProperty, false, relationship.relationshiptype_label)
                                                 }">
                                             </select>
                                         </span>
@@ -182,7 +182,7 @@
                                         <span class="col-sm-4">
                                             <select style="width:30%; display:inline-block;" data-bind="
                                                 select2Query: {
-                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass, $root.translations.selectOntologyProperty)
+                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass, $root.translations.selectOntologyProperty, false, relationship.inverserelationshiptype_label)
                                                 }">
                                             </select>
                                         </span>
@@ -201,7 +201,7 @@
                                         <span class="col-sm-4">
                                             <select style="width:30%; display:inline-block;" data-bind="
                                                 select2Query: {
-                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, $root.translations.selectOntologyProperty)
+                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, $root.translations.selectOntologyProperty, false, relationship.inverserelationshiptype_label)
                                                 }">
                                             </select>
                                         </span>
@@ -219,7 +219,7 @@
                                             <span class="col-sm-4">
                                                 <select style="width:30%; display:inline-block;" data-bind="
                                                     select2Query: {
-                                                        select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass, $root.translations.selectOntologyProperty)
+                                                        select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass, $root.translations.selectOntologyProperty, false, relationship.relationshiptype_label)
                                                     }">
                                                 </select>
                                             </span>
