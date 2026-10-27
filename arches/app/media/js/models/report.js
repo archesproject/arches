@@ -67,6 +67,9 @@ export default AbstractModel.extend({
         
         if (options.related_resources) {
             this.updateRelatedResourcesLookup(options.related_resources);
+            if (Array.isArray(options.related_resources)) {
+                this.loadFirstPages();
+            }
         }
 
         this.graph = options.graph;
@@ -136,7 +139,12 @@ export default AbstractModel.extend({
     updateRelatedResourcesLookup: function(json) {
         var relatedResourcesLookup = this.relatedResourcesLookup();
 
-        for (var [graphId, value] of Object.entries(json)) {
+        /* the report API's summary is a list of {graphid, name, resources}: key it by graph id */
+        const entries = Array.isArray(json)
+            ? json.map(function(value) { return [value['graphid'], value]; })
+            : Object.entries(json);
+
+        for (const [graphId, value] of entries) {
             var relatedResources;
             var paginator;
             var remainingResources;
@@ -188,7 +196,6 @@ export default AbstractModel.extend({
                         return (
                             resource.resourceinstanceid === resourceRelationship.to_resource
                             || resource.resourceinstanceid === resourceRelationship.from_resource
-                            || this.attributes && resource.resourceinstanceid === this.attributes.graph.graphid  // self
                         );
                     });
                     if (relatedResource) {
@@ -218,6 +225,48 @@ export default AbstractModel.extend({
         }
 
         this.relatedResourcesLookup(relatedResourcesLookup);
+    },
+
+    /**
+     * loadFirstPages - replaces the summary entries that have relations with
+     * the first page of the related_resources route, so that each list gets its
+     * total and paginator ("Load more", "Load all"). The summary is kept when a
+     * request fails.
+     * @memberof ReportModel.prototype
+     */
+    loadFirstPages: function() {
+        const resourceid = this.attributes.resourceid;
+        const summary = this.relatedResourcesLookup();
+        const graphIds = Object.keys(summary).filter(function(graphId) {
+            return summary[graphId].totalRelatedResources > 0;
+        });
+        if (!resourceid || graphIds.length === 0) {
+            return;
+        }
+        const requests = graphIds.map(function(graphId) {
+            return Promise.resolve($.ajax({
+                url: arches.urls.related_resources + resourceid + `?resourceinstance_graphid=${graphId}&page=1`,
+            }));
+        });
+        Promise.all(requests).then((pages) => {
+            const ordered = {};
+            for (const graphId of Object.keys(summary)) {
+                const index = graphIds.indexOf(graphId);
+                ordered[graphId] = index === -1
+                    ? { 'name': summary[graphId].name, 'resources': [] }
+                    : Object.assign({}, pages[index], { 'name': summary[graphId].name });
+            }
+            const shown = this.relatedResourcesLookup;
+            this.relatedResourcesLookup = ko.observable({});
+            try {
+                this.updateRelatedResourcesLookup(ordered);
+                shown(this.relatedResourcesLookup());
+            } finally {
+                this.relatedResourcesLookup = shown;
+            }
+        }).catch(function(error) {
+            console.warn('Related resources: kept the summary', error);
+        });
     },
 
     getRelatedResources: function(loadAll, resource) {
