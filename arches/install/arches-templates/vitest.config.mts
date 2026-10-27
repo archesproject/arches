@@ -2,12 +2,12 @@ import fs from 'fs';
 import path from 'path';
 import vue from "@vitejs/plugin-vue";
 
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 
-import type { UserConfigExport } from 'vite';
+import type { ViteUserConfig } from 'vitest/config';
 
 
-function generateConfig(): Promise<UserConfigExport> {
+function generateConfig(): Promise<ViteUserConfig> {
     return new Promise((resolve, reject) => {
         const exclude = [
             '**/node_modules/**',
