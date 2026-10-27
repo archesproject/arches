@@ -371,6 +371,35 @@ class ResourceViewTests(ArchesTestCase):
         relationship = ret["resource_relationships"][0]["relationshiptype_label"]
         self.assertEqual(relationship, en_preflabel)
 
+    def test_get_related_resources_names_the_tile_and_node_of_a_relationship(self):
+        """The related resources manager reads `tile`, `node` and `from_resource`."""
+        person_resource = Resource(graph_id=self.person_graphid)
+        person_resource.save()
+        reference_resource = Resource(graph_id=self.reference_graphid)
+        reference_resource.save()
+        reference_tile = Tile.get_blank_tile(
+            self.reference_nodeid, str(reference_resource.pk)
+        )
+        reference_tile.data[self.reference_nodeid] = [
+            {
+                "resourceName": "",
+                "ontologyProperty": "is related to",
+                "inverseOntologyProperty": "is related to",
+                "resourceId": str(person_resource.pk),
+            }
+        ]
+        reference_tile.save()
+        sync_es(SearchEngineFactory().create())
+
+        ret = reference_resource.get_related_resources(user=self.test_users["admin"])
+
+        relationship = ret["resource_relationships"][0]
+        self.assertEqual(relationship["tile"], reference_tile.tileid)
+        self.assertEqual(str(relationship["node"]), self.reference_nodeid)
+        self.assertEqual(relationship["from_resource"], reference_resource.pk)
+        for legacy_key in ("tileid", "nodeid", "resourceinstanceidfrom"):
+            self.assertNotIn(legacy_key, relationship)
+
     def test_resource_report_good(self):
         self.client.login(username="admin", password="admin")
         url = reverse(

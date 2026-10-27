@@ -129,7 +129,7 @@
                                 </button>
                             </div>
                             <div class='rr-table-column icon-column'>
-                                <button data-bind="click: !!relationship.tileid() ?  self.updateTile.bind(self, {'delete':true}) : self.deleteRelationships.bind(self), clickBubble: false">
+                                <button data-bind="click: !!relationship.tile() ?  self.updateTile.bind(self, {'delete':true}) : self.deleteRelationships.bind(self), clickBubble: false">
                                     <i class="fa fa-trash"></i>
                                 </button>
                             </div>
@@ -148,11 +148,11 @@
                             </div>
                         </div>
                         <div class="rr-table-row-panel" data-bind="if: self.selectedResourceRelationship() === relationship, visible:  self.selectedResourceRelationship() === relationship, css: { 'rr-table-border': self.selectedResourceRelationship() === relationship} ">
-                            <div data-bind="if: !!relationship.tileid()">
+                            <div data-bind="if: !!relationship.tile()">
                                 <div data-bind="text: $root.translations.nodeResourceRelationshipText"></div>
                                 <div class="widget-container" style="padding-left: 0px;">
                                     <!--ko if: self.graphIsSemantic -->
-                                    <!--ko if: self.currentResource().resourceinstanceid === relationship.resourceinstanceidfrom() -->
+                                    <!--ko if: self.currentResource().resourceinstanceid === relationship.from_resource() -->
                                     <div class="row">
                                         <label class="col-sm-12" style="font-weight: bold;">
                                             <span class="" data-bind="text: self.currentResource().displayname + $root.translations.relationshipText + ' ' + resource.displayname"></span>
@@ -246,7 +246,7 @@
                                     <!-- /ko -->
                                 </div>
                             </div>
-                            <div data-bind="ifnot: !!relationship.tileid()">
+                            <div data-bind="ifnot: !!relationship.tile()">
                                 <div data-bind="text: $root.translations.relationshipDesc"></div>
                                 <div class="row widget-container" style="padding-left: 0px;">
                                     <div class="form-group">
@@ -269,32 +269,6 @@
                                 </div>
 
                                 <!--ko if: self.graphIsSemantic === false -->
-                                <div class="row widget-container" style="padding-left: 0px;">
-                                    <div class="form-group">
-                                        <div class="relative">
-                                            <label class="col-xs-6 control-label widget-input-label" for="">
-                                                <span data-bind="text: $root.translations.fromDate"></span>
-                                                <i class="ion-ios-checkmark-outline"></i>
-                                            </label>
-                                            <label class="col-xs-6 control-label widget-input-label" for="">
-                                                <span data-bind="text: $root.translations.toDate"></span>
-                                                <i class="ion-ios-checkmark-outline"></i>
-                                            </label>
-                                        </div>
-
-                                        <div class="relative">
-                                            <div class="col-xs-6">
-                                                <input type="text" class="form-control input-lg widget-input" placeholder="date from"
-                                                    data-bind="datepicker: {format: 'YYYY-MM-DD'}, value: relationship.datestarted">
-                                            </div>
-                                            <div class="col-xs-6">
-                                                <input type="text" class="form-control input-lg widget-input" placeholder="date to"
-                                                    data-bind="datepicker: {format: 'YYYY-MM-DD'}, value: relationship.dateended">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
                                 <div class="row widget-container" style="padding-left: 0px;">
                                     <div class="form-group">
                                         <div class="relative">

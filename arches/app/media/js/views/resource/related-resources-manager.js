@@ -178,6 +178,10 @@ const viewModel = Backbone.View.extend({
                             }
                         });
                         relationship = koMapping.fromJS(relationship);
+                        // `node` carries the id of the resource-instance node that holds
+                        // the relationship; keep it before `node` becomes the holder of
+                        // that node's name and ontology class.
+                        relationship.nodeid = relationship.node;
                         relationship.node = {
                             'name': ko.observable(),
                             'ontologyclass': ko.observable()
@@ -318,8 +322,6 @@ const viewModel = Backbone.View.extend({
 
             this.relationshipTypePlaceholder = ko.observable('Select a Relationship Type');
             this.relatedProperties = koMapping.fromJS({
-                datestarted: '',
-                dateended: '',
                 relationshiptype: undefined,
                 notes: ''
             });
@@ -504,7 +506,7 @@ const viewModel = Backbone.View.extend({
     updateTile: function(options, relationship) {
         var self = this;
         self.loading(true);
-        window.fetch(arches.urls.api_tiles(relationship.tileid()), {
+        window.fetch(arches.urls.api_tiles(relationship.tile()), {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -532,7 +534,7 @@ const viewModel = Backbone.View.extend({
                     tiledata[relationship.nodeid()] = newResourceRelations;
                 }
 
-                window.fetch(arches.urls.api_tiles(relationship.tileid()), {
+                window.fetch(arches.urls.api_tiles(relationship.tile()), {
                     method: 'POST',
                     credentials: 'include',
                     body: JSON.stringify(tile),
@@ -541,14 +543,17 @@ const viewModel = Backbone.View.extend({
                     },
                 })
                     .then(function(response) {
-                        if (response.ok) {
-                            relationship._json(JSON.stringify(koMapping.toJS(relationship)));
-                            if (!!options.delete) {
-                                window.setTimeout(function() {
-                                    self.newPage(1);
-                                    self.loading(false);
-                                }, 1000);
-                            }
+                        if (!response.ok) {
+                            throw new Error(response.statusText);
+                        }
+                        relationship._json(JSON.stringify(koMapping.toJS(relationship)));
+                        if (!!options.delete) {
+                            window.setTimeout(function() {
+                                self.newPage(1);
+                                self.loading(false);
+                            }, 1000);
+                        } else {
+                            self.loading(false);
                         }
                     })
                     .catch(function(err) {
