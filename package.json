@@ -160,7 +160,6 @@
         "moment-timezone": "^0.5.45",
         "nomnom": "npm:@gerhobbelt/nomnom",
         "rimraf": "^5.0.7",
-        "underscore": "^1.13.6",
-        "tinypool": "^2.1.2"
+        "underscore": "^1.13.6"
     }
 }
