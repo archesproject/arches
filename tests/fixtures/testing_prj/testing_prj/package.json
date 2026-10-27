@@ -76,7 +76,6 @@
         "primeicons": "7.0.0",
         "openvue": "1.0.0",
         "proj4": "2.19.10",
-        "select-woo": "jadu/selectWoo",
         "shpjs": "6.1.0",
         "underscore": "^1.13.6",
         "uuidjs": "3.6.2",
@@ -137,8 +136,6 @@
         "text": "node_modules/requirejs-text/text",
         "jquery": "node_modules/jquery/dist/jquery.min",
         "js-cookie": "node_modules/js-cookie/dist/js.cookie",
-        "select-woo": "node_modules/select-woo/dist/js/selectWoo.full",
-        "select-woo-src": "node_modules/select-woo/src/js/select2",
         "bootstrap": "node_modules/bootstrap/dist/js/bootstrap.min",
         "jquery-ui": "node_modules/jqueryui/jquery-ui.min",
         "backbone": "node_modules/backbone/backbone-min",
@@ -185,7 +182,8 @@
         "shpjsesm": "node_modules/shpjs/dist/shp.esm",
         "cytoscape": "node_modules/cytoscape/dist/cytoscape.min",
         "cytoscape-cola": "node_modules/cytoscape-cola/cytoscape-cola",
-        "webcola": "node_modules/webcola/WebCola/cola.min"
+        "webcola": "node_modules/webcola/WebCola/cola.min",
+        "select-woo": "js/select-woo/selectWoo.full"
     },
     "overrides": {
         "moment-timezone": "^0.5.45",
