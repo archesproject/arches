@@ -350,6 +350,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
             )
             .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .values_list("pk", flat=True)
+            .distinct()
         )
 
         return list(str(graph) for graph in graphs)

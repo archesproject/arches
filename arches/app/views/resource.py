@@ -1139,12 +1139,36 @@ class RelatedResourcesView(BaseManagerView):
 
         return JSONResponse(ret)
 
+    def authorize_mutation(self, request, resourceid, root_ids, relationship_ids):
+        """Requires edit permission on the root resource and that every
+        relationship being changed involves it. Fails closed."""
+        if len(root_ids) != 1:
+            raise PermissionDenied
+        try:
+            root_id = str(uuid.UUID(str(root_ids[0])))
+            if resourceid and str(uuid.UUID(str(resourceid))) != root_id:
+                raise PermissionDenied
+            relationship_ids = [str(uuid.UUID(str(rid))) for rid in relationship_ids]
+        except ValueError:
+            raise PermissionDenied
+        if not user_can_edit_resource(request.user, resourceid=root_id):
+            raise PermissionDenied
+        for rr in models.ResourceXResource.objects.filter(pk__in=relationship_ids):
+            if root_id not in (
+                str(rr.resourceinstanceidfrom_id),
+                str(rr.resourceinstanceidto_id),
+            ):
+                raise PermissionDenied
+
     def delete(self, request, resourceid=None):
         lang = request.GET.get("lang", request.LANGUAGE_CODE)
         se = SearchEngineFactory().create()
         req = dict(request.GET)
-        ids_to_delete = req["resourcexids[]"]
-        root_resourceinstanceid = req["root_resourceinstanceid"]
+        ids_to_delete = req.get("resourcexids[]", [])
+        root_resourceinstanceid = req.get("root_resourceinstanceid", [])
+        self.authorize_mutation(
+            request, resourceid, root_resourceinstanceid, ids_to_delete
+        )
         for resourcexid in ids_to_delete:
             try:
                 ret = models.ResourceXResource.objects.get(pk=resourcexid).delete()
@@ -1168,13 +1192,16 @@ class RelatedResourcesView(BaseManagerView):
         res = dict(request.POST)
         relationshiptype = res["relationship_properties[relationshiptype]"][0]
         notes = res["relationship_properties[notes]"][0]
-        root_resourceinstanceid = res["root_resourceinstanceid"]
+        root_resourceinstanceid = res.get("root_resourceinstanceid", [])
         instances_to_relate = []
         relationships_to_update = []
         if "instances_to_relate[]" in res:
             instances_to_relate = res["instances_to_relate[]"]
         if "relationship_ids[]" in res:
             relationships_to_update = res["relationship_ids[]"]
+        self.authorize_mutation(
+            request, resourceid, root_resourceinstanceid, relationships_to_update
+        )
 
         def get_relatable_resources(graphid):
             """

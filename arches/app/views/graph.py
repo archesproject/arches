@@ -659,6 +659,7 @@ class GraphDataView(View):
         return True
 
 
+@method_decorator(group_required("Graph Editor"), name="dispatch")
 class GraphPublicationView(View):
     action = None
 
