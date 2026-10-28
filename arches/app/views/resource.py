@@ -1155,8 +1155,8 @@ class RelatedResourcesView(BaseManagerView):
             raise PermissionDenied
         for rr in models.ResourceXResource.objects.filter(pk__in=relationship_ids):
             if root_id not in (
-                str(rr.resourceinstanceidfrom_id),
-                str(rr.resourceinstanceidto_id),
+                str(rr.from_resource_id),
+                str(rr.to_resource_id),
             ):
                 raise PermissionDenied
 

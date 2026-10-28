@@ -28,12 +28,12 @@ class GraphPublicationAuthorizationTests(ArchesTestCase):
         super().setUpTestData()
         User.objects.create_user("noperms", "noperms@test.com", "Test12345!")
 
-    def test_anonymous_cannot_unpublish(self):
-        url = reverse("unpublish_graph", kwargs={"graphid": self.graphid})
-        with patch("arches.app.views.graph.Graph.unpublish") as unpublish:
+    def test_anonymous_cannot_publish(self):
+        url = reverse("publish_graph", kwargs={"graphid": self.graphid})
+        with patch("arches.app.views.graph.Graph.publish") as publish:
             response = Client().post(url)
         self.assertIn(response.status_code, (302, 401, 403))
-        unpublish.assert_not_called()
+        publish.assert_not_called()
 
     def test_user_without_graph_editor_group_cannot_publish(self):
         client = Client()
@@ -44,14 +44,17 @@ class GraphPublicationAuthorizationTests(ArchesTestCase):
         self.assertIn(response.status_code, (302, 401, 403))
         publish.assert_not_called()
 
-    def test_graph_editor_can_unpublish(self):
+    def test_graph_editor_can_publish(self):
         client = Client()
         client.login(username="admin", password="admin")
-        url = reverse("unpublish_graph", kwargs={"graphid": self.graphid})
-        with patch("arches.app.views.graph.Graph.unpublish") as unpublish:
+        url = reverse("publish_graph", kwargs={"graphid": self.graphid})
+        with (
+            patch("arches.app.views.graph.Graph.promote_draft_graph_to_active_graph"),
+            patch("arches.app.views.graph.Graph.publish") as publish,
+        ):
             response = client.post(url, "{}", content_type="application/json")
         self.assertEqual(response.status_code, 200)
-        unpublish.assert_called_once()
+        publish.assert_called_once()
 
 
 class ConceptValueAuthorizationTests(ArchesTestCase):
@@ -207,13 +210,13 @@ class RelatedResourcesAuthorizationTests(ArchesTestCase):
         self.unrelated_a = models.ResourceInstance.objects.create(graph_id=self.graphid)
         self.unrelated_b = models.ResourceInstance.objects.create(graph_id=self.graphid)
         self.rr = models.ResourceXResource.objects.create(
-            resourceinstanceidfrom=self.root,
-            resourceinstanceidto=self.target,
+            from_resource=self.root,
+            to_resource=self.target,
             relationshiptype="http://www.w3.org/2004/02/skos/core#related",
         )
         self.foreign_rr = models.ResourceXResource.objects.create(
-            resourceinstanceidfrom=self.unrelated_a,
-            resourceinstanceidto=self.unrelated_b,
+            from_resource=self.unrelated_a,
+            to_resource=self.unrelated_b,
             relationshiptype="http://www.w3.org/2004/02/skos/core#related",
         )
         self.client = Client()
@@ -276,9 +279,7 @@ class RelatedResourcesAuthorizationTests(ArchesTestCase):
             )
         self.assertEqual(response.status_code, 403)
         self.assertEqual(
-            models.ResourceXResource.objects.filter(
-                resourceinstanceidfrom=self.root
-            ).count(),
+            models.ResourceXResource.objects.filter(from_resource=self.root).count(),
             1,
         )
 
