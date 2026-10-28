@@ -5,9 +5,9 @@ import vue from "@vitejs/plugin-vue";
 import { fileURLToPath } from 'url';
 import { defineConfig } from 'vitest/config';
 
-import type { UserConfig } from 'vitest/config';
+import type { ViteUserConfig } from 'vitest/config';
 
-function generateConfig(): Promise<UserConfig> {
+function generateConfig(): Promise<ViteUserConfig> {
     return new Promise((resolve, reject) => {
         const filePath = path.dirname(fileURLToPath(import.meta.url));
 
