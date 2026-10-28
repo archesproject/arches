@@ -14,7 +14,6 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.arches_crypto import AESCipher
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from tests.base_test import ArchesTestCase
-from tests.utils.permission_test_utils import add_users
 
 # these tests can be run from the command line via
 # python manage.py test tests.views.authorization_tests --settings="tests.test_settings"
@@ -200,7 +199,7 @@ class RelatedResourcesAuthorizationTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        add_users()
+        cls.add_users()
 
     def setUp(self):
         self.root = models.ResourceInstance.objects.create(graph_id=self.graphid)
