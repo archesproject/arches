@@ -72,8 +72,8 @@ function generateConfig(): Promise<ViteUserConfig> {
                 alias: alias,
                 coverage: {
                     include: [
-                        path.join(parsedData['APP_RELATIVE_PATH'], 'src', path.sep),
-                        path.join('arches', 'extensions', '*', 'src', path.sep),
+                        path.join(parsedData['APP_RELATIVE_PATH'], 'src', '**'),
+                        path.join('arches', 'extensions', '*', 'src', '**'),
                     ],
                     exclude: exclude,
                     reporter: [
