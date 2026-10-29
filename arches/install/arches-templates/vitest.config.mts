@@ -72,7 +72,7 @@ function generateConfig(): Promise<ViteUserConfig> {
             test: {
                 alias: alias,
                 coverage: {
-                    include: [path.join(parsedData['APP_RELATIVE_PATH'], 'src', path.sep)],
+                    include: [path.join(parsedData['APP_RELATIVE_PATH'], 'src', '**')],
                     exclude: exclude,
                     reporter: [
                         ['clover', { 'file': 'coverage.xml' }],
