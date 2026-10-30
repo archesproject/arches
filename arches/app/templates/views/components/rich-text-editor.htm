@@ -1,0 +1,645 @@
+{% load i18n %}
+<div class="rich-text-editor" data-bind="css: {max: isMax}">
+    <div
+        class="rich-text-editor-toolbar"
+        role="toolbar"
+        aria-label="{% trans 'Formatting' %}"
+        data-bind="
+            attr: {inert: disabled},
+            event: {keydown: onKeydown, focusin: onFocus}
+        "
+    >
+        <div class="rich-text-editor-toolbar-group" data-bind="attr: {inert: isSourceMode}">
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                title="{% trans 'Cut' %}"
+                aria-label="{% trans 'Cut' %}"
+                data-bind="
+                    click: run('cut'),
+                    css: {disabled: state().cut.isDisabled},
+                    attr: {'aria-disabled': state().cut.isDisabled}
+                "
+            >
+                <i class="fa fa-scissors" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Copy' %}"
+                aria-label="{% trans 'Copy' %}"
+                data-bind="
+                    click: run('copy'),
+                    css: {disabled: state().copy.isDisabled},
+                    attr: {'aria-disabled': state().copy.isDisabled}
+                "
+            >
+                <i class="fa fa-files-o" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Paste' %}"
+                aria-label="{% trans 'Paste' %}"
+                data-bind="
+                    click: run('paste'),
+                    css: {disabled: state().paste.isDisabled},
+                    attr: {'aria-disabled': state().paste.isDisabled}
+                "
+            >
+                <i class="fa fa-clipboard" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Paste as plain text' %}"
+                aria-label="{% trans 'Paste as plain text' %}"
+                data-bind="
+                    click: run('pasteText'),
+                    css: {disabled: state().pasteText.isDisabled},
+                    attr: {'aria-disabled': state().pasteText.isDisabled}
+                "
+            >
+                <i class="fa fa-file-text-o" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Undo' %}"
+                aria-label="{% trans 'Undo' %}"
+                data-bind="
+                    click: run('undo'),
+                    css: {disabled: state().undo.isDisabled},
+                    attr: {'aria-disabled': state().undo.isDisabled}
+                "
+            >
+                <i class="fa fa-undo" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Redo' %}"
+                aria-label="{% trans 'Redo' %}"
+                data-bind="
+                    click: run('redo'),
+                    css: {disabled: state().redo.isDisabled},
+                    attr: {'aria-disabled': state().redo.isDisabled}
+                "
+            >
+                <i class="fa fa-repeat" aria-hidden="true"></i>
+            </button>
+        </div>
+
+        <div class="rich-text-editor-toolbar-group" data-bind="attr: {inert: isSourceMode}">
+            <div class="dropdown">
+                <button
+                    type="button"
+                    class="rich-text-editor-toolbar-button"
+                    tabindex="-1"
+                    title="{% trans 'Link' %}"
+                    aria-label="{% trans 'Link' %}"
+                    aria-expanded="false"
+                    data-toggle="dropdown"
+                    data-bind="
+                        click: editLink,
+                        css: {active: state().link.isActive}
+                    "
+                >
+                    <i class="fa fa-link" aria-hidden="true"></i>
+                </button>
+                <div class="dropdown-menu rich-text-editor-popup">
+                    <input
+                        type="url"
+                        class="rich-text-editor-popup-input"
+                        placeholder="{% trans 'Paste a link' %}"
+                        aria-label="{% trans 'Link URL' %}"
+                        data-bind="textInput: linkUrl"
+                    >
+                    <button type="button" title="{% trans 'Open link' %}" aria-label="{% trans 'Open link' %}" data-bind="click: openLink">
+                        <i class="fa fa-external-link" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" title="{% trans 'Apply link' %}" aria-label="{% trans 'Apply link' %}" data-bind="click: applyLink">
+                        <i class="fa fa-check" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" title="{% trans 'Remove link' %}" aria-label="{% trans 'Remove link' %}" data-bind="click: removeLink">
+                        <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button
+                    type="button"
+                    class="rich-text-editor-toolbar-button"
+                    tabindex="-1"
+                    title="{% trans 'Image' %}"
+                    aria-label="{% trans 'Image' %}"
+                    aria-expanded="false"
+                    data-toggle="dropdown"
+                    data-bind="
+                        click: editImage,
+                        css: {active: state().image.isActive}
+                    "
+                >
+                    <i class="fa fa-picture-o" aria-hidden="true"></i>
+                </button>
+                <div class="dropdown-menu rich-text-editor-popup rich-text-editor-image-popup">
+                    <input
+                        type="url"
+                        class="rich-text-editor-popup-input"
+                        placeholder="{% trans 'Image URL' %}"
+                        aria-label="{% trans 'Image URL' %}"
+                        data-bind="textInput: imageUrl"
+                    >
+                    <input
+                        type="text"
+                        class="rich-text-editor-popup-input"
+                        placeholder="{% trans 'Alt text' %}"
+                        aria-label="{% trans 'Alt text' %}"
+                        data-bind="textInput: imageAlt"
+                    >
+                    <div class="rich-text-editor-popup-row">
+                        <input
+                            type="number"
+                            min="1"
+                            class="rich-text-editor-popup-input"
+                            placeholder="{% trans 'Width' %}"
+                            aria-label="{% trans 'Width' %}"
+                            data-bind="textInput: imageWidth"
+                        >
+                        <input
+                            type="number"
+                            min="1"
+                            class="rich-text-editor-popup-input"
+                            placeholder="{% trans 'Height' %}"
+                            aria-label="{% trans 'Height' %}"
+                            data-bind="textInput: imageHeight"
+                        >
+                    </div>
+                    <div class="rich-text-editor-popup-row">
+                        <button type="button" title="{% trans 'Apply image' %}" aria-label="{% trans 'Apply image' %}" data-bind="click: applyImage">
+                            <i class="fa fa-check" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" title="{% trans 'Remove image' %}" aria-label="{% trans 'Remove image' %}" data-bind="click: removeImage">
+                            <i class="fa fa-trash" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button
+                    type="button"
+                    class="rich-text-editor-toolbar-button"
+                    tabindex="-1"
+                    title="{% trans 'Table' %}"
+                    aria-label="{% trans 'Table' %}"
+                    aria-expanded="false"
+                    data-toggle="dropdown"
+                >
+                    <i class="fa fa-table" aria-hidden="true"></i>
+                    <i class="fa fa-caret-down" aria-hidden="true"></i>
+                </button>
+                <ul class="dropdown-menu">
+                    <li data-bind="css: {disabled: state().insertTable.isDisabled}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('insertTable'),
+                                attr: {'aria-disabled': state().insertTable.isDisabled}
+                            "
+                        >
+                            {% trans "Insert table" %}
+                        </a>
+                    </li>
+                    <li data-bind="css: {disabled: state().addRowBefore.isDisabled}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('addRowBefore'),
+                                attr: {'aria-disabled': state().addRowBefore.isDisabled}
+                            "
+                        >
+                            {% trans "Insert row above" %}
+                        </a>
+                    </li>
+                    <li data-bind="css: {disabled: state().addRowAfter.isDisabled}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('addRowAfter'),
+                                attr: {'aria-disabled': state().addRowAfter.isDisabled}
+                            "
+                        >
+                            {% trans "Insert row below" %}
+                        </a>
+                    </li>
+                    <li data-bind="css: {disabled: state().deleteRow.isDisabled}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('deleteRow'),
+                                attr: {'aria-disabled': state().deleteRow.isDisabled}
+                            "
+                        >
+                            {% trans "Delete row" %}
+                        </a>
+                    </li>
+                    <li data-bind="css: {disabled: state().addColumnBefore.isDisabled}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('addColumnBefore'),
+                                attr: {'aria-disabled': state().addColumnBefore.isDisabled}
+                            "
+                        >
+                            {% trans "Insert column before" %}
+                        </a>
+                    </li>
+                    <li data-bind="css: {disabled: state().addColumnAfter.isDisabled}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('addColumnAfter'),
+                                attr: {'aria-disabled': state().addColumnAfter.isDisabled}
+                            "
+                        >
+                            {% trans "Insert column after" %}
+                        </a>
+                    </li>
+                    <li data-bind="css: {disabled: state().deleteColumn.isDisabled}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('deleteColumn'),
+                                attr: {'aria-disabled': state().deleteColumn.isDisabled}
+                            "
+                        >
+                            {% trans "Delete column" %}
+                        </a>
+                    </li>
+                    <li data-bind="css: {disabled: state().toggleHeaderRow.isDisabled}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('toggleHeaderRow'),
+                                attr: {'aria-disabled': state().toggleHeaderRow.isDisabled}
+                            "
+                        >
+                            {% trans "Toggle header row" %}
+                        </a>
+                    </li>
+                    <li data-bind="css: {disabled: state().deleteTable.isDisabled}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('deleteTable'),
+                                attr: {'aria-disabled': state().deleteTable.isDisabled}
+                            "
+                        >
+                            {% trans "Delete table" %}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Insert horizontal line' %}"
+                aria-label="{% trans 'Insert horizontal line' %}"
+                data-bind="
+                    click: run('horizontalRule'),
+                    css: {disabled: state().horizontalRule.isDisabled},
+                    attr: {'aria-disabled': state().horizontalRule.isDisabled}
+                "
+            >
+                <i class="fa fa-minus" aria-hidden="true"></i>
+            </button>
+        </div>
+
+        <div class="rich-text-editor-toolbar-group" data-bind="attr: {inert: isSourceMode}">
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Bold' %}"
+                aria-label="{% trans 'Bold' %}"
+                data-bind="
+                    click: run('bold'),
+                    css: {disabled: state().bold.isDisabled, active: state().bold.isActive},
+                    attr: {'aria-disabled': state().bold.isDisabled, 'aria-pressed': state().bold.isActive.toString()}
+                "
+            >
+                <i class="fa fa-bold" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Italic' %}"
+                aria-label="{% trans 'Italic' %}"
+                data-bind="
+                    click: run('italic'),
+                    css: {disabled: state().italic.isDisabled, active: state().italic.isActive},
+                    attr: {'aria-disabled': state().italic.isDisabled, 'aria-pressed': state().italic.isActive.toString()}
+                "
+            >
+                <i class="fa fa-italic" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Underline' %}"
+                aria-label="{% trans 'Underline' %}"
+                data-bind="
+                    click: run('underline'),
+                    css: {disabled: state().underline.isDisabled, active: state().underline.isActive},
+                    attr: {'aria-disabled': state().underline.isDisabled, 'aria-pressed': state().underline.isActive.toString()}
+                "
+            >
+                <i class="fa fa-underline" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Strikethrough' %}"
+                aria-label="{% trans 'Strikethrough' %}"
+                data-bind="
+                    click: run('strike'),
+                    css: {disabled: state().strike.isDisabled, active: state().strike.isActive},
+                    attr: {'aria-disabled': state().strike.isDisabled, 'aria-pressed': state().strike.isActive.toString()}
+                "
+            >
+                <i class="fa fa-strikethrough" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Subscript' %}"
+                aria-label="{% trans 'Subscript' %}"
+                data-bind="
+                    click: run('subscript'),
+                    css: {disabled: state().subscript.isDisabled, active: state().subscript.isActive},
+                    attr: {'aria-disabled': state().subscript.isDisabled, 'aria-pressed': state().subscript.isActive.toString()}
+                "
+            >
+                <i class="fa fa-subscript" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Superscript' %}"
+                aria-label="{% trans 'Superscript' %}"
+                data-bind="
+                    click: run('superscript'),
+                    css: {disabled: state().superscript.isDisabled, active: state().superscript.isActive},
+                    attr: {'aria-disabled': state().superscript.isDisabled, 'aria-pressed': state().superscript.isActive.toString()}
+                "
+            >
+                <i class="fa fa-superscript" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Remove format' %}"
+                aria-label="{% trans 'Remove format' %}"
+                data-bind="
+                    click: run('removeFormat'),
+                    css: {disabled: state().removeFormat.isDisabled},
+                    attr: {'aria-disabled': state().removeFormat.isDisabled}
+                "
+            >
+                <i class="fa fa-eraser" aria-hidden="true"></i>
+            </button>
+        </div>
+
+        <div class="rich-text-editor-toolbar-group" data-bind="attr: {inert: isSourceMode}">
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Numbered list' %}"
+                aria-label="{% trans 'Numbered list' %}"
+                data-bind="
+                    click: run('orderedList'),
+                    css: {disabled: state().orderedList.isDisabled, active: state().orderedList.isActive},
+                    attr: {'aria-disabled': state().orderedList.isDisabled, 'aria-pressed': state().orderedList.isActive.toString()}
+                "
+            >
+                <i class="fa fa-list-ol" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Bulleted list' %}"
+                aria-label="{% trans 'Bulleted list' %}"
+                data-bind="
+                    click: run('bulletList'),
+                    css: {disabled: state().bulletList.isDisabled, active: state().bulletList.isActive},
+                    attr: {'aria-disabled': state().bulletList.isDisabled, 'aria-pressed': state().bulletList.isActive.toString()}
+                "
+            >
+                <i class="fa fa-list-ul" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Decrease indent' %}"
+                aria-label="{% trans 'Decrease indent' %}"
+                data-bind="
+                    click: run('outdent'),
+                    css: {disabled: state().outdent.isDisabled},
+                    attr: {'aria-disabled': state().outdent.isDisabled}
+                "
+            >
+                <i class="fa fa-outdent" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Increase indent' %}"
+                aria-label="{% trans 'Increase indent' %}"
+                data-bind="
+                    click: run('indent'),
+                    css: {disabled: state().indent.isDisabled},
+                    attr: {'aria-disabled': state().indent.isDisabled}
+                "
+            >
+                <i class="fa fa-indent" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Block quote' %}"
+                aria-label="{% trans 'Block quote' %}"
+                data-bind="
+                    click: run('blockquote'),
+                    css: {disabled: state().blockquote.isDisabled, active: state().blockquote.isActive},
+                    attr: {'aria-disabled': state().blockquote.isDisabled, 'aria-pressed': state().blockquote.isActive.toString()}
+                "
+            >
+                <i class="fa fa-quote-left" aria-hidden="true"></i>
+            </button>
+        </div>
+
+        <div class="rich-text-editor-toolbar-group" data-bind="attr: {inert: isSourceMode}">
+            <div class="dropdown">
+                <button
+                    type="button"
+                    class="rich-text-editor-toolbar-button"
+                    tabindex="-1"
+                    title="{% trans 'Format' %}"
+                    aria-label="{% trans 'Format' %}"
+                    aria-expanded="false"
+                    data-toggle="dropdown"
+                >
+                    {% trans 'Format' %}
+                    <i class="fa fa-caret-down" aria-hidden="true"></i>
+                </button>
+                <ul class="dropdown-menu">
+                    <li data-bind="css: {disabled: state().paragraph.isDisabled, active: state().paragraph.isActive}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('paragraph'),
+                                attr: {'aria-disabled': state().paragraph.isDisabled}
+                            "
+                        >
+                            {% trans "Paragraph" %}
+                        </a>
+                    </li>
+                    <li data-bind="css: {disabled: state().heading1.isDisabled, active: state().heading1.isActive}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('heading1'),
+                                attr: {'aria-disabled': state().heading1.isDisabled}
+                            "
+                        >
+                            {% trans "Heading 1" %}
+                        </a>
+                    </li>
+                    <li data-bind="css: {disabled: state().heading2.isDisabled, active: state().heading2.isActive}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('heading2'),
+                                attr: {'aria-disabled': state().heading2.isDisabled}
+                            "
+                        >
+                            {% trans "Heading 2" %}
+                        </a>
+                    </li>
+                    <li data-bind="css: {disabled: state().heading3.isDisabled, active: state().heading3.isActive}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('heading3'),
+                                attr: {'aria-disabled': state().heading3.isDisabled}
+                            "
+                        >
+                            {% trans "Heading 3" %}
+                        </a>
+                    </li>
+                    <li data-bind="css: {disabled: state().heading4.isDisabled, active: state().heading4.isActive}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('heading4'),
+                                attr: {'aria-disabled': state().heading4.isDisabled}
+                            "
+                        >
+                            {% trans "Heading 4" %}
+                        </a>
+                    </li>
+                    <li data-bind="css: {disabled: state().heading5.isDisabled, active: state().heading5.isActive}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('heading5'),
+                                attr: {'aria-disabled': state().heading5.isDisabled}
+                            "
+                        >
+                            {% trans "Heading 5" %}
+                        </a>
+                    </li>
+                    <li data-bind="css: {disabled: state().heading6.isDisabled, active: state().heading6.isActive}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('heading6'),
+                                attr: {'aria-disabled': state().heading6.isDisabled}
+                            "
+                        >
+                            {% trans "Heading 6" %}
+                        </a>
+                    </li>
+                    <li data-bind="css: {disabled: state().codeBlock.isDisabled, active: state().codeBlock.isActive}">
+                        <a
+                            href="javascript:void(0);"
+                            data-bind="
+                                click: run('codeBlock'),
+                                attr: {'aria-disabled': state().codeBlock.isDisabled}
+                            "
+                        >
+                            {% trans "Formatted" %}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="rich-text-editor-toolbar-group">
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Source' %}"
+                aria-label="{% trans 'Source' %}"
+                data-bind="
+                    click: toggleSource,
+                    css: {active: isSourceMode},
+                    attr: {'aria-pressed': isSourceMode().toString()}
+                "
+            >
+                <i class="fa fa-code" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Maximise' %}"
+                aria-label="{% trans 'Maximise' %}"
+                data-bind="
+                    click: toggleMax,
+                    css: {active: isMax},
+                    attr: {'aria-pressed': isMax().toString()}
+                "
+            >
+                <i class="fa fa-expand" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="rich-text-editor-content" data-bind="tiptap: editor, visible: !isSourceMode(), attr: {dir: direction}">
+        <div class="rich-text-editor-placeholder" data-bind="html: placeholder, visible: isEmpty"></div>
+    </div>
+    <textarea
+        class="rich-text-editor-source"
+        aria-label="{% trans 'HTML source' %}"
+        data-bind="visible: isSourceMode, textInput: source"
+    ></textarea>
+</div>

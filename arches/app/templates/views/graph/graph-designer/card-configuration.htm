@@ -101,7 +101,12 @@
                                 <div class="control-label">
                                     {% trans "Content" %}
                                 </div>
-                                <textarea rows="10" cols="80" data-bind="ckeditor: model.helptext, ckeditorOptions: {}, valueUpdate: 'afterkeydown'"></textarea>
+                                <div
+                                    data-bind="component: {
+                                        name: 'views/components/rich-text-editor',
+                                        params: {value: model.helptext}
+                                    }"
+                                ></div>
                             </div>
 
 
