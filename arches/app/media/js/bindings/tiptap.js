@@ -7,6 +7,5 @@ ko.bindingHandlers.tiptap = {
         valueAccessor().mount(element);
     },
 };
-ko.bindingHandlers.tiptap.init = ko.bindingHandlers.tiptap.init.bind(ko.bindingHandlers.tiptap);
 
 export default ko.bindingHandlers.tiptap;
