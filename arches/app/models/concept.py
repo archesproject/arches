@@ -28,7 +28,6 @@ from arches.app.search.mappings import CONCEPTS_INDEX
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.i18n import capitalize_region, rank_label
 from django.utils.translation import get_language, gettext as _
-from psycopg2.extensions import AsIs
 
 import logging
 
@@ -699,7 +698,7 @@ class Concept(object):
                         ) as collector
                         FROM relations r
                         WHERE r.conceptidfrom = %(conceptid)s
-                        and (%(relationtypes)s)
+                        and ({relationtypes})
                         ORDER BY sortorder, valuesto
                     )
                     UNION
@@ -733,7 +732,7 @@ class Concept(object):
                         ) as collector
                         FROM relations r
                         JOIN ordered_relationships b ON(b.conceptidto = r.conceptidfrom)
-                        WHERE (%(relationtypes)s)
+                        WHERE ({relationtypes})
                         ORDER BY sortorder, valuesto
                     )
                 ),
@@ -745,7 +744,7 @@ class Concept(object):
                         1 AS depth       ---|NonRecursive Part
                         FROM ordered_relationships r
                         WHERE r.conceptidfrom = %(conceptid)s
-                        and (%(relationtypes)s)
+                        and ({relationtypes})
                     UNION
                         SELECT r.conceptidfrom, r.conceptidto,
                         row || '-' || to_char(row_number() OVER (), 'fm000000'),
@@ -753,7 +752,7 @@ class Concept(object):
                         depth+1      ---|RecursivePart
                         FROM ordered_relationships r
                         JOIN children b ON(b.conceptidto = r.conceptidfrom)
-                        WHERE (%(relationtypes)s)
+                        WHERE ({relationtypes})
                         {depth_clause}
                 )
 
@@ -765,7 +764,7 @@ class Concept(object):
                     FROM (
                         SELECT *
                         FROM values
-                        WHERE conceptid=%(recursive_table)s.conceptidto
+                        WHERE conceptid={recursive_table}.conceptidto
                         AND valuetype in ('prefLabel')
                         ORDER BY (
                             CASE WHEN languageid = %(languageid)s THEN 10
@@ -778,7 +777,7 @@ class Concept(object):
                 ) as valueto,
                 depth, collector, count(*) OVER() AS full_count
 
-               FROM %(recursive_table)s order by row {offset_clause};
+               FROM {recursive_table} order by row {offset_clause};
             """
 
             if query:
@@ -805,26 +804,27 @@ class Concept(object):
             else:
                 subquery = ""
 
+            recursive_table = "results" if query else "children"
+
             sql = sql.format(
                 subquery=subquery,
                 offset_clause=offset_clause,
                 depth_clause=depth_clause,
+                relationtypes=relationtypes,
+                recursive_table=recursive_table,
             )
 
-            recursive_table = "results" if query else "children"
             languageid = get_language() if languageid is None else languageid
 
             cursor.execute(
                 sql,
                 {
                     "conceptid": conceptid,
-                    "relationtypes": AsIs(relationtypes),
                     "depth_limit": depth_limit,
                     "limit": limit,
                     "offset": offset,
                     "query": "%" + query.lower() + "%",
                     "match": query.lower(),
-                    "recursive_table": AsIs(recursive_table),
                     "languageid": languageid,
                     "short_languageid": languageid.split("-")[0] + "%",
                     "default_languageid": settings.LANGUAGE_CODE + "%",
@@ -837,12 +837,12 @@ class Concept(object):
                         SELECT r.conceptidfrom, r.conceptidto, r.relationtype, 1 AS depth
                             FROM relations r
                             WHERE r.conceptidfrom = %(conceptid)s
-                            AND (%(relationtypes)s)
+                            AND ({relationtypes})
                         UNION
                             SELECT r.conceptidfrom, r.conceptidto, r.relationtype, depth+1
                             FROM relations r
                             JOIN children c ON(c.conceptidto = r.conceptidfrom)
-                            WHERE (%(relationtypes)s)
+                            WHERE ({relationtypes})
                             {depth_clause}
                     ),
                     results AS (
@@ -861,11 +861,9 @@ class Concept(object):
                         WHERE valueto.valuetype = ANY (%(child_valuetypes)s)
                         AND valuefrom.valuetype = ANY (%(child_valuetypes)s)
                     )
-                    SELECT distinct %(columns)s
+                    SELECT distinct {columns}
                     FROM results {offset_clause}
             """
-
-            sql = sql.format(offset_clause=offset_clause, depth_clause=depth_clause)
 
             if not columns:
                 columns = """
@@ -877,11 +875,17 @@ class Concept(object):
                     categoryfrom, categoryto
                 """
 
+            sql = sql.format(
+                offset_clause=offset_clause,
+                depth_clause=depth_clause,
+                relationtypes=relationtypes,
+                columns=columns,
+            )
+
             cursor.execute(
                 sql,
                 {
                     "conceptid": conceptid,
-                    "relationtypes": AsIs(relationtypes),
                     "child_valuetypes": (
                         child_valuetypes
                         if child_valuetypes
@@ -891,7 +895,6 @@ class Concept(object):
                             ).values_list("valuetype", flat=True)
                         )
                     ),
-                    "columns": AsIs(columns),
                     "depth_limit": depth_limit,
                     "limit": limit,
                     "offset": offset,

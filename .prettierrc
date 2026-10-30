@@ -1,3 +1,10 @@
 {
-    "singleAttributePerLine": true
+    "singleAttributePerLine": true,
+    "overrides": [
+        {
+            "comment": "Vendored with arches 8.2 at the width their source repositories used. Unifying is a follow-up, not a condition of the move.",
+            "files": "arches/extensions/**/*.{ts,vue,js,mjs,json,css,scss}",
+            "options": { "tabWidth": 4 }
+        }
+    ]
 }

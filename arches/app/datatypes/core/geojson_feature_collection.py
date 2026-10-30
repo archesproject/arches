@@ -10,6 +10,7 @@ from django.utils.translation import gettext as _
 from rdflib import ConjunctiveGraph as Graph
 from rdflib import Literal, URIRef
 
+from arches.app.utils.decorators import deprecated
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
 from arches.app.models.system_settings import settings
@@ -122,6 +123,14 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         if tile.data[nodeid] == "":
             tile.data[nodeid] = None
 
+    @staticmethod
+    def _get_valid_feature_id(feature_id):
+        try:
+            uuid.UUID(str(feature_id))
+            return feature_id
+        except ValueError:
+            return str(uuid.uuid4())
+
     def check_geojson_value(self, value):
         if type(value) is str:
             geojson = json.loads(value)
@@ -139,8 +148,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                         new_feature["id"] = geojson.get("id", str(uuid.uuid4()))
                     features = features + new_collection["features"]
                 else:
-                    # keep the feature id if it exists, or generate a fresh one.
-                    feature["id"] = feature.get("id", str(uuid.uuid4()))
+                    feature["id"] = self._get_valid_feature_id(feature.get("id"))
                     features.append(feature)
             geojson["features"] = features
             return geojson
@@ -294,6 +302,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             ]
             return feature_collections
 
+    @deprecated
     def get_bounds(self, tile, node):
         bounds = None
         try:

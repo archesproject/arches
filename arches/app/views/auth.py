@@ -33,6 +33,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.debug import sensitive_post_parameters, sensitive_variables
+from django.utils import timezone
 from django.utils.html import strip_tags
 from django.utils.translation import gettext as _
 from django.utils.http import urlencode
@@ -48,7 +49,11 @@ from django.core.exceptions import ValidationError
 import django.contrib.auth.password_validation as validation
 from django_ratelimit.decorators import ratelimit
 from arches import __version__
-from arches.app.utils.response import JSONResponse, Http401Response
+from arches.app.utils.response import (
+    Http401Response,
+    JSONErrorResponse,
+    JSONResponse,
+)
 from arches.app.utils.forms import (
     ArchesUserCreationForm,
     ArchesPasswordResetForm,
@@ -68,7 +73,7 @@ logger = logging.getLogger(__name__)
 
 class LoginView(View):
     def get(self, request):
-        next = request.GET.get("next", reverse("home"))
+        next = request.GET.get("next", settings.LOGIN_REDIRECT_URL)
         registration_success = request.GET.get("registration_success")
 
         if request.GET.get("logout", None) is not None:
@@ -109,7 +114,7 @@ class LoginView(View):
     )
     def post(self, request):
         # POST request is taken to mean user is logging in
-        next = request.POST.get("next", reverse("home"))
+        next = request.POST.get("next", settings.LOGIN_REDIRECT_URL)
 
         if getattr(request, "limited", False):
             return render(
@@ -451,6 +456,22 @@ class UserProfileView(View):
         return response
 
 
+class DeviceClientIdView(View):
+    """
+    The client id for device sign-in (RFC 8628). A public client id isn't a
+    secret, and a desktop client needs it before anyone has signed in.
+    """
+
+    def get(self, request):
+        if not settings.OAUTH_DEVICE_CLIENT_ID:
+            return JSONErrorResponse(
+                _("Device sign-in is not enabled"),
+                _("Set OAUTH_DEVICE_CLIENT_ID to enable it."),
+                status=404,
+            )
+        return JSONResponse({"clientid": settings.OAUTH_DEVICE_CLIENT_ID})
+
+
 @method_decorator(csrf_exempt, name="dispatch")
 class GetClientIdView(View):
     @method_decorator(
@@ -598,7 +619,7 @@ class TwoFactorAuthenticationLoginView(View):
         password = request.POST.get("password", None)
         user = authenticate(username=username, password=password)
 
-        next = request.POST.get("next", reverse("home"))
+        next = request.POST.get("next", settings.LOGIN_REDIRECT_URL)
         user_has_enabled_two_factor_authentication = request.POST.get(
             "user-has-enabled-two-factor-authentication", None
         )
@@ -645,38 +666,55 @@ class TwoFactorAuthenticationLoginView(View):
 
 @method_decorator(never_cache, name="dispatch")
 class TwoFactorAuthenticationSettingsView(View):
+    @staticmethod
+    def get_user_id_from_link(link):
+        """Returns the user id from a valid, unexpired reset link, else None."""
+        try:
+            decrypted_data = JSONDeserializer().deserialize(
+                AESCipher(settings.SECRET_KEY).decrypt(link)
+            )
+            link_time = datetime.fromtimestamp(int(decrypted_data["ts"]))
+            if link_time + timedelta(minutes=15) < datetime.fromtimestamp(
+                int(time.time())
+            ):
+                return None
+            return int(decrypted_data["user"]["id"])
+        except Exception:
+            return None
+
     def get(self, request):
         link = request.GET.get("link", None)
-        AES = AESCipher(settings.SECRET_KEY)
+        user_id = self.get_user_id_from_link(link)
+        if user_id is None:
+            return HttpResponseForbidden(_("Link invalid or expired"))
 
-        decrypted_data = JSONDeserializer().deserialize(AES.decrypt(link))
-
-        if datetime.fromtimestamp(decrypted_data["ts"]) + timedelta(
-            minutes=15
-        ) >= datetime.fromtimestamp(
-            int(time.time())
-        ):  # if before email expiry
-            user_id = decrypted_data["user"]["id"]
+        try:
             user_profile = models.UserProfile.objects.get(user_id=user_id)
+        except models.UserProfile.DoesNotExist:
+            return HttpResponseForbidden(_("Link invalid or expired"))
 
-            context = {
-                "ENABLE_TWO_FACTOR_AUTHENTICATION": settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
-                "FORCE_TWO_FACTOR_AUTHENTICATION": settings.FORCE_TWO_FACTOR_AUTHENTICATION,
-                "user_has_enabled_two_factor_authentication": bool(
-                    user_profile.encrypted_mfa_hash
-                ),
-                "user_id": user_id,
-            }
-
-        else:
-            raise Exception("Link Expired")
+        context = {
+            "ENABLE_TWO_FACTOR_AUTHENTICATION": settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
+            "FORCE_TWO_FACTOR_AUTHENTICATION": settings.FORCE_TWO_FACTOR_AUTHENTICATION,
+            "user_has_enabled_two_factor_authentication": bool(
+                user_profile.encrypted_mfa_hash
+            ),
+            "link": link,
+        }
 
         return render(request, "two_factor_authentication_settings.htm", context)
 
     def post(self, request):
-        user_id = request.POST.get("user-id")
-        user = models.User.objects.get(pk=int(user_id))
-        user_profile = models.UserProfile.objects.get(user_id=user_id)
+        link = request.POST.get("link", None)
+        user_id = self.get_user_id_from_link(link)
+        if user_id is None:
+            return HttpResponseForbidden(_("Link invalid or expired"))
+
+        try:
+            user = models.User.objects.get(pk=user_id)
+            user_profile = models.UserProfile.objects.get(user_id=user_id)
+        except (models.User.DoesNotExist, models.UserProfile.DoesNotExist):
+            return HttpResponseForbidden(_("Link invalid or expired"))
 
         generate_qr_code = request.POST.get("generate-qr-code-button")
         generate_manual_key = request.POST.get("generate-manual-key-button")
@@ -718,7 +756,8 @@ class TwoFactorAuthenticationSettingsView(View):
 
             user_profile.save()
 
-            for session in Session.objects.all():  # logs user out of all sessions
+            # logs user out of all sessions
+            for session in Session.objects.filter(expire_date__gte=timezone.now()):
                 if str(session.get_decoded().get("_auth_user_id")) == str(user.id):
                     session.delete()
 
@@ -730,7 +769,7 @@ class TwoFactorAuthenticationSettingsView(View):
             ),
             "new_mfa_hash_qr_code": new_mfa_hash_qr_code,
             "new_mfa_hash_manual_entry_data": new_mfa_hash_manual_entry_data,
-            "user_id": user_id,
+            "link": link,
         }
 
         return render(request, "two_factor_authentication_settings.htm", context)
@@ -757,7 +796,7 @@ class Token(View):
 
 class ExternalOauth(View):
     def start(request):
-        next = request.GET.get("next", reverse("home"))
+        next = request.GET.get("next", settings.LOGIN_REDIRECT_URL)
         username = request.GET.get("username", None)
 
         token, user = ExternalOauthAuthenticationBackend.get_token_for_username(
@@ -779,7 +818,9 @@ class ExternalOauth(View):
     @csrf_exempt
     def callback(request):
         next_url = (
-            request.session["next"] if "next" in request.session else reverse("home")
+            request.session["next"]
+            if "next" in request.session
+            else settings.LOGIN_REDIRECT_URL
         )
         user = authenticate(
             request, username=request.session["user"], sso_authentication=True

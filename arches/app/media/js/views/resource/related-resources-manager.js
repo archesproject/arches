@@ -369,7 +369,7 @@ const viewModel = Backbone.View.extend({
                     return url();
                 },
                 dataType: 'json',
-                quietMillis: 250,
+                delay: 250,
                 data: function(requestParams) {
                     let term = requestParams.term || '';
                     let page = requestParams.page || 1;
@@ -522,8 +522,8 @@ const viewModel = Backbone.View.extend({
                 var resourceRelations = tiledata[relationship.nodeid()];
                 resourceRelations.forEach(function(relation) {
                     if (relation.resourceXresourceId === relationship.resourcexid()) {
-                        relation.ontologyProperty = relationship.relationshiptype();
-                        relation.inverseOntologyProperty = relationship.inverserelationshiptype();
+                        relation.relationship = relationship.relationshiptype();
+                        relation.inverseRelationship = relationship.inverserelationshiptype();
                     } else {
                         newResourceRelations.push(relation);
                     }

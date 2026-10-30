@@ -4,7 +4,7 @@ import WidgetViewModel from "viewmodels/widget";
 
 let LANGUAGE_LOOKUP = {};
 const LanguageSelectViewModel = function(params) {
-    params.configKeys = ["placeholder", "width", "uneditable"];
+    params.configKeys = ["placeholder", "width"];
     
     WidgetViewModel.apply(this, [params]);
     const self = this;

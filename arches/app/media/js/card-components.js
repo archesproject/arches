@@ -1,4 +1,4 @@
-import { loadComponentDependencies } from "utils/load-component-dependencies";
+import { registerComponentPaths } from "utils/load-component-dependencies";
 
 function removeTrailingCommaFromObject(string) {
     return string.replace(/,\s*}*$/, "}");
@@ -10,7 +10,7 @@ try {
     const cardComponentData = cardComponentDataHTML.getAttribute('cardComponents');
     cardComponents = JSON.parse(removeTrailingCommaFromObject(cardComponentData));
 
-    loadComponentDependencies(Object.values(cardComponents).map(value => value['component']));
+    registerComponentPaths(cardComponents, 'componentname', 'component');
 } catch (error) {
     console.error(error);
 }

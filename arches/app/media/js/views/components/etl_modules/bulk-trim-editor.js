@@ -1,6 +1,7 @@
 import ko from 'knockout';
 import BaseEditorViewModel from 'views/components/etl_modules/base-bulk-string-editor';
 import baseStringEditorTemplate from 'templates/views/components/etl_modules/base-bulk-string-editor.htm';
+import 'bindings/chosen';
 
 const viewModel = function (params) {
     BaseEditorViewModel.apply(this, [params]);

@@ -109,7 +109,7 @@ class Command(BaseCommand):  # pragma: no cover
         )
         content = re.sub(
             "image: postgis/postgis:14-3.4",
-            "image: postgis/postgis:16-3.5",
+            "image: postgis/postgis:18-3.6",
             content,
         )
 

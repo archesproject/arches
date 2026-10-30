@@ -10,10 +10,12 @@ from django_ratelimit.decorators import ratelimit
 
 from arches.app.models.system_settings import settings
 from arches.app.search.components.base import SearchFilterFactory
+from arches.app.utils.decorators import requires_elasticsearch
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
 from arches.app.views.api import APIBase
 
 
+@method_decorator(requires_elasticsearch, name="dispatch")
 class SearchExport(View):
     @sensitive_variables("user_cred")
     @method_decorator(

@@ -20,9 +20,17 @@ class ArchesAppConfig(AppConfig):
     name = "arches"
     verbose_name = "Arches"
     is_arches_application = False
+    # Set on Arches applications that ship inside the arches distribution rather
+    # than as separately released packages. See check_arches_compatibility().
+    bundled_with_arches = False
 
     def ready(self):
         import arches.app.signals
+
+        # Imported here: django-oauth-toolkit's models need the app registry.
+        from arches.app.utils.oauth_device_grant import patch_device_grant_expiry
+
+        patch_device_grant_expiry()
 
         os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arches.settings")
         generate_frontend_configuration()
@@ -73,6 +81,32 @@ def check_cache_backend(app_configs, **kwargs):
 
 
 @register(Tags.compatibility)
+def check_elasticsearch_disabled_permission_framework(app_configs, **kwargs):
+    """
+    The default allow permission framework resolves per-user restrictions against
+    the Elasticsearch resource index and has no database equivalent, so it cannot
+    be used with Elasticsearch disabled.
+    """
+    errors = []
+    if settings.ELASTICSEARCH_ENABLED:
+        return errors
+    if "arches_default_allow" in settings.PERMISSION_FRAMEWORK:
+        errors.append(
+            Error(
+                "PERMISSION_FRAMEWORK is incompatible with ELASTICSEARCH_ENABLED = False",
+                hint=(
+                    "The default allow framework requires Elasticsearch. Use "
+                    "'arches_default_deny.ArchesDefaultDenyPermissionFramework', or set "
+                    "ELASTICSEARCH_ENABLED = True."
+                ),
+                obj=settings.APP_NAME,
+                id="arches.E004",
+            )
+        )
+    return errors
+
+
+@register(Tags.compatibility)
 def check_arches_compatibility(app_configs, **kwargs):
     def read_project_requirements_from_toml_file(config: AppConfig):
         with open(Path(config.path).parent / "pyproject.toml", "rb") as f:
@@ -91,6 +125,11 @@ def check_arches_compatibility(app_configs, **kwargs):
     errors = []
     for config in app_configs:
         if not getattr(config, "is_arches_application", False):
+            continue
+        if getattr(config, "bundled_with_arches", False):
+            # Bundled applications ship inside the arches distribution, so they have
+            # no pyproject.toml or distribution metadata of their own to declare an
+            # arches requirement in. Their compatibility is guaranteed by construction.
             continue
         project_requirements = ["No project requirements found."]
 
@@ -175,6 +214,22 @@ def warn_default_allow_permission_framework(app_configs, **kwargs):
                 hint="Set PERMISSION_FRAMEWORK to arches_default_deny.ArchesDefaultDenyPermissionFramework.",
                 obj=settings.APP_NAME,
                 id="arches.W003",
+            )
+        )
+    return errors
+
+
+@register(Tags.compatibility)
+def warn_mapbox_api_key_deprecated(app_configs, **kwargs):
+    errors = []
+
+    if getattr(settings, "MAPBOX_API_KEY", None):
+        errors.append(
+            Warning(
+                msg="MAPBOX_API_KEY is deprecated and no longer used by Arches.",
+                hint="Remove MAPBOX_API_KEY from your settings. It will be removed in a future release.",
+                obj=settings.APP_NAME,
+                id="arches.W004",
             )
         )
     return errors

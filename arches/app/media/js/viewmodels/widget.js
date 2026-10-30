@@ -45,7 +45,7 @@ var WidgetViewModel = function(params) {
             return ko.unwrap(self.value);
         }
     });
-    this.disabled = params.disabled || ko.observable(false);
+    const _disabled = params.disabled || ko.observable(false);
     this.node = params.node || null;
     this.configForm = params.configForm || false;
     this.config = params.config || ko.observable({});
@@ -55,6 +55,7 @@ var WidgetViewModel = function(params) {
     });
     this.configKeys.push('label');
     this.configKeys.push('required');
+    this.configKeys.push('uneditable');
     this.valueProperties = params.valueProperties || [];
     if (this.node) {
         this.required = this.node.isrequired;
@@ -119,6 +120,10 @@ var WidgetViewModel = function(params) {
     } else {
         this.defaultValue = ko.observable(null);
     }
+
+    this.disabled = ko.pureComputed(function() {
+        return ko.unwrap(_disabled) || !!ko.unwrap(self.uneditable);
+    });
 
     if (ko.isObservable(this.value) && ko.isObservable(this.defaultValue)) {
         var defaultValue = this.defaultValue();

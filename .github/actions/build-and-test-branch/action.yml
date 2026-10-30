@@ -29,7 +29,12 @@ runs:
     - name: Set up Elasticsearch
       uses: ankane/setup-elasticsearch@v1
       with:
-        elasticsearch-version: 8
+        elasticsearch-version: 9
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v7
+      with:
+        node-version: 24
 
     - name: Install Python packages
       run: |

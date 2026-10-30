@@ -273,8 +273,8 @@ class ResourceTests(ArchesTestCase):
             return [
                 {
                     "resourceId": str(related_resource_id),
-                    "ontologyProperty": "",
-                    "inverseOntologyProperty": "",
+                    "relationship": "",
+                    "inverseRelationship": "",
                 }
             ]
 
@@ -282,8 +282,8 @@ class ResourceTests(ArchesTestCase):
             return [
                 {
                     "resourceId": str(related_resource_id),
-                    "ontologyProperty": "",
-                    "inverseOntologyProperty": "",
+                    "relationship": "",
+                    "inverseRelationship": "",
                 }
             ]
 
@@ -454,6 +454,75 @@ class ResourceTests(ArchesTestCase):
                 self.permissioned_user, resourceid=None, resource=self.test_resource
             ),
             True,
+        )
+
+    def test_reviewer_cannot_delete_when_lifecycle_state_forbids_deletion(self):
+        """A Resource Reviewer is refused deletion of a resource whose
+        lifecycle state has can_delete_resource_instances set to False,
+        unless the reviewer also holds
+        can_delete_all_resource_instance_lifecycle_states.
+
+        Arches ships Active and Retired as non-deletable in the default
+        lifecycle. The Bulk Data Deletion module has no permission check of
+        its own, so Resource.delete() is its only gate.
+
+        The test checks that the row still exists, not only the return
+        value. Bulk Data Deletion ignores the return value, so only the
+        surviving row proves the refusal.
+        """
+        self.state1.can_delete_resource_instances = False
+        self.state1.save()
+        self.test_resource.resource_instance_lifecycle_state = self.state1
+        self.test_resource.save()
+
+        reviewer = User.objects.create_user(
+            "reviewer_without_lifecycle_override",
+            "reviewer_without_lifecycle_override@archesproject.org",
+            "password",
+        )
+        reviewer.groups.add(Group.objects.get(name="Resource Reviewer"))
+        self.assertFalse(
+            reviewer.has_perm(
+                "models.can_delete_all_resource_instance_lifecycle_states"
+            )
+        )
+
+        resourceid = self.test_resource.pk
+        permitted = self.test_resource.delete(user=reviewer)
+
+        self.assertTrue(
+            models.ResourceInstance.objects.filter(pk=resourceid).exists(),
+            "the resource row was deleted even though deletion should be refused",
+        )
+        self.assertFalse(permitted)
+
+    def test_reviewer_can_still_delete_when_lifecycle_state_allows_deletion(self):
+        """A Resource Reviewer still deletes a resource whose lifecycle
+        state permits deletion.
+
+        This test pairs with
+        test_reviewer_cannot_delete_when_lifecycle_state_forbids_deletion,
+        which alone also passes if every reviewer is refused. Together they
+        show that the refusal depends on the lifecycle state.
+        """
+        self.assertTrue(self.state2.can_delete_resource_instances)
+        self.test_resource.resource_instance_lifecycle_state = self.state2
+        self.test_resource.save()
+
+        reviewer = User.objects.create_user(
+            "reviewer_without_lifecycle_override",
+            "reviewer_without_lifecycle_override@archesproject.org",
+            "password",
+        )
+        reviewer.groups.add(Group.objects.get(name="Resource Reviewer"))
+
+        resourceid = self.test_resource.pk
+        permitted = self.test_resource.delete(user=reviewer)
+
+        self.assertTrue(permitted)
+        self.assertFalse(
+            models.ResourceInstance.objects.filter(pk=resourceid).exists(),
+            "the resource row survived a permitted deletion",
         )
 
     @patch("arches.app.functions.base.BaseFunction.on_update_lifecycle_state")
@@ -855,8 +924,8 @@ class ResourceTests(ArchesTestCase):
                 str(resource_instance_node.pk): [
                     {
                         "resourceId": str(resource.pk),
-                        "ontologyProperty": "",
-                        "inverseOntologyProperty": "",
+                        "relationship": "",
+                        "inverseRelationship": "",
                     }
                 ],
             },
@@ -941,8 +1010,12 @@ class ResourceTests(ArchesTestCase):
         self.assertEqual(all_datatypes_resource.graph_id, copied_resource.graph_id)
         self.assertEqual(len(all_datatypes_resource.tiles), len(copied_resource.tiles))
 
-        original_tiles = all_datatypes_resource.tiles
-        copied_tiles = copied_resource.tiles
+        # copy() reads the original's tiles straight off an unordered queryset,
+        # so pair the two lists up by sortorder rather than by position.
+        original_tiles = sorted(
+            all_datatypes_resource.tiles, key=lambda tile: tile.sortorder
+        )
+        copied_tiles = sorted(copied_resource.tiles, key=lambda tile: tile.sortorder)
 
         for original_tile, copied_tile in zip(
             original_tiles,
@@ -962,12 +1035,12 @@ class ResourceTests(ArchesTestCase):
                         copied_value["resourceId"],
                     )
                     self.assertEqual(
-                        original_value["ontologyProperty"],
-                        copied_value["ontologyProperty"],
+                        original_value["relationship"],
+                        copied_value["relationship"],
                     )
                     self.assertEqual(
-                        original_value["inverseOntologyProperty"],
-                        copied_value["inverseOntologyProperty"],
+                        original_value["inverseRelationship"],
+                        copied_value["inverseRelationship"],
                     )
                     copied_cross_record = copied_value["resourceXresourceId"]
                     self.assertNotEqual(
@@ -1030,12 +1103,12 @@ class ResourceTests(ArchesTestCase):
                         copied_value["resourceId"],
                     )
                     self.assertEqual(
-                        original_value["ontologyProperty"],
-                        copied_value["ontologyProperty"],
+                        original_value["relationship"],
+                        copied_value["relationship"],
                     )
                     self.assertEqual(
-                        original_value["inverseOntologyProperty"],
-                        copied_value["inverseOntologyProperty"],
+                        original_value["inverseRelationship"],
+                        copied_value["inverseRelationship"],
                     )
                     copied_cross_record = copied_value["resourceXresourceId"]
                     self.assertNotEqual(

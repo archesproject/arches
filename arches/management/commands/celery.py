@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import subprocess
 from arches.management.commands import utils
 from arches.app.models.system_settings import settings
+from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError
 
 
@@ -47,9 +48,10 @@ class Command(BaseCommand):
             self.start_worker(options["beat"])
 
     def start_worker(self, beat):
+        app = apps.get_containing_app_config(settings.SETTINGS_MODULE).name
         if beat is True:
-            cmd = f"celery -A {settings.ELASTICSEARCH_PREFIX} worker -B -l info"
+            cmd = f"celery -A {app} worker -B -l info"
         else:
-            cmd = f"celery -A {settings.ELASTICSEARCH_PREFIX} worker -l info"
+            cmd = f"celery -A {app} worker -l info"
         cmd_process = cmd.split()
         subprocess.call(cmd_process)

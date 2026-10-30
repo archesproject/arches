@@ -79,6 +79,7 @@ var ConceptSelectViewModel = function(params) {
     this.select2Config = {
         value: self.value,
         clickBubble: true,
+        disabled: self.disabled,
         multiple: self.multiple,
         closeOnSelect: true,
         placeholder: self.placeholder,
@@ -86,7 +87,7 @@ var ConceptSelectViewModel = function(params) {
         ajax: {
             url: arches.urls.paged_dropdown,
             dataType: 'json',
-            quietMillis: 250,
+            delay: 250,
             data: function(requestParams) {
                 let term = requestParams.term || '';
                 let page = requestParams.page || 1;

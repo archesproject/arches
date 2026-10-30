@@ -91,13 +91,13 @@
                       "0e900254-4148-11e7-9902-c4b301baab9f":{
                          "en":{
                             "direction":"ltr",
-                            "value":"mapbox://sprites/mapbox/basic-v9"
+                            "value":"https://icons.maptoolkit.org/sprite"
                          }
                       },
                       "0e90031e-4148-11e7-a176-c4b301baab9f":{
                          "en":{
                             "direction":"ltr",
-                            "value":"mapbox://fonts/mapbox/{fontstack}/{range}.pbf"
+                            "value":"https://fonts.maptoolkit.org/{fontstack}/{range}.pbf"
                          }
                       }
                    },

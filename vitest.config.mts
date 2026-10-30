@@ -8,7 +8,7 @@ import { defineConfig } from 'vitest/config';
 
 import { createProjectNodeModulesFallbackPlugin } from './vitest-utils/project-node-modules-fallback.ts';
 
-import type { UserConfig } from 'vitest/config';
+import type { ViteUserConfig } from 'vitest/config';
 
 // Loaded with require(), not import: Vite's config bundler chokes on this file's own
 // require('fs') when it tries to esbuild-bundle it into the config's ESM graph.
@@ -18,7 +18,7 @@ const { requireVueLoaderWithTypeResolutionPatch } = createRequire(import.meta.ur
 
 void requireVueLoaderWithTypeResolutionPatch();
 
-function generateConfig(): Promise<UserConfig> {
+function generateConfig(): Promise<ViteUserConfig> {
     return new Promise((resolve, reject) => {
         const filePath = path.dirname(fileURLToPath(import.meta.url));
         const frontendConfigurationDirectory = path.join(filePath, 'frontend_configuration');
@@ -52,6 +52,17 @@ function generateConfig(): Promise<UserConfig> {
             alias[`@/${archesApplicationName}`] = path.join(archesApplicationPath, 'src', archesApplicationName);
         }
 
+        // Applications bundled with arches resolve whether or not a project enabled
+        // them, so that arches' own frontend tests can import them.
+        for (
+            const [applicationName, applicationPath]
+            of Object.entries(
+                (parsedData['RESOLVABLE_APPLICATION_PATHS'] ?? {}) as { [key: string]: string }
+            )
+        ) {
+            alias[`@/${applicationName}`] ??= path.join(applicationPath, 'src', applicationName);
+        }
+
         resolve({
             plugins: [
                 vue(),
@@ -60,7 +71,10 @@ function generateConfig(): Promise<UserConfig> {
             test: {
                 alias: alias,
                 coverage: {
-                    include: [path.join(parsedData['APP_RELATIVE_PATH'], 'src', path.sep)],
+                    include: [
+                        path.join(parsedData['APP_RELATIVE_PATH'], 'src', '**'),
+                        path.join('arches', 'extensions', '*', 'src', '**'),
+                    ],
                     exclude: exclude,
                     reporter: [
                         ['clover', { 'file': 'coverage.xml' }],

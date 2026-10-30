@@ -35,7 +35,7 @@ class TestGenerateWebpackConfiguration(TestCase):
         with (
             patch.object(
                 self.webpack_configuration_module,
-                "list_arches_app_names",
+                "list_arches_app_labels",
                 return_value=arches_application_names,
             ),
             patch.object(
@@ -74,7 +74,7 @@ class TestGenerateWebpackConfiguration(TestCase):
         with (
             patch.object(
                 self.webpack_configuration_module,
-                "list_arches_app_names",
+                "list_arches_app_labels",
                 return_value=[],
             ),
             patch.object(
@@ -94,7 +94,7 @@ class TestGenerateWebpackConfiguration(TestCase):
         with (
             patch.object(
                 self.webpack_configuration_module,
-                "list_arches_app_names",
+                "list_arches_app_labels",
                 return_value=["one", "two"],
             ),
             patch.object(
@@ -112,7 +112,7 @@ class TestGenerateWebpackConfiguration(TestCase):
         with (
             patch.object(
                 self.webpack_configuration_module,
-                "list_arches_app_names",
+                "list_arches_app_labels",
                 return_value=[],
             ),
             patch.object(
@@ -135,7 +135,7 @@ class TestGenerateWebpackConfiguration(TestCase):
             with (
                 patch.object(
                     self.webpack_configuration_module,
-                    "list_arches_app_names",
+                    "list_arches_app_labels",
                     return_value=[],
                 ),
                 patch.object(

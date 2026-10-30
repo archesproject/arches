@@ -211,7 +211,9 @@ class ResourceEditorView(MapBaseManagerView):
             if len(primary_descriptor_functions) > 0
             else None
         )
-        user_is_reviewer = user_is_resource_reviewer(request.user)
+        user_is_reviewer = user_is_resource_reviewer(
+            request.user, resource=resource_instance, graph=graph
+        )
         is_system_settings = False
         if resource_instance is None:
             tiles = []
@@ -304,14 +306,7 @@ class ResourceEditorView(MapBaseManagerView):
             graphiconclass=graph.iconclass,
             graphname=graph.name,
             ontologyclass=ontologyclass,
-            resource_graphs=(
-                models.GraphModel.objects.exclude(
-                    pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
-                )
-                .exclude(isresource=False)
-                .exclude(is_active=False)
-                .exclude(source_identifier__isnull=False)
-            ),
+            resource_graphs=models.GraphModel.objects.get_resource_models(),
             relationship_types=get_resource_relationship_types(),
             widgets=updated_widgets,
             widgets_json=JSONSerializer().serialize(updated_widgets),
@@ -331,7 +326,6 @@ class ResourceEditorView(MapBaseManagerView):
                 exclude=["iconclass", "modulename", "classname"],
             ),
             map_markers=models.MapMarker.objects.all(),
-            geocoding_providers=models.Geocoder.objects.all(),
             user_is_reviewer=json.dumps(user_is_reviewer),
             user_can_delete_resource=user_can_delete_resource(request.user, resourceid),
             creator=json.dumps(creator),
@@ -489,7 +483,8 @@ class ResourcePermissionDataView(View):
                     user, resource_instance
                 ),
                 "is_editor_or_reviewer": bool(
-                    user_is_resource_editor(user) or user_is_resource_reviewer(user)
+                    user_is_resource_editor(user, resource=resource_instance)
+                    or user_is_resource_reviewer(user, resource=resource_instance)
                 ),
             }
             for user in User.objects.prefetch_related("groups")
@@ -943,6 +938,7 @@ class ResourceCards(View):
         return JSONResponse({"success": True, "cards": cards})
 
 
+@method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceDescriptors(View):
     def get_localized_descriptor(self, document, descriptor_type):
         language_codes = (translation.get_language(), settings.LANGUAGE_CODE)
@@ -954,6 +950,63 @@ class ResourceDescriptors(View):
                     return entry["value"]
         return result["value"]
 
+    def get_source_from_db(self, resource):
+        """
+        Rebuilds the subset of the resource index document this view needs, using
+        only the database. Used when settings.ELASTICSEARCH_ENABLED is False.
+        """
+        descriptor_keys = {
+            "displayname": "name",
+            "displaydescription": "description",
+            "map_popup": "map_popup",
+        }
+        source = {document_key: [] for document_key in descriptor_keys}
+        for language, values in (resource.descriptors or {}).items():
+            for document_key, descriptor_key in descriptor_keys.items():
+                value = values.get(descriptor_key)
+                if value:
+                    source[document_key].append({"value": value, "language": language})
+
+        # mirrors the permissions section built by Resource.get_documents_to_index()
+        permissions = {
+            "principal_user": (
+                [int(resource.principaluser_id)] if resource.principaluser_id else []
+            )
+        }
+        permissions.update(apb.get_index_values(resource))
+
+        source["graph_id"] = str(resource.graph_id)
+        source["permissions"] = permissions
+        source["geometries"] = self.get_geometries_from_db(resource)
+        return source
+
+    def get_geometries_from_db(self, resource):
+        """
+        Builds the index document's "geometries" section from the resource's tiles,
+        reusing the geojson datatype so the shape matches the indexed document.
+        """
+        geojson_nodes = models.Node.objects.filter(
+            graph_id=resource.graph_id, datatype="geojson-feature-collection"
+        )
+        nodeids = {str(node.nodeid) for node in geojson_nodes}
+        if not nodeids:
+            return []
+
+        document = {"geometries": [], "points": []}
+        datatype_instance = DataTypeFactory().get_instance("geojson-feature-collection")
+        tiles = models.TileModel.objects.filter(
+            resourceinstance_id=resource.pk,
+            nodegroup_id__in={node.nodegroup_id for node in geojson_nodes},
+        )
+        for tile in tiles:
+            for nodeid, nodevalue in tile.data.items():
+                if nodeid in nodeids and nodevalue:
+                    datatype_instance.append_to_document(
+                        document, nodevalue, nodeid, tile
+                    )
+
+        return document["geometries"]
+
     def get(self, request, resourceid=None):
         if (
             Resource.objects.filter(pk=resourceid)
@@ -961,13 +1014,22 @@ class ResourceDescriptors(View):
             .exists()
         ):
             try:
-                resource = Resource.objects.get(pk=resourceid)
-                se = SearchEngineFactory().create()
-                document = se.search(index=RESOURCES_INDEX, id=resourceid)
+                resource = Resource.objects.select_related(
+                    "graph", "resource_instance_lifecycle_state"
+                ).get(pk=resourceid)
+                if settings.ELASTICSEARCH_ENABLED:
+                    se = SearchEngineFactory().create()
+                    document = se.search(index=RESOURCES_INDEX, id=resourceid)
+                else:
+                    document = {"_source": self.get_source_from_db(resource)}
                 return JSONResponse(
                     {
                         "graphid": document["_source"]["graph_id"],
                         "graph_name": resource.graph.name,
+                        "graph_iconclass": resource.graph.iconclass,
+                        "lifecycle_state": str(
+                            resource.resource_instance_lifecycle_state.name
+                        ),
                         "displaydescription": self.get_localized_descriptor(
                             document, "displaydescription"
                         ),
@@ -1010,7 +1072,6 @@ class ResourceReportView(MapBaseManagerView):
             card_components=models.CardComponent.objects.all(),
             widgets=models.Widget.objects.all(),
             map_markers=models.MapMarker.objects.all(),
-            geocoding_providers=models.Geocoder.objects.all(),
             graph_has_different_publication=graph_has_different_publication,
             graph_has_different_publication_and_user_has_insufficient_permissions=bool(
                 graph_has_different_publication
@@ -1055,10 +1116,9 @@ class RelatedResourcesView(BaseManagerView):
         page = paginator.page(page)
 
         def parse_relationshiptype_label(relationship):
-            if relationship["relationshiptype_label"].startswith("http"):
-                relationship["relationshiptype_label"] = relationship[
-                    "relationshiptype_label"
-                ].rsplit("/")[-1]
+            for key in ("relationshiptype_label", "inverserelationshiptype_label"):
+                if relationship.get(key, "").startswith("http"):
+                    relationship[key] = relationship[key].rsplit("/")[-1]
             return relationship
 
         related_resources["resource_relationships"] = [
@@ -1149,12 +1209,36 @@ class RelatedResourcesView(BaseManagerView):
 
         return JSONResponse(ret)
 
+    def authorize_mutation(self, request, resourceid, root_ids, relationship_ids):
+        """Requires edit permission on the root resource and that every
+        relationship being changed involves it. Fails closed."""
+        if len(root_ids) != 1:
+            raise PermissionDenied
+        try:
+            root_id = str(uuid.UUID(str(root_ids[0])))
+            if resourceid and str(uuid.UUID(str(resourceid))) != root_id:
+                raise PermissionDenied
+            relationship_ids = [str(uuid.UUID(str(rid))) for rid in relationship_ids]
+        except ValueError:
+            raise PermissionDenied
+        if not user_can_edit_resource(request.user, resourceid=root_id):
+            raise PermissionDenied
+        for rr in models.ResourceXResource.objects.filter(pk__in=relationship_ids):
+            if root_id not in (
+                str(rr.from_resource_id),
+                str(rr.to_resource_id),
+            ):
+                raise PermissionDenied
+
     def delete(self, request, resourceid=None):
         lang = request.GET.get("lang", request.LANGUAGE_CODE)
         se = SearchEngineFactory().create()
         req = dict(request.GET)
-        ids_to_delete = req["resourcexids[]"]
-        root_resourceinstanceid = req["root_resourceinstanceid"]
+        ids_to_delete = req.get("resourcexids[]", [])
+        root_resourceinstanceid = req.get("root_resourceinstanceid", [])
+        self.authorize_mutation(
+            request, resourceid, root_resourceinstanceid, ids_to_delete
+        )
         for resourcexid in ids_to_delete:
             try:
                 ret = models.ResourceXResource.objects.get(pk=resourcexid).delete()
@@ -1178,13 +1262,16 @@ class RelatedResourcesView(BaseManagerView):
         res = dict(request.POST)
         relationshiptype = res["relationship_properties[relationshiptype]"][0]
         notes = res["relationship_properties[notes]"][0]
-        root_resourceinstanceid = res["root_resourceinstanceid"]
+        root_resourceinstanceid = res.get("root_resourceinstanceid", [])
         instances_to_relate = []
         relationships_to_update = []
         if "instances_to_relate[]" in res:
             instances_to_relate = res["instances_to_relate[]"]
         if "relationship_ids[]" in res:
             relationships_to_update = res["relationship_ids[]"]
+        self.authorize_mutation(
+            request, resourceid, root_resourceinstanceid, relationships_to_update
+        )
 
         def get_relatable_resources(graphid):
             """

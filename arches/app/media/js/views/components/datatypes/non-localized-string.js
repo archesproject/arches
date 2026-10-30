@@ -1,5 +1,6 @@
 import ko from 'knockout';
 import nonLocalizedStringDatatypeTemplate from 'templates/views/components/datatypes/non-localized-string.htm';
+import 'bindings/select2-query';
 
 
 const name = 'non-localized-string-datatype-config';

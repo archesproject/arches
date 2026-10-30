@@ -5,7 +5,7 @@ import arches from 'arches';
 import ReportViewModel from 'viewmodels/report';
 import imageReportTemplate from 'templates/views/report-templates/image.htm';
 
-import 'knockstrap';
+import 'bindings/carousel';
 import 'bindings/chosen';
 
 export default ko.components.register('image-report', {
@@ -20,6 +20,9 @@ export default ko.components.register('image-report', {
             var nodes = ko.unwrap(self.nodes);
             self.tiles().forEach(function (tile) {
                 _.each(tile.data, function (val, key) {
+                    if (val === null || val === undefined) {
+                        return;
+                    }
                     val = koMapping.toJS(val);
                     if (Array.isArray(val)) {
                         val.forEach(function (item) {

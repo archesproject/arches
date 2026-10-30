@@ -63,9 +63,20 @@ ANONYMOUS_USER_NAME = None
 ELASTICSEARCH_HTTP_PORT = (
     9200  # this should be in increments of 200, eg: 9400, 9600, 9800
 )
+
+# Set to False to run Arches without an Elasticsearch instance. Intended for
+# projects that supply their own search implementation (e.g. a PostgreSQL-backed
+# Arches application). When False:
+#   - SearchEngineFactory returns a no-op engine and all indexing is discarded
+#   - the core search views return 404 and the core search nav links are hidden
+#   - RDM/concept search and term autocomplete return no results
+#   - Elasticsearch snapshot/restore is unavailable
+#   - the default allow permission framework cannot be used
+ELASTICSEARCH_ENABLED = True
+
 SEARCH_BACKEND = "arches.app.search.search.SearchEngine"
 SEARCH_THUMBNAILS = False
-# see http://elasticsearch-py.readthedocs.org/en/master/api.html#elasticsearch.Elasticsearch
+# see http://elasticsearch-py.readthedocs.org/en/stable/api.html#elasticsearch.Elasticsearch
 ELASTICSEARCH_HOSTS = [
     {"scheme": "https", "host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}
 ]
@@ -103,6 +114,15 @@ ELASTICSEARCH_CUSTOM_INDEXES = []
 #     'name': 'my_new_custom_index',
 #     'should_update_asynchronously': False
 # }]
+
+# Name of the index used by arches.extensions.controlled_lists for reference
+# data. The index itself is registered by the project, not here, so that
+# projects which do not install the application are not made to build it.
+REFERENCES_INDEX_NAME = "references"
+
+# Classes contributing additional mappings to the resource index, e.g.
+# "arches.extensions.controlled_lists.search.references_es_mapping_modifier.ReferencesEsMappingModifier"
+ES_MAPPING_MODIFIER_CLASSES = []
 
 TERM_SEARCH_TYPES = [
     {
@@ -358,11 +378,22 @@ JWT_ALGORITHM = "HS256"
 
 # OAuth settings
 # https://django-oauth-toolkit.readthedocs.io/en/latest/settings.html
-OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 36000}
+OAUTH2_PROVIDER = {
+    "ACCESS_TOKEN_EXPIRE_SECONDS": 604800,  # one week
+    # Where a device sign-in sends the user to enter their code. Relative, so
+    # clients resolve it against the instance's URL.
+    "OAUTH_DEVICE_VERIFICATION_URI": "/o/device/",
+}
 
 # This is the client id you get when you register a new application
 # see https://arches.readthedocs.io/en/stable/api/#authentication
 OAUTH_CLIENT_ID = ""  # '9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
+
+# The client id of a public application with the "Device Code" grant type, for
+# clients such as desktop GIS plugins that sign users in through a browser
+# (RFC 8628). Desktop clients read it from auth/device_client_id. Leave empty
+# to turn device sign-in off.
+OAUTH_DEVICE_CLIENT_ID = ""
 
 AUTHENTICATION_BACKENDS = (
     "arches.app.utils.email_auth_backend.EmailAuthenticationBackend",
@@ -560,7 +591,25 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.db.DatabaseCache",
         "LOCATION": "user_permission_cache",
     },
+    "querysets_concepts": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "querysets_concepts_cache",
+        "TIMEOUT": 86400,  # one day in seconds
+        "OPTIONS": {"MAX_ENTRIES": 1000},
+    },
+    "querysets_resource_instances": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "querysets_resource_instances_cache",
+        "TIMEOUT": 86400,  # one day in seconds
+        "OPTIONS": {"MAX_ENTRIES": 1000},
+    },
 }
+
+# Cache aliases used by arches.extensions.querysets. Both must name entries in
+# CACHES above; setting either to None falls back to the default cache, with a
+# system check warning.
+ARCHES_QUERYSETS_CONCEPT_CACHE = "querysets_concepts"
+ARCHES_QUERYSETS_RESOURCE_INSTANCE_CACHE = "querysets_resource_instances"
 
 DEFAULT_RESOURCE_IMPORT_USER = {"username": "admin", "userid": 1}
 
@@ -631,8 +680,6 @@ UUID_REGEX = (
     "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
 )
 
-OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 604800}  # one week
-
 #######################################
 ###       END STATIC SETTINGS       ###
 #######################################
@@ -655,7 +702,7 @@ RELATED_RESOURCES_EXPORT_LIMIT = 10000
 SEARCH_DROPDOWN_LENGTH = 100
 
 # a lower number will give more "Fuzzy" matches, recomend between 0-4,
-# see "prefix_length" at https://www.elastic.co/guide/en/elasticsearch/reference/6.7/query-dsl-fuzzy-query.html#_parameters_7
+# see "prefix_length" at https://www.elastic.co/docs/reference/query-languages/query-dsl/query-dsl-fuzzy-query
 SEARCH_TERM_SENSITIVITY = 3
 
 WORDS_PER_SEARCH_TERM = (
@@ -666,8 +713,6 @@ SEARCH_RESULT_LIMIT = 10000  # should be less than or equal to elasticsearch con
 ETL_USERNAME = "ETL"  # override this setting in your packages settings.py file
 
 GOOGLE_ANALYTICS_TRACKING_ID = None
-
-DEFAULT_GEOCODER = "10000000-0000-0000-0000-010000000000"
 
 SPARQL_ENDPOINT_PROVIDERS = (
     {
@@ -737,11 +782,14 @@ FILE_TYPES = [
 FILENAME_GENERATOR = "arches.app.utils.storage_filename_generator.generate_filename"
 UPLOADED_FILES_DIR = "uploadedfiles"
 
-MAPBOX_API_KEY = ""  # Put your Mapbox key here!
+# Deprecated: unused since the move to MapLibre and will be removed in a future release.
+MAPBOX_API_KEY = ""
 
-# links to sprites and glyphs for use on map
-MAPBOX_SPRITES = "mapbox://sprites/mapbox/basic-v9"
-MAPBOX_GLYPHS = "mapbox://fonts/mapbox/{fontstack}/{range}.pbf"
+# links to sprites and glyphs for use on map. MapLibre GL JS does not require
+# an API key; these default to Maptoolkit's free tile/font/sprite service,
+# which also backs the default "streets" basemap (see db_data.sql).
+MAPLIBRE_SPRITES = "https://icons.maptoolkit.org/sprite"
+MAPLIBRE_GLYPHS = "https://fonts.maptoolkit.org/{fontstack}/{range}.pbf"
 
 DEFAULT_MAP_ZOOM = 0
 MAP_MIN_ZOOM = 0
@@ -755,6 +803,8 @@ ENABLE_TWO_FACTOR_AUTHENTICATION = False
 
 # If True, users cannot log in unless they have enabled two-factor authentication
 FORCE_TWO_FACTOR_AUTHENTICATION = False
+
+LOGIN_REDIRECT_URL = "home"
 
 # bounds for search results hex binning fabric (search grid).
 # a smaller bbox will give you less distortion in hexes and better performance

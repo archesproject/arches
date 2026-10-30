@@ -209,9 +209,10 @@ def create_tile_excel_workbook(graphid, tiledata=None):
             )
             for i, node in enumerate(nodes):
                 sheet.cell(column=i + 4, row=1, value=node["alias"])
-                sheet.cell(column=i + 5, row=1, value="sortorder")
-                sheet.cell(column=i + 6, row=1, value="provisionaledits")
-                sheet.cell(column=i + 7, row=1, value="nodegroup_id")
+            trailing_column = len(nodes) + 4
+            sheet.cell(column=trailing_column, row=1, value="sortorder")
+            sheet.cell(column=trailing_column + 1, row=1, value="provisionaledits")
+            sheet.cell(column=trailing_column + 2, row=1, value="nodegroup_id")
 
         if tiledata is not None:
             for card_name, tiles in tiledata.items():
@@ -234,14 +235,19 @@ def create_tile_excel_workbook(graphid, tiledata=None):
                                 row=row_number,
                                 value=f"{tile.get(node['alias'])}",
                             )
-                        sheet.cell(
-                            column=i + 5, row=row_number, value=tile["sortorder"]
-                        )
-                        sheet.cell(
-                            column=i + 6, row=row_number, value=tile["provisionaledits"]
-                        )
-                        sheet.cell(
-                            column=i + 7, row=row_number, value=str(tile["nodegroupid"])
-                        )
+                    trailing_column = len(nodes) + 4
+                    sheet.cell(
+                        column=trailing_column, row=row_number, value=tile["sortorder"]
+                    )
+                    sheet.cell(
+                        column=trailing_column + 1,
+                        row=row_number,
+                        value=tile["provisionaledits"],
+                    )
+                    sheet.cell(
+                        column=trailing_column + 2,
+                        row=row_number,
+                        value=str(tile["nodegroupid"]),
+                    )
 
     return wb

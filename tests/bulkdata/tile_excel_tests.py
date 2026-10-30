@@ -39,7 +39,7 @@ from arches.app.etl_modules.tile_excel_importer import TileExcelImporter
 
 from arches.app.etl_modules.base_import_module import FileValidationError
 
-from arches.app.models.models import ETLModule, LoadEvent
+from arches.app.models.models import EditLog, ETLModule, LoadEvent
 
 from tests.base_test import ArchesTransactionTestCase
 
@@ -115,6 +115,25 @@ class TileExcelTests(ArchesTransactionTestCase):
 
         load_event = LoadEvent.objects.filter(status="completed").last()
         self.assertIsNotNone(load_event)
+
+    def test_cli_calls_post_import_with_load_id(self):
+        excel_file_path = str(
+            Path("tests", "fixtures", "data", "uploadedfiles", "tile_excel_test.xlsx")
+        )
+        with patch(
+            "arches.app.etl_modules.save._call_post_import_functions"
+        ) as mock_post_import:
+            call_command(
+                "etl",
+                "tile-excel-importer",
+                source=excel_file_path,
+                index=False,
+                stdout=StringIO(),
+            )
+
+        mock_post_import.assert_called_once()
+        (loadid,) = mock_post_import.call_args.args
+        self.assertTrue(EditLog.objects.filter(transactionid=loadid).exists())
 
     def test_export_with_orphaned_tile_node(self):
         """Export should not raise KeyError when tile tiledata contains a node

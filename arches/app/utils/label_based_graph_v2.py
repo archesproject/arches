@@ -1,5 +1,6 @@
 import copy
 
+from arches.app.utils.decorators import deprecated
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from django.utils import translation
@@ -353,6 +354,7 @@ class LabelBasedGraph(object):
             return root_label_based_node
 
     @classmethod
+    @deprecated
     def from_resources(
         cls, resources, compact=False, hide_empty_nodes=False, as_json=True
     ):

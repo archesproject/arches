@@ -9,7 +9,7 @@ import geojsonhint from "geojsonhint";
 import { kml } from "togeojson";
 import shp from "shpjsesm";
 import proj4 from "proj4";
-import MapboxDraw from "mapbox-gl-draw";
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import MapComponentViewModel from "views/components/map";
 import selectFeatureLayersFactory from "views/components/cards/select-feature-layers";
 import geojsonFeatureCollection from "views/components/datatypes/geojson-feature-collection";
@@ -311,6 +311,7 @@ var viewModel = function (params) {
     MapComponentViewModel.apply(this, [params]);
 
     this.deleteFeature = function (feature) {
+        if (ko.unwrap(self.disabled)) { return; }
         if (self.draw) {
             self.draw.delete(feature.id);
             self.selectedFeatureIds(
@@ -323,6 +324,7 @@ var viewModel = function (params) {
     };
 
     this.editFeature = function (feature) {
+        if (ko.unwrap(self.disabled)) { return; }
         if (self.draw) {
             self.draw.changeMode("simple_select", {
                 featureIds: [feature.id],
@@ -452,8 +454,21 @@ var viewModel = function (params) {
         }
     };
 
+    // mapbox-gl-draw >= 1.5 generates non-UUID ids; Arches requires UUID feature ids.
+    var newFeatureWithUuid = function (geojson) {
+        return Object.getPrototypeOf(this).newFeature.call(
+            this,
+            Object.assign({}, geojson, { id: geojson.id || uuid.generate() })
+        );
+    };
+
     var setupDraw = function (map) {
-        var modes = MapboxDraw.modes;
+        var modes = {};
+        Object.keys(MapboxDraw.modes).forEach(function (name) {
+            modes[name] = Object.assign({}, MapboxDraw.modes[name], {
+                newFeature: newFeatureWithUuid,
+            });
+        });
         modes.static = {
             onSetup: function () {
                 this.setActionableState();

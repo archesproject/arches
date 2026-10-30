@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        {% include 'custom_email_css.htm' %}
+    </head>
+
+    <body style="width: 400px;">
+        {% include 'custom_email_header.htm' %}
+
+        <p>{{greeting}}</p>
+        {% if files %}
+            <!-- ko foreach: { data: files, as: 'file' } -->
+            <div class='entry'>
+                <a data-bind="attr: { href: '/files/' + file.fileid }" target="_blank" style="color: steelblue">
+                    <button class='btn btn-notifs-download btn-labeled btn-sm fa fa-download'>
+                        <span data-bind="text: file.name"></span>
+                    </button>
+                </a>
+            </div>
+            <!-- /ko -->
+
+        {% endif %}
+
+        {% if link != "" %}
+            <a class="btn" href="{{email_link}}"><button
+                    class='btn btn-notifs-download btn-labeled btn-sm fa fa-download'><span>{{button_text}}</span></button></a>    
+        {% endif %}
+
+        <p>{{closing}}</p>
+
+        {% include 'custom_email_footer.htm' %}
+    </body>
+    
+</html>

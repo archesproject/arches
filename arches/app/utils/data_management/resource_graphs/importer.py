@@ -67,6 +67,55 @@ class GraphImportException(Exception):
 def import_graph(graphs, overwrite_graphs=True, user=None):
     reporter = GraphImportReporter(graphs)
 
+    def update_resource_instance_config(node):
+        if node.datatype not in ("resource-instance", "resource-instance-list"):
+            return
+        if not isinstance(node.config, dict):
+            return
+
+        for graph_config in node.config.get("graphs") or []:
+            if "relationshipSource" in graph_config:
+                continue
+
+            use_ontology = graph_config.pop("useOntologyRelationship", None)
+            ontology_property = graph_config.pop("ontologyProperty", None)
+            inverse_ontology_property = graph_config.pop(
+                "inverseOntologyProperty", None
+            )
+            relationship_concept = graph_config.pop("relationshipConcept", None)
+            inverse_relationship_concept = graph_config.pop(
+                "inverseRelationshipConcept", None
+            )
+
+            if use_ontology is None:
+                # configs without the flag only ever set the ontology properties
+                use_ontology = (
+                    ontology_property is not None
+                    or inverse_ontology_property is not None
+                ) and (
+                    relationship_concept is None
+                    and inverse_relationship_concept is None
+                )
+
+            if use_ontology:
+                relationship_source = "ontology"
+                relationship = ontology_property
+                inverse_relationship = inverse_ontology_property
+            else:
+                relationship_source = "concept"
+                relationship = relationship_concept
+                inverse_relationship = inverse_relationship_concept
+                value = relationship or inverse_relationship
+                if value:
+                    try:
+                        uuid.UUID(str(value))
+                    except ValueError:
+                        relationship_source = "reference"
+
+            graph_config["relationshipSource"] = relationship_source
+            graph_config["relationship"] = relationship
+            graph_config["inverseRelationship"] = inverse_relationship
+
     def check_default_configs(default_configs, configs):
         if default_configs is not None:
             if configs is None:
@@ -109,13 +158,7 @@ def import_graph(graphs, overwrite_graphs=True, user=None):
 
             try:
                 graph = Graph(resource)
-
-                try:
-                    graph.update_permissions_from_serialized_graph(resource)
-                except (
-                    AttributeError
-                ):  # AttributeError happens if attempting to update permissions on a non-existent NodeGroup
-                    pass
+                graph.slugify_node_aliases()
 
                 ontology_classes = [
                     str(f["source"])
@@ -128,7 +171,13 @@ def import_graph(graphs, overwrite_graphs=True, user=None):
                             errors.append(
                                 "The ontology class of this node does not exist in the indicated ontology scheme."
                             )
+
+                    # 8.x & 8.2 Compatibility. Allow 8.1 configured resource instance nodes.
+                    # TODO Remove in V9.0
+                    update_resource_instance_config(node)
+
                     node_config = node.config
+
                     default_config = DDataType.objects.get(
                         datatype=node.datatype
                     ).defaultconfig
@@ -166,6 +215,9 @@ def import_graph(graphs, overwrite_graphs=True, user=None):
                                     graph.name
                                 )
                             )
+
+                # nodegroups must exist before permissions can reference them
+                graph.update_permissions_from_serialized_graph(resource)
 
                 if not hasattr(graph, "cards_x_nodes_x_widgets"):
                     errors.append(

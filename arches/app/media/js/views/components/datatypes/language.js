@@ -2,6 +2,7 @@ import ko from 'knockout';
 import arches from 'arches';
 import LanguageSelectViewModel from "viewmodels/language-select";
 import languageDatatypeTemplate from 'templates/views/components/datatypes/language.htm';
+import 'bindings/select2-query';
 
 const name = 'language-datatype-config';
 

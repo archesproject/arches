@@ -1,0 +1,399 @@
+[
+    {
+        "model": "models.concept",
+        "pk": "0fc72a30-2ead-4afd-9e7a-a5067d2cc5c8",
+        "fields": {
+            "nodetype": "Concept",
+            "legacyoid": "http://localhost:8000/0fc72a30-2ead-4afd-9e7a-a5067d2cc5c8"
+        }
+    },
+    {
+        "model": "models.concept",
+        "pk": "6490ac87-ac80-41d7-a135-1119b4cd912d",
+        "fields": {
+            "nodetype": "Concept",
+            "legacyoid": "http://localhost:8000/6490ac87-ac80-41d7-a135-1119b4cd912d"
+        }
+    },
+    {
+        "model": "models.concept",
+        "pk": "7c90899a-dbe9-4574-9175-e69481a80b3c",
+        "fields": {
+            "nodetype": "ConceptScheme",
+            "legacyoid": "http://localhost:8000/7c90899a-dbe9-4574-9175-e69481a80b3c"
+        }
+    },
+    {
+        "model": "models.concept",
+        "pk": "843c76cb-7e2a-47dd-b588-a0d0fcb00de7",
+        "fields": {
+            "nodetype": "Collection",
+            "legacyoid": "http://localhost:8000/843c76cb-7e2a-47dd-b588-a0d0fcb00de7"
+        }
+    },
+    {
+        "model": "models.concept",
+        "pk": "86399966-b68a-4ac1-8255-d452e0fe1ce8",
+        "fields": {
+            "nodetype": "Collection",
+            "legacyoid": "http://localhost:8000/86399966-b68a-4ac1-8255-d452e0fe1ce8"
+        }
+    },
+    {
+        "model": "models.concept",
+        "pk": "89ff530a-f350-44f0-ac88-bdd8904eb57e",
+        "fields": {
+            "nodetype": "Concept",
+            "legacyoid": "http://localhost:8000/89ff530a-f350-44f0-ac88-bdd8904eb57e"
+        }
+    },
+    {
+        "model": "models.concept",
+        "pk": "abeaef4a-f57c-40d3-bdb1-9d16bf0811b5",
+        "fields": {
+            "nodetype": "Collection",
+            "legacyoid": "Polyhierarchy Collection 2"
+        }
+    },
+    {
+        "model": "models.value",
+        "pk": "1219d940-701f-4e88-9105-b9d6d3ca1022",
+        "fields": {
+            "concept": "abeaef4a-f57c-40d3-bdb1-9d16bf0811b5",
+            "valuetype": "prefLabel",
+            "value": "Polyhierarchy Collection 2",
+            "language": "en"
+        }
+    },
+    {
+        "model": "models.value",
+        "pk": "34458821-a31b-4727-8199-d805efb344ad",
+        "fields": {
+            "concept": "0fc72a30-2ead-4afd-9e7a-a5067d2cc5c8",
+            "valuetype": "identifier",
+            "value": "http://www.archesproject.org/0fc72a30-2ead-4afd-9e7a-a5067d2cc5c8",
+            "language": "en"
+        }
+    },
+    {
+        "model": "models.value",
+        "pk": "4ef16d39-dc7b-4db7-b471-71ad568dc20a",
+        "fields": {
+            "concept": "6490ac87-ac80-41d7-a135-1119b4cd912d",
+            "valuetype": "sortorder",
+            "value": "0",
+            "language": "en"
+        }
+    },
+    {
+        "model": "models.value",
+        "pk": "7949d7b5-6e57-469a-8f38-87aac08e1788",
+        "fields": {
+            "concept": "0fc72a30-2ead-4afd-9e7a-a5067d2cc5c8",
+            "valuetype": "prefLabel",
+            "value": "Test Concept 2",
+            "language": "en"
+        }
+    },
+    {
+        "model": "models.value",
+        "pk": "91f70cc9-f9f2-48ab-8393-9ae6c26e6c8e",
+        "fields": {
+            "concept": "89ff530a-f350-44f0-ac88-bdd8904eb57e",
+            "valuetype": "prefLabel",
+            "value": "French Test Concept 1",
+            "language": "fr"
+        }
+    },
+    {
+        "model": "models.value",
+        "pk": "97ab3f70-d0e5-49ed-b896-3574251f5723",
+        "fields": {
+            "concept": "843c76cb-7e2a-47dd-b588-a0d0fcb00de7",
+            "valuetype": "prefLabel",
+            "value": "Polyhierarchical Collection Test",
+            "language": "en"
+        }
+    },
+    {
+        "model": "models.value",
+        "pk": "9fa56006-6828-480f-8395-ad5c5a84726b",
+        "fields": {
+            "concept": "89ff530a-f350-44f0-ac88-bdd8904eb57e",
+            "valuetype": "prefLabel",
+            "value": "Test Concept 1",
+            "language": "en"
+        }
+    },
+    {
+        "model": "models.value",
+        "pk": "ace4b2c7-a5e9-412a-9839-85e143036c4c",
+        "fields": {
+            "concept": "0fc72a30-2ead-4afd-9e7a-a5067d2cc5c8",
+            "valuetype": "sortorder",
+            "value": "1",
+            "language": "en"
+        }
+    },
+    {
+        "model": "models.value",
+        "pk": "b1f230c5-c9c3-4f86-a23f-8c56b2094c86",
+        "fields": {
+            "concept": "6490ac87-ac80-41d7-a135-1119b4cd912d",
+            "valuetype": "identifier",
+            "value": "http://www.archesproject.org/6490ac87-ac80-41d7-a135-1119b4cd912d",
+            "language": "en"
+        }
+    },
+    {
+        "model": "models.value",
+        "pk": "b967985b-585c-4f70-8b55-20c251250ba7",
+        "fields": {
+            "concept": "0fc72a30-2ead-4afd-9e7a-a5067d2cc5c8",
+            "valuetype": "prefLabel",
+            "value": "French Test Concept 2",
+            "language": "fr"
+        }
+    },
+    {
+        "model": "models.value",
+        "pk": "bc905a83-223b-419e-850c-4e9c0c1b817a",
+        "fields": {
+            "concept": "89ff530a-f350-44f0-ac88-bdd8904eb57e",
+            "valuetype": "identifier",
+            "value": "http://www.archesproject.org/89ff530a-f350-44f0-ac88-bdd8904eb57e",
+            "language": "en"
+        }
+    },
+    {
+        "model": "models.value",
+        "pk": "df418223-c574-4b24-8db3-ce767542f908",
+        "fields": {
+            "concept": "86399966-b68a-4ac1-8255-d452e0fe1ce8",
+            "valuetype": "prefLabel",
+            "value": "Nested Polyhierarchy",
+            "language": "en"
+        }
+    },
+    {
+        "model": "models.value",
+        "pk": "ed0c85a3-d679-42e2-b465-b5f79e53122b",
+        "fields": {
+            "concept": "7c90899a-dbe9-4574-9175-e69481a80b3c",
+            "valuetype": "identifier",
+            "value": "http://www.archesproject.org/7c90899a-dbe9-4574-9175-e69481a80b3c",
+            "language": "en"
+        }
+    },
+    {
+        "model": "models.value",
+        "pk": "f5e1a756-c658-4a3c-bc3a-e9293242e8f7",
+        "fields": {
+            "concept": "7c90899a-dbe9-4574-9175-e69481a80b3c",
+            "valuetype": "prefLabel",
+            "value": "Polyhierarchical Collection Test",
+            "language": "en"
+        }
+    },
+    {
+        "model": "models.value",
+        "pk": "fad6f17d-f7c8-4fa1-b358-e8626571599e",
+        "fields": {
+            "concept": "6490ac87-ac80-41d7-a135-1119b4cd912d",
+            "valuetype": "prefLabel",
+            "value": "Test Concept 3",
+            "language": "en"
+        }
+    },
+    {
+        "model": "models.value",
+        "pk": "fdbbc8e9-9996-4ae2-b244-29bfcf4f8951",
+        "fields": {
+            "concept": "6490ac87-ac80-41d7-a135-1119b4cd912d",
+            "valuetype": "prefLabel",
+            "value": "French Test Concept 3",
+            "language": "fr"
+        }
+    },
+    {
+        "model": "models.relation",
+        "pk": "000febf0-030c-4f1b-92a8-2599f9a2a6a5",
+        "fields": {
+            "conceptfrom": "abeaef4a-f57c-40d3-bdb1-9d16bf0811b5",
+            "conceptto": "6490ac87-ac80-41d7-a135-1119b4cd912d",
+            "relationtype": "member"
+        }
+    },
+    {
+        "model": "models.relation",
+        "pk": "15a7a793-8d38-41da-b81e-5df46bee23cc",
+        "fields": {
+            "conceptfrom": "abeaef4a-f57c-40d3-bdb1-9d16bf0811b5",
+            "conceptto": "89ff530a-f350-44f0-ac88-bdd8904eb57e",
+            "relationtype": "member"
+        }
+    },
+    {
+        "model": "models.relation",
+        "pk": "2838d385-4dd9-42ef-9458-63455e25e430",
+        "fields": {
+            "conceptfrom": "843c76cb-7e2a-47dd-b588-a0d0fcb00de7",
+            "conceptto": "0fc72a30-2ead-4afd-9e7a-a5067d2cc5c8",
+            "relationtype": "member"
+        }
+    },
+    {
+        "model": "models.relation",
+        "pk": "477406e7-1640-45ec-8f7d-d3acd9dd0de2",
+        "fields": {
+            "conceptfrom": "86399966-b68a-4ac1-8255-d452e0fe1ce8",
+            "conceptto": "abeaef4a-f57c-40d3-bdb1-9d16bf0811b5",
+            "relationtype": "member"
+        }
+    },
+    {
+        "model": "models.relation",
+        "pk": "5013864a-a308-4b37-b947-f741e5d68fde",
+        "fields": {
+            "conceptfrom": "abeaef4a-f57c-40d3-bdb1-9d16bf0811b5",
+            "conceptto": "0fc72a30-2ead-4afd-9e7a-a5067d2cc5c8",
+            "relationtype": "member"
+        }
+    },
+    {
+        "model": "models.relation",
+        "pk": "55cc1eab-3b60-499e-ac8c-cbcda1c833b0",
+        "fields": {
+            "conceptfrom": "843c76cb-7e2a-47dd-b588-a0d0fcb00de7",
+            "conceptto": "6490ac87-ac80-41d7-a135-1119b4cd912d",
+            "relationtype": "member"
+        }
+    },
+    {
+        "model": "models.relation",
+        "pk": "579c64f8-cd28-4998-93ee-000ad9ff1905",
+        "fields": {
+            "conceptfrom": "7c90899a-dbe9-4574-9175-e69481a80b3c",
+            "conceptto": "89ff530a-f350-44f0-ac88-bdd8904eb57e",
+            "relationtype": "hasTopConcept"
+        }
+    },
+    {
+        "model": "models.relation",
+        "pk": "767a2137-91ce-4cc5-8b61-de98ed126176",
+        "fields": {
+            "conceptfrom": "7c90899a-dbe9-4574-9175-e69481a80b3c",
+            "conceptto": "0fc72a30-2ead-4afd-9e7a-a5067d2cc5c8",
+            "relationtype": "member"
+        }
+    },
+    {
+        "model": "models.relation",
+        "pk": "a5a3df7f-83b7-42e2-84b9-35a0143e0325",
+        "fields": {
+            "conceptfrom": "7c90899a-dbe9-4574-9175-e69481a80b3c",
+            "conceptto": "0fc72a30-2ead-4afd-9e7a-a5067d2cc5c8",
+            "relationtype": "hasTopConcept"
+        }
+    },
+    {
+        "model": "models.relation",
+        "pk": "a6caaab1-d52b-43fc-b211-6e05aa465adb",
+        "fields": {
+            "conceptfrom": "7c90899a-dbe9-4574-9175-e69481a80b3c",
+            "conceptto": "6490ac87-ac80-41d7-a135-1119b4cd912d",
+            "relationtype": "member"
+        }
+    },
+    {
+        "model": "models.relation",
+        "pk": "a9bc9e9c-7423-4b0b-81be-242be3589eaa",
+        "fields": {
+            "conceptfrom": "7c90899a-dbe9-4574-9175-e69481a80b3c",
+            "conceptto": "89ff530a-f350-44f0-ac88-bdd8904eb57e",
+            "relationtype": "member"
+        }
+    },
+    {
+        "model": "models.relation",
+        "pk": "bb0574bd-785d-4e28-b12f-5019d176529a",
+        "fields": {
+            "conceptfrom": "843c76cb-7e2a-47dd-b588-a0d0fcb00de7",
+            "conceptto": "89ff530a-f350-44f0-ac88-bdd8904eb57e",
+            "relationtype": "member"
+        }
+    },
+    {
+        "model": "models.relation",
+        "pk": "c27ac77f-f136-4cd1-8021-b1b9046345a2",
+        "fields": {
+            "conceptfrom": "86399966-b68a-4ac1-8255-d452e0fe1ce8",
+            "conceptto": "7c90899a-dbe9-4574-9175-e69481a80b3c",
+            "relationtype": "member"
+        }
+    },
+    {
+        "model": "models.relation",
+        "pk": "d01b73e6-18ca-4e2b-bf7f-86608f05e036",
+        "fields": {
+            "conceptfrom": "7c90899a-dbe9-4574-9175-e69481a80b3c",
+            "conceptto": "6490ac87-ac80-41d7-a135-1119b4cd912d",
+            "relationtype": "hasTopConcept"
+        }
+    },
+    {
+        "model": "models.language",
+        "pk": 1,
+        "fields": {
+            "code": "en",
+            "name": "English",
+            "default_direction": "ltr",
+            "scope": "system",
+            "isdefault": true
+        }
+    },
+    {
+        "model": "models.language",
+        "pk": 2,
+        "fields": {
+            "code": "de",
+            "name": "German",
+            "default_direction": "ltr",
+            "scope": "system",
+            "isdefault": false
+        }
+    },
+    {
+        "model": "models.language",
+        "pk": 3,
+        "fields": {
+            "code": "en-gb",
+            "name": "British English",
+            "default_direction": "ltr",
+            "scope": "system",
+            "isdefault": false
+        }
+    },
+    {
+        "model": "models.language",
+        "pk": 4,
+        "fields": {
+            "code": "es",
+            "name": "Spanish",
+            "default_direction": "ltr",
+            "scope": "system",
+            "isdefault": false
+        }
+    },
+    {
+        "model": "models.language",
+        "pk": 5,
+        "fields": {
+            "code": "fr",
+            "name": "French",
+            "default_direction": "ltr",
+            "scope": "system",
+            "isdefault": false
+        }
+    }
+]

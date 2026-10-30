@@ -2,6 +2,8 @@ import ko from 'knockout';
 import BaseManagerView from 'views/base-manager';
 import data from 'views/plugin-data';
 import 'plugins';
+import 'widgets';
+import 'card-components';
 
 
 if (!data.config) data.config = {};

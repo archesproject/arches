@@ -1,9 +1,13 @@
 import json
+from django.conf import settings
+from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from django.contrib.auth.models import User, Group
 
 
-def sync_es(search_engine, index="test_resources"):
+def sync_es(search_engine, index=None):
+    if index is None:
+        index = f"{settings.ELASTICSEARCH_PREFIX}_{RESOURCES_INDEX}"
     search_engine.es.indices.refresh(index=index)
 
 

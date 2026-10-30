@@ -1,7 +1,6 @@
 @import url(../fonts/openSans.css);
-@import url(node_modules/bootstrap/dist/css/bootstrap.min.css);
-@import url(node_modules/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css);
-@import url(node_modules/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css);
+@import url(vendor/bootstrap-3.4.1.css);
+@import url(node_modules/@eonasdan/tempus-dominus/dist/css/tempus-dominus.min.css);
 @import url(nifty.css);
 @import url(node_modules/font-awesome/css/font-awesome.min.css);
 @import url(node_modules/primeicons/primeicons.css);
@@ -9,7 +8,7 @@
 @import url(node_modules/lt-themify-icons/themify-icons.css);
 @import url(node_modules/chosen-js/chosen.css);
 @import url(node_modules/select-woo/dist/css/selectWoo.min.css);
-@import url(node_modules/mapbox-gl/dist/mapbox-gl.css);
+@import url(node_modules/maplibre-gl/dist/maplibre-gl.css);
 @import url(node_modules/nouislider/distribute/nouislider.min.css);
 @import url(node_modules/codemirror/lib/codemirror.css);
 @import url(node_modules/codemirror/theme/monokai.css);
@@ -19,7 +18,7 @@
 @import url(node_modules/leaflet/dist/leaflet.css);
 @import url(node_modules/leaflet-draw/dist/leaflet.draw.css);
 @import url(../css/tree/tree.css);
-@import url(node_modules/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
+@import url(node_modules/@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css);
 @import url(node_modules/leaflet.fullscreen/Control.FullScreen.css);
 @import url(../css/base-manager.css);
 @import "abstracts";
@@ -1206,48 +1205,6 @@ div.wf-multi-tile-card-info div {
         background: #5fa2dd;
         i {
             color: white;
-        }
-    }
-
-    // CSS-only tooltip matching Bootstrap's dark tooltip style
-    &[data-tooltip] {
-        &::before {
-            border-color: transparent transparent rgba(0, 0, 0, 0.9) transparent;
-            border-style: solid;
-            border-width: 0 5px 5px;
-            content: '';
-            left: 50%;
-            margin-left: -5px;
-            opacity: 0;
-            pointer-events: none;
-            position: absolute;
-            top: calc(100% + 3px);
-            transition: opacity 0.15s;
-            z-index: 1071;
-        }
-        &::after {
-            background-color: rgba(0, 0, 0, 0.9);
-            border-radius: 4px;
-            color: #fff;
-            content: attr(data-tooltip);
-            font-size: 12px;
-            left: 50%;
-            line-height: 1.42857143;
-            opacity: 0;
-            padding: 6px 8px;
-            pointer-events: none;
-            position: absolute;
-            top: calc(100% + 8px);
-            transform: translateX(-50%);
-            transition: opacity 0.15s;
-            white-space: nowrap;
-            z-index: 1070;
-        }
-        &:hover::before,
-        &:hover::after,
-        &:focus-visible::before,
-        &:focus-visible::after {
-            opacity: 1;
         }
     }
 }
@@ -2768,6 +2725,63 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     padding: 30px;
     margin-bottom: 30px;
     background: #fbfbfb;
+}
+
+.permission-manager {
+    .permissions-instructions-panel {
+        padding: 15px 20px;
+        margin-bottom: 20px;
+    }
+
+    .permission-selector {
+        margin: 15px 0px 20px 0px;
+    }
+
+    .permissions-options {
+        flex-wrap: wrap;
+        gap: 5px 20px;
+
+        // keep the checkbox reachable by keyboard while the theme draws the box
+        .form-checkbox > input[type="checkbox"] {
+            display: block;
+            position: absolute;
+            visibility: visible;
+            width: 1px;
+            height: 1px;
+            margin: 0;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+        }
+
+        .form-checkbox:focus-within {
+            outline: 2px solid #489eed;
+            outline-offset: 2px;
+        }
+
+        // box has a 3px left margin here; center the theme's check in it
+        .form-checkbox.form-normal:not(.disabled):hover:after,
+        .form-checkbox.form-normal.active:after {
+            left: 5.5px;
+        }
+
+        .form-checkbox.form-normal.indeterminate:not(.active):after {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 50%;
+            width: 10px;
+            height: 0;
+            margin-top: -1px;
+            transform: none;
+            border-left: 0;
+            border-bottom: 2.5px solid #404449;
+        }
+    }
+}
+
+.designer-permission-tree .permissions-card:focus-visible {
+    outline: 2px solid #489eed;
+    outline-offset: -2px;
 }
 
 .settings-panel-heading+.permissions-instructions-panel {
@@ -6347,7 +6361,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .grid-list.provisional-edit-history {
-    height: 100%;
+    height: calc(100vh - 100px);
     position: absolute;
     width: 100%;
     overflow-y: scroll;
@@ -6693,6 +6707,10 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .node-permission-icon {
     padding-right: 3px;
+}
+
+.node-permission-icon.inherited {
+    opacity: 0.55;
 }
 
 .expand-icon {
@@ -7103,6 +7121,11 @@ div.hide-file-list>div>div>div>div>form>div>div:nth-child(3) {
     background: rgba(214, 214, 214, 0.3);
 }
 
+.state-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
 .wizard-card-tools {
     float: right;
     padding-left: 10px;
@@ -7399,6 +7422,67 @@ a.mega-dropdown-toggle.disabled {
 
 .rr-table-row-panel .node-config-item {
     margin: 5px 0px 15px -7.5px;
+}
+
+.rr-relationship-config {
+    .rr-relationship-field {
+        margin-bottom: 15px;
+    }
+
+    .rr-relationship-field:last-child {
+        margin-bottom: 0px;
+    }
+
+    .rr-relationship-source {
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .rr-relationship-label,
+    .node-config-item .control-label {
+        display: block;
+        margin: 0px 0px 5px 0px;
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .rr-relationship-ontology-class {
+        margin: 3px 0px;
+        color: #666;
+    }
+
+    .rr-relationship-select {
+        width: 100%;
+    }
+
+    .select2-container {
+        display: block;
+        width: 100% !important;
+    }
+
+    .node-config-item {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    div.row.widget-wrapper {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    .form-group {
+        margin: 0px;
+    }
+
+    .resource-instance-wrapper {
+        padding: 0px;
+    }
+
+    .widget-wrapper .widget-input-label {
+        display: none;
+    }
 }
 
 .rr-table-column {
@@ -8694,7 +8778,7 @@ a.clear-geojson-button:hover {
     display: flex;
 }
 
-.mapboxgl-canvas:focus {
+.maplibregl-canvas:focus {
     outline: none;
 }
 
@@ -8707,28 +8791,28 @@ a.clear-geojson-button:hover {
     background: steelblue;
 }
 
-.mapboxgl-ctrl-top-left .mapboxgl-ctrl {
+.maplibregl-ctrl-top-left .maplibregl-ctrl {
     visibility: hidden;
 }
 
-.mapboxgl-ctrl-geocoder--input {
+.maplibregl-ctrl-geocoder--input {
     font-size: 1.3rem;
     @include break-at(mobile) {
         height: 30px;
     }
 }
 
-.mapboxgl-ctrl-geocoder--icon-search {
+.maplibregl-ctrl-geocoder--icon-search {
     @include break-at(mobile) {
         top: 5px;
     }
 }
 
-.workbench-card-wrapper .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
+.workbench-card-wrapper .maplibregl-ctrl-top-left .maplibregl-ctrl {
     visibility: visible;
 }
 
-.widget-wrapper .mapboxgl-map {
+.widget-wrapper .maplibregl-map {
     z-index: 10;
     margin-bottom: -10px;
 }
@@ -9114,12 +9198,12 @@ a.clear-geojson-button:hover {
     max-width: 311px;
 }
 
-.mapboxgl-popup-content .hover-feature-title-bar {
+.maplibregl-popup-content .hover-feature-title-bar {
     margin-bottom: 0px;
     padding: 0px;
 }
 
-.mapboxgl-popup-close-button {
+.maplibregl-popup-close-button {
     position: absolute;
     right: 0px;
     top: 0px;
@@ -9134,7 +9218,7 @@ a.clear-geojson-button:hover {
     font-weight: 600;
 }
 
-.mapboxgl-popup-close-button:hover {
+.maplibregl-popup-close-button:hover {
     cursor: pointer;
     background-color: #f4f4f4;
     color: #454545;
@@ -11085,12 +11169,12 @@ a.filter-tools:hover {
     padding-left: 10px;
 }
 
-.mapboxgl-popup-content {
+.maplibregl-popup-content {
     width: 350px;
     padding: 0px;
 }
 
-.mapboxgl-popup-content .hover-feature-footer {
+.maplibregl-popup-content .hover-feature-footer {
     padding: 10px 15px;
     height: auto;
 }
@@ -12597,7 +12681,7 @@ a.filter-tools:hover {
     aside,
     .print-btn,
     .ep-tools,
-    .mapboxgl-ctrl-geocoder,
+    .maplibregl-ctrl-geocoder,
     .workbench-card-sidebar,
     .geocode-container,
     .geometry-tools-container,
@@ -12858,6 +12942,122 @@ a.filter-tools:hover {
 
 .etl-module-component-block label {
     margin-bottom: 0px;
+}
+
+.arches-json-importer {
+    .r-select-icon {
+        color: #000;
+    }
+
+    .upload-actions {
+        text-align: center;
+        padding: 1.5rem 2.5rem;
+
+        .dropzone-photo-upload {
+            display: inline-flex;
+
+            > .btn {
+                border-top: 1px solid #c4c4c4;
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        #hidden-dz-previews {
+            display: none;
+        }
+    }
+
+    .branch-xl-metadata-container > div {
+        height: 100%;
+        overflow: auto;
+        padding: 1.5rem 2rem;
+
+        > section {
+            margin-top: 2rem;
+
+            > h4 {
+                margin-bottom: 0.8rem;
+            }
+        }
+    }
+
+    .file-summary,
+    .file-list {
+        > div + div {
+            margin-top: 0.4rem;
+        }
+
+        > div > span:first-child {
+            display: inline-block;
+            margin-right: 1rem;
+        }
+    }
+
+    .file-summary > div > span:first-child {
+        min-width: 4rem;
+    }
+
+    .file-list {
+        max-height: 26rem;
+        overflow-y: auto;
+
+        > div > span:first-child {
+            min-width: 20rem;
+        }
+
+        > .total {
+            margin-top: 1rem;
+        }
+    }
+
+    .import-option {
+        display: flex;
+        align-items: baseline;
+        gap: 0.8rem;
+
+        + .import-option {
+            margin-top: 1.2rem;
+        }
+
+        input,
+        label {
+            margin: 0;
+        }
+
+        .text-warning {
+            font-size: 1.5rem;
+        }
+    }
+
+    &.loading-panel {
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        padding: 4rem;
+    }
+
+    &.load-status {
+        justify-content: flex-start;
+        height: fit-content;
+        margin-top: -0.5rem;
+    }
+
+    &.etl-error-report {
+        > table {
+            margin-top: 0.5rem;
+            border: 1px solid rgba(0, 0, 0, 0.14);
+        }
+
+        .details-toggle {
+            text-align: right;
+            vertical-align: top;
+        }
+
+        .details-value {
+            min-width: 8rem;
+        }
+    }
 }
 
 .etl-module-body p.pad-btm {
