@@ -346,6 +346,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
             GraphModel.objects.get_resource_models(exclude_inactive=False)
             .filter(node__nodegroup__in=nodegroups)
             .values_list("pk", flat=True)
+            .distinct()
         )
 
         return list(str(graph) for graph in graphs)
