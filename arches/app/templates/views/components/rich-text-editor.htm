@@ -13,62 +13,6 @@
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
-                title="{% trans 'Cut' %}"
-                aria-label="{% trans 'Cut' %}"
-                data-bind="
-                    click: run('cut'),
-                    css: {disabled: state().cut.isDisabled},
-                    attr: {'aria-disabled': state().cut.isDisabled}
-                "
-            >
-                <i class="fa fa-scissors" aria-hidden="true"></i>
-            </button>
-            <button
-                type="button"
-                class="rich-text-editor-toolbar-button"
-                tabindex="-1"
-                title="{% trans 'Copy' %}"
-                aria-label="{% trans 'Copy' %}"
-                data-bind="
-                    click: run('copy'),
-                    css: {disabled: state().copy.isDisabled},
-                    attr: {'aria-disabled': state().copy.isDisabled}
-                "
-            >
-                <i class="fa fa-files-o" aria-hidden="true"></i>
-            </button>
-            <button
-                type="button"
-                class="rich-text-editor-toolbar-button"
-                tabindex="-1"
-                title="{% trans 'Paste' %}"
-                aria-label="{% trans 'Paste' %}"
-                data-bind="
-                    click: run('paste'),
-                    css: {disabled: state().paste.isDisabled},
-                    attr: {'aria-disabled': state().paste.isDisabled}
-                "
-            >
-                <i class="fa fa-clipboard" aria-hidden="true"></i>
-            </button>
-            <button
-                type="button"
-                class="rich-text-editor-toolbar-button"
-                tabindex="-1"
-                title="{% trans 'Paste as plain text' %}"
-                aria-label="{% trans 'Paste as plain text' %}"
-                data-bind="
-                    click: run('pasteText'),
-                    css: {disabled: state().pasteText.isDisabled},
-                    attr: {'aria-disabled': state().pasteText.isDisabled}
-                "
-            >
-                <i class="fa fa-file-text-o" aria-hidden="true"></i>
-            </button>
-            <button
-                type="button"
-                class="rich-text-editor-toolbar-button"
-                tabindex="-1"
                 title="{% trans 'Undo' %}"
                 aria-label="{% trans 'Undo' %}"
                 data-bind="

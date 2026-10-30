@@ -12,43 +12,9 @@ import richTextEditorTemplate from 'templates/views/components/rich-text-editor.
 import 'bindings/tiptap';
 
 
-const writeToClipboard = async (editor, isCut) => {
-    const { state, view } = editor;
-    if (state.selection.empty) {
-        return;
-    }
-    const { dom, text } = view.serializeForClipboard(state.selection.content());
-    await navigator.clipboard.write([new ClipboardItem({
-        'text/html': new Blob([dom.innerHTML], { type: 'text/html' }),
-        'text/plain': new Blob([text], { type: 'text/plain' }),
-    })]);
-    if (isCut) {
-        editor.chain().focus().deleteSelection().run();
-    }
-};
-
-// browsers block pasting from a button with execCommand, so read the clipboard and paste it the same way as Ctrl+V
-const pasteFromClipboard = async (editor, asPlainText) => {
-    if (asPlainText) {
-        editor.view.pasteText(await navigator.clipboard.readText());
-        return;
-    }
-    const [item] = await navigator.clipboard.read();
-    if (item?.types.includes('text/html')) {
-        editor.view.pasteHTML(await (await item.getType('text/html')).text());
-    } else if (item?.types.includes('text/plain')) {
-        editor.view.pasteText(await (await item.getType('text/plain')).text());
-    }
-};
-
 // Defines each option within the toolbar.
 // - command(chain) - adds Tiptap commands to a chain
-// - action(editor) - additional, bespoke functions 
 const toolbarItems = {
-    cut: { action: editor => writeToClipboard(editor, true), isDisabled: editor => editor.state.selection.empty },
-    copy: { action: editor => writeToClipboard(editor, false), isDisabled: editor => editor.state.selection.empty },
-    paste: { action: editor => pasteFromClipboard(editor, false) },
-    pasteText: { action: editor => pasteFromClipboard(editor, true) },
     undo: { command: chain => chain.undo() },
     redo: { command: chain => chain.redo() },
     link: { isActive: editor => editor.isActive('link') },
@@ -148,12 +114,7 @@ export default ko.components.register('views/components/rich-text-editor', {
         });
 
         this.run = name => () => {
-            const item = toolbarItems[name];
-            if (item.action) {
-                item.action(editor);
-            } else {
-                item.command(editor.chain().focus()).run();
-            }
+            toolbarItems[name].command(editor.chain().focus()).run();
         };
 
         // link url popup
