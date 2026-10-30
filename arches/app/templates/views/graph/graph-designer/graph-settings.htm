@@ -69,6 +69,8 @@
                             <div class="col-xs-12 crm-selector">
                                 <select class="design" data-bind="
                                     attr: {'disabled': graphSettingsViewModel.nodeCount() > 1, 'data-label': {% quoted_trans _('Ontology') %}},
+                                    value: graph.ontology_id,
+                                    valueAllowUnset: true,                                    
                                     options: ontologies,
                                     optionsText: 'name',
                                     optionsValue: 'ontologyid',
