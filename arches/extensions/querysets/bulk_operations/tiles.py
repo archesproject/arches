@@ -58,12 +58,6 @@ class TileTreeOperation:
         self.editable_nodegroups: set[str] = (
             self.request.user.userprofile.editable_nodegroups
         )
-        self.deletable_nodegroups: set[str] = (
-            self.request.user.userprofile.deletable_nodegroups
-        )
-        self.viewable_nodegroups: set[str] = (
-            self.request.user.userprofile.viewable_nodegroups
-        )
 
         if (self.partial and self.request.method == "PUT") or (
             not self.partial and self.request.method == "PATCH"
@@ -351,9 +345,10 @@ class TileTreeOperation:
 
     def _can_delete_missing_tile(self, tile):
         nodegroup_id = str(tile.nodegroup_id)
+        user_profile = self.request.user.userprofile
         return (
-            nodegroup_id in self.deletable_nodegroups
-            and nodegroup_id in self.viewable_nodegroups
+            nodegroup_id in user_profile.deletable_nodegroups
+            and nodegroup_id in user_profile.viewable_nodegroups
         )
 
     def _extract_incoming_tiles(self, container, grouping_node):
