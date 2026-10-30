@@ -122,7 +122,10 @@ export interface MapContext {
     ) => void;
     addFeatures: (features: Feature[]) => boolean;
     updateDrawnFeature: (feature: Feature) => void;
-    fitToFeatures: (features: Feature[]) => void;
+    fitToFeatures: (
+        features: Feature[],
+        options?: { animate?: boolean },
+    ) => void;
     moveOverlay: (overlay: MapLayer, toIndex: number) => void;
     setOverlayOpacity: (overlay: MapLayer, opacityPercent: number) => void;
     showFeatureHighlight: (geometries: Geometry[]) => void;

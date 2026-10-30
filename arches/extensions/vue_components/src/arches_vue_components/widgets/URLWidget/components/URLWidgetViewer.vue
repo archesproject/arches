@@ -13,6 +13,7 @@ const { $gettext } = useGettext();
 <template>
     <a
         v-if="aliasedNodeData?.node_value?.url"
+        class="url-widget-link"
         :href="aliasedNodeData.node_value.url"
     >
         {{
@@ -25,3 +26,13 @@ const { $gettext } = useGettext();
         {{ $gettext("No URL provided") }}
     </span>
 </template>
+
+<style scoped>
+.url-widget-link {
+    color: var(--p-primary-color);
+}
+
+.url-widget-link:hover {
+    color: var(--p-primary-hover-color);
+}
+</style>

@@ -23,3 +23,13 @@ defineProps<{
         </a>
     </div>
 </template>
+
+<style scoped>
+.resource-instance-link {
+    color: var(--p-primary-color);
+}
+
+.resource-instance-link:hover {
+    color: var(--p-primary-hover-color);
+}
+</style>

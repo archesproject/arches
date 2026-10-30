@@ -1,4 +1,4 @@
-import { ref, shallowRef } from "vue";
+import { ref, shallowRef, toValue } from "vue";
 
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import geojsonExtent from "@mapbox/geojson-extent";
@@ -22,13 +22,17 @@ import {
     DRAW_DELETE_EVENT,
     DRAW_SELECTION_CHANGE_EVENT,
     DRAW_UPDATE_EVENT,
+    EMPTY_FEATURE_COLLECTION,
+    FIT_TO_FEATURES_MAX_ZOOM,
+    FIT_TO_FEATURES_PADDING,
     GEOMETRY_TYPE_POINT,
     METERS,
     SIMPLE_SELECT,
+    STATIC,
 } from "@/arches_vue_components/components/MapComponent/constants.ts";
 import { onDrawEvent } from "@/arches_vue_components/components/MapComponent/utils/draw-events.ts";
 
-import type { Ref, ShallowRef } from "vue";
+import type { MaybeRefOrGetter, Ref, ShallowRef } from "vue";
 import type { Feature, FeatureCollection } from "geojson";
 import type {
     GeoJSONSource,
@@ -43,8 +47,19 @@ import type {
     MapContext,
 } from "@/arches_vue_components/components/MapComponent/types.ts";
 
-const FIT_TO_FEATURES_MAX_ZOOM = 17;
-const FIT_TO_FEATURES_PADDING = 80;
+const STATIC_MODE = {
+    onSetup(this: { setActionableState: () => void }): Record<string, never> {
+        this.setActionableState();
+        return {};
+    },
+    toDisplayFeatures(
+        _state: unknown,
+        geojson: Feature,
+        display: (geojson: Feature) => void,
+    ): void {
+        display(geojson);
+    },
+};
 
 export interface UseDrawnFeaturesReturn
     extends Pick<
@@ -69,13 +84,15 @@ export interface UseDrawnFeaturesReturn
     addBufferLayer: () => void;
     isActivelyDrawingOrEditing: () => boolean;
     isDrawnFeatureOnTop: (point: MapMouseEvent["point"]) => boolean;
+    replaceDrawnFeatures: (featureCollection: FeatureCollection | null) => void;
 }
 
 export function useDrawnFeatures(
     map: ShallowRef<MaplibreMap | null>,
     props: {
-        value: FeatureCollection | null;
+        value: MaybeRefOrGetter<FeatureCollection | null>;
         maxFeatures?: number;
+        isReadOnly?: boolean;
     },
     emit: MapComponentEmit,
 ): UseDrawnFeaturesReturn {
@@ -99,7 +116,11 @@ export function useDrawnFeatures(
     let latestUpdateDrawnFeaturesToken = 0;
 
     function isActivelyDrawingOrEditing(): boolean {
-        return draw && draw.getMode() !== SIMPLE_SELECT;
+        return (
+            draw &&
+            draw.getMode() !== SIMPLE_SELECT &&
+            draw.getMode() !== STATIC
+        );
     }
 
     function isDrawnFeatureOnTop(point: MapMouseEvent["point"]): boolean {
@@ -109,6 +130,8 @@ export function useDrawnFeatures(
 
     function setupDraw(): void {
         draw = new MapboxDraw({
+            modes: { ...MapboxDraw.modes, [STATIC]: STATIC_MODE },
+            defaultMode: props.isReadOnly ? STATIC : SIMPLE_SELECT,
             displayControlsDefault: false,
             controls: {
                 point: false,
@@ -120,15 +143,13 @@ export function useDrawnFeatures(
 
         map.value!.addControl(draw);
 
-        if (props.value?.features?.length) {
-            for (const feature of props.value.features) {
+        const featureCollection = toValue(props.value);
+        if (featureCollection?.features?.length) {
+            for (const feature of featureCollection.features) {
                 draw.add(feature);
             }
 
-            updateDrawnFeatures({
-                shouldEmitValueChange: false,
-                shouldFitBounds: true,
-            });
+            updateDrawnFeatures({ shouldEmitValueChange: false });
         }
 
         onDrawEvent(map.value!, DRAW_CREATE_EVENT, (drawEvent: DrawEvent) => {
@@ -159,6 +180,12 @@ export function useDrawnFeatures(
             activeDrawMode.value = null;
             map.value!.getCanvas().style.cursor = "";
         });
+    }
+
+    function replaceDrawnFeatures(
+        featureCollection: FeatureCollection | null,
+    ): void {
+        draw?.set(featureCollection ?? EMPTY_FEATURE_COLLECTION);
     }
 
     function addBufferLayer(): void {
@@ -372,7 +399,10 @@ export function useDrawnFeatures(
         updateDrawnFeatures({ shouldFitBounds: true });
     }
 
-    function fitToFeatures(features: Feature[]): void {
+    function fitToFeatures(
+        features: Feature[],
+        { animate = true }: { animate?: boolean } = {},
+    ): void {
         if (!features.length) {
             return;
         }
@@ -389,6 +419,7 @@ export function useDrawnFeatures(
             {
                 padding: FIT_TO_FEATURES_PADDING,
                 maxZoom: FIT_TO_FEATURES_MAX_ZOOM,
+                animate,
             },
         );
     }
@@ -401,6 +432,7 @@ export function useDrawnFeatures(
         addBufferLayer,
         isActivelyDrawingOrEditing,
         isDrawnFeatureOnTop,
+        replaceDrawnFeatures,
         setDrawMode,
         selectDrawnFeature,
         deselectDrawnFeature,
