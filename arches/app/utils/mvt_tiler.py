@@ -132,7 +132,7 @@ class MVTTiler:
                                     '' AS extent
                                 FROM clusters
                                 WHERE cid is NULL
-                                UNION
+                                UNION ALL
                                 SELECT NULL as resourceinstanceid,
                                     -- feature-state ids must be unique per source across tiles:
                                     -- 2^31 (above any int4 geojson_geometries.id) + lowest member id
