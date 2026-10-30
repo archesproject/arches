@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 
 import { generateArchesURL } from "@/arches_vue_components/application/generate-arches-url.ts";
+import { useWidgetConfigStore } from "@/arches_vue_components/stores/useWidgetConfigStore.ts";
 
 import type {
     CardXNodeXWidgetData,
@@ -52,6 +53,8 @@ async function requestGraphWidgetConfigs(
 export const useNodegroupWidgetConfigStore = defineStore(
     "arches_vue_components:nodegroupWidgetConfig",
     () => {
+        const widgetConfigStore = useWidgetConfigStore();
+
         const cache = new Map<
             string,
             Map<string, Promise<CardXNodeXWidgetData[]>>
@@ -108,6 +111,10 @@ export const useNodegroupWidgetConfigStore = defineStore(
                                     ),
                                 );
                             }
+                            widgetConfigStore.cacheWidgetConfigs(
+                                graphSlug,
+                                nodegroupWidgetConfig.card_x_node_x_widgets,
+                            );
                         }
                         return nodegroupWidgetConfigs;
                     },
