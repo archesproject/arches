@@ -55,6 +55,12 @@ AS $BODY$
                 display_value := __arches_get_resourceinstance_label(in_tiledata -> in_nodeid::text, 'name', language_id);
             when 'resource-instance-list' then
                 display_value := __arches_get_resourceinstance_list_label(in_tiledata -> in_nodeid::text, 'name', language_id);
+            when 'reference' then
+                select coalesce(string_agg(reference_label, ', '), '')
+                into display_value
+                from jsonb_array_elements_text(
+                    __arches_controlled_lists_get_reference_label_list(in_tiledata -> in_nodeid::text, language_id)
+                ) as reference_label;
             else
                 display_value := (in_tiledata ->> in_nodeid::text)::text;
 
