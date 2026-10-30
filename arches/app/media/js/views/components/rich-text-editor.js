@@ -63,6 +63,7 @@ const toolbarItems = {
 export default ko.components.register('views/components/rich-text-editor', {
     viewModel: function(params) {
         const editor = new Editor({
+            element: null,
             content: ko.unwrap(params.value) || '',
             editable: !ko.unwrap(params.disabled),
             extensions: [
