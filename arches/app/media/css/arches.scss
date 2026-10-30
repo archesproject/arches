@@ -6,7 +6,6 @@
 @import url(node_modules/primeicons/primeicons.css);
 @import url(node_modules/ionicons/css/ionicons.min.css);
 @import url(node_modules/lt-themify-icons/themify-icons.css);
-@import url(node_modules/chosen-js/chosen.css);
 @import url(node_modules/select-woo/dist/css/selectWoo.min.css);
 @import url(node_modules/maplibre-gl/dist/maplibre-gl.css);
 @import url(node_modules/nouislider/distribute/nouislider.min.css);
@@ -3444,20 +3443,11 @@ ul.nav.nav-tabs.nav-justified {
     min-width: 500px;
 }
 
-.graph-settings-panel-body .widgets .widget-container div .crm-selector div .chosen-drop .chosen-search>input {
-    max-width: 490px;
-    min-width: 490px;
-}
-
 .graph-settings-panel-body .widgets .widget-container div .colorpicker-component {
     max-width: 250px;
     min-width: 250px;
     padding-left: 5px;
     height: 32px;
-}
-
-.graph-settings-panel-body .widgets .widget-container div div div div div select .chosen-container {
-    width: 500px;
 }
 
 .graph-settings-panel-body .widgets .widget-container div div .domain-input {
@@ -3640,28 +3630,6 @@ div.dropdown-menu.open {
 .nav-tabs.library-tools>li.active>a {
     background-color: inherit;
     border: none;
-}
-
-.chosen-container {
-    margin-bottom: 0px;
-    color: #8d8d8d;
-    line-height: 1.3333333;
-}
-
-.chosen-hide {
-    display: none;
-}
-
-.chosen-container-multi .chosen-choices li.search-field {
-    margin: 2px 3px 0 10px;
-}
-
-.chosen-container-single .chosen-single {
-    height: 36px;
-}
-
-.chosen-container-multi .chosen-choices li.search-choice .search-choice-close {
-    background-image: none !important;
 }
 
 .list-group-item.active:hover,
@@ -4628,33 +4596,6 @@ fieldset.model-history-list .active-publication {
     padding-right: 2px;
 }
 
-.resource-list a.chosen-single {
-    background: transparent;
-    color: #333;
-    font-size: 2.2rem;
-    height: 40px;
-    padding-top: 0;
-    border-color: transparent;
-}
-
-.resource-list a.chosen-single div b {
-    margin-top: -8px;
-}
-
-.resource-list .chosen-drop .chosen-results {
-    background: #fff;
-    color: #555;
-    border-width: 1px;
-}
-
-.resource-list .chosen-drop {
-    border-width: 1px;
-}
-
-.resource-list .chosen-container-active .chosen-with-drop {
-    border: 1px solid #ddd;
-}
-
 .form-toolbar {
     position: absolute;
     height: 60px;
@@ -4941,28 +4882,8 @@ a.selected {
     border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.functions .chosen-choices {
-    height: 32px;
-    background: #314151;
-    border: 1px solid #314151;
-    color: #fff;
-}
-
 textarea:placeholder {
     top: 0;
-}
-
-.design a.chosen-single {
-    height: 36px;
-    background: #fff;
-    border: 1px solid #ddd;
-    color: #999;
-}
-
-.design .chosen-drop .chosen-results {
-    background: #fff;
-    color: #123;
-    margin-bottom: 0;
 }
 
 .editable {
@@ -5668,10 +5589,6 @@ div.card-grid-item.selected {
 
 .ep-tools-right a:first-child {
     margin: auto;
-}
-
-#lang_dd_chosen {
-    border: 1px solid #fff;
 }
 
 .ep-tools-login {
@@ -6845,8 +6762,6 @@ li.search-field {
 
 .bg-gray-dark,
 .bg-gray-dark a,
-.design a.chosen-single:hover,
-.design a.chosen-single:hover,
 .bg-gray-dark,
 .bg-gray-dark a {
     color: #999;
@@ -10674,127 +10589,6 @@ a.filter-tools:hover {
     border-radius: 2px;
 }
 
-.chosen-container-single .chosen-single {
-    background: #fff;
-    color: #4d627b;
-    border: 1px solid #ddd;
-    box-shadow: none;
-    border-radius: 3px;
-    display: block;
-    height: 32px;
-    line-height: 1.42857;
-    overflow: hidden;
-    padding: 6px 12px;
-    white-space: nowrap;
-    font-size: 1.3rem;
-}
-
-.chosen-container-single .chosen-single div b {
-    background-image: none !important;
-}
-
-.chosen-container-single .chosen-single .search-choice-close {
-    top: 10px;
-}
-
-.chosen-container-single .chosen-single div b:before {
-    border-bottom: 0 solid transparent;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-style: solid;
-    border-width: 5px 4px 0;
-    color: #4d627b;
-    content: "";
-    display: inline-block;
-    height: 0;
-    margin: 1em -2px;
-    vertical-align: middle;
-    width: 0;
-}
-
-.chosen-container .chosen-drop {
-    background: #fff;
-    border-color: currentcolor rgba(0, 0, 0, 0.09) rgba(0, 0, 0, 0.09);
-    border-style: none solid solid;
-    border-width: 0 1px 1px;
-    border-radius: 3px;
-}
-
-.chosen-container .chosen-search {
-    background: #fff;
-}
-
-.chosen-container-active.chosen-with-drop .chosen-single {
-    background: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.09);
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-.chosen-container .chosen-results li.highlighted {
-    background-color: #177bbb;
-    background-image: none;
-    color: #fff;
-}
-
-.chosen-container-multi .chosen-choices {
-    background: #fff;
-    color: #8f9ea6;
-    border: 1px solid rgba(0, 0, 0, 0.09);
-    box-shadow: none;
-    border-radius: 3px;
-    min-height: 32px;
-}
-
-.chosen-container-active .chosen-choices,
-.chosen-container-single .chosen-search input[type="text"] {
-    border: 1px solid rgba(0, 0, 0, 0.09);
-}
-
-.chosen-container-multi .chosen-choices li.search-choice {
-    background-color: #177bbb;
-    background-image: none;
-    color: #fff;
-    border: 0;
-    border-radius: 2px;
-    box-shadow: none;
-    line-height: 16px
-}
-
-.chosen-container-multi .chosen-choices li.search-choice .search-choice-close::after,
-.chosen-container-multi .chosen-choices li.search-choice .search-choice-close::before {
-    box-shadow: 0 0 0 1px inset;
-    content: "";
-    left: 50%;
-    position: absolute;
-    top: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.chosen-container-multi .chosen-choices li.search-choice .search-choice-close::after {
-    height: 0.8em;
-    width: 2px;
-}
-
-.chosen-container-multi .chosen-choices li.search-choice .search-choice-close::before {
-    height: 2px;
-    width: 0.8em;
-}
-
-.chosen-container-multi .chosen-choices li.search-choice .search-choice-close {
-    display: block;
-    height: 1.5em;
-    transform: rotate(45deg);
-    width: 1em;
-    color: #fff;
-    font-size: inherit;
-    top: 2px
-}
-
-.chosen-container .chosen-results li {
-    padding: 8px 6px
-}
-
 .sidepanel-draggable {
     background-color: #f7f7f7;
     border-left: solid 1px gainsboro;
@@ -13223,10 +13017,6 @@ section .etl-preview table {
     margin-top: 10px;
     margin-bottom: 5px;
     border: 1px solid rgba(0,0,0,0.14);
-}
-
-.csv-mapping-table-container .chosen-drop .chosen-results {
-    max-height: 180px;
 }
 
 .csv-mapping-table {

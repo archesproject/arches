@@ -4,7 +4,7 @@ import _ from 'underscore';
 import WidgetViewModel from 'viewmodels/widget';
 import arches from 'arches';
 import textWidgetTemplate from 'templates/views/components/widgets/text.htm';
-import 'bindings/chosen';
+import 'bindings/select2-query';
 
 
 /**
@@ -25,7 +25,7 @@ const viewModel = function(params) {
     const self = this;
 
     self.card = params.card;
-    self.currentLanguage = ko.observable({code: arches.activeLanguage});
+    self.currentLanguage = ko.observable(arches.activeLanguage);
     self.languages = ko.observableArray();
     self.currentText = ko.observable();
     self.currentDirection = ko.observable();
@@ -33,7 +33,7 @@ const viewModel = function(params) {
 
     self.currentDefaultText = ko.observable();
     self.currentDefaultDirection = ko.observable();
-    self.currentDefaultLanguage = ko.observable({code: arches.activeLanguage});
+    self.currentDefaultLanguage = ko.observable(arches.activeLanguage);
     self.currentPlaceholder = ko.observable();
 
     const initialCurrent = {};
@@ -47,50 +47,50 @@ const viewModel = function(params) {
         self.form.on('tile-reset', (x) => {
             if (ko.unwrap(self.value)) {
                 currentValue = koMapping.toJS(self.value);
-                self.currentText(currentValue[self.currentLanguage().code]?.value);
-                self.currentDirection(currentValue[self.currentLanguage().code]?.direction);
+                self.currentText(currentValue[self.currentLanguage()]?.value);
+                self.currentDirection(currentValue[self.currentLanguage()]?.direction);
             }
         });
     }
 
     const init = async() => {
         const languages = arches.languages;
-        const currentLanguage = languages?.find(element => element.code == arches.activeLanguage);
+        const currentLanguage = languages?.find(element => element.code == arches.activeLanguage)?.code;
         self.languages(languages);
         self.currentLanguage(currentLanguage);
         self.currentDefaultLanguage(currentLanguage);
 
-        if (currentLanguage?.code && currentValue?.[currentLanguage.code]){
-            self.currentText(currentValue?.[currentLanguage.code]?.value);
-            self.currentDirection(currentValue?.[currentLanguage.code]?.direction);
-        } else if (!currentLanguage?.code) {
+        if (currentLanguage && currentValue?.[currentLanguage]){
+            self.currentText(currentValue?.[currentLanguage]?.value);
+            self.currentDirection(currentValue?.[currentLanguage]?.direction);
+        } else if (!currentLanguage) {
             self.currentText('');
             self.currentDirection('ltr');
         } else if (currentValue) {
             self.currentText('');
             self.currentDirection('ltr');
-            currentValue[currentLanguage.code] = {value: '', direction: 'ltr'};
+            currentValue[currentLanguage] = {value: '', direction: 'ltr'};
         }
 
-        if(currentLanguage?.code && currentDefaultValue?.[currentLanguage.code]){
-            self.currentDefaultText(currentDefaultValue?.[currentLanguage.code]?.value);
-            self.currentDefaultDirection(currentDefaultValue?.[currentLanguage.code]?.direction);
-        } else if (!currentLanguage?.code) {
+        if(currentLanguage && currentDefaultValue?.[currentLanguage]){
+            self.currentDefaultText(currentDefaultValue?.[currentLanguage]?.value);
+            self.currentDefaultDirection(currentDefaultValue?.[currentLanguage]?.direction);
+        } else if (!currentLanguage) {
             self.currentDefaultText('');
             self.currentDefaultDirection('ltr');
         } else if (currentDefaultValue) {
             self.currentDefaultText('');
             self.currentDefaultDirection('ltr');
-            currentDefaultValue[currentLanguage.code] = {value: '', direction: 'ltr'};
+            currentDefaultValue[currentLanguage] = {value: '', direction: 'ltr'};
         }
 
         if (ko.unwrap(self.placeholder)) {
             if (typeof ko.unwrap(self.placeholder) === 'string') {
                 self.placeholder({
-                    [self.currentLanguage().code]: ko.unwrap(self.placeholder),
+                    [self.currentLanguage()]: ko.unwrap(self.placeholder),
                 });
             }
-            self.currentPlaceholder(self.placeholder()[self.currentLanguage().code]);
+            self.currentPlaceholder(self.placeholder()[self.currentLanguage()]);
         }
     };
 
@@ -99,7 +99,7 @@ const viewModel = function(params) {
     self.currentDefaultText.subscribe(newValue => {
         const currentLanguage = self.currentDefaultLanguage();
         if(!currentLanguage) { return; }
-        currentDefaultValue[currentLanguage.code].value = newValue;
+        currentDefaultValue[currentLanguage].value = newValue;
         self.defaultValue(currentDefaultValue);
         self.card._card.valueHasMutated();
     });
@@ -107,10 +107,10 @@ const viewModel = function(params) {
     self.currentDefaultDirection.subscribe(newValue => {
         const currentLanguage = self.currentDefaultLanguage();
         if(!currentLanguage) { return; }
-        if(!currentDefaultValue?.[currentLanguage.code]){
-            currentDefaultValue[currentLanguage.code] = {};
+        if(!currentDefaultValue?.[currentLanguage]){
+            currentDefaultValue[currentLanguage] = {};
         }
-        currentDefaultValue[currentLanguage.code].direction = newValue;
+        currentDefaultValue[currentLanguage].direction = newValue;
         self.defaultValue(currentDefaultValue);
         self.card._card.valueHasMutated();
     });
@@ -118,17 +118,17 @@ const viewModel = function(params) {
     self.currentDefaultLanguage.subscribe(newValue => {
         if(!self.currentDefaultLanguage()){ return; }
         const currentLanguage = self.currentDefaultLanguage();
-        if(!currentDefaultValue?.[currentLanguage.code]) {
-            currentDefaultValue[currentLanguage.code] = {
+        if(!currentDefaultValue?.[currentLanguage]) {
+            currentDefaultValue[currentLanguage] = {
                 value: '',
-                direction: currentLanguage?.default_direction
+                direction: self.languages().find(lang => lang.code === currentLanguage)?.default_direction
             };
             self.defaultValue(currentDefaultValue);
             self.card._card.valueHasMutated();
         }
 
-        self.currentDefaultText(self.defaultValue()?.[currentLanguage.code]?.value);
-        self.currentDefaultDirection(self.defaultValue()?.[currentLanguage.code]?.direction);
+        self.currentDefaultText(self.defaultValue()?.[currentLanguage]?.value);
+        self.currentDefaultDirection(self.defaultValue()?.[currentLanguage]?.direction);
 
     });
 
@@ -137,7 +137,7 @@ const viewModel = function(params) {
             const currentLanguage = self.currentLanguage();
             if(!currentLanguage) { return; }
             if(JSON.stringify(currentValue) != JSON.stringify(ko.toJS(ko.unwrap(self.value)))){
-                self.currentText(newValue?.[currentLanguage.code]?.value);
+                self.currentText(newValue?.[currentLanguage]?.value);
             }
         });
     }
@@ -146,15 +146,15 @@ const viewModel = function(params) {
         const currentLanguage = self.currentLanguage();
         if(!currentLanguage) { return; }
 
-        if(!currentValue?.[currentLanguage.code]){
-            currentValue[currentLanguage.code] = {};
+        if(!currentValue?.[currentLanguage]){
+            currentValue[currentLanguage] = {};
         }
-        currentValue[currentLanguage.code].value = newValue?.[currentLanguage.code] ? newValue[currentLanguage.code]?.value : newValue;
+        currentValue[currentLanguage].value = newValue?.[currentLanguage] ? newValue[currentLanguage]?.value : newValue;
         
         if (ko.isObservable(self.value)) {
             self.value(currentValue);
         } else {
-            self.value[currentLanguage.code].value(newValue);
+            self.value[currentLanguage].value(newValue);
         }
         
     });
@@ -163,14 +163,14 @@ const viewModel = function(params) {
         const currentLanguage = self.currentLanguage();
         if(!currentLanguage) { return; }
 
-        if(!currentValue?.[currentLanguage.code]){
-            currentValue[currentLanguage.code] = {};
+        if(!currentValue?.[currentLanguage]){
+            currentValue[currentLanguage] = {};
         }
-        currentValue[currentLanguage.code].direction = newValue;
+        currentValue[currentLanguage].direction = newValue;
         if (ko.isObservable(self.value)) {
             self.value(currentValue);
         } else {
-            self.value[currentLanguage.code].direction(newValue);
+            self.value[currentLanguage].direction(newValue);
         }
     });
 
@@ -178,9 +178,9 @@ const viewModel = function(params) {
         if(!self.currentLanguage()){ return; }
         const currentLanguage = self.currentLanguage();
 
-        self.currentText(koMapping.toJS(self.value)[currentLanguage.code]?.value);
-        self.currentDirection(koMapping.toJS(self.value)[currentLanguage.code]?.direction);
-        self.currentPlaceholder(koMapping.toJS(self.placeholder)[currentLanguage.code]);
+        self.currentText(koMapping.toJS(self.value)[currentLanguage]?.value);
+        self.currentDirection(koMapping.toJS(self.value)[currentLanguage]?.direction);
+        self.currentPlaceholder(koMapping.toJS(self.placeholder)[currentLanguage]);
     });
 
     self.currentPlaceholder.subscribe(newValue => {
@@ -189,7 +189,7 @@ const viewModel = function(params) {
 
         if (self.card && ko.isObservable(self.placeholder)) {
             const patchedPlaceholder = self.placeholder() || {};
-            patchedPlaceholder[currentLanguage.code] = newValue;
+            patchedPlaceholder[currentLanguage] = newValue;
             self.placeholder(patchedPlaceholder);
             self.card._card.valueHasMutated();
         }

@@ -1,5 +1,6 @@
 {% load static %}
 {% load i18n %}
+{% load template_tags %}
 <div id="menu-panel" class="ep-menu" style="display: none;" data-bind="visible:menuActive()">
     <div class="panel ep-menu-panel relative" style="">
 
@@ -8,7 +9,16 @@
            <ul class="list-group ep-menu-list">
                 <!-- Menu Item -->
                 <li class="resource-selector" data-bind="click: function() { menuActive(true); }, clickBubble: false">
-                    <select data-placeholder="{% trans "Select a graph..." %}" class="design" style="width:100px;" data-bind="value: graphid, options: resources, optionsText: 'name', optionsValue: 'graphid', chosen: {'width': '100%'}"></select>
+                    <select class="design" data-bind="
+                        attr: {'data-label': {% quoted_trans _('Graph') %}},
+                        options: resources,
+                        optionsText: 'name',
+                        optionsValue: 'graphid',
+                        select2Query: {select2Config: {
+                            value: graphid,
+                            placeholder: {% quoted_trans _('Select a graph...') %},
+                            dropdownCssClass: 'select2-zindex'
+                        }}"></select>
                 </li>
 
                 <!-- Menu Item -->

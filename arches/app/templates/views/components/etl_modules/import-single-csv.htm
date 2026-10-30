@@ -68,13 +68,17 @@
             <span data-bind="text: $root.translations.targetModel"></span>
         </h4>
         <select data-bind="
+            attr: {'data-label': $root.translations.targetModel},
             value: selectedGraph,
+            valueAllowUnset: true,
             options: graphs,
             optionsText: 'name',
             optionsValue: 'graphid',
-            optionsCaption: $root.translations.selectAResourceModel + '...',
-            valueAllowUnset: true,
-            chosen: {width: '500px'}"
+            select2Query: {select2Config: {
+                value: selectedGraph,
+                placeholder: $root.translations.selectAResourceModel + '...',
+                allowClear: true
+            }}"
         ></select>
     </div>
     <!-- ko if: selectedGraph -->
@@ -94,20 +98,27 @@
                     <!-- ko if: nodes() -->
                     <th style="border-bottom: 1px solid #ddd; vertical-align: top;">
                         <select data-bind="
+                            attr: {'data-label': $root.translations.selectANode},
                             value: mapping.node,
+                            valueAllowUnset: true,
                             options: nodes,
                             optionsText: 'label',
-                            optionsCaption: $root.translations.select + '...',
                             optionsValue: 'alias',
-                            valueAllowUnset: true,
-                            chosen: {width: '100%'}"
+                            select2Query: {select2Config: {
+                                value: mapping.node,
+                                placeholder: $root.translations.select + '...',
+                                allowClear: true
+                            }}"
                         ></select>
                         <!-- ko if: stringNodes.includes(mapping.node()) -->
                         <select id="lang_dd" style="flex:1" name="language" data-bind="
-                            value: mapping.language,
+                            attr: {'data-label': $root.translations.language},
                             options: languages,
+                            optionsValue: 'code',
                             optionsText: function(item){return item.name + ' (' + item.code + ')'},
-                            chosen: {width: '100%'}"
+                            select2Query: {select2Config: {
+                                value: mapping.language
+                            }}"
                         ></select>
                         <!-- /ko -->
                     </th>

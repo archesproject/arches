@@ -7,7 +7,7 @@ import controlledListUtils from 'utils/controlled-list';
 import resourceInstanceDatatypeTemplate from 'templates/views/components/datatypes/resource-instance.htm';
 import 'views/components/widgets/resource-instance-select';
 import 'bindings/key-events-click';
-import 'bindings/chosen';
+import 'bindings/select2-query';
 
 
 var name = 'resource-instance-datatype-config';
@@ -40,9 +40,11 @@ const viewModel = function(params) {
             window.open(self.config.searchString(), '_blank');
         };
         this.selectedResourceModel = ko.observable('');
-        this.selectedResourceModel.subscribe(function(resourceType) {
-            if (resourceType.length > 0) {
-                resourceType = resourceType.concat(self.config.graphs());
+        this.selectedResourceModel.subscribe(function(graphids) {
+            if (graphids.length > 0) {
+                const resourceType = self.resourceModels
+                    .filter(model => graphids.includes(model.graphid))
+                    .concat(self.config.graphs());
                 self.config.graphs(resourceType);
                 self.selectedResourceModel([]);
             }

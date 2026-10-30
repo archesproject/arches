@@ -25,15 +25,12 @@ body {
 .form-control,
 .dropdown-menu,
 .btn,
-.chosen-container,
 .jstree-container-ul,
 .popover {
     font-size: 1.3rem;
 }
 
 // Focus indicator
-div.chosen-container-active:not(.chosen-with-drop) a.chosen-single,
-ul.chosen-results li.highlighted,
 ul.select2-results li.select2-highlighted,
 a[href]:focus-visible,
 area[href]:focus-visible,

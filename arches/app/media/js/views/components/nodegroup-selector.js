@@ -4,7 +4,7 @@ import ko from 'knockout';
 import koMapping from 'knockout-mapping';
 import FunctionViewModel from 'viewmodels/function-view-model';
 import GraphModel from 'models/graph';
-import chosen from 'bindings/chosen';
+import 'bindings/select2-query';
 import nodegroupSelectorTemplate from 'templates/views/components/nodegroup-selector.htm';
 
 
@@ -26,8 +26,6 @@ export default ko.components.register('views/components/nodegroup-selector', {
         }, this);
 
         this.triggering_nodegroups = params.triggering_nodegroups;
-
-        window.setTimeout(function(){$("select[data-bind^=chosen]").trigger("chosen:updated");}, 300);
     },
     template: nodegroupSelectorTemplate,
 });

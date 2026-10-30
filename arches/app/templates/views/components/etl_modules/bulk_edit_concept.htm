@@ -25,7 +25,16 @@
                 <label style="font-weight: normal; font-size: 1.5rem; color: #565656;" data-bind="text: $root.translations.selectAResourceModel"></label>
             </h3>
             <div>
-                <select data-bind="options: dropdowngraph, optionsText: 'graphName', optionsValue: 'graphid', value: selectedGraph, valueAllowUnset: true, chosen: {width: '400px'}"></select>
+                <select data-bind="
+                    attr: {'data-label': $root.translations.selectAResourceModel},
+                    value: selectedGraph,
+                    valueAllowUnset: true,
+                    options: dropdowngraph,
+                    optionsText: 'graphName',
+                    optionsValue: 'graphid',
+                    select2Query: {select2Config: {
+                        value: selectedGraph
+                    }}"></select>
             </div>
         </div>
 
@@ -33,10 +42,19 @@
             <h3>
                 <label style="font-weight: normal; font-size: 1.5rem; color: #565656;" data-bind="text: $root.translations.selectANode"></label>
             </h3>
-            <select data-bind="options: dropdownnodes, optionsText: 'label', value: selectedNode, valueAllowUnset: true, chosen: {width: '400px'}"></select>
+            <select data-bind="
+                attr: {'data-label': $root.translations.selectANode},
+                value: selectedNode,
+                valueAllowUnset: true,
+                options: dropdownnodes,
+                optionsText: 'label',
+                optionsValue: 'node',
+                select2Query: {select2Config: {
+                    value: selectedNode
+                }}"></select>
         </div>
 
-        <div data-bind="if: selectedNode" style="font-size: 1.5rem; margin: 30px 0px;">
+        <div data-bind="if: selectedNodeDetails" style="font-size: 1.5rem; margin: 30px 0px;">
             <div display="flex" style="border:solid 1px lightgrey; border-radius: 5px; margin: 10px 0px;">
                 <div style="background-color: #ebebeb;padding: 5px;">
                     <label style="font-weight: normal; color: #565656;" data-bind="text: $root.translations.selectConceptToReplace"></label>
@@ -58,7 +76,7 @@
                         <div data-bind="component: {
                             name: 'concept-select-widget',
                             params: {
-                                node: {'config': {'rdmCollection': selectedNode().rdmCollection }},
+                                node: {'config': {'rdmCollection': selectedNodeDetails().rdmCollection }},
                                 value: conceptOld,
                                 allowClear: false,
                                 placeholder: $root.translations.selectReplacementConcept,
@@ -90,7 +108,7 @@
                         <div data-bind="component: {
                             name: 'concept-select-widget',
                             params: {
-                                node: {'config': {'rdmCollection': selectedNode().rdmCollection }},
+                                node: {'config': {'rdmCollection': selectedNodeDetails().rdmCollection }},
                                 value: conceptNew,
                                 allowClear: false,
                                 placeholder: $root.translations.selectReplacementConcept,

@@ -13,14 +13,11 @@
             options: coordinateReferences,
             optionsText: 'name',
             optionsValue: 'proj4',
-            value: selectedCoordinateReference,
-            valueAllowUnset: false,
-            chosen: {
-                'width': '210px',
-                'disable_search_threshold': 10,
-                'allow_single_deselect': false
-            },
-            attr: {'aria-label': $root.translations.coordinateReference}
+            select2Query: {select2Config: {
+                value: selectedCoordinateReference,
+                minimumResultsForSearch: 10
+            }},
+            attr: {'data-label': $root.translations.coordinateReference}
         "></select>
     </div>
     <hr/>

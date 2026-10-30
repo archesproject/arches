@@ -6,7 +6,7 @@ import JsonErrorAlertViewModel from 'viewmodels/alert-json';
 import baseStringEditorTemplate from 'templates/views/components/etl_modules/bulk_edit_concept.htm';
 import 'views/components/widgets/concept-select';
 import 'select-woo';
-import 'bindings/chosen';
+import 'bindings/select2-query';
 
 
 const ViewModel = function(params) {
@@ -23,6 +23,7 @@ const ViewModel = function(params) {
     this.searchUrl = ko.observable();
     this.dropdownnodes = ko.observableArray();
     this.selectedNode = ko.observable();
+    this.selectedNodeDetails = ko.pureComputed(() => self.dropdownnodes().find(node => node.node === self.selectedNode()));
     this.dropdowngraph = ko.observableArray();
     this.selectedGraph = ko.observable();
     this.conceptOld = ko.observable();
@@ -53,7 +54,7 @@ const ViewModel = function(params) {
         if (self.selectedGraph()) { self.formData.append('selectedGraph', self.selectedGraph()); }
         if (self.conceptOld()) { self.formData.append('conceptOld', self.conceptOld()); }
         if (self.conceptNew()) { self.formData.append('conceptNew', self.conceptNew()); }
-        if (self.selectedNode()) { self.formData.append('selectedNode', JSON.stringify(self.selectedNode())); }
+        if (self.selectedNode()) { self.formData.append('selectedNode', JSON.stringify(self.selectedNodeDetails())); }
         if (self.searchUrl()) { self.formData.append('search_url', self.searchUrl()); }
         if (self.rdmCollection) { self.formData.append('rdmCollection', self.rdmCollection); }
         self.formData.append('currentPageIndex', self.currentPageIndex());
@@ -159,11 +160,11 @@ const ViewModel = function(params) {
         });
     };
 
-    this.selectedNode.subscribe((node) => {
+    this.selectedNodeDetails.subscribe((node) => {
         self.conceptNew(undefined);
         self.conceptOld(undefined);
         self.rdmCollectionLanguages.removeAll();
-        
+
         if(!!node){
             self.rdmCollection = node.rdmCollection;
 

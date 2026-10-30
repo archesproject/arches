@@ -67,7 +67,19 @@
                             </div>
 
                             <div class="col-xs-12 crm-selector">
-                                <select class="design" data-bind="attr: {'disabled': graphSettingsViewModel.nodeCount() > 1 }, value: graph.ontology_id, valueAllowUnset: true, options: ontologies, optionsText: 'name', optionsValue:'ontologyid', optionsCaption: {% quoted_trans _("No ontology") %}, chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                                <select class="design" data-bind="
+                                    attr: {'disabled': graphSettingsViewModel.nodeCount() > 1, 'data-label': {% quoted_trans _('Ontology') %}},
+                                    value: graph.ontology_id,
+                                    valueAllowUnset: true,                                    
+                                    options: ontologies,
+                                    optionsText: 'name',
+                                    optionsValue: 'ontologyid',
+                                    select2Query: {select2Config: {
+                                        value: graph.ontology_id,
+                                        placeholder: {% quoted_trans _('No ontology') %},
+                                        allowClear: true,
+                                        minimumResultsForSearch: 10
+                                    }}"></select>
                             </div>
                         </div>
                     </div>
@@ -79,7 +91,16 @@
                             </div>
 
                             <div class="col-xs-12 crm-selector">
-                                <select class="design" data-bind="attr: {'disabled': graphSettingsViewModel.nodeCount() > 1 }, value: graphSettingsViewModel.ontologyClass, valueAllowUnset: false, options: ontologyClasses, optionsText: 'display', optionsValue:'source', chosen: {disable_search_threshold: 10, width: '500px', search_contains: true}"></select>
+                                <select class="design" data-bind="
+                                    attr: {'disabled': graphSettingsViewModel.nodeCount() > 1, 'data-label': {% quoted_trans _('Root Class') %}},
+                                    value: graphSettingsViewModel.ontologyClass,
+                                    options: ontologyClasses,
+                                    optionsText: 'display',
+                                    optionsValue: 'source',
+                                    select2Query: {select2Config: {
+                                        value: graphSettingsViewModel.ontologyClass,
+                                        minimumResultsForSearch: 10
+                                    }}"></select>
                             </div>
                         </div>
                     </div>
@@ -101,7 +122,14 @@
                             </div>
 
                             <div class="col-xs-12 crm-selector">
-                                <select class="design" data-bind="value: graphSettingsViewModel.graph.root.datatype, options: datatypes, optionsCaption: {% quoted_trans _('Choose a data type') %}, chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                                <select class="design" data-bind="
+                                    attr: {'data-label': {% quoted_trans _('Root Node Data Type') %}},
+                                    options: datatypes,
+                                    select2Query: {select2Config: {
+                                        value: graphSettingsViewModel.graph.root.datatype,
+                                        placeholder: {% quoted_trans _('Choose a data type') %},
+                                        minimumResultsForSearch: 10
+                                    }}"></select>
                             </div>
                         </div>
                     </div>
