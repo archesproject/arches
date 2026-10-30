@@ -25,6 +25,7 @@ begin
             when 'domain-value-list' then datatype = 'uuid[]';
             when 'concept' then datatype = 'uuid';
             when 'concept-list' then datatype = 'uuid[]';
+            when 'reference' then datatype = 'jsonb';
             else
                 datatype = 'text';
             end case;

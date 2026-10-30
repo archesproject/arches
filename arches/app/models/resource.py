@@ -717,7 +717,9 @@ class Resource(models.ResourceInstance):
                     if creator_id == user.id:
                         permit_deletion = True
             else:
-                permit_deletion = True
+                permit_deletion = permission_backend.user_can_delete_resource(
+                    user, resource=self
+                )
         else:
             permit_deletion = True
 
