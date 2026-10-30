@@ -1,7 +1,6 @@
 import { ref } from "vue";
 import { mount } from "@vue/test-utils";
 import { describe, expect, it, vi } from "vitest";
-import { createGettext } from "vue3-gettext";
 
 import Checkbox from "openvue/checkbox";
 import OpenVue from "openvue/config";
@@ -35,7 +34,7 @@ describe("OverlayRow visibility", () => {
             };
             const wrapper = mount(OverlayRow, {
                 global: {
-                    plugins: [OpenVue, createGettext({ silent: true })],
+                    plugins: [OpenVue],
                 },
                 props: {
                     overlay,
