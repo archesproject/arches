@@ -1,6 +1,7 @@
 from types import SimpleNamespace
 from unittest import mock
 from uuid import uuid4
+from django.contrib.auth.models import User
 from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
 from django.core import management
@@ -166,9 +167,17 @@ class CardXNodeXWidgetPermissionTests(GraphTestCase):
                 return [nodegroup.pk for nodegroup in writable_nodegroups]
             return [nodegroup.pk for nodegroup in readable_nodegroups]
 
-        with mock.patch(
-            "arches.extensions.vue_components.views.api.card_x_node_x_widget.get_nodegroups_by_perm",
-            side_effect=nodegroups_by_perm,
+        def user_has_perm(user, perm, obj=None):
+            return perm == "read_nodegroup" and obj in readable_nodegroups
+
+        with (
+            mock.patch(
+                "arches.extensions.vue_components.views.api.card_x_node_x_widget.get_nodegroups_by_perm",
+                side_effect=nodegroups_by_perm,
+            ),
+            mock.patch.object(
+                User, "has_perm", autospec=True, side_effect=user_has_perm
+            ),
         ):
             return self.client.get(
                 reverse(f"arches_vue_components:{url_name}", kwargs=url_kwargs)
@@ -188,11 +197,17 @@ class CardXNodeXWidgetPermissionTests(GraphTestCase):
                 },
             ),
         ):
-            with self.subTest(url_name=url_name):
-                response = self.get_with_permissions(
-                    url_name, url_kwargs, readable_nodegroups=[self.nodegroup_1]
-                )
-                self.assertEqual(response.status_code, 403)
+            for readable_nodegroup, expected_status_code in (
+                (self.nodegroup_1, 403),
+                (self.nodegroup_n, 200),
+            ):
+                with self.subTest(
+                    url_name=url_name, expected_status_code=expected_status_code
+                ):
+                    response = self.get_with_permissions(
+                        url_name, url_kwargs, readable_nodegroups=[readable_nodegroup]
+                    )
+                    self.assertEqual(response.status_code, expected_status_code)
 
     def test_graph_widgets_cover_readable_nodegroups_and_mark_writable_ones(self):
         response = self.get_with_permissions(

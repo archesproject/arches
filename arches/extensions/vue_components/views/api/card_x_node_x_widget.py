@@ -28,12 +28,10 @@ def widget_mapping_error_response():
 
 class CardXNodeXWidgetView(View):
     def get(self, request, graph_slug, node_alias):
-        node = models.Node.objects.get(
+        node = models.Node.objects.select_related("nodegroup").get(
             graph__slug=graph_slug, alias=node_alias, source_identifier=None
         )
-        if node.nodegroup_id not in get_nodegroups_by_perm(
-            request.user, "models.read_nodegroup"
-        ):
+        if not request.user.has_perm("read_nodegroup", node.nodegroup):
             return nodegroup_permission_error_response()
 
         try:
@@ -55,11 +53,9 @@ class CardXNodeXWidgetListFromNodegroupView(View):
                 graph__slug=graph_slug,
                 nodegroup__node__alias=nodegroup_alias,
                 source_identifier=None,
-            )
+            ).select_related("nodegroup")
         )
-        if nodes and nodes[0].nodegroup_id not in get_nodegroups_by_perm(
-            request.user, "models.read_nodegroup"
-        ):
+        if nodes and not request.user.has_perm("read_nodegroup", nodes[0].nodegroup):
             return nodegroup_permission_error_response()
 
         try:
