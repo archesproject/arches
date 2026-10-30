@@ -13,29 +13,100 @@
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
-                title="{% trans 'Undo' %}"
-                aria-label="{% trans 'Undo' %}"
+                tabindex="-1"
+                title="{% trans 'Bold' %}"
+                aria-label="{% trans 'Bold' %}"
                 data-bind="
-                    click: run('undo'),
-                    css: {disabled: state().undo.isDisabled},
-                    attr: {'aria-disabled': state().undo.isDisabled}
+                    click: run('bold'),
+                    css: {disabled: state().bold.isDisabled, active: state().bold.isActive},
+                    attr: {'aria-disabled': state().bold.isDisabled, 'aria-pressed': state().bold.isActive.toString()}
                 "
             >
-                <i class="fa fa-undo" aria-hidden="true"></i>
+                <i class="fa fa-bold" aria-hidden="true"></i>
             </button>
             <button
                 type="button"
                 class="rich-text-editor-toolbar-button"
                 tabindex="-1"
-                title="{% trans 'Redo' %}"
-                aria-label="{% trans 'Redo' %}"
+                title="{% trans 'Italic' %}"
+                aria-label="{% trans 'Italic' %}"
                 data-bind="
-                    click: run('redo'),
-                    css: {disabled: state().redo.isDisabled},
-                    attr: {'aria-disabled': state().redo.isDisabled}
+                    click: run('italic'),
+                    css: {disabled: state().italic.isDisabled, active: state().italic.isActive},
+                    attr: {'aria-disabled': state().italic.isDisabled, 'aria-pressed': state().italic.isActive.toString()}
                 "
             >
-                <i class="fa fa-repeat" aria-hidden="true"></i>
+                <i class="fa fa-italic" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Underline' %}"
+                aria-label="{% trans 'Underline' %}"
+                data-bind="
+                    click: run('underline'),
+                    css: {disabled: state().underline.isDisabled, active: state().underline.isActive},
+                    attr: {'aria-disabled': state().underline.isDisabled, 'aria-pressed': state().underline.isActive.toString()}
+                "
+            >
+                <i class="fa fa-underline" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Strikethrough' %}"
+                aria-label="{% trans 'Strikethrough' %}"
+                data-bind="
+                    click: run('strike'),
+                    css: {disabled: state().strike.isDisabled, active: state().strike.isActive},
+                    attr: {'aria-disabled': state().strike.isDisabled, 'aria-pressed': state().strike.isActive.toString()}
+                "
+            >
+                <i class="fa fa-strikethrough" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Subscript' %}"
+                aria-label="{% trans 'Subscript' %}"
+                data-bind="
+                    click: run('subscript'),
+                    css: {disabled: state().subscript.isDisabled, active: state().subscript.isActive},
+                    attr: {'aria-disabled': state().subscript.isDisabled, 'aria-pressed': state().subscript.isActive.toString()}
+                "
+            >
+                <i class="fa fa-subscript" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Superscript' %}"
+                aria-label="{% trans 'Superscript' %}"
+                data-bind="
+                    click: run('superscript'),
+                    css: {disabled: state().superscript.isDisabled, active: state().superscript.isActive},
+                    attr: {'aria-disabled': state().superscript.isDisabled, 'aria-pressed': state().superscript.isActive.toString()}
+                "
+            >
+                <i class="fa fa-superscript" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Remove format' %}"
+                aria-label="{% trans 'Remove format' %}"
+                data-bind="
+                    click: run('removeFormat'),
+                    css: {disabled: state().removeFormat.isDisabled},
+                    attr: {'aria-disabled': state().removeFormat.isDisabled}
+                "
+            >
+                <i class="fa fa-eraser" aria-hidden="true"></i>
             </button>
         </div>
 
@@ -270,107 +341,6 @@
                 type="button"
                 class="rich-text-editor-toolbar-button"
                 tabindex="-1"
-                title="{% trans 'Bold' %}"
-                aria-label="{% trans 'Bold' %}"
-                data-bind="
-                    click: run('bold'),
-                    css: {disabled: state().bold.isDisabled, active: state().bold.isActive},
-                    attr: {'aria-disabled': state().bold.isDisabled, 'aria-pressed': state().bold.isActive.toString()}
-                "
-            >
-                <i class="fa fa-bold" aria-hidden="true"></i>
-            </button>
-            <button
-                type="button"
-                class="rich-text-editor-toolbar-button"
-                tabindex="-1"
-                title="{% trans 'Italic' %}"
-                aria-label="{% trans 'Italic' %}"
-                data-bind="
-                    click: run('italic'),
-                    css: {disabled: state().italic.isDisabled, active: state().italic.isActive},
-                    attr: {'aria-disabled': state().italic.isDisabled, 'aria-pressed': state().italic.isActive.toString()}
-                "
-            >
-                <i class="fa fa-italic" aria-hidden="true"></i>
-            </button>
-            <button
-                type="button"
-                class="rich-text-editor-toolbar-button"
-                tabindex="-1"
-                title="{% trans 'Underline' %}"
-                aria-label="{% trans 'Underline' %}"
-                data-bind="
-                    click: run('underline'),
-                    css: {disabled: state().underline.isDisabled, active: state().underline.isActive},
-                    attr: {'aria-disabled': state().underline.isDisabled, 'aria-pressed': state().underline.isActive.toString()}
-                "
-            >
-                <i class="fa fa-underline" aria-hidden="true"></i>
-            </button>
-            <button
-                type="button"
-                class="rich-text-editor-toolbar-button"
-                tabindex="-1"
-                title="{% trans 'Strikethrough' %}"
-                aria-label="{% trans 'Strikethrough' %}"
-                data-bind="
-                    click: run('strike'),
-                    css: {disabled: state().strike.isDisabled, active: state().strike.isActive},
-                    attr: {'aria-disabled': state().strike.isDisabled, 'aria-pressed': state().strike.isActive.toString()}
-                "
-            >
-                <i class="fa fa-strikethrough" aria-hidden="true"></i>
-            </button>
-            <button
-                type="button"
-                class="rich-text-editor-toolbar-button"
-                tabindex="-1"
-                title="{% trans 'Subscript' %}"
-                aria-label="{% trans 'Subscript' %}"
-                data-bind="
-                    click: run('subscript'),
-                    css: {disabled: state().subscript.isDisabled, active: state().subscript.isActive},
-                    attr: {'aria-disabled': state().subscript.isDisabled, 'aria-pressed': state().subscript.isActive.toString()}
-                "
-            >
-                <i class="fa fa-subscript" aria-hidden="true"></i>
-            </button>
-            <button
-                type="button"
-                class="rich-text-editor-toolbar-button"
-                tabindex="-1"
-                title="{% trans 'Superscript' %}"
-                aria-label="{% trans 'Superscript' %}"
-                data-bind="
-                    click: run('superscript'),
-                    css: {disabled: state().superscript.isDisabled, active: state().superscript.isActive},
-                    attr: {'aria-disabled': state().superscript.isDisabled, 'aria-pressed': state().superscript.isActive.toString()}
-                "
-            >
-                <i class="fa fa-superscript" aria-hidden="true"></i>
-            </button>
-            <button
-                type="button"
-                class="rich-text-editor-toolbar-button"
-                tabindex="-1"
-                title="{% trans 'Remove format' %}"
-                aria-label="{% trans 'Remove format' %}"
-                data-bind="
-                    click: run('removeFormat'),
-                    css: {disabled: state().removeFormat.isDisabled},
-                    attr: {'aria-disabled': state().removeFormat.isDisabled}
-                "
-            >
-                <i class="fa fa-eraser" aria-hidden="true"></i>
-            </button>
-        </div>
-
-        <div class="rich-text-editor-toolbar-group" data-bind="attr: {inert: isSourceMode}">
-            <button
-                type="button"
-                class="rich-text-editor-toolbar-button"
-                tabindex="-1"
                 title="{% trans 'Numbered list' %}"
                 aria-label="{% trans 'Numbered list' %}"
                 data-bind="
@@ -544,6 +514,36 @@
                     </li>
                 </ul>
             </div>
+        </div>
+
+        <div class="rich-text-editor-toolbar-group" data-bind="attr: {inert: isSourceMode}">
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                title="{% trans 'Undo' %}"
+                aria-label="{% trans 'Undo' %}"
+                data-bind="
+                    click: run('undo'),
+                    css: {disabled: state().undo.isDisabled},
+                    attr: {'aria-disabled': state().undo.isDisabled}
+                "
+            >
+                <i class="fa fa-undo" aria-hidden="true"></i>
+            </button>
+            <button
+                type="button"
+                class="rich-text-editor-toolbar-button"
+                tabindex="-1"
+                title="{% trans 'Redo' %}"
+                aria-label="{% trans 'Redo' %}"
+                data-bind="
+                    click: run('redo'),
+                    css: {disabled: state().redo.isDisabled},
+                    attr: {'aria-disabled': state().redo.isDisabled}
+                "
+            >
+                <i class="fa fa-repeat" aria-hidden="true"></i>
+            </button>
         </div>
 
         <div class="rich-text-editor-toolbar-group">
