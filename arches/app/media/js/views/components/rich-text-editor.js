@@ -72,7 +72,7 @@ export default ko.components.register('views/components/rich-text-editor', {
                     // don't add an empty paragraph to the end of saved content
                     trailingNode: false,
                 }),
-                Image.configure({ inline: true, allowBase64: false }),
+                Image.configure({ inline: true, allowBase64: true }),
                 TableKit,
                 Subscript,
                 Superscript,
