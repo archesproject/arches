@@ -41,7 +41,7 @@ class Login(LoginView, APIBase):
                 failure_title, failure_msg_invalid, status=HTTPStatus.UNAUTHORIZED
             )
 
-        user = authenticate(username=username, password=password)
+        user = authenticate(request, username=username, password=password)
         if user is None:
             return JSONErrorResponse(
                 failure_title, failure_msg_invalid, status=HTTPStatus.UNAUTHORIZED
