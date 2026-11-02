@@ -36,7 +36,9 @@ class SearchExport(View):
             request_auth = request.META.get("HTTP_AUTHORIZATION").split()
             if request_auth[0].lower() == "basic":
                 user_cred = b64decode(request_auth[1]).decode().split(":")
-                user = authenticate(username=user_cred[0], password=user_cred[1])
+                user = authenticate(
+                    request, username=user_cred[0], password=user_cred[1]
+                )
                 if user is not None:
                     request.user = user
                 else:

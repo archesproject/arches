@@ -152,7 +152,7 @@ class LoginView(View):
                 },
             )
 
-        user = authenticate(username=username, password=password)
+        user = authenticate(request, username=username, password=password)
 
         if user is not None and user.is_active:
             if (
@@ -410,7 +410,7 @@ class ChangePasswordView(View):
                 user.set_password(new_password)
                 user.save()
                 authenticated_user = authenticate(
-                    username=user.username, password=new_password
+                    request, username=user.username, password=new_password
                 )
                 login(request, authenticated_user)
                 messages["success"] = _("Password successfully updated")
@@ -441,7 +441,9 @@ class UserProfileView(View):
     def post(self, request):
         username = request.POST.get("username", None)
         password = request.POST.get("password", None)
-        user = authenticate(username=username, password=password) or request.user
+        user = (
+            authenticate(request, username=username, password=password) or request.user
+        )
         if user:
             userDict = JSONSerializer().serializeToPython(user)
             userDict["password"] = None
@@ -489,7 +491,7 @@ class GetClientIdView(View):
         else:
             username = request.POST.get("username", None)
             password = request.POST.get("password", None)
-            user = authenticate(username=username, password=password)
+            user = authenticate(request, username=username, password=password)
             if user:
                 response = JSONResponse({"clientid": settings.OAUTH_CLIENT_ID})
             else:
@@ -513,7 +515,7 @@ class ServerSettingView(View):
 
         username = request.POST.get("username", None)
         password = request.POST.get("password", None)
-        user = authenticate(username=username, password=password)
+        user = authenticate(request, username=username, password=password)
         if user:
             server_settings = {
                 "version": __version__,
@@ -617,7 +619,7 @@ class TwoFactorAuthenticationLoginView(View):
     def post(self, request):
         username = request.POST.get("username", None)
         password = request.POST.get("password", None)
-        user = authenticate(username=username, password=password)
+        user = authenticate(request, username=username, password=password)
 
         next = request.POST.get("next", settings.LOGIN_REDIRECT_URL)
         user_has_enabled_two_factor_authentication = request.POST.get(
