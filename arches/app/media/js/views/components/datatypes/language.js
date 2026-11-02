@@ -9,8 +9,8 @@ const viewModel = function (params) {
     const self = this;
     self.search = params.search;
 
-    LanguageSelectViewModel.apply(this, [params]);
     if (self.search) {
+        LanguageSelectViewModel.apply(this, [params]);
         let filter = params.filterValue();
         self.op = ko.observable(filter.op || 'eq');
         self.node = params.node;
