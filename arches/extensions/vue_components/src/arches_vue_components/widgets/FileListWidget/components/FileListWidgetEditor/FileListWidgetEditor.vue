@@ -1,16 +1,22 @@
 <script setup lang="ts">
-import { computed, ref, watchEffect } from "vue";
+import { computed, onMounted, ref, watchEffect } from "vue";
 
 import FileUpload from "openvue/fileupload";
 
 import FileList from "@/arches_vue_components/widgets/FileListWidget/components/FileListWidgetEditor/components/FileList.vue";
 import FileDropZone from "@/arches_vue_components/widgets/FileListWidget/components/FileListWidgetEditor/components/FileDropZone.vue";
 
-import { buildFileListAliasedNodeData } from "@/arches_vue_components/datatypes/file-list/utils.ts";
+import { useLanguageStore } from "@/arches_vue_components/stores/useLanguageStore.ts";
+import {
+    buildEmptyFileMetadata,
+    buildFileListAliasedNodeData,
+} from "@/arches_vue_components/datatypes/file-list/utils.ts";
 
+import type { LanguageValue } from "@/arches_vue_components/datatypes/string/types.ts";
 import type {
     FileListAliasedNodeData,
     FileListCardXNodeXWidgetData,
+    FileMetadataField,
     FileReference,
 } from "@/arches_vue_components/datatypes/file-list/types.ts";
 import type {
@@ -31,6 +37,22 @@ const emit = defineEmits<{
 }>();
 
 const fileUploadRef = ref<InstanceType<typeof FileUpload> | null>(null);
+
+const languageStore = useLanguageStore();
+
+onMounted(async () => {
+    await languageStore.fetchAllLanguages();
+});
+
+const requestLanguage = computed(() =>
+    languageStore.languages.find(
+        (language) => language.code === languageStore.requestLanguageCode,
+    ),
+);
+
+const isAltTextRequired = computed(() =>
+    Boolean(cardXNodeXWidgetData?.node.config?.imagesOnly),
+);
 
 const savedFiles = ref<FileReference[]>([]);
 const pendingFiles = ref<FileData[]>([]);
@@ -96,15 +118,48 @@ function emitUpdatedValue() {
 }
 
 function onSelect(event: { files: OpenVueFile[] }): void {
-    pendingFiles.value = event.files.map((file) => ({
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        url: file.objectURL,
-        file: file,
-        node_id: cardXNodeXWidgetData?.node.nodeid ?? "",
-    }));
+    // event.files holds every pending file, not just the new ones, so keep
+    // the metadata already entered for files that were selected earlier.
+    pendingFiles.value = event.files.map((file) => {
+        const existingPendingFile = pendingFiles.value.find(
+            (pendingFile) => pendingFile.file === file,
+        );
+        return {
+            ...buildEmptyFileMetadata(languageStore.languages),
+            ...existingPendingFile,
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            url: file.objectURL,
+            file: file,
+            node_id: cardXNodeXWidgetData?.node.nodeid ?? "",
+        };
+    });
 
+    emitUpdatedValue();
+}
+
+function onUpdatePendingFileMetadata(
+    fileIndex: number,
+    field: FileMetadataField,
+    localizedValue: Record<string, LanguageValue>,
+): void {
+    pendingFiles.value[fileIndex] = {
+        ...pendingFiles.value[fileIndex],
+        [field]: localizedValue,
+    };
+    emitUpdatedValue();
+}
+
+function onUpdateSavedFileMetadata(
+    fileIndex: number,
+    field: FileMetadataField,
+    localizedValue: Record<string, LanguageValue>,
+): void {
+    savedFiles.value[fileIndex] = {
+        ...savedFiles.value[fileIndex],
+        [field]: localizedValue,
+    };
     emitUpdatedValue();
 }
 
@@ -154,17 +209,23 @@ function openFileChooser(): void {
 
             <FileList
                 :files="pendingFiles as unknown as FileReference[]"
+                :metadata-language="requestLanguage"
+                :is-alt-text-required="isAltTextRequired"
                 @remove="
                     (_fileReference, fileIndex) =>
                         onRemovePendingFile(fileIndex, removeFileCallback)
                 "
+                @update:metadata="onUpdatePendingFileMetadata"
             />
 
             <FileList
                 :files="savedFiles"
+                :metadata-language="requestLanguage"
+                :is-alt-text-required="isAltTextRequired"
                 @remove="
                     (_fileReference, fileIndex) => onRemoveSavedFile(fileIndex)
                 "
+                @update:metadata="onUpdateSavedFileMetadata"
             />
         </template>
     </FileUpload>
