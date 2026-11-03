@@ -5,6 +5,7 @@ import { Image, Galleria } from "openvue";
 
 import { useLanguageStore } from "@/arches_vue_components/stores/useLanguageStore.ts";
 import { useSettingsStore } from "@/arches_vue_components/stores/useSettingsStore.ts";
+import { getFileAltText } from "@/arches_vue_components/datatypes/file-list/utils.ts";
 
 import type {
     FileListAliasedNodeData,
@@ -29,7 +30,10 @@ const imageData = computed(() => {
         return {
             thumbnailImageSrc: getFileUrl(fileReference.url),
             itemImageSrc: getFileUrl(fileReference.url),
-            alt: altText(fileReference),
+            alt: getFileAltText(
+                fileReference,
+                languageStore.requestLanguageCode,
+            ),
         };
     });
 });
@@ -48,14 +52,6 @@ function getFileUrl(originalUrl: string) {
         return originalUrl;
     }
     return (forceScriptName.value + originalUrl).replace("//", "/");
-}
-
-function altText(fileReference: FileReference): string {
-    const languageCode = languageStore.requestLanguageCode;
-    if (languageCode === null) {
-        return "";
-    }
-    return fileReference.altText?.[languageCode]?.value ?? "";
 }
 </script>
 
