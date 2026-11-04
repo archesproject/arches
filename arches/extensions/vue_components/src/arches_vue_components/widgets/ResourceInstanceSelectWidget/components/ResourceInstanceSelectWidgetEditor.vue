@@ -62,12 +62,19 @@ const emptyFilterMessage = ref($gettext("Search returned no results"));
 const selectedGraphId = ref<string>("");
 const showResourceCreation = ref(false);
 const resourceCreationDialogKey = ref(0);
+const unavailableValue = ref<string | null>(null);
 
 const selectedValue = ref<string | null>(
     aliasedNodeData?.node_value?.[0]?.resourceId ?? null,
 );
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
+
+const isSelectedValueUnavailable = computed(
+    () =>
+        selectedValue.value !== null &&
+        selectedValue.value === unavailableValue.value,
+);
 
 watch(isLoading, (newValue) => {
     emit("update:isLoading", newValue);
@@ -93,12 +100,13 @@ async function getOptions(page: number, filterTerm?: string) {
         if (filterTerm) {
             filterTerms.push(filterTerm);
         }
+        const requestedValue = selectedValue.value;
         const resourceData = await fetchRelatableResources(
             graphSlug,
             nodeAlias,
             page,
             filterTerms,
-            selectedValue.value,
+            requestedValue,
         );
 
         const references = resourceData.data.map(
@@ -112,6 +120,15 @@ async function getOptions(page: number, filterTerm?: string) {
 
         if (resourceData.current_page == 1) {
             options.value = references;
+            unavailableValue.value = null;
+            if (
+                references.every(
+                    (reference: ResourceInstanceSelectOption) =>
+                        reference.resource_id !== requestedValue,
+                )
+            ) {
+                unavailableValue.value = requestedValue;
+            }
         } else {
             options.value = [...options.value, ...references];
         }
@@ -249,6 +266,12 @@ async function onResourceCreated(createdTile: AliasedTileData) {
                     }}
                 </div>
             </div>
+        </template>
+        <template
+            v-if="isSelectedValueUnavailable"
+            #value
+        >
+            <span>{{ $gettext("Unavailable resource") }}</span>
         </template>
     </Select>
     <ResourceInstanceCreation

@@ -87,6 +87,10 @@ class ResourcePermissionTests(GraphTestCase):
             cls.missing_reference,
         ]
         cls.cardinality_n_tile.save()
+        cls.resource_instance_list_node_1.config["graphs"] = [
+            {"graphid": str(cls.graph.pk)}
+        ]
+        cls.resource_instance_list_node_1.save()
 
     @classmethod
     def create_resource(cls, name):
@@ -222,6 +226,31 @@ class ResourcePermissionTests(GraphTestCase):
         )
         self.assertNotContains(resource_response, "Unreadable Resource")
         self.assertNotContains(tile_response, "Unreadable Resource")
+
+    def test_relatable_resources_omit_unreadable_resources(self):
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse(
+                "arches_vue_components:api-relatable-resources",
+                kwargs={
+                    "graph": "datatype_lookups",
+                    "node_alias": "resource_instance_list_alias",
+                },
+            ),
+            {
+                "initialValue": [
+                    str(self.unreadable_resource.pk),
+                    str(self.resource_42.pk),
+                ]
+            },
+        )
+
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            [record["resourceinstanceid"] for record in response.json()["data"]],
+            [str(self.resource_42.pk)],
+        )
+        self.assertNotContains(response, "Unreadable Resource")
 
     def test_saving_returned_values_keeps_unreadable_references(self):
         single_value, list_value = self.get_cardinality_1_values(
