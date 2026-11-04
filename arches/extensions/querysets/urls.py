@@ -3,6 +3,7 @@ from django.urls import path
 from arches.extensions.querysets.apps import ArchesQuerySetsConfig
 from arches.extensions.querysets.rest_framework.generic_views import (
     ArchesResourceBlankView,
+    ArchesResourceChangesView,
     ArchesResourceDetailView,
     ArchesResourceListCreateView,
     ArchesTileBlankView,
@@ -21,6 +22,11 @@ urlpatterns = [
         "api/resource/<slug:graph>/<uuid:pk>",
         ArchesResourceDetailView.as_view(),
         name="api-resource",
+    ),
+    path(
+        "api/resource/<slug:graph>/<uuid:pk>/changes",
+        ArchesResourceChangesView.as_view(),
+        name="api-resource-changes",
     ),
     path(
         "api/resource/<slug:graph>/blank",
