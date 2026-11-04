@@ -383,6 +383,7 @@ OAUTH2_PROVIDER = {
     # Where a device sign-in sends the user to enter their code. Relative, so
     # clients resolve it against the instance's URL.
     "OAUTH_DEVICE_VERIFICATION_URI": "/o/device/",
+    "OAUTH2_VALIDATOR_CLASS": "arches.app.utils.oauth_device_grant.ArchesOAuth2Validator",
 }
 
 # This is the client id you get when you register a new application
