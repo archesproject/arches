@@ -11891,6 +11891,11 @@ a.filter-tools:hover {
 .map-coordinate-editor-crs-selector select {
     display: block;
     float: left;
+    width: 210px;
+}
+
+.map-coordinate-editor-crs-selector .select2-container {
+    width: 210px !important;
 }
 
 .map-coordinate-editor-crs-selector dt {
