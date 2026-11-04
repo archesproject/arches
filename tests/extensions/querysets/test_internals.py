@@ -1,5 +1,12 @@
+from types import SimpleNamespace
+from unittest import mock
+
 from arches.app.models.models import TileModel
-from arches.extensions.querysets.models import TileTree
+from arches.extensions.querysets.models import ResourceTileTree, TileTree
+from arches.extensions.querysets.querysets import (
+    TileTreeQuerySet,
+    cap_depth_to_graph,
+)
 from arches.extensions.querysets.utils.tests import GraphTestCase
 
 
@@ -65,3 +72,51 @@ class InternalsTests(GraphTestCase):
 
         self.assertIsNone(getattr(tile.aliased_data, self.string_node_1.alias))
         self.assertIsNone(tile.data[str(self.string_node_1.pk)])
+
+    def test_cap_depth_to_graph(self):
+        def node(ng, parent_ng=None, grandparent_id=None):
+            parent = None
+            if parent_ng is not None:
+                parent = SimpleNamespace(
+                    pk=parent_ng, parentnodegroup_id=grandparent_id
+                )
+            ng_obj = SimpleNamespace(
+                pk=ng, parentnodegroup=parent, parentnodegroup_id=parent_ng
+            )
+            return SimpleNamespace(nodegroup=ng_obj)
+
+        self.assertEqual(cap_depth_to_graph(20, [node(1)]), 0)
+        self.assertEqual(cap_depth_to_graph(20, [node(1), node(2, 1)]), 1)
+        three = [node(1), node(2, 1), node(3, 2, 1)]
+        self.assertEqual(cap_depth_to_graph(20, three), 2)
+        self.assertEqual(cap_depth_to_graph(1, three), 1)
+        # Unresolvable ancestor chain: fall back to the caller's depth.
+        self.assertEqual(cap_depth_to_graph(20, [node(3, 2, 1)]), 20)
+
+    def test_recursion_capped_at_graph_depth(self):
+        real = TileTreeQuerySet.get_tiles
+        with mock.patch.object(
+            TileTreeQuerySet, "get_tiles", autospec=True, side_effect=real
+        ) as spy:
+            list(ResourceTileTree.get_tiles("datatype_lookups"))
+        # Top-level tiles plus one child level (the graph nests one deep),
+        # not the default 20.
+        self.assertEqual(spy.call_count, 2)
+
+    def test_explicit_depth_still_an_upper_bound(self):
+        real = TileTreeQuerySet.get_tiles
+        with mock.patch.object(
+            TileTreeQuerySet, "get_tiles", autospec=True, side_effect=real
+        ) as spy:
+            list(ResourceTileTree.objects.get_tiles("datatype_lookups", depth=0))
+        self.assertEqual(spy.call_count, 1)
+
+    def test_nodegroup_alias_entry_loads_children(self):
+        tile = TileTree.get_tiles(
+            "datatype_lookups",
+            "datatypes_1",
+            resource_ids=[self.resource_42.pk],
+        ).get()
+        self.assertIn(
+            self.cardinality_1_child_tile.pk, [c.pk for c in tile._tile_trees]
+        )

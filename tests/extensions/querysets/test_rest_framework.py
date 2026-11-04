@@ -1544,9 +1544,8 @@ class RestFrameworkPerformanceTests(GraphTestCase):
         # 18: select resources limit 500
         # 19: tile depth 1
         # 20: tile depth 2
-        # 21: tile depth 3: none!
-        # 22-25: arches perms (BUG: core arches)
-        num_queries = 25
+        # 21-24: arches perms (BUG: core arches)
+        num_queries = 24
         if arches_version < Version("8.1.0a0"):
             num_queries += 1  # extra user profile query on Arches 8.0 and below.
         if arches_version < Version("8.2.0a8"):
@@ -1574,9 +1573,8 @@ class RestFrameworkPerformanceTests(GraphTestCase):
         # 17: tile count (paginator)
         # 18: select tiles limit 500
         # 19: tile depth 2
-        # 20: tile depth 3: none!
-        # 21-24: arches perms (BUG: core arches)
-        num_queries = 24
+        # 20-23: arches perms (BUG: core arches)
+        num_queries = 23
         if arches_version < Version("8.1.0a0"):
             num_queries += 1  # extra user profile query on Arches 8.0 and below.
         if arches_version < Version("8.2.0a8"):

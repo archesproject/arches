@@ -36,16 +36,16 @@ class PerformanceTests(GraphTestCase):
         # 17: resource -> resourcexresource depth 1
         # 18: resource -> resourcexresource -> to_resource
         # (17-18 are a little unfortunate, but worth it for resourcexresource prefetches.
-        # 19-21: depth 2
-        # 22: concept value
+        # 19-20: depth 2
+        # 21: concept value
         # (N+1 BUG: core arches) more concept values
-        with self.assertNumQueries(22):
+        with self.assertNumQueries(21):
             qs = ResourceTileTree.get_tiles("datatype_lookups")
             self.assertCountEqual(qs, [self.resource_42, self.resource_none])
 
     def test_get_tiles(self):
-        # 1-20 from test_get_resources()
-        with self.assertNumQueries(20):
+        # 1-19 from test_get_resources()
+        with self.assertNumQueries(19):
             qs = TileTree.get_tiles("datatype_lookups", "datatypes_1")
             self.assertCountEqual(
                 qs, [self.cardinality_1_tile, self.cardinality_1_tile_none]

@@ -105,6 +105,33 @@ def reprocess_tiles_aliased_data(tiles, as_representation, grouping_node_lookup)
                 )
 
 
+def cap_depth_to_graph(depth, nodes):
+    """
+    Limit child-tile recursion to the deepest nodegroup nesting in `nodes`,
+    computed in memory from select_related("nodegroup__parentnodegroup").
+    Returns `depth` unchanged if the chain can't be fully resolved.
+    """
+    parent_of = {}
+    for node in nodes:
+        nodegroup = node.nodegroup
+        parent_of[nodegroup.pk] = nodegroup.parentnodegroup_id
+        parent = nodegroup.parentnodegroup
+        if parent is not None:
+            parent_of[parent.pk] = parent.parentnodegroup_id
+
+    max_levels = 0
+    for nodegroup_id in parent_of:
+        levels = 0
+        current = nodegroup_id
+        while parent_of[current] is not None:
+            current = parent_of[current]
+            levels += 1
+            if current not in parent_of:
+                return depth
+        max_levels = max(max_levels, levels)
+    return min(depth, max_levels)
+
+
 class NodeAliasValuesMixin:
     def values(self, *args, **kwargs):
         """Allow using a node_alias as a field name in a values() query."""
@@ -238,6 +265,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
             )
             if not resolved_nodes:
                 raise ValueError(f"No nodes found for graph with slug: {graph_slug}")
+            depth = cap_depth_to_graph(depth, resolved_nodes)
 
         alias_expressions = generate_node_alias_expressions(self.model, resolved_nodes)
 
@@ -259,9 +287,8 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
             nodes=nodes,
         )
 
-        # Future: see various solutions mentioned here for avoiding
-        # "magic number" depth traversal (but the magic number is harmless,
-        # causes no additional queries beyond actual depth):
+        # Recursion stops at the graph's actual nodegroup nesting
+        # (cap_depth_to_graph()); `depth` is only an upper bound. See:
         # https://forum.djangoproject.com/t/prefetching-relations-to-arbitrary-depth/39328
         if depth:
             child_tile_query = (
@@ -521,6 +548,7 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
             )
             if not nodes:
                 raise ValueError(f"No nodes found for graph with slug: {graph_slug}")
+            depth = cap_depth_to_graph(depth, nodes)
 
         alias_expressions = generate_node_alias_expressions(self.model, nodes)
 
