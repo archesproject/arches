@@ -1,5 +1,5 @@
 import { mount } from "@vue/test-utils";
-import { describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 
 import OpenVue from "openvue/config";
 
@@ -31,7 +31,19 @@ const english: Language = {
     scope: "system",
 };
 
-function mountFileList(fileReference: Partial<FileReference>) {
+const arabic: Language = {
+    code: "ar",
+    default_direction: "rtl",
+    id: 2,
+    isdefault: false,
+    name: "Arabic",
+    scope: "system",
+};
+
+function mountFileList(
+    fileReference: Partial<FileReference>,
+    extraProps: Record<string, unknown> = {},
+) {
     return mount(FileList, {
         global: {
             plugins: [OpenVue],
@@ -46,13 +58,27 @@ function mountFileList(fileReference: Partial<FileReference>) {
                     ...fileReference,
                 } as FileReference,
             ],
-            metadataLanguage: english,
+            languages: [english, arabic],
+            defaultMetadataLanguage: english,
             isAltTextRequired: true,
+            ...extraProps,
         },
     });
 }
 
 describe("FileList metadata", () => {
+    beforeAll(() => {
+        // OpenVue's Select listens for orientation changes on mount.
+        vi.stubGlobal(
+            "matchMedia",
+            vi.fn().mockReturnValue({
+                matches: false,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            }),
+        );
+    });
+
     it("labels every metadata input", () => {
         const wrapper = mountFileList({});
 
@@ -136,6 +162,30 @@ describe("FileList metadata", () => {
         expect(wrapper.get("img").attributes("alt")).toBe("");
     });
 
+    it("hides the language select by default", () => {
+        const wrapper = mountFileList({});
+
+        expect(wrapper.find(".file-metadata-language").exists()).toBe(false);
+    });
+
+    it("edits the selected language when the language select is on", async () => {
+        const wrapper = mountFileList({}, { shouldShowLanguageSelect: true });
+        const languageSelect = wrapper.findComponent({ name: "Select" });
+
+        expect(languageSelect.props("modelValue")).toBe("en");
+        languageSelect.vm.$emit("update:modelValue", "ar");
+        await wrapper.vm.$nextTick();
+
+        const altTextInput = wrapper.get('input[aria-required="true"]');
+        expect(altTextInput.attributes("lang")).toBe("ar");
+        expect(altTextInput.attributes("dir")).toBe("rtl");
+
+        await altTextInput.setValue("مزهرية");
+        expect(wrapper.emitted("update:metadata")?.[0]?.[2]).toEqual({
+            ar: { value: "مزهرية", direction: "rtl" },
+        });
+    });
+
     it("collapses the additional metadata behind a toggle", async () => {
         const wrapper = mountFileList({});
         const toggle = wrapper.get(".additional-metadata-toggle");
@@ -148,5 +198,26 @@ describe("FileList metadata", () => {
 
         expect(toggle.attributes("aria-expanded")).toBe("true");
         expect(drawer.isVisible()).toBe(true);
+    });
+
+    it("shows only the visible metadata fields", () => {
+        const wrapper = mountFileList(
+            {},
+            { visibleMetadataFields: ["altText", "attribution"] },
+        );
+        const labels = wrapper.findAll("label").map((label) => label.text());
+
+        expect(labels).toEqual(["Alternative text (required)", "Attribution"]);
+    });
+
+    it("drops the toggle when no additional fields are visible", () => {
+        const wrapper = mountFileList(
+            {},
+            { visibleMetadataFields: ["altText"] },
+        );
+
+        expect(wrapper.find(".additional-metadata-toggle").exists()).toBe(
+            false,
+        );
     });
 });
