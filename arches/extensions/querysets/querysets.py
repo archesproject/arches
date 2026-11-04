@@ -184,6 +184,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         depth=None,
         nodes=None,
         graph_query=None,
+        node_aliases=True,
     ):
         """
         Entry point for filtering arches data by nodegroups.
@@ -217,6 +218,11 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
             Maximum levels of child tiles to load. Defaults to None, which
             works it out from the graph's actual nodegroup nesting; an
             integer is an upper bound on that.
+
+        node_aliases:
+            - True: node aliases are usable in filter()/order_by()/values()
+            - False: skips building the alias expressions (cheaper), for
+              callers that never filter on node aliases.
         """
         from arches.extensions.querysets.models import GraphWithPrefetching
 
@@ -247,7 +253,11 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
             depth = cap_depth_to_graph(depth, graph_nodes)
             resolved_nodes = resolved_nodes or graph_nodes
 
-        alias_expressions = generate_node_alias_expressions(self.model, resolved_nodes)
+        alias_expressions = (
+            generate_node_alias_expressions(self.model, resolved_nodes)
+            if node_aliases
+            else {}
+        )
 
         # arches_version==9.0.0
         if arches_version < Version("8.0"):
@@ -279,6 +289,8 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
                     depth=depth - 1,
                     nodes=resolved_nodes,
                     graph_query=graph_query,
+                    # Internal prefetch: never exposed for filtering.
+                    node_aliases=False,
                 )
                 .filter(
                     nodegroup__parentnodegroup_id=models.F("parenttile__nodegroup_id")
@@ -457,6 +469,7 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         nodes=None,
         depth=None,
         graph_query=None,
+        node_aliases=True,
     ):
         """Aliases a ResourceTileTreeQuerySet with tile data unpacked
         and mapped onto nodegroup aliases, e.g.:
@@ -503,6 +516,11 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         as_representation:
             - True: calls to_json() datatype methods
             - False: calls to_python() datatype methods
+
+        node_aliases:
+            - True: node aliases are usable in filter()/order_by()/values()
+            - False: skips building the alias expressions (cheaper), for
+              callers that never filter on node aliases.
         """
         from arches.extensions.querysets.models import GraphWithPrefetching, TileTree
 
@@ -531,7 +549,9 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
             depth = cap_depth_to_graph(depth, graph_nodes)
             nodes = nodes or graph_nodes
 
-        alias_expressions = generate_node_alias_expressions(self.model, nodes)
+        alias_expressions = (
+            generate_node_alias_expressions(self.model, nodes) if node_aliases else {}
+        )
 
         if resource_ids:
             qs = self.filter(graph__slug=graph_slug, pk__in=resource_ids)
@@ -553,6 +573,7 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
                         nodes=nodes,
                         graph_query=graph_query,
                         depth=depth,
+                        node_aliases=False,
                     ).filter(parenttile=None),
                     to_attr="_tile_trees",
                 ),

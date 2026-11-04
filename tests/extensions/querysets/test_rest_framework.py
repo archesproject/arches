@@ -30,7 +30,10 @@ from arches.extensions.querysets.rest_framework.serializers import (
     ArchesSingleNodegroupSerializer,
     ArchesTileSerializer,
 )
-from arches.extensions.querysets.utils.models import ensure_request
+from arches.extensions.querysets.utils.models import (
+    ensure_request,
+    generate_node_alias_expressions,
+)
 from arches.extensions.querysets.utils.tests import GraphTestCase
 
 MUTABLE_PERMITTED_NODEGROUPS = set()
@@ -1482,6 +1485,21 @@ class RestFrameworkTests(GraphTestCase):
             response.json()["results"][0]["resourceinstance"],
             str(self.resource_none.pk),
         )
+
+    def test_node_aliases_only_requested_with_filter_params(self):
+        url = reverse(
+            "arches_querysets:api-resources", kwargs={"graph": "datatype_lookups"}
+        )
+        target = "arches.extensions.querysets.querysets.generate_node_alias_expressions"
+        with patch(target, wraps=generate_node_alias_expressions) as spy:
+            self.assertEqual(self.client.get(url).status_code, HTTPStatus.OK)
+            spy.assert_not_called()
+
+            response = self.client.get(
+                url, QUERY_STRING="aliased_data__string_alias__isnull=false"
+            )
+            self.assertEqual(response.status_code, HTTPStatus.OK)
+            spy.assert_called_once()
 
     def test_filter_kwargs_disallows_joins(self):
         self.assertContains(
