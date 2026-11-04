@@ -640,7 +640,7 @@ class TileTree(TileModel, AliasedDataMixin):
         resource_ids=None,
         as_representation=False,
         nodes=None,
-        depth=20,
+        depth=None,
     ):
         """See `arches.extensions.querysets.querysets.TileTreeQuerySet.get_tiles`."""
         return cls.objects.get_tiles(

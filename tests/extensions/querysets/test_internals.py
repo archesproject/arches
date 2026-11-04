@@ -89,6 +89,8 @@ class InternalsTests(GraphTestCase):
         self.assertEqual(cap_depth_to_graph(20, [node(1), node(2, 1)]), 1)
         three = [node(1), node(2, 1), node(3, 2, 1)]
         self.assertEqual(cap_depth_to_graph(20, three), 2)
+        self.assertEqual(cap_depth_to_graph(None, three), 2)
+        self.assertEqual(cap_depth_to_graph(None, [node(3, 2, 1)]), 20)
         self.assertEqual(cap_depth_to_graph(1, three), 1)
         # Unresolvable ancestor chain: fall back to the caller's depth.
         self.assertEqual(cap_depth_to_graph(20, [node(3, 2, 1)]), 20)

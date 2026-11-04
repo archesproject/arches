@@ -105,12 +105,18 @@ def reprocess_tiles_aliased_data(tiles, as_representation, grouping_node_lookup)
                 )
 
 
+# Used only if an ancestor chain can't be resolved from the loaded nodes.
+FALLBACK_DEPTH = 20
+
+
 def cap_depth_to_graph(depth, nodes):
     """
-    Limit child-tile recursion to the deepest nodegroup nesting in `nodes`,
-    computed in memory from select_related("nodegroup__parentnodegroup").
-    Returns `depth` unchanged if the chain can't be fully resolved.
+    Deepest nodegroup nesting in `nodes`, computed in memory from
+    select_related("nodegroup__parentnodegroup"). An explicit `depth` is an
+    upper bound. If a chain can't be fully resolved, returns `depth`
+    (or FALLBACK_DEPTH if None).
     """
+    unresolved = FALLBACK_DEPTH if depth is None else depth
     parent_of = {}
     for node in nodes:
         nodegroup = node.nodegroup
@@ -127,9 +133,9 @@ def cap_depth_to_graph(depth, nodes):
             current = parent_of[current]
             levels += 1
             if current not in parent_of:
-                return depth
+                return unresolved
         max_levels = max(max_levels, levels)
-    return min(depth, max_levels)
+    return max_levels if depth is None else min(depth, max_levels)
 
 
 class NodeAliasValuesMixin:
@@ -207,7 +213,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         *,
         resource_ids=None,
         as_representation=False,
-        depth=20,
+        depth=None,
         nodes=None,
         graph_query=None,
     ):
@@ -252,20 +258,21 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
             qs = qs.filter(resourceinstance_id__in=resource_ids)
 
         resolved_nodes = nodes
-        if not resolved_nodes:
+        if not resolved_nodes or depth is None:
             filters = models.Q(graph__slug=graph_slug)
             # arches_version==9.0.0
             if arches_version >= Version("8.0"):
                 filters &= models.Q(source_identifier=None)
-            resolved_nodes = (
+            graph_nodes = (
                 Node.objects.filter(filters)
                 .exclude(datatype="semantic")
                 .exclude(nodegroup=None)
                 .select_related("nodegroup__parentnodegroup")
             )
-            if not resolved_nodes:
+            if not graph_nodes:
                 raise ValueError(f"No nodes found for graph with slug: {graph_slug}")
-            depth = cap_depth_to_graph(depth, resolved_nodes)
+            depth = cap_depth_to_graph(depth, graph_nodes)
+            resolved_nodes = resolved_nodes or graph_nodes
 
         alias_expressions = generate_node_alias_expressions(self.model, resolved_nodes)
 
@@ -288,7 +295,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         )
 
         # Recursion stops at the graph's actual nodegroup nesting
-        # (cap_depth_to_graph()); `depth` is only an upper bound. See:
+        # (cap_depth_to_graph()); an explicit `depth` is only an upper bound. See:
         # https://forum.djangoproject.com/t/prefetching-relations-to-arbitrary-depth/39328
         if depth:
             child_tile_query = (
@@ -475,7 +482,7 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
         resource_ids=None,
         as_representation=False,
         nodes=None,
-        depth=20,
+        depth=None,
         graph_query=None,
     ):
         """Aliases a ResourceTileTreeQuerySet with tile data unpacked
@@ -530,7 +537,7 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
             graph_query = GraphWithPrefetching.objects.prefetch(graph_slug)
         self._add_hints(as_representation=as_representation, graph_query=graph_query)
 
-        if not nodes:
+        if not nodes or depth is None:
             # Violates laziness of QuerySets, but can be made fully lazy
             # by providing a `nodes` argument doing the same query. That
             # argument is forwarded to TileTree.objects.get_tiles() below, so
@@ -539,16 +546,17 @@ class ResourceTileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
             # arches_version==9.0.0
             if arches_version >= Version("8.0"):
                 filters &= models.Q(source_identifier=None)
-            nodes = (
+            graph_nodes = (
                 Node.objects.filter(filters)
                 .exclude(datatype="semantic")
                 .exclude(nodegroup=None)
                 .select_related("nodegroup__parentnodegroup")
                 .order_by()
             )
-            if not nodes:
+            if not graph_nodes:
                 raise ValueError(f"No nodes found for graph with slug: {graph_slug}")
-            depth = cap_depth_to_graph(depth, nodes)
+            depth = cap_depth_to_graph(depth, graph_nodes)
+            nodes = nodes or graph_nodes
 
         alias_expressions = generate_node_alias_expressions(self.model, nodes)
 
