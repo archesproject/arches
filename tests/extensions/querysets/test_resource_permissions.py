@@ -60,6 +60,8 @@ class ResourcePermissionTests(GraphTestCase):
         framework = ArchesDefaultDenyPermissionFramework()
         framework.assign_perm("view_resourceinstance", cls.user, cls.resource_42)
         framework.assign_perm("change_resourceinstance", cls.user, cls.resource_42)
+        cls.reader = User.objects.create_user("resource_reader", password="x")
+        framework.assign_perm("view_resourceinstance", cls.reader, cls.resource_42)
 
         resource_instance_datatype = cls.datatype_factory.get_instance(
             "resource-instance"
@@ -251,6 +253,54 @@ class ResourcePermissionTests(GraphTestCase):
             [str(self.resource_42.pk)],
         )
         self.assertNotContains(response, "Unreadable Resource")
+
+    def test_creating_a_tile_requires_edit_permission_on_its_resource(self):
+        self.reader.groups.add(Group.objects.get(name="Resource Editor"))
+        create_url = reverse(
+            "arches_querysets:api-tiles",
+            kwargs={"graph": "datatype_lookups", "nodegroup_alias": "datatypes_n"},
+        )
+        request_body = {
+            "aliased_data": {"string_alias_n": "created"},
+            "resourceinstance": str(self.resource_42.pk),
+        }
+
+        for user, expected_status_code in ((self.reader, 403), (self.user, 201)):
+            with self.subTest(user=user.username):
+                self.client.force_login(user)
+                response = self.client.post(
+                    create_url, request_body, content_type="application/json"
+                )
+                self.assertEqual(
+                    response.status_code, expected_status_code, response.content
+                )
+
+    def test_provisional_edits_are_limited_to_the_requesting_user(self):
+        reader_edit = {"value": {}}
+        other_edit = {"value": {}}
+        for provisional_edits, user, expected_provisional_edits in (
+            (
+                {str(self.reader.pk): reader_edit, str(self.admin.pk): other_edit},
+                self.reader,
+                {str(self.reader.pk): reader_edit},
+            ),
+            ({str(self.admin.pk): other_edit}, self.reader, None),
+            (
+                {str(self.reader.pk): reader_edit, str(self.admin.pk): other_edit},
+                self.user,
+                {str(self.reader.pk): reader_edit, str(self.admin.pk): other_edit},
+            ),
+        ):
+            with self.subTest(user=user.username, edits=sorted(provisional_edits)):
+                TileModel.objects.filter(pk=self.cardinality_1_tile.pk).update(
+                    provisionaledits=provisional_edits
+                )
+                response = self.get_resource_response(user)
+                self.assertEqual(response.status_code, 200, response.content)
+                self.assertEqual(
+                    response.json()["aliased_data"]["datatypes_1"]["provisionaledits"],
+                    expected_provisional_edits,
+                )
 
     def test_saving_returned_values_keeps_unreadable_references(self):
         single_value, list_value = self.get_cardinality_1_values(

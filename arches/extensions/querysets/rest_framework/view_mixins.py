@@ -285,6 +285,11 @@ class ArchesModelAPIMixin:
             raise ValidationError(errors) from django_error
 
     def perform_create(self, serializer):
+        resource = serializer.validated_data.get("resourceinstance")
+        if resource is not None and not user_can_edit_resource(
+            user=self.request.user, resource=resource
+        ):
+            raise PermissionDenied
         self.validate_tile_data_and_save(serializer)
 
     def perform_update(self, serializer):
