@@ -4,11 +4,13 @@ import { useGettext } from "vue3-gettext";
 
 import Image from "openvue/image";
 import Button from "openvue/button";
+import Select from "openvue/select";
 
 import FileMetadataInput from "@/arches_vue_components/widgets/FileListWidget/components/FileListWidgetEditor/components/FileMetadataInput.vue";
 
 import {
     ADDITIONAL_FILE_METADATA_FIELDS,
+    FILE_METADATA_FIELDS,
     PRIMARY_FILE_METADATA_FIELDS,
     REMOVE,
     UPDATE_METADATA,
@@ -29,11 +31,17 @@ import type {
 
 const {
     files,
-    metadataLanguage = undefined,
+    languages = [],
+    defaultMetadataLanguage = undefined,
+    shouldShowLanguageSelect = false,
+    visibleMetadataFields = FILE_METADATA_FIELDS,
     isAltTextRequired = false,
 } = defineProps<{
     files: FileReference[];
-    metadataLanguage?: Language;
+    languages?: Language[];
+    defaultMetadataLanguage?: Language;
+    shouldShowLanguageSelect?: boolean;
+    visibleMetadataFields?: readonly FileMetadataField[];
     isAltTextRequired?: boolean;
 }>();
 
@@ -57,6 +65,7 @@ const { $gettext } = useGettext();
 const listId = useId();
 const touchedAltTextKeys = ref(new Set<string>());
 const expandedFileKeys = ref(new Set<string>());
+const selectedLanguageCodes = ref(new Map<string, string>());
 
 const metadataFieldLabels = computed<Record<FileMetadataField, string>>(() => ({
     altText: $gettext("Alternative text"),
@@ -65,12 +74,41 @@ const metadataFieldLabels = computed<Record<FileMetadataField, string>>(() => ({
     attribution: $gettext("Attribution"),
 }));
 
+const primaryFields = computed(() =>
+    PRIMARY_FILE_METADATA_FIELDS.filter((field) =>
+        visibleMetadataFields.includes(field),
+    ),
+);
+
+const additionalFields = computed(() =>
+    ADDITIONAL_FILE_METADATA_FIELDS.filter((field) =>
+        visibleMetadataFields.includes(field),
+    ),
+);
+
 function getFileKey(fileReference: FileReference): string {
     return fileReference.file_id ?? fileReference.url;
 }
 
 function getFieldId(fileIndex: number, field: string): string {
     return `${listId}-${fileIndex}-${field}`;
+}
+
+function getFileLanguage(fileReference: FileReference): Language | undefined {
+    const selectedCode = selectedLanguageCodes.value.get(
+        getFileKey(fileReference),
+    );
+    return (
+        languages.find((language) => language.code === selectedCode) ??
+        defaultMetadataLanguage
+    );
+}
+
+function onSelectFileLanguage(
+    fileReference: FileReference,
+    languageCode: string,
+) {
+    selectedLanguageCodes.value.set(getFileKey(fileReference), languageCode);
 }
 
 function isExpanded(fileReference: FileReference): boolean {
@@ -127,14 +165,15 @@ function onUpdateField(
     field: FileMetadataField,
     value: string,
 ) {
-    if (!metadataLanguage) {
+    const language = getFileLanguage(fileReference);
+    if (!language) {
         return;
     }
     emit(
         UPDATE_METADATA,
         fileIndex,
         field,
-        setLocalizedValue(fileReference[field], metadataLanguage, value),
+        setLocalizedValue(fileReference[field], language, value),
     );
 }
 </script>
@@ -160,7 +199,7 @@ function onUpdateField(
                     :alt="
                         getFileAltText(
                             fileReference,
-                            metadataLanguage?.code ?? null,
+                            getFileLanguage(fileReference)?.code ?? null,
                         )
                     "
                 />
@@ -185,19 +224,38 @@ function onUpdateField(
             </div>
 
             <div
-                v-if="metadataLanguage"
+                v-if="shouldShowLanguageSelect && languages.length > 1"
+                class="file-metadata-language"
+            >
+                <label :id="getFieldId(fileIndex, 'language')">
+                    {{ $gettext("Language of file details") }}
+                </label>
+                <Select
+                    :model-value="getFileLanguage(fileReference)?.code"
+                    :options="languages"
+                    option-label="name"
+                    option-value="code"
+                    :aria-labelledby="getFieldId(fileIndex, 'language')"
+                    @update:model-value="
+                        onSelectFileLanguage(fileReference, $event)
+                    "
+                />
+            </div>
+
+            <div
+                v-if="getFileLanguage(fileReference)"
                 class="file-metadata"
             >
                 <FileMetadataInput
-                    v-for="field in PRIMARY_FILE_METADATA_FIELDS"
+                    v-for="field in primaryFields"
                     :key="field"
                     :input-id="getFieldId(fileIndex, field)"
                     :label="metadataFieldLabels[field]"
-                    :language="metadataLanguage"
+                    :language="getFileLanguage(fileReference)!"
                     :model-value="
                         getLocalizedValue(
                             fileReference[field],
-                            metadataLanguage.code,
+                            getFileLanguage(fileReference)!.code,
                         )
                     "
                     :is-required="field === 'altText' && isAltTextRequired"
@@ -209,47 +267,49 @@ function onUpdateField(
                     @blur="onBlurField(fileReference, field)"
                 />
 
-                <Button
-                    class="additional-metadata-toggle"
-                    :icon="
-                        isExpanded(fileReference)
-                            ? 'pi pi-chevron-down'
-                            : 'pi pi-chevron-right'
-                    "
-                    :label="$gettext('Additional metadata')"
-                    :aria-expanded="isExpanded(fileReference)"
-                    :aria-controls="getFieldId(fileIndex, 'additional')"
-                    text
-                    @click="toggleExpanded(fileReference)"
-                />
-                <div
-                    v-show="isExpanded(fileReference)"
-                    :id="getFieldId(fileIndex, 'additional')"
-                    class="file-metadata"
-                >
-                    <FileMetadataInput
-                        v-for="field in ADDITIONAL_FILE_METADATA_FIELDS"
-                        :key="field"
-                        :input-id="getFieldId(fileIndex, field)"
-                        :label="metadataFieldLabels[field]"
-                        :language="metadataLanguage"
-                        :model-value="
-                            getLocalizedValue(
-                                fileReference[field],
-                                metadataLanguage.code,
-                            )
+                <template v-if="additionalFields.length">
+                    <Button
+                        class="additional-metadata-toggle"
+                        :icon="
+                            isExpanded(fileReference)
+                                ? 'pi pi-chevron-down'
+                                : 'pi pi-chevron-right'
                         "
-                        :is-multiline="field === 'description'"
-                        @update:model-value="
-                            onUpdateField(
-                                fileReference,
-                                fileIndex,
-                                field,
-                                $event,
-                            )
-                        "
+                        :label="$gettext('Additional metadata')"
+                        :aria-expanded="isExpanded(fileReference)"
+                        :aria-controls="getFieldId(fileIndex, 'additional')"
+                        text
+                        @click="toggleExpanded(fileReference)"
                     />
-                </div>
+                    <div
+                        v-show="isExpanded(fileReference)"
+                        :id="getFieldId(fileIndex, 'additional')"
+                        class="file-metadata"
+                    >
+                        <FileMetadataInput
+                            v-for="field in additionalFields"
+                            :key="field"
+                            :input-id="getFieldId(fileIndex, field)"
+                            :label="metadataFieldLabels[field]"
+                            :language="getFileLanguage(fileReference)!"
+                            :model-value="
+                                getLocalizedValue(
+                                    fileReference[field],
+                                    getFileLanguage(fileReference)!.code,
+                                )
+                            "
+                            :is-multiline="field === 'description'"
+                            @update:model-value="
+                                onUpdateField(
+                                    fileReference,
+                                    fileIndex,
+                                    field,
+                                    $event,
+                                )
+                            "
+                        />
+                    </div>
+                </template>
             </div>
         </li>
     </ul>
@@ -289,6 +349,16 @@ function onUpdateField(
 
 .delete-button {
     flex: 0 0 auto;
+}
+
+.file-metadata-language {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.file-metadata-language label {
+    font-weight: 600;
 }
 
 .file-metadata {

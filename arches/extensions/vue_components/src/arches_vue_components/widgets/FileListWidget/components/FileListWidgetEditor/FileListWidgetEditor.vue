@@ -7,6 +7,7 @@ import FileList from "@/arches_vue_components/widgets/FileListWidget/components/
 import FileDropZone from "@/arches_vue_components/widgets/FileListWidget/components/FileListWidgetEditor/components/FileDropZone.vue";
 
 import { useLanguageStore } from "@/arches_vue_components/stores/useLanguageStore.ts";
+import { FILE_METADATA_FIELDS } from "@/arches_vue_components/datatypes/file-list/constants.ts";
 import {
     buildEmptyFileMetadata,
     buildFileListAliasedNodeData,
@@ -24,9 +25,16 @@ import type {
     OpenVueFile,
 } from "@/arches_vue_components/widgets/FileListWidget/types.ts";
 
-const { aliasedNodeData, cardXNodeXWidgetData = undefined } = defineProps<{
+const {
+    aliasedNodeData,
+    cardXNodeXWidgetData = undefined,
+    shouldShowMetadataLanguageSelect = false,
+    visibleMetadataFields = FILE_METADATA_FIELDS,
+} = defineProps<{
     aliasedNodeData: FileListAliasedNodeData | null;
     cardXNodeXWidgetData?: FileListCardXNodeXWidgetData;
+    shouldShowMetadataLanguageSelect?: boolean;
+    visibleMetadataFields?: readonly FileMetadataField[];
 }>();
 
 const emit = defineEmits<{
@@ -209,7 +217,10 @@ function openFileChooser(): void {
 
             <FileList
                 :files="pendingFiles as unknown as FileReference[]"
-                :metadata-language="requestLanguage"
+                :languages="languageStore.languages"
+                :default-metadata-language="requestLanguage"
+                :should-show-language-select="shouldShowMetadataLanguageSelect"
+                :visible-metadata-fields="visibleMetadataFields"
                 :is-alt-text-required="isAltTextRequired"
                 @remove="
                     (_fileReference, fileIndex) =>
@@ -220,7 +231,10 @@ function openFileChooser(): void {
 
             <FileList
                 :files="savedFiles"
-                :metadata-language="requestLanguage"
+                :languages="languageStore.languages"
+                :default-metadata-language="requestLanguage"
+                :should-show-language-select="shouldShowMetadataLanguageSelect"
+                :visible-metadata-fields="visibleMetadataFields"
                 :is-alt-text-required="isAltTextRequired"
                 @remove="
                     (_fileReference, fileIndex) => onRemoveSavedFile(fileIndex)
