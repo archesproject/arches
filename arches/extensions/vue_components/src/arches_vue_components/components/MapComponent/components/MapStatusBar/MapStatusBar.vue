@@ -139,7 +139,11 @@ function handleMouseOut(): void {
     gap: 1.1rem;
     block-size: var(--map-component-status-bar-height);
     padding-inline: 1.1rem;
-    background: var(--p-content-background);
+    background: color-mix(
+        in srgb,
+        var(--p-content-background) 85%,
+        transparent
+    );
     border-block-start: 0.1rem solid var(--p-content-border-color);
     color: var(--p-text-muted-color);
     font-size: 1.15rem;

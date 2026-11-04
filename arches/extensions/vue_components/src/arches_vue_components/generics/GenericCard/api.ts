@@ -87,7 +87,7 @@ export async function upsertTileAsJson(
         });
     } else if (resourceInstanceId) {
         endpointUrl = generateArchesURL(
-            "arches_querysets:api-tile-list-create",
+            "arches_vue_components:api-tile-list-create",
             {
                 graph: graphSlug,
                 nodegroup_alias: nodegroupAlias,
@@ -96,7 +96,7 @@ export async function upsertTileAsJson(
         );
     } else {
         endpointUrl = generateArchesURL(
-            "arches_querysets:api-tile-new-resource",
+            "arches_vue_components:api-tile-new-resource",
             {
                 graph: graphSlug,
                 nodegroup_alias: nodegroupAlias,
@@ -141,7 +141,7 @@ export async function upsertTileWithFiles(
         });
     } else if (resourceInstanceId) {
         endpointUrl = generateArchesURL(
-            "arches_querysets:api-tile-list-create",
+            "arches_vue_components:api-tile-list-create",
             {
                 graph: graphSlug,
                 nodegroup_alias: nodegroupAlias,
@@ -150,7 +150,7 @@ export async function upsertTileWithFiles(
         );
     } else {
         endpointUrl = generateArchesURL(
-            "arches_querysets:api-tile-new-resource",
+            "arches_vue_components:api-tile-new-resource",
             {
                 graph: graphSlug,
                 nodegroup_alias: nodegroupAlias,

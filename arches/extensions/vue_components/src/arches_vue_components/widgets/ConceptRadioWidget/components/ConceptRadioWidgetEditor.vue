@@ -45,6 +45,8 @@ const flexDirection =
         ? "flex-column"
         : "flex-row";
 
+const conceptTreeStore = useConceptTreeStore();
+
 const options = ref<CollectionItem[]>([]);
 const isLoading = ref(false);
 const optionsLoaded = ref(false);
@@ -98,7 +100,7 @@ async function getOptions() {
 
         isLoading.value = true;
         const fetchedData: ConceptFetchResult =
-            await useConceptTreeStore().fetchTree(graphSlug, nodeAlias);
+            await conceptTreeStore.fetchTree(graphSlug, nodeAlias);
 
         options.value = flattenCollectionItems(fetchedData.results);
         optionsTotalCount.value = options.value.length;

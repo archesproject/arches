@@ -168,7 +168,7 @@ function closeCoordinateEditor(): void {
 
 .map-tools-scroll-section {
     flex: 1;
-    min-height: 0;
+    min-height: 12rem;
     overflow-y: auto;
     border-block-end: none;
 }

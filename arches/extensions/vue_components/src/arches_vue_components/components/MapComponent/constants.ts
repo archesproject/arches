@@ -1,4 +1,5 @@
 import type { InjectionKey, ShallowRef } from "vue";
+import type { FeatureCollection } from "geojson";
 
 import type {
     DrawMode,
@@ -22,7 +23,13 @@ export const DRAW_POINT = "draw_point";
 export const DRAW_POLYGON = "draw_polygon";
 export const DRAW_SELECTION_CHANGE_EVENT = "draw.selectionchange";
 export const DRAW_UPDATE_EVENT = "draw.update";
+export const EMPTY_FEATURE_COLLECTION: FeatureCollection = {
+    type: "FeatureCollection",
+    features: [],
+};
 export const FEET = "feet";
+export const FIT_TO_FEATURES_MAX_ZOOM = 17;
+export const FIT_TO_FEATURES_PADDING = 80;
 export const GEOMETRY_TYPE_LINESTRING = "LineString";
 export const GEOMETRY_TYPE_POINT = "Point";
 export const GEOMETRY_TYPE_POLYGON = "Polygon";
@@ -33,6 +40,7 @@ export const MILES = "miles";
 export const POINT = "point";
 export const POLYGON = "polygon";
 export const SIMPLE_SELECT = "simple_select";
+export const STATIC = "static";
 export const STYLE_LOAD_EVENT = "style.load";
 export const YARDS = "yards";
 export const BUFFER_INPUT_DEBOUNCE_MILLISECONDS = 300;

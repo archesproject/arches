@@ -15,6 +15,7 @@ from arches.extensions.vue_components.views.api.relatable_resources import (
 )
 from arches.extensions.vue_components.views.api.card_x_node_x_widget import (
     CardXNodeXWidgetView,
+    CardXNodeXWidgetListFromGraphView,
     CardXNodeXWidgetListFromNodegroupView,
 )
 from arches.extensions.vue_components.views.api.concept import ConceptsTreeView
@@ -57,6 +58,11 @@ urlpatterns = [
         "api/card-x-node-x-widget-list-from-nodegroup/<slug:graph_slug>/<slug:nodegroup_alias>",
         CardXNodeXWidgetListFromNodegroupView.as_view(),
         name="api-card-x-node-x-widget-list-from-nodegroup",
+    ),
+    path(
+        "api/card-x-node-x-widget-list-from-graph/<slug:graph_slug>",
+        CardXNodeXWidgetListFromGraphView.as_view(),
+        name="api-card-x-node-x-widget-list-from-graph",
     ),
     path(
         "api/concepts/<slug:graph_slug>/<slug:node_alias>",

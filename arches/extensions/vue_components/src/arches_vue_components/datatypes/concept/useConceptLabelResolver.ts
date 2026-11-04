@@ -11,6 +11,7 @@ export function useConceptLabelResolver(
     graphSlug: string,
     nodeAlias: string,
 ) {
+    const conceptTreeStore = useConceptTreeStore();
     const resolved = ref<CollectionItem | null>(null);
     const loading = ref(false);
     let latestRequestId = 0;
@@ -29,7 +30,7 @@ export function useConceptLabelResolver(
                 loading.value = false;
                 return;
             }
-            const conceptTree = await useConceptTreeStore().fetchTree(
+            const conceptTree = await conceptTreeStore.fetchTree(
                 graphSlug,
                 nodeAlias,
             );

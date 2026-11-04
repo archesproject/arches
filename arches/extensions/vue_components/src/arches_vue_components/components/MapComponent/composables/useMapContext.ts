@@ -5,6 +5,7 @@ import {
     onUnmounted,
     ref,
     shallowRef,
+    toValue,
     watch,
 } from "vue";
 
@@ -26,7 +27,7 @@ import { useOverlayLayers } from "@/arches_vue_components/components/MapComponen
 import { GEOCODER_ATTRIBUTION } from "@/arches_vue_components/components/MapComponent/utils/geocoder-api.ts";
 import { registerCoordinateSystems } from "@/arches_vue_components/components/MapComponent/utils/coordinate-systems.ts";
 
-import type { InjectionKey, Ref } from "vue";
+import type { InjectionKey, MaybeRefOrGetter, Ref } from "vue";
 import type { FeatureCollection } from "geojson";
 import type { Map as MaplibreMap } from "maplibre-gl";
 
@@ -128,7 +129,7 @@ export interface UseMapContextReturn
 
 export function useMapContext(
     props: {
-        value: FeatureCollection | null;
+        value: MaybeRefOrGetter<FeatureCollection | null>;
         zoom?: number;
         pitch?: number;
         bearing?: number;
@@ -142,6 +143,7 @@ export function useMapContext(
             candidateOverlayLayers: MapLayer[],
         ) => MapLayer[];
         maxFeatures?: number;
+        isReadOnly?: boolean;
         settings?: Partial<MapSettings>;
     },
     emit: MapComponentEmit,
@@ -169,11 +171,7 @@ export function useMapContext(
         () => props.allowedGeometryTypes ?? null,
     );
 
-    const drawnFeatureControls = useDrawnFeatures(
-        map,
-        { value: props.value, maxFeatures: props.maxFeatures },
-        emit,
-    );
+    const drawnFeatureControls = useDrawnFeatures(map, props, emit);
     const {
         overlayOpacities,
         overlayLayerIds,
@@ -200,6 +198,16 @@ export function useMapContext(
         emit("update:isLoading", newValue);
     });
 
+    watch(
+        () => toValue(props.value),
+        (featureCollection) => {
+            if (props.isReadOnly && map.value) {
+                drawnFeatureControls.replaceDrawnFeatures(featureCollection);
+                fitToValue();
+            }
+        },
+    );
+
     onMounted(async () => {
         await waitForNonZeroContainerSize(mapContainer.value!);
 
@@ -219,17 +227,7 @@ export function useMapContext(
 
         map.value.once(STYLE_LOAD_EVENT, () => {
             drawnFeatureControls.setupDraw();
-
-            if (defaultBounds) {
-                const [west, south, east, north] = defaultBounds;
-                map.value!.fitBounds(
-                    [
-                        [west, south],
-                        [east, north],
-                    ],
-                    { padding: 20 },
-                );
-            }
+            fitToValue();
 
             emit("ready");
         });
@@ -248,6 +246,31 @@ export function useMapContext(
     onUnmounted(() => {
         map.value?.remove();
     });
+
+    function fitToDefaultBounds(): void {
+        if (!defaultBounds) {
+            return;
+        }
+        const [west, south, east, north] = defaultBounds;
+        map.value!.fitBounds(
+            [
+                [west, south],
+                [east, north],
+            ],
+            { padding: 20, animate: false },
+        );
+    }
+
+    function fitToValue(): void {
+        const featureCollection = toValue(props.value);
+        if (!featureCollection?.features.length) {
+            fitToDefaultBounds();
+            return;
+        }
+        drawnFeatureControls.fitToFeatures(featureCollection.features, {
+            animate: false,
+        });
+    }
 
     async function loadMapData(): Promise<void> {
         isLoading.value = true;

@@ -2,7 +2,7 @@ import logging
 
 from django.test import TestCase
 from django.urls import reverse
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.test import Client
 from unittest.mock import patch, MagicMock
 from arches.app.models.graph import Graph
@@ -15,6 +15,7 @@ class GraphPublicationViewTests(TestCase):
 
         self.client = Client()
         self.user = User.objects.create_user("testuser")
+        self.user.groups.add(Group.objects.get(name="Graph Editor"))
         self.client.force_login(self.user)
         self.graph = Graph.objects.create_graph()
         self.graph.delete_draft_graph()

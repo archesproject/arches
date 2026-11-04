@@ -1,9 +1,12 @@
+import hashlib
 import time
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError, transaction
 from django.test import TestCase
 
-from arches.app.models.models import DValueType
+from arches.app.models.models import DValueType, Language
 from arches.app.search.elasticsearch_dsl_builder import Query
 from arches.app.search.search_engine_factory import SearchEngineInstance
 from arches.extensions.controlled_lists.models import List, ListItem, ListItemValue
@@ -23,6 +26,77 @@ class ListItemTests(TestCase):
 
         item.full_clean(exclude={"list"})
         self.assertIsNotNone(item.uri)
+
+
+class ListItemValueTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        test_list = List(name="Test List")
+        List.objects.bulk_create([test_list])
+        cls.items = [
+            ListItem(list=test_list, sortorder=index, uri=f"http://example.com/{index}")
+            for index in range(2)
+        ]
+        ListItem.objects.bulk_create(cls.items)
+        for language in ("en", "de"):
+            Language.objects.get_or_create(code=language)
+        cls.value_fields = {
+            "list_item": cls.items[0],
+            "valuetype": DValueType.objects.get(valuetype="note"),
+            "language_id": "en",
+        }
+        # Varied text avoids compression hiding PostgreSQL's index-entry limit.
+        cls.long_value = "".join(
+            hashlib.sha256(str(index).encode()).hexdigest() for index in range(512)
+        )
+
+    def test_long_note_is_stored_without_truncation(self):
+        value = ListItemValue(**self.value_fields, value=self.long_value)
+        value.full_clean()
+        ListItemValue.objects.bulk_create([value])
+        value.refresh_from_db()
+        self.assertEqual(value.value, self.long_value)
+
+    def test_duplicate_long_note_is_rejected_by_database(self):
+        ListItemValue.objects.bulk_create(
+            [ListItemValue(**self.value_fields, value=self.long_value)]
+        )
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            ListItemValue.objects.bulk_create(
+                [ListItemValue(**self.value_fields, value=self.long_value)]
+            )
+
+    def test_duplicate_long_note_is_rejected_by_validation(self):
+        ListItemValue.objects.bulk_create(
+            [ListItemValue(**self.value_fields, value=self.long_value)]
+        )
+        duplicate = ListItemValue(**self.value_fields, value=self.long_value)
+        with self.assertRaisesMessage(
+            ValidationError,
+            "The same item value cannot be stored twice in the same language.",
+        ):
+            duplicate.full_clean()
+
+    def test_different_values_items_types_and_languages_remain_allowed(self):
+        ListItemValue.objects.bulk_create(
+            [ListItemValue(**self.value_fields, value=self.long_value)]
+        )
+        alternatives = [
+            {"value": self.long_value + "different"},
+            {"list_item": self.items[1]},
+            {"valuetype": DValueType.objects.get(valuetype="scopeNote")},
+            {"language_id": "de"},
+        ]
+        for alternative in alternatives:
+            with self.subTest(alternative=tuple(alternative)):
+                fields = {
+                    **self.value_fields,
+                    "value": self.long_value,
+                    **alternative,
+                }
+                value = ListItemValue(**fields)
+                value.full_clean()
+                ListItemValue.objects.bulk_create([value])
 
 
 class ListItemGetChildUrisTests(TestCase):

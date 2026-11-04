@@ -51,6 +51,16 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
                     transformed.append(inner_val)
         return transformed
 
+    def validate(self, value, row_number=None, source="", **kwargs):
+        for relation in self.get_nodevalues(value):
+            if isinstance(relation, dict) and "resourceId" not in relation:
+                message = _("The related resource has no resourceId.")
+                title = _("Invalid Resource Instance Datatype")
+                return [
+                    self.create_error_message(value, source, row_number, message, title)
+                ]
+        return super().validate(value, row_number=row_number, source=source, **kwargs)
+
     def get_resource(self, tile):
         try:
             return tile.resourceinstance

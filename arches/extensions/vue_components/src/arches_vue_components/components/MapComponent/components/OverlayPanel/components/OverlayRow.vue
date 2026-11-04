@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, useId } from "vue";
 
 import { useGettext } from "vue3-gettext";
 
 import Button from "openvue/button";
+import Checkbox from "openvue/checkbox";
 import Slider from "openvue/slider";
 
 import OverlaySwatch from "@/arches_vue_components/components/MapComponent/components/OverlaySwatch.vue";
@@ -45,6 +46,7 @@ const { overlays, overlayOpacities, moveOverlay, setOverlayOpacity } =
     useResolvedMapContext(context, "OverlayRow");
 
 const { $gettext } = useGettext();
+const visibilityInputId = useId();
 
 const isOpacityExpanded = ref(false);
 
@@ -121,11 +123,15 @@ function updateOpacity(value: number | number[]): void {
                     @click="moveBy(1)"
                 />
             </div>
-            <Button
-                class="overlay-visibility-toggle"
-                :text="true"
-                :aria-pressed="overlay.addtomap"
-                @click="emit(TOGGLE_VISIBILITY_EVENT)"
+            <Checkbox
+                :input-id="visibilityInputId"
+                :model-value="overlay.addtomap"
+                :binary="true"
+                @update:model-value="emit(TOGGLE_VISIBILITY_EVENT)"
+            />
+            <label
+                class="overlay-details"
+                :for="visibilityInputId"
             >
                 <OverlaySwatch
                     :overlay="overlay"
@@ -137,7 +143,7 @@ function updateOpacity(value: number | number[]): void {
                 >
                     {{ overlay.name }}
                 </span>
-            </Button>
+            </label>
             <Button
                 v-if="isOpacityControlVisible"
                 class="overlay-opacity-button"
@@ -201,10 +207,6 @@ function updateOpacity(value: number | number[]): void {
     background: var(--p-content-hover-background);
 }
 
-.overlay-row-off {
-    background: var(--p-content-hover-background);
-    color: var(--p-text-muted-color);
-}
 
 .overlay-row-drag-target {
     box-shadow: inset 0 0.3rem 0 var(--p-primary-color);
@@ -246,13 +248,16 @@ function updateOpacity(value: number | number[]): void {
     padding: 0;
 }
 
-.overlay-visibility-toggle {
+.overlay-details {
+    display: flex;
+    align-items: center;
     flex: 1;
     justify-content: flex-start;
     gap: 0.65rem;
     min-width: 0;
-    padding: 0;
+    padding: 0.6rem;
     color: inherit;
+    cursor: pointer;
 }
 
 .overlay-label {

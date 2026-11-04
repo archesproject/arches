@@ -147,7 +147,7 @@ function navigateToNextFeature(): void {
             <div class="popup-header">
                 <Skeleton
                     v-if="isFirstLoad"
-                    height="1.6rem"
+                    height="var(--popup-skeleton-height)"
                     width="60%"
                 />
                 <template v-else>
@@ -181,9 +181,9 @@ function navigateToNextFeature(): void {
                 v-if="isFirstLoad"
                 class="popup-body"
             >
-                <Skeleton height="1.6rem" />
+                <Skeleton height="var(--popup-skeleton-height)" />
                 <Skeleton
-                    height="1.6rem"
+                    height="var(--popup-skeleton-height)"
                     width="80%"
                 />
             </div>
@@ -230,6 +230,8 @@ function navigateToNextFeature(): void {
 
 <style scoped>
 .popup {
+    /* Skeleton sets height inline, which the build's rem correction can't reach */
+    --popup-skeleton-height: 1.6rem;
     display: flex;
     flex-direction: column;
     height: 100%;

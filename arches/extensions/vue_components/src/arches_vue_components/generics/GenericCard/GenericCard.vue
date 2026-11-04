@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, useTemplateRef, watchEffect } from "vue";
+import { computed, ref, useTemplateRef, watch, watchEffect } from "vue";
 
 import Message from "openvue/message";
 import Skeleton from "openvue/skeleton";
@@ -8,6 +8,7 @@ import GenericCardEditor from "@/arches_vue_components/generics/GenericCard/comp
 import GenericCardViewer from "@/arches_vue_components/generics/GenericCard/components/GenericCardViewer.vue";
 
 import { fetchTileData } from "@/arches_vue_components/generics/GenericCard/api.ts";
+import { useLanguageStore } from "@/arches_vue_components/stores/useLanguageStore.ts";
 import { useNodegroupWidgetConfigStore } from "@/arches_vue_components/stores/useNodegroupWidgetConfigStore.ts";
 
 import { EDIT, VIEW } from "@/arches_vue_components/widgets/constants.ts";
@@ -25,6 +26,7 @@ const {
     graphSlug,
     resourceInstanceId,
     selectedNodeAlias,
+    shouldShowCardName = true,
     shouldShowFormButtons = true,
     tileData,
     tileId,
@@ -39,6 +41,9 @@ const emit = defineEmits<{
     initialized: [aliasedNodeData: Record<string, AliasedNodeData>];
 }>();
 
+const languageStore = useLanguageStore();
+const nodegroupWidgetConfigStore = useNodegroupWidgetConfigStore();
+
 const isLoading = ref(true);
 const configurationError = ref();
 const cardXNodeXWidgetData = ref<CardXNodeXWidgetData[]>([]);
@@ -46,34 +51,64 @@ const aliasedTileData = ref<AliasedTileData>();
 
 const defaultCardEditor = useTemplateRef("defaultCardEditor");
 
-watchEffect(async () => {
+const shouldFetchTile = computed(() => tileData === undefined);
+
+watch(
+    () => tileData,
+    (newTileData) => {
+        if (newTileData !== undefined) {
+            aliasedTileData.value = newTileData;
+        }
+    },
+    { immediate: true },
+);
+
+watchEffect(async (onCleanup) => {
+    let isStale = false;
+    onCleanup(() => {
+        isStale = true;
+    });
     isLoading.value = true;
 
-    try {
-        const cardXNodeXWidgetDataPromise =
-            useNodegroupWidgetConfigStore().fetchNodegroupWidgetConfigs(
-                graphSlug,
-                nodegroupAlias,
-            );
+    let tileDataPromise: Promise<AliasedTileData | undefined> =
+        Promise.resolve(undefined);
+    if (shouldFetchTile.value) {
+        tileDataPromise = fetchTileData(graphSlug, nodegroupAlias, tileId);
+    }
+    let languagesPromise: Promise<unknown> = Promise.resolve();
+    if (mode === EDIT) {
+        languagesPromise = languageStore
+            .fetchAllLanguages()
+            .catch(() => undefined);
+    }
 
-        if (tileData) {
-            aliasedTileData.value = tileData;
-        } else {
-            aliasedTileData.value = await fetchTileData(
+    try {
+        const [loadedCardXNodeXWidgetData, loadedTileData] = await Promise.all([
+            nodegroupWidgetConfigStore.fetchNodegroupWidgetConfigs(
                 graphSlug,
                 nodegroupAlias,
-                tileId,
-            );
+            ),
+            tileDataPromise,
+            languagesPromise,
+        ]);
+        if (isStale) {
+            return;
+        }
+        if (loadedTileData) {
+            aliasedTileData.value = loadedTileData;
             if (!tileId && resourceInstanceId) {
                 aliasedTileData.value.resourceinstance = resourceInstanceId;
             }
         }
-
-        cardXNodeXWidgetData.value = await cardXNodeXWidgetDataPromise;
+        cardXNodeXWidgetData.value = loadedCardXNodeXWidgetData;
     } catch (error) {
-        configurationError.value = error;
+        if (!isStale) {
+            configurationError.value = error;
+        }
     } finally {
-        isLoading.value = false;
+        if (!isStale) {
+            isLoading.value = false;
+        }
     }
 });
 
@@ -81,6 +116,15 @@ defineExpose({
     save: function () {
         if (defaultCardEditor.value) {
             defaultCardEditor.value.save();
+        }
+    },
+    focusWidgetInputForNodeAlias: async function (
+        nodeAlias: string,
+    ): Promise<void> {
+        if (defaultCardEditor.value) {
+            await defaultCardEditor.value.focusWidgetInputForNodeAlias(
+                nodeAlias,
+            );
         }
     },
 });
@@ -99,9 +143,12 @@ defineExpose({
             {{ configurationError.message }}
         </Message>
         <template v-else>
-            <span class="card-name">{{
-                cardXNodeXWidgetData[0].card.name
-            }}</span>
+            <span
+                v-if="shouldShowCardName"
+                class="card-name"
+            >
+                {{ cardXNodeXWidgetData[0].card.name }}
+            </span>
 
             <GenericCardEditor
                 v-if="mode === EDIT"

@@ -1,12 +1,14 @@
 from types import SimpleNamespace
 from unittest import mock
 from uuid import uuid4
+from django.contrib.auth.models import User
 from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
 from django.core import management
 from django.test.utils import captured_stdout
 
 from arches.app.models.models import Node, Widget
+from arches.extensions.querysets.utils.tests import GraphTestCase
 from arches.extensions.vue_components.models import WidgetMapping
 from arches.extensions.vue_components.utils.widget_synchronizer import (
     WidgetSynchronizer,
@@ -154,6 +156,73 @@ class EnsureAbsoluteTileURLsTests(SimpleTestCase):
         with self.stub_settings("http://localhost:8000/"):
             map_api.MapDataAPI._ensure_absolute_tile_urls(source)
         self.assertEqual(source, {"type": "raster"})
+
+
+class CardXNodeXWidgetPermissionTests(GraphTestCase):
+    def get_with_permissions(
+        self, url_name, url_kwargs, readable_nodegroups, writable_nodegroups=()
+    ):
+        def nodegroups_by_perm(user, perm):
+            if perm == "models.write_nodegroup":
+                return [nodegroup.pk for nodegroup in writable_nodegroups]
+            return [nodegroup.pk for nodegroup in readable_nodegroups]
+
+        def user_has_perm(user, perm, obj=None):
+            return perm == "read_nodegroup" and obj in readable_nodegroups
+
+        with (
+            mock.patch(
+                "arches.extensions.vue_components.views.api.card_x_node_x_widget.get_nodegroups_by_perm",
+                side_effect=nodegroups_by_perm,
+            ),
+            mock.patch.object(
+                User, "has_perm", autospec=True, side_effect=user_has_perm
+            ),
+        ):
+            return self.client.get(
+                reverse(f"arches_vue_components:{url_name}", kwargs=url_kwargs)
+            )
+
+    def test_node_and_nodegroup_widgets_require_read_permission(self):
+        for url_name, url_kwargs in (
+            (
+                "api-card-x-node-x-widget-list-from-nodegroup",
+                {"graph_slug": "datatype_lookups", "nodegroup_alias": "datatypes_n"},
+            ),
+            (
+                "api-card-x-node-x-widget",
+                {
+                    "graph_slug": "datatype_lookups",
+                    "node_alias": "non_localized_string_alias_n",
+                },
+            ),
+        ):
+            for readable_nodegroup, expected_status_code in (
+                (self.nodegroup_1, 403),
+                (self.nodegroup_n, 200),
+            ):
+                with self.subTest(
+                    url_name=url_name, expected_status_code=expected_status_code
+                ):
+                    response = self.get_with_permissions(
+                        url_name, url_kwargs, readable_nodegroups=[readable_nodegroup]
+                    )
+                    self.assertEqual(response.status_code, expected_status_code)
+
+    def test_graph_widgets_cover_readable_nodegroups_and_mark_writable_ones(self):
+        response = self.get_with_permissions(
+            "api-card-x-node-x-widget-list-from-graph",
+            {"graph_slug": "datatype_lookups"},
+            readable_nodegroups=[self.nodegroup_1, self.nodegroup_1_n_child],
+            writable_nodegroups=[self.nodegroup_1_n_child],
+        )
+        nodegroups_by_alias = response.json()
+
+        self.assertEqual(
+            set(nodegroups_by_alias), {"datatypes_1", "datatypes_1_n_child"}
+        )
+        self.assertFalse(nodegroups_by_alias["datatypes_1"]["is_writable"])
+        self.assertTrue(nodegroups_by_alias["datatypes_1_n_child"]["is_writable"])
 
 
 class ClusterResourcesAPITests(ArchesTestCase):

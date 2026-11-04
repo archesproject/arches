@@ -11,7 +11,8 @@ from django.contrib.postgres.fields import RangeOperators
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models, transaction
-from django.db.models import Deferrable, Q
+from django.db.models import Deferrable, F, Q
+from django.db.models.functions import MD5
 from django.utils import translation
 from django.utils.translation import gettext_lazy as _
 
@@ -544,7 +545,11 @@ class ListItemValue(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["list_item", "value", "valuetype", "language"],
+                F("list_item"),
+                # Hash long notes to stay within PostgreSQL's B-tree entry limit.
+                MD5("value"),
+                F("valuetype"),
+                F("language"),
                 name="unique_item_value_valuetype_language",
                 violation_error_message=_(
                     "The same item value cannot be stored twice in the same language."

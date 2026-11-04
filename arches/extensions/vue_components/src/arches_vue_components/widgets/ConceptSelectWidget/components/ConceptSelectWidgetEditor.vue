@@ -40,6 +40,8 @@ const emit = defineEmits<{
     (event: "ready"): void;
 }>();
 
+const conceptTreeStore = useConceptTreeStore();
+
 const options: Ref<CollectionItem[] | null> = ref<CollectionItem[] | null>(
     null,
 );
@@ -102,7 +104,7 @@ async function getOptions() {
         isLoading.value = true;
 
         const fetchedData: ConceptFetchResult =
-            await useConceptTreeStore().fetchTree(graphSlug, nodeAlias);
+            await conceptTreeStore.fetchTree(graphSlug, nodeAlias);
 
         options.value = fetchedData.results as CollectionItem[];
         optionsTotalCount.value = options.value.length;

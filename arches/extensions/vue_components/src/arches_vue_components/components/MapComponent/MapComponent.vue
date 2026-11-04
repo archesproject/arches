@@ -8,6 +8,7 @@ import FeaturePopup from "@/arches_vue_components/components/MapComponent/compon
 import FloatingPanel from "@/arches_vue_components/components/MapComponent/components/FloatingPanel.vue";
 import MapHeader from "@/arches_vue_components/components/MapComponent/components/MapHeader.vue";
 import MapStatusBar from "@/arches_vue_components/components/MapComponent/components/MapStatusBar/MapStatusBar.vue";
+import MapToolsPanel from "@/arches_vue_components/components/MapComponent/components/MapToolsPanel/MapToolsPanel.vue";
 
 import {
     mapContextKey,
@@ -40,6 +41,7 @@ const {
     interactionTools = undefined,
     maxFeatures = undefined,
     featurePopupComponent = undefined,
+    isReadOnly = false,
     settings = undefined,
 } = defineProps<{
     value?: FeatureCollection | null;
@@ -56,10 +58,14 @@ const {
     interactionTools?: MapInteractionTool[];
     maxFeatures?: number;
     featurePopupComponent?: Component;
+    isReadOnly?: boolean;
     settings?: Partial<MapSettings>;
 }>();
 
 const emit = defineEmits<MapComponentEmit>();
+
+// The root renders beside a popup Teleport, so attrs must be bound explicitly.
+defineOptions({ inheritAttrs: false });
 
 const mapShell = useTemplateRef<HTMLDivElement>("mapShell");
 const mapContainer = useTemplateRef<HTMLDivElement>("mapContainer");
@@ -67,7 +73,7 @@ const mapHeader = useTemplateRef<InstanceType<typeof MapHeader>>("mapHeader");
 
 const { context, popupContainer, popupFeatures } = useMapContext(
     {
-        value: value ?? null,
+        value: () => value ?? null,
         zoom,
         pitch,
         bearing,
@@ -79,6 +85,7 @@ const { context, popupContainer, popupFeatures } = useMapContext(
         allowedGeometryTypes,
         resolveOverlayLayers,
         maxFeatures,
+        isReadOnly,
         settings,
     },
     emit,
@@ -104,9 +111,13 @@ defineExpose({
 const resolvedFeaturePopupComponent = computed(
     () => featurePopupComponent ?? FeaturePopup,
 );
-const resolvedInteractionTools = computed(
-    () => interactionTools ?? defaultMapInteractionTools,
-);
+const resolvedInteractionTools = computed(() => {
+    const tools = interactionTools ?? defaultMapInteractionTools;
+    if (!isReadOnly) {
+        return tools;
+    }
+    return tools.filter((tool) => tool.component !== MapToolsPanel);
+});
 const isStatusBarVisible = computed(
     () =>
         context.settings.value.showCursorCoordinates ||
@@ -147,6 +158,7 @@ async function closePanel(): Promise<void> {
     <div
         ref="mapShell"
         class="map-component"
+        v-bind="$attrs"
         @keydown.esc="closePanel"
     >
         <MapHeader
@@ -255,11 +267,20 @@ async function closePanel(): Promise<void> {
     display: flex;
     flex-direction: column;
     width: 100%;
+    height: 100%;
     flex: 1;
-    min-height: 25rem;
+    /* Header plus a feature popup between the panel insets */
+    min-height: var(--map-component-min-height, 37.2rem);
     overflow: hidden;
     background: var(--p-content-background);
     color: var(--p-text-color);
+}
+
+.map-component,
+.map-component :deep(*),
+.map-component :deep(*::before),
+.map-component :deep(*::after) {
+    box-sizing: border-box;
 }
 
 .map-component:fullscreen {
@@ -326,5 +347,21 @@ async function closePanel(): Promise<void> {
 .map-body-with-status-bar
     :deep(.maplibregl-ctrl-bottom-right .maplibregl-ctrl-attrib) {
     margin-block-end: var(--map-component-status-bar-attribution-inset);
+}
+
+.map-body :deep(.maplibregl-ctrl-attrib.maplibregl-compact) {
+    box-sizing: content-box;
+}
+
+.map-body-with-status-bar
+    :deep(
+        .maplibregl-ctrl-bottom-right
+            .maplibregl-compact:not(.maplibregl-compact-show)
+    ) {
+    background-color: transparent;
+}
+
+.map-body :deep(.maplibregl-ctrl-geocoder--input) {
+    font-size: 1.3rem;
 }
 </style>

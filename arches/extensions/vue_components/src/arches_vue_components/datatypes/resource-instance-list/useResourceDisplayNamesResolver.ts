@@ -13,6 +13,7 @@ export function useResourceDisplayNamesResolver(
     graphSlug: string,
     nodeAlias: string,
 ) {
+    const resourceDisplayNameStore = useResourceDisplayNameStore();
     const resolved = ref<ResourceInstanceListOption[]>([]);
     const loading = ref(false);
     let latestRequestId = 0;
@@ -32,12 +33,11 @@ export function useResourceDisplayNamesResolver(
                 return;
             }
 
-            const result =
-                await useResourceDisplayNameStore().fetchDisplayNames(
-                    graphSlug,
-                    nodeAlias,
-                    resourceInstanceIds,
-                );
+            const result = await resourceDisplayNameStore.fetchDisplayNames(
+                graphSlug,
+                nodeAlias,
+                resourceInstanceIds,
+            );
             if (requestId === latestRequestId) {
                 resolved.value = result;
                 loading.value = false;

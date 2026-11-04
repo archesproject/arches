@@ -48,6 +48,7 @@ export interface Card {
     cardid: string;
     nodegroup_id: string;
     nodes: Node[];
+    visible: boolean;
 }
 
 export interface CardXNodeXWidgetData {
@@ -65,6 +66,14 @@ export interface CardXNodeXWidgetData {
         widgetid: string;
         component: string;
     };
+}
+
+export interface NodegroupWidgetConfig {
+    parent_nodegroup_alias: string | null;
+    cardinality: string;
+    is_writable: boolean;
+    card: Card | null;
+    card_x_node_x_widgets: CardXNodeXWidgetData[];
 }
 
 export interface StringCardXNodeXWidgetData extends CardXNodeXWidgetData {

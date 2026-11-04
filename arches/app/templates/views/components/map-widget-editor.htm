@@ -32,7 +32,7 @@
     </div>
     <div class="workbench-card-sidepanel-border"></div>
         <div class="new-provisional-edit-card-container" style="height: 100%">
-            <!-- ko if: !disable() && geoJSONString() !== undefined -->
+            <!-- ko if: !disabled() && geoJSONString() !== undefined -->
             <div class="card">
                 <div class="geojson-editor" data-bind="codemirror: {
                     value: geoJSONString,
@@ -64,7 +64,7 @@
             </div>
             <!-- /ko-->
 
-            <!-- ko ifnot: disable -->
+            <!-- ko ifnot: disabled -->
             {% include 'views/components/coordinate-editor.htm' %}
 
             {% include 'views/components/buffer-editor.htm' %}
@@ -75,7 +75,7 @@
                     <div class="form-group">
                         <div class="col-xs-12">
                             <div class="map-card-feature-list">
-                                <div data-bind="css: {'state-disabled': disable()}">
+                                <div data-bind="css: {'state-disabled': disabled()}">
                                 <div class="add-new-feature">
                                     <select
                                         data-bind="
@@ -158,7 +158,7 @@
                                         <!-- /ko -->
                                     </tbody>
                                 </table>
-                                <div class="map-card-zoom-tool" data-bind="css: {'state-disabled': disable()}">
+                                <div class="map-card-zoom-tool" data-bind="css: {'state-disabled': disabled()}">
                                     <button data-bind="click: function() {
                                         self.editGeoJSON(self.featureLookup[widget.node_id()].features(), widget.node_id());
                                     }">

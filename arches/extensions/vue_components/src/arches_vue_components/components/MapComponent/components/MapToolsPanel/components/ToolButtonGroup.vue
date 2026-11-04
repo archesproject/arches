@@ -20,6 +20,7 @@ const emit = defineEmits<{
             :key="option.value"
             class="tool-button"
             :class="{ 'tool-button-active': option.value === activeValue }"
+            size="small"
             :outlined="true"
             :aria-pressed="option.value === activeValue"
             :title="option.title"

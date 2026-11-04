@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { ref, watchEffect } from "vue";
+import { computed, onMounted, ref, watchEffect } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import InputText from "openvue/inputtext";
+import Message from "openvue/message";
 import Select from "openvue/select";
 import Textarea from "openvue/textarea";
 
 import { MULTILINE_RENDER_CONTEXT } from "@/arches_vue_components/widgets/TextWidget/constants.ts";
-import { fetchLanguages } from "@/arches_vue_components/widgets/api.ts";
 import { buildStringAliasedNodeData } from "@/arches_vue_components/datatypes/string/utils.ts";
+import { useLanguageStore } from "@/arches_vue_components/stores/useLanguageStore.ts";
 
 import type {
     StringCardXNodeXWidgetData,
@@ -40,36 +41,26 @@ const emit = defineEmits<{
 }>();
 
 const { $gettext } = useGettext();
+const languageStore = useLanguageStore();
 
-const languages = ref<Language[]>([]);
-const selectedLanguage = ref<Language>();
+const selectedLanguage = ref<Language | undefined>(resolveInitialLanguage());
 const managedNodeValue = ref<Record<string, LanguageValue>>();
 const singleInputValue = ref<string>();
+const fetchError = ref<string | null>(null);
+
+const languages = computed(() => languageStore.languages);
 
 watchEffect(async () => {
-    const response = (await fetchLanguages()) as {
-        languages: Language[];
-        request_language: string;
-    };
-    languages.value = response.languages;
-
-    const nonEmptyLanguageCodes = Object.entries(initialNodeValue ?? {})
-        .filter(([, language]) => language.value !== "")
-        .map(([code]) => code);
-
-    const targetLanguageCode =
-        nonEmptyLanguageCodes.length === 1
-            ? nonEmptyLanguageCodes[0]
-            : response.request_language;
-
-    selectedLanguage.value =
-        languages.value.find(
-            (lang: Language) => lang.code === targetLanguageCode,
-        ) ??
-        response.languages.find((lang: Language) => lang.isdefault) ??
-        response.languages[0];
-
     if (selectedLanguage.value) {
+        return;
+    }
+    try {
+        await languageStore.fetchAllLanguages();
+        selectedLanguage.value = resolveInitialLanguage();
+    } catch (error) {
+        fetchError.value =
+            error instanceof Error ? error.message : String(error);
+    } finally {
         emit("ready");
     }
 });
@@ -94,6 +85,31 @@ watchEffect(() => {
     }
 });
 
+onMounted(() => {
+    if (selectedLanguage.value) {
+        emit("ready");
+    }
+});
+
+function resolveInitialLanguage(): Language | undefined {
+    const nonEmptyLanguageCodes = Object.entries(initialNodeValue ?? {})
+        .filter(([, language]) => language.value !== "")
+        .map(([code]) => code);
+    let targetLanguageCode = languageStore.requestLanguageCode;
+    if (nonEmptyLanguageCodes.length === 1) {
+        targetLanguageCode = nonEmptyLanguageCodes[0];
+    }
+    return (
+        languageStore.languages.find(
+            (language: Language) => language.code === targetLanguageCode,
+        ) ??
+        languageStore.languages.find(
+            (language: Language) => language.isdefault,
+        ) ??
+        languageStore.languages[0]
+    );
+}
+
 function onUpdateModelValue(updatedValue: string | undefined) {
     if (updatedValue === undefined) {
         updatedValue = "";
@@ -114,7 +130,26 @@ function onUpdateModelValue(updatedValue: string | undefined) {
 </script>
 
 <template>
-    <div class="widget-language-inputs">
+    <Message
+        v-if="fetchError"
+        severity="error"
+        size="small"
+        variant="simple"
+    >
+        <span>
+            {{
+                $gettext(
+                    "Unable to load languages: %{message}",
+                    { message: fetchError },
+                    true,
+                )
+            }}
+        </span>
+    </Message>
+    <div
+        v-else
+        class="widget-language-inputs"
+    >
         <Select
             v-model="selectedLanguage"
             class="language-selector"
