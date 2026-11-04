@@ -532,3 +532,32 @@ class DeviceSignInTests(ArchesTestCase):
             token=token_response.json()["access_token"]
         )
         self.assertEqual(access_token.user.username, "ben")
+
+    @override_settings(OAUTH_DEVICE_CLIENT_ID=device_client_id)
+    def test_device_token_request_rejects_unknown_and_pending_device_codes(self):
+        device_client = Client()
+        authorization = device_client.post(
+            reverse("oauth2:device-authorization"),
+            urlencode({"client_id": self.device_client_id}),
+            content_type=FORM_ENCODED,
+        ).json()
+        self.assertNotIn("scope", authorization)
+
+        def poll(device_code):
+            return device_client.post(
+                reverse("oauth2:token"),
+                urlencode(
+                    {
+                        "grant_type": Application.GRANT_DEVICE_CODE,
+                        "device_code": device_code,
+                        "client_id": self.device_client_id,
+                    }
+                ),
+                content_type=FORM_ENCODED,
+            )
+
+        pending = poll(authorization["device_code"])
+        self.assertEqual(pending.status_code, 400)
+        self.assertEqual(pending.json()["error"], "authorization_pending")
+        self.assertEqual(poll("not-a-device-code").status_code, 404)
+        self.assertFalse(AccessToken.objects.exists())
