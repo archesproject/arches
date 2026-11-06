@@ -371,9 +371,9 @@
                 title="{% trans 'Decrease indent' %}"
                 aria-label="{% trans 'Decrease indent' %}"
                 data-bind="
-                    click: run('outdent'),
-                    css: {disabled: state().outdent.isDisabled},
-                    attr: {'aria-disabled': state().outdent.isDisabled}
+                    click: run('decreaseIndent'),
+                    css: {disabled: state().decreaseIndent.isDisabled},
+                    attr: {'aria-disabled': state().decreaseIndent.isDisabled}
                 "
             >
                 <i class="fa fa-outdent" aria-hidden="true"></i>
