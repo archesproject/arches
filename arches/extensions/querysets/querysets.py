@@ -348,6 +348,8 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
                     continue
                 datatype_instance = DataTypeFactory().get_instance(node.datatype)
                 tile_data = datatype_instance.get_tile_data(tile)
+                if tile_data is None:
+                    tile_data = tile.data if tile.data is not None else {}
                 node_value = tile_data.get(str(node.pk))
                 if node_value is None:
                     # Datatype methods assume tiles always have all keys, but we've
