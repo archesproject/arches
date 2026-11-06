@@ -34,6 +34,7 @@ from arches.extensions.querysets.querysets import (
 )
 from arches.extensions.querysets.utils.models import (
     append_tiles_recursively,
+    cap_depth_to_graph,
     ensure_request,
     pop_arches_model_kwargs,
 )
@@ -199,6 +200,7 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         resource_ids=None,
         as_representation=False,
         nodes=None,
+        depth=None,
         graph_query=None,
     ):
         """Return a chainable QuerySet for a requested graph's instances,
@@ -211,6 +213,7 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
             resource_ids=resource_ids,
             as_representation=as_representation,
             nodes=nodes,
+            depth=depth,
             graph_query=graph_query,
         )
 
@@ -269,13 +272,19 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
                     .exclude(nodegroup=None)
                 )
                 graph_query = [cached_graph]
+                depth = cap_depth_to_graph(
+                    None,
+                    [n for n in cached_graph.node_set.all() if n.nodegroup_id],
+                )
             else:
                 nodes = None
                 graph_query = None
+                depth = None
             from_queryset = self.__class__.get_tiles(
                 self.graph.slug,
                 as_representation=getattr(self, "_as_representation", False),
                 nodes=nodes or None,
+                depth=depth,
                 graph_query=graph_query,
             )
         self._refresh_aliased_data(using, fields, from_queryset)

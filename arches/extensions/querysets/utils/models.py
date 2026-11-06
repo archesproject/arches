@@ -232,6 +232,39 @@ def any_nodegroup_in_hierarchy_is_cardinality_n(nodegroup, graph_nodes):
     return cardinality_n_found
 
 
+# Used only if an ancestor chain can't be resolved from the loaded nodes.
+FALLBACK_DEPTH = 20
+
+
+def cap_depth_to_graph(depth, nodes):
+    """
+    Deepest nodegroup nesting in `nodes`, computed in memory from
+    select_related("nodegroup__parentnodegroup"). An explicit `depth` is an
+    upper bound. If a chain can't be fully resolved, returns `depth`
+    (or FALLBACK_DEPTH if None).
+    """
+    unresolved = FALLBACK_DEPTH if depth is None else depth
+    parent_of = {}
+    for node in nodes:
+        nodegroup = node.nodegroup
+        parent_of[nodegroup.pk] = nodegroup.parentnodegroup_id
+        parent = nodegroup.parentnodegroup
+        if parent is not None:
+            parent_of[parent.pk] = parent.parentnodegroup_id
+
+    max_levels = 0
+    for nodegroup_id in parent_of:
+        levels = 0
+        current = nodegroup_id
+        while parent_of[current] is not None:
+            current = parent_of[current]
+            levels += 1
+            if current not in parent_of:
+                return unresolved
+        max_levels = max(max_levels, levels)
+    return max_levels if depth is None else min(depth, max_levels)
+
+
 def get_recursive_prefetches(lookup_str, *, recursive_part="children", depth):
     """
     Future: see various solutions mentioned here for avoiding

@@ -3,10 +3,8 @@ from unittest import mock
 
 from arches.app.models.models import TileModel
 from arches.extensions.querysets.models import ResourceTileTree, TileTree
-from arches.extensions.querysets.querysets import (
-    TileTreeQuerySet,
-    cap_depth_to_graph,
-)
+from arches.extensions.querysets.querysets import TileTreeQuerySet
+from arches.extensions.querysets.utils.models import cap_depth_to_graph
 from arches.extensions.querysets.utils.tests import GraphTestCase
 
 

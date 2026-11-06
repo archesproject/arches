@@ -16,6 +16,7 @@ from arches.app.models.models import Node
 
 from arches.extensions.querysets.datatypes.datatypes import DataTypeFactory
 from arches.extensions.querysets.utils.models import (
+    cap_depth_to_graph,
     generate_node_alias_expressions,
     get_recursive_prefetches,
 )
@@ -103,39 +104,6 @@ def reprocess_tiles_aliased_data(tiles, as_representation, grouping_node_lookup)
                     grouping_node.alias,
                     None if child_nodegroup.cardinality == "1" else [],
                 )
-
-
-# Used only if an ancestor chain can't be resolved from the loaded nodes.
-FALLBACK_DEPTH = 20
-
-
-def cap_depth_to_graph(depth, nodes):
-    """
-    Deepest nodegroup nesting in `nodes`, computed in memory from
-    select_related("nodegroup__parentnodegroup"). An explicit `depth` is an
-    upper bound. If a chain can't be fully resolved, returns `depth`
-    (or FALLBACK_DEPTH if None).
-    """
-    unresolved = FALLBACK_DEPTH if depth is None else depth
-    parent_of = {}
-    for node in nodes:
-        nodegroup = node.nodegroup
-        parent_of[nodegroup.pk] = nodegroup.parentnodegroup_id
-        parent = nodegroup.parentnodegroup
-        if parent is not None:
-            parent_of[parent.pk] = parent.parentnodegroup_id
-
-    max_levels = 0
-    for nodegroup_id in parent_of:
-        levels = 0
-        current = nodegroup_id
-        while parent_of[current] is not None:
-            current = parent_of[current]
-            levels += 1
-            if current not in parent_of:
-                return unresolved
-        max_levels = max(max_levels, levels)
-    return max_levels if depth is None else min(depth, max_levels)
 
 
 class NodeAliasValuesMixin:
@@ -244,6 +212,11 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
             every sibling node in the nodegroup. Tiles then have no attribute
             for an unlisted node -- pass every node whose value you intend to
             read.
+
+        depth:
+            Maximum levels of child tiles to load. Defaults to None, which
+            works it out from the graph's actual nodegroup nesting; an
+            integer is an upper bound on that.
         """
         from arches.extensions.querysets.models import GraphWithPrefetching
 
