@@ -431,7 +431,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             'jquery-ui': "{% webpack_static 'node_modules/jqueryui/jquery-ui.min' %}",
             'jquery-validate': "{% webpack_static 'node_modules/jquery-validation/dist/jquery.validate.min' %}",
             'underscore': "{% webpack_static 'node_modules/underscore/underscore-min' %}",
-            'chosen': "{% webpack_static 'node_modules/chosen-js/chosen.jquery.min' %}",
             'knockout': "{% webpack_static 'node_modules/knockout/build/output/knockout-latest' %}",
             'bootstrap': "{% webpack_static 'node_modules/bootstrap/dist/js/bootstrap.min' %}",
             'one-app': "{% webpack_static 'plugins/one.app' %}",
@@ -446,9 +445,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             },
             'bootstrap': {
                 deps: ['jquery', 'jquery-ui']
-            },
-            'chosen': {
-                deps: ['jquery'],
             },
             'one-app': {
                 deps: ['jquery'],
@@ -477,7 +473,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             'themepunch-revolution',
             'revolution-slider',
             'slick',
-            'bindings/chosen',
             'bindings/key-events-click',
             'views/components/language-switcher'
         ], function ($, ko) {

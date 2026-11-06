@@ -2,7 +2,7 @@ import ko from 'knockout';
 import _ from 'underscore';
 import BaseManager from 'views/base-manager';
 import data from 'views/graph/graph-base-data';
-import 'bindings/chosen';
+import 'bindings/select2-query';
 
 
 /**

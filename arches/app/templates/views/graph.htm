@@ -45,10 +45,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div class="find-widget" style="display: none;" data-bind="visible: showFind()">
                         <div>
                             <!-- ko if: groupedGraphs -->
-                            <select data-bind="template: { name: 'selectGraphTemplate', data: groupedGraphs }, chosen: {width: '100%'}, value: graphId"></select>
+                            <select data-bind="
+                                attr: {'data-label': {% quoted_trans _('Resource Model/Branch') %}},
+                                template: { name: 'selectGraphTemplate', data: groupedGraphs },
+                                select2Query: {select2Config: {
+                                    value: graphId,
+                                    placeholder: {% quoted_trans _('Find a Resource Model/Branch...') %}
+                                }}"></select>
                             <!-- /ko -->
                             <script type="text/html" id="selectGraphTemplate">
-                                <option disabled selected value>{% trans "Find a Resource Model/Branch..." %}</option>
+                                <option disabled selected value></option>
                                 <!-- ko foreach: groups -->
                                     <optgroup data-bind="attr: { 'label': (name==='Resource Models')?{% quoted_trans _("Resource Models") %}:{% quoted_trans _("Branches") %}}, foreach: items">
                                         <option data-bind="value: graphid, text: name"></option>

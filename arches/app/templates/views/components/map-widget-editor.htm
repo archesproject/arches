@@ -79,19 +79,19 @@
                                 <div class="add-new-feature">
                                     <select
                                         data-bind="
-                                            placeholder: $root.translations.addANewFeature + '...',
+                                            attr: {'data-label': $root.translations.addANewFeature},
                                             value: self.featureLookup[widget.node_id()].selectedTool,
                                             valueAllowUnset: true,
                                             options: widget.drawTools,
                                             optionsText: 'text',
                                             optionsValue: 'value',
                                                 disable: disabled,
-                                            chosen: {
-                                                'width': '100%',
-                                                'disable_search_threshold': 10,
-                                                'allow_single_deselect': true
-                                            },
-                                            attr: {'aria-label': $root.translations.addANewFeature}
+                                            select2Query: {select2Config: {
+                                                value: self.featureLookup[widget.node_id()].selectedTool,
+                                                placeholder: $root.translations.addANewFeature + '...',
+                                                allowClear: true,
+                                                minimumResultsForSearch: 10
+                                            }}
                                         "
                                     ></select>
                                 </div>

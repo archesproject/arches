@@ -62,12 +62,15 @@
                 <select 
                     class="design" 
                     data-bind="
-                        placeholder: $root.translations.selectTabIcon,
-                        value: tab.icon, 
-                        options: $parent.icons(), 
-                        optionsText: 'name', 
-                        optionsValue: 'cssclass', 
-                        chosen: {disable_search_threshold: 10, width: '100%'}
+                        attr: {'data-label': $root.translations.selectTabIcon},
+                        options: $parent.icons(),
+                        optionsText: 'name',
+                        optionsValue: 'cssclass',
+                        select2Query: {select2Config: {
+                            value: tab.icon,
+                            placeholder: $root.translations.selectTabIcon,
+                            minimumResultsForSearch: 10
+                        }}
                     "
                     ></select>
                 <!--/ko-->
@@ -77,12 +80,16 @@
                     class="design" 
                     multiple 
                     data-bind="
-                        placeholder: $root.translations.selectCardsInTab,
-                        selectedOptions: tab.nodegroup_ids, 
-                        options: $parent.topcards, 
-                        optionsText: 'name', 
-                        optionsValue: 'nodegroupid', 
-                        chosen: {disable_search_threshold: 10, width: '100%'}
+                        attr: {'data-label': $root.translations.selectCardsInTab},
+                        options: $parent.topcards,
+                        optionsText: 'name',
+                        optionsValue: 'nodegroupid',
+                        select2Query: {select2Config: {
+                            value: tab.nodegroup_ids,
+                            multiple: true,
+                            placeholder: $root.translations.selectCardsInTab,
+                            minimumResultsForSearch: 10
+                        }}
                     "
                 ></select>
             </div>

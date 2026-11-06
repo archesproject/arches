@@ -7,13 +7,15 @@ import Cookies from 'js-cookie';
 import WorkbenchViewmodel from 'views/components/workbench';
 import iiifPopup from 'templates/views/components/iiif-popup.htm';
 import iiifViewerTemplate from 'templates/views/components/iiif-viewer.htm';
-import selectWooUtils from 'select-woo-src/utils';
-import selectWooArrayAdapter from 'select-woo-src/data/array';
 import 'leaflet-iiif';
 import 'leaflet-fullscreen';
 import 'leaflet-side-by-side';
 import 'bindings/select2-query';
 import 'bindings/leaflet';
+import 'select-woo';
+
+const selectWooUtils = $.fn.select2.amd.require('select2/utils');
+const selectWooArrayAdapter = $.fn.select2.amd.require('select2/data/array');
 
 
 var IIIFViewerViewmodel = function(params) {

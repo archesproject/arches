@@ -27,14 +27,11 @@
             }],
             optionsText: 'text',
             optionsValue: 'value',
-            value: bufferUnits,
-            valueAllowUnset: false,
-            chosen: {
-                'width': '100%',
-                'disable_search_threshold': 10,
-                'allow_single_deselect': false
-            },
-            attr: {'aria-label': $root.translations.selectBufferUnits},
+            select2Query: {select2Config: {
+                value: bufferUnits,
+                minimumResultsForSearch: 10
+            }},
+            attr: {'data-label': $root.translations.selectBufferUnits},
         "></select>
     </div>
     <!-- ko if: allowAddNew -->

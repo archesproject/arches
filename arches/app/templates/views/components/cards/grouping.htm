@@ -406,12 +406,16 @@
         class="resources"
         multiple
         data-bind="
-            placeholder: $root.translations.chooseASiblingCard + '...',
-            selectedOptions: groupedCardIds,
+            attr: {'data-label': $root.translations.chooseASiblingCard},
             options: siblingCards,
             optionsText: 'name',
             optionsValue: 'id',
-            chosen: {multiple: true, disable_search_threshold: 10, width: '100%'}
+            select2Query: {select2Config: {
+                value: groupedCardIds,
+                multiple: true,
+                placeholder: $root.translations.chooseASiblingCard + '...',
+                minimumResultsForSearch: 10
+            }}
         "
     ></select>
 </div>

@@ -10,7 +10,7 @@ import 'views/components/simple-switch';
 import 'bindings/datatable';
 import 'bindings/dropzone';
 import 'bindings/resizable-sidepanel';
-import 'bindings/chosen';
+import 'bindings/select2-query';
 
 
 const viewModel = function(params) {
@@ -43,7 +43,7 @@ const viewModel = function(params) {
     this.loading(true);
     this.previewing = ko.observable();
     this.languages = ko.observable(arches.languages);
-    this.selectedLanguage = ko.observable(this.languages().find(lang => lang.code === arches.activeLanguage));
+    this.selectedLanguage = ko.observable(arches.activeLanguage);
     this.graphs = ko.observable();
     this.selectedGraph = ko.observable();
     this.nodes = ko.observable();
@@ -130,7 +130,7 @@ const viewModel = function(params) {
         if (self.selectedNode()) { self.formData.append('node_id', self.selectedNode()); }
         if (self.selectedNodeName()) { self.formData.append('node_name', self.selectedNodeName()); }
         if (self.selectedGraph()) { self.formData.append('graph_id', self.selectedGraph()); }
-        if (self.selectedLanguage()) { self.formData.append('language_code', self.selectedLanguage().code); }
+        if (self.selectedLanguage()) { self.formData.append('language_code', self.selectedLanguage()); }
         if (self.caseInsensitive()) { self.formData.append('case_insensitive', self.caseInsensitive()); }
         if (self.wholeWord()) { self.formData.append('whole_word', self.wholeWord()); }
         if (self.trim()) { self.formData.append('also_trim', self.trim()); }

@@ -63,6 +63,7 @@ from arches.app.views.transaction import ReverseTransaction
 from arches.app.views.notifications import NotificationView
 from arches.app.views.map import MapLayerManagerView, TileserverProxyView
 from arches.app.views.manifest_manager import ManifestManagerView
+from arches.app.utils.oauth_device_grant import ArchesDeviceAuthorizationView
 from arches.app.views.manifest_manager import IIIFServerProxyView
 from arches.app.views.auth import (
     LoginView,
@@ -738,6 +739,11 @@ urlpatterns = [
         r"^reset/done/$",
         auth_views.PasswordResetCompleteView.as_view(),
         name="password_reset_complete",
+    ),
+    re_path(
+        r"^o/device-authorization/$",
+        ArchesDeviceAuthorizationView.as_view(),
+        name="arches_device_authorization",
     ),
     re_path(r"^o/", include("oauth2_provider.urls", namespace="oauth2")),
     re_path(r"^iiifmanifest$", api.IIIFManifest.as_view(), name="iiifmanifest"),

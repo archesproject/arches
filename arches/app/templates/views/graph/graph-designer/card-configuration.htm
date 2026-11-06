@@ -18,7 +18,16 @@
                 {% trans "Card Type" %}
             </div>
             <div>
-                <select class="resources" data-bind="value: model.component_id, options: $parent.cardComponents, optionsText: 'name', optionsValue: 'componentid', optionsCaption: {% quoted_trans _("Choose a card component...") %}, chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select class="resources" data-bind="
+                    attr: {'data-label': {% quoted_trans _('Card Type') %}},
+                    options: $parent.cardComponents,
+                    optionsText: 'name',
+                    optionsValue: 'componentid',
+                    select2Query: {select2Config: {
+                        value: model.component_id,
+                        placeholder: {% quoted_trans _('Choose a card component...') %},
+                        minimumResultsForSearch: 10
+                    }}"></select>
             </div>
         </div>
 

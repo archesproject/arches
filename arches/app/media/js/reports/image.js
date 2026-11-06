@@ -6,7 +6,7 @@ import ReportViewModel from 'viewmodels/report';
 import imageReportTemplate from 'templates/views/report-templates/image.htm';
 
 import 'bindings/carousel';
-import 'bindings/chosen';
+import 'bindings/select2-query';
 
 export default ko.components.register('image-report', {
     viewModel: function (params) {

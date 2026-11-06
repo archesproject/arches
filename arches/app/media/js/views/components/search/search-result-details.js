@@ -8,7 +8,6 @@ import searchResultDetailsTemplate from 'templates/views/components/search/searc
 import ReportModel from 'models/report';
 import CardViewModel from 'viewmodels/card';
 import 'views/components/resource-report-abstract';
-import 'bindings/chosen';
 
 
 var componentName = 'search-result-details';
