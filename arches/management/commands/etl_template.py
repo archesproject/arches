@@ -118,6 +118,7 @@ def create_workbook(graphid, tiledata=None) -> Workbook:
         first_sheet = True
         metadata = {"nodes": [], "graphid": graphid}
         column_length = 0
+        sheet_titles = {}
         for row in rows:
             details = dict(zip(columns, row))
             tab = "    " * details["depth"]
@@ -129,12 +130,14 @@ def create_workbook(graphid, tiledata=None) -> Workbook:
             metadata["nodes"] += nodes
             if details["depth"] == 0:
                 column_length = 0
+                sheet_name = details["alias"][:29]
                 if first_sheet is True:
                     sheet = wb.active
-                    sheet.title = details["alias"]
+                    sheet.title = sheet_name
                     first_sheet = False
                 else:
-                    sheet = wb.create_sheet(title=details["alias"])
+                    sheet = wb.create_sheet(title=sheet_name)
+                sheet_titles[details["alias"]] = sheet.title
                 row_number = 2
                 sheet[f"A1"] = "resource_id"
                 sheet[f"B1"] = "tileid"
@@ -158,7 +161,7 @@ def create_workbook(graphid, tiledata=None) -> Workbook:
 
         if tiledata is not None:
             for root_nodegroup, tiles in tiledata.items():
-                sheet = wb[root_nodegroup]
+                sheet = wb[sheet_titles[root_nodegroup]]
                 for tile in tiles:
                     row_number = sheet.max_row + 1
                     tab = "    " * tile["depth"]
@@ -190,15 +193,17 @@ def create_tile_excel_workbook(graphid, tiledata=None):
         )
         rows = dictfetchall(cursor)
         first_sheet = True
+        sheet_titles = {}
         for row in rows:
             card_name = str(Card.objects.get(nodegroup=row["nodegroupid"]).name)
-            sheet_name = card_name.replace("/", "_")
+            sheet_name = card_name.replace("/", "_")[:29]
             if first_sheet is True:
                 sheet = wb.active
                 sheet.title = sheet_name
                 first_sheet = False
             else:
                 sheet = wb.create_sheet(title=sheet_name)
+            sheet_titles.setdefault(card_name, sheet.title)
             sheet[f"A1"] = "tileid"
             sheet[f"B1"] = "parenttile_id"
             sheet[f"C1"] = "resourceinstance_id"
@@ -215,8 +220,7 @@ def create_tile_excel_workbook(graphid, tiledata=None):
 
         if tiledata is not None:
             for card_name, tiles in tiledata.items():
-                sheet_name = card_name.replace("/", "_")
-                sheet = wb[sheet_name]
+                sheet = wb[sheet_titles[card_name]]
                 for tile in tiles:
                     row_number = sheet.max_row + 1
                     sheet[f"A{row_number}"] = str(tile["tileid"])
