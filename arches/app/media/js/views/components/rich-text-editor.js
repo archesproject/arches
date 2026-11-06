@@ -95,6 +95,7 @@ export default ko.components.register('views/components/rich-text-editor', {
                     .command(({ tr }) => tr.setMeta('addToHistory', false))
                     .setContent(value || '', { emitUpdate: false })
                     .run();
+                this.isSourceMode(false);
             }
         })];
         if (ko.isObservable(params.disabled)) {
