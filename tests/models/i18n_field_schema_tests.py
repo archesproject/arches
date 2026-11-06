@@ -42,6 +42,12 @@ class I18nFieldAddFieldTests(TestCase):
         self.assertEqual(len(rows), 1)
         self.assertIsInstance(json.loads(rows[0][0]), dict)
 
+    def test_add_non_null_i18n_textfield_writes_default(self):
+        rows = self._add(I18n_TextField(blank=True, null=False))
+        stored = json.loads(rows[0][0])
+        self.assertEqual(len(stored), 1)
+        self.assertEqual(list(stored.values()), [""])
+
     def test_add_i18n_jsonfield_with_default(self):
         rows = self._add(I18n_JSONField(default=dict, null=True))
         self.assertEqual(json.loads(rows[0][0]), {})
