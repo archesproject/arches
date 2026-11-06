@@ -38,8 +38,7 @@ const toolbarItems = {
     removeFormat: { command: chain => chain.unsetAllMarks().clearNodes() },
     orderedList: { command: chain => chain.toggleOrderedList(), isActive: editor => editor.isActive('orderedList') },
     bulletList: { command: chain => chain.toggleBulletList(), isActive: editor => editor.isActive('bulletList') },
-    // indent and outdent only work on list items
-    outdent: { command: chain => chain.liftListItem('listItem'), isDisabled: editor => !editor.can().liftListItem('listItem') },
+    decreaseIndent: { command: chain => chain.liftListItem('listItem'), isDisabled: editor => !editor.can().liftListItem('listItem') },
     indent: { command: chain => chain.sinkListItem('listItem'), isDisabled: editor => !editor.can().sinkListItem('listItem') },
     blockquote: { command: chain => chain.toggleBlockquote(), isActive: editor => editor.isActive('blockquote') },
     paragraph: { command: chain => chain.setParagraph(), isActive: editor => editor.isActive('paragraph') },
