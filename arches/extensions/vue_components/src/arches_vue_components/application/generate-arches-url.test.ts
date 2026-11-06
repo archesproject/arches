@@ -192,6 +192,26 @@ describe("generateArchesURL", () => {
         expect(result).toBe("/en/admin/example/123");
     });
 
+    it("repeats a query parameter once for each value in an array", () => {
+        const result = generateArchesURL(
+            "example_url",
+            { id: "123" },
+            { ids: ["a", "b"], limit: 10 },
+            "en",
+        );
+        expect(result).toBe("/en/admin/example/123?ids=a&ids=b&limit=10");
+    });
+
+    it("does not append a query string when every array is empty", () => {
+        const result = generateArchesURL(
+            "example_url",
+            { id: "123" },
+            { ids: [] },
+            "en",
+        );
+        expect(result).toBe("/en/admin/example/123");
+    });
+
     it("does not append a query string when queryParameters is an empty object", () => {
         const result = generateArchesURL(
             "example_url",
