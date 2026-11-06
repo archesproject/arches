@@ -1,12 +1,12 @@
 import json
 
 from django.db import connection
-from django.test import TransactionTestCase
+from django.test import TestCase
 
 from arches.app.models.fields.i18n import I18n_JSONField, I18n_TextField
 
 
-class I18nFieldAddFieldTests(TransactionTestCase):
+class I18nFieldAddFieldTests(TestCase):
     """AddField must work on an existing table; the schema editor binds the default."""
 
     table = "i18n_addfield_test"
