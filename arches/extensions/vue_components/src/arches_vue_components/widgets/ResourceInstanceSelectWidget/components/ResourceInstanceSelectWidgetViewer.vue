@@ -11,13 +11,14 @@ defineProps<{
 <template>
     <div :key="aliasedNodeData?.node_value?.[0]?.resourceId ?? undefined">
         <a
+            v-if="aliasedNodeData?.display_value"
+            class="resource-instance-link"
             :href="
                 generateArchesURL('arches:resource_editor', {
                     resourceid:
                         aliasedNodeData?.node_value?.[0]?.resourceId ?? '',
                 })
             "
-            class="resource-instance-link"
         >
             {{ aliasedNodeData?.display_value }}
         </a>

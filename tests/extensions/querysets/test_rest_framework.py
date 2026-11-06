@@ -269,6 +269,32 @@ class RestFrameworkTests(GraphTestCase):
             },
         )
 
+    def test_patch_tile_keeps_omitted_nodes(self):
+        tile = self.resource_42.aliased_data.datatypes_1
+        self.client.login(username="dev", password="dev")
+        response = self.client.patch(
+            reverse(
+                "arches_querysets:api-tile",
+                kwargs={
+                    "graph": "datatype_lookups",
+                    "nodegroup_alias": "datatypes_1",
+                    "pk": tile.pk,
+                },
+            ),
+            {
+                "aliased_data": {"string_alias": "update_value"},
+                "resourceinstance": str(self.resource_42.pk),
+            },
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.OK, response.json())
+        stored_data = TileModel.objects.get(pk=tile.pk).data
+        self.assertEqual(stored_data[str(self.number_node_1.pk)], 42)
+        self.assertEqual(
+            stored_data[str(self.non_localized_string_node_1.pk)], "forty-two"
+        )
+
     def test_update_tile_with_child(self):
         """PATCH a cardinality-n parent tile + child simultaneously; child value must be
         fresh in the response (regression test for stale child aliased_data after save).

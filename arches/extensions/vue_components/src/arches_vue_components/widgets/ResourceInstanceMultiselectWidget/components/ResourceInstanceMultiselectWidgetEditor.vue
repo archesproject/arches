@@ -20,6 +20,7 @@ import type {
     ResourceInstanceDataItem,
     ResourceInstanceListOption,
     ResourceInstanceListCardXNodeXWidgetData,
+    ResourceInstanceReference,
 } from "@/arches_vue_components/datatypes/resource-instance-list/types.ts";
 import type { AliasedTileData } from "@/arches_vue_components/types.ts";
 import type { ResourceInstanceListAliasedNodeData } from "@/arches_vue_components/datatypes/resource-instance-list/types.ts";
@@ -59,6 +60,7 @@ const emptyFilterMessage = ref($gettext("Search returned no results"));
 const selectedGraphId = ref<string>("");
 const showResourceCreation = ref(false);
 const resourceCreationDialogKey = ref(0);
+const unavailableValues = ref<string[]>([]);
 
 const selectedValues = ref<string[]>(
     aliasedNodeData?.node_value
@@ -96,12 +98,13 @@ async function getOptions(page: number, filterTerm?: string) {
         isLoading.value = true;
         emptyFilterMessage.value = $gettext("Searching...");
 
+        const requestedValues = [...selectedValues.value];
         const resourceData = await fetchRelatableResources(
             graphSlug,
             nodeAlias,
             page,
             filterTerm,
-            selectedValues.value,
+            requestedValues,
         );
 
         const references = resourceData.data.map(
@@ -115,6 +118,12 @@ async function getOptions(page: number, filterTerm?: string) {
 
         if (resourceData.current_page == 1) {
             options.value = references;
+            unavailableValues.value = requestedValues.filter((requestedId) =>
+                references.every(
+                    (reference: ResourceInstanceListOption) =>
+                        reference.resource_id !== requestedId,
+                ),
+            );
         } else {
             options.value = [...options.value, ...references];
         }
@@ -167,6 +176,17 @@ function getOption(value: string): ResourceInstanceListOption | undefined {
     return options.value.find((option) => option.resource_id == value);
 }
 
+function isUnavailable(value: string): boolean {
+    return unavailableValues.value.includes(value);
+}
+
+function getChipLabel(value: string): string {
+    if (isUnavailable(value)) {
+        return $gettext("Unavailable resource");
+    }
+    return getOption(value)?.display_value ?? "";
+}
+
 const onFilter = debounce(function onFilterDebounced(
     event: MultiSelectFilterEvent,
 ) {
@@ -180,13 +200,39 @@ function onCreateNewResource(graphId: string) {
 }
 
 function onUpdateModelValue(updatedValue: string[]) {
-    selectedValues.value = updatedValue;
-    const nodeValues = updatedValue.map((selectedId) => ({
+    const mergedValue = [...updatedValue];
+    selectedValues.value.forEach((selectedId, index) => {
+        if (isUnavailable(selectedId) && !updatedValue.includes(selectedId)) {
+            mergedValue.splice(index, 0, selectedId);
+        }
+    });
+    setSelectedValues(mergedValue);
+}
+
+function removeSelectedValue(removedId: string) {
+    setSelectedValues(
+        selectedValues.value.filter((selectedId) => selectedId !== removedId),
+    );
+}
+
+function buildResourceReference(selectedId: string): ResourceInstanceReference {
+    const existingReference = aliasedNodeData?.node_value?.find(
+        (resourceReference) => resourceReference.resourceId === selectedId,
+    );
+    if (existingReference) {
+        return existingReference;
+    }
+    return {
         inverseRelationship: "",
         relationship: "",
         resourceId: selectedId,
         resourceXresourceId: "",
-    }));
+    };
+}
+
+function setSelectedValues(updatedValue: string[]) {
+    selectedValues.value = updatedValue;
+    const nodeValues = updatedValue.map(buildResourceReference);
     const resolvedOptions = updatedValue
         .map((selectedId) =>
             options.value.find((option) => option.resource_id === selectedId),
@@ -264,45 +310,45 @@ async function onResourceCreated(createdTile: AliasedTileData) {
         <template #chip="slotProps">
             <div style="width: 100%">
                 <div class="chip-text">
-                    {{ getOption(slotProps.value)?.display_value }}
+                    {{ getChipLabel(slotProps.value) }}
                 </div>
             </div>
             <div class="button-container">
-                <Button
-                    as="a"
-                    icon="pi pi-info-circle"
-                    target="_blank"
-                    variant="text"
-                    size="small"
-                    class="no-text-decoration"
-                    :href="
-                        generateArchesURL('arches:resource_report', {
-                            resourceid: slotProps.value,
-                        })
-                    "
-                    @click.stop
-                />
-                <Button
-                    as="a"
-                    icon="pi pi-pencil"
-                    target="_blank"
-                    variant="text"
-                    size="small"
-                    class="no-text-decoration"
-                    :href="
-                        generateArchesURL('arches:resource_editor', {
-                            resourceid: slotProps.value,
-                        })
-                    "
-                    @click.stop
-                />
+                <template v-if="!isUnavailable(slotProps.value)">
+                    <Button
+                        as="a"
+                        icon="pi pi-info-circle"
+                        target="_blank"
+                        variant="text"
+                        size="small"
+                        class="no-text-decoration"
+                        :href="
+                            generateArchesURL('arches:resource_report', {
+                                resourceid: slotProps.value,
+                            })
+                        "
+                        @click.stop
+                    />
+                    <Button
+                        as="a"
+                        icon="pi pi-pencil"
+                        target="_blank"
+                        variant="text"
+                        size="small"
+                        class="no-text-decoration"
+                        :href="
+                            generateArchesURL('arches:resource_editor', {
+                                resourceid: slotProps.value,
+                            })
+                        "
+                        @click.stop
+                    />
+                </template>
                 <Button
                     icon="pi pi-times"
                     variant="text"
                     size="small"
-                    @click.stop="
-                        slotProps.removeCallback($event, slotProps.value)
-                    "
+                    @click.stop="removeSelectedValue(slotProps.value)"
                 />
             </div>
         </template>

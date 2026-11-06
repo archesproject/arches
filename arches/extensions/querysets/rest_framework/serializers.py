@@ -18,6 +18,7 @@ arches_version = Version(_arches_version_str)
 from arches.app.models.fields.i18n import I18n_JSON, I18n_String
 from arches.app.models.models import GraphModel, Node, NodeGroup
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.utils.permission_backend import user_is_resource_reviewer
 
 from arches.extensions.querysets.datatypes.datatypes import DataTypeFactory
 from arches.extensions.querysets.models import AliasedData, ResourceTileTree, TileTree
@@ -113,9 +114,11 @@ def _fill_blank_cardinality_n_lists(serializer, data):
     return data
 
 
-def _handle_nested_aliased_data(data, *, fields_map) -> AliasedData:
+def _handle_nested_aliased_data(data, *, fields_map, partial) -> AliasedData:
     all_data = AliasedData(**data)
     for field_name, serializer in fields_map.items():
+        if partial and field_name not in data:
+            continue
         field_data = getattr(all_data, field_name, None)
         if isinstance(serializer, ArchesTileSerializer) or (
             isinstance(serializer, serializers.ListSerializer)
@@ -301,7 +304,9 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
     def to_internal_value(self, data):
         """Make nested aliased data writable."""
         self.initial_data = data
-        return _handle_nested_aliased_data(data, fields_map=self.fields)
+        return _handle_nested_aliased_data(
+            data, fields_map=self.fields, partial=self.root.partial
+        )
 
     def validate(self, attrs):
         aliased_data = attrs  # thanks to to_internal_value().
@@ -530,7 +535,9 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
     def to_internal_value(self, data):
         """Make nested aliased data writable."""
         self.initial_data = data
-        return _handle_nested_aliased_data(data, fields_map=self.fields)
+        return _handle_nested_aliased_data(
+            data, fields_map=self.fields, partial=self.root.partial
+        )
 
     def validate(self, attrs):
         aliased_data = attrs  # thanks to to_internal_value().
@@ -633,7 +640,21 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             if data._state.adding:
                 ret["tileid"] = None
                 ret["parenttile"] = None
+        if ret.get("provisionaledits"):
+            ret["provisionaledits"] = self.get_visible_provisional_edits(
+                ret["provisionaledits"]
+            )
         return ret
+
+    def get_visible_provisional_edits(self, provisional_edits):
+        user = self.context["request"].user
+        if "user_is_resource_reviewer" not in self.context:
+            self.context["user_is_resource_reviewer"] = user_is_resource_reviewer(user)
+        if self.context["user_is_resource_reviewer"]:
+            return provisional_edits
+        if str(user.id) in provisional_edits:
+            return {str(user.id): provisional_edits[str(user.id)]}
+        return None
 
     def to_internal_value(self, data):
         ret = super().to_internal_value(data)

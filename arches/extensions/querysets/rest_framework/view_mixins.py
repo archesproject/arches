@@ -22,6 +22,9 @@ from arches.app.utils.permission_backend import (
 from arches.app.utils.string_utils import str_to_bool
 
 from arches.extensions.querysets.models import TileTree
+from arches.extensions.querysets.rest_framework.utils import (
+    redact_unreadable_related_resources,
+)
 from arches.extensions.querysets.utils.models import ensure_request
 
 
@@ -136,6 +139,15 @@ class ArchesModelAPIMixin:
                 "cardxnodexwidget_set",
             )
         )
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        redact_unreadable_related_resources(
+            response.data,
+            user=request.user,
+            graph_nodes=self.graph_nodes
+            or self._find_graph_nodes().prefetch_related(None),
+        )
+        return super().finalize_response(request, response, *args, **kwargs)
 
     def get_object(self, permission_callable=None, fill_blanks=False):
         ret = super().get_object()
@@ -281,6 +293,11 @@ class ArchesModelAPIMixin:
             raise ValidationError(errors) from django_error
 
     def perform_create(self, serializer):
+        resource = serializer.validated_data.get("resourceinstance")
+        if resource is not None and not user_can_edit_resource(
+            user=self.request.user, resource=resource
+        ):
+            raise PermissionDenied
         self.validate_tile_data_and_save(serializer)
 
     def perform_update(self, serializer):

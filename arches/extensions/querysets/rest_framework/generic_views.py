@@ -37,6 +37,7 @@ from arches.extensions.querysets.rest_framework.serializers import (
     ArchesTileSerializer,
 )
 from arches.extensions.querysets.rest_framework.view_mixins import ArchesModelAPIMixin
+from arches.extensions.querysets.utils.permissions import filter_readable_resources
 
 
 @contextmanager
@@ -62,6 +63,9 @@ class ArchesResourceListCreateView(ArchesModelAPIMixin, ListCreateAPIView):
     serializer_class = ArchesResourceSerializer
     parser_classes = [JSONParser, MultiPartJSONParser]
     pagination_class = ArchesLimitOffsetPagination
+
+    def get_queryset(self):
+        return filter_readable_resources(self.request.user, super().get_queryset())
 
 
 class ArchesResourceDetailView(ArchesModelAPIMixin, RetrieveUpdateDestroyAPIView):
@@ -123,6 +127,14 @@ class ArchesTileListCreateView(ArchesModelAPIMixin, ListCreateAPIView):
     serializer_class = ArchesTileSerializer
     parser_classes = [JSONParser, MultiPartJSONParser]
     pagination_class = ArchesLimitOffsetPagination
+
+    def get_queryset(self):
+        return filter_readable_resources(
+            self.request.user,
+            super().get_queryset(),
+            resourceinstance_field="resourceinstance_id",
+            graph_field="resourceinstance__graph_id",
+        )
 
 
 class ArchesTileDetailView(ArchesModelAPIMixin, RetrieveUpdateDestroyAPIView):
