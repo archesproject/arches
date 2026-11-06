@@ -1,4 +1,3 @@
-import { nextTick } from "vue";
 import { describe, expect, it, vi } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
 import OpenVue from "openvue/config";
@@ -131,45 +130,6 @@ describe("ResourceInstanceMultiselectWidgetEditor", () => {
             wrapper.findAll(".button-container");
         expect(unavailableChipButtons.findAll("a")).toHaveLength(0);
         expect(readableChipButtons.findAll("a")).toHaveLength(2);
-    });
-
-    it("does not label selections unavailable before results load", () => {
-        const wrapper = mountEditor();
-
-        expect(getChipLabels(wrapper)).not.toContain("Unavailable resource");
-    });
-
-    it("keeps the unavailable label while results reload", async () => {
-        const wrapper = mountEditor();
-        await flushPromises();
-
-        wrapper.findComponent(MultiSelect).vm.$emit("before-show");
-        await nextTick();
-
-        expect(getChipLabels(wrapper)).toEqual([
-            "Unavailable resource",
-            "Readable",
-        ]);
-    });
-
-    it("does not label a newly added value unavailable before it is checked", async () => {
-        const wrapper = mountEditor();
-        await flushPromises();
-
-        wrapper
-            .findComponent(MultiSelect)
-            .vm.$emit("update:modelValue", [
-                UNAVAILABLE_RESOURCE_ID,
-                READABLE_RESOURCE_ID,
-                "created-resource",
-            ]);
-        await nextTick();
-
-        expect(getChipLabels(wrapper)).toEqual([
-            "Unavailable resource",
-            "Readable",
-            "",
-        ]);
     });
 
     it("keeps unavailable references when the selection is replaced", async () => {

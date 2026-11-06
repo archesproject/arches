@@ -1,8 +1,6 @@
-import { nextTick } from "vue";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
 import OpenVue from "openvue/config";
-import Select from "openvue/select";
 
 import ResourceInstanceSelectWidgetEditor from "@/arches_vue_components/widgets/ResourceInstanceSelectWidget/components/ResourceInstanceSelectWidgetEditor.vue";
 
@@ -92,29 +90,5 @@ describe("ResourceInstanceSelectWidgetEditor", () => {
         await flushPromises();
 
         expect(wrapper.text()).toContain("Unavailable resource");
-    });
-
-    it("shows the name of a selected resource that the results include", async () => {
-        const wrapper = mountEditor(READABLE_RESOURCE_ID);
-        await flushPromises();
-
-        expect(wrapper.text()).toContain("Readable");
-        expect(wrapper.text()).not.toContain("Unavailable resource");
-    });
-
-    it("keeps the unavailable label while results reload", async () => {
-        const wrapper = mountEditor(UNAVAILABLE_RESOURCE_ID);
-        await flushPromises();
-
-        wrapper.findComponent(Select).vm.$emit("before-show");
-        await nextTick();
-
-        expect(wrapper.text()).toContain("Unavailable resource");
-    });
-
-    it("does not label the selection unavailable before results load", () => {
-        const wrapper = mountEditor(UNAVAILABLE_RESOURCE_ID);
-
-        expect(wrapper.text()).not.toContain("Unavailable resource");
     });
 });

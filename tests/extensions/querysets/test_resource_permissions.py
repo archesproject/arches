@@ -21,15 +21,22 @@ from arches.app.permissions.arches_default_deny import (
 )
 from arches.app.utils import permission_backend
 
-from arches.extensions.querysets.utils.permissions import (
-    DEFAULT_ALLOW_PERMISSION_FRAMEWORK,
-    filter_readable_resources,
-)
+from arches.extensions.querysets.utils.permissions import filter_readable_resources
 from arches.extensions.querysets.utils.tests import GraphTestCase
 
+DEFAULT_ALLOW_PERMISSION_FRAMEWORK = (
+    "arches_default_allow.ArchesDefaultAllowPermissionFramework"
+)
 DEFAULT_DENY_PERMISSION_FRAMEWORK = (
     "arches_default_deny.ArchesDefaultDenyPermissionFramework"
 )
+SUBCLASSED_DEFAULT_ALLOW_PERMISSION_FRAMEWORK = (
+    "subclassed_default_allow.SubclassedDefaultAllowPermissionFramework"
+)
+
+
+class SubclassedDefaultAllowPermissionFramework(ArchesDefaultAllowPermissionFramework):
+    pass
 
 
 @contextmanager
@@ -175,17 +182,24 @@ class ResourcePermissionTests(GraphTestCase):
             )
             self.assertEqual(single_value["display_value"], "Unreadable Resource")
 
-        with (
-            self.subTest(framework="default allow"),
-            permission_framework(
+        for dotted_path, framework in (
+            (
                 DEFAULT_ALLOW_PERMISSION_FRAMEWORK,
                 ArchesDefaultAllowPermissionFramework(),
             ),
+            (
+                SUBCLASSED_DEFAULT_ALLOW_PERMISSION_FRAMEWORK,
+                SubclassedDefaultAllowPermissionFramework(),
+            ),
         ):
-            single_value, _ = self.get_cardinality_1_values(
-                self.get_resource_response(self.user)
-            )
-            self.assertEqual(single_value["display_value"], "Unreadable Resource")
+            with (
+                self.subTest(framework=dotted_path),
+                permission_framework(dotted_path, framework),
+            ):
+                single_value, _ = self.get_cardinality_1_values(
+                    self.get_resource_response(self.user)
+                )
+                self.assertEqual(single_value["display_value"], "Unreadable Resource")
 
     def test_readable_resources_need_a_readable_nodegroup_in_their_graph(self):
         ArchesDefaultDenyPermissionFramework().assign_perm(

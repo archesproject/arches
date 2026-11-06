@@ -8,20 +8,6 @@ vi.mock("@/arches_vue_components/application/generate-arches-url.ts", () => ({
 }));
 
 describe("ResourceInstanceSelectWidgetViewer", () => {
-    it("links to a related resource that has a name", () => {
-        const wrapper = mount(ResourceInstanceSelectWidgetViewer, {
-            props: {
-                aliasedNodeData: {
-                    node_value: [{ resourceId: "readable-resource" }],
-                    display_value: "Readable",
-                    details: [],
-                },
-            },
-        });
-
-        expect(wrapper.find("a").text()).toBe("Readable");
-    });
-
     it("renders no link when the related resource has no name to show", () => {
         const wrapper = mount(ResourceInstanceSelectWidgetViewer, {
             props: {

@@ -1,18 +1,17 @@
 from django.db.models import Exists, OuterRef
 
 from arches.app.models.models import Node
-from arches.app.models.system_settings import settings
-from arches.app.utils import permission_backend
-
-DEFAULT_ALLOW_PERMISSION_FRAMEWORK = (
-    "arches_default_allow.ArchesDefaultAllowPermissionFramework"
+from arches.app.permissions.arches_default_allow import (
+    ArchesDefaultAllowPermissionFramework,
 )
+from arches.app.utils import permission_backend
 
 
 def resource_read_permissions_apply(user):
-    return (
-        not user.is_superuser
-        and settings.PERMISSION_FRAMEWORK != DEFAULT_ALLOW_PERMISSION_FRAMEWORK
+    # Default allow is deprecated (arches.W003) with no queryset filter (arches.E004).
+    return not user.is_superuser and not isinstance(
+        permission_backend._get_permission_framework(),
+        ArchesDefaultAllowPermissionFramework,
     )
 
 
