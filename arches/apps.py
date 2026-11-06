@@ -26,6 +26,9 @@ class ArchesAppConfig(AppConfig):
 
     def ready(self):
         import arches.app.signals
+        from arches.app.models.fields.i18n import register_i18n_adapters
+
+        register_i18n_adapters()
 
         # Imported here: django-oauth-toolkit's models need the app registry.
         from arches.app.utils.oauth_device_grant import patch_device_grant_expiry
