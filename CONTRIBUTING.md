@@ -58,6 +58,7 @@ If I am working on ticket "Cool New Feature (ticket #1231)" my branch may be nam
     ```shell
    python manage.py test tests --settings="tests.test_settings"
    ```
+   Add `--buffer` to hide output from passing tests, and `--durations N` to list the N slowest tests.
 * Push your branch to GitHub:
     ```shell
    git push origin my-fix-branch
