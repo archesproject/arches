@@ -1,3 +1,4 @@
+from arches.app.models.models import TileModel
 from arches.extensions.querysets.models import TileTree
 from arches.extensions.querysets.utils.tests import GraphTestCase
 
@@ -47,3 +48,20 @@ class InternalsTests(GraphTestCase):
         self.assertTrue(hasattr(tile.aliased_data, self.string_node_1.alias))
         self.assertFalse(hasattr(tile.aliased_data, self.number_node_1.alias))
         self.assertFalse(hasattr(tile.aliased_data, self.boolean_node_1.alias))
+
+    def test_get_tiles_with_empty_tile_data(self):
+        """A tile with no authoritative or provisional data makes the datatype's
+        get_tile_data() return None; nodes should decode to None instead of
+        raising AttributeError."""
+        TileModel.objects.filter(pk=self.cardinality_1_tile.pk).update(
+            data={}, provisionaledits=None
+        )
+        tile = TileTree.get_tiles(
+            graph_slug="datatype_lookups",
+            nodegroup_alias="datatypes_1",
+            resource_ids=[self.resource_42.pk],
+            depth=0,
+        ).get(pk=self.cardinality_1_tile.pk)
+
+        self.assertIsNone(getattr(tile.aliased_data, self.string_node_1.alias))
+        self.assertIsNone(tile.data[str(self.string_node_1.pk)])
