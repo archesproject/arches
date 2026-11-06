@@ -1,6 +1,8 @@
 from types import SimpleNamespace
 from unittest import mock
 
+from django.core.exceptions import FieldError
+
 from arches.app.models.models import TileModel
 from arches.extensions.querysets.models import ResourceTileTree, TileTree
 from arches.extensions.querysets.querysets import TileTreeQuerySet
@@ -119,4 +121,22 @@ class InternalsTests(GraphTestCase):
         ).get()
         self.assertIn(
             self.cardinality_1_child_tile.pk, [c.pk for c in tile._tile_trees]
+        )
+
+    def test_node_aliases_false_omits_alias_expressions(self):
+        alias = self.string_node_1.alias
+        resources = ResourceTileTree.get_tiles("datatype_lookups", node_aliases=False)
+        tiles = TileTree.get_tiles(
+            "datatype_lookups", "datatypes_1", node_aliases=False
+        )
+        for qs in (resources, tiles):
+            self.assertNotIn(alias, qs.query.annotations)
+            with self.assertRaises(FieldError):
+                qs.filter(**{f"{alias}__any_lang_icontains": "forty"})
+
+        # Values are still decoded from tile data.
+        resource = resources.get(pk=self.resource_42.pk)
+        self.assertEqual(
+            resource.aliased_data.datatypes_1.aliased_data.string_alias["en"]["value"],
+            "forty-two",
         )

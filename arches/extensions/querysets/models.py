@@ -202,6 +202,7 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         nodes=None,
         depth=None,
         graph_query=None,
+        node_aliases=True,
     ):
         """Return a chainable QuerySet for a requested graph's instances,
         with tile data keyed by node and nodegroup aliases.
@@ -215,6 +216,7 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
             nodes=nodes,
             depth=depth,
             graph_query=graph_query,
+            node_aliases=node_aliases,
         )
 
     def append_tile(self, nodegroup_alias):
@@ -286,6 +288,7 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
                 nodes=nodes or None,
                 depth=depth,
                 graph_query=graph_query,
+                node_aliases=False,
             )
         self._refresh_aliased_data(using, fields, from_queryset)
 
@@ -650,6 +653,7 @@ class TileTree(TileModel, AliasedDataMixin):
         as_representation=False,
         nodes=None,
         depth=None,
+        node_aliases=True,
     ):
         """See `arches.extensions.querysets.querysets.TileTreeQuerySet.get_tiles`."""
         return cls.objects.get_tiles(
@@ -659,6 +663,7 @@ class TileTree(TileModel, AliasedDataMixin):
             as_representation=as_representation,
             nodes=nodes,
             depth=depth,
+            node_aliases=node_aliases,
         )
 
     def serialize(self, **kwargs):
@@ -990,6 +995,7 @@ class TileTree(TileModel, AliasedDataMixin):
                 self.resourceinstance.graph.slug,
                 nodegroup_alias=self.find_nodegroup_alias(),
                 as_representation=getattr(self, "_as_representation", False),
+                node_aliases=False,
             )
         self._refresh_aliased_data(using, fields, from_queryset)
 
