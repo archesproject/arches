@@ -3,6 +3,13 @@ import type {
     CardXNodeXWidgetData,
 } from "@/arches_vue_components/types.ts";
 import type { LanguageValue } from "@/arches_vue_components/datatypes/string/types.ts";
+import type { FILE_METADATA_FIELDS } from "@/arches_vue_components/datatypes/file-list/constants.ts";
+
+export type FileMetadataField = (typeof FILE_METADATA_FIELDS)[number];
+export type FileMetadata = Record<
+    FileMetadataField,
+    Record<string, LanguageValue>
+>;
 
 export interface FileReference {
     url: string;
