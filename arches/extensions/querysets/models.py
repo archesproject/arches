@@ -288,6 +288,7 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
                 nodes=nodes or None,
                 depth=depth,
                 graph_query=graph_query,
+                node_aliases=False,
             )
         self._refresh_aliased_data(using, fields, from_queryset)
 
@@ -994,6 +995,7 @@ class TileTree(TileModel, AliasedDataMixin):
                 self.resourceinstance.graph.slug,
                 nodegroup_alias=self.find_nodegroup_alias(),
                 as_representation=getattr(self, "_as_representation", False),
+                node_aliases=False,
             )
         self._refresh_aliased_data(using, fields, from_queryset)
 

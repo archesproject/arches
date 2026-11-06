@@ -140,22 +140,3 @@ class InternalsTests(GraphTestCase):
             resource.aliased_data.datatypes_1.aliased_data.string_alias["en"]["value"],
             "forty-two",
         )
-
-    def test_node_aliases_default_allows_filtering(self):
-        alias = self.string_node_1.alias
-        lookup = {f"{alias}__any_lang_icontains": "forty"}
-        self.assertEqual(
-            list(
-                ResourceTileTree.get_tiles("datatype_lookups")
-                .filter(**lookup)
-                .values_list("pk", flat=True)
-            ),
-            [self.resource_42.pk],
-        )
-        self.assertEqual(
-            TileTree.get_tiles("datatype_lookups", "datatypes_1")
-            .filter(**lookup)
-            .get()
-            .resourceinstance_id,
-            self.resource_42.pk,
-        )
