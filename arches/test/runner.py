@@ -1,12 +1,18 @@
 import contextlib
+import gc
 import io
+import re
 import sys
 import warnings
 
-from django.test.runner import DiscoverRunner
+from django.conf import settings as django_settings
+from django.test import runner as django_runner
+from django.test.runner import DiscoverRunner, ParallelTestSuite
 
 from arches.app.models.system_settings import settings
 from arches.app.search.base_index import get_index
+from arches.app.search.search import SearchEngine
+from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.mappings import (
     prepare_terms_index,
     delete_terms_index,
@@ -18,7 +24,70 @@ from arches.app.search.mappings import (
 from arches.app.utils.context_processors import app_settings
 
 
+def _prepare_search_indexes():
+    prepare_terms_index(create=True)
+    prepare_concepts_index(create=True)
+    prepare_search_index(create=True)
+    for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
+        get_index(index["name"]).prepare_index()
+
+
+def _worker_prefix(base_prefix, worker_id):
+    return f"{base_prefix}_w{worker_id}"
+
+
+def _init_parallel_worker(
+    counter,
+    initial_settings=None,
+    serialized_contents=None,
+    process_setup=None,
+    process_setup_args=None,
+    debug_mode=None,
+    used_aliases=None,
+):
+    """Django's worker init, then give the worker its own ES indexes.
+
+    Workers share one Elasticsearch, so each one gets a distinct index prefix
+    (e.g. test_w1) in place of the shared one.
+    """
+    django_runner._init_worker(
+        counter,
+        initial_settings,
+        serialized_contents,
+        process_setup,
+        process_setup_args,
+        debug_mode,
+        used_aliases,
+    )
+    if (used_aliases is not None and not used_aliases) or (
+        not settings.ELASTICSEARCH_ENABLED
+    ):
+        return
+
+    prefix = _worker_prefix(settings.ELASTICSEARCH_PREFIX, django_runner._worker_id)
+    # arches' settings proxy wraps its own copy, separate from django.conf.settings
+    settings.ELASTICSEARCH_PREFIX = prefix
+    django_settings.ELASTICSEARCH_PREFIX = prefix
+    # Engines created at import time (and factory defaults) captured the old prefix.
+    defaults = list(SearchEngineFactory.create.__defaults__)
+    defaults[1] = prefix
+    SearchEngineFactory.create.__defaults__ = tuple(defaults)
+    for obj in gc.get_objects():
+        if isinstance(obj, SearchEngine):
+            obj.prefix = prefix.lower()
+
+    app_settings()
+    with contextlib.redirect_stdout(io.StringIO()):
+        _prepare_search_indexes()
+
+
+class ArchesParallelTestSuite(ParallelTestSuite):
+    init_worker = _init_parallel_worker
+
+
 class ArchesTestRunner(DiscoverRunner):
+    parallel_test_suite = ArchesParallelTestSuite
+
     def __init__(self, *args, **kwargs) -> None:
         kwargs["debug_mode"] = True
         # Unless the user has something other than the Django default, give them
@@ -35,16 +104,27 @@ class ArchesTestRunner(DiscoverRunner):
         with warnings.catch_warnings(record=True) as caught:
             result = super().run_suite(suite, **kwargs)
 
-        unique = {}
+        # Group by message; remember one example location and how many sites.
+        grouped = {}
         for w in caught:
-            key = (w.category.__name__, str(w.message), w.filename, w.lineno)
-            unique.setdefault(key, w)
-        if unique:
-            print(f"\nWarnings ({len(unique)} unique):", file=sys.stderr)
-            for category, message, filename, lineno in unique:
-                first_line = message.strip().splitlines()[0] if message.strip() else ""
+            message = str(w.message).strip()
+            first_line = message.splitlines()[0] if message else ""
+            entry = grouped.setdefault(
+                (w.category.__name__, first_line), {"sites": set(), "example": None}
+            )
+            site = (w.filename, w.lineno)
+            if entry["example"] is None:
+                entry["example"] = site
+            entry["sites"].add(site)
+        if grouped:
+            print(f"\nWarnings ({len(grouped)} unique):", file=sys.stderr)
+            for (category, first_line), entry in grouped.items():
+                filename, lineno = entry["example"]
+                extra = len(entry["sites"]) - 1
+                more = f" (+{extra} more locations)" if extra else ""
                 print(
-                    f"  {filename}:{lineno}: {category}: {first_line}", file=sys.stderr
+                    f"  {category}: {first_line} [{filename}:{lineno}]{more}",
+                    file=sys.stderr,
                 )
         return result
 
@@ -69,11 +149,7 @@ class ArchesTestRunner(DiscoverRunner):
             return ret
 
         with self._quiet_stdout():
-            prepare_terms_index(create=True)
-            prepare_concepts_index(create=True)
-            prepare_search_index(create=True)
-            for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
-                get_index(index["name"]).prepare_index()
+            _prepare_search_indexes()
 
         return ret
 
@@ -85,5 +161,15 @@ class ArchesTestRunner(DiscoverRunner):
                 delete_search_index()
                 for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
                     get_index(index["name"]).delete_index()
+            if self.parallel > 1:
+                self._delete_worker_indexes()
 
         super().teardown_databases(old_config, **kwargs)
+
+    def _delete_worker_indexes(self):
+        es = SearchEngineFactory().create().es.options(ignore_status=[404])
+        base = re.escape(settings.ELASTICSEARCH_PREFIX.lower())
+        worker_index = re.compile(rf"^{base}_w\d+_")
+        for name in es.indices.get(index=f"{base}_w*"):
+            if worker_index.match(name):
+                es.indices.delete(index=name)
