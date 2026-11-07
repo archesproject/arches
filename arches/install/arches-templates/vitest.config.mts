@@ -76,7 +76,7 @@ function generateConfig(): Promise<ViteUserConfig> {
                     exclude: exclude,
                     reporter: [
                         ['clover', { 'file': 'coverage.xml' }],
-                        'text',
+                        'text-summary',
                     ],
                     reportsDirectory: path.join(filePath, 'coverage', 'frontend'),
                 },

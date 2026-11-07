@@ -12,11 +12,11 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Install Java, GDAL, and other system dependencies
+    - name: Install GDAL and Postgres runtime libraries
       run: |
-        sudo apt update
-        sudo apt-get install libxml2-dev libpq-dev openjdk-8-jdk libgdal-dev libxslt-dev
-        echo Postgres and ES dependencies installed
+        sudo apt-get update -qq
+        sudo apt-get install -y -qq --no-install-recommends gdal-bin libpq5
+        echo System dependencies installed
       shell: bash
 
     - name: Set up Elasticsearch
@@ -31,8 +31,8 @@ runs:
 
     - name: Install Python packages
       run: |
-        python -m pip install --upgrade pip
-        pip install . --group dev
+        python -m pip install -q --upgrade pip
+        pip install -q -e . --group dev
         echo Python packages installed
       shell: bash
     
@@ -89,12 +89,12 @@ runs:
 
     - name: Run Python unit tests
       run: |
-        python -W default::DeprecationWarning -m coverage run manage.py test tests --settings="tests.test_settings"
+        python -W default::DeprecationWarning -m coverage run manage.py test tests --settings="tests.test_settings" --buffer --durations 20
       shell: bash
 
     - name: Generate Python report coverage
       run: |
-        coverage report
+        coverage report --format=total
         coverage json
         mv coverage/python/coverage.json ${{ inputs.branch-type }}_branch_python_coverage.json
       shell: bash
