@@ -1,6 +1,7 @@
 import contextlib
 import gc
 import io
+import multiprocessing
 import re
 import sys
 import warnings
@@ -95,6 +96,10 @@ class ArchesTestRunner(DiscoverRunner):
         if kwargs["pattern"] == "test*.py":
             kwargs["pattern"] = "*.py"
         super().__init__(*args, **kwargs)
+        # Python 3.14 defaults to forkserver on Linux, which doesn't work with
+        # the worker setup (and coverage) used here; fork is what 3.12/3.13 use.
+        if self.parallel > 1 and sys.platform.startswith("linux"):
+            multiprocessing.set_start_method("fork", force=True)
 
     def run_suite(self, suite, **kwargs):
         if not self.buffer:
