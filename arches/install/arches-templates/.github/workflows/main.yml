@@ -8,6 +8,7 @@ on:
 jobs:
   build_target_branch:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
 
     services:
       postgres:
@@ -49,6 +50,7 @@ jobs:
 
   build_feature_branch:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
 
     services:
       postgres:

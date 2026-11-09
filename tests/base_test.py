@@ -195,7 +195,8 @@ class ArchesTestCase(TestCase):
             )
 
         path_to_cheesy_image = Path(settings.MEDIA_ROOT) / "uploadedfiles" / "test.png"
-        cls.addClassCleanup(os.unlink, path_to_cheesy_image)
+        # Parallel workers share this file; another may have removed it already.
+        cls.addClassCleanup(path_to_cheesy_image.unlink, missing_ok=True)
 
     @classmethod
     def add_users(cls):
