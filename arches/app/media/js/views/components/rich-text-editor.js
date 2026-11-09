@@ -38,8 +38,8 @@ const toolbarItems = {
     removeFormat: { command: chain => chain.unsetAllMarks().clearNodes() },
     orderedList: { command: chain => chain.toggleOrderedList(), isActive: editor => editor.isActive('orderedList') },
     bulletList: { command: chain => chain.toggleBulletList(), isActive: editor => editor.isActive('bulletList') },
-    decreaseIndent: { command: chain => chain.liftListItem('listItem'), isDisabled: editor => !editor.can().liftListItem('listItem') },
-    indent: { command: chain => chain.sinkListItem('listItem'), isDisabled: editor => !editor.can().sinkListItem('listItem') },
+    decreaseIndent: { command: chain => chain.liftListItem('listItem') },
+    indent: { command: chain => chain.sinkListItem('listItem') },
     blockquote: { command: chain => chain.toggleBlockquote(), isActive: editor => editor.isActive('blockquote') },
     paragraph: { command: chain => chain.setParagraph(), isActive: editor => editor.isActive('paragraph') },
     heading1: { command: chain => chain.setHeading({ level: 1 }), isActive: editor => editor.isActive('heading', { level: 1 }), },
@@ -101,9 +101,19 @@ export default ko.components.register('views/components/rich-text-editor', {
             this.disposables.push(params.disabled.subscribe(disabled => editor.setEditable(!disabled, false)));
         }
 
+        const isItemDisabled = (item) => {
+            if (item.isDisabled) {
+                return item.isDisabled(editor);
+            }
+            if (item.command) {
+                return !item.command(editor.can().chain()).run();
+            }
+            return false;
+        };
+
         // get isDisabled and isActive for each item name
         const getState = () => Object.fromEntries(Object.entries(toolbarItems).map(([name, item]) => [name, {
-            isDisabled: item.isDisabled?.(editor) ?? false,
+            isDisabled: isItemDisabled(item),
             isActive: item.isActive?.(editor) ?? false,
         }]));
 
