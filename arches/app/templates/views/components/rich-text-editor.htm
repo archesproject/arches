@@ -133,7 +133,7 @@
                         class="rich-text-editor-popup-input"
                         placeholder="{% trans 'Paste a link' %}"
                         aria-label="{% trans 'Link URL' %}"
-                        data-bind="textInput: linkUrl"
+                        data-bind="textInput: linkUrl, event: {keydown: onPopupKeydown(applyLink)}"
                     >
                     <button type="button" title="{% trans 'Open link' %}" aria-label="{% trans 'Open link' %}" data-bind="click: openLink">
                         <i class="fa fa-external-link" aria-hidden="true"></i>
@@ -169,14 +169,14 @@
                         class="rich-text-editor-popup-input"
                         placeholder="{% trans 'Image URL' %}"
                         aria-label="{% trans 'Image URL' %}"
-                        data-bind="textInput: imageUrl"
+                        data-bind="textInput: imageUrl, event: {keydown: onPopupKeydown(applyImage)}"
                     >
                     <input
                         type="text"
                         class="rich-text-editor-popup-input"
                         placeholder="{% trans 'Alt text' %}"
                         aria-label="{% trans 'Alt text' %}"
-                        data-bind="textInput: imageAlt"
+                        data-bind="textInput: imageAlt, event: {keydown: onPopupKeydown(applyImage)}"
                     >
                     <div class="rich-text-editor-popup-row">
                         <input
@@ -185,7 +185,7 @@
                             class="rich-text-editor-popup-input"
                             placeholder="{% trans 'Width' %}"
                             aria-label="{% trans 'Width' %}"
-                            data-bind="textInput: imageWidth"
+                            data-bind="textInput: imageWidth, event: {keydown: onPopupKeydown(applyImage)}"
                         >
                         <input
                             type="number"
@@ -193,7 +193,7 @@
                             class="rich-text-editor-popup-input"
                             placeholder="{% trans 'Height' %}"
                             aria-label="{% trans 'Height' %}"
-                            data-bind="textInput: imageHeight"
+                            data-bind="textInput: imageHeight, event: {keydown: onPopupKeydown(applyImage)}"
                         >
                     </div>
                     <div class="rich-text-editor-popup-row">
