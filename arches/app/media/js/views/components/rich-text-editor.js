@@ -6,7 +6,7 @@ import { Image } from '@tiptap/extension-image';
 import { Subscript } from '@tiptap/extension-subscript';
 import { Superscript } from '@tiptap/extension-superscript';
 import { TableKit } from '@tiptap/extension-table';
-import 'bootstrap';
+import { dropdown } from 'bootstrap';
 import dispose from 'utils/dispose';
 import richTextEditorTemplate from 'templates/views/components/rich-text-editor.htm';
 import 'bindings/tiptap';
@@ -187,6 +187,16 @@ export default ko.components.register('views/components/rich-text-editor', {
             if (editor.isActive('image')) {
                 editor.chain().focus().deleteSelection().run();
             }
+        };
+
+        // pressing the enter key will apply and close popups
+        this.onPopupKeydown = apply => (context, event) => {
+            if (event.key === 'Enter') {
+                apply();
+                dropdown.hideAll();
+                return false;
+            }
+            return true;
         };
 
         // source mode enables html editing, 
