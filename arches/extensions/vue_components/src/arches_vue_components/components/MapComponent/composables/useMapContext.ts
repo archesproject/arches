@@ -26,6 +26,7 @@ import { useMapControls } from "@/arches_vue_components/components/MapComponent/
 import { useOverlayLayers } from "@/arches_vue_components/components/MapComponent/composables/useOverlayLayers.ts";
 import { GEOCODER_ATTRIBUTION } from "@/arches_vue_components/components/MapComponent/utils/geocoder-api.ts";
 import { registerCoordinateSystems } from "@/arches_vue_components/components/MapComponent/utils/coordinate-systems.ts";
+import { registerPmtilesProtocol } from "@/arches_vue_components/components/MapComponent/utils/pmtiles-protocol.ts";
 
 import type { InjectionKey, MaybeRefOrGetter, Ref } from "vue";
 import type { FeatureCollection } from "geojson";
@@ -211,6 +212,7 @@ export function useMapContext(
     onMounted(async () => {
         await waitForNonZeroContainerSize(mapContainer.value!);
 
+        registerPmtilesProtocol();
         map.value = new maplibregl.Map({
             container: mapContainer.value!,
             zoom: props.zoom ?? 2,

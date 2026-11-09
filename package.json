@@ -78,6 +78,7 @@
         "nouislider": "11.0.3",
         "numeral": "2.0.6",
         "pinia": "3.0.4",
+        "pmtiles": "4.5.0",
         "primeicons": "7.0.0",
         "openvue": "1.0.0",
         "proj4": "2.19.10",

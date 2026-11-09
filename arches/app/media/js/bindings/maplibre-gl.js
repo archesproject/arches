@@ -3,6 +3,7 @@ import _ from 'underscore';
 import ko from 'knockout';
 import arches from 'arches';
 import * as maplibre from 'maplibre-gl';
+import { registerPmtilesProtocol } from '@/arches_vue_components/components/MapComponent/utils/pmtiles-protocol.ts';
 
 // Point maplibre-gl at its worker script as webpack-emitted static assets.
 maplibre.setWorkerUrl(
@@ -33,6 +34,7 @@ const initialize = function(element, valueAccessor, maplibregl) {
         ];
     }
 
+    registerPmtilesProtocol();
     var map = new maplibregl.Map(
         _.defaults(mapInitOptions, defaults)
     );

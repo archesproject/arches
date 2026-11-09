@@ -1,5 +1,7 @@
 import * as maplibregl from "maplibre-gl";
 
+import { registerPmtilesProtocol } from "@/arches_vue_components/components/MapComponent/utils/pmtiles-protocol.ts";
+
 import type { LngLatLike } from "maplibre-gl";
 
 const cachedThumbnailsByStyleUrl = new Map<string, string>();
@@ -15,6 +17,7 @@ export async function renderBasemapThumbnail(
         return cachedThumbnail;
     }
 
+    registerPmtilesProtocol();
     const thumbnailRenderer = new maplibregl.Map({
         container,
         style: styleUrl,
