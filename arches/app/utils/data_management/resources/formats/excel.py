@@ -23,7 +23,7 @@ class ExcelWriter(TileCsvWriter):
         for csv_file in csv_files:
             # create a tab/worksheet for every csv file
             csv_file_name, extension = os.path.splitext(csv_file["name"])
-            ws = wb.create_sheet(title=csv_file_name)
+            ws = wb.create_sheet(title=csv_file_name[:29])
             for row in csv.reader(csv_file["outputfile"].getvalue().split("\r\n")):
                 ws.append(row)
         # delete default blank first sheet in workbook

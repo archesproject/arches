@@ -25,6 +25,7 @@ from arches.app.utils.data_management.resources.formats.csvfile import (
     MissingConfigException,
 )
 from operator import itemgetter
+from arches.app.models.models import CardModel
 from tests.base_test import ArchesTestCase
 from arches.app.utils.skos import SKOSReader
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
@@ -155,3 +156,21 @@ class BusinessDataExportTests(ArchesTestCase):
                 del instance["createdtime"]
 
         self.assertDictEqual(json_export, json_truth)
+
+    def test_tilexl_export_sheet_title_truncated_to_excel_limit(self):
+        with captured_stdout():
+            BusinessDataImporter(
+                "tests/fixtures/data/csv/resource_export_test.csv"
+            ).import_business_data()
+        card = CardModel.objects.get(name__en__iexact="Names")
+        card.name = "A card name longer than the Excel sheet name limit"
+        card.save()
+
+        export = BusinessDataExporter("tilexl").export(
+            "ab74af76-fa0e-11e6-9e3e-026d961c88e6"
+        )
+
+        wb = export[0]["outputfile"]
+        self.assertIn("A card name longer than the E", wb.sheetnames)
+        for sheetname in wb.sheetnames:
+            self.assertLessEqual(len(sheetname), 31)
