@@ -142,6 +142,7 @@ export function useMapContext(
         resolveOverlayLayers?: (
             candidateOverlayLayers: MapLayer[],
         ) => MapLayer[];
+        resolveMapSources?: (candidateMapSources: MapSource[]) => MapSource[];
         maxFeatures?: number;
         isReadOnly?: boolean;
         openPopupsInsideDrawnShapes?: boolean;
@@ -296,10 +297,13 @@ export function useMapContext(
                     source: raw.source,
                 }),
             );
-            mapSources.value = [
+            const candidateMapSources = [
                 ...((mapData?.map_sources ?? []) as MapSource[]),
                 ...resourceSources,
             ];
+            mapSources.value =
+                props.resolveMapSources?.(candidateMapSources) ??
+                candidateMapSources;
 
             coordinateSystems.value = (mapData?.preferred_coordinate_systems ??
                 []) as CoordinateSystem[];

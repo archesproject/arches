@@ -168,6 +168,7 @@ export interface MapSource {
         data?: GeoJSON;
         tileSize?: number;
         coordinates?: [number, number];
+        promoteId?: string;
     };
     source_json?: string;
 }
@@ -184,8 +185,10 @@ export interface MapComponentProps {
     basemap?: string;
     allowedGeometryTypes?: string[];
     resolveOverlayLayers?: (candidateOverlayLayers: MapLayer[]) => MapLayer[];
+    resolveMapSources?: (candidateMapSources: MapSource[]) => MapSource[];
     interactionTools?: MapInteractionTool[];
     maxFeatures?: number;
     featurePopupComponent?: Component;
+    openPopupsInsideDrawnShapes?: boolean;
     settings?: Partial<MapSettings>;
 }
