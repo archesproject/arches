@@ -793,13 +793,18 @@ MAPLIBRE_SPRITES = "https://icons.maptoolkit.org/sprite"
 MAPLIBRE_GLYPHS = "https://fonts.maptoolkit.org/{fontstack}/{range}.pbf"
 
 # Folder of locally served basemaps (PMTiles archives, fonts, sprites, styles),
-# served at /basemaps/ with HTTP range requests. None turns it off.
+# served at /basemaps/ with HTTP range requests. None turns it off. With
+# several web servers, it must be one shared or synced folder.
 LOCAL_BASEMAPS_ROOT = None
 
 # A map style has one glyphs URL, so requests under /basemaps/ for fonts that
 # aren't stored locally redirect here, which lets online basemaps' labels work
 # beside local ones. None turns it off, as an offline instance should.
 LOCAL_BASEMAPS_FONT_FALLBACK = "https://fonts.maptoolkit.org/{fontstack}/{range}.pbf"
+
+# The go-pmtiles command that `manage.py basemap extract` runs: a name on the
+# PATH or a full path. See https://github.com/protomaps/go-pmtiles/releases
+LOCAL_BASEMAPS_PMTILES_COMMAND = "pmtiles"
 
 DEFAULT_MAP_ZOOM = 0
 MAP_MIN_ZOOM = 0

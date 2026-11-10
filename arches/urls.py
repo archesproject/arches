@@ -24,7 +24,10 @@ from arches.app.views import concept, main, search, api
 from arches.app.views.admin import ReIndexResources, ClearUserPermissionCache
 from arches.app.views.etl_manager import ETLManagerView
 from arches.app.views.file import FileView, TempFileView
-from arches.app.views.local_basemap import LocalBasemapFileView
+from arches.app.views.local_basemap import (
+    LocalBasemapFileView,
+    LocalBasemapStyleView,
+)
 from arches.app.views.thumbnail import ThumbnailView
 from arches.app.views.graph import (
     GraphDesignerView,
@@ -701,6 +704,11 @@ urlpatterns = [
         r"^validate/(?P<itemtype>[-\w]+)", api.Validator.as_view(), name="validatejson"
     ),
     re_path(r"^tileserver/(?P<path>.*)$", TileserverProxyView.as_view()),
+    re_path(
+        r"^basemaps/styles/(?P<name>[-\w]+)\.json$",
+        LocalBasemapStyleView.as_view(),
+        name="local_basemap_style",
+    ),
     re_path(
         r"^basemaps/(?P<path>.+)$",
         LocalBasemapFileView.as_view(),

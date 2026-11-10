@@ -232,7 +232,8 @@ MEDIA_URL = '/files/'
 MEDIA_ROOT =  os.path.join(APP_ROOT)
 
 # Folder of locally served basemaps (PMTiles archives, fonts, sprites, styles),
-# served at /basemaps/. Uncomment to turn local basemaps on.
+# served at /basemaps/. Uncomment to turn local basemaps on. With several web
+# servers, it must be one shared or synced folder.
 # LOCAL_BASEMAPS_ROOT = os.path.join(os.path.dirname(APP_ROOT), "basemaps")
 
 # URL prefix for static files.
