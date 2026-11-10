@@ -363,6 +363,16 @@ async function onResourceCreated(createdTile: AliasedTileData) {
 </template>
 
 <style scoped>
+/*
+ * Chip colours can be overridden by setting these custom properties on any
+ * ancestor of the widget:
+ *   --resource-instance-multiselect-chip-background
+ *   --resource-instance-multiselect-chip-color
+ *   --resource-instance-multiselect-chip-button-color
+ *   --resource-instance-multiselect-chip-button-hover-background
+ * The defaults (blue-700 with white) keep text and icons above 4.5:1 contrast
+ * with both the Arches and the default OpenVue blue palettes.
+ */
 .no-text-decoration {
     text-decoration: none;
 }
@@ -388,11 +398,42 @@ async function onResourceCreated(createdTile: AliasedTileData) {
 
 :deep(.p-multiselect-chip-item) {
     width: inherit;
-    border: 0.125rem solid var(--p-inputtext-border-color);
+    border: 0.125rem solid
+        var(--resource-instance-multiselect-chip-background, var(--p-blue-700));
     padding: 0.25rem;
     border-radius: 0.5rem;
     margin: 0.25rem;
     display: flex;
+    background: var(
+        --resource-instance-multiselect-chip-background,
+        var(--p-blue-700)
+    );
+    color: var(--resource-instance-multiselect-chip-color, var(--p-surface-0));
+}
+
+/* Text buttons otherwise use the primary colour and gain a border on hover. */
+:deep(.p-multiselect-chip-item .p-button),
+:deep(.p-multiselect-chip-item .p-button:not(:disabled):hover) {
+    border: none;
+    color: var(
+        --resource-instance-multiselect-chip-button-color,
+        var(--p-surface-0)
+    );
+}
+
+:deep(.p-multiselect-chip-item .p-button:not(:disabled):hover) {
+    background: var(
+        --resource-instance-multiselect-chip-button-hover-background,
+        color-mix(
+            in srgb,
+            var(
+                    --resource-instance-multiselect-chip-button-color,
+                    var(--p-surface-0)
+                )
+                20%,
+            transparent
+        )
+    );
 }
 
 :deep(.p-multiselect-label-container) {

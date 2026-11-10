@@ -43,6 +43,7 @@ function handleUpdateModelValue(updatedValue: string | undefined) {
         />
         <Button
             class="p-button-text custom-text-button"
+            size="small"
             @click="shouldShowHelpDrawer = true"
         >
             {{ $gettext("EDTF Formatting") }}
@@ -69,5 +70,6 @@ function handleUpdateModelValue(updatedValue: string | undefined) {
 
 .custom-text-button {
     padding: 0rem 1rem;
+    font-size: 1.1rem;
 }
 </style>

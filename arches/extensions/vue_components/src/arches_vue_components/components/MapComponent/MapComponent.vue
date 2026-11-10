@@ -269,6 +269,7 @@ async function closePanel(): Promise<void> {
     width: 100%;
     height: 100%;
     flex: 1;
+    border: .2rem solid var(--p-inputtext-border-color)
     /* Header plus a feature popup between the panel insets */
     min-height: var(--map-component-min-height, 37.2rem);
     overflow: hidden;
