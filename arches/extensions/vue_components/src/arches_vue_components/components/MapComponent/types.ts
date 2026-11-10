@@ -1,6 +1,6 @@
 import type { Component, ComputedRef, Ref, ShallowRef } from "vue";
 import type { Feature, FeatureCollection, GeoJSON, Geometry } from "geojson";
-import type { Map as MaplibreMap } from "maplibre-gl";
+import type { Map as MaplibreMap, MapMouseEvent } from "maplibre-gl";
 
 export interface Basemap {
     id: string;
@@ -126,11 +126,14 @@ export interface MapContext {
         features: Feature[],
         options?: { animate?: boolean },
     ) => void;
+    isFeatureClickBlockedByDrawing: (point: MapMouseEvent["point"]) => boolean;
     moveOverlay: (overlay: MapLayer, toIndex: number) => void;
     setOverlayOpacity: (overlay: MapLayer, opacityPercent: number) => void;
     showFeatureHighlight: (geometries: Geometry[]) => void;
     clearFeatureHighlight: () => void;
     closeFeaturePopup: () => void;
+    popupFeature: Readonly<ShallowRef<Feature | null>>;
+    setPopupFeature: (feature: Feature) => void;
 }
 
 export interface FeaturePopupProps {

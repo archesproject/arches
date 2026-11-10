@@ -144,6 +144,7 @@ export function useMapContext(
         ) => MapLayer[];
         maxFeatures?: number;
         isReadOnly?: boolean;
+        openPopupsInsideDrawnShapes?: boolean;
         settings?: Partial<MapSettings>;
     },
     emit: MapComponentEmit,
@@ -181,15 +182,19 @@ export function useMapContext(
     } = useOverlayLayers(map, overlays, mapSources);
     const {
         popupFeatures,
+        popupFeature,
         popupContainer,
         showFeatureHighlight,
         clearFeatureHighlight,
         closeFeaturePopup,
+        setPopupFeature,
+        isClickableOverlayFeatureAt,
     } = useFeaturePopup(
         map,
         overlayLayerIds,
         drawnFeatureControls.isActivelyDrawingOrEditing,
         drawnFeatureControls.isDrawnFeatureOnTop,
+        drawnFeatureControls.deselectDrawnFeatureIfSelected,
     );
     useBasemapStyle(map, basemaps);
     useMapControls(map, settings, fullscreenContainer);
@@ -226,7 +231,7 @@ export function useMapContext(
         });
 
         map.value.once(STYLE_LOAD_EVENT, () => {
-            drawnFeatureControls.setupDraw();
+            drawnFeatureControls.setupDraw(isClickableOverlayFeatureAt);
             fitToValue();
 
             emit("ready");
@@ -365,11 +370,15 @@ export function useMapContext(
         addFeatures: drawnFeatureControls.addFeatures,
         updateDrawnFeature: drawnFeatureControls.updateDrawnFeature,
         fitToFeatures: drawnFeatureControls.fitToFeatures,
+        isFeatureClickBlockedByDrawing:
+            drawnFeatureControls.isFeatureClickBlockedByDrawing,
         moveOverlay,
         setOverlayOpacity,
         showFeatureHighlight,
         clearFeatureHighlight,
         closeFeaturePopup,
+        popupFeature,
+        setPopupFeature,
     };
 
     return { context, popupContainer, popupFeatures };

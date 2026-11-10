@@ -42,6 +42,7 @@ const {
     maxFeatures = undefined,
     featurePopupComponent = undefined,
     isReadOnly = false,
+    openPopupsInsideDrawnShapes = false,
     settings = undefined,
 } = defineProps<{
     value?: FeatureCollection | null;
@@ -59,6 +60,7 @@ const {
     maxFeatures?: number;
     featurePopupComponent?: Component;
     isReadOnly?: boolean;
+    openPopupsInsideDrawnShapes?: boolean;
     settings?: Partial<MapSettings>;
 }>();
 
@@ -86,6 +88,7 @@ const { context, popupContainer, popupFeatures } = useMapContext(
         resolveOverlayLayers,
         maxFeatures,
         isReadOnly,
+        openPopupsInsideDrawnShapes,
         settings,
     },
     emit,
