@@ -1,11 +1,11 @@
-import { watch } from "vue";
+import { useId, watch } from "vue";
 
-import MaplibreGeocoder from "@maplibre/maplibre-gl-geocoder";
 import "@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css";
 import * as maplibregl from "maplibre-gl";
 
 import { useGettext } from "vue3-gettext";
 
+import { AccessibleGeocoder } from "@/arches_vue_components/components/MapComponent/utils/accessible-geocoder.ts";
 import { geocoderApi } from "@/arches_vue_components/components/MapComponent/utils/geocoder-api.ts";
 
 import type { Ref, ShallowRef } from "vue";
@@ -22,7 +22,8 @@ export function useMapControls(
     settings: Ref<MapSettings>,
     fullscreenContainer: Readonly<Ref<HTMLElement | null>>,
 ): void {
-    const { $gettext } = useGettext();
+    const { $gettext, $ngettext } = useGettext();
+    const geocoderHintId = useId();
 
     let orderedControls: { control: IControl; isVisible: () => boolean }[] = [];
 
@@ -35,12 +36,39 @@ export function useMapControls(
 
             orderedControls = [
                 {
-                    control: new MaplibreGeocoder(geocoderApi, {
-                        maplibregl,
-                        placeholder:
-                            settings.value.geocoderPlaceholder ??
-                            $gettext("Search for a place"),
-                    }),
+                    control: new AccessibleGeocoder(
+                        geocoderApi,
+                        {
+                            maplibregl,
+                            placeholder:
+                                settings.value.geocoderPlaceholder ??
+                                $gettext("Search for a place"),
+                        },
+                        {
+                            searchButtonLabel: $gettext("Search"),
+                            clearButtonLabel: $gettext("Clear search"),
+                            hint: $gettext(
+                                "Type a place name, then press Enter or select Search.",
+                            ),
+                            searching: $gettext("Searching for places…"),
+                            placesFound: (count) =>
+                                $ngettext(
+                                    "%{count} place found. Use the arrow keys to choose it.",
+                                    "%{count} places found. Use the arrow keys to choose one.",
+                                    count,
+                                    { count: String(count) },
+                                ),
+                            noPlacesFound: $gettext("No places found."),
+                            searchFailed: $gettext(
+                                "The place search failed. Try again later.",
+                            ),
+                            placeChosen: (placeName) =>
+                                $gettext("Showing %{placeName}.", {
+                                    placeName,
+                                }),
+                        },
+                        geocoderHintId,
+                    ),
                     isVisible: () => settings.value.geocoderVisible,
                 },
                 {

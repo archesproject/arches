@@ -8,13 +8,21 @@ import Button from "openvue/button";
 
 import type {
     MapContext,
+    MapHeaderAction,
     MapInteractionTool,
 } from "@/arches_vue_components/components/MapComponent/types.ts";
 
 const TOGGLE_TOOL_EVENT = "toggle-tool" as const;
 
-const { tools, activeToolName, panelId, context } = defineProps<{
+const {
+    tools,
+    actions = [],
+    activeToolName,
+    panelId,
+    context,
+} = defineProps<{
     tools: MapInteractionTool[];
+    actions?: MapHeaderAction[];
     activeToolName: string | null;
     panelId: string;
     context: MapContext;
@@ -74,6 +82,28 @@ function focusTool(toolName: string): void {
                 :value="badgeCountsByToolName[tool.name]"
             />
         </Button>
+        <div
+            v-if="actions.length"
+            class="map-header-actions"
+        >
+            <Button
+                v-for="action in actions"
+                :key="action.id"
+                class="map-header-button"
+                :data-action-id="action.id"
+                :aria-label="action.ariaLabel"
+                :disabled="action.disabled"
+                :text="true"
+                @click="action.onClick"
+            >
+                <i
+                    class="map-header-icon"
+                    aria-hidden="true"
+                    :class="action.icon"
+                />
+                <span>{{ action.label }}</span>
+            </Button>
+        </div>
     </div>
 </template>
 
@@ -94,6 +124,11 @@ function focusTool(toolName: string): void {
     color: var(--p-text-muted-color);
     font-size: 1.35rem;
     font-weight: 600;
+}
+
+.map-header-actions {
+    display: flex;
+    margin-inline-start: auto;
 }
 
 .map-header-icon {

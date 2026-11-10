@@ -21,6 +21,7 @@ import type { FeatureCollection } from "geojson";
 
 import type { MapComponentEmit } from "@/arches_vue_components/components/MapComponent/composables/useMapContext.ts";
 import type {
+    MapHeaderAction,
     MapInteractionTool,
     MapLayer,
     MapSettings,
@@ -39,6 +40,8 @@ const {
     allowedGeometryTypes = undefined,
     resolveOverlayLayers = undefined,
     interactionTools = undefined,
+    visibleToolIds = undefined,
+    headerActions = undefined,
     maxFeatures = undefined,
     featurePopupComponent = undefined,
     isReadOnly = false,
@@ -56,6 +59,8 @@ const {
     allowedGeometryTypes?: string[];
     resolveOverlayLayers?: (candidateOverlayLayers: MapLayer[]) => MapLayer[];
     interactionTools?: MapInteractionTool[];
+    visibleToolIds?: string[];
+    headerActions?: MapHeaderAction[];
     maxFeatures?: number;
     featurePopupComponent?: Component;
     isReadOnly?: boolean;
@@ -112,12 +117,17 @@ const resolvedFeaturePopupComponent = computed(
     () => featurePopupComponent ?? FeaturePopup,
 );
 const resolvedInteractionTools = computed(() => {
-    const tools = interactionTools ?? defaultMapInteractionTools;
+    const tools = (interactionTools ?? defaultMapInteractionTools).filter(
+        (tool) =>
+            visibleToolIds === undefined ||
+            (tool.id !== undefined && visibleToolIds.includes(tool.id)),
+    );
     if (!isReadOnly) {
         return tools;
     }
     return tools.filter((tool) => tool.component !== MapToolsPanel);
 });
+const resolvedHeaderActions = computed(() => headerActions ?? []);
 const isStatusBarVisible = computed(
     () =>
         context.settings.value.showCursorCoordinates ||
@@ -162,9 +172,12 @@ async function closePanel(): Promise<void> {
         @keydown.esc="closePanel"
     >
         <MapHeader
-            v-if="resolvedInteractionTools.length"
+            v-if="
+                resolvedInteractionTools.length || resolvedHeaderActions.length
+            "
             ref="mapHeader"
             :tools="resolvedInteractionTools"
+            :actions="resolvedHeaderActions"
             :active-tool-name="activeToolName"
             :panel-id="panelId"
             :context="context"
@@ -269,7 +282,7 @@ async function closePanel(): Promise<void> {
     width: 100%;
     height: 100%;
     flex: 1;
-    border: .2rem solid var(--p-inputtext-border-color)
+    border: 0.2rem solid var(--p-content-border-color);
     /* Header plus a feature popup between the panel insets */
     min-height: var(--map-component-min-height, 37.2rem);
     overflow: hidden;
@@ -364,5 +377,90 @@ async function closePanel(): Promise<void> {
 
 .map-body :deep(.maplibregl-ctrl-geocoder--input) {
     font-size: 1.3rem;
+}
+
+/* Built by AccessibleGeocoder: the plugin's field beside a Search button. */
+.map-body :deep(.map-geocoder) {
+    display: flex;
+    align-items: stretch;
+}
+
+.map-body :deep(.map-geocoder-field) {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+
+/* The browser's own clear button duplicates deleting the text. */
+.map-body :deep(.map-geocoder input::-webkit-search-cancel-button) {
+    appearance: none;
+}
+
+.map-body :deep(.map-geocoder-field .maplibregl-ctrl-geocoder--input) {
+    padding-inline-end: 3.2rem;
+}
+
+.map-body :deep(.map-geocoder-clear-button) {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.8rem;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--p-text-muted-color);
+    cursor: pointer;
+}
+
+.map-body :deep(.map-geocoder-clear-button[hidden]) {
+    display: none;
+}
+
+.map-body :deep(.map-geocoder-clear-button:hover) {
+    color: var(--p-text-color);
+}
+
+.map-body :deep(.map-geocoder-clear-button:focus-visible) {
+    outline: 0.2rem solid var(--p-primary-color);
+    outline-offset: -0.2rem;
+}
+
+.map-body :deep(.map-geocoder-clear-button .pi) {
+    font-size: 1.2rem;
+}
+
+.map-body :deep(.map-geocoder-search-button) {
+    flex: 0 0 auto;
+    padding-inline: 1.2rem;
+    border: none;
+    border-inline-start: 0.1rem solid var(--p-content-border-color);
+    border-start-end-radius: inherit;
+    border-end-end-radius: inherit;
+    background: var(--p-content-background);
+    color: var(--p-primary-color);
+    font-size: 1.3rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.map-body :deep(.map-geocoder-search-button:hover) {
+    background: var(--p-content-hover-background);
+}
+
+.map-body :deep(.map-geocoder-search-button:focus-visible) {
+    outline: 0.2rem solid var(--p-primary-color);
+    outline-offset: -0.2rem;
+}
+
+.map-body :deep(.map-geocoder-visually-hidden) {
+    position: absolute;
+    width: 0.1rem;
+    height: 0.1rem;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
 }
 </style>

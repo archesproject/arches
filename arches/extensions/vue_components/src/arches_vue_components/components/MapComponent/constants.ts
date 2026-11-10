@@ -58,6 +58,11 @@ export const FEATURE_HIGHLIGHT_OUTLINE_LAYER_ID =
 export const COORDINATE_PREVIEW_SOURCE_ID = "map-component-coordinate-preview";
 export const COMPONENT_LAYER_ID_PREFIX = "map-component-";
 export const WGS84_SRID = "4326";
+export const MAP_TOOLS_TOOL_ID = "map_tools";
+export const BASEMAP_TOOL_ID = "basemap";
+export const OVERLAYS_TOOL_ID = "overlays";
+export const LEGEND_TOOL_ID = "legend";
+export const SETTINGS_TOOL_ID = "settings";
 
 export const DRAW_MODE_BY_GEOMETRY_TYPE: Record<string, DrawMode> = {
     [GEOMETRY_TYPE_POINT]: POINT,

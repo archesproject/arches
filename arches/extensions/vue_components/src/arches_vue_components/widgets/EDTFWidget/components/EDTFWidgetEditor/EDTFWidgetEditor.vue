@@ -71,5 +71,6 @@ function handleUpdateModelValue(updatedValue: string | undefined) {
 .custom-text-button {
     padding: 0rem 1rem;
     font-size: 1.1rem;
+    padding: 0.75rem 1rem;
 }
 </style>

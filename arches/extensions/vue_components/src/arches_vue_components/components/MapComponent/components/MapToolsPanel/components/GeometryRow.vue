@@ -335,10 +335,18 @@ function editFeature(): void {
 }
 
 .geometry-buffer-distance {
+    flex: 0 0 8rem;
     width: 8rem;
+}
+
+/* The input keeps its intrinsic width unless told to fill its wrapper. */
+.geometry-buffer-distance :deep(.p-inputnumber-input) {
+    width: 100%;
+    min-width: 0;
 }
 
 .geometry-buffer-units {
     flex: 1;
+    min-width: 0;
 }
 </style>

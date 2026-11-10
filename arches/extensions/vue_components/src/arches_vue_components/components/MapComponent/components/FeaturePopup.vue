@@ -195,14 +195,14 @@ function navigateToNextFeature(): void {
                     v-html="descriptor.map_popup"
                 />
                 <!-- eslint-enable vue/no-v-html -->
-                <div
+                <!-- <div
                     v-if="descriptor.displaydescription"
                     class="popup-snippet-section"
                 >
                     <p class="popup-snippet">
                         {{ descriptor.displaydescription }}
                     </p>
-                </div>
+                </div> -->
             </template>
         </div>
 

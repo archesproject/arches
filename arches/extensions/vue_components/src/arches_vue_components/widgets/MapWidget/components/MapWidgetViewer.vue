@@ -5,12 +5,20 @@ import MapComponent from "@/arches_vue_components/components/MapComponent/MapCom
 
 import { buildMapSettings } from "@/arches_vue_components/widgets/MapWidget/utils.ts";
 
+import type { MapHeaderAction } from "@/arches_vue_components/components/MapComponent/types.ts";
 import type { GeoJSONFeatureCollectionAliasedNodeData } from "@/arches_vue_components/datatypes/geojson-feature-collection/types.ts";
 import type { MapCardXNodeXWidgetData } from "@/arches_vue_components/widgets/MapWidget/types.ts";
 
-const { aliasedNodeData, cardXNodeXWidgetData = undefined } = defineProps<{
+const {
+    aliasedNodeData,
+    cardXNodeXWidgetData = undefined,
+    visibleToolIds = undefined,
+    headerActions = undefined,
+} = defineProps<{
     aliasedNodeData: GeoJSONFeatureCollectionAliasedNodeData;
     cardXNodeXWidgetData?: MapCardXNodeXWidgetData;
+    visibleToolIds?: string[];
+    headerActions?: MapHeaderAction[];
 }>();
 
 const emit = defineEmits<{
@@ -24,6 +32,7 @@ const mapSettings = computed(() =>
 
 <template>
     <MapComponent
+        class="map-widget-viewer"
         :value="aliasedNodeData.node_value"
         :zoom="cardXNodeXWidgetData?.config?.zoom"
         :pitch="cardXNodeXWidgetData?.config?.pitch"
@@ -34,7 +43,16 @@ const mapSettings = computed(() =>
         :max-zoom="cardXNodeXWidgetData?.config?.maxZoom"
         :basemap="cardXNodeXWidgetData?.config?.basemap"
         :is-read-only="true"
+        :visible-tool-ids="visibleToolIds"
+        :header-actions="headerActions"
         :settings="mapSettings"
         @update:is-loading="emit('update:isLoading', $event)"
     />
 </template>
+
+<style>
+/* Ancestors can set --map-component-viewer-block-size to change the height. */
+.map-widget-viewer {
+    --map-component-min-height: var(--map-component-viewer-block-size, 37.2rem);
+}
+</style>

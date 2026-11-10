@@ -189,7 +189,10 @@ export function useMapContext(
         map,
         overlayLayerIds,
         drawnFeatureControls.isActivelyDrawingOrEditing,
-        drawnFeatureControls.isDrawnFeatureOnTop,
+        // Read-only drawn features are display only, so they never block popups.
+        (point) =>
+            !props.isReadOnly &&
+            drawnFeatureControls.isDrawnFeatureOnTop(point),
     );
     useBasemapStyle(map, basemaps);
     useMapControls(map, settings, fullscreenContainer);

@@ -48,6 +48,8 @@ export interface MapLayer {
 }
 
 export interface MapInteractionTool {
+    // A stable, untranslated key for choosing tools; the name is translated.
+    id?: string;
     name: string;
     header: string;
     component: Component;
@@ -55,6 +57,16 @@ export interface MapInteractionTool {
     props?: Record<string, unknown>;
     badgeCount?: (context: MapContext) => number;
     wide?: boolean;
+}
+
+// A header button that runs a command rather than opening a panel.
+export interface MapHeaderAction {
+    id: string;
+    label: string;
+    icon: string;
+    ariaLabel?: string;
+    disabled?: boolean;
+    onClick: () => void;
 }
 
 export type DrawMode = "point" | "line" | "polygon";
@@ -182,6 +194,8 @@ export interface MapComponentProps {
     allowedGeometryTypes?: string[];
     resolveOverlayLayers?: (candidateOverlayLayers: MapLayer[]) => MapLayer[];
     interactionTools?: MapInteractionTool[];
+    visibleToolIds?: string[];
+    headerActions?: MapHeaderAction[];
     maxFeatures?: number;
     featurePopupComponent?: Component;
     settings?: Partial<MapSettings>;
