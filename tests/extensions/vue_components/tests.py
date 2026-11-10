@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.core import management
 from django.test.utils import captured_stdout
 
-from arches.app.models.models import Node, Widget
+from arches.app.models.models import LocalBasemap, MapLayer, Node, Widget
 from arches.extensions.querysets.utils.tests import GraphTestCase
 from arches.extensions.vue_components.models import WidgetMapping
 from arches.extensions.vue_components.utils.widget_synchronizer import (
@@ -156,6 +156,62 @@ class EnsureAbsoluteTileURLsTests(SimpleTestCase):
         with self.stub_settings("http://localhost:8000/"):
             map_api.MapDataAPI._ensure_absolute_tile_urls(source)
         self.assertEqual(source, {"type": "raster"})
+
+
+class MapDataBasemapsTests(TestCase):
+    CONFIGURED_BASEMAP = {
+        "name": "positron",
+        "title": "Positron",
+        "url": "https://tiles.example.org/positron",
+        "addtomap": True,
+    }
+
+    def local_basemap(self, name, addtomap):
+        return LocalBasemap.objects.create(
+            name=name,
+            flavor="light",
+            archive_path=f"{name}/{name}.pmtiles",
+            bounds=[-1, -1, 1, 1],
+            min_zoom=0,
+            max_zoom=15,
+            map_layer=MapLayer.objects.create(
+                name=name.title(), icon="fa fa-globe", addtomap=addtomap
+            ),
+        )
+
+    def basemaps(self, readable_map_layers):
+        with mock.patch.object(
+            map_api, "settings", SimpleNamespace(BASEMAPS=[self.CONFIGURED_BASEMAP])
+        ):
+            return map_api.MapDataAPI._basemaps(readable_map_layers)
+
+    def test_readable_local_basemaps_come_first(self):
+        readable_basemap = self.local_basemap("la", addtomap=False)
+        self.local_basemap("hidden", addtomap=False)
+
+        self.assertEqual(
+            self.basemaps([readable_basemap.map_layer]),
+            [
+                {
+                    "name": "la",
+                    "title": "La",
+                    "url": "/basemaps/styles/la.json",
+                    "addtomap": False,
+                },
+                self.CONFIGURED_BASEMAP,
+            ],
+        )
+
+    def test_default_local_basemap_wins_over_configured_ones(self):
+        default_basemap = self.local_basemap("la", addtomap=True)
+
+        self.assertEqual(
+            [
+                basemap["addtomap"]
+                for basemap in self.basemaps([default_basemap.map_layer])
+            ],
+            [True, False],
+        )
 
 
 class CardXNodeXWidgetPermissionTests(GraphTestCase):

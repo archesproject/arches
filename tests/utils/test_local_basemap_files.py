@@ -72,6 +72,7 @@ class LocalBasemapFileTests(SimpleTestCase):
         local_font_path = self.basemaps_root / "fonts" / "Noto Sans Regular"
         local_font_path.mkdir(parents=True)
         (local_font_path / "0-255.pbf").write_bytes(b"glyphs")
+        (self.basemaps_root / ".online_basemaps.json").write_text("{}")
         settings_override = override_settings(
             LOCAL_BASEMAPS_ROOT=str(self.basemaps_root),
             LOCAL_BASEMAPS_FONT_FALLBACK=FONT_FALLBACK,
@@ -84,7 +85,13 @@ class LocalBasemapFileTests(SimpleTestCase):
             local_basemap_file_path("fonts/Noto Sans Regular/0-255.pbf"),
             str(self.basemaps_root / "fonts" / "Noto Sans Regular" / "0-255.pbf"),
         )
-        for missing_path in ["fonts/missing.pbf", "fonts", "../outside.pmtiles"]:
+        for missing_path in [
+            "fonts/missing.pbf",
+            "fonts",
+            "../outside.pmtiles",
+            "/outside.pmtiles",
+            ".online_basemaps.json",
+        ]:
             with self.subTest(missing_path=missing_path):
                 self.assertIsNone(local_basemap_file_path(missing_path))
 

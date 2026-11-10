@@ -2252,6 +2252,38 @@ class MapLayer(SaveSupportsBlindOverwriteMixin, models.Model):
         )
 
 
+class LocalBasemap(models.Model):
+    """A basemap served from a PMTiles archive under LOCAL_BASEMAPS_ROOT. Its
+    map layer holds the layers the Knockout maps draw; the Vue maps load the
+    style that LocalBasemapStyleView builds from this record."""
+
+    FLAVORS = ["light", "dark"]
+
+    localbasemapid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, db_default=UUID4()
+    )
+    name = models.SlugField(unique=True)
+    flavor = models.TextField(choices=[(flavor, flavor) for flavor in FLAVORS])
+    archive_path = models.TextField()
+    overview_archive_path = models.TextField(blank=True, null=True)
+    bounds = JSONField()
+    min_zoom = models.IntegerField()
+    max_zoom = models.IntegerField()
+    overview_max_zoom = models.IntegerField(blank=True, null=True)
+    tile_schema_version = models.TextField(blank=True, null=True)
+    build = models.TextField(blank=True, null=True)
+    map_layer = models.OneToOneField(
+        MapLayer, on_delete=models.CASCADE, related_name="local_basemap"
+    )
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        managed = True
+        db_table = "local_basemaps"
+
+
 class GraphXMapping(SaveSupportsBlindOverwriteMixin, models.Model):
     id = models.UUIDField(
         primary_key=True, serialize=False, default=uuid.uuid4, db_default=UUID4()

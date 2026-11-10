@@ -25,8 +25,11 @@ class UnsatisfiableByteRange(Exception):
 
 def local_basemap_file_path(relative_path):
     """Returns None when no local basemap file is at relative_path, including
-    when local basemaps are turned off or the path leaves the folder."""
-    if not settings.LOCAL_BASEMAPS_ROOT:
+    when local basemaps are turned off, the path leaves the folder or it names
+    a hidden file, such as the snapshot of removed online basemaps."""
+    if not settings.LOCAL_BASEMAPS_ROOT or any(
+        path_part.startswith(".") for path_part in relative_path.split("/")
+    ):
         return None
     try:
         file_path = safe_join(settings.LOCAL_BASEMAPS_ROOT, relative_path)
