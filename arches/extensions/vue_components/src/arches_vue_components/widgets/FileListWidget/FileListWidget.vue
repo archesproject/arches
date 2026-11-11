@@ -17,7 +17,6 @@ const {
     aliasedNodeData,
     value,
     shouldShowMetadataLanguageSelect = false,
-    visibleMetadataFields = undefined,
 } = defineProps<FileListWidgetProps>();
 
 const emit = defineEmits<{
@@ -50,7 +49,6 @@ function onUpdateAliasedNodeData(
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :aliased-node-data="resolvedAliasedNodeData"
         :should-show-metadata-language-select="shouldShowMetadataLanguageSelect"
-        :visible-metadata-fields="visibleMetadataFields"
         @update:aliased-node-data="onUpdateAliasedNodeData"
     />
     <FileListWidgetViewer

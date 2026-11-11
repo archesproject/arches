@@ -3,12 +3,16 @@ import { describe, expect, it } from "vitest";
 import {
     buildEmptyFileMetadata,
     getFileAltText,
+    getVisibleMetadataFields,
     hasAnyAltText,
     setLocalizedValue,
 } from "@/arches_vue_components/datatypes/file-list/utils.ts";
 
 import type { Language } from "@/arches_vue_components/types.ts";
-import type { FileReference } from "@/arches_vue_components/datatypes/file-list/types.ts";
+import type {
+    FileListCardXNodeXWidgetData,
+    FileReference,
+} from "@/arches_vue_components/datatypes/file-list/types.ts";
 
 const english: Language = {
     code: "en",
@@ -58,6 +62,44 @@ describe("buildEmptyFileMetadata", () => {
         const metadata = buildEmptyFileMetadata([english]);
 
         expect(metadata.altText).not.toBe(metadata.title);
+    });
+});
+
+describe("getVisibleMetadataFields", () => {
+    function buildCardXNodeXWidgetData(
+        metadataFields?: FileListCardXNodeXWidgetData["config"]["metadataFields"],
+    ): FileListCardXNodeXWidgetData {
+        return {
+            config: { metadataFields },
+        } as FileListCardXNodeXWidgetData;
+    }
+
+    it("shows every field without widget data", () => {
+        expect(getVisibleMetadataFields(undefined)).toEqual([
+            "altText",
+            "title",
+            "description",
+            "attribution",
+        ]);
+    });
+
+    it("shows every field when the config has no entries", () => {
+        expect(
+            getVisibleMetadataFields(buildCardXNodeXWidgetData()),
+        ).toHaveLength(4);
+    });
+
+    it("hides only the fields whose visible bit is false", () => {
+        const cardXNodeXWidgetData = buildCardXNodeXWidgetData({
+            title: { visible: false },
+            description: { visible: false },
+            attribution: { visible: true },
+        });
+
+        expect(getVisibleMetadataFields(cardXNodeXWidgetData)).toEqual([
+            "altText",
+            "attribution",
+        ]);
     });
 });
 
