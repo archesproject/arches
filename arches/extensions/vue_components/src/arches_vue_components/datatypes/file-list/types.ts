@@ -30,6 +30,13 @@ export interface FileReference {
     description?: Record<string, LanguageValue>;
     title?: Record<string, LanguageValue>;
 }
+// Mirrors CardXNodeXWidgetData.visible: a field is shown unless its
+// `visible` bit is false. Saved widget configs have no entry, so every
+// field is shown by default.
+export interface FileMetadataFieldConfig {
+    visible: boolean;
+}
+
 export interface FileListCardXNodeXWidgetData extends CardXNodeXWidgetData {
     config: CardXNodeXWidgetData["config"] & {
         acceptedFiles: string;
@@ -37,6 +44,9 @@ export interface FileListCardXNodeXWidgetData extends CardXNodeXWidgetData {
         maxFilesize: number;
         rerender: boolean;
         label: string;
+        metadataFields?: Partial<
+            Record<FileMetadataField, FileMetadataFieldConfig>
+        >;
     };
 }
 
