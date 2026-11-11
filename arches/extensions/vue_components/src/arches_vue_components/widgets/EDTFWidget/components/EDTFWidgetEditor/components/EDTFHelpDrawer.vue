@@ -97,11 +97,23 @@ function handleUpdateVisible(nextVisible: boolean) {
         style="height: 100%; width: 30%"
         :modal="true"
         :dismissable="true"
+        :pt="{
+            header: {
+                style: {
+                    backgroundColor: 'var(--p-content-hover-background)',
+                    borderBottom: '1px solid var(--p-content-border-color)',
+                },
+            },
+        }"
         @update:visible="handleUpdateVisible"
     >
-        <h4>{{ $gettext("Extended Date/Time Formats (EDTF)") }}</h4>
+        <template #header>
+            <h4 class="drawer-title">
+                {{ $gettext("Extended Date/Time Formats (EDTF)") }}
+            </h4>
+        </template>
 
-        <p>
+        <p class="drawer-description">
             {{
                 $gettext(
                     "The EDTF datatype allows you to describe dates (even uncertain dates). You can find a summary of the standard here: EDTF Date Specfication (Library of Congress)",
@@ -109,7 +121,7 @@ function handleUpdateVisible(nextVisible: boolean) {
             }}
         </p>
 
-        <p>{{ $gettext("Some common encodings:") }}</p>
+        <h5>{{ $gettext("Some common encodings:") }}</h5>
 
         <section
             v-for="currentEdtfExample in edtfExamples"
@@ -144,12 +156,33 @@ function handleUpdateVisible(nextVisible: boolean) {
 </template>
 
 <style scoped>
-p {
+.drawer-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+    margin-top: 0rem;
+    padding: 1rem 1.1rem;
+}
+h4.drawer-title {
+   padding: 0rem;
+}
+.drawer-description {
+    margin-top: 0.75rem;
     margin-bottom: 0.5rem;
 }
-
+p {
+    margin-top: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+h5 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 0.25rem;
+}
 .edtf-example {
-    margin-bottom: 0.75rem;
+    margin-bottom: 1.75rem;
+    line-height: 1.2;
 }
 
 .edtf-example-values {
@@ -163,5 +196,6 @@ p {
 
 .edtf-example-description {
     margin-top: 0.15rem;
+    color: var(--p-text-muted-color);
 }
 </style>
