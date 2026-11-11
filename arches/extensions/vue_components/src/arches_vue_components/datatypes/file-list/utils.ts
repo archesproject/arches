@@ -4,7 +4,9 @@ import type { Language } from "@/arches_vue_components/types.ts";
 import type { LanguageValue } from "@/arches_vue_components/datatypes/string/types.ts";
 import type {
     FileListAliasedNodeData,
+    FileListCardXNodeXWidgetData,
     FileMetadata,
+    FileMetadataField,
     FileReference,
 } from "@/arches_vue_components/datatypes/file-list/types.ts";
 
@@ -35,6 +37,18 @@ export function buildEmptyFileMetadata(languages: Language[]): FileMetadata {
             buildEmptyLocalizedValue(),
         ]),
     ) as FileMetadata;
+}
+
+// Like a card hiding a node through CardXNodeXWidgetData.visible, a consumer
+// hides a metadata field by setting config.metadataFields[field].visible to
+// false. A field without an entry is shown.
+export function getVisibleMetadataFields(
+    cardXNodeXWidgetData: FileListCardXNodeXWidgetData | undefined,
+): FileMetadataField[] {
+    const metadataFieldConfigs = cardXNodeXWidgetData?.config.metadataFields;
+    return FILE_METADATA_FIELDS.filter(
+        (field) => metadataFieldConfigs?.[field]?.visible !== false,
+    );
 }
 
 export function getLocalizedValue(

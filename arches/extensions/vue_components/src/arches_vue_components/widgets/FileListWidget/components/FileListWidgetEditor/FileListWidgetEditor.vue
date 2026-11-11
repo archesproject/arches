@@ -7,10 +7,10 @@ import FileList from "@/arches_vue_components/widgets/FileListWidget/components/
 import FileDropZone from "@/arches_vue_components/widgets/FileListWidget/components/FileListWidgetEditor/components/FileDropZone.vue";
 
 import { useLanguageStore } from "@/arches_vue_components/stores/useLanguageStore.ts";
-import { FILE_METADATA_FIELDS } from "@/arches_vue_components/datatypes/file-list/constants.ts";
 import {
     buildEmptyFileMetadata,
     buildFileListAliasedNodeData,
+    getVisibleMetadataFields,
 } from "@/arches_vue_components/datatypes/file-list/utils.ts";
 
 import type { LanguageValue } from "@/arches_vue_components/datatypes/string/types.ts";
@@ -29,12 +29,10 @@ const {
     aliasedNodeData,
     cardXNodeXWidgetData = undefined,
     shouldShowMetadataLanguageSelect = false,
-    visibleMetadataFields = FILE_METADATA_FIELDS,
 } = defineProps<{
     aliasedNodeData: FileListAliasedNodeData | null;
     cardXNodeXWidgetData?: FileListCardXNodeXWidgetData;
     shouldShowMetadataLanguageSelect?: boolean;
-    visibleMetadataFields?: readonly FileMetadataField[];
 }>();
 
 const emit = defineEmits<{
@@ -60,6 +58,10 @@ const requestLanguage = computed(() =>
 
 const isAltTextRequired = computed(() =>
     Boolean(cardXNodeXWidgetData?.node.config?.imagesOnly),
+);
+
+const visibleMetadataFields = computed(() =>
+    getVisibleMetadataFields(cardXNodeXWidgetData),
 );
 
 const savedFiles = ref<FileReference[]>([]);
