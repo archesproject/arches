@@ -5,7 +5,10 @@ import MapComponent from "@/arches_vue_components/components/MapComponent/MapCom
 
 import { buildMapSettings } from "@/arches_vue_components/widgets/MapWidget/utils.ts";
 
-import type { MapHeaderAction } from "@/arches_vue_components/components/MapComponent/types.ts";
+import type {
+    MapHeaderAction,
+    MapSettings,
+} from "@/arches_vue_components/components/MapComponent/types.ts";
 import type { GeoJSONFeatureCollectionAliasedNodeData } from "@/arches_vue_components/datatypes/geojson-feature-collection/types.ts";
 import type { MapCardXNodeXWidgetData } from "@/arches_vue_components/widgets/MapWidget/types.ts";
 
@@ -14,20 +17,28 @@ const {
     cardXNodeXWidgetData = undefined,
     visibleToolIds = undefined,
     headerActions = undefined,
+    defaultSettings = undefined,
 } = defineProps<{
     aliasedNodeData: GeoJSONFeatureCollectionAliasedNodeData;
     cardXNodeXWidgetData?: MapCardXNodeXWidgetData;
     visibleToolIds?: string[];
     headerActions?: MapHeaderAction[];
+    defaultSettings?: Partial<MapSettings>;
 }>();
 
 const emit = defineEmits<{
     "update:isLoading": [isLoading: boolean];
 }>();
 
-const mapSettings = computed(() =>
-    buildMapSettings(cardXNodeXWidgetData?.config),
-);
+// The widget config wins; the caller's defaults fill only what it leaves unset.
+const mapSettings = computed<Partial<MapSettings>>(() => ({
+    ...defaultSettings,
+    ...Object.fromEntries(
+        Object.entries(buildMapSettings(cardXNodeXWidgetData?.config)).filter(
+            ([, settingValue]) => settingValue !== undefined,
+        ),
+    ),
+}));
 </script>
 
 <template>
@@ -51,8 +62,15 @@ const mapSettings = computed(() =>
 </template>
 
 <style>
-/* Ancestors can set --map-component-viewer-block-size to change the height. */
+/*
+ * Ancestors can set --map-component-viewer-block-size to change the height
+ * and --map-component-viewer-header-font-size to resize the header buttons.
+ */
 .map-widget-viewer {
     --map-component-min-height: var(--map-component-viewer-block-size, 37.2rem);
+    --map-header-button-font-size: var(
+        --map-component-viewer-header-font-size,
+        1.35rem
+    );
 }
 </style>

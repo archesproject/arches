@@ -64,6 +64,7 @@ onMounted(() => {
         :aliased-node-data="resolvedAliasedNodeData"
         :visible-tool-ids="visibleToolIds"
         :header-actions="headerActions"
+        :default-settings="defaultSettings"
         @update:is-loading="emit('update:isLoading', $event)"
     />
 </template>

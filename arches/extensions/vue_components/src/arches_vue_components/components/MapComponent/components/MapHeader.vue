@@ -69,6 +69,7 @@ function focusTool(toolName: string): void {
             :aria-expanded="tool.name === activeToolName"
             :aria-controls="panelId"
             :text="true"
+            size="small"
             @click="emit(TOGGLE_TOOL_EVENT, tool.name)"
         >
             <i
@@ -94,6 +95,7 @@ function focusTool(toolName: string): void {
                 :aria-label="action.ariaLabel"
                 :disabled="action.disabled"
                 :text="true"
+                size="small"
                 @click="action.onClick"
             >
                 <i
@@ -122,7 +124,8 @@ function focusTool(toolName: string): void {
     padding-inline: 1.75rem;
     border-radius: 0;
     color: var(--p-text-muted-color);
-    font-size: 1.35rem;
+    /* Small buttons, so themes that force a button font size leave these be. */
+    font-size: var(--map-header-button-font-size, 1.35rem);
     font-weight: 600;
 }
 
