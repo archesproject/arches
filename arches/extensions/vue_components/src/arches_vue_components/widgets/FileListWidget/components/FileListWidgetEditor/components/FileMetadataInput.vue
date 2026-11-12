@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 
+import Button from "openvue/button";
 import InputText from "openvue/inputtext";
+import Select from "openvue/select";
 import Textarea from "openvue/textarea";
 
 import type { Language } from "@/arches_vue_components/types.ts";
@@ -15,6 +17,8 @@ const {
     isRequired = false,
     helpText = undefined,
     errorText = undefined,
+    selectableLanguages = [],
+    languageToggleAriaLabel = undefined,
 } = defineProps<{
     inputId: string;
     label: string;
@@ -24,15 +28,24 @@ const {
     isRequired?: boolean;
     helpText?: string;
     errorText?: string;
+    selectableLanguages?: Language[];
+    languageToggleAriaLabel?: string;
 }>();
 
 const emit = defineEmits<{
     (e: "update:modelValue", value: string): void;
+    (e: "update:language", languageCode: string): void;
     (e: "blur"): void;
 }>();
 
+const isLanguagePanelOpen = ref(false);
+
 const helpId = computed(() => `${inputId}-help`);
 const errorId = computed(() => `${inputId}-error`);
+const languagePanelId = computed(() => `${inputId}-language-panel`);
+const languageLabelId = computed(() => `${inputId}-language-label`);
+
+const shouldShowLanguageToggle = computed(() => selectableLanguages.length > 1);
 
 const describedBy = computed(() => {
     const describingIds = [
@@ -41,14 +54,56 @@ const describedBy = computed(() => {
     ].filter(Boolean);
     return describingIds.length ? describingIds.join(" ") : undefined;
 });
+
+function formatLanguageOption(option: Language): string {
+    return `${option.name} (${option.code})`;
+}
 </script>
 
 <template>
     <div class="file-metadata-field">
-        <label :for="inputId">
-            {{ label }}
-            <span v-if="isRequired">{{ $gettext("(required)") }}</span>
-        </label>
+        <div class="file-metadata-label-row">
+            <label
+                :for="inputId"
+                class="file-metadata-label"
+            >
+                {{ label }}
+                <span v-if="isRequired">{{ $gettext("(required)") }}</span>
+            </label>
+            <Button
+                v-if="shouldShowLanguageToggle"
+                class="metadata-language-toggle"
+                :icon="
+                    isLanguagePanelOpen
+                        ? 'pi pi-chevron-down'
+                        : 'pi pi-chevron-right'
+                "
+                :label="$gettext('Languages')"
+                :aria-label="languageToggleAriaLabel"
+                :aria-expanded="isLanguagePanelOpen"
+                :aria-controls="languagePanelId"
+                size="small"
+                text
+                @click="isLanguagePanelOpen = !isLanguagePanelOpen"
+            />
+        </div>
+        <div
+            v-if="shouldShowLanguageToggle"
+            v-show="isLanguagePanelOpen"
+            :id="languagePanelId"
+            class="metadata-language-panel"
+        >
+            <label :id="languageLabelId">{{ $gettext("Language") }}</label>
+            <Select
+                :model-value="language.code"
+                :options="selectableLanguages"
+                :option-label="formatLanguageOption"
+                option-value="code"
+                :aria-labelledby="languageLabelId"
+                fluid
+                @update:model-value="emit('update:language', $event)"
+            />
+        </div>
         <p
             v-if="helpText"
             :id="helpId"
@@ -96,9 +151,35 @@ const describedBy = computed(() => {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    width: 100%;
 }
 
-.file-metadata-field label {
+.file-metadata-label-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.file-metadata-label {
+    flex: 1 1 auto;
+    font-weight: 600;
+}
+
+.metadata-language-toggle {
+    flex: 0 0 auto;
+}
+
+.metadata-language-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem;
+    border: 1px solid var(--p-content-border-color);
+    border-radius: var(--p-content-border-radius);
+    background: var(--p-content-background);
+}
+
+.metadata-language-panel label {
     font-weight: 600;
 }
 

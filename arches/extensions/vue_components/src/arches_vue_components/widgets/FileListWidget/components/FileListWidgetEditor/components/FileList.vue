@@ -4,7 +4,6 @@ import { useGettext } from "vue3-gettext";
 
 import Image from "openvue/image";
 import Button from "openvue/button";
-import Select from "openvue/select";
 
 import FileMetadataInput from "@/arches_vue_components/widgets/FileListWidget/components/FileListWidgetEditor/components/FileMetadataInput.vue";
 
@@ -14,6 +13,7 @@ import {
     PRIMARY_FILE_METADATA_FIELDS,
     REMOVE,
     UPDATE_METADATA,
+    UPDATE_METADATA_LANGUAGE,
 } from "@/arches_vue_components/datatypes/file-list/constants.ts";
 import {
     getFileAltText,
@@ -58,6 +58,11 @@ const emit = defineEmits<{
         field: FileMetadataField,
         localizedValue: Record<string, LanguageValue>,
     ): void;
+    (
+        e: typeof UPDATE_METADATA_LANGUAGE,
+        fileIndex: number,
+        languageCode: string,
+    ): void;
 }>();
 
 const { $gettext } = useGettext();
@@ -86,6 +91,10 @@ const additionalFields = computed(() =>
     ),
 );
 
+const languageSelectHostField = computed<FileMetadataField | undefined>(
+    () => primaryFields.value[0] ?? additionalFields.value[0],
+);
+
 function getFileKey(fileReference: FileReference): string {
     return fileReference.file_id ?? fileReference.url;
 }
@@ -104,11 +113,27 @@ function getFileLanguage(fileReference: FileReference): Language | undefined {
     );
 }
 
+function getSelectableLanguages(field: FileMetadataField): Language[] {
+    const shouldHostLanguageSelect =
+        shouldShowLanguageSelect && field === languageSelectHostField.value;
+    return shouldHostLanguageSelect ? languages : [];
+}
+
+function getLanguageToggleAriaLabel(fileReference: FileReference): string {
+    return $gettext(
+        "Languages for %{fileName}",
+        { fileName: fileReference.name },
+        true,
+    );
+}
+
 function onSelectFileLanguage(
     fileReference: FileReference,
+    fileIndex: number,
     languageCode: string,
 ) {
     selectedLanguageCodes.value.set(getFileKey(fileReference), languageCode);
+    emit(UPDATE_METADATA_LANGUAGE, fileIndex, languageCode);
 }
 
 function isExpanded(fileReference: FileReference): boolean {
@@ -224,25 +249,6 @@ function onUpdateField(
             </div>
 
             <div
-                v-if="shouldShowLanguageSelect && languages.length > 1"
-                class="file-metadata-language"
-            >
-                <label :id="getFieldId(fileIndex, 'language')">
-                    {{ $gettext("Language of file details") }}
-                </label>
-                <Select
-                    :model-value="getFileLanguage(fileReference)?.code"
-                    :options="languages"
-                    option-label="name"
-                    option-value="code"
-                    :aria-labelledby="getFieldId(fileIndex, 'language')"
-                    @update:model-value="
-                        onSelectFileLanguage(fileReference, $event)
-                    "
-                />
-            </div>
-
-            <div
                 v-if="getFileLanguage(fileReference)"
                 class="file-metadata"
             >
@@ -261,8 +267,15 @@ function onUpdateField(
                     :is-required="field === 'altText' && isAltTextRequired"
                     :help-text="getHelpText(field)"
                     :error-text="getErrorText(fileReference, field)"
+                    :selectable-languages="getSelectableLanguages(field)"
+                    :language-toggle-aria-label="
+                        getLanguageToggleAriaLabel(fileReference)
+                    "
                     @update:model-value="
                         onUpdateField(fileReference, fileIndex, field, $event)
+                    "
+                    @update:language="
+                        onSelectFileLanguage(fileReference, fileIndex, $event)
                     "
                     @blur="onBlurField(fileReference, field)"
                 />
@@ -299,11 +312,24 @@ function onUpdateField(
                                 )
                             "
                             :is-multiline="field === 'description'"
+                            :selectable-languages="
+                                getSelectableLanguages(field)
+                            "
+                            :language-toggle-aria-label="
+                                getLanguageToggleAriaLabel(fileReference)
+                            "
                             @update:model-value="
                                 onUpdateField(
                                     fileReference,
                                     fileIndex,
                                     field,
+                                    $event,
+                                )
+                            "
+                            @update:language="
+                                onSelectFileLanguage(
+                                    fileReference,
+                                    fileIndex,
                                     $event,
                                 )
                             "
@@ -317,16 +343,22 @@ function onUpdateField(
 
 <style scoped>
 .file-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
     list-style: none;
-    margin: 0;
+    margin: 0.75rem 0 0;
     padding: 0;
 }
 
 .file-list-item {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    padding-block: 0.5rem;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border: 1px solid var(--p-content-border-color);
+    border-radius: var(--p-content-border-radius);
+    background: var(--p-content-hover-background);
 }
 
 .file-summary {
@@ -349,16 +381,6 @@ function onUpdateField(
 
 .delete-button {
     flex: 0 0 auto;
-}
-
-.file-metadata-language {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-
-.file-metadata-language label {
-    font-weight: 600;
 }
 
 .file-metadata {

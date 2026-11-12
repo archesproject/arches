@@ -11,6 +11,7 @@ import {
     buildEmptyFileMetadata,
     buildFileListAliasedNodeData,
     getVisibleMetadataFields,
+    shouldShowMetadataLanguageSelect,
 } from "@/arches_vue_components/datatypes/file-list/utils.ts";
 
 import type { LanguageValue } from "@/arches_vue_components/datatypes/string/types.ts";
@@ -28,17 +29,22 @@ import type {
 const {
     aliasedNodeData,
     cardXNodeXWidgetData = undefined,
-    shouldShowMetadataLanguageSelect = false,
+    metadataLanguageCode = undefined,
 } = defineProps<{
     aliasedNodeData: FileListAliasedNodeData | null;
     cardXNodeXWidgetData?: FileListCardXNodeXWidgetData;
-    shouldShowMetadataLanguageSelect?: boolean;
+    metadataLanguageCode?: string;
 }>();
 
 const emit = defineEmits<{
     (
         event: "update:aliasedNodeData",
         updatedValue: FileListAliasedNodeData,
+    ): void;
+    (
+        event: "update:metadataLanguageCode",
+        languageCode: string,
+        fileIndex: number,
     ): void;
 }>();
 
@@ -54,6 +60,17 @@ const requestLanguage = computed(() =>
     languageStore.languages.find(
         (language) => language.code === languageStore.requestLanguageCode,
     ),
+);
+
+const defaultMetadataLanguage = computed(
+    () =>
+        languageStore.languages.find(
+            (language) => language.code === metadataLanguageCode,
+        ) ?? requestLanguage.value,
+);
+
+const isMetadataLanguageSelectShown = computed(() =>
+    shouldShowMetadataLanguageSelect(cardXNodeXWidgetData),
 );
 
 const isAltTextRequired = computed(() =>
@@ -173,6 +190,15 @@ function onUpdateSavedFileMetadata(
     emitUpdatedValue();
 }
 
+// Saved files come first in the emitted value (see emitUpdatedValue), so a
+// pending file's index is offset by the number of saved files.
+function onSelectMetadataLanguage(
+    languageCode: string,
+    fileIndexInValue: number,
+): void {
+    emit("update:metadataLanguageCode", languageCode, fileIndexInValue);
+}
+
 function onRemovePendingFile(
     fileIndex: number,
     removeFileCallback: (index: number) => void,
@@ -220,8 +246,8 @@ function openFileChooser(): void {
             <FileList
                 :files="pendingFiles as unknown as FileReference[]"
                 :languages="languageStore.languages"
-                :default-metadata-language="requestLanguage"
-                :should-show-language-select="shouldShowMetadataLanguageSelect"
+                :default-metadata-language="defaultMetadataLanguage"
+                :should-show-language-select="isMetadataLanguageSelectShown"
                 :visible-metadata-fields="visibleMetadataFields"
                 :is-alt-text-required="isAltTextRequired"
                 @remove="
@@ -229,25 +255,40 @@ function openFileChooser(): void {
                         onRemovePendingFile(fileIndex, removeFileCallback)
                 "
                 @update:metadata="onUpdatePendingFileMetadata"
+                @update:metadata-language="
+                    (fileIndex, languageCode) =>
+                        onSelectMetadataLanguage(
+                            languageCode,
+                            savedFiles.length + fileIndex,
+                        )
+                "
             />
 
             <FileList
                 :files="savedFiles"
                 :languages="languageStore.languages"
-                :default-metadata-language="requestLanguage"
-                :should-show-language-select="shouldShowMetadataLanguageSelect"
+                :default-metadata-language="defaultMetadataLanguage"
+                :should-show-language-select="isMetadataLanguageSelectShown"
                 :visible-metadata-fields="visibleMetadataFields"
                 :is-alt-text-required="isAltTextRequired"
                 @remove="
                     (_fileReference, fileIndex) => onRemoveSavedFile(fileIndex)
                 "
                 @update:metadata="onUpdateSavedFileMetadata"
+                @update:metadata-language="
+                    (fileIndex, languageCode) =>
+                        onSelectMetadataLanguage(languageCode, fileIndex)
+                "
             />
         </template>
     </FileUpload>
 </template>
 
 <style scoped>
+:deep(.p-fileupload) {
+    color: inherit;
+    background: transparent;
+}
 :deep(.p-fileupload-header) {
     display: none;
 }

@@ -6,6 +6,7 @@ import {
     getVisibleMetadataFields,
     hasAnyAltText,
     setLocalizedValue,
+    shouldShowMetadataLanguageSelect,
 } from "@/arches_vue_components/datatypes/file-list/utils.ts";
 
 import type { Language } from "@/arches_vue_components/types.ts";
@@ -100,6 +101,36 @@ describe("getVisibleMetadataFields", () => {
             "altText",
             "attribution",
         ]);
+    });
+});
+
+describe("shouldShowMetadataLanguageSelect", () => {
+    function buildCardXNodeXWidgetData(
+        metadataLanguageSelect?: FileListCardXNodeXWidgetData["config"]["metadataLanguageSelect"],
+    ): FileListCardXNodeXWidgetData {
+        return {
+            config: { metadataLanguageSelect },
+        } as FileListCardXNodeXWidgetData;
+    }
+
+    it("hides the picker without widget data or a config entry", () => {
+        expect(shouldShowMetadataLanguageSelect(undefined)).toBe(false);
+        expect(
+            shouldShowMetadataLanguageSelect(buildCardXNodeXWidgetData()),
+        ).toBe(false);
+    });
+
+    it("follows the visible bit", () => {
+        expect(
+            shouldShowMetadataLanguageSelect(
+                buildCardXNodeXWidgetData({ visible: true }),
+            ),
+        ).toBe(true);
+        expect(
+            shouldShowMetadataLanguageSelect(
+                buildCardXNodeXWidgetData({ visible: false }),
+            ),
+        ).toBe(false);
     });
 });
 
