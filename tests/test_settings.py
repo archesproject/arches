@@ -27,6 +27,31 @@ APP_ROOT = ""
 TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, "..", "tests"))
 STATICFILES_DIRS = []
 
+DATABASES = {
+    "default": {
+        "ATOMIC_REQUESTS": False,
+        "AUTOCOMMIT": True,
+        "CONN_MAX_AGE": 0,
+        "ENGINE": "django.contrib.gis.db.backends.postgis",
+        "HOST": "postgres18_arches8-2-dev",
+        "NAME": "test_core_testing82",
+        "OPTIONS": {
+            "options": "-c cursor_tuple_fraction=1",
+        },
+        "PASSWORD": "postgis",
+        "PORT": "5432",
+        "POSTGIS_TEMPLATE": "template_postgis",
+        "TEST": {
+            "CHARSET": None,
+            "COLLATION": None,
+            "MIRROR": None,
+            "NAME": None
+        },
+        "TIME_ZONE": None,
+        "USER": "postgres"
+    }
+}
+
 RESOURCE_GRAPH_LOCATIONS = [
     os.path.join(TEST_ROOT, "fixtures", "resource_graphs"),
     os.path.join(
@@ -62,6 +87,16 @@ ES_MAPPING_MODIFIER_CLASSES = [
     "arches.extensions.controlled_lists.search.references_es_mapping_modifier.ReferencesEsMappingModifier",
 ]
 
+ELASTICSEARCH_SCHEME = "http"
+ELASTICSEARCH_HTTP_PORT = 9200
+ELASTICSEARCH_HTTP_HOST = "elasticsearch9_arches8-2-dev"
+ELASTICSEARCH_HOSTS = [
+    {
+        "scheme": ELASTICSEARCH_SCHEME,
+        "host": ELASTICSEARCH_HTTP_HOST,
+        "port": ELASTICSEARCH_HTTP_PORT,
+    }
+]
 # Reference data index, so that the bundled controlled lists tests can build and
 # query it. REFERENCES_INDEX_NAME comes from arches.settings.
 ELASTICSEARCH_CUSTOM_INDEXES = [
@@ -153,9 +188,6 @@ ENABLE_TWO_FACTOR_AUTHENTICATION = False
 FORCE_TWO_FACTOR_AUTHENTICATION = False
 
 DATATYPE_LOCATIONS.append("tests.fixtures.datatypes")
-ELASTICSEARCH_HOSTS = [
-    {"scheme": "http", "host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}
-]
 LANGUAGES = [
     ("de", _("German")),
     ("en", _("English")),

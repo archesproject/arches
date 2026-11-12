@@ -21,8 +21,6 @@ class IntegrityCheck(Enum):
     PUBLICATION_MISSING_FOR_LANGUAGE = 1014
     GRAPH_MISSING_SLUG = 1015
     TOO_MANY_WIDGETS = 1016
-    # NO_WIDGETS isn't currently an error condition,
-    # but it might be in the future.
     NO_WIDGETS = 1017
     INVALID_DEFAULT_VALUE = 1020
 
