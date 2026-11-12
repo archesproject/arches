@@ -127,6 +127,7 @@ function updateOpacity(value: number | number[]): void {
                 :input-id="visibilityInputId"
                 :model-value="overlay.addtomap"
                 :binary="true"
+                size="large"
                 @update:model-value="emit(TOGGLE_VISIBILITY_EVENT)"
             />
             <label
