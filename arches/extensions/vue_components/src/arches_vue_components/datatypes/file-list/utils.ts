@@ -20,8 +20,6 @@ export function buildFileListAliasedNodeData(
     };
 }
 
-// Mirrors the Knockout file widget's createStrObject: every language starts
-// with an empty value, so FileListDataType stores a complete localized dict.
 export function buildEmptyFileMetadata(languages: Language[]): FileMetadata {
     const buildEmptyLocalizedValue = () =>
         Object.fromEntries(
@@ -39,15 +37,20 @@ export function buildEmptyFileMetadata(languages: Language[]): FileMetadata {
     ) as FileMetadata;
 }
 
-// Like a card hiding a node through CardXNodeXWidgetData.visible, a consumer
-// hides a metadata field by setting config.metadataFields[field].visible to
-// false. A field without an entry is shown.
 export function getVisibleMetadataFields(
     cardXNodeXWidgetData: FileListCardXNodeXWidgetData | undefined,
 ): FileMetadataField[] {
     const metadataFieldConfigs = cardXNodeXWidgetData?.config.metadataFields;
     return FILE_METADATA_FIELDS.filter(
         (field) => metadataFieldConfigs?.[field]?.visible !== false,
+    );
+}
+
+export function shouldShowMetadataLanguageSelect(
+    cardXNodeXWidgetData: FileListCardXNodeXWidgetData | undefined,
+): boolean {
+    return (
+        cardXNodeXWidgetData?.config.metadataLanguageSelect?.visible === true
     );
 }
 
@@ -61,8 +64,6 @@ export function getLocalizedValue(
     return localizedValue?.[languageCode]?.value ?? "";
 }
 
-// Falls back to the title, never the file name: a name like "IMG_0042.jpg"
-// tells a screen reader user nothing, and an empty alt is better than that.
 export function getFileAltText(
     fileReference: FileReference,
     languageCode: string | null,
