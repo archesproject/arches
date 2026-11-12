@@ -21,7 +21,5 @@ export interface FileListWidgetProps extends BaseWidgetProps {
     cardXNodeXWidgetData?: FileListCardXNodeXWidgetData;
     aliasedNodeData?: FileListAliasedNodeData | null;
     value?: FileReference[] | null;
-    // Off by default: metadata is edited in the request language, as in the
-    // Knockout widget. Turn on to let editors pick a language per file.
-    shouldShowMetadataLanguageSelect?: boolean;
+    metadataLanguageCode?: string;
 }
