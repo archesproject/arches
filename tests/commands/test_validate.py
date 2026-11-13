@@ -122,9 +122,7 @@ class ValidateTests(ArchesTestCase):
         """Nodes whose datatypes have a default widget, and that already have a
         widget record, do not trigger the check."""
         out = StringIO()
-        call_command(
-            "validate", codes=[IntegrityCheck.NO_WIDGETS.value], stdout=out
-        )
+        call_command("validate", codes=[IntegrityCheck.NO_WIDGETS.value], stdout=out)
         self.assertIn("PASS", out.getvalue())
 
     def test_no_widgets_reported(self):
@@ -132,9 +130,7 @@ class ValidateTests(ArchesTestCase):
         card = CardModel.objects.get(graph=self.graph, nodegroup=self.nodegroup_1)
         CardXNodeXWidget.objects.filter(card=card).delete()
         out = StringIO()
-        call_command(
-            "validate", codes=[IntegrityCheck.NO_WIDGETS.value], stdout=out
-        )
+        call_command("validate", codes=[IntegrityCheck.NO_WIDGETS.value], stdout=out)
         self.assertIn("FAIL", out.getvalue())
 
     def test_backfill_creates_widgets_with_correct_datatype(self):
@@ -156,7 +152,9 @@ class ValidateTests(ArchesTestCase):
             if node is None:
                 continue
             widget = CardXNodeXWidget.objects.filter(node=node, card=card).first()
-            self.assertIsNotNone(widget, f"No widget created for node with datatype {dt.pk}")
+            self.assertIsNotNone(
+                widget, f"No widget created for node with datatype {dt.pk}"
+            )
             self.assertEqual(widget.widget_id, dt.defaultwidget_id)
 
     def test_backfill_sortorder_sequential_from_zero(self):
@@ -170,9 +168,13 @@ class ValidateTests(ArchesTestCase):
         )
 
         sortorders = sorted(
-            CardXNodeXWidget.objects.filter(card=card).values_list("sortorder", flat=True)
+            CardXNodeXWidget.objects.filter(card=card).values_list(
+                "sortorder", flat=True
+            )
         )
-        self.assertFalse(any(s is None for s in sortorders), "NULL sortorder after backfill")
+        self.assertFalse(
+            any(s is None for s in sortorders), "NULL sortorder after backfill"
+        )
         self.assertEqual(sortorders, list(range(len(sortorders))))
 
     def test_backfill_sortorder_continues_after_existing(self):
