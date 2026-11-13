@@ -24,7 +24,7 @@ from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.core.management import BaseCommand, CommandError, call_command
 from django.db import transaction
-from django.db.models import Count, Exists, OuterRef, Q, Subquery
+from django.db.models import Count, Exists, Max, OuterRef, Q, Subquery
 
 from arches import __version__
 from arches.app.const import IntegrityCheck
@@ -44,6 +44,7 @@ class FixActions(StrEnum):
     like delete(), or values(), or prefetch_related() that generate clones.)
     """
 
+    BACKFILL_MISSING_WIDGETS = auto()
     DELETE_QUERYSET = auto()
     DEDUPLICATE_WIDGETS = auto()
     UPDATE_GRAPH_PUBLICATIONS = auto()
@@ -108,6 +109,27 @@ class Command(BaseCommand):
             action="store",
             type=int,
             help="Maximum number of rows to print; does not affect fix actions",
+        )
+        parser.add_argument(
+            "--export",
+            action="store_true",
+            dest="export",
+            default=False,
+            help=(
+                "After fixing, export modified graphs as JSON. "
+                "Only applies when used with --fix or --fix-all."
+            ),
+        )
+        parser.add_argument(
+            "--export-dir",
+            default=".",
+            dest="export_dir",
+            metavar="DIR",
+            help=(
+                "Directory to export modified graphs to as JSON. "
+                "Defaults to the current working directory. "
+                "Only applies when used with --export and --fix or --fix-all."
+            ),
         )
 
     def handle(self, *args, **options):
@@ -210,14 +232,18 @@ class Command(BaseCommand):
             queryset=self.get_invalid_default_values(),
             fix_action=None,
         )
-        # This is not currently an error condition, so don't show it.
-        # self.check_integrity(
-        #     check=IntegrityCheck.NO_WIDGETS,  # 1017
-        #     queryset=models.Node.objects.exclude(datatype="semantic")
-        #     .annotate(widget_count=Count("cardxnodexwidget"))
-        #     .filter(widget_count__lt=1),
-        #     fix_action=None,
-        # )
+        self.check_integrity(
+            check=IntegrityCheck.NO_WIDGETS,  # 1017
+            queryset=models.Node.objects.filter(source_identifier=None)
+            .filter(
+                datatype__in=models.DDataType.objects.filter(
+                    defaultwidget__isnull=False
+                ).values("datatype")
+            )
+            .annotate(widget_count=Count("cardxnodexwidget"))
+            .filter(widget_count__lt=1),
+            fix_action=FixActions.BACKFILL_MISSING_WIDGETS,
+        )
 
     def get_invalid_default_values(self):
         invalid_defaults = ValidationResultList()
@@ -236,6 +262,33 @@ class Command(BaseCommand):
                 invalid_defaults.append(InvalidNodeDefaultValue(node, errors))
 
         return invalid_defaults
+
+    def _export_graphs(self, graph_slugs):
+        if self.options.get("export"):
+            export_dir = self.options["export_dir"]
+            self.stdout.write(f"\tExporting modified graphs to {export_dir!r}:")
+            call_command(
+                "packages",
+                operation="export_graphs",
+                dest_dir=export_dir,
+                graphs=",".join(
+                    str(pk)
+                    for slug in graph_slugs
+                    for pk in models.GraphModel.objects.filter(
+                        slug=slug, source_identifier=None
+                    ).values_list("pk", flat=True)
+                ),
+                verbosity=self.options["verbosity"],
+                stdout=self.stdout,
+                stderr=self.stderr,
+            )
+        else:
+            self.stdout.write(
+                "\tThese graphs were modified in the database only."
+                " Re-export each to persist the changes:"
+            )
+            for slug in sorted(graph_slugs):
+                self.stdout.write(f"\t  {slug}")
 
     def check_integrity(self, check, queryset, fix_action):
         # 500 not set as a default earlier:
@@ -271,10 +324,19 @@ class Command(BaseCommand):
                 fix_status = self.style.ERROR("No")  # until actually fixed below
                 # Perform fix action
                 if fix_action == FixActions.DELETE_QUERYSET:
+                    graph_slugs = set(
+                        models.GraphModel.objects.filter(
+                            cardmodel__nodegroup__in=queryset,
+                            source_identifier=None,
+                        ).values_list("slug", flat=True)
+                    )
                     with transaction.atomic():
                         queryset.delete()
                     fix_status = self.style.SUCCESS("Yes")
+                    if graph_slugs:
+                        self._export_graphs(graph_slugs)
                 elif fix_action == FixActions.UPDATE_GRAPH_PUBLICATIONS:
+                    graph_slugs = set(queryset.values_list("slug", flat=True))
                     call_command(
                         "graph",
                         "publish",
@@ -288,7 +350,10 @@ class Command(BaseCommand):
                         stderr=self.stderr,
                     )
                     fix_status = self.style.SUCCESS("Yes")
+                    if graph_slugs:
+                        self._export_graphs(graph_slugs)
                 elif fix_action == FixActions.DEDUPLICATE_WIDGETS:
+                    graph_slugs = set(queryset.values_list("graph__slug", flat=True))
                     problems_remain = deduplicate_widgets(
                         queryset.prefetch_related("nodegroup__cardmodel_set")
                     )
@@ -297,6 +362,24 @@ class Command(BaseCommand):
                         if problems_remain
                         else self.style.SUCCESS("Yes")
                     )
+                    if graph_slugs:
+                        self._export_graphs(graph_slugs)
+                elif fix_action == FixActions.BACKFILL_MISSING_WIDGETS:
+                    changes = backfill_missing_widgets(queryset)
+                    fix_status = self.style.SUCCESS("Yes")
+                    if changes and self.options["verbosity"] > 0:
+                        self.stdout.write()
+                        self.stdout.write("\tBackfilled CXNxW records:")
+                        for slug, nodes_changed in sorted(changes.items()):
+                            self.stdout.write(
+                                f"\t  {slug}: {len(nodes_changed)} node(s)"
+                            )
+                            if self.options["verbosity"] > 1:
+                                for alias, nodeid in nodes_changed:
+                                    self.stdout.write(f"\t    {alias} ({nodeid})")
+                        self.stdout.write()
+                    if changes:
+                        self._export_graphs(changes)
                 else:
                     raise NotImplementedError
             else:
@@ -341,6 +424,71 @@ class Command(BaseCommand):
                             break
 
             self.stdout.write()
+
+
+def backfill_missing_widgets(nodes):
+    widget_by_datatype = {
+        dt.datatype: dt.defaultwidget
+        for dt in models.DDataType.objects.filter(
+            defaultwidget__isnull=False
+        ).select_related("defaultwidget")
+    }
+    graph_ids_to_republish: set[uuid.UUID] = set()
+    # graph_id → [(alias, nodeid)] for every record created
+    changes: dict[uuid.UUID, list[tuple[str, uuid.UUID]]] = {}
+    with transaction.atomic():
+        card_by_nodegroup = {
+            card.nodegroup_id: card
+            for card in models.CardModel.objects.filter(
+                nodegroup_id__in=nodes.values("nodegroup_id"),
+                source_identifier=None,
+            )
+        }
+        next_sortorder_by_card = {
+            card_id: (0 if max_so is None else max_so + 1)
+            for card_id, max_so in models.CardXNodeXWidget.objects.filter(
+                card__in=card_by_nodegroup.values()
+            )
+            .values("card_id")
+            .annotate(max_so=Max("sortorder"))
+            .values_list("card_id", "max_so")
+        }
+        for node in nodes:
+            card = card_by_nodegroup.get(node.nodegroup_id)
+            if not card:
+                continue
+            defaultwidget = widget_by_datatype.get(node.datatype)
+            if not defaultwidget:
+                continue
+            next_sortorder = next_sortorder_by_card.get(card.pk, 0)
+            next_sortorder_by_card[card.pk] = next_sortorder + 1
+            _, created = models.CardXNodeXWidget.objects.update_or_create(
+                node=node,
+                card=card,
+                defaults={
+                    "widget_id": defaultwidget.pk,
+                    "config": defaultwidget.defaultconfig or {},
+                    "label": node.name,
+                    "sortorder": next_sortorder,
+                },
+            )
+            if created:
+                graph_ids_to_republish.add(node.graph_id)
+                changes.setdefault(node.graph_id, []).append((node.alias, node.pk))
+
+        for graph in models.Graph.objects.filter(
+            pk__in=graph_ids_to_republish,
+            source_identifier=None,
+        ):
+            graph.publish(notes="Backfilled missing card_x_node_x_widgets")
+
+    slug_map = dict(
+        models.GraphModel.objects.filter(pk__in=changes).values_list("pk", "slug")
+    )
+    return {
+        slug_map.get(graph_id, str(graph_id)): nodes_changed
+        for graph_id, nodes_changed in changes.items()
+    }
 
 
 def deduplicate_widgets(nodes):
