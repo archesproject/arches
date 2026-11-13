@@ -2,6 +2,7 @@
 # python manage.py test tests.commands.test_validate --settings="tests.test_settings"
 
 from io import StringIO
+from unittest.mock import patch
 
 from django.core.management import call_command
 
@@ -198,3 +199,43 @@ class ValidateTests(ArchesTestCase):
 
         new_widget = CardXNodeXWidget.objects.get(node=deleted_node, card=card)
         self.assertEqual(new_widget.sortorder, expected_sortorder)
+
+    def test_backfill_suggests_reexport_without_export_flag(self):
+        """Without --export, the fix outputs a message suggesting manual re-export."""
+        card = CardModel.objects.get(graph=self.graph, nodegroup=self.nodegroup_1)
+        CardXNodeXWidget.objects.filter(card=card).delete()
+        out = StringIO()
+        call_command("validate", fix=[IntegrityCheck.NO_WIDGETS.value], stdout=out)
+        self.assertIn("modified in the database only", out.getvalue())
+        self.assertIn("datatype_lookups", out.getvalue())
+
+    def test_backfill_export_runs_regardless_of_verbosity(self):
+        """Export suggestion appears even at --verbosity=0."""
+        card = CardModel.objects.get(graph=self.graph, nodegroup=self.nodegroup_1)
+        CardXNodeXWidget.objects.filter(card=card).delete()
+        out = StringIO()
+        call_command(
+            "validate",
+            fix=[IntegrityCheck.NO_WIDGETS.value],
+            verbosity=0,
+            stdout=out,
+        )
+        self.assertIn("modified in the database only", out.getvalue())
+
+    def test_backfill_export_flag_triggers_export(self):
+        """With --export, packages export_graphs is invoked for the modified graph."""
+        card = CardModel.objects.get(graph=self.graph, nodegroup=self.nodegroup_1)
+        CardXNodeXWidget.objects.filter(card=card).delete()
+        with patch("arches.management.commands.validate.call_command") as mock_cc:
+            call_command(
+                "validate",
+                fix=[IntegrityCheck.NO_WIDGETS.value],
+                export=True,
+                export_dir=".",
+                stdout=StringIO(),
+            )
+        packages_calls = [
+            c for c in mock_cc.call_args_list if c.args and c.args[0] == "packages"
+        ]
+        self.assertEqual(len(packages_calls), 1)
+        self.assertEqual(packages_calls[0].kwargs["operation"], "export_graphs")

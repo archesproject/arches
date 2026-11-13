@@ -263,6 +263,33 @@ class Command(BaseCommand):
 
         return invalid_defaults
 
+    def _export_graphs(self, graph_slugs):
+        if self.options.get("export"):
+            export_dir = self.options["export_dir"]
+            self.stdout.write(f"\tExporting modified graphs to {export_dir!r}:")
+            call_command(
+                "packages",
+                operation="export_graphs",
+                dest_dir=export_dir,
+                graphs=",".join(
+                    str(pk)
+                    for slug in graph_slugs
+                    for pk in models.GraphModel.objects.filter(
+                        slug=slug, source_identifier=None
+                    ).values_list("pk", flat=True)
+                ),
+                verbosity=self.options["verbosity"],
+                stdout=self.stdout,
+                stderr=self.stderr,
+            )
+        else:
+            self.stdout.write(
+                "\tThese graphs were modified in the database only."
+                " Re-export each to persist the changes:"
+            )
+            for slug in sorted(graph_slugs):
+                self.stdout.write(f"\t  {slug}")
+
     def check_integrity(self, check, queryset, fix_action):
         # 500 not set as a default earlier:
         # None distinguishes whether verbose output implied.
@@ -297,10 +324,19 @@ class Command(BaseCommand):
                 fix_status = self.style.ERROR("No")  # until actually fixed below
                 # Perform fix action
                 if fix_action == FixActions.DELETE_QUERYSET:
+                    graph_slugs = set(
+                        models.GraphModel.objects.filter(
+                            cardmodel__nodegroup__in=queryset,
+                            source_identifier=None,
+                        ).values_list("slug", flat=True)
+                    )
                     with transaction.atomic():
                         queryset.delete()
                     fix_status = self.style.SUCCESS("Yes")
+                    if graph_slugs:
+                        self._export_graphs(graph_slugs)
                 elif fix_action == FixActions.UPDATE_GRAPH_PUBLICATIONS:
+                    graph_slugs = set(queryset.values_list("slug", flat=True))
                     call_command(
                         "graph",
                         "publish",
@@ -314,7 +350,10 @@ class Command(BaseCommand):
                         stderr=self.stderr,
                     )
                     fix_status = self.style.SUCCESS("Yes")
+                    if graph_slugs:
+                        self._export_graphs(graph_slugs)
                 elif fix_action == FixActions.DEDUPLICATE_WIDGETS:
+                    graph_slugs = set(queryset.values_list("graph__slug", flat=True))
                     problems_remain = deduplicate_widgets(
                         queryset.prefetch_related("nodegroup__cardmodel_set")
                     )
@@ -323,6 +362,8 @@ class Command(BaseCommand):
                         if problems_remain
                         else self.style.SUCCESS("Yes")
                     )
+                    if graph_slugs:
+                        self._export_graphs(graph_slugs)
                 elif fix_action == FixActions.BACKFILL_MISSING_WIDGETS:
                     changes = backfill_missing_widgets(queryset)
                     fix_status = self.style.SUCCESS("Yes")
@@ -337,33 +378,8 @@ class Command(BaseCommand):
                                 for alias, nodeid in nodes_changed:
                                     self.stdout.write(f"\t    {alias} ({nodeid})")
                         self.stdout.write()
-                        if self.options.get("export"):
-                            export_dir = self.options["export_dir"]
-                            self.stdout.write(
-                                f"\tExporting modified graphs to {export_dir!r}:"
-                            )
-                            call_command(
-                                "packages",
-                                operation="export_graphs",
-                                dest_dir=export_dir,
-                                graphs=",".join(
-                                    str(pk)
-                                    for slug in changes
-                                    for pk in models.GraphModel.objects.filter(
-                                        slug=slug, source_identifier=None
-                                    ).values_list("pk", flat=True)
-                                ),
-                                verbosity=self.options["verbosity"],
-                                stdout=self.stdout,
-                                stderr=self.stderr,
-                            )
-                        else:
-                            self.stdout.write(
-                                "\tThese graphs were modified in the database only."
-                                " Re-export each to persist the changes:"
-                            )
-                            for slug in sorted(changes):
-                                self.stdout.write(f"\t  {slug}")
+                    if changes:
+                        self._export_graphs(changes)
                 else:
                     raise NotImplementedError
             else:
