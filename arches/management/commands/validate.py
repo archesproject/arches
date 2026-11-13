@@ -24,7 +24,7 @@ from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.core.management import BaseCommand, CommandError, call_command
 from django.db import transaction
-from django.db.models import Count, Exists, OuterRef, Q, Subquery
+from django.db.models import Count, Exists, Max, OuterRef, Q, Subquery
 
 from arches import __version__
 from arches.app.const import IntegrityCheck
@@ -111,16 +111,24 @@ class Command(BaseCommand):
             help="Maximum number of rows to print; does not affect fix actions",
         )
         parser.add_argument(
+            "--export",
+            action="store_true",
+            dest="export",
+            default=False,
+            help=(
+                "After fixing, export modified graphs as JSON. "
+                "Only applies when used with --fix or --fix-all."
+            ),
+        )
+        parser.add_argument(
             "--export-dir",
-            nargs="?",
-            const=".",
-            default=None,
+            default=".",
             dest="export_dir",
             metavar="DIR",
             help=(
-                "After fixing, export modified graphs to DIR as JSON. "
-                "Omit DIR to export to the current working directory. "
-                "Only applies when used with --fix or --fix-all."
+                "Directory to export modified graphs to as JSON. "
+                "Defaults to the current working directory. "
+                "Only applies when used with --export and --fix or --fix-all."
             ),
         )
 
@@ -329,8 +337,8 @@ class Command(BaseCommand):
                                 for alias, nodeid in nodes_changed:
                                     self.stdout.write(f"\t    {alias} ({nodeid})")
                         self.stdout.write()
-                        export_dir = self.options.get("export_dir")
-                        if export_dir:
+                        if self.options.get("export"):
+                            export_dir = self.options["export_dir"]
                             self.stdout.write(
                                 f"\tExporting modified graphs to {export_dir!r}:"
                             )
@@ -403,15 +411,6 @@ class Command(BaseCommand):
 
 
 def backfill_missing_widgets(nodes):
-    """Create a default CardXNodeXWidget for each source node that has none.
-
-    Uses the datatype's defaultwidget and defaultconfig, mirroring the
-    in-memory synthesis performed by Card.serialize() and CardWidgetModel
-    when no DB record exists.  Republishes any graphs that were modified so
-    that published_graphs.serialized_graph stays consistent.
-    """
-    # Node.datatype is a TextField (not a FK), so pre-build the lookup to
-    # avoid N+1 queries and bypass select_related limitations.
     widget_by_datatype = {
         dt.datatype: dt.defaultwidget
         for dt in models.DDataType.objects.filter(
@@ -420,18 +419,33 @@ def backfill_missing_widgets(nodes):
     }
     graph_ids_to_republish: set[uuid.UUID] = set()
     # graph_id → [(alias, nodeid)] for every record created
-    changes: dict[uuid.UUID, list[tuple[str | None, uuid.UUID]]] = {}
+    changes: dict[uuid.UUID, list[tuple[str, uuid.UUID]]] = {}
     with transaction.atomic():
-        for node in nodes:
-            card = models.CardModel.objects.filter(
-                nodegroup_id=node.nodegroup_id,
+        card_by_nodegroup = {
+            card.nodegroup_id: card
+            for card in models.CardModel.objects.filter(
+                nodegroup_id__in=nodes.values("nodegroup_id"),
                 source_identifier=None,
-            ).first()
+            )
+        }
+        next_sortorder_by_card = {
+            card_id: (0 if max_so is None else max_so + 1)
+            for card_id, max_so in models.CardXNodeXWidget.objects.filter(
+                card__in=card_by_nodegroup.values()
+            )
+            .values("card_id")
+            .annotate(max_so=Max("sortorder"))
+            .values_list("card_id", "max_so")
+        }
+        for node in nodes:
+            card = card_by_nodegroup.get(node.nodegroup_id)
             if not card:
                 continue
             defaultwidget = widget_by_datatype.get(node.datatype)
             if not defaultwidget:
                 continue
+            next_sortorder = next_sortorder_by_card.get(card.pk, 0)
+            next_sortorder_by_card[card.pk] = next_sortorder + 1
             _, created = models.CardXNodeXWidget.objects.update_or_create(
                 node=node,
                 card=card,
@@ -439,7 +453,7 @@ def backfill_missing_widgets(nodes):
                     "widget_id": defaultwidget.pk,
                     "config": defaultwidget.defaultconfig or {},
                     "label": node.name,
-                    "sortorder": None,
+                    "sortorder": next_sortorder,
                 },
             )
             if created:
