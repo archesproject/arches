@@ -12,6 +12,7 @@ from arches.app.models.models import (
     CardModel,
     CardXNodeXWidget,
     DDataType,
+    Edge,
     Node,
     NodeGroup,
 )
@@ -92,6 +93,9 @@ class ValidateTests(ArchesTestCase):
             for nodegroup in [cls.nodegroup_1, cls.nodegroup_n]
         ]
         cards = CardModel.objects.bulk_create(cards)
+        for i, card in enumerate(cards):
+            card.sortorder = i
+        CardModel.objects.bulk_update(cards, ["sortorder"])
 
         node_widgets = [
             CardXNodeXWidget(
@@ -101,7 +105,14 @@ class ValidateTests(ArchesTestCase):
             )
             for node in [n for n in nodes if n.datatype != "semantic"]
         ]
-        CardXNodeXWidget.objects.bulk_create(node_widgets)
+        node_widgets = CardXNodeXWidget.objects.bulk_create(node_widgets)
+        widgets_by_card = {}
+        for w in node_widgets:
+            widgets_by_card.setdefault(w.card_id, []).append(w)
+        for card_widgets in widgets_by_card.values():
+            for i, w in enumerate(card_widgets):
+                w.sortorder = i
+        CardXNodeXWidget.objects.bulk_update(node_widgets, ["sortorder"])
 
     @classmethod
     def find_default_widget_id(cls, node, datatypes):
@@ -239,3 +250,252 @@ class ValidateTests(ArchesTestCase):
         ]
         self.assertEqual(len(packages_calls), 1)
         self.assertEqual(packages_calls[0].kwargs["operation"], "export_graphs")
+
+    # --- 1018: NULL_OR_DUPLICATE_CARD_SORTORDER ---
+
+    def test_card_sortorder_pass(self):
+        """Cards with unique non-null sortorders do not trigger the check."""
+        out = StringIO()
+        call_command(
+            "validate",
+            codes=[IntegrityCheck.NULL_OR_DUPLICATE_CARD_SORTORDER.value],
+            stdout=out,
+        )
+        self.assertIn("PASS", out.getvalue())
+
+    def test_null_card_sortorder_reported(self):
+        """A card with a NULL sortorder is reported as a failure."""
+        card = CardModel.objects.get(graph=self.graph, nodegroup=self.nodegroup_1)
+        card.sortorder = None
+        card.save()
+        out = StringIO()
+        call_command(
+            "validate",
+            codes=[IntegrityCheck.NULL_OR_DUPLICATE_CARD_SORTORDER.value],
+            stdout=out,
+        )
+        self.assertIn("FAIL", out.getvalue())
+
+    def test_duplicate_card_sortorder_reported(self):
+        """Two sibling cards sharing the same sortorder are reported."""
+        cards = list(CardModel.objects.filter(graph=self.graph, source_identifier=None))
+        for card in cards:
+            card.sortorder = 0
+        CardModel.objects.bulk_update(cards, ["sortorder"])
+        out = StringIO()
+        call_command(
+            "validate",
+            codes=[IntegrityCheck.NULL_OR_DUPLICATE_CARD_SORTORDER.value],
+            stdout=out,
+        )
+        self.assertIn("FAIL", out.getvalue())
+
+    def test_fix_card_sortorders_assigns_sequential_values(self):
+        """Fix action assigns consecutive non-null sortorders within each sibling group."""
+        cards = list(CardModel.objects.filter(graph=self.graph, source_identifier=None))
+        for card in cards:
+            card.sortorder = None
+        CardModel.objects.bulk_update(cards, ["sortorder"])
+
+        call_command(
+            "validate",
+            fix=[IntegrityCheck.NULL_OR_DUPLICATE_CARD_SORTORDER.value],
+            stdout=StringIO(),
+        )
+
+        sortorders = sorted(
+            CardModel.objects.filter(
+                graph=self.graph, source_identifier=None
+            ).values_list("sortorder", flat=True)
+        )
+        self.assertFalse(any(s is None for s in sortorders), "NULL sortorder after fix")
+        self.assertEqual(sortorders, list(range(len(sortorders))))
+
+    # --- 1021: NULL_OR_DUPLICATE_WIDGET_SORTORDER ---
+
+    def test_widget_sortorder_pass(self):
+        """Widgets with unique non-null sortorders per card do not trigger the check."""
+        out = StringIO()
+        call_command(
+            "validate",
+            codes=[IntegrityCheck.NULL_OR_DUPLICATE_WIDGET_SORTORDER.value],
+            stdout=out,
+        )
+        self.assertIn("PASS", out.getvalue())
+
+    def test_null_widget_sortorder_reported(self):
+        """A widget with a NULL sortorder is reported as a failure."""
+        card = CardModel.objects.get(graph=self.graph, nodegroup=self.nodegroup_1)
+        widget = CardXNodeXWidget.objects.filter(card=card).first()
+        widget.sortorder = None
+        widget.save()
+        out = StringIO()
+        call_command(
+            "validate",
+            codes=[IntegrityCheck.NULL_OR_DUPLICATE_WIDGET_SORTORDER.value],
+            stdout=out,
+        )
+        self.assertIn("FAIL", out.getvalue())
+
+    def test_duplicate_widget_sortorder_reported(self):
+        """Two widgets in the same card sharing a sortorder are reported."""
+        card = CardModel.objects.get(graph=self.graph, nodegroup=self.nodegroup_1)
+        widgets = list(CardXNodeXWidget.objects.filter(card=card))
+        for widget in widgets:
+            widget.sortorder = 0
+        CardXNodeXWidget.objects.bulk_update(widgets, ["sortorder"])
+        out = StringIO()
+        call_command(
+            "validate",
+            codes=[IntegrityCheck.NULL_OR_DUPLICATE_WIDGET_SORTORDER.value],
+            stdout=out,
+        )
+        self.assertIn("FAIL", out.getvalue())
+
+    def test_fix_widget_sortorders_assigns_sequential_values(self):
+        """Fix action assigns consecutive non-null sortorders within each card."""
+        card = CardModel.objects.get(graph=self.graph, nodegroup=self.nodegroup_1)
+        widgets = list(CardXNodeXWidget.objects.filter(card=card))
+        for widget in widgets:
+            widget.sortorder = None
+        CardXNodeXWidget.objects.bulk_update(widgets, ["sortorder"])
+
+        call_command(
+            "validate",
+            fix=[IntegrityCheck.NULL_OR_DUPLICATE_WIDGET_SORTORDER.value],
+            stdout=StringIO(),
+        )
+
+        sortorders = sorted(
+            CardXNodeXWidget.objects.filter(card=card).values_list(
+                "sortorder", flat=True
+            )
+        )
+        self.assertFalse(any(s is None for s in sortorders), "NULL sortorder after fix")
+        self.assertEqual(sortorders, list(range(len(sortorders))))
+
+
+# --- 1019: NULL_OR_DUPLICATE_NODE_SORTORDER ---
+
+
+class NodeSortorderTests(ArchesTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        """Create a graph with two sibling non-root nodes connected via Edges,
+        both initially having valid unique sortorders."""
+
+        super().setUpTestData()
+
+        cls.node_graph = Graph.objects.create_graph(
+            name="Node Sortorder Test", is_resource=True
+        )
+        draft = cls.node_graph.get_draft_graph()
+        draft.slug = "node_sortorder_test"
+        draft.save()
+        cls.node_graph.promote_draft_graph_to_active_graph()
+
+        # Root node (no Edge points to it, so NULL/duplicate sortorder is not an issue)
+        cls.parent_node = Node.objects.create(
+            graph=cls.node_graph,
+            alias="ns-parent",
+            name="ns-parent",
+            datatype="semantic",
+            istopnode=True,
+        )
+
+        # Two sibling child nodes with valid, unique sortorders.
+        # Non-top nodes require a nodegroup (constraint: has_nodegroup_or_istopnode),
+        # so create each NodeGroup first using the node's PK, then assign and save.
+        cls.child_node_a = Node(
+            graph=cls.node_graph,
+            alias="ns-child-a",
+            name="ns-child-a",
+            datatype="semantic",
+            istopnode=False,
+            sortorder=0,
+        )
+        cls.nodegroup_a = NodeGroup.objects.create(
+            pk=cls.child_node_a.pk, grouping_node=cls.child_node_a
+        )
+        cls.child_node_a.nodegroup = cls.nodegroup_a
+        cls.child_node_a.save()
+
+        cls.child_node_b = Node(
+            graph=cls.node_graph,
+            alias="ns-child-b",
+            name="ns-child-b",
+            datatype="semantic",
+            istopnode=False,
+            sortorder=1,
+        )
+        cls.nodegroup_b = NodeGroup.objects.create(
+            pk=cls.child_node_b.pk, grouping_node=cls.child_node_b
+        )
+        cls.child_node_b.nodegroup = cls.nodegroup_b
+        cls.child_node_b.save()
+
+        # Edges make child_a and child_b siblings (same domainnode = parent)
+        Edge.objects.create(
+            domainnode=cls.parent_node,
+            rangenode=cls.child_node_a,
+            graph=cls.node_graph,
+        )
+        Edge.objects.create(
+            domainnode=cls.parent_node,
+            rangenode=cls.child_node_b,
+            graph=cls.node_graph,
+        )
+
+    def test_node_sortorder_pass(self):
+        """Non-root sibling nodes with unique non-null sortorders do not trigger the check."""
+        out = StringIO()
+        call_command(
+            "validate",
+            codes=[IntegrityCheck.NULL_OR_DUPLICATE_NODE_SORTORDER.value],
+            stdout=out,
+        )
+        self.assertIn("PASS", out.getvalue())
+
+    def test_null_node_sortorder_reported(self):
+        """A non-root node with a NULL sortorder is reported as a failure."""
+        Node.objects.filter(pk=self.child_node_a.pk).update(sortorder=None)
+        out = StringIO()
+        call_command(
+            "validate",
+            codes=[IntegrityCheck.NULL_OR_DUPLICATE_NODE_SORTORDER.value],
+            stdout=out,
+        )
+        self.assertIn("FAIL", out.getvalue())
+
+    def test_duplicate_node_sortorder_reported(self):
+        """Sibling nodes sharing a sortorder are reported."""
+        Node.objects.filter(pk__in=[self.child_node_a.pk, self.child_node_b.pk]).update(
+            sortorder=0
+        )
+        out = StringIO()
+        call_command(
+            "validate",
+            codes=[IntegrityCheck.NULL_OR_DUPLICATE_NODE_SORTORDER.value],
+            stdout=out,
+        )
+        self.assertIn("FAIL", out.getvalue())
+
+    def test_fix_node_sortorders_assigns_sequential_values(self):
+        """Fix action assigns consecutive non-null sortorders within each sibling group."""
+        Node.objects.filter(pk__in=[self.child_node_a.pk, self.child_node_b.pk]).update(
+            sortorder=None
+        )
+
+        call_command(
+            "validate",
+            fix=[IntegrityCheck.NULL_OR_DUPLICATE_NODE_SORTORDER.value],
+            stdout=StringIO(),
+        )
+
+        sortorders = sorted(
+            Node.objects.filter(
+                pk__in=[self.child_node_a.pk, self.child_node_b.pk]
+            ).values_list("sortorder", flat=True)
+        )
+        self.assertFalse(any(s is None for s in sortorders), "NULL sortorder after fix")
+        self.assertEqual(sortorders, list(range(len(sortorders))))

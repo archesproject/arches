@@ -9,7 +9,10 @@ IntegrityCheckDescriptions = {
     1015: "Graphs missing slugs",
     1016: "Nodes with excess widgets",
     1017: "Nodes missing widgets",
+    1018: "Cards with null or duplicate sortorders",
+    1019: "Nodes with null or duplicate sortorders",
     1020: "Nodes with invalid default values",
+    1021: "Card widgets with null or duplicate sortorders",
 }
 
 
@@ -22,7 +25,10 @@ class IntegrityCheck(Enum):
     GRAPH_MISSING_SLUG = 1015
     TOO_MANY_WIDGETS = 1016
     NO_WIDGETS = 1017
+    NULL_OR_DUPLICATE_CARD_SORTORDER = 1018
+    NULL_OR_DUPLICATE_NODE_SORTORDER = 1019
     INVALID_DEFAULT_VALUE = 1020
+    NULL_OR_DUPLICATE_WIDGET_SORTORDER = 1021
 
     def __str__(self):
         return IntegrityCheckDescriptions[self.value]

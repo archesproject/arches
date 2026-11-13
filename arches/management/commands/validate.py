@@ -47,6 +47,9 @@ class FixActions(StrEnum):
     BACKFILL_MISSING_WIDGETS = auto()
     DELETE_QUERYSET = auto()
     DEDUPLICATE_WIDGETS = auto()
+    FIX_CARD_SORTORDERS = auto()
+    FIX_NODE_SORTORDERS = auto()
+    FIX_WIDGET_SORTORDERS = auto()
     UPDATE_GRAPH_PUBLICATIONS = auto()
 
 
@@ -244,6 +247,78 @@ class Command(BaseCommand):
             .filter(widget_count__lt=1),
             fix_action=FixActions.BACKFILL_MISSING_WIDGETS,
         )
+        # Cards with NULL sortorder, or a duplicate sortorder among their siblings
+        # (siblings share the same parentnodegroup within the same graph).
+        # The null-parent and non-null-parent cases are handled with separate
+        # subqueries because SQL cannot equate NULL = NULL.
+        _dup_card_nonnull = models.CardModel.objects.filter(
+            source_identifier=None,
+            sortorder=OuterRef("sortorder"),
+            sortorder__isnull=False,
+            nodegroup__parentnodegroup_id=OuterRef("nodegroup__parentnodegroup_id"),
+            graph_id=OuterRef("graph_id"),
+        ).exclude(cardid=OuterRef("cardid"))
+        _dup_card_null = models.CardModel.objects.filter(
+            source_identifier=None,
+            sortorder=OuterRef("sortorder"),
+            sortorder__isnull=False,
+            nodegroup__parentnodegroup_id__isnull=True,
+            graph_id=OuterRef("graph_id"),
+        ).exclude(cardid=OuterRef("cardid"))
+        self.check_integrity(
+            check=IntegrityCheck.NULL_OR_DUPLICATE_CARD_SORTORDER,  # 1018
+            queryset=models.CardModel.objects.filter(source_identifier=None).filter(
+                Q(sortorder=None)
+                | (
+                    Q(nodegroup__parentnodegroup_id__isnull=False)
+                    & Exists(_dup_card_nonnull)
+                )
+                | (
+                    Q(nodegroup__parentnodegroup_id__isnull=True)
+                    & Exists(_dup_card_null)
+                )
+            ),
+            fix_action=FixActions.FIX_CARD_SORTORDERS,
+        )
+        # Nodes with NULL sortorder (excluding root nodes which have no parent
+        # edge), or a duplicate sortorder among their Edge-table siblings.
+        self.check_integrity(
+            check=IntegrityCheck.NULL_OR_DUPLICATE_NODE_SORTORDER,  # 1019
+            queryset=models.Node.objects.filter(source_identifier=None).filter(
+                (
+                    Q(sortorder=None)
+                    & Exists(
+                        models.Edge.objects.filter(rangenode_id=OuterRef("nodeid"))
+                    )
+                )
+                | Exists(
+                    models.Edge.objects.filter(
+                        domainnode_id=Subquery(
+                            models.Edge.objects.filter(
+                                rangenode_id=OuterRef(OuterRef("nodeid"))
+                            ).values("domainnode_id")[:1]
+                        ),
+                        rangenode__sortorder=OuterRef("sortorder"),
+                        rangenode__sortorder__isnull=False,
+                    ).exclude(rangenode_id=OuterRef("nodeid"))
+                ),
+            ),
+            fix_action=FixActions.FIX_NODE_SORTORDERS,
+        )
+        # CXNxW records with NULL sortorder, or a duplicate sortorder within
+        # the same card.
+        _dup_widget = models.CardXNodeXWidget.objects.filter(
+            card_id=OuterRef("card_id"),
+            sortorder=OuterRef("sortorder"),
+            sortorder__isnull=False,
+        ).exclude(pk=OuterRef("pk"))
+        self.check_integrity(
+            check=IntegrityCheck.NULL_OR_DUPLICATE_WIDGET_SORTORDER,  # 1021
+            queryset=models.CardXNodeXWidget.objects.filter(
+                card__source_identifier=None
+            ).filter(Q(sortorder=None) | Exists(_dup_widget)),
+            fix_action=FixActions.FIX_WIDGET_SORTORDERS,
+        )
 
     def get_invalid_default_values(self):
         invalid_defaults = ValidationResultList()
@@ -380,6 +455,41 @@ class Command(BaseCommand):
                         self.stdout.write()
                     if changes:
                         self._export_graphs(changes)
+                elif fix_action in (
+                    FixActions.FIX_CARD_SORTORDERS,
+                    FixActions.FIX_NODE_SORTORDERS,
+                    FixActions.FIX_WIDGET_SORTORDERS,
+                ):
+                    fn_map = {
+                        FixActions.FIX_CARD_SORTORDERS: (
+                            fix_card_sortorders,
+                            "Fixed card sortorders",
+                        ),
+                        FixActions.FIX_NODE_SORTORDERS: (
+                            fix_node_sortorders,
+                            "Fixed node sortorders",
+                        ),
+                        FixActions.FIX_WIDGET_SORTORDERS: (
+                            fix_widget_sortorders,
+                            "Fixed widget sortorders",
+                        ),
+                    }
+                    fix_fn, label = fn_map[fix_action]
+                    changes = fix_fn(queryset)
+                    fix_status = self.style.SUCCESS("Yes")
+                    if changes and self.options["verbosity"] > 0:
+                        self.stdout.write()
+                        self.stdout.write(f"\t{label}:")
+                        for slug, items_changed in sorted(changes.items()):
+                            self.stdout.write(
+                                f"\t  {slug}: {len(items_changed)} item(s)"
+                            )
+                            if self.options["verbosity"] > 1:
+                                for name, item_id in items_changed:
+                                    self.stdout.write(f"\t    {name} ({item_id})")
+                        self.stdout.write()
+                    if changes:
+                        self._export_graphs(changes)
                 else:
                     raise NotImplementedError
             else:
@@ -489,6 +599,200 @@ def backfill_missing_widgets(nodes):
         slug_map.get(graph_id, str(graph_id)): nodes_changed
         for graph_id, nodes_changed in changes.items()
     }
+
+
+def fix_card_sortorders(problem_cards):
+    """Assign 0-based sequential sortorders to source cards within sibling
+    groups that have NULL or duplicate sortorders.
+
+    Groups cards by (graph_id, parentnodegroup_id), preserving the relative
+    order of cards with unique existing sortorders (NULLs sort last).
+    Republishes affected graphs.
+    Returns {graph_slug: [(card_name, card_id), ...]} for each updated card.
+    """
+    from collections import defaultdict
+
+    affected_pairs = set(
+        problem_cards.values_list("graph_id", "nodegroup__parentnodegroup_id")
+    )
+    affected_graph_ids = {pair[0] for pair in affected_pairs}
+    all_cards = list(
+        models.CardModel.objects.filter(
+            source_identifier=None,
+            graph_id__in=affected_graph_ids,
+        ).select_related("nodegroup")
+    )
+
+    groups: dict = defaultdict(list)
+    for card in all_cards:
+        key = (card.graph_id, card.nodegroup.parentnodegroup_id)
+        groups[key].append(card)
+
+    graph_ids_to_republish: set[uuid.UUID] = set()
+    changes: dict[uuid.UUID, list[tuple[str, uuid.UUID]]] = {}
+
+    with transaction.atomic():
+        for key, group in groups.items():
+            if key not in affected_pairs:
+                continue
+            sorted_group = sorted(
+                group,
+                key=lambda c: (
+                    c.sortorder is None,
+                    c.sortorder if c.sortorder is not None else 0,
+                ),
+            )
+            db_updates = []
+            for new_so, card in enumerate(sorted_group):
+                if card.sortorder != new_so:
+                    card.sortorder = new_so
+                    db_updates.append(card)
+            if db_updates:
+                models.CardModel.objects.bulk_update(db_updates, ["sortorder"])
+                graph_id = key[0]
+                graph_ids_to_republish.add(graph_id)
+                for card in db_updates:
+                    changes.setdefault(graph_id, []).append(
+                        (str(card.name), card.cardid)
+                    )
+
+    for graph in models.Graph.objects.filter(
+        pk__in=graph_ids_to_republish,
+        source_identifier=None,
+    ):
+        graph.publish(notes="Fixed card sortorders")
+
+    slug_map = dict(
+        models.GraphModel.objects.filter(pk__in=changes).values_list("pk", "slug")
+    )
+    return {slug_map.get(gid, str(gid)): items for gid, items in changes.items()}
+
+
+def fix_node_sortorders(problem_nodes):
+    """Assign 0-based sequential sortorders to nodes within parent-node
+    sibling groups that have NULL or duplicate sortorders.
+
+    Sibling groups are determined via the Edge table (nodes sharing the same
+    domainnode are siblings). Preserves relative order of nodes with unique
+    existing sortorders (NULLs sort last). Republishes affected graphs.
+    Returns {graph_slug: [(node_name, node_id), ...]} for each updated node.
+    """
+    from collections import defaultdict
+
+    affected_graph_ids = set(problem_nodes.values_list("graph_id", flat=True))
+    problem_node_ids = set(problem_nodes.values_list("nodeid", flat=True))
+
+    all_nodes = {
+        n.nodeid: n for n in models.Node.objects.filter(graph_id__in=affected_graph_ids)
+    }
+    edges = models.Edge.objects.filter(graph_id__in=affected_graph_ids).values_list(
+        "rangenode_id", "domainnode_id"
+    )
+
+    sibling_groups: dict = defaultdict(list)
+    for child_id, parent_id in edges:
+        child = all_nodes.get(child_id)
+        if child is not None:
+            sibling_groups[parent_id].append(child)
+
+    graph_ids_to_republish: set[uuid.UUID] = set()
+    changes: dict[uuid.UUID, list[tuple[str, uuid.UUID]]] = {}
+
+    with transaction.atomic():
+        for group in sibling_groups.values():
+            if not any(n.nodeid in problem_node_ids for n in group):
+                continue
+            sorted_group = sorted(
+                group,
+                key=lambda n: (
+                    n.sortorder is None,
+                    n.sortorder if n.sortorder is not None else 0,
+                ),
+            )
+            db_updates = []
+            for new_so, node in enumerate(sorted_group):
+                if node.sortorder != new_so:
+                    node.sortorder = new_so
+                    db_updates.append(node)
+            if db_updates:
+                models.Node.objects.bulk_update(db_updates, ["sortorder"])
+                for node in db_updates:
+                    graph_ids_to_republish.add(node.graph_id)
+                    changes.setdefault(node.graph_id, []).append(
+                        (str(node.name), node.nodeid)
+                    )
+
+    for graph in models.Graph.objects.filter(
+        pk__in=graph_ids_to_republish,
+        source_identifier=None,
+    ):
+        graph.publish(notes="Fixed node sortorders")
+
+    slug_map = dict(
+        models.GraphModel.objects.filter(pk__in=changes).values_list("pk", "slug")
+    )
+    return {slug_map.get(gid, str(gid)): items for gid, items in changes.items()}
+
+
+def fix_widget_sortorders(problem_widgets):
+    """Assign 0-based sequential sortorders to CXNxW records within cards
+    that have NULL or duplicate widget sortorders.
+
+    Groups widgets by card and re-sequences sortorders, preserving relative
+    order of widgets with unique existing sortorders (NULLs sort last).
+    Republishes affected graphs.
+    Returns {graph_slug: [(node_name, widget_id), ...]} for each updated widget.
+    """
+    from collections import defaultdict
+
+    affected_card_ids = set(problem_widgets.values_list("card_id", flat=True))
+    all_widgets = list(
+        models.CardXNodeXWidget.objects.filter(
+            card_id__in=affected_card_ids,
+            card__source_identifier=None,
+        ).select_related("node", "card")
+    )
+
+    card_groups: dict = defaultdict(list)
+    for widget in all_widgets:
+        card_groups[widget.card_id].append(widget)
+
+    graph_ids_to_republish: set[uuid.UUID] = set()
+    changes: dict[uuid.UUID, list[tuple[str, uuid.UUID]]] = {}
+
+    with transaction.atomic():
+        for card_widgets in card_groups.values():
+            sorted_widgets = sorted(
+                card_widgets,
+                key=lambda w: (
+                    w.sortorder is None,
+                    w.sortorder if w.sortorder is not None else 0,
+                ),
+            )
+            db_updates = []
+            for new_so, widget in enumerate(sorted_widgets):
+                if widget.sortorder != new_so:
+                    widget.sortorder = new_so
+                    db_updates.append(widget)
+            if db_updates:
+                models.CardXNodeXWidget.objects.bulk_update(db_updates, ["sortorder"])
+                for widget in db_updates:
+                    graph_id = widget.node.graph_id
+                    graph_ids_to_republish.add(graph_id)
+                    changes.setdefault(graph_id, []).append(
+                        (str(widget.node.name), widget.pk)
+                    )
+
+    for graph in models.Graph.objects.filter(
+        pk__in=graph_ids_to_republish,
+        source_identifier=None,
+    ):
+        graph.publish(notes="Fixed widget sortorders")
+
+    slug_map = dict(
+        models.GraphModel.objects.filter(pk__in=changes).values_list("pk", "slug")
+    )
+    return {slug_map.get(gid, str(gid)): items for gid, items in changes.items()}
 
 
 def deduplicate_widgets(nodes):
