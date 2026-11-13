@@ -115,3 +115,84 @@ class ValidateTests(ArchesTestCase):
             "validate", codes=[IntegrityCheck.TOO_MANY_WIDGETS.value], stdout=out
         )
         self.assertEqual(out.getvalue().count("PASS"), 1)
+
+    # --- 1017: NO_WIDGETS ---
+
+    def test_no_widgets_pass(self):
+        """Nodes whose datatypes have a default widget, and that already have a
+        widget record, do not trigger the check."""
+        out = StringIO()
+        call_command(
+            "validate", codes=[IntegrityCheck.NO_WIDGETS.value], stdout=out
+        )
+        self.assertIn("PASS", out.getvalue())
+
+    def test_no_widgets_reported(self):
+        """Nodes missing a widget record are reported as failures."""
+        card = CardModel.objects.get(graph=self.graph, nodegroup=self.nodegroup_1)
+        CardXNodeXWidget.objects.filter(card=card).delete()
+        out = StringIO()
+        call_command(
+            "validate", codes=[IntegrityCheck.NO_WIDGETS.value], stdout=out
+        )
+        self.assertIn("FAIL", out.getvalue())
+
+    def test_backfill_creates_widgets_with_correct_datatype(self):
+        """Fix action creates a widget record using the datatype's default widget."""
+        card = CardModel.objects.get(graph=self.graph, nodegroup=self.nodegroup_1)
+        CardXNodeXWidget.objects.filter(card=card).delete()
+
+        call_command(
+            "validate", fix=[IntegrityCheck.NO_WIDGETS.value], stdout=StringIO()
+        )
+
+        datatypes_with_widgets = DDataType.objects.filter(
+            defaultwidget__isnull=False
+        ).select_related("defaultwidget")
+        for dt in datatypes_with_widgets:
+            node = Node.objects.filter(
+                nodegroup=self.nodegroup_1, datatype=dt.pk, source_identifier=None
+            ).first()
+            if node is None:
+                continue
+            widget = CardXNodeXWidget.objects.filter(node=node, card=card).first()
+            self.assertIsNotNone(widget, f"No widget created for node with datatype {dt.pk}")
+            self.assertEqual(widget.widget_id, dt.defaultwidget_id)
+
+    def test_backfill_sortorder_sequential_from_zero(self):
+        """When a card has no existing widgets, backfilled widgets get
+        consecutive sortorders starting at 0."""
+        card = CardModel.objects.get(graph=self.graph, nodegroup=self.nodegroup_1)
+        CardXNodeXWidget.objects.filter(card=card).delete()
+
+        call_command(
+            "validate", fix=[IntegrityCheck.NO_WIDGETS.value], stdout=StringIO()
+        )
+
+        sortorders = sorted(
+            CardXNodeXWidget.objects.filter(card=card).values_list("sortorder", flat=True)
+        )
+        self.assertFalse(any(s is None for s in sortorders), "NULL sortorder after backfill")
+        self.assertEqual(sortorders, list(range(len(sortorders))))
+
+    def test_backfill_sortorder_continues_after_existing(self):
+        """When a card already has widgets with explicit sortorders, backfilled
+        widgets are appended after the current maximum."""
+        card = CardModel.objects.get(graph=self.graph, nodegroup=self.nodegroup_1)
+        existing = list(CardXNodeXWidget.objects.filter(card=card))
+        for i, widget in enumerate(existing):
+            widget.sortorder = i
+        CardXNodeXWidget.objects.bulk_update(existing, ["sortorder"])
+
+        # Delete the last widget to create a gap to fill.
+        deleted = existing[-1]
+        deleted_node = deleted.node
+        deleted.delete()
+        expected_sortorder = len(existing) - 1  # max remaining + 1
+
+        call_command(
+            "validate", fix=[IntegrityCheck.NO_WIDGETS.value], stdout=StringIO()
+        )
+
+        new_widget = CardXNodeXWidget.objects.get(node=deleted_node, card=card)
+        self.assertEqual(new_widget.sortorder, expected_sortorder)
