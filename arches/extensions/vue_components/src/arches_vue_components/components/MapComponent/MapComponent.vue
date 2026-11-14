@@ -24,6 +24,7 @@ import type {
     MapInteractionTool,
     MapLayer,
     MapSettings,
+    MapSource,
 } from "@/arches_vue_components/components/MapComponent/types.ts";
 
 const {
@@ -38,10 +39,12 @@ const {
     basemap = undefined,
     allowedGeometryTypes = undefined,
     resolveOverlayLayers = undefined,
+    resolveMapSources = undefined,
     interactionTools = undefined,
     maxFeatures = undefined,
     featurePopupComponent = undefined,
     isReadOnly = false,
+    openPopupsInsideDrawnShapes = false,
     settings = undefined,
 } = defineProps<{
     value?: FeatureCollection | null;
@@ -55,10 +58,12 @@ const {
     basemap?: string;
     allowedGeometryTypes?: string[];
     resolveOverlayLayers?: (candidateOverlayLayers: MapLayer[]) => MapLayer[];
+    resolveMapSources?: (candidateMapSources: MapSource[]) => MapSource[];
     interactionTools?: MapInteractionTool[];
     maxFeatures?: number;
     featurePopupComponent?: Component;
     isReadOnly?: boolean;
+    openPopupsInsideDrawnShapes?: boolean;
     settings?: Partial<MapSettings>;
 }>();
 
@@ -84,8 +89,10 @@ const { context, popupContainer, popupFeatures } = useMapContext(
         basemap,
         allowedGeometryTypes,
         resolveOverlayLayers,
+        resolveMapSources,
         maxFeatures,
         isReadOnly,
+        openPopupsInsideDrawnShapes,
         settings,
     },
     emit,

@@ -142,8 +142,10 @@ export function useMapContext(
         resolveOverlayLayers?: (
             candidateOverlayLayers: MapLayer[],
         ) => MapLayer[];
+        resolveMapSources?: (candidateMapSources: MapSource[]) => MapSource[];
         maxFeatures?: number;
         isReadOnly?: boolean;
+        openPopupsInsideDrawnShapes?: boolean;
         settings?: Partial<MapSettings>;
     },
     emit: MapComponentEmit,
@@ -181,15 +183,19 @@ export function useMapContext(
     } = useOverlayLayers(map, overlays, mapSources);
     const {
         popupFeatures,
+        popupFeature,
         popupContainer,
         showFeatureHighlight,
         clearFeatureHighlight,
         closeFeaturePopup,
+        setPopupFeature,
+        isClickableOverlayFeatureAt,
     } = useFeaturePopup(
         map,
         overlayLayerIds,
         drawnFeatureControls.isActivelyDrawingOrEditing,
         drawnFeatureControls.isDrawnFeatureOnTop,
+        drawnFeatureControls.deselectDrawnFeatureIfSelected,
     );
     useBasemapStyle(map, basemaps);
     useMapControls(map, settings, fullscreenContainer);
@@ -226,7 +232,7 @@ export function useMapContext(
         });
 
         map.value.once(STYLE_LOAD_EVENT, () => {
-            drawnFeatureControls.setupDraw();
+            drawnFeatureControls.setupDraw(isClickableOverlayFeatureAt);
             fitToValue();
 
             emit("ready");
@@ -291,10 +297,13 @@ export function useMapContext(
                     source: raw.source,
                 }),
             );
-            mapSources.value = [
+            const candidateMapSources = [
                 ...((mapData?.map_sources ?? []) as MapSource[]),
                 ...resourceSources,
             ];
+            mapSources.value =
+                props.resolveMapSources?.(candidateMapSources) ??
+                candidateMapSources;
 
             coordinateSystems.value = (mapData?.preferred_coordinate_systems ??
                 []) as CoordinateSystem[];
@@ -365,11 +374,15 @@ export function useMapContext(
         addFeatures: drawnFeatureControls.addFeatures,
         updateDrawnFeature: drawnFeatureControls.updateDrawnFeature,
         fitToFeatures: drawnFeatureControls.fitToFeatures,
+        isFeatureClickBlockedByDrawing:
+            drawnFeatureControls.isFeatureClickBlockedByDrawing,
         moveOverlay,
         setOverlayOpacity,
         showFeatureHighlight,
         clearFeatureHighlight,
         closeFeaturePopup,
+        popupFeature,
+        setPopupFeature,
     };
 
     return { context, popupContainer, popupFeatures };

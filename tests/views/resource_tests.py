@@ -25,7 +25,7 @@ from tests.base_test import ArchesTestCase
 from django.apps import apps
 from django.db import connection
 from django.urls import reverse
-from arches.app.models.models import EditLog, Graph
+from arches.app.models.models import EditLog, Graph, NodeGroup
 from arches.app.models.models import ResourceInstance
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
@@ -52,6 +52,7 @@ class ResourceViewTests(ArchesTestCase):
     reference_graphid = "e3d4505e-bfa7-11e9-b4dc-0242ac160002"
     reference_nodeid = "fc3c8080-bfa7-11e9-b4dc-0242ac160002"
     person_graphid = "0c6269e8-bfa8-11e9-bd39-0242ac160002"
+    geojson_nodegroupid = "2e3b04c0-95ed-11e8-b68c-acde48001122"
 
     @classmethod
     def setUpTestData(cls):
@@ -491,6 +492,39 @@ class ResourceViewTests(ArchesTestCase):
             descriptors["lifecycle_state"],
             str(resource.resource_instance_lifecycle_state.name),
         )
+
+    def test_resource_descriptors_omit_geometries_the_user_cannot_read(self):
+        self.resource.index()
+        sync_es(SearchEngineFactory().create())
+        assign_perm(
+            "no_access_to_nodegroup",
+            self.test_users["ben"],
+            NodeGroup.objects.get(pk=self.geojson_nodegroupid),
+        )
+        url = reverse(
+            "resource_descriptors", kwargs={"resourceid": self.resource_instance_id}
+        )
+
+        def geometry_count_for(user, elasticsearch_enabled):
+            self.client.force_login(user)
+            with (
+                self.settings(ELASTICSEARCH_ENABLED=elasticsearch_enabled),
+                sync_overridden_test_settings_to_arches(),
+            ):
+                return len(self.client.get(url).json()["geometries"])
+
+        for elasticsearch_enabled in (True, False):
+            with self.subTest(elasticsearch_enabled=elasticsearch_enabled):
+                self.assertEqual(
+                    geometry_count_for(
+                        User.objects.get(username="admin"), elasticsearch_enabled
+                    ),
+                    1,
+                )
+                self.assertEqual(
+                    geometry_count_for(self.test_users["ben"], elasticsearch_enabled),
+                    0,
+                )
 
     def test_resource_report_missing_resource(self):
         self.client.login(username="sam", password="Test12345!")

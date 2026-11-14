@@ -58,6 +58,7 @@ from arches.app.utils.permission_backend import (
 )
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.utils.string_utils import str_to_bool
+from arches.app.search.components.search_results import select_geoms_for_results
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.views.base import BaseManagerView, MapBaseManagerView
@@ -1005,7 +1006,10 @@ class ResourceDescriptors(View):
                         document, nodevalue, nodeid, tile
                     )
 
-        return document["geometries"]
+        return [
+            {**geometry, "nodegroup_id": str(geometry["nodegroup_id"])}
+            for geometry in document["geometries"]
+        ]
 
     def get(self, request, resourceid=None):
         if (
@@ -1039,7 +1043,11 @@ class ResourceDescriptors(View):
                         "displayname": self.get_localized_descriptor(
                             document, "displayname"
                         ),
-                        "geometries": document["_source"]["geometries"],
+                        "geometries": select_geoms_for_results(
+                            document["_source"]["geometries"],
+                            request.user.userprofile.viewable_nodegroups,
+                            user_is_resource_reviewer(request.user, resource=resource),
+                        ),
                         "permissions": document["_source"]["permissions"],
                         "userid": request.user.id,
                     }

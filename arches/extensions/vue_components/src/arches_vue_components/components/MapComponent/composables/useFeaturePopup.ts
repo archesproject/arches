@@ -35,10 +35,15 @@ const POINT_GEOMETRY_TYPES = ["Point", "MultiPoint"];
 export interface UseFeaturePopupReturn
     extends Pick<
         MapContext,
-        "showFeatureHighlight" | "clearFeatureHighlight" | "closeFeaturePopup"
+        | "showFeatureHighlight"
+        | "clearFeatureHighlight"
+        | "closeFeaturePopup"
+        | "popupFeature"
+        | "setPopupFeature"
     > {
     popupFeatures: ShallowRef<Feature[]>;
     popupContainer: Ref<HTMLElement | null>;
+    isClickableOverlayFeatureAt: (point: MapMouseEvent["point"]) => boolean;
 }
 
 export function useFeaturePopup(
@@ -46,8 +51,10 @@ export function useFeaturePopup(
     overlayLayerIds: ComputedRef<string[]>,
     isActivelyDrawingOrEditing: () => boolean,
     isDrawnFeatureOnTop: (point: MapMouseEvent["point"]) => boolean,
+    deselectDrawnFeatureIfSelected: () => void,
 ): UseFeaturePopupReturn {
     const popupFeatures = shallowRef<Feature[]>([]);
+    const popupFeature = shallowRef<Feature | null>(null);
     const popupContainer = ref<HTMLElement | null>(null);
 
     let activePopup: Popup | null = null;
@@ -145,6 +152,7 @@ export function useFeaturePopup(
 
     function openFeaturePopup(features: Feature[], lngLat: LngLat): void {
         activePopup?.remove();
+        deselectDrawnFeatureIfSelected();
 
         const container = document.createElement("div");
         container.className = "feature-info-popup-container";
@@ -160,10 +168,12 @@ export function useFeaturePopup(
 
         popupContainer.value = container;
         popupFeatures.value = features;
+        popupFeature.value = features[0];
 
         activePopup.on("close", () => {
             popupContainer.value = null;
             popupFeatures.value = [];
+            popupFeature.value = null;
             activePopup = null;
             clearFeatureHighlight();
         });
@@ -173,24 +183,36 @@ export function useFeaturePopup(
         activePopup?.remove();
     }
 
-    function handleMapMousemove(event: MapMouseEvent): void {
-        const canvas = map.value!.getCanvas();
+    function setPopupFeature(feature: Feature): void {
+        popupFeature.value = feature;
+    }
 
-        if (!overlayLayerIds.value.length) {
-            canvas.style.cursor = "";
+    function handleMapMousemove(event: MapMouseEvent): void {
+        if (isActivelyDrawingOrEditing()) {
             return;
         }
 
-        const features = map.value!.queryRenderedFeatures(event.point, {
+        const canvas = map.value!.getCanvas();
+        const isOverClickableFeature = isClickableOverlayFeatureAt(event.point);
+
+        canvas.style.cursor = isOverClickableFeature ? "pointer" : "";
+    }
+
+    function isClickableOverlayFeatureAt(
+        point: MapMouseEvent["point"],
+    ): boolean {
+        if (!overlayLayerIds.value.length) {
+            return false;
+        }
+
+        const features = map.value!.queryRenderedFeatures(point, {
             layers: overlayLayerIds.value,
         });
-        const isOverClickableFeature = features.some(
+        return features.some(
             (feature) =>
                 isClusterFeature(feature) ||
                 feature.properties.resourceinstanceid,
         );
-
-        canvas.style.cursor = isOverClickableFeature ? "pointer" : "";
     }
 
     function ensureHighlightLayers(): void {
@@ -276,9 +298,12 @@ export function useFeaturePopup(
 
     return {
         popupFeatures,
+        popupFeature,
         popupContainer,
         showFeatureHighlight,
         clearFeatureHighlight,
         closeFeaturePopup,
+        setPopupFeature,
+        isClickableOverlayFeatureAt,
     };
 }

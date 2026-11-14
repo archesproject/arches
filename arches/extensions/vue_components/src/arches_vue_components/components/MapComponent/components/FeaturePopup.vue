@@ -50,6 +50,10 @@ watch(
     },
 );
 
+watch(feature, (currentFeature) => {
+    resolvedContext?.setPopupFeature(currentFeature);
+});
+
 watch(
     resourceId,
     async (id) => {
