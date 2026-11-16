@@ -5,8 +5,8 @@ import _ from 'underscore';
 import WidgetViewModel from 'viewmodels/widget';
 import arches from 'arches';
 import richTextWidgetTemplate from 'templates/views/components/widgets/rich-text.htm';
-import 'bindings/ckeditor';
 import 'bindings/select2-query';
+import 'views/components/rich-text-editor';
 
 
 /**
@@ -63,13 +63,6 @@ const viewModel = function(params) {
         }
         self.currentPlaceholder(self.placeholder()[self.currentLanguage()]);
     }
-
-    self.defaultText = ko.observable();
-    self.defaultText.subscribe(newValue => {
-        const config = self.config();
-        config.placeholder = newValue;
-        self.config(config);
-    });
 
     const valueLeaf = self.value?.[arches.activeLanguage]?.value || self.value;
     valueLeaf?.subscribe(newValue => {
@@ -133,7 +126,7 @@ const viewModel = function(params) {
         const currentLanguage = self.currentLanguage();
 
         if (self.card && ko.isObservable(self.placeholder)) {
-            const patchedPlaceholder = self.placeholder();
+            const patchedPlaceholder = self.placeholder() || {};
             patchedPlaceholder[currentLanguage] = newValue;
             self.placeholder(patchedPlaceholder);
             self.card._card.valueHasMutated();

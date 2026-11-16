@@ -260,7 +260,12 @@
                                                                         {% trans "Legend content:" %}
                                                                     </div>
                                                                     <div class="row">
-                                                                        <textarea rows="10" cols="80" data-bind="ckeditor: legend, ckeditorOptions: {},  valueUpdate: 'afterkeydown'"></textarea>
+                                                                        <div
+                                                                            data-bind="component: {
+                                                                                name: 'views/components/rich-text-editor',
+                                                                                params: {value: legend}
+                                                                            }"
+                                                                        ></div>
                                                                     </div>
                                                                 </div>
                                                             </div>
