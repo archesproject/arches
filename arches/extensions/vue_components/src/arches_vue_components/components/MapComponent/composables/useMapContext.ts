@@ -123,7 +123,10 @@ export function resolveDefaultOverlayLayers(
 }
 
 export interface UseMapContextReturn
-    extends Pick<UseFeaturePopupReturn, "popupContainer" | "popupFeatures"> {
+    extends Pick<
+        UseFeaturePopupReturn,
+        "popupContainer" | "popupFeatures" | "popupFeatureIndex"
+    > {
     context: MapContext;
 }
 
@@ -183,12 +186,12 @@ export function useMapContext(
     } = useOverlayLayers(map, overlays, mapSources);
     const {
         popupFeatures,
+        popupFeatureIndex,
         popupFeature,
         popupContainer,
         showFeatureHighlight,
         clearFeatureHighlight,
         closeFeaturePopup,
-        setPopupFeature,
         isClickableOverlayFeatureAt,
     } = useFeaturePopup(
         map,
@@ -382,8 +385,7 @@ export function useMapContext(
         clearFeatureHighlight,
         closeFeaturePopup,
         popupFeature,
-        setPopupFeature,
     };
 
-    return { context, popupContainer, popupFeatures };
+    return { context, popupContainer, popupFeatures, popupFeatureIndex };
 }

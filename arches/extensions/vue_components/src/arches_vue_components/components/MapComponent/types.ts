@@ -132,12 +132,12 @@ export interface MapContext {
     showFeatureHighlight: (geometries: Geometry[]) => void;
     clearFeatureHighlight: () => void;
     closeFeaturePopup: () => void;
-    popupFeature: Readonly<ShallowRef<Feature | null>>;
-    setPopupFeature: (feature: Feature) => void;
+    popupFeature: ComputedRef<Feature | null>;
 }
 
 export interface FeaturePopupProps {
     features: Feature[];
+    index: number;
     context?: MapContext;
 }
 

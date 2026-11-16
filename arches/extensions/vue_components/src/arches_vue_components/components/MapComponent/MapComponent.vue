@@ -76,29 +76,30 @@ const mapShell = useTemplateRef<HTMLDivElement>("mapShell");
 const mapContainer = useTemplateRef<HTMLDivElement>("mapContainer");
 const mapHeader = useTemplateRef<InstanceType<typeof MapHeader>>("mapHeader");
 
-const { context, popupContainer, popupFeatures } = useMapContext(
-    {
-        value: () => value ?? null,
-        zoom,
-        pitch,
-        bearing,
-        centerX,
-        centerY,
-        minZoom,
-        maxZoom,
-        basemap,
-        allowedGeometryTypes,
-        resolveOverlayLayers,
-        resolveMapSources,
-        maxFeatures,
-        isReadOnly,
-        openPopupsInsideDrawnShapes,
-        settings,
-    },
-    emit,
-    mapContainer,
-    mapShell,
-);
+const { context, popupContainer, popupFeatures, popupFeatureIndex } =
+    useMapContext(
+        {
+            value: () => value ?? null,
+            zoom,
+            pitch,
+            bearing,
+            centerX,
+            centerY,
+            minZoom,
+            maxZoom,
+            basemap,
+            allowedGeometryTypes,
+            resolveOverlayLayers,
+            resolveMapSources,
+            maxFeatures,
+            isReadOnly,
+            openPopupsInsideDrawnShapes,
+            settings,
+        },
+        emit,
+        mapContainer,
+        mapShell,
+    );
 
 const panelId = useId();
 const defaultMapInteractionTools = useDefaultMapInteractionTools();
@@ -230,6 +231,7 @@ async function closePanel(): Promise<void> {
     >
         <component
             :is="resolvedFeaturePopupComponent"
+            v-model:index="popupFeatureIndex"
             :features="popupFeatures"
         />
     </Teleport>

@@ -23,11 +23,12 @@ const { features, context = undefined } = defineProps<{
     context?: MapContext;
 }>();
 
+const index = defineModel<number>("index", { default: 0 });
+
 const resolvedContext = context ?? inject(mapContextKey, null);
 
 const { $gettext } = useGettext();
 
-const index = ref(0);
 const isLoading = ref(false);
 const descriptor = ref<ResourceDescriptor | null>(null);
 
@@ -49,10 +50,6 @@ watch(
         index.value = 0;
     },
 );
-
-watch(feature, (currentFeature) => {
-    resolvedContext?.setPopupFeature(currentFeature);
-});
 
 watch(
     resourceId,

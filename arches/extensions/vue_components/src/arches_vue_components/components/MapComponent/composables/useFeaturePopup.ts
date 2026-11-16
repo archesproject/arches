@@ -1,4 +1,4 @@
-import { ref, shallowRef, watch } from "vue";
+import { computed, ref, shallowRef, watch } from "vue";
 
 import * as maplibregl from "maplibre-gl";
 
@@ -39,9 +39,9 @@ export interface UseFeaturePopupReturn
         | "clearFeatureHighlight"
         | "closeFeaturePopup"
         | "popupFeature"
-        | "setPopupFeature"
     > {
     popupFeatures: ShallowRef<Feature[]>;
+    popupFeatureIndex: Ref<number>;
     popupContainer: Ref<HTMLElement | null>;
     isClickableOverlayFeatureAt: (point: MapMouseEvent["point"]) => boolean;
 }
@@ -54,8 +54,11 @@ export function useFeaturePopup(
     deselectDrawnFeatureIfSelected: () => void,
 ): UseFeaturePopupReturn {
     const popupFeatures = shallowRef<Feature[]>([]);
-    const popupFeature = shallowRef<Feature | null>(null);
+    const popupFeatureIndex = ref(0);
     const popupContainer = ref<HTMLElement | null>(null);
+    const popupFeature = computed(
+        () => popupFeatures.value[popupFeatureIndex.value] ?? null,
+    );
 
     let activePopup: Popup | null = null;
     let latestClickToken = 0;
@@ -164,13 +167,12 @@ export function useFeaturePopup(
             .addTo(map.value!);
 
         popupContainer.value = container;
+        popupFeatureIndex.value = 0;
         popupFeatures.value = features;
-        popupFeature.value = features[0];
 
         activePopup.on("close", () => {
             popupContainer.value = null;
             popupFeatures.value = [];
-            popupFeature.value = null;
             activePopup = null;
             clearFeatureHighlight();
         });
@@ -178,10 +180,6 @@ export function useFeaturePopup(
 
     function closeFeaturePopup(): void {
         activePopup?.remove();
-    }
-
-    function setPopupFeature(feature: Feature): void {
-        popupFeature.value = feature;
     }
 
     function handleMapMousemove(event: MapMouseEvent): void {
@@ -295,12 +293,12 @@ export function useFeaturePopup(
 
     return {
         popupFeatures,
+        popupFeatureIndex,
         popupFeature,
         popupContainer,
         showFeatureHighlight,
         clearFeatureHighlight,
         closeFeaturePopup,
-        setPopupFeature,
         isClickableOverlayFeatureAt,
     };
 }
