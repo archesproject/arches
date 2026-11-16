@@ -1,6 +1,8 @@
+import io
 import json
 from urllib.parse import urlsplit, parse_qs
 from django.contrib.auth.models import User
+from django.core import management
 from django.core.validators import URLValidator
 from django.db import connection
 from django.http import HttpRequest
@@ -159,7 +161,8 @@ def _post_save_edit_log(
         multiprocessing,
         index,
     )
-    if index and not settings.ELASTICSEARCH_ENABLED:
+    recalculate_only = index and not settings.ELASTICSEARCH_ENABLED
+    if recalculate_only:
         logger.debug("Elasticsearch is disabled; skipping Elasticsearch indexing")
         index = False
     try:
@@ -177,6 +180,17 @@ def _post_save_edit_log(
             )
             logger.debug(
                 "Indexing complete for loadid=%s; fetching user id=%s", loadid, userid
+            )
+        elif recalculate_only:
+            # Descriptors are otherwise only recalculated as part of indexing
+            with connection.cursor() as cursor:
+                log_event_details(cursor, loadid, "done|Recalculating descriptors...")
+            management.call_command(
+                "resources",
+                "calculate_descriptors",
+                transaction=str(loadid),
+                yes=True,
+                stdout=io.StringIO(),
             )
         else:
             logger.debug("Skipping indexing for loadid=%s (index=False)", loadid)
