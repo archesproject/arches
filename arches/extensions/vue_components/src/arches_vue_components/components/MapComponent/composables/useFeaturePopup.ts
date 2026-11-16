@@ -50,7 +50,7 @@ export function useFeaturePopup(
     map: ShallowRef<MaplibreMap | null>,
     overlayLayerIds: ComputedRef<string[]>,
     isActivelyDrawingOrEditing: () => boolean,
-    isDrawnFeatureOnTop: (point: MapMouseEvent["point"]) => boolean,
+    isFeatureClickBlockedByDrawing: (point: MapMouseEvent["point"]) => boolean,
     deselectDrawnFeatureIfSelected: () => void,
 ): UseFeaturePopupReturn {
     const popupFeatures = shallowRef<Feature[]>([]);
@@ -79,9 +79,6 @@ export function useFeaturePopup(
         if (!overlayLayerIds.value.length) {
             return;
         }
-        if (isActivelyDrawingOrEditing()) {
-            return;
-        }
 
         const features = map.value!.queryRenderedFeatures(event.point, {
             layers: overlayLayerIds.value,
@@ -90,7 +87,7 @@ export function useFeaturePopup(
         if (!features.length) {
             return;
         }
-        if (isDrawnFeatureOnTop(event.point)) {
+        if (isFeatureClickBlockedByDrawing(event.point)) {
             return;
         }
 

@@ -194,7 +194,7 @@ export function useMapContext(
         map,
         overlayLayerIds,
         drawnFeatureControls.isActivelyDrawingOrEditing,
-        drawnFeatureControls.isDrawnFeatureOnTop,
+        drawnFeatureControls.isFeatureClickBlockedByDrawing,
         drawnFeatureControls.deselectDrawnFeatureIfSelected,
     );
     useBasemapStyle(map, basemaps);

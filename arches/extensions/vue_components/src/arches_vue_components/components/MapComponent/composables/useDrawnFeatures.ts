@@ -87,7 +87,6 @@ export interface UseDrawnFeaturesReturn
     ) => void;
     addBufferLayer: () => void;
     isActivelyDrawingOrEditing: () => boolean;
-    isDrawnFeatureOnTop: (point: MapMouseEvent["point"]) => boolean;
     deselectDrawnFeatureIfSelected: () => void;
     replaceDrawnFeatures: (featureCollection: FeatureCollection | null) => void;
 }
@@ -129,7 +128,13 @@ export function useDrawnFeatures(
         );
     }
 
-    function isDrawnFeatureOnTop(point: MapMouseEvent["point"]): boolean {
+    function isFeatureClickBlockedByDrawing(
+        point: MapMouseEvent["point"],
+    ): boolean {
+        if (isActivelyDrawingOrEditing()) {
+            return true;
+        }
+
         const topFeature = map.value!.queryRenderedFeatures(point)[0];
         if (
             props.openPopupsInsideDrawnShapes &&
@@ -138,12 +143,6 @@ export function useDrawnFeatures(
             return false;
         }
         return topFeature?.layer.id.startsWith(DRAW_LAYER_ID_PREFIX);
-    }
-
-    function isFeatureClickBlockedByDrawing(
-        point: MapMouseEvent["point"],
-    ): boolean {
-        return isActivelyDrawingOrEditing() || isDrawnFeatureOnTop(point);
     }
 
     function setupDraw(
@@ -498,7 +497,6 @@ export function useDrawnFeatures(
         setupDraw,
         addBufferLayer,
         isActivelyDrawingOrEditing,
-        isDrawnFeatureOnTop,
         isFeatureClickBlockedByDrawing,
         deselectDrawnFeatureIfSelected,
         replaceDrawnFeatures,
