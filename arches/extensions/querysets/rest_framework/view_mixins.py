@@ -22,6 +22,9 @@ from arches.app.utils.permission_backend import (
 from arches.app.utils.string_utils import str_to_bool
 
 from arches.extensions.querysets.models import TileTree
+from arches.extensions.querysets.rest_framework.utils import (
+    redact_unreadable_related_resources,
+)
 from arches.extensions.querysets.utils.models import ensure_request
 
 
@@ -71,6 +74,8 @@ class ArchesModelAPIMixin:
 
     def get_queryset(self):
         options = self.serializer_class.Meta
+        # Aliases are only needed to filter on node aliases.
+        needs_aliases = bool(self.get_data_filters())
         user = self.request.user if self.include_provisional_edits else None
         try:
             if issubclass(options.model, ResourceInstance):
@@ -78,6 +83,7 @@ class ArchesModelAPIMixin:
                     self.graph_slug,
                     resource_ids=self.resource_ids,
                     as_representation=True,
+                    node_aliases=needs_aliases,
                     provisional_edits_user=user,
                 ).select_related("graph")
                 if arches_version >= Version("8.0"):
@@ -88,6 +94,7 @@ class ArchesModelAPIMixin:
                     self.nodegroup_alias,
                     as_representation=True,
                     resource_ids=self.resource_ids,
+                    node_aliases=needs_aliases,
                     provisional_edits_user=user,
                 ).select_related("nodegroup", "resourceinstance__graph")
                 if self.resource_ids:
@@ -136,6 +143,15 @@ class ArchesModelAPIMixin:
                 "cardxnodexwidget_set",
             )
         )
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        redact_unreadable_related_resources(
+            response.data,
+            user=request.user,
+            graph_nodes=self.graph_nodes
+            or self._find_graph_nodes().prefetch_related(None),
+        )
+        return super().finalize_response(request, response, *args, **kwargs)
 
     def get_object(self, permission_callable=None, fill_blanks=False):
         ret = super().get_object()
@@ -192,6 +208,16 @@ class ArchesModelAPIMixin:
 
         return ret
 
+    def get_data_filters(self):
+        """ORM lookups from query params starting with "aliased_data__"."""
+        return {
+            param.split("aliased_data__", maxsplit=1)[1]: (
+                str_to_bool(value) if param.endswith("__isnull") else value
+            )
+            for param, value in self.request.GET.items()
+            if param.startswith("aliased_data__")
+        }
+
     def filter_queryset(self, queryset):
         if queryset._hints.get("graph_query") is not None:
             self.graph_nodes = next(
@@ -206,17 +232,11 @@ class ArchesModelAPIMixin:
         # Parse ORM lookpus from query params starting with "aliased_data__"
         # This is a quick-n-dirty riff on https://github.com/miki725/django-url-filter
         # minus some features like negation (`!=`)
-        data_filters = {
-            param.split("aliased_data__", maxsplit=1)[1]: (
-                str_to_bool(value) if param.endswith("__isnull") else value
-            )
-            for param, value in self.request.GET.items()
-            if param.startswith("aliased_data__")
-        }
-        node_aliases = [n.alias for n in self.graph_nodes]
+        data_filters = self.get_data_filters()
+        graph_aliases = [n.alias for n in self.graph_nodes]
         for filter_value in data_filters:
             first_filter_term = filter_value.split(LOOKUP_SEP, maxsplit=1)[0]
-            if first_filter_term not in node_aliases:
+            if first_filter_term not in graph_aliases:
                 msg = _("Invalid filter param: %s") % first_filter_term
                 raise ValidationError(msg)
         queryset = queryset.filter(**data_filters)
@@ -282,6 +302,11 @@ class ArchesModelAPIMixin:
             raise ValidationError(errors) from django_error
 
     def perform_create(self, serializer):
+        resource = serializer.validated_data.get("resourceinstance")
+        if resource is not None and not user_can_edit_resource(
+            user=self.request.user, resource=resource
+        ):
+            raise PermissionDenied
         self.validate_tile_data_and_save(serializer)
 
     def perform_update(self, serializer):

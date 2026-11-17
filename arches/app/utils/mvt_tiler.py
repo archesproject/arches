@@ -98,12 +98,13 @@ class MVTTiler:
 
                     if search_geom_count >= min_points:
                         cursor.execute(
-                            """WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid)
+                            """WITH clusters(id, tileid, resourceinstanceid, nodeid, geom, cid)
                             AS (
                                 SELECT m.*,
                                 ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
                                 FROM (
-                                    SELECT tileid,
+                                    SELECT id,
+                                        tileid,
                                         resourceinstanceid,
                                         nodeid,
                                         geom
@@ -122,7 +123,7 @@ class MVTTiler:
                                 'id'
                             ) FROM (
                                 SELECT resourceinstanceid::text,
-                                    row_number() over () as id,
+                                    id::bigint as id,
                                     1 as total,
                                     ST_AsMVTGeom(
                                         geom,
@@ -131,9 +132,11 @@ class MVTTiler:
                                     '' AS extent
                                 FROM clusters
                                 WHERE cid is NULL
-                                UNION
+                                UNION ALL
                                 SELECT NULL as resourceinstanceid,
-                                    row_number() over () as id,
+                                    -- feature-state ids must be unique per source across tiles:
+                                    -- 2^31 (above any int4 geojson_geometries.id) + lowest member id
+                                    (2147483648 + min(id))::bigint as id,
                                     count(*) as total,
                                     ST_AsMVTGeom(
                                         ST_Centroid(

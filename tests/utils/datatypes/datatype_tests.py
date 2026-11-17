@@ -16,7 +16,10 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import copy
+import json
 import uuid
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from django.conf import settings
@@ -26,7 +29,7 @@ from arches.app.datatypes.datatypes import (
     DataTypeFactory,
     ResourceInstanceListDataType,
 )
-from arches.app.models.graph import Graph
+from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.models.models import (
     DDataType,
     GraphModel,
@@ -298,13 +301,13 @@ class ResourceInstanceListDataTypeTests(ArchesTestCase):
                     str(dummy_node.pk): [
                         {
                             "resourceId": str(resource1.pk),
-                            "ontologyProperty": "",
-                            "inverseOntologyProperty": "",
+                            "relationship": "",
+                            "inverseRelationship": "",
                         },
                         {
                             "resourceId": str(resource2.pk),
-                            "ontologyProperty": "",
-                            "inverseOntologyProperty": "",
+                            "relationship": "",
+                            "inverseRelationship": "",
                         },
                     ]
                 },
@@ -320,6 +323,74 @@ class ResourceInstanceListDataTypeTests(ArchesTestCase):
             [inner["display_value"] for inner in json["instance_details"]],
             ["ONE", "TWO"],
         )
+
+
+class ResourceInstanceLegacyKeysTests(ArchesTestCase):
+    def test_transform_value_for_tile_renames_legacy_keys(self):
+        ri = DataTypeFactory().get_instance("resource-instance")
+        legacy = [
+            {
+                "resourceId": "abc",
+                "ontologyProperty": "P1",
+                "inverseOntologyProperty": "P2",
+                "resourceXresourceId": "",
+            }
+        ]
+        for value in (json.dumps(legacy), legacy):
+            with self.subTest(value=type(value).__name__):
+                self.assertEqual(
+                    ri.transform_value_for_tile(copy.deepcopy(value)),
+                    [
+                        {
+                            "resourceId": "abc",
+                            "relationship": "P1",
+                            "inverseRelationship": "P2",
+                            "resourceXresourceId": "",
+                        }
+                    ],
+                )
+
+    def test_rename_legacy_relationship_keys_prefers_new_keys(self):
+        ri = DataTypeFactory().get_instance("resource-instance")
+        value = [{"relationship": "new", "ontologyProperty": "old"}]
+        self.assertEqual(
+            ri.rename_legacy_relationship_keys(value), [{"relationship": "new"}]
+        )
+
+
+class ResourceInstanceValidateNodeTests(ArchesTestCase):
+    def validate_node(self, config, datatype="resource-instance"):
+        ri = DataTypeFactory().get_instance(datatype)
+        ri.validate_node(SimpleNamespace(config=config))
+
+    def test_relationship_sources_are_valid(self):
+        for datatype in ("resource-instance", "resource-instance-list"):
+            for relationship_source in ("ontology", "concept", "reference"):
+                with self.subTest(datatype=datatype, source=relationship_source):
+                    self.validate_node(
+                        {"graphs": [{"relationshipSource": relationship_source}]},
+                        datatype,
+                    )
+
+    def test_invalid_relationship_source_is_rejected(self):
+        invalid_configs = {
+            "unknown source": {"graphs": [{"relationshipSource": "ontology-property"}]},
+            "missing source": {"graphs": [{"graphid": "abc"}]},
+            "empty source": {"graphs": [{"relationshipSource": ""}]},
+            "null source": {"graphs": [{"relationshipSource": None}]},
+            "one invalid entry": {
+                "graphs": [
+                    {"relationshipSource": "concept"},
+                    {"relationshipSource": "bogus"},
+                ]
+            },
+            "entry is not a dict": {"graphs": ["concept"]},
+            "no config": None,
+        }
+        for name, config in invalid_configs.items():
+            with self.subTest(name):
+                with self.assertRaises(GraphValidationError):
+                    self.validate_node(config)
 
 
 class LanguageDataTypeTests(ArchesTestCase):

@@ -57,7 +57,7 @@
                 <form action="{% url 'two-factor-authentication-settings' %}" method="post">
                     {% csrf_token %}
 
-                    <input type="hidden" name="user-id" value="{{ user_id }}" />
+                    <input type="hidden" name="link" value="{{ link }}" />
                     
                     {% if not new_mfa_hash_qr_code and not new_mfa_hash_manual_entry_data %}
                         <button 

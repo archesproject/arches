@@ -1,3 +1,4 @@
+from arches.app.utils.decorators import deprecated
 from arches.app.utils.permission_backend import get_editable_resource_types
 from arches.app.utils.permission_backend import get_createable_resource_types
 from arches.app.utils.permission_backend import get_resource_types_by_perm
@@ -47,6 +48,7 @@ def can_create_resource_instance(user):
 
 
 @register.filter(name="can_create_graph")
+@deprecated
 def can_create_graph(user):
     return (
         len(

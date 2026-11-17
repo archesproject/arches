@@ -2,6 +2,7 @@ import type {
     AliasedNodeData,
     CardXNodeXWidgetData,
 } from "@/arches_vue_components/types.ts";
+import type { LanguageValue } from "@/arches_vue_components/datatypes/string/types.ts";
 
 export interface FileReference {
     url: string;
@@ -17,10 +18,10 @@ export interface FileReference {
     file_id: string;
     accepted: boolean;
     lastModified: number;
-    altText: string;
-    attribution: string;
-    description: string;
-    title: string;
+    altText?: Record<string, LanguageValue>;
+    attribution?: Record<string, LanguageValue>;
+    description?: Record<string, LanguageValue>;
+    title?: Record<string, LanguageValue>;
 }
 export interface FileListCardXNodeXWidgetData extends CardXNodeXWidgetData {
     config: CardXNodeXWidgetData["config"] & {

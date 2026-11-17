@@ -16,7 +16,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import random
 import os, uuid
 
 from django.test.utils import captured_stdout
@@ -118,7 +117,7 @@ class SpatialViewTests(ArchesTestCase):
         spatialview = SpatialView()
         spatialview.spatialviewid = uuid.uuid4()
         spatialview.schema = "public"
-        spatialview.slug = "spatialviews_test_" + str(random.randint(1, 1000))
+        spatialview.slug = "spatialviews_test_" + uuid.uuid4().hex
         spatialview.description = "test_description"
         spatialview.geometrynode = models.Node.objects.get(
             nodeid=self.spatialview_geometrynode_id
@@ -371,7 +370,7 @@ class SpatialViewTriggerTests(ArchesTransactionTestCase):
         spatialview = SpatialView()
         spatialview.spatialviewid = uuid.uuid4()
         spatialview.schema = "public"
-        spatialview.slug = "spatialviews_test_" + str(random.randint(1, 1000))
+        spatialview.slug = "spatialviews_test_" + uuid.uuid4().hex
         spatialview.description = "test description"
         spatialview.geometrynode = models.Node.objects.get(
             nodeid="95b2c8de-1cf8-11ef-971a-0242ac130005"

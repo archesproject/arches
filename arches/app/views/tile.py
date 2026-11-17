@@ -310,73 +310,72 @@ class TileData(View):
         json = request.body
         if json is not None:
             data = JSONDeserializer().deserialize(json)
-            with transaction.atomic():
-                try:
-                    tile = Tile.objects.get(tileid=data["tileid"])
-                    resource_instance = tile.resourceinstance
-                    is_active = resource_instance.graph.is_active
-                except ObjectDoesNotExist:
-                    return JSONErrorResponse(
-                        title=_("This tile is no longer available"),
-                        message=_("It was likely already deleted by another user"),
-                        # Not localized (not user-facing)
-                        content={"exception": "TileModel.ObjectDoesNotExist"},
-                    )
-                user_is_reviewer = user_is_resource_reviewer(
-                    request.user, resource=tile.resourceinstance
-                )
-                if (
-                    user_is_reviewer or tile.is_provisional() is True
-                ) and is_active is True:
-                    if tile.filter_by_perm(request.user, "delete_nodegroup"):
-                        if (
-                            tile.is_provisional() is True
-                            and len(list(tile.provisionaledits.keys())) == 1
-                        ):
-                            provisional_editor_id = list(tile.provisionaledits.keys())[
-                                0
-                            ]
-                            edit = tile.provisionaledits[provisional_editor_id]
-                            provisional_editor = User.objects.get(
-                                pk=provisional_editor_id
-                            )
-                            reviewer = request.user
-                            tile.delete(
-                                request=request,
-                                provisional_edit_log_details={
-                                    "user": reviewer,
-                                    "action": "delete edit",
-                                    "edit": edit,
-                                    "provisional_editor": provisional_editor,
-                                },
-                            )
-                        else:
-                            tile.delete(request=request)
-                        tile.after_update_all()
-                        update_system_settings_cache(tile)
-                        return JSONResponse(tile)
-                    else:
-                        return JSONErrorResponse(
-                            _("Request Failed"), _("Permission Denied")
-                        )
-                elif is_active is False:
-                    response = {
-                        "status": "false",
-                        "message": [
-                            _("Request Failed"),
-                            _("Unable to delete. Verify model status is active"),
-                        ],
-                    }
-                    return JSONResponse(response, status=500)
-                else:
-                    return JSONErrorResponse(
-                        _("Request Failed"),
-                        _(
-                            "You do not have permissions to delete a tile with authoritative data."
-                        ),
-                    )
+            return self.delete_tile(request, data["tileid"])
 
         return HttpResponseNotFound()
+
+    def delete_tile(self, request, tileid):
+        with transaction.atomic():
+            try:
+                tile = Tile.objects.get(tileid=tileid)
+                resource_instance = tile.resourceinstance
+                is_active = resource_instance.graph.is_active
+            except ObjectDoesNotExist:
+                return JSONErrorResponse(
+                    title=_("This tile is no longer available"),
+                    message=_("It was likely already deleted by another user"),
+                    # Not localized (not user-facing)
+                    content={"exception": "TileModel.ObjectDoesNotExist"},
+                )
+            user_is_reviewer = user_is_resource_reviewer(
+                request.user, resource=tile.resourceinstance
+            )
+            if (
+                user_is_reviewer or tile.is_provisional() is True
+            ) and is_active is True:
+                if tile.filter_by_perm(request.user, "delete_nodegroup"):
+                    if (
+                        tile.is_provisional() is True
+                        and len(list(tile.provisionaledits.keys())) == 1
+                    ):
+                        provisional_editor_id = list(tile.provisionaledits.keys())[0]
+                        edit = tile.provisionaledits[provisional_editor_id]
+                        provisional_editor = User.objects.get(pk=provisional_editor_id)
+                        reviewer = request.user
+                        tile.delete(
+                            request=request,
+                            provisional_edit_log_details={
+                                "user": reviewer,
+                                "action": "delete edit",
+                                "edit": edit,
+                                "provisional_editor": provisional_editor,
+                            },
+                        )
+                    else:
+                        tile.delete(request=request)
+                    tile.after_update_all()
+                    update_system_settings_cache(tile)
+                    return JSONResponse(tile)
+                else:
+                    return JSONErrorResponse(
+                        _("Request Failed"), _("Permission Denied")
+                    )
+            elif is_active is False:
+                response = {
+                    "status": "false",
+                    "message": [
+                        _("Request Failed"),
+                        _("Unable to delete. Verify model status is active"),
+                    ],
+                }
+                return JSONResponse(response, status=500)
+            else:
+                return JSONErrorResponse(
+                    _("Request Failed"),
+                    _(
+                        "You do not have permissions to delete a tile with authoritative data."
+                    ),
+                )
 
     def download_files(self, request):
         try:

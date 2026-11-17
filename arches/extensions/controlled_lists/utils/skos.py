@@ -15,8 +15,14 @@ from arches.extensions.controlled_lists.models import List, ListItem, ListItemVa
 # ARCHES namespace is used for project-specific URIs
 ARCHES = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 
-# ARCHES_CONTROLLED_LISTS namespace used for searchable property
+# ARCHES_CONTROLLED_LISTS namespace used for schema-level properties (searchable, sortorder)
 ARCHES_CONTROLLED_LISTS = Namespace("https://archesproject.org/ns/controlled-lists#")
+
+
+def is_sortorder_predicate(predicate):
+    """Accept the fixed namespace, or any namespace for files exported with the
+    site-specific ARCHES namespace (which varies between environments)."""
+    return str(predicate).endswith(("/sortorder", "#sortorder"))
 
 
 class SKOSReader(SKOSReader):
@@ -133,6 +139,9 @@ class SKOSReader(SKOSReader):
                         # if the list exists, but adding a new list item, create proper reference
                         list_item.list = self.lists[object] or existing_list
 
+                    elif is_sortorder_predicate(predicate):
+                        sortorder = int(obj_value)
+
                     elif any(
                         type in predicate for type in skos_note_and_label_types.keys()
                     ):
@@ -160,9 +169,6 @@ class SKOSReader(SKOSReader):
                     elif predicate == SKOS.narrower:
                         child = self.generate_uuidv5_from_subject(baseuuid, object)
                         self.relations[child].append(list_item)
-
-                    elif predicate == ARCHES.sortorder:
-                        sortorder = int(obj_value)
 
                 list_item.uri = uri
                 list_item.sortorder = sortorder
@@ -283,7 +289,7 @@ class SKOSWriter(SKOSWriter):
                 rdf_graph.add(
                     (
                         ARCHES[str(lst_item.id)],
-                        ARCHES.sortorder,
+                        ARCHES_CONTROLLED_LISTS.sortorder,
                         Literal(lst_item.sortorder),
                     )
                 )

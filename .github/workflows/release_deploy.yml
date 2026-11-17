@@ -1,0 +1,17 @@
+name: Release application to pypi
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - 'dev/*'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  build_and_publish:
+    uses: archesproject/reusable-github-workflows/.github/workflows/release_deploy.yml@main
+    secrets:
+      pypi-token: ${{ secrets.PYPI_TOKEN }}

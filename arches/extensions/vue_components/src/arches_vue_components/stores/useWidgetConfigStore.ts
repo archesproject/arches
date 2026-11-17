@@ -32,15 +32,21 @@ export const useWidgetConfigStore = defineStore(
             Map<string, Promise<CardXNodeXWidgetData>>
         >();
 
-        function fetchWidgetConfig(
+        function nodeCache(
             graphSlug: string,
-            nodeAlias: string,
-        ): Promise<CardXNodeXWidgetData> {
+        ): Map<string, Promise<CardXNodeXWidgetData>> {
             if (!cache.has(graphSlug)) {
                 cache.set(graphSlug, new Map());
             }
 
-            const inner = cache.get(graphSlug)!;
+            return cache.get(graphSlug)!;
+        }
+
+        function fetchWidgetConfig(
+            graphSlug: string,
+            nodeAlias: string,
+        ): Promise<CardXNodeXWidgetData> {
+            const inner = nodeCache(graphSlug);
 
             if (!inner.has(nodeAlias)) {
                 const promise = requestWidgetConfig(graphSlug, nodeAlias);
@@ -51,6 +57,22 @@ export const useWidgetConfigStore = defineStore(
             return inner.get(nodeAlias)!;
         }
 
-        return { fetchWidgetConfig };
+        function cacheWidgetConfigs(
+            graphSlug: string,
+            cardXNodeXWidgets: CardXNodeXWidgetData[],
+        ): void {
+            const inner = nodeCache(graphSlug);
+
+            for (const cardXNodeXWidget of cardXNodeXWidgets) {
+                if (!inner.has(cardXNodeXWidget.node.alias)) {
+                    inner.set(
+                        cardXNodeXWidget.node.alias,
+                        Promise.resolve(cardXNodeXWidget),
+                    );
+                }
+            }
+        }
+
+        return { fetchWidgetConfig, cacheWidgetConfigs };
     },
 );

@@ -34,6 +34,7 @@ from arches.extensions.querysets.querysets import (
 )
 from arches.extensions.querysets.utils.models import (
     append_tiles_recursively,
+    cap_depth_to_graph,
     ensure_request,
     pop_arches_model_kwargs,
     get_provisional_edits_for_user,
@@ -207,7 +208,9 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
         resource_ids=None,
         as_representation=False,
         nodes=None,
+        depth=None,
         graph_query=None,
+        node_aliases=True,
         provisional_edits_user=None,
     ):
         """Return a chainable QuerySet for a requested graph's instances,
@@ -220,7 +223,9 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
             resource_ids=resource_ids,
             as_representation=as_representation,
             nodes=nodes,
+            depth=depth,
             graph_query=graph_query,
+            node_aliases=node_aliases,
             provisional_edits_user=provisional_edits_user,
         )
 
@@ -284,14 +289,21 @@ class ResourceTileTree(ResourceInstance, AliasedDataMixin):
                     .exclude(nodegroup=None)
                 )
                 graph_query = [cached_graph]
+                depth = cap_depth_to_graph(
+                    None,
+                    [n for n in cached_graph.node_set.all() if n.nodegroup_id],
+                )
             else:
                 nodes = None
                 graph_query = None
+                depth = None
             from_queryset = self.__class__.get_tiles(
                 self.graph.slug,
                 as_representation=getattr(self, "_as_representation", False),
                 nodes=nodes or None,
+                depth=depth,
                 graph_query=graph_query,
+                node_aliases=False,
                 provisional_edits_user=getattr(self, "_provisional_edits_user", None),
             )
         self._refresh_aliased_data(using, fields, from_queryset)
@@ -583,6 +595,8 @@ class TileTree(TileModel, AliasedDataMixin):
         arches_model_kwargs, other_kwargs = pop_arches_model_kwargs(
             kwargs, self._meta.get_fields()
         )
+        if not args:
+            other_kwargs.setdefault("sortorder", None)
         super().__init__(*args, **other_kwargs)
         self.aliased_data = arches_model_kwargs.pop(
             "aliased_data", None
@@ -671,7 +685,8 @@ class TileTree(TileModel, AliasedDataMixin):
         resource_ids=None,
         as_representation=False,
         nodes=None,
-        depth=20,
+        depth=None,
+        node_aliases=True,
         provisional_edits_user=None,
     ):
         """See `arches.extensions.querysets.querysets.TileTreeQuerySet.get_tiles`."""
@@ -682,6 +697,7 @@ class TileTree(TileModel, AliasedDataMixin):
             as_representation=as_representation,
             nodes=nodes,
             depth=depth,
+            node_aliases=node_aliases,
             provisional_edits_user=provisional_edits_user,
         )
 
@@ -1023,6 +1039,7 @@ class TileTree(TileModel, AliasedDataMixin):
                 self.resourceinstance.graph.slug,
                 nodegroup_alias=self.find_nodegroup_alias(),
                 as_representation=getattr(self, "_as_representation", False),
+                node_aliases=False,
                 provisional_edits_user=getattr(self, "_provisional_edits_user", None),
             )
         self._refresh_aliased_data(using, fields, from_queryset)

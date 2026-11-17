@@ -3,7 +3,7 @@ import _ from 'underscore';
 import ko from 'knockout';
 import arches from 'arches';
 import nodeValueDatatypeTemplate from 'templates/views/components/datatypes/node-value.htm';
-import 'bindings/chosen';
+import 'bindings/select2-query';
 
 
 var name = 'node-value-datatype-config';

@@ -1,0 +1,69 @@
+import type { Feature, Point } from "geojson";
+import type {
+    CarmenGeojsonFeature,
+    MaplibreGeocoderApi,
+    MaplibreGeocoderApiConfig,
+    MaplibreGeocoderFeatureResults,
+} from "@maplibre/maplibre-gl-geocoder";
+
+const GEOCODER_PROVIDER_URL = "https://nominatim.openstreetmap.org/search";
+const DEFAULT_RESULT_LIMIT = 5;
+
+export const GEOCODER_ATTRIBUTION =
+    '<a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>';
+
+interface PlaceSearchResult
+    extends Feature<
+        Point,
+        { place_id: number; name?: string; display_name: string; type: string }
+    > {
+    bbox?: [number, number, number, number];
+}
+
+function toGeocoderFeature(feature: PlaceSearchResult): CarmenGeojsonFeature {
+    const [longitude, latitude] = feature.geometry.coordinates;
+
+    return {
+        id: String(feature.properties.place_id),
+        type: "Feature",
+        text: feature.properties.name || feature.properties.display_name,
+        place_name: feature.properties.display_name,
+        place_type: [feature.properties.type],
+        bbox: feature.bbox,
+        center: [longitude, latitude],
+        geometry: feature.geometry,
+        properties: {},
+    };
+}
+
+async function forwardGeocode(
+    config: MaplibreGeocoderApiConfig,
+): Promise<MaplibreGeocoderFeatureResults> {
+    const params = new URLSearchParams({
+        format: "geojson",
+        q: String(config.query),
+        limit: String(config.limit ?? DEFAULT_RESULT_LIMIT),
+    });
+
+    if (config.bbox) {
+        params.set("viewbox", config.bbox.join(","));
+        params.set("bounded", "1");
+    }
+
+    try {
+        const response = await fetch(
+            `${GEOCODER_PROVIDER_URL}?${params.toString()}`,
+        );
+        const geojson: { features: PlaceSearchResult[] } =
+            await response.json();
+        return {
+            type: "FeatureCollection",
+            features: geojson.features.map(toGeocoderFeature),
+        };
+    } catch (error) {
+        console.error(error);
+        return { type: "FeatureCollection", features: [] };
+    }
+}
+
+export const geocoderApi: MaplibreGeocoderApi = { forwardGeocode };

@@ -41,7 +41,6 @@ a, button {
 }
 
 .select2-default,
-.chosen-container-single .chosen-single,
 .search-listing-body,
 .map-sidebar-text,
 .search-export .instruction h4,
@@ -164,9 +163,6 @@ a, button {
 }
 
 // Focus indicator
-select2-search__field
-div.chosen-container-active:not(.chosen-with-drop) a.chosen-single,
-ul.chosen-results li.highlighted,
 ul.select2-results li.select2-highlighted,
 a[href]:focus-visible,
 area[href]:focus-visible,

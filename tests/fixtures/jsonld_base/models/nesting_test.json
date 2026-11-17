@@ -786,8 +786,9 @@
                         "graphs": [
                             {
                                 "graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
-                                "ontologyProperty": "",
-                                "inverseOntologyProperty": ""
+                                "relationshipSource": "ontology",
+                                "relationship": "",
+                                "inverseRelationship": ""
                             }
                         ]
                     },
@@ -810,8 +811,9 @@
                         "graphs": [
                             {
                                 "graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
-                                "ontologyProperty": "",
-                                "inverseOntologyProperty": ""
+                                "relationshipSource": "ontology",
+                                "relationship": "",
+                                "inverseRelationship": ""
                             }
                         ]
                     },
@@ -834,8 +836,9 @@
                         "graphs": [
                             {
                                 "graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
-                                "ontologyProperty": "",
-                                "inverseOntologyProperty": ""
+                                "relationshipSource": "ontology",
+                                "relationship": "",
+                                "inverseRelationship": ""
                             }
                         ]
                     },
@@ -894,8 +897,9 @@
                         "graphs": [
                             {
                                 "graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
-                                "ontologyProperty": "",
-                                "inverseOntologyProperty": ""
+                                "relationshipSource": "ontology",
+                                "relationship": "",
+                                "inverseRelationship": ""
                             }
                         ]
                     },
@@ -918,8 +922,9 @@
                         "graphs": [
                             {
                                 "graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
-                                "ontologyProperty": "",
-                                "inverseOntologyProperty": ""
+                                "relationshipSource": "ontology",
+                                "relationship": "",
+                                "inverseRelationship": ""
                             }
                         ]
                     },
@@ -942,8 +947,9 @@
                         "graphs": [
                             {
                                 "graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
-                                "ontologyProperty": "",
-                                "inverseOntologyProperty": ""
+                                "relationshipSource": "ontology",
+                                "relationship": "",
+                                "inverseRelationship": ""
                             }
                         ]
                     },
@@ -966,8 +972,9 @@
                         "graphs": [
                             {
                                 "graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
-                                "ontologyProperty": "",
-                                "inverseOntologyProperty": ""
+                                "relationshipSource": "ontology",
+                                "relationship": "",
+                                "inverseRelationship": ""
                             }
                         ]
                     },

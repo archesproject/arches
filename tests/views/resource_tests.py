@@ -16,11 +16,13 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import unittest
 import uuid
 from http import HTTPStatus
 from unittest.mock import patch
 from arches.app.views.resource import ResourcePermissionDataView
 from tests.base_test import ArchesTestCase
+from django.apps import apps
 from django.db import connection
 from django.urls import reverse
 from arches.app.models.models import EditLog, Graph
@@ -358,8 +360,8 @@ class ResourceViewTests(ArchesTestCase):
         reference_tile.data[self.reference_nodeid] = [
             {
                 "resourceName": "",
-                "ontologyProperty": en_preflabel,
-                "inverseOntologyProperty": en_preflabel,
+                "relationship": en_preflabel,
+                "inverseRelationship": en_preflabel,
                 "resourceId": person_resourceid,
             }
         ]
@@ -369,6 +371,85 @@ class ResourceViewTests(ArchesTestCase):
         relationship = ret["resource_relationships"][0]["relationshiptype_label"]
         self.assertEqual(relationship, en_preflabel)
 
+    def create_related_resources(self, relationship, inverse_relationship):
+        """A reference resource related to a person, with the given relationships."""
+        person_resource = Resource(graph_id=self.person_graphid)
+        person_resource.save()
+        reference_resource = Resource(graph_id=self.reference_graphid)
+        reference_resource.save()
+        reference_tile = Tile.get_blank_tile(
+            self.reference_nodeid, str(reference_resource.pk)
+        )
+        reference_tile.data[self.reference_nodeid] = [
+            {
+                "resourceName": "",
+                "relationship": relationship,
+                "inverseRelationship": inverse_relationship,
+                "resourceId": str(person_resource.pk),
+            }
+        ]
+        reference_tile.save()
+        sync_es(SearchEngineFactory().create())
+        return reference_resource
+
+    def create_list_item(self, uri, label):
+        from arches.app.models.models import DValueType
+        from arches.extensions.controlled_lists.models import (
+            List,
+            ListItem,
+            ListItemValue,
+        )
+
+        list_item = ListItem.objects.create(
+            list=List.objects.create(name="Relationship Types"), sortorder=0, uri=uri
+        )
+        ListItemValue.objects.create(
+            list_item=list_item,
+            valuetype=DValueType.objects.get(valuetype="prefLabel"),
+            language_id="en",
+            value=label,
+        )
+        return list_item
+
+    @unittest.skipUnless(
+        apps.is_installed("arches.extensions.controlled_lists"),
+        "requires the controlled_lists application",
+    )
+    def test_get_related_resources_labels_both_relationships(self):
+        item_uri = "https://example.org/plugins/controlled-list-manager/item/6e0f0a3e-6fd4-4a4d-9f0f-0ffb8e2c1b0b"
+        self.create_list_item(item_uri, "is depicted by")
+        concept_valueid = "ac41d9be-79db-4256-b368-2f4559cfbe55"
+        ontology_property = "http://www.cidoc-crm.org/cidoc-crm/P62_depicts"
+
+        cases = {
+            "concept and controlled list item": (
+                (concept_valueid, item_uri),
+                ("is related to", "is depicted by"),
+            ),
+            "controlled list item and concept": (
+                (item_uri, concept_valueid),
+                ("is depicted by", "is related to"),
+            ),
+            "ontology property is left as it is": (
+                (ontology_property, ontology_property),
+                (ontology_property, ontology_property),
+            ),
+        }
+        for name, (relationships, expected_labels) in cases.items():
+            with self.subTest(name):
+                reference_resource = self.create_related_resources(*relationships)
+                ret = reference_resource.get_related_resources(
+                    user=self.test_users["admin"]
+                )
+                relationship = ret["resource_relationships"][0]
+                self.assertEqual(
+                    (
+                        relationship["relationshiptype_label"],
+                        relationship["inverserelationshiptype_label"],
+                    ),
+                    expected_labels,
+                )
+
     def test_resource_report_good(self):
         self.client.login(username="admin", password="admin")
         url = reverse(
@@ -376,6 +457,40 @@ class ResourceViewTests(ArchesTestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+    def test_resource_descriptors_include_graph_icon_and_lifecycle_state(self):
+        self.client.login(username="admin", password="admin")
+        resource = ResourceInstance.objects.select_related(
+            "graph", "resource_instance_lifecycle_state"
+        ).get(pk=self.resource_instance_id)
+        localized_value = [{"language": "en", "value": "Value"}]
+        document = {
+            "_source": {
+                "graph_id": str(resource.graph_id),
+                "displayname": localized_value,
+                "displaydescription": localized_value,
+                "map_popup": localized_value,
+                "geometries": [],
+                "permissions": {},
+            }
+        }
+        url = reverse(
+            "resource_descriptors", kwargs={"resourceid": self.resource_instance_id}
+        )
+
+        with patch(
+            "arches.app.views.resource.SearchEngineFactory.create"
+        ) as create_search_engine:
+            create_search_engine.return_value.search.return_value = document
+            response = self.client.get(url)
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        descriptors = response.json()
+        self.assertEqual(descriptors["graph_iconclass"], resource.graph.iconclass)
+        self.assertEqual(
+            descriptors["lifecycle_state"],
+            str(resource.resource_instance_lifecycle_state.name),
+        )
 
     def test_resource_report_missing_resource(self):
         self.client.login(username="sam", password="Test12345!")

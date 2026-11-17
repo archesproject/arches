@@ -192,10 +192,13 @@ export default AbstractModel.extend({
                         );
                     });
                     if (relatedResource) {
+                        const isTarget = resourceRelationship.to_resource === this.attributes.resourceid
+                            && resourceRelationship.from_resource !== this.attributes.resourceid;
                         relatedResources.push({
                             'displayName': relatedResource.displayname,
                             'resourceinstanceid': relatedResource.resourceinstanceid,
-                            'relationship': resourceRelationship.relationshiptype_label,
+                            'relationship': (isTarget && resourceRelationship.inverserelationshiptype_label)
+                                || resourceRelationship.relationshiptype_label,
                             'link': arches.urls.resource_report + relatedResource.resourceinstanceid,
                         });
                     }

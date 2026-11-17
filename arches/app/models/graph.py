@@ -26,12 +26,13 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connection
 from django.db.models import Q, FETCH_RAISE, prefetch_related_objects
 from django.db.utils import IntegrityError
+from arches.app.utils.decorators import deprecated
 from arches.app.const import IntegrityCheck
 from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.querysets.graph import GraphQuerySet
 from arches.app.models.system_settings import settings
-from arches.app.models.utils import make_name_unique
+from arches.app.models.utils import get_slugified_alias_renames, make_name_unique
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.bulk_data_deletion import BulkDataDeletion
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -1406,6 +1407,7 @@ class Graph(models.GraphModel):
                 ret.append(edge)
         return ret
 
+    @deprecated
     def is_node_in_child_group(self, node):
         """
         test to see if the node is in a group that is a child to another group
@@ -1428,6 +1430,7 @@ class Graph(models.GraphModel):
 
         return hasParentGroup
 
+    @deprecated
     def get_parent_nodes_and_edges(self, node):
         """
         given a node, get all the parent nodes and edges
@@ -1452,6 +1455,7 @@ class Graph(models.GraphModel):
 
         return {"nodes": nodes, "edges": edges}
 
+    @deprecated
     def is_group_semantic(self, node):
         """
         test to see if all the nodes in a group are semantic
@@ -1469,6 +1473,7 @@ class Graph(models.GraphModel):
 
         return True
 
+    @deprecated
     def get_grouped_nodes(self, node):
         """
         given a node, get any other nodes that share the same group
@@ -1934,6 +1939,7 @@ class Graph(models.GraphModel):
         found.grouping_node_id = found.nodegroupid
         return found
 
+    @deprecated
     def get_root_nodegroup(self):
         """
         gets the top level nodegroup (the first nodegroup that doesn't have a parentnodegroup)
@@ -1944,6 +1950,7 @@ class Graph(models.GraphModel):
             if nodegroup.parentnodegroup is None:
                 return nodegroup
 
+    @deprecated
     def get_root_card(self):
         """
         gets the top level card/card container
@@ -2230,6 +2237,17 @@ class Graph(models.GraphModel):
                 node.alias = make_name_unique(row[0], aliases, "_n")
                 node.hascustomalias = False
         return node.alias
+
+    def slugify_node_aliases(self):
+        """
+        Renames any node alias that is not a valid slug, e.g. one serialized
+        before hyphens were replaced by __arches_slugify.
+        """
+        aliases_by_nodeid = {
+            nodeid: node.alias for nodeid, node in self.nodes.items() if node.alias
+        }
+        for nodeid, new_alias in get_slugified_alias_renames(aliases_by_nodeid).items():
+            self.nodes[nodeid].alias = new_alias
 
     def validate(self):
         """
@@ -2846,7 +2864,7 @@ class Graph(models.GraphModel):
 
             return Graph.objects.get(pk=updated_graph.pk)
 
-    def publish(self, user=None, notes=None):
+    def publish(self, user=None, notes=None, *, publication_id=None):
         """
         Adds a corresponding entry to the GraphXPublishedGraph table,
         and creates a PublishedGraph entry for every active language
@@ -2861,8 +2879,11 @@ class Graph(models.GraphModel):
                 update_published_graphs=False
             )
 
+            publication_fields = {}
+            if publication_id is not None:
+                publication_fields["publicationid"] = publication_id
             publication = models.GraphXPublishedGraph.objects.create(
-                graph=self, notes=notes, user=user
+                graph=self, notes=notes, user=user, **publication_fields
             )
 
             self.publication = publication

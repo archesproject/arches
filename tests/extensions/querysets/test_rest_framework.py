@@ -15,7 +15,14 @@ from packaging.version import Version
 
 arches_version = Version(_arches_version_str)
 from arches.app.models.graph import Graph
-from arches.app.models.models import EditLog, File, Language, Node, NodeGroup
+from arches.app.models.models import (
+    EditLog,
+    File,
+    Language,
+    Node,
+    NodeGroup,
+    TileModel,
+)
 
 from arches.extensions.querysets.rest_framework.serializers import (
     ArchesResourceSerializer,
@@ -23,7 +30,10 @@ from arches.extensions.querysets.rest_framework.serializers import (
     ArchesSingleNodegroupSerializer,
     ArchesTileSerializer,
 )
-from arches.extensions.querysets.utils.models import ensure_request
+from arches.extensions.querysets.utils.models import (
+    ensure_request,
+    generate_node_alias_expressions,
+)
 from arches.extensions.querysets.utils.tests import GraphTestCase
 
 MUTABLE_PERMITTED_NODEGROUPS = set()
@@ -115,6 +125,31 @@ class RestFrameworkTests(GraphTestCase):
                 "details": [],
             },
         )
+
+    def test_create_tile_without_sortorder_appends(self):
+        next_sortorder = (
+            max(
+                TileModel.objects.filter(
+                    resourceinstance=self.resource_42, nodegroup=self.nodegroup_n
+                ).values_list("sortorder", flat=True)
+            )
+            + 1
+        )
+        create_url = reverse(
+            "arches_querysets:api-tiles",
+            kwargs={"graph": "datatype_lookups", "nodegroup_alias": "datatypes_n"},
+        )
+        self.client.login(username="dev", password="dev")
+        response = self.client.post(
+            create_url,
+            {
+                "aliased_data": {"string_alias_n": "appended"},
+                "resourceinstance": str(self.resource_42.pk),
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, HTTPStatus.CREATED)
+        self.assertEqual(response.json()["sortorder"], next_sortorder)
 
     def test_create_nested_tiles_for_new_resource(self):
         self.client.login(username="dev", password="dev")
@@ -232,6 +267,32 @@ class RestFrameworkTests(GraphTestCase):
                 "node_value": padded_string_node_value("update_value"),
                 "details": [],
             },
+        )
+
+    def test_patch_tile_keeps_omitted_nodes(self):
+        tile = self.resource_42.aliased_data.datatypes_1
+        self.client.login(username="dev", password="dev")
+        response = self.client.patch(
+            reverse(
+                "arches_querysets:api-tile",
+                kwargs={
+                    "graph": "datatype_lookups",
+                    "nodegroup_alias": "datatypes_1",
+                    "pk": tile.pk,
+                },
+            ),
+            {
+                "aliased_data": {"string_alias": "update_value"},
+                "resourceinstance": str(self.resource_42.pk),
+            },
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.OK, response.json())
+        stored_data = TileModel.objects.get(pk=tile.pk).data
+        self.assertEqual(stored_data[str(self.number_node_1.pk)], 42)
+        self.assertEqual(
+            stored_data[str(self.non_localized_string_node_1.pk)], "forty-two"
         )
 
     def test_update_tile_with_child(self):
@@ -361,6 +422,141 @@ class RestFrameworkTests(GraphTestCase):
             "resource-put-child-value",
             "Child tile aliased_data must be refreshed after resource PUT, not stale",
         )
+
+    def test_resource_put_keeps_tiles_the_user_cannot_read(self):
+        readable_nodegroup_ids = {
+            str(nodegroup_id)
+            for nodegroup_id in Node.objects.filter(graph=self.graph)
+            .exclude(nodegroup=None)
+            .values_list("nodegroup_id", flat=True)
+        }
+        readable_nodegroup_ids.discard(str(self.nodegroup_n.pk))
+        unreadable_tiles = TileModel.objects.filter(
+            resourceinstance=self.resource_42, nodegroup=self.nodegroup_n
+        )
+        readable_tiles = TileModel.objects.filter(
+            resourceinstance=self.resource_42, nodegroup=self.nodegroup_1
+        )
+        unreadable_tile_count = unreadable_tiles.count()
+
+        self.client.login(username="dev", password="dev")
+        with patch(
+            "arches.app.models.models.UserProfile.viewable_nodegroups",
+            readable_nodegroup_ids,
+        ):
+            response = self.client.put(
+                reverse(
+                    "arches_querysets:api-resource",
+                    kwargs={
+                        "graph": "datatype_lookups",
+                        "pk": str(self.resource_42.pk),
+                    },
+                ),
+                {"aliased_data": {}},
+                content_type="application/json",
+            )
+
+        self.assertEqual(response.status_code, HTTPStatus.OK, response.json())
+        self.assertEqual(unreadable_tiles.count(), unreadable_tile_count)
+        self.assertEqual(readable_tiles.count(), 0)
+
+    def test_resource_put_skips_incoming_sortorders_for_new_tiles(self):
+        next_sortorder = (
+            max(
+                TileModel.objects.filter(
+                    resourceinstance=self.resource_42, nodegroup=self.nodegroup_n
+                ).values_list("sortorder", flat=True)
+            )
+            + 1
+        )
+        update_url = reverse(
+            "arches_querysets:api-resource",
+            kwargs={"graph": "datatype_lookups", "pk": str(self.resource_42.pk)},
+        )
+        request_body = {
+            "aliased_data": {
+                "datatypes_n": [
+                    {
+                        "resourceinstance": str(self.resource_42.pk),
+                        "aliased_data": {"non_localized_string_alias_n": "appended"},
+                    },
+                    {
+                        "resourceinstance": str(self.resource_42.pk),
+                        "sortorder": next_sortorder,
+                        "aliased_data": {
+                            "non_localized_string_alias_n": "explicitly-placed"
+                        },
+                    },
+                ],
+            },
+        }
+
+        self.client.login(username="dev", password="dev")
+        response = self.client.put(
+            update_url, request_body, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, HTTPStatus.OK, response.json())
+
+        new_sortorders = [
+            tile["sortorder"]
+            for tile in response.json()["aliased_data"]["datatypes_n"]
+            if tile["sortorder"] >= next_sortorder
+        ]
+        self.assertCountEqual(new_sortorders, [next_sortorder, next_sortorder + 1])
+
+    def test_resource_put_leaves_tiles_parented_in_their_own_nodegroup(self):
+        misparented_tile = TileModel.objects.create(
+            nodegroup=self.nodegroup_1,
+            resourceinstance=self.resource_42,
+            data={},
+            parenttile=self.cardinality_1_tile,
+        )
+        resource_url = reverse(
+            "arches_querysets:api-resource",
+            kwargs={"graph": "datatype_lookups", "pk": str(self.resource_42.pk)},
+        )
+
+        self.client.login(username="dev", password="dev")
+        response = self.client.put(
+            resource_url,
+            {
+                "aliased_data": {
+                    "datatypes_1": {
+                        "tileid": str(self.cardinality_1_tile.pk),
+                        "resourceinstance": str(self.resource_42.pk),
+                        "aliased_data": {},
+                    },
+                },
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, HTTPStatus.OK, response.json())
+        self.assertTrue(TileModel.objects.filter(pk=misparented_tile.pk).exists())
+
+    def test_update_tile_rejects_a_related_resource_without_a_resource_id(self):
+        update_url = reverse(
+            "arches_querysets:api-tile",
+            kwargs={
+                "graph": "datatype_lookups",
+                "nodegroup_alias": "datatypes_1",
+                "pk": self.cardinality_1_tile.pk,
+            },
+        )
+        request_body = {
+            "aliased_data": {
+                "resource_instance_alias": [
+                    {"tileid": str(self.cardinality_1_tile.pk)}
+                ],
+            },
+            "resourceinstance": str(self.resource_42.pk),
+        }
+
+        self.client.login(username="dev", password="dev")
+        response = self.client.patch(
+            update_url, request_body, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertIn("resource_instance_alias", response.json())
 
     # ------------------------------------------------------------------ #
     # PATCH tile endpoint — parent + child, all cardinality combinations
@@ -1316,6 +1512,21 @@ class RestFrameworkTests(GraphTestCase):
             str(self.resource_none.pk),
         )
 
+    def test_node_aliases_only_requested_with_filter_params(self):
+        url = reverse(
+            "arches_querysets:api-resources", kwargs={"graph": "datatype_lookups"}
+        )
+        target = "arches.extensions.querysets.querysets.generate_node_alias_expressions"
+        with patch(target, wraps=generate_node_alias_expressions) as spy:
+            self.assertEqual(self.client.get(url).status_code, HTTPStatus.OK)
+            spy.assert_not_called()
+
+            response = self.client.get(
+                url, QUERY_STRING="aliased_data__string_alias__isnull=false"
+            )
+            self.assertEqual(response.status_code, HTTPStatus.OK)
+            spy.assert_called_once()
+
     def test_filter_kwargs_disallows_joins(self):
         self.assertContains(
             self.client.get(
@@ -1377,9 +1588,8 @@ class RestFrameworkPerformanceTests(GraphTestCase):
         # 18: select resources limit 500
         # 19: tile depth 1
         # 20: tile depth 2
-        # 21: tile depth 3: none!
-        # 22-25: arches perms (BUG: core arches)
-        num_queries = 25
+        # 21-24: arches perms (BUG: core arches)
+        num_queries = 24
         if arches_version < Version("8.1.0a0"):
             num_queries += 1  # extra user profile query on Arches 8.0 and below.
         if arches_version < Version("8.2.0a8"):
@@ -1407,9 +1617,8 @@ class RestFrameworkPerformanceTests(GraphTestCase):
         # 17: tile count (paginator)
         # 18: select tiles limit 500
         # 19: tile depth 2
-        # 20: tile depth 3: none!
-        # 21-24: arches perms (BUG: core arches)
-        num_queries = 24
+        # 20-23: arches perms (BUG: core arches)
+        num_queries = 23
         if arches_version < Version("8.1.0a0"):
             num_queries += 1  # extra user profile query on Arches 8.0 and below.
         if arches_version < Version("8.2.0a8"):

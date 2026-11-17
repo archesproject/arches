@@ -1039,27 +1039,27 @@ class JsonLdReader(Reader):
                                 gs = branch[0]["config"]["graphs"]
                                 if len(gs) == 1:
                                     # just select it
-                                    if "ontologyProperty" in gs[0]:
-                                        node_value[0]["ontologyProperty"] = gs[0][
-                                            "ontologyProperty"
+                                    if "relationship" in gs[0]:
+                                        node_value[0]["relationship"] = gs[0][
+                                            "relationship"
                                         ]
-                                    if "inverseOntologyProperty" in gs[0]:
-                                        node_value[0]["inverseOntologyProperty"] = gs[
-                                            0
-                                        ]["inverseOntologyProperty"]
+                                    if "inverseRelationship" in gs[0]:
+                                        node_value[0]["inverseRelationship"] = gs[0][
+                                            "inverseRelationship"
+                                        ]
                                 else:
                                     for g in gs:
                                         # Now test current node's class against graph's class
                                         # This isn't a guarantee, but close enough
                                         if vi["@type"][0] == g["rootclass"]:
-                                            if "ontologyProperty" in g:
-                                                node_value[0]["ontologyProperty"] = g[
-                                                    "ontologyProperty"
+                                            if "relationship" in g:
+                                                node_value[0]["relationship"] = g[
+                                                    "relationship"
                                                 ]
-                                            if "inverseOntologyProperty" in g:
-                                                node_value[0][
-                                                    "inverseOntologyProperty"
-                                                ] = g["inverseOntologyProperty"]
+                                            if "inverseRelationship" in g:
+                                                node_value[0]["inverseRelationship"] = (
+                                                    g["inverseRelationship"]
+                                                )
                                             break
                     else:
                         # Might get checked in a cardinality n branch that shouldn't be repeated

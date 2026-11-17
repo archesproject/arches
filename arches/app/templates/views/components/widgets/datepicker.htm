@@ -70,13 +70,14 @@
 <div class="col-xs-12 pad-no crud-widget-container">
     <select
         data-bind="
-            attr: {placeholder: $root.translations.viewMode, 'aria-label': $root.translations.viewMode},
+            attr: {'data-label': $root.translations.viewMode},
             options:viewModeOptions,
             optionsText:'name',
             optionsValue:'id',
             event: {change: onViewModeSelection},
-            value: viewMode,
-            chosen: {width: '100%', disable_search: true}
+            select2Query: {select2Config: {
+                value: viewMode
+            }}
         "
     ></select>
 </div>

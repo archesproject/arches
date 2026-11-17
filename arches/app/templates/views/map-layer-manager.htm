@@ -15,7 +15,7 @@
     <div class="flex">
         <div class="flex">
             <div class="side-column-crud-container form-list">
-                <div class="layer-list">
+                <div class="layer-filter-container">
                     <!-- Layer Filter -->
                     <div class="list-filter" data-bind="">
                         <input type="text" class="form-control" placeholder="Find a layer..." data-bind="value: listFilter, valueUpdate: 'keyup'">
@@ -260,7 +260,12 @@
                                                                         {% trans "Legend content:" %}
                                                                     </div>
                                                                     <div class="row">
-                                                                        <textarea rows="10" cols="80" data-bind="ckeditor: legend, ckeditorOptions: {},  valueUpdate: 'afterkeydown'"></textarea>
+                                                                        <div
+                                                                            data-bind="component: {
+                                                                                name: 'views/components/rich-text-editor',
+                                                                                params: {value: legend}
+                                                                            }"
+                                                                        ></div>
                                                                     </div>
                                                                 </div>
                                                             </div>

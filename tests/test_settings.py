@@ -164,8 +164,6 @@ LANGUAGES = [
     ("ar", _("Arabic")),
 ]
 
-DOCKER = False
-
 PERMISSION_DEFAULTS = {}
 
 CELERY_CHECK_ONLY_INSPECT_BROKER = True
@@ -175,12 +173,6 @@ try:
     from arches.settings_local import *
 except ImportError:
     pass
-
-if DOCKER:
-    try:
-        from arches.settings_docker import *
-    except ImportError:
-        pass
 
 
 # Tests shouldn't depend on celery running, so overwrite after settings_local import

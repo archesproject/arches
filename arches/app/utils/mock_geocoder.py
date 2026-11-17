@@ -16,7 +16,10 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+from arches.app.utils.decorators import deprecated
 
+
+@deprecated
 def find_candidates(search_string):
     # use search string to retrieve candidate list from data source.
     # return data as follows:

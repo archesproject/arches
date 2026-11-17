@@ -1,0 +1,17 @@
+name: Prepare release
+
+on:
+  push:
+    branches:
+      - 'release_alpha'
+      - 'release_beta'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  increment_version_and_pr:
+    uses: archesproject/reusable-github-workflows/.github/workflows/release_prep.yml@main
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}

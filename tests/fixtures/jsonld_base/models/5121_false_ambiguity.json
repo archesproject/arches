@@ -234,8 +234,9 @@
                         "graphs": [
                             {
                                 "graphid": "29a5d064-bf97-11e9-bd39-0242ac160002",
-                                "ontologyProperty": "",
-                                "inverseOntologyProperty": ""
+                                "relationshipSource": "ontology",
+                                "relationship": "",
+                                "inverseRelationship": ""
                             }
                         ]
                     },

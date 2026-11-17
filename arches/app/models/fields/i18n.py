@@ -1,5 +1,7 @@
 import json
 import copy
+import psycopg
+from psycopg.types.json import JsonbDumper
 from arches.app.models.system_settings import settings
 from arches.app.utils import import_class_from_string
 from django.utils.translation import gettext_lazy as _
@@ -493,3 +495,23 @@ class I18NFieldMigrationSerializer(BaseSerializer):
 
 Serializer.register(I18n_String, I18NFieldMigrationSerializer)
 Serializer.register(I18n_JSONField, I18NFieldMigrationSerializer)
+
+
+class I18nStringDumper(JsonbDumper):
+    """
+    Lets psycopg bind an I18n_String as jsonb. The ORM compiles these through
+    as_sql(), but the schema editor passes column defaults straight to the driver.
+    """
+
+    def dump(self, obj):
+        return super().dump(obj.raw_value)
+
+
+class I18nJSONDumper(JsonbDumper):
+    def dump(self, obj):
+        return super().dump(obj.to_localized_object())
+
+
+def register_i18n_adapters():
+    psycopg.adapters.register_dumper(I18n_String, I18nStringDumper)
+    psycopg.adapters.register_dumper(I18n_JSON, I18nJSONDumper)

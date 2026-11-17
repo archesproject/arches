@@ -4,7 +4,7 @@ import CardComponentViewModel from 'viewmodels/card-component';
 import IIIFAnnotationViewmodel from 'views/components/iiif-annotation';
 import AlertViewModel from 'viewmodels/alert';
 import iiifCardTemplate from 'templates/views/components/cards/iiif-card.htm';
-import 'bindings/chosen';
+import 'bindings/select2-query';
 
 
 const viewModel = function(params) {

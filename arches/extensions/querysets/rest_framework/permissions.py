@@ -1,5 +1,6 @@
 from rest_framework import permissions
 
+from arches.app.utils.decorators import deprecated
 from arches.app.utils.permission_backend import group_required
 
 
@@ -14,6 +15,7 @@ class Guest(permissions.BasePermission):
 
 
 class RDMAdministrator(permissions.BasePermission):
+    @deprecated
     def has_permission(self, request, view):
         return group_required(request.user, "RDM Administrator")
 

@@ -2,6 +2,7 @@ import os
 import uuid
 import shutil
 import datetime
+from arches.app.utils.decorators import deprecated
 from arches.app.models.concept import Concept
 from arches.app.models import models
 from arches.app.models.models import ResourceXResource
@@ -55,6 +56,7 @@ class ResourceImportReporter:
     def update_tiles_saved(self, count=1):
         self.tiles_saved += count
 
+    @deprecated
     def update_relations_saved(self, count=1):
         self.relations_saved += count
         print(
@@ -81,6 +83,7 @@ class Reader(object):
         self.errors = []
         self.datatype_factory = DataTypeFactory()
 
+    @deprecated
     def validate_datatypes(self, record):
         pass
 

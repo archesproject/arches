@@ -60,6 +60,18 @@ class Tile(APIBase):
             request.POST["data"] = request.body
         return tileview.post(request)
 
+    @method_decorator(group_required("Resource Editor", raise_exception=True))
+    def delete(self, request, tileid):
+        try:
+            tile = models.TileModel.objects.get(tileid=tileid)
+        except ObjectDoesNotExist:
+            return JSONResponse(_("Tile not found."), status=404)
+        if not user_can_edit_resource(request.user, tile.resourceinstance_id):
+            return JSONResponse(
+                _("User is not permitted to edit this resource"), status=403
+            )
+        return TileView().delete_tile(request, tileid)
+
 
 @method_decorator(csrf_exempt, name="dispatch")
 @method_decorator(

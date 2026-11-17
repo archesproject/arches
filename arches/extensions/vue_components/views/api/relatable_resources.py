@@ -7,6 +7,8 @@ from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from django.db.models import Q, F
 
+from arches.extensions.querysets.utils.permissions import filter_readable_resources
+
 
 class RelatableResourcesView(View):
     def get(self, request, graph, node_alias):
@@ -32,7 +34,9 @@ class RelatableResourcesView(View):
         )
 
         resources = (
-            ResourceInstance.objects.filter(graph_id__in=graphs)
+            filter_readable_resources(
+                request.user, ResourceInstance.objects.filter(graph_id__in=graphs)
+            )
             .exclude(resourceinstanceid__in=initial_values)
             .values("resourceinstanceid")
             .annotate(display_value=F("descriptors__{}__name".format(language)))
@@ -41,7 +45,12 @@ class RelatableResourcesView(View):
 
         selected_resources = (
             (
-                ResourceInstance.objects.filter(resourceinstanceid__in=initial_values)
+                filter_readable_resources(
+                    request.user,
+                    ResourceInstance.objects.filter(
+                        resourceinstanceid__in=initial_values
+                    ),
+                )
                 .values("resourceinstanceid")
                 .annotate(display_value=F("descriptors__{}__name".format(language)))
                 .order_by("graph", "pk")

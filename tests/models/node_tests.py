@@ -1,3 +1,5 @@
+import uuid
+
 from arches.app.models.graph import Graph
 from arches.app.models.models import Node
 from tests.base_test import ArchesTestCase
@@ -26,3 +28,15 @@ class NodeTests(ArchesTestCase):
         new_node.clean()
         self.assertEqual(new_node.alias, "test_node")
         self.assertIs(new_node.hascustomalias, False)
+
+    def test_slugify_node_aliases(self):
+        aliases = ["time-span", "time_span", "-edge-", "valid_alias", ""]
+        graph = Graph()
+        graph.nodes = {uuid.uuid4(): Node(alias=alias) for alias in aliases}
+
+        graph.slugify_node_aliases()
+
+        self.assertEqual(
+            [node.alias for node in graph.nodes.values()],
+            ["time_span_n1", "time_span", "edge", "valid_alias", ""],
+        )

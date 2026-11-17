@@ -1,8 +1,12 @@
 import { defineStore } from "pinia";
 
 import { generateArchesURL } from "@/arches_vue_components/application/generate-arches-url.ts";
+import { useWidgetConfigStore } from "@/arches_vue_components/stores/useWidgetConfigStore.ts";
 
-import type { CardXNodeXWidgetData } from "@/arches_vue_components/types.ts";
+import type {
+    CardXNodeXWidgetData,
+    NodegroupWidgetConfig,
+} from "@/arches_vue_components/types.ts";
 
 async function requestNodegroupWidgetConfigs(
     graphSlug: string,
@@ -27,23 +31,54 @@ async function requestNodegroupWidgetConfigs(
     return parsed;
 }
 
+async function requestGraphWidgetConfigs(
+    graphSlug: string,
+): Promise<Record<string, NodegroupWidgetConfig>> {
+    const response = await fetch(
+        generateArchesURL(
+            "arches_vue_components:api-card-x-node-x-widget-list-from-graph",
+            { graph_slug: graphSlug },
+        ),
+    );
+
+    const parsed = await response.json();
+
+    if (!response.ok) {
+        throw new Error(parsed.message ?? response.statusText);
+    }
+
+    return parsed;
+}
+
 export const useNodegroupWidgetConfigStore = defineStore(
     "arches_vue_components:nodegroupWidgetConfig",
     () => {
+        const widgetConfigStore = useWidgetConfigStore();
+
         const cache = new Map<
             string,
             Map<string, Promise<CardXNodeXWidgetData[]>>
         >();
+        const graphCache = new Map<
+            string,
+            Promise<Record<string, NodegroupWidgetConfig>>
+        >();
+
+        function nodegroupCache(
+            graphSlug: string,
+        ): Map<string, Promise<CardXNodeXWidgetData[]>> {
+            if (!cache.has(graphSlug)) {
+                cache.set(graphSlug, new Map());
+            }
+
+            return cache.get(graphSlug)!;
+        }
 
         function fetchNodegroupWidgetConfigs(
             graphSlug: string,
             nodegroupAlias: string,
         ): Promise<CardXNodeXWidgetData[]> {
-            if (!cache.has(graphSlug)) {
-                cache.set(graphSlug, new Map());
-            }
-
-            const inner = cache.get(graphSlug)!;
+            const inner = nodegroupCache(graphSlug);
 
             if (!inner.has(nodegroupAlias)) {
                 const promise = requestNodegroupWidgetConfigs(
@@ -57,6 +92,40 @@ export const useNodegroupWidgetConfigStore = defineStore(
             return inner.get(nodegroupAlias)!;
         }
 
-        return { fetchNodegroupWidgetConfigs };
+        function fetchGraphWidgetConfigs(
+            graphSlug: string,
+        ): Promise<Record<string, NodegroupWidgetConfig>> {
+            if (!graphCache.has(graphSlug)) {
+                const promise = requestGraphWidgetConfigs(graphSlug).then(
+                    (nodegroupWidgetConfigs) => {
+                        const inner = nodegroupCache(graphSlug);
+                        for (const [
+                            nodegroupAlias,
+                            nodegroupWidgetConfig,
+                        ] of Object.entries(nodegroupWidgetConfigs)) {
+                            if (!inner.has(nodegroupAlias)) {
+                                inner.set(
+                                    nodegroupAlias,
+                                    Promise.resolve(
+                                        nodegroupWidgetConfig.card_x_node_x_widgets,
+                                    ),
+                                );
+                            }
+                            widgetConfigStore.cacheWidgetConfigs(
+                                graphSlug,
+                                nodegroupWidgetConfig.card_x_node_x_widgets,
+                            );
+                        }
+                        return nodegroupWidgetConfigs;
+                    },
+                );
+                promise.catch(() => graphCache.delete(graphSlug));
+                graphCache.set(graphSlug, promise);
+            }
+
+            return graphCache.get(graphSlug)!;
+        }
+
+        return { fetchNodegroupWidgetConfigs, fetchGraphWidgetConfigs };
     },
 );

@@ -28,6 +28,7 @@ from django.utils.decorators import method_decorator
 from django.utils.html import strip_tags
 from django.utils.translation import gettext as _
 from django.views.generic import View
+from arches.app.utils.decorators import deprecated
 from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.system_settings import settings
@@ -47,6 +48,7 @@ logger = logging.getLogger(__name__)
 class UserManagerView(BaseManagerView):
     action = ""
 
+    @deprecated
     def get_last_login(self, date):
         result = _("Not yet logged in")
         try:
@@ -55,6 +57,7 @@ class UserManagerView(BaseManagerView):
             pass
         return result
 
+    @deprecated
     def get_user_details(self, user):
         identities = []
         for group in Group.objects.all():

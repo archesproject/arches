@@ -22,7 +22,7 @@
                         'aria-checked': $parent.isOptionSelected($data)
                     }"
                     tabindex="0" role="checkbox">
-                    <input type="checkbox" data-bind="checked: $parent.isOptionSelected($data)">
+                    <input type="checkbox" data-bind="checked: $parent.isOptionSelected($data), disable: $parent.disabled">
                     <span data-bind="text:text"></span>
                 </label>
             </div>

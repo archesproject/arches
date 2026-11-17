@@ -29,6 +29,7 @@ from django.http import Http404
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.utils.translation import get_language, gettext as _
+from arches.app.utils.decorators import deprecated
 from arches.app.models.models import (
     Node,
     ResourceInstance,
@@ -133,6 +134,7 @@ class SearchView(MapBaseManagerView):
         return render(request, "views/search.htm", context)
 
 
+@deprecated
 def home_page(request):
     return render(
         request,

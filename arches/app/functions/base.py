@@ -19,6 +19,10 @@ class BaseFunction(object):
     def on_import(self, *args, **kwargs):
         raise NotImplementedError
 
+    # occurs after a bulk load (ETL), which writes tiles without calling Tile.save
+    def post_import(self, *args, **kwargs):
+        raise NotImplementedError
+
     def on_update_lifecycle_state(
         self, resource_instance, current_state, new_state, request=None, context=None
     ):

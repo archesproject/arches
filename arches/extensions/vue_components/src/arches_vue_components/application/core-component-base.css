@@ -1,0 +1,82 @@
+/*
+ * Base styles core Vue components were built with inside the Arches chrome. The build fences the
+ * chrome's own stylesheets off from core components (webpack-utils/postcss-legacy-fence.js), so
+ * these travel with the components instead and apply the same on any page.
+ */
+
+:where([data-arches-core], [data-arches-core] *):is(
+        button,
+        input,
+        optgroup,
+        select,
+        textarea
+    ) {
+    color: inherit;
+    font: inherit;
+    margin: 0;
+}
+
+:where([data-arches-core], [data-arches-core] *):is(button) {
+    overflow: visible;
+}
+
+:where([data-arches-core], [data-arches-core] *):is(button, select) {
+    text-transform: none;
+}
+
+:where([data-arches-core], [data-arches-core] *):is(
+        button,
+        input[type="button"],
+        input[type="reset"],
+        input[type="submit"]
+    ) {
+    appearance: button;
+    cursor: pointer;
+}
+
+:where([data-arches-core], [data-arches-core] *):is(
+        button[disabled],
+        input[disabled]
+    ) {
+    cursor: default;
+}
+
+:where([data-arches-core], [data-arches-core] *):is(textarea) {
+    overflow: auto;
+}
+
+:where([data-arches-core], [data-arches-core] *):is(
+        input,
+        button,
+        select,
+        textarea
+    ) {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+:where([data-arches-core], [data-arches-core] *):is(button),
+:where([data-arches-core], [data-arches-core] *):is(button):focus {
+    outline: 0 !important;
+}
+
+:where([data-arches-core], [data-arches-core] *):is(h1, h2, h3, h4, h5, h6) {
+    font-family: inherit;
+    font-weight: 600;
+    line-height: 1.1;
+    color: inherit;
+}
+
+:where([data-arches-core], [data-arches-core] *):is(a) {
+    text-decoration: none;
+    color: #454545;
+    outline: 0;
+}
+
+:where([data-arches-core], [data-arches-core] *):is(a):hover,
+:where([data-arches-core], [data-arches-core] *):is(a):focus {
+    text-decoration: none;
+    color: #383838;
+    outline: 0 !important;
+}

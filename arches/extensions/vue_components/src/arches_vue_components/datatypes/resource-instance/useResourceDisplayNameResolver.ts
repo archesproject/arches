@@ -13,6 +13,7 @@ export function useResourceDisplayNameResolver(
     graphSlug: string,
     nodeAlias: string,
 ) {
+    const resourceDisplayNameStore = useResourceDisplayNameStore();
     const resolved = ref<ResourceInstanceSelectOption | null>(null);
     const loading = ref(false);
     let latestRequestId = 0;
@@ -27,7 +28,7 @@ export function useResourceDisplayNameResolver(
             if (!newNodeValue?.resourceId) return;
 
             loading.value = true;
-            const result = await useResourceDisplayNameStore().fetchDisplayName(
+            const result = await resourceDisplayNameStore.fetchDisplayName(
                 graphSlug,
                 nodeAlias,
                 newNodeValue.resourceId,

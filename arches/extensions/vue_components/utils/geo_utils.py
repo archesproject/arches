@@ -3,8 +3,11 @@ import uuid
 
 from django.contrib.gis.geos import GEOSGeometry
 
+from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.geo_utils import GeoUtils as ArchesGeoUtils
+
+TILE_EXTENT_ROUNDING_TOLERANCE_METERS = 0.001
 
 
 class GeoUtils(ArchesGeoUtils):
@@ -41,3 +44,18 @@ class GeoUtils(ArchesGeoUtils):
             )
 
         return {"type": "FeatureCollection", "features": buffered_features}
+
+    def get_resource_ids_within_extent(self, nodeid, extent_geojson):
+        extent = GEOSGeometry(extent_geojson)
+        extent.srid = models.GeoJSONGeometry._meta.get_field("geom").srid
+
+        resource_ids = (
+            models.GeoJSONGeometry.objects.filter(
+                node_id=nodeid,
+                geom__dwithin=(extent, TILE_EXTENT_ROUNDING_TOLERANCE_METERS),
+            )
+            .order_by("resourceinstance_id")
+            .values_list("resourceinstance_id", flat=True)
+            .distinct()
+        )
+        return [str(resource_id) for resource_id in resource_ids]

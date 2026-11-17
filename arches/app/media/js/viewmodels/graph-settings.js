@@ -5,7 +5,7 @@ import koMapping from 'knockout-mapping';
 import arches from 'arches';
 import colorPicker from 'bindings/color-picker';
 import JsonErrorAlertViewModel from 'viewmodels/alert-json';
-import chosen from 'bindings/chosen';
+import 'bindings/select2-query';
 import 'utils/set-csrf-token';
 
 

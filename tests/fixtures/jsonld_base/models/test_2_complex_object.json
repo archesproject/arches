@@ -650,8 +650,9 @@
                         "graphs": [
                             {
                                 "graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
-                                "ontologyProperty": "",
-                                "inverseOntologyProperty": ""
+                                "relationshipSource": "ontology",
+                                "relationship": "",
+                                "inverseRelationship": ""
                             }
                         ]
                     },
@@ -676,8 +677,9 @@
                         "graphs": [
                             {
                                 "graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
-                                "inverseOntologyProperty": "http://www.cidoc-crm.org/cidoc-crm/P62i_is_depicted_by",
-                                "ontologyProperty": "http://www.cidoc-crm.org/cidoc-crm/P62_depicts"
+                                "relationshipSource": "ontology",
+                                "inverseRelationship": "http://www.cidoc-crm.org/cidoc-crm/P62i_is_depicted_by",
+                                "relationship": "http://www.cidoc-crm.org/cidoc-crm/P62_depicts"
                             }
                         ]
                     },
@@ -793,8 +795,9 @@
                         "graphs": [
                             {
                                 "graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
-                                "ontologyProperty": "",
-                                "inverseOntologyProperty": ""
+                                "relationshipSource": "ontology",
+                                "relationship": "",
+                                "inverseRelationship": ""
                             }
                         ]
                     },

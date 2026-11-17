@@ -534,7 +534,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <script src="{% webpack_static 'node_modules/jqueryui/jquery-ui.min.js' %}"></script>
     <script src="{% webpack_static 'node_modules/jquery-validation/dist/jquery.validate.min.js' %}"></script>
     <script src="{% webpack_static 'node_modules/underscore/underscore-min.js' %}"></script>
-    <script src="{% webpack_static 'node_modules/chosen-js/chosen.jquery.min.js' %}"></script>
     <script src="{% webpack_static 'node_modules/knockout/build/output/knockout-latest.js' %}"></script>
     <script src="{% webpack_static 'plugins/one.app.js' %}"></script>
     <script src="{% webpack_static 'plugins/revolution-slider/rs-plugin/js/jquery.themepunch.tools.min.js' %}"></script>
@@ -545,7 +544,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <!-- Custom Scripts -->
     {# Not on the admin bundle, so the navbar toggle needs this loaded explicitly. #}
     {% render_bundle 'bootstrap-behaviors/index' %}
-    {% render_bundle 'bindings/chosen' %}
     {% render_bundle 'bindings/key-events-click' %}
     {% render_bundle 'views/components/language-switcher' %}
 

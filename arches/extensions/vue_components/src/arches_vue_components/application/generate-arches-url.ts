@@ -1,7 +1,7 @@
 export function generateArchesURL(
     urlName: string,
     urlParameters: Record<string, string | number> = {},
-    queryParameters?: Record<string, string | number>,
+    queryParameters?: Record<string, string | number | (string | number)[]>,
     languageCode?: string,
 ): string {
     // @ts-expect-error ARCHES_URLS is defined globally
@@ -39,12 +39,14 @@ export function generateArchesURL(
         url = url.replace(new RegExp(`{${key}}`, "g"), String(value));
     });
 
-    if (queryParameters && Object.keys(queryParameters).length > 0) {
-        const searchParameters = new URLSearchParams();
-        Object.entries(queryParameters).forEach(([key, value]) => {
-            searchParameters.set(key, String(value));
-        });
-        url = `${url}?${searchParameters.toString()}`;
+    const searchParameters = new URLSearchParams();
+    Object.entries(queryParameters ?? {}).forEach(([key, value]) => {
+        const values = Array.isArray(value) ? value : [value];
+        values.forEach((item) => searchParameters.append(key, String(item)));
+    });
+    const queryString = searchParameters.toString();
+    if (queryString) {
+        url = `${url}?${queryString}`;
     }
 
     return url;

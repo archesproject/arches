@@ -18,11 +18,12 @@ import CardTreeViewModel from 'views/graph/graph-designer/card-tree';
 import PermissionDesigner from 'views/graph/permission-designer';
 import GraphSettingsViewModel from 'viewmodels/graph-settings';
 import 'bindings/resizable-sidepanel';
+import 'bindings/select2-query';
 import 'views/components/simple-switch';
 import 'views/components/icon-selector';
 import 'utils/set-csrf-token';
 import 'datatype-config-components';
-import 'bindings/ckeditor';
+import 'views/components/rich-text-editor';
 
 
 var GraphDesignerView = BaseManagerView.extend({
@@ -270,7 +271,7 @@ var GraphDesignerView = BaseManagerView.extend({
         };
 
         viewModel.exportMappingFile = function() {
-            window.open(arches.urls.export_mapping_file(viewModel.graph.source_identifier_id()), '_blank');
+            window.open(arches.urls.export_mapping_file(viewModel.graph.source_identifier_id() || viewModel.graph.graphid()), '_blank');
         };
 
         viewModel.publishGraph = function() {

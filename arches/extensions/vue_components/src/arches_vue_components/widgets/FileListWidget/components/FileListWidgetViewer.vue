@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from "vue";
 
 import { Image, Galleria } from "openvue";
 
+import { useLanguageStore } from "@/arches_vue_components/stores/useLanguageStore.ts";
 import { useSettingsStore } from "@/arches_vue_components/stores/useSettingsStore.ts";
 
 import type {
@@ -14,11 +15,13 @@ const { aliasedNodeData } = defineProps<{
     aliasedNodeData: FileListAliasedNodeData;
 }>();
 
+const languageStore = useLanguageStore();
 const settingsStore = useSettingsStore();
 const forceScriptName = ref("");
 
 onMounted(async () => {
     forceScriptName.value = await settingsStore.fetchForceScriptName();
+    await languageStore.fetchAllLanguages();
 });
 
 const imageData = computed(() => {
@@ -26,8 +29,7 @@ const imageData = computed(() => {
         return {
             thumbnailImageSrc: getFileUrl(fileReference.url),
             itemImageSrc: getFileUrl(fileReference.url),
-            alt: fileReference.altText,
-            title: fileReference.title,
+            alt: altText(fileReference),
         };
     });
 });
@@ -46,6 +48,14 @@ function getFileUrl(originalUrl: string) {
         return originalUrl;
     }
     return (forceScriptName.value + originalUrl).replace("//", "/");
+}
+
+function altText(fileReference: FileReference): string {
+    const languageCode = languageStore.requestLanguageCode;
+    if (languageCode === null) {
+        return "";
+    }
+    return fileReference.altText?.[languageCode]?.value ?? "";
 }
 </script>
 

@@ -50,6 +50,8 @@ const widgetInstanceRef = useTemplateRef("widgetInstance");
 
 defineExpose({ widget: widgetInstanceRef });
 
+const widgetConfigStore = useWidgetConfigStore();
+
 const isLoading = ref(false);
 const isChildLoading = ref(false);
 const isWidgetInitialized = ref(false);
@@ -123,10 +125,7 @@ watchEffect(async () => {
 
     try {
         resolvedCardXNodeXWidgetData.value =
-            await useWidgetConfigStore().fetchWidgetConfig(
-                graphSlug,
-                nodeAlias,
-            );
+            await widgetConfigStore.fetchWidgetConfig(graphSlug, nodeAlias);
         if (
             cardXNodeXWidgetDataOverrides &&
             resolvedCardXNodeXWidgetData.value

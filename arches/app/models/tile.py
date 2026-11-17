@@ -387,7 +387,7 @@ class Tile(models.TileModel):
                         )
             if errors is not None:
                 errors += error
-        if not raise_early:
+        if not raise_early and tile_errors:
             raise TileValidationError(tile_errors)
         return errors
 
@@ -764,7 +764,11 @@ class Tile(models.TileModel):
             new_resource_created = False
             if not resourceinstanceid:
                 graph = models.Node.objects.get(pk=nodeid).graph
-                resource_instance = models.ResourceInstance(graph=graph)
+                user = getattr(request, "user", None)
+                resource_instance = models.ResourceInstance(
+                    graph=graph,
+                    principaluser=user if user and user.is_authenticated else None,
+                )
                 resource_instance.save()
                 resourceinstanceid = str(resource_instance.resourceinstanceid)
                 new_resource_created = True

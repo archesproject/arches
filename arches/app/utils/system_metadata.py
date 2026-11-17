@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import platform
 import subprocess
 from django.db import connection, transaction
+from arches import __version__
 from arches.app.models.system_settings import settings
 
 
@@ -46,5 +47,11 @@ def system_metadata():
     except:
         tag = "git not found."
 
-    metadata = {"os": os_type, "os version": os_release, "db": db, "git hash": tag}
+    metadata = {
+        "os": os_type,
+        "os version": os_release,
+        "db": db,
+        "git hash": tag,
+        "arches version": __version__,
+    }
     return metadata

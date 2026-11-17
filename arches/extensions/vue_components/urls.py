@@ -5,6 +5,7 @@ from arches.extensions.vue_components.views.api.language import (
     LanguageViewWithRequestLanguage,
 )
 from arches.extensions.vue_components.views.api.map import (
+    ClusterResourcesAPI,
     FeatureBufferAPI,
     GeoJSONBoundsAPI,
     MapDataAPI,
@@ -14,6 +15,7 @@ from arches.extensions.vue_components.views.api.relatable_resources import (
 )
 from arches.extensions.vue_components.views.api.card_x_node_x_widget import (
     CardXNodeXWidgetView,
+    CardXNodeXWidgetListFromGraphView,
     CardXNodeXWidgetListFromNodegroupView,
 )
 from arches.extensions.vue_components.views.api.concept import ConceptsTreeView
@@ -33,6 +35,11 @@ urlpatterns = [
     path("api/feature-buffer", FeatureBufferAPI.as_view(), name="api-feature-buffer"),
     path("api/geojson-bounds", GeoJSONBoundsAPI.as_view(), name="api-geojson-bounds"),
     path(
+        "api/cluster-resources",
+        ClusterResourcesAPI.as_view(),
+        name="api-cluster-resources",
+    ),
+    path(
         "api/languages-with-request-language",
         LanguageViewWithRequestLanguage.as_view(),
         name="api-languages-with-request-language",
@@ -51,6 +58,11 @@ urlpatterns = [
         "api/card-x-node-x-widget-list-from-nodegroup/<slug:graph_slug>/<slug:nodegroup_alias>",
         CardXNodeXWidgetListFromNodegroupView.as_view(),
         name="api-card-x-node-x-widget-list-from-nodegroup",
+    ),
+    path(
+        "api/card-x-node-x-widget-list-from-graph/<slug:graph_slug>",
+        CardXNodeXWidgetListFromGraphView.as_view(),
+        name="api-card-x-node-x-widget-list-from-graph",
     ),
     path(
         "api/concepts/<slug:graph_slug>/<slug:node_alias>",

@@ -39,12 +39,16 @@
                 <div class="col-xs-12">
                     <select 
                         data-bind="
-                            placeholder: $root.translations.selectPrimaryDescriptionIdentifierCard,
-                            value: name.nodegroup_id, 
-                            options: cards, 
-                            optionsText: 'name', 
-                            optionsValue: 'nodegroup_id', 
-                            chosen: {width: '100%', allow_single_deselect: true, disable_search_threshold: 15}
+                            attr: {'data-label': $root.translations.cardName},
+                            options: cards,
+                            optionsText: 'name',
+                            optionsValue: 'nodegroup_id',
+                            select2Query: {select2Config: {
+                                value: name.nodegroup_id,
+                                placeholder: $root.translations.selectPrimaryDescriptionIdentifierCard,
+                                allowClear: true,
+                                minimumResultsForSearch: 15
+                            }}
                         "
                     ></select>
                 </div>
@@ -83,13 +87,18 @@
                 <div class="col-xs-12">
                     <select 
                         data-bind="
-                            placeholder: $root.translations.selectPrimaryDescriptionIdentifierCard,
-                            value: description.nodegroup_id, 
-                            options: cards, 
-                            optionsText: 'name', 
-                            optionsValue: 'nodegroup_id', 
-                            valueAllowUnset: true, 
-                            chosen: {width: '100%', allow_single_deselect: true, disable_search_threshold: 15}
+                            attr: {'data-label': $root.translations.cardName},
+                            value: description.nodegroup_id,
+                            valueAllowUnset: true,
+                            options: cards,
+                            optionsText: 'name',
+                            optionsValue: 'nodegroup_id',
+                            select2Query: {select2Config: {
+                                value: description.nodegroup_id,
+                                placeholder: $root.translations.selectPrimaryDescriptionIdentifierCard,
+                                allowClear: true,
+                                minimumResultsForSearch: 15
+                            }}
                         "
                     ></select>
                 </div>
@@ -128,13 +137,18 @@
                 <div class="col-xs-12">
                     <select 
                         data-bind="
-                            placeholder: $root.translations.selectPrimaryDescriptionIdentifierCard,
-                            value: map_popup.nodegroup_id, 
-                            options: cards, 
-                            optionsText: 'name', 
-                            optionsValue: 'nodegroup_id', 
-                            valueAllowUnset: true, 
-                            chosen: {width: '100%', allow_single_deselect: true, disable_search_threshold: 15}
+                            attr: {'data-label': $root.translations.cardName},
+                            value: map_popup.nodegroup_id,
+                            valueAllowUnset: true,
+                            options: cards,
+                            optionsText: 'name',
+                            optionsValue: 'nodegroup_id',
+                            select2Query: {select2Config: {
+                                value: map_popup.nodegroup_id,
+                                placeholder: $root.translations.selectPrimaryDescriptionIdentifierCard,
+                                allowClear: true,
+                                minimumResultsForSearch: 15
+                            }}
                         "
                     ></select>
                 </div>

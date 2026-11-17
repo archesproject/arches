@@ -4,6 +4,7 @@ import { computed, useTemplateRef } from "vue";
 import MapComponent from "@/arches_vue_components/components/MapComponent/MapComponent.vue";
 
 import { buildGeoJSONFeatureCollectionAliasedNodeData } from "@/arches_vue_components/datatypes/geojson-feature-collection/utils.ts";
+import { buildMapSettings } from "@/arches_vue_components/widgets/MapWidget/utils.ts";
 
 import type { Component } from "vue";
 import type { FeatureCollection } from "geojson";
@@ -50,6 +51,10 @@ const resolvedAllowedGeometryTypes = computed(
         ) ?? undefined,
 );
 
+const mapSettings = computed(() =>
+    buildMapSettings(cardXNodeXWidgetData?.config),
+);
+
 const componentRef =
     useTemplateRef<InstanceType<typeof MapComponent>>("component");
 
@@ -70,6 +75,7 @@ function onValueUpdate(updatedValue: FeatureCollection): void {
 <template>
     <MapComponent
         ref="component"
+        class="map-widget-editor"
         :value="resolvedAliasedNodeData.node_value"
         :zoom="cardXNodeXWidgetData?.config?.zoom"
         :pitch="cardXNodeXWidgetData?.config?.pitch"
@@ -83,9 +89,16 @@ function onValueUpdate(updatedValue: FeatureCollection): void {
         :interaction-tools="interactionTools"
         :max-features="cardXNodeXWidgetData?.config?.maxDrawnFeatures"
         :feature-popup-component="featurePopupComponent"
+        :settings="mapSettings"
         @update:is-loading="emit('update:isLoading', $event)"
         @update:value="onValueUpdate"
         @update:overlays="emit('update:overlays')"
         @ready="emit('ready')"
     />
 </template>
+
+<style>
+.map-widget-editor {
+    --map-component-min-height: 56rem;
+}
+</style>
