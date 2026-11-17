@@ -13,3 +13,15 @@ export function buildStringAliasedNodeData(
         details: [],
     };
 }
+
+export function getOnlyFilledLanguageCode(
+    nodeValue: Record<string, LanguageValue> | null | undefined,
+): string | undefined {
+    const filledLanguageCodes = Object.entries(nodeValue ?? {})
+        .filter(([, languageValue]) => languageValue.value !== "")
+        .map(([languageCode]) => languageCode);
+    if (filledLanguageCodes.length === 1) {
+        return filledLanguageCodes[0];
+    }
+    return undefined;
+}

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watchEffect } from "vue";
+import { computed, onMounted, ref, watch, watchEffect } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import InputText from "openvue/inputtext";
@@ -8,7 +8,10 @@ import Select from "openvue/select";
 import Textarea from "openvue/textarea";
 
 import { MULTILINE_RENDER_CONTEXT } from "@/arches_vue_components/widgets/TextWidget/constants.ts";
-import { buildStringAliasedNodeData } from "@/arches_vue_components/datatypes/string/utils.ts";
+import {
+    buildStringAliasedNodeData,
+    getOnlyFilledLanguageCode,
+} from "@/arches_vue_components/datatypes/string/utils.ts";
 import { useLanguageStore } from "@/arches_vue_components/stores/useLanguageStore.ts";
 
 import type {
@@ -37,6 +40,7 @@ const emit = defineEmits<{
         event: "update:aliasedNodeData",
         updatedValue: StringAliasedNodeData,
     ): void;
+    (event: "update:selectedLanguage", languageCode: string): void;
     (event: "ready"): void;
 }>();
 
@@ -85,6 +89,16 @@ watchEffect(() => {
     }
 });
 
+watch(
+    selectedLanguage,
+    (language) => {
+        if (language) {
+            emit("update:selectedLanguage", language.code);
+        }
+    },
+    { immediate: true },
+);
+
 onMounted(() => {
     if (selectedLanguage.value) {
         emit("ready");
@@ -92,13 +106,9 @@ onMounted(() => {
 });
 
 function resolveInitialLanguage(): Language | undefined {
-    const nonEmptyLanguageCodes = Object.entries(initialNodeValue ?? {})
-        .filter(([, language]) => language.value !== "")
-        .map(([code]) => code);
-    let targetLanguageCode = languageStore.requestLanguageCode;
-    if (nonEmptyLanguageCodes.length === 1) {
-        targetLanguageCode = nonEmptyLanguageCodes[0];
-    }
+    const targetLanguageCode =
+        getOnlyFilledLanguageCode(initialNodeValue) ??
+        languageStore.requestLanguageCode;
     return (
         languageStore.languages.find(
             (language: Language) => language.code === targetLanguageCode,
