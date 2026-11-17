@@ -161,12 +161,9 @@ def _post_save_edit_log(
         multiprocessing,
         index,
     )
-    recalculate_only = index and not settings.ELASTICSEARCH_ENABLED
-    if recalculate_only:
-        logger.debug("Elasticsearch is disabled; skipping Elasticsearch indexing")
-        index = False
+    es_index = index and settings.ELASTICSEARCH_ENABLED
     try:
-        if index:
+        if es_index:
             with connection.cursor() as cursor:
                 log_event_details(cursor, loadid, "done|Indexing...")
 
@@ -181,7 +178,8 @@ def _post_save_edit_log(
             logger.debug(
                 "Indexing complete for loadid=%s; fetching user id=%s", loadid, userid
             )
-        elif recalculate_only:
+        elif index:
+            logger.debug("Elasticsearch is disabled; recalculating descriptors only")
             # Descriptors are otherwise only recalculated as part of indexing
             with connection.cursor() as cursor:
                 log_event_details(cursor, loadid, "done|Recalculating descriptors...")
@@ -230,7 +228,7 @@ def _post_save_edit_log(
                 ),
             )
             log_event_details(cursor, loadid, "done")
-            final_status = "indexed" if index else "completed"
+            final_status = "indexed" if es_index else "completed"
             cursor.execute(
                 """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
                 (final_status, timezone.now(), True, True, loadid),
