@@ -303,7 +303,7 @@ class TileTreeQuerySet(NodeAliasValuesMixin, models.QuerySet):
                     graph_query=graph_query,
                     # Internal prefetch: never exposed for filtering.
                     node_aliases=False,
-                    provisional_edits_user=provisional_edits_user
+                    provisional_edits_user=provisional_edits_user,
                 )
                 .filter(
                     nodegroup__parentnodegroup_id=models.F("parenttile__nodegroup_id")
