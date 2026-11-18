@@ -4,13 +4,15 @@ import os
 from django.db import connection
 from arches.app.etl_modules.base_excel_exporter import BaseExcelExporter
 from arches.app.etl_modules.decorators import load_data_async
-from arches.app.models.card import Card
 from arches.app.models.models import Node
 from arches.app.models.system_settings import settings
 from arches.app.etl_modules.save import get_resourceids_from_search_url
 import arches.app.tasks as tasks
 from arches.app.utils.db_utils import dictfetchall
-from arches.management.commands.etl_template import create_tile_excel_workbook
+from arches.management.commands.etl_template import (
+    create_tile_excel_workbook,
+    get_card_names_by_nodegroup,
+)
 
 
 class TileExcelExporter(BaseExcelExporter):
@@ -53,6 +55,7 @@ class TileExcelExporter(BaseExcelExporter):
 
             nodes = Node.objects.filter(graph_id=graph_id)
             node_lookup_by_id = self.get_node_lookup_by_id(nodes)
+            card_names = get_card_names_by_nodegroup(graph_id)
             tiles_to_export = {}
             files_to_download = []
 
@@ -98,9 +101,7 @@ class TileExcelExporter(BaseExcelExporter):
                                 if value
                                 else None
                             )
-                    card_name = str(
-                        Card.objects.get(nodegroup=tile["nodegroupid"]).name
-                    )
+                    card_name = card_names[str(tile["nodegroupid"])]
                     tiles_to_export.setdefault(card_name, []).append(tile)
 
         wb = create_tile_excel_workbook(graph_id, tiles_to_export)
