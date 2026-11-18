@@ -330,7 +330,7 @@ class TileTreeOperation:
             tile.set_missing_keys_to_none()
 
             # Remove no-op upserts (validation may normalize values to match existing).
-            if original and tile._tile_update_is_noop(original, request=self.request):
+            if original and tile._tile_update_is_noop(original, user=self.request.user):
                 to_update.remove(tile)
 
         self.to_insert |= to_insert

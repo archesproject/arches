@@ -1055,7 +1055,7 @@ class TileTree(TileModel, AliasedDataMixin):
             return self.parenttile.backfill_parent_tiles()
         return self
 
-    def _tile_update_is_noop(self, original_tile, *, request=None):
+    def _tile_update_is_noop(self, original_tile, *, user=None):
         """Skipping no-op tile saves avoids regenerating RxR rows, at least
         given the current implementation that doesn't serialize them."""
         datatype_factory = DataTypeFactory()
@@ -1065,7 +1065,7 @@ class TileTree(TileModel, AliasedDataMixin):
         # For a non-reviewer with an existing provisional edit, compare incoming
         # tile.data against their provisional values rather than the authoritative
         # data.
-        user = getattr(request or self._request, "user", None)
+        user = user or getattr(self._request, "user", None)
         provisional_data = get_provisional_edits_for_user(original_tile, user)
         existing_data = provisional_data or original_tile["data"]
 
