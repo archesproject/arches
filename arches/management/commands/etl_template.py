@@ -159,8 +159,9 @@ def create_workbook(graphid, tiledata=None) -> Workbook:
         if tiledata is not None:
             for root_nodegroup, tiles in tiledata.items():
                 sheet = wb[root_nodegroup]
+                row_number = sheet.max_row
                 for tile in tiles:
-                    row_number = sheet.max_row + 1
+                    row_number += 1
                     tab = "    " * tile["depth"]
                     sheet[f"A{row_number}"] = str(tile["resourceinstanceid"])
                     sheet[f"B{row_number}"] = str(tile["tileid"])
@@ -218,8 +219,9 @@ def create_tile_excel_workbook(graphid, tiledata=None):
             for card_name, tiles in tiledata.items():
                 sheet_name = card_name.replace("/", "_")
                 sheet = wb[sheet_name]
+                row_number = sheet.max_row
                 for tile in tiles:
-                    row_number = sheet.max_row + 1
+                    row_number += 1
                     sheet[f"A{row_number}"] = str(tile["tileid"])
                     sheet[f"B{row_number}"] = str(tile["parenttileid"])
                     sheet[f"C{row_number}"] = str(tile["resourceinstanceid"])
