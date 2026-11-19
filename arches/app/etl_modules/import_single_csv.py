@@ -14,7 +14,14 @@ from django.db.models.functions import Lower
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import ETLModule, GraphModel, Node, NodeGroup
+from arches.app.models.models import (
+    ETLModule,
+    GraphModel,
+    Node,
+    NodeGroup,
+    ResourceInstance,
+    LoadStaging,
+)
 from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -22,6 +29,9 @@ from arches.app.utils.file_validator import FileValidator
 from arches.app.etl_modules.base_import_module import BaseImportModule
 from arches.app.etl_modules.decorators import load_data_async
 from arches.app.etl_modules.save import save_to_tiles
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class ImportSingleCsv(BaseImportModule):
@@ -160,7 +170,7 @@ class ImportSingleCsv(BaseImportModule):
         temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         try:
             self.delete_from_default_storage(temp_dir)
-        except FileNotFoundError:
+        except:
             pass
 
         csv_file_name = None
@@ -196,10 +206,13 @@ class ImportSingleCsv(BaseImportModule):
                 "message": _("Upload a valid csv file"),
             }
 
+        data = {"csv": [], "csv_file": csv_file_name}
         with default_storage.open(csv_file_path, mode="rb") as csvfile:
             text_wrapper = io.TextIOWrapper(csvfile, encoding="utf-8")
             reader = csv.reader(text_wrapper)
-            data = {"csv": [line for line in reader], "csv_file": csv_file_name}
+            for line in reader:
+                data["csv"].append(line)
+            # data = {"csv": [line for line in reader], "csv_file": csv_file_name}
             with connection.cursor() as cursor:
                 cursor.execute(
                     """SELECT load_details FROM load_event WHERE loadid = %s""",
@@ -397,12 +410,41 @@ class ImportSingleCsv(BaseImportModule):
                 for row in reader:
                     if id_label in fieldnames:
                         id_index = fieldnames.index(id_label)
+                        row[id_index] = row[id_index].strip()
                         try:
                             resourceid = uuid.UUID(row[id_index])
                             legacyid = None
-                        except (AttributeError, ValueError):
-                            resourceid = uuid.uuid4()
-                            legacyid = row[id_index]
+                        except (AttributeError, ValueError) as ex:
+                            logger.info(f"id was not a valid UUID: {row[id_index]}")
+                            legacyid = row[id_index] if row[id_index] != "" else None
+                            try:  # check for pre-existing resource keyed on the legacyid
+                                resource = ResourceInstance.objects.get(
+                                    legacyid=legacyid,
+                                    graph_id=graphid,
+                                    legacyid__isnull=False,
+                                )
+                                resourceid = resource.resourceinstanceid
+                                logger.info(
+                                    f"pre-existing resource ({resourceid}) found for legacyid {row[id_index]}"
+                                )
+                                # continue
+                            except ResourceInstance.DoesNotExist:
+                                logger.info(
+                                    "no pre-existing resource found for legacyid ",
+                                    legacyid,
+                                )
+                                resourceid = uuid.uuid4()
+                            except ResourceInstance.MultipleObjectsReturned:
+                                pre_existing_resources = (
+                                    ResourceInstance.objects.filter(
+                                        legacyid=legacyid,
+                                        graph_id=graphid,
+                                        legacyid__isnull=False,
+                                    ).values_list("resourceinstanceid", flat=True)
+                                )
+                                msg = f"Multiple matching resources found for legacyid {legacyid}. Operation forbidden. Resourceids: {','.join([str(rid) for rid in pre_existing_resources])}"
+                                logger.error(msg)
+                                raise ValueError(msg)
                     else:
                         resourceid = uuid.uuid4()
                         legacyid = None
@@ -426,6 +468,8 @@ class ImportSingleCsv(BaseImportModule):
                             config = current_node.config
                             config["nodeid"] = node
                             config["path"] = temp_dir
+                            config["resourceid"] = resourceid
+                            # config["strict"] = True
 
                             if source_value:
                                 if datatype == "string":
@@ -454,10 +498,14 @@ class ImportSingleCsv(BaseImportModule):
                                     )
                                 else:
                                     value, errors = self.prepare_data_for_loading(
-                                        datatype_instance, source_value, config
+                                        datatype_instance,
+                                        source_value,
+                                        config,
                                     )
 
                                 valid = True if len(errors) == 0 else False
+                                if valid and value is None:
+                                    continue
                                 error_message = ""
                                 for error in errors:
                                     error_message = (
@@ -574,17 +622,40 @@ class ImportSingleCsv(BaseImportModule):
                     """CALL __arches_check_tile_cardinality_violation_for_load(%s)""",
                     [loadid],
                 )
+                excess_tile_erroneous_load_staging = LoadStaging.objects.filter(
+                    load_event_id=loadid, error_message="excess tile error"
+                )
+                for inst in excess_tile_erroneous_load_staging:
+                    cursor.execute(
+                        """
+                        INSERT INTO load_errors (type, value, source, error, message, nodeid, datatype, loadid, nodegroupid)
+                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                        (
+                            "tile",
+                            str(list(inst.value.values())[0]["value"]),
+                            csv_file_name,
+                            "Excess Tile Error",
+                            f"Excess Tile Error -- Resource ID: {inst.resourceid} --Legacy ID: {inst.legacyid}",
+                            list(inst.value.keys())[0],
+                            list(inst.value.values())[0]["datatype"],
+                            loadid,
+                            inst.nodegroup_id,
+                        ),
+                    )
                 cursor.execute(
                     """
                     INSERT INTO load_errors (type, source, error, loadid, nodegroupid)
                     SELECT 'tile', source_description, error_message, loadid, nodegroupid
                     FROM load_staging
-                    WHERE loadid = %s AND passes_validation = false AND error_message IS NOT null
+                    WHERE loadid = %s AND passes_validation = false AND error_message IS NOT null and error_message != 'excess tile error'
                     """,
                     [loadid],
                 )
 
-        self.delete_from_default_storage(temp_dir)
+        try:
+            self.delete_from_default_storage(temp_dir)
+        except:
+            pass
 
         message = "staging table populated"
         return {"success": True, "data": message}

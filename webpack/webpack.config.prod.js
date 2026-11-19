@@ -5,6 +5,7 @@ const TerserPlugin = require("terser-webpack-plugin");
 const Webpack = require('webpack');
 const { merge } = require('webpack-merge');
 
+const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const commonWebpackConfigPromise = require('./webpack.common.js');
 
 module.exports = () => {

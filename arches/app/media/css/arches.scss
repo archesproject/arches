@@ -8266,21 +8266,11 @@ div.row.widget-wrapper.report-header:hover {
     padding-bottom: 4px;
     padding-right: 2px;
     font-size: x-small;
-    color: #999;
+    color: #fff;
     display: flex;
     flex-direction: column;
     align-items: center;
     margin-bottom: 50px;
-}
-
-.debug-notice {
-    padding-bottom: 4px;
-    padding-right: 2px;
-    font-size: x-small;
-    color: #999;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
 #navbar {
@@ -9164,7 +9154,7 @@ a.clear-geojson-button:hover {
 
 .hover-feature {
     font-size: 1.3rem;
-    color: #555;
+    color: #3f4345;
     margin-bottom: 10px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -9386,7 +9376,7 @@ a.search-query-link-captions:focus {
 
 .search-candidate-title,
 .search-candidate-link {
-    color: steelblue;
+    color: #3B6E99;
     padding-right: 7px;
     background: none;
     border: none;
@@ -9699,7 +9689,7 @@ ul.pagination {
     height: 4.6em;
     font-size: 1.2rem;
     line-height: 1.35;
-    color: #888;
+    color: #3f4345;
     background: #fff;
     padding: 5px 10px;
     margin-bottom: 10px;

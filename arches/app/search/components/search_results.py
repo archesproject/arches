@@ -107,12 +107,11 @@ class SearchResultsFilter(BaseSearchFilter):
             self.request, "geojson-feature-collection", "read_nodegroup"
         )
 
-        for result in response_object["results"]["hits"]["hits"]:
-            result.update(
-                permission_backend.get_search_ui_permissions(
-                    self.request.user, result, groups
-                )
-            )
+        results = permission_backend.get_search_ui_permissions_bulk(
+            self.request.user, response_object["results"]["hits"]["hits"], groups
+        )
+
+        for result in results:
             result["_source"]["points"] = select_geoms_for_results(
                 result["_source"]["points"], geojson_nodes, user_is_reviewer
             )

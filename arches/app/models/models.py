@@ -1084,17 +1084,26 @@ class ResourceXResource(models.Model):
     def delete(self, *args, **kwargs):
         # update the resource-instance tile by removing any references to a deleted resource
         deletedResourceId = kwargs.pop("deletedResourceId", None)
-        if deletedResourceId and self.tileid and self.nodeid:
-            newTileData = []
-            data = self.tileid.data[str(self.nodeid_id)]
-            if type(data) != list:
-                data = [data]
-            for relatedresourceItem in data:
-                if relatedresourceItem:
-                    if relatedresourceItem["resourceId"] != str(deletedResourceId):
-                        newTileData.append(relatedresourceItem)
-            self.tileid.data[str(self.nodeid_id)] = newTileData
-            self.tileid.save()
+        if deletedResourceId and self.tileid and self.nodeid_id:
+            if self.resourceinstanceidfrom == deletedResourceId:
+                self.tileid.delete(index=False, recalculate_descriptors=False)
+            elif self.resourceinstanceidto_id == deletedResourceId:
+                newTileData = []
+                data = self.tileid.data[str(self.nodeid_id)]
+                if data is None:
+                    data = []
+                if type(data) != list:
+                    data = [data]
+                newTileData = list(
+                    filter(lambda x: x["resourceId"] != str(deletedResourceId), data)
+                )
+                if len(newTileData):
+                    self.tileid.data[str(self.nodeid_id)] = newTileData
+                    self.tileid.save()
+                elif not any(
+                    [value for value in self.tileid.data.values() if value is not None]
+                ):
+                    self.tileid.delete()
 
         super(ResourceXResource, self).delete()
 

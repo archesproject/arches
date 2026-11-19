@@ -10,11 +10,11 @@ from types import SimpleNamespace
 from django.db import connection, connections
 from django.db.models import prefetch_related_objects, Prefetch, Q, QuerySet
 from arches.app.models import models
-from arches.app.models.models import Value
+from arches.app.models.models import Value, EditLog
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
-from arches.app.search.elasticsearch_dsl_builder import Query, Term
+from arches.app.search.elasticsearch_dsl_builder import Query, Term, Terms, Bool
 from arches.app.search.base_index import get_index
 from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -225,17 +225,39 @@ def optimize_resource_iteration(resources: Iterable[Resource], chunk_size: int):
         to_attr="descriptor_function",
     )
 
+    from_resource_prefetch = Prefetch(
+        "resxres_resource_instance_ids_from",
+        queryset=models.ResourceXResource.objects.select_related("nodeid"),
+        to_attr="prefetched_from_relations",
+    )
+    to_resource_prefetch = Prefetch(
+        "resxres_resource_instance_ids_to",
+        queryset=models.ResourceXResource.objects.select_related("nodeid"),
+        to_attr="prefetched_to_relations",
+    )
+
     if isinstance(resources, QuerySet):
         return (
             resources.select_related("graph")
-            .prefetch_related(tiles_prefetch, descriptor_prefetch)
+            .prefetch_related(
+                tiles_prefetch,
+                descriptor_prefetch,
+                from_resource_prefetch,
+                to_resource_prefetch,
+            )
             .iterator(chunk_size=chunk_size)
         )
     else:  # public API that arches itself does not currently use
         for r in resources:
             r.clean_fields()  # ensure strings become UUIDs
 
-        prefetch_related_objects(resources, tiles_prefetch, descriptor_prefetch)
+        prefetch_related_objects(
+            resources,
+            tiles_prefetch,
+            descriptor_prefetch,
+            from_resource_prefetch,
+            to_resource_prefetch,
+        )
         return resources
 
 
@@ -417,6 +439,7 @@ def index_custom_indexes(
     clear_index=True,
     batch_size=settings.BULK_IMPORT_BATCH_SIZE,
     quiet=False,
+    **kwargs,
 ):
     """
     Indexes any custom indexes, optionally by name
@@ -433,11 +456,13 @@ def index_custom_indexes(
         for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
             es_index = import_class_from_string(index["module"])(index["name"])
             es_index.reindex(
-                clear_index=clear_index, batch_size=batch_size, quiet=quiet
+                clear_index=clear_index, batch_size=batch_size, quiet=quiet, **kwargs
             )
     else:
         es_index = get_index(index_name)
-        es_index.reindex(clear_index=clear_index, batch_size=batch_size, quiet=quiet)
+        es_index.reindex(
+            clear_index=clear_index, batch_size=batch_size, quiet=quiet, **kwargs
+        )
 
 
 def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
@@ -611,3 +636,77 @@ def index_resources_by_transaction(
             transaction_id, len(resourceids), (datetime.now() - start).seconds
         )
     )
+
+
+def index_custom_indexes_by_transaction(
+    transaction_id,
+    batch_size=settings.BULK_IMPORT_BATCH_SIZE,
+    quiet=False,
+    use_multiprocessing=False,
+    max_subprocesses=0,
+):
+    """
+    Indexes all the custom indexes with a transaction id
+    Keyword Arguments:
+    quiet -- Silences the status bar output during certain operations, use in celery operations for example
+    recalculate_descriptors - forces the primary descriptors to be recalculated before (re)indexing
+    """
+
+    for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
+        es_index = import_class_from_string(index["module"])(index["name"])
+        es_index.index_resources_by_transaction(
+            transaction_id,
+            batch_size=batch_size,
+            quiet=quiet,
+            use_multiprocessing=use_multiprocessing,
+            max_subprocesses=max_subprocesses,
+        )
+
+
+def index_tile_deletion_by_transaction(
+    transaction_id,
+    batch_size=settings.BULK_IMPORT_BATCH_SIZE,
+):
+    """
+    Bulk delete index for tiles
+
+    Keyword Arguments:
+    transaction_id -- the transaction id to delete
+    batch_size -- the number of records to index as a group, the larger the number to more memory required
+    """
+
+    try:
+        uuid.UUID(transaction_id)
+    except ValueError:
+        logger.error("A transaction id must be a valid uuid")
+        return
+
+    transaction_changes = EditLog.objects.filter(
+        transactionid=transaction_id,
+        edittype="tile create",
+    )
+    number_of_db_changes = transaction_changes.count()
+    to_delete_tileids_iter = transaction_changes.values_list(
+        "tileinstanceid", flat=True
+    ).iterator(chunk_size=batch_size)
+
+    batch = []
+    for tileid in to_delete_tileids_iter:
+        batch.append(tileid)
+        if len(batch) == batch_size:
+            query = Query(se)
+            bool_query = Bool()
+            bool_query.filter(Terms(field="tileid", terms=batch))
+            query.add_query(bool_query)
+            query.delete(index=TERMS_INDEX)
+            batch.clear()
+
+    if len(batch):
+        query = Query(se)
+        bool_query = Bool()
+        bool_query.filter(Terms(field="tileid", terms=batch))
+        query.add_query(bool_query)
+        query.delete(index=TERMS_INDEX)
+        batch.clear()
+
+    return number_of_db_changes

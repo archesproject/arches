@@ -88,7 +88,8 @@
         "uuidjs": "^3.3.0",
         "vue": "^3.5.8",
         "vue3-gettext": "^3.0.0-beta.6",
-        "webpack-bundle-tracker": "^3.1.0"
+        "webpack-bundle-tracker": "^3.1.0",
+        "webpack-manifest-plugin": "5.0.0"
     },
     "devDependencies": {
         "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/7.6.x"

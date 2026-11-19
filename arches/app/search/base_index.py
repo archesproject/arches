@@ -1,6 +1,8 @@
 import pyprind
 from datetime import datetime
 from django.utils.translation import gettext as _
+
+# from django.db.models import Q, Func, F
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
@@ -116,6 +118,38 @@ class BaseIndex(object):
         print(
             f"    Status: {status}, In Database: {result_summary['database']}, Indexed: {result_summary['indexed']}, Took: {(datetime.now() - start).seconds} seconds"
         )
+
+    def index_resources_by_transaction(
+        self,
+        transaction_id,
+        batch_size=settings.BULK_IMPORT_BATCH_SIZE,
+        quiet=False,
+        use_multiprocessing=False,
+        max_subprocesses=0,
+    ):
+        """
+        Indexes resources by transaction id in bulk to Elastic Search
+
+        Keyword Arguments:
+        transaction_id -- the transaction id to index resources for
+        batch_size -- the number of records to index as a group, the larger the number to more memory required
+        quiet -- Silences the status bar output during certain operations, use in celery operations for example
+
+        Return: None
+        """
+
+        # transaction_changes = models.EditLog.objects.filter(transactionid=transaction_id).annotate(
+        #     resourceinstanceid_uuid=Func(F("resourceinstanceid"), function="UUID"),
+        #     graphid_uuid=Func(F("resourceclassid"), function="UUID")
+        # )
+        # resources = Resource.objects.filter(
+        #     resourceinstanceid__in=transaction_changes.values_list(
+        #         "resourceinstanceid_uuid", flat=True
+        #     )
+        # )
+        # self.index_resources(resources=resources, batch_size=batch_size, quiet=quiet)
+
+        raise NotImplementedError
 
     def delete_resources(self, resources=None):
         """

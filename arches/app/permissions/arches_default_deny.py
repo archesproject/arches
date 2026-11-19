@@ -212,6 +212,94 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
         has_access.filter(should_access)
         return has_access
 
+    def get_search_ui_permissions_bulk(
+        self, user: User, search_results: list, groups: list[str]
+    ) -> list:
+        """
+        Determintes whether or not read/edit buttons show up in search results.
+        """
+        user_can_read = self.get_resource_types_by_perm(
+            user,
+            [
+                "models.write_nodegroup",
+                "models.delete_nodegroup",
+                "models.read_nodegroup",
+            ],
+        )
+        user_can_edit = len(self.get_editable_resource_types(user)) > 0
+        for result in search_results:
+            # validate permissions structure for search result
+            users_read_exists = (
+                "permissions" in result["_source"]
+                and "users_read" in result["_source"]["permissions"]
+            )
+            users_edit_exists = (
+                "permissions" in result["_source"]
+                and "users_edit" in result["_source"]["permissions"]
+            )
+            groups_read_exists = (
+                "permissions" in result["_source"]
+                and "groups_read" in result["_source"]["permissions"]
+            )
+            groups_edit_exists = (
+                "permissions" in result["_source"]
+                and "groups_edit" in result["_source"]["permissions"]
+            )
+
+            result["can_read"] = user.is_superuser or (
+                (
+                    groups_read_exists
+                    and len(
+                        set(
+                            result["_source"]["permissions"]["groups_read"]
+                        ).intersection(set(groups))
+                    )
+                    > 0
+                )
+                or (
+                    users_read_exists
+                    and len(
+                        set(
+                            result["_source"]["permissions"]["users_read"]
+                        ).intersection(set([user.id]))
+                    )
+                    > 0
+                )
+                and user_can_read
+            )
+
+            result["can_edit"] = (
+                user.is_superuser
+                or (
+                    groups_edit_exists
+                    and len(
+                        set(
+                            result["_source"]["permissions"]["groups_edit"]
+                        ).intersection(set(groups))
+                    )
+                    > 0
+                    and user_can_edit
+                )
+                or (
+                    users_edit_exists
+                    and len(
+                        set(
+                            result["_source"]["permissions"]["users_edit"]
+                        ).intersection(set([user.id]))
+                    )
+                    > 0
+                    and user_can_edit
+                )
+            )
+
+            result["is_principal"] = (
+                "permissions" in result["_source"]
+                and "principal_user" in result["_source"]["permissions"]
+                and user.id in result["_source"]["permissions"]["principal_user"]
+            )
+
+        return search_results
+
     def get_search_ui_permissions(
         self, user: User, search_result: dict, groups: list[str]
     ) -> dict:
