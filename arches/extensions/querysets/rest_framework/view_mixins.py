@@ -45,6 +45,7 @@ class MetadataWithWidgetConfig(SimpleMetadata):
 
 class ArchesModelAPIMixin:
     metadata_class = MetadataWithWidgetConfig
+    include_provisional_edits = True
 
     def setup(self, request, *args, **kwargs):
         options = self.serializer_class.Meta
@@ -75,6 +76,7 @@ class ArchesModelAPIMixin:
         options = self.serializer_class.Meta
         # Aliases are only needed to filter on node aliases.
         needs_aliases = bool(self.get_data_filters())
+        user = self.request.user if self.include_provisional_edits else None
         try:
             if issubclass(options.model, ResourceInstance):
                 qs = options.model.get_tiles(
@@ -82,6 +84,7 @@ class ArchesModelAPIMixin:
                     resource_ids=self.resource_ids,
                     as_representation=True,
                     node_aliases=needs_aliases,
+                    provisional_edits_user=user,
                 ).select_related("graph")
                 if arches_version >= Version("8.0"):
                     qs = qs.select_related("resource_instance_lifecycle_state")
@@ -92,6 +95,7 @@ class ArchesModelAPIMixin:
                     as_representation=True,
                     resource_ids=self.resource_ids,
                     node_aliases=needs_aliases,
+                    provisional_edits_user=user,
                 ).select_related("nodegroup", "resourceinstance__graph")
                 if self.resource_ids:
                     qs = qs.filter(resourceinstance__in=self.resource_ids)
@@ -190,8 +194,13 @@ class ArchesModelAPIMixin:
         # EVENTUALLY_CONSISTENT_ES_INDEXING is not enabled but sync indexing is
         # the primary cause of slow PUT/PATCH responses.
         index = self.request.GET.get("index", "true").lower() != "false"
+        user = self.request.user if self.include_provisional_edits else None
         ret.save = partial(
-            ret.save, request=self.request, partial=is_partial_update, index=index
+            ret.save,
+            request=self.request,
+            partial=is_partial_update,
+            index=index,
+            provisional_edits_user=user,
         )
 
         if fill_blanks:
