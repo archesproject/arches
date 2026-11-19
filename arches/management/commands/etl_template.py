@@ -167,7 +167,7 @@ def create_workbook(graphid, tiledata=None) -> Workbook:
                     sheet[f"A{row_number}"] = str(tile["resourceinstanceid"])
                     sheet[f"B{row_number}"] = str(tile["tileid"])
                     sheet[f"C{row_number}"] = f'{tab}{tile["alias"]}'
-                    nodes = nodes_by_nodegroup[str(tile["nodegroupid"])]
+                    nodes = nodes_by_nodegroup.get(str(tile["nodegroupid"]), [])
                     for i, node in enumerate(nodes):
                         if tile.get(node["alias"]) is not None:
                             sheet.cell(
@@ -232,7 +232,7 @@ def create_tile_excel_workbook(graphid, tiledata=None):
                     sheet[f"A{row_number}"] = str(tile["tileid"])
                     sheet[f"B{row_number}"] = str(tile["parenttileid"])
                     sheet[f"C{row_number}"] = str(tile["resourceinstanceid"])
-                    nodes = nodes_by_nodegroup[str(tile["nodegroupid"])]
+                    nodes = nodes_by_nodegroup.get(str(tile["nodegroupid"]), [])
                     for i, node in enumerate(nodes):
                         if tile.get(node["alias"]) is not None:
                             sheet.cell(
