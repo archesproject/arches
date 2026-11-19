@@ -15,7 +15,7 @@ from arches.app.utils.db_utils import dictfetchall
 
 
 class BaseExcelExporter:
-    resource_batch_size = 1000
+    resource_batch_size = 500
 
     def __init__(self, request=None, loadid=None):
         self.request = request if request else None
