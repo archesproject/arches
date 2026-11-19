@@ -92,7 +92,7 @@ class BranchExcelExporter(BaseExcelExporter):
             tiles_to_export = {}
             files_to_download = []
 
-            for resource_id, tile_tree in self.get_tiles_by_resource(
+            for _, tile_tree in self.get_tiles_by_resource(
                 cursor, tile_tree_query, resource_ids
             ):
                 for tile in tile_tree:
@@ -101,7 +101,6 @@ class BranchExcelExporter(BaseExcelExporter):
                     ]
                     root_alias = root_aliases[root_nodegroup]
                     tile["alias"] = nodegroup_alias
-                    tile["resourceinstanceid"] = resource_id
                     tile_data = json.loads(tile["tiledata"])
                     for key, value in tile_data.items():
                         if key not in node_lookup_by_id:
