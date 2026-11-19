@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import base64
 import hashlib
+import pyotp
 from arches.app.utils.external_oauth_backend import ExternalOauthAuthenticationBackend
 from django.http import HttpRequest
 import time
@@ -222,7 +223,7 @@ class AuthTests(ArchesTestCase):
         ):
             with mock.patch(
                 "arches.app.utils.arches_crypto.AESCipher.decrypt",
-                return_value="123456",
+                return_value=pyotp.random_base32(),
             ):
                 with mock.patch("pyotp.TOTP.verify", return_value=True):
                     response = self.client.post(
