@@ -1,5 +1,6 @@
 from datetime import datetime
 from io import BytesIO
+from itertools import batched
 import json
 import os
 import zipfile
@@ -10,9 +11,12 @@ from arches.app.etl_modules.save import get_resourceids_from_search_url
 from arches.app.etl_modules.decorators import load_data_async
 from arches.app.models.models import File, TempFile
 from arches.app.models.system_settings import settings
+from arches.app.utils.db_utils import dictfetchall
 
 
 class BaseExcelExporter:
+    resource_batch_size = 1000
+
     def __init__(self, request=None, loadid=None):
         self.request = request if request else None
         self.userid = request.user.id if request else None
@@ -27,6 +31,24 @@ class BaseExcelExporter:
                 "config": node.config,
             }
         return lookup
+
+    def get_tiles_by_resource(self, cursor, tile_query, resource_ids):
+        """
+        Runs tile_query (which takes an array of resourceinstanceids) over batches
+        of resource_ids and yields (resource_id, tiles) in resource_ids order
+        """
+        for resource_id_batch in batched(resource_ids, self.resource_batch_size):
+            cursor.execute(
+                tile_query,
+                [[str(resource_id) for resource_id in resource_id_batch]],
+            )
+            tiles_by_resource = {}
+            for tile in dictfetchall(cursor):
+                tiles_by_resource.setdefault(
+                    str(tile["resourceinstanceid"]), []
+                ).append(tile)
+            for resource_id in resource_id_batch:
+                yield resource_id, tiles_by_resource.get(str(resource_id), [])
 
     def get_files_in_zip_file(
         self, files, graph_name, wb, user_generated_filename=None

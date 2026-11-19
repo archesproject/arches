@@ -8,7 +8,6 @@ from arches.app.models.models import Node
 from arches.app.models.system_settings import settings
 from arches.app.etl_modules.save import get_resourceids_from_search_url
 import arches.app.tasks as tasks
-from arches.app.utils.db_utils import dictfetchall
 from arches.management.commands.etl_template import (
     create_tile_excel_workbook,
     get_card_names_by_nodegroup,
@@ -59,12 +58,11 @@ class TileExcelExporter(BaseExcelExporter):
             tiles_to_export = {}
             files_to_download = []
 
-            for resource_id in resource_ids:
-                cursor.execute(
-                    """SELECT * FROM tiles WHERE resourceinstanceid = (%s)""",
-                    [resource_id],
-                )
-                tiles = dictfetchall(cursor)
+            for resource_id, tiles in self.get_tiles_by_resource(
+                cursor,
+                """SELECT * FROM tiles WHERE resourceinstanceid = ANY(%s::uuid[])""",
+                resource_ids,
+            ):
                 for tile in tiles:
                     tile_data = json.loads(tile["tiledata"])
                     for key, value in tile_data.items():

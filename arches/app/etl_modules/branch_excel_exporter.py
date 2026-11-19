@@ -12,22 +12,24 @@ from arches.app.utils.db_utils import dictfetchall
 from arches.management.commands.etl_template import create_workbook
 
 tile_tree_query = """
-    WITH RECURSIVE tile_tree(tileid, parenttileid, tiledata, nodegroupid, depth) AS (
+    WITH RECURSIVE tile_tree(tileid, parenttileid, tiledata, nodegroupid, resourceinstanceid, depth) AS (
         SELECT
             t.tileid,
             t.parenttileid,
             t.tiledata,
             t.nodegroupid,
+            t.resourceinstanceid,
             0
         FROM
             tiles t
-        WHERE tileid = (%s)
+        WHERE parenttileid IS null AND resourceinstanceid = ANY(%s::uuid[])
         UNION
             SELECT
                 t.tileid,
                 t.parenttileid,
                 t.tiledata,
                 t.nodegroupid,
+                t.resourceinstanceid,
                 tt.depth + 1
             FROM
                 tile_tree tt, tiles t
@@ -77,67 +79,62 @@ class BranchExcelExporter(BaseExcelExporter):
                 """SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graph_id,)
             )
             nodegroup_lookup = dictfetchall(cursor)
+            nodegroup_aliases = {}
+            root_aliases = {}
+            for ng in nodegroup_lookup:
+                nodegroup_aliases.setdefault(
+                    ng["nodegroupid"], (ng["root_nodegroup"], ng["alias"])
+                )
+                root_aliases.setdefault(ng["root_nodegroup"], ng["alias"])
 
             nodes = Node.objects.filter(graph_id=graph_id)
             node_lookup_by_id = self.get_node_lookup_by_id(nodes)
             tiles_to_export = {}
             files_to_download = []
 
-            for resource_id in resource_ids:
-                cursor.execute(
-                    """SELECT * FROM tiles WHERE parenttileid IS null AND resourceinstanceid = (%s)""",
-                    [resource_id],
-                )
-                root_tiles = dictfetchall(cursor)
-                for root_tile in root_tiles:
-                    cursor.execute(tile_tree_query, [root_tile["tileid"]])
-                    tile_tree = dictfetchall(cursor)
-                    for tile in tile_tree:
-                        root_nodegroup, nodegroup_alias = [
-                            (ng["root_nodegroup"], ng["alias"])
-                            for ng in nodegroup_lookup
-                            if ng["nodegroupid"] == tile["nodegroupid"]
-                        ][0]
-                        root_alias = [
-                            ng["alias"]
-                            for ng in nodegroup_lookup
-                            if ng["root_nodegroup"] == root_nodegroup
-                        ][0]
-                        tile["alias"] = nodegroup_alias
-                        tile["resourceinstanceid"] = resource_id
-                        tile_data = json.loads(tile["tiledata"])
-                        for key, value in tile_data.items():
-                            if key not in node_lookup_by_id:
-                                continue
-                            alias = node_lookup_by_id[key]["alias"]
-                            if node_lookup_by_id[key]["datatype"] == "file-list":
-                                file_names_to_export = []
-                                if value is not None:
-                                    for file in value:
-                                        files_to_download.append(
-                                            {
-                                                "name": file["name"],
-                                                "file_id": file["file_id"],
-                                            }
-                                        )
-                                        file_names_to_export.append(file["name"])
-                                    tile[alias] = ",".join(file_names_to_export)
-                                else:
-                                    tile[alias] = value
-                            elif node_lookup_by_id[key]["datatype"] in [
-                                "concept-list",
-                                "domain-value-list",
-                            ]:
-                                if type(value) == list:
-                                    value = ",".join(value)
-                                tile[alias] = value
+            for resource_id, tile_tree in self.get_tiles_by_resource(
+                cursor, tile_tree_query, resource_ids
+            ):
+                for tile in tile_tree:
+                    root_nodegroup, nodegroup_alias = nodegroup_aliases[
+                        tile["nodegroupid"]
+                    ]
+                    root_alias = root_aliases[root_nodegroup]
+                    tile["alias"] = nodegroup_alias
+                    tile["resourceinstanceid"] = resource_id
+                    tile_data = json.loads(tile["tiledata"])
+                    for key, value in tile_data.items():
+                        if key not in node_lookup_by_id:
+                            continue
+                        alias = node_lookup_by_id[key]["alias"]
+                        if node_lookup_by_id[key]["datatype"] == "file-list":
+                            file_names_to_export = []
+                            if value is not None:
+                                for file in value:
+                                    files_to_download.append(
+                                        {
+                                            "name": file["name"],
+                                            "file_id": file["file_id"],
+                                        }
+                                    )
+                                    file_names_to_export.append(file["name"])
+                                tile[alias] = ",".join(file_names_to_export)
                             else:
-                                try:
-                                    value.keys()  # to check if it is a dictionary
-                                    tile[alias] = json.dumps(value)
-                                except AttributeError:
-                                    tile[alias] = value
-                        tiles_to_export.setdefault(root_alias, []).append(tile)
+                                tile[alias] = value
+                        elif node_lookup_by_id[key]["datatype"] in [
+                            "concept-list",
+                            "domain-value-list",
+                        ]:
+                            if type(value) == list:
+                                value = ",".join(value)
+                            tile[alias] = value
+                        else:
+                            try:
+                                value.keys()  # check if a dictionary
+                                tile[alias] = json.dumps(value)
+                            except AttributeError:
+                                tile[alias] = value
+                    tiles_to_export.setdefault(root_alias, []).append(tile)
 
         wb = create_workbook(graph_id, tiles_to_export)
 
