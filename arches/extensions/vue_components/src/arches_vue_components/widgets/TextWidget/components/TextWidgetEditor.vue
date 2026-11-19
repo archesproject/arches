@@ -10,7 +10,7 @@ import Textarea from "openvue/textarea";
 import { MULTILINE_RENDER_CONTEXT } from "@/arches_vue_components/widgets/TextWidget/constants.ts";
 import {
     buildStringAliasedNodeData,
-    getOnlyFilledLanguageCode,
+    resolveInitialLanguageCode,
 } from "@/arches_vue_components/datatypes/string/utils.ts";
 import { useLanguageStore } from "@/arches_vue_components/stores/useLanguageStore.ts";
 
@@ -106,9 +106,14 @@ onMounted(() => {
 });
 
 function resolveInitialLanguage(): Language | undefined {
-    const targetLanguageCode =
-        getOnlyFilledLanguageCode(initialNodeValue) ??
-        languageStore.requestLanguageCode;
+    const requestLanguageCode = languageStore.requestLanguageCode;
+    if (requestLanguageCode === null) {
+        return undefined;
+    }
+    const targetLanguageCode = resolveInitialLanguageCode(
+        initialNodeValue,
+        requestLanguageCode,
+    );
     return (
         languageStore.languages.find(
             (language: Language) => language.code === targetLanguageCode,

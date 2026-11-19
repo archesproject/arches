@@ -14,14 +14,18 @@ export function buildStringAliasedNodeData(
     };
 }
 
-export function getOnlyFilledLanguageCode(
+export function resolveInitialLanguageCode(
     nodeValue: Record<string, LanguageValue> | null | undefined,
-): string | undefined {
+    requestedLanguageCode: string,
+): string {
     const filledLanguageCodes = Object.entries(nodeValue ?? {})
         .filter(([, languageValue]) => languageValue.value !== "")
         .map(([languageCode]) => languageCode);
-    if (filledLanguageCodes.length === 1) {
+    if (filledLanguageCodes.includes(requestedLanguageCode)) {
+        return requestedLanguageCode;
+    }
+    if (filledLanguageCodes.length > 0) {
         return filledLanguageCodes[0];
     }
-    return undefined;
+    return requestedLanguageCode;
 }

@@ -10,7 +10,7 @@ import FocusController from "@/arches_vue_components/widgets/RichTextWidget/comp
 import { fetchLanguages } from "@/arches_vue_components/widgets/api.ts";
 import {
     buildStringAliasedNodeData,
-    getOnlyFilledLanguageCode,
+    resolveInitialLanguageCode,
 } from "@/arches_vue_components/datatypes/string/utils.ts";
 
 import type {
@@ -53,9 +53,10 @@ watchEffect(async () => {
 
     languages.value = response.languages;
 
-    const targetLanguageCode =
-        getOnlyFilledLanguageCode(initialNodeValue) ??
-        response.request_language;
+    const targetLanguageCode = resolveInitialLanguageCode(
+        initialNodeValue,
+        response.request_language,
+    );
 
     selectedLanguage.value =
         languages.value.find((lang: Language) => {
