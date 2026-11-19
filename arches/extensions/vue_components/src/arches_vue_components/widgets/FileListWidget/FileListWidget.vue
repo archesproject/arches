@@ -13,11 +13,16 @@ import type {
 } from "@/arches_vue_components/datatypes/file-list/types.ts";
 import type { FileListWidgetProps } from "@/arches_vue_components/widgets/FileListWidget/types.ts";
 
-const { aliasedNodeData, value } = defineProps<FileListWidgetProps>();
+const {
+    aliasedNodeData,
+    value,
+    metadataLanguageCode = undefined,
+} = defineProps<FileListWidgetProps>();
 
 const emit = defineEmits<{
     "update:value": [updatedValue: FileReference[] | null];
     "update:aliasedNodeData": [updatedValue: FileListAliasedNodeData];
+    "update:metadataLanguageCode": [languageCode: string, fileIndex: number];
     initialized: [updatedValue: FileListAliasedNodeData];
     ready: [];
 }>();
@@ -44,7 +49,12 @@ function onUpdateAliasedNodeData(
         v-if="mode === EDIT"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :aliased-node-data="resolvedAliasedNodeData"
+        :metadata-language-code="metadataLanguageCode"
         @update:aliased-node-data="onUpdateAliasedNodeData"
+        @update:metadata-language-code="
+            (languageCode, fileIndex) =>
+                emit('update:metadataLanguageCode', languageCode, fileIndex)
+        "
     />
     <FileListWidgetViewer
         v-if="mode === VIEW"

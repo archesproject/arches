@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, useId } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import type { CardXNodeXWidgetData } from "@/arches_vue_components/types";
@@ -17,6 +17,15 @@ const {
     isDisabled: boolean;
     acceptedFileTypes: string[];
 }>();
+
+const disabledReasonId = useId();
+
+// pointer-events: none only blocks the mouse; keyboard activation still fires.
+function onActivate() {
+    if (!isDisabled) {
+        openFileChooser();
+    }
+}
 
 const displayFileTypes = computed(() => {
     if (!acceptedFileTypes.length) {
@@ -51,27 +60,26 @@ const displayFileTypes = computed(() => {
             },
         }"
     >
-        <div
+        <button
             :id="cardXNodeXWidgetData?.node.alias"
+            type="button"
             class="upload-container"
-            role="button"
-            tabindex="0"
             :class="{ 'p-disabled': isDisabled }"
-            @click="openFileChooser"
-            @keydown.enter.prevent="openFileChooser"
-            @keydown.space.prevent="openFileChooser"
+            :aria-disabled="isDisabled ? 'true' : undefined"
+            :aria-describedby="isDisabled ? disabledReasonId : undefined"
+            @click="onActivate"
         >
             <i
                 class="pi pi-cloud-upload upload-icon"
                 aria-hidden="true"
             />
-            <div class="upload-title">
+            <span class="upload-title">
                 {{ $gettext("Upload Files") }}
-            </div>
-            <div class="upload-subtitle">
+            </span>
+            <span class="upload-subtitle">
                 {{ $gettext("Drag & drop files here or click to browse") }}
-            </div>
-            <div
+            </span>
+            <span
                 v-if="displayFileTypes"
                 class="accepted-types"
             >
@@ -80,8 +88,15 @@ const displayFileTypes = computed(() => {
                         acceptedFileTypeLabels: displayFileTypes,
                     })
                 }}
-            </div>
-        </div>
+            </span>
+        </button>
+        <span
+            v-if="isDisabled"
+            :id="disabledReasonId"
+            class="p-hidden-accessible"
+        >
+            {{ $gettext("Maximum number of files reached.") }}
+        </span>
     </div>
 </template>
 
@@ -89,6 +104,10 @@ const displayFileTypes = computed(() => {
 .upload-container {
     display: flex;
     flex-direction: column;
+    width: 100%;
+    font: inherit;
+    color: inherit;
+    text-align: center;
     align-items: center;
     justify-content: center;
     padding: 1rem;

@@ -1,13 +1,48 @@
 <script setup lang="ts">
+import { computed, ref, useId } from "vue";
+import { useGettext } from "vue3-gettext";
+
 import Image from "openvue/image";
 import Button from "openvue/button";
 
-import { REMOVE } from "@/arches_vue_components/datatypes/file-list/constants.ts";
+import FileMetadataInput from "@/arches_vue_components/widgets/FileListWidget/components/FileListWidgetEditor/components/FileMetadataInput.vue";
 
-import type { FileReference } from "@/arches_vue_components/datatypes/file-list/types.ts";
+import {
+    ADDITIONAL_FILE_METADATA_FIELDS,
+    FILE_METADATA_FIELDS,
+    PRIMARY_FILE_METADATA_FIELDS,
+    REMOVE,
+    UPDATE_METADATA,
+    UPDATE_METADATA_LANGUAGE,
+} from "@/arches_vue_components/datatypes/file-list/constants.ts";
+import {
+    getFileAltText,
+    getLocalizedValue,
+    hasAnyAltText,
+    setLocalizedValue,
+} from "@/arches_vue_components/datatypes/file-list/utils.ts";
 
-const { files } = defineProps<{
+import type { Language } from "@/arches_vue_components/types.ts";
+import type { LanguageValue } from "@/arches_vue_components/datatypes/string/types.ts";
+import type {
+    FileMetadataField,
+    FileReference,
+} from "@/arches_vue_components/datatypes/file-list/types.ts";
+
+const {
+    files,
+    languages = [],
+    defaultMetadataLanguage = undefined,
+    shouldShowLanguageSelect = false,
+    visibleMetadataFields = FILE_METADATA_FIELDS,
+    isAltTextRequired = false,
+} = defineProps<{
     files: FileReference[];
+    languages?: Language[];
+    defaultMetadataLanguage?: Language;
+    shouldShowLanguageSelect?: boolean;
+    visibleMetadataFields?: readonly FileMetadataField[];
+    isAltTextRequired?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -17,41 +52,319 @@ const emit = defineEmits<{
         fileIndex: number,
         event: Event,
     ): void;
+    (
+        e: typeof UPDATE_METADATA,
+        fileIndex: number,
+        field: FileMetadataField,
+        localizedValue: Record<string, LanguageValue>,
+    ): void;
+    (
+        e: typeof UPDATE_METADATA_LANGUAGE,
+        fileIndex: number,
+        languageCode: string,
+    ): void;
 }>();
+
+const { $gettext } = useGettext();
+
+const listId = useId();
+const touchedAltTextKeys = ref(new Set<string>());
+const expandedFileKeys = ref(new Set<string>());
+const selectedLanguageCodes = ref(new Map<string, string>());
+
+const metadataFieldLabels = computed<Record<FileMetadataField, string>>(() => ({
+    altText: $gettext("Alternative text"),
+    title: $gettext("Title"),
+    description: $gettext("Description"),
+    attribution: $gettext("Attribution"),
+}));
+
+const primaryFields = computed(() =>
+    PRIMARY_FILE_METADATA_FIELDS.filter((field) =>
+        visibleMetadataFields.includes(field),
+    ),
+);
+
+const additionalFields = computed(() =>
+    ADDITIONAL_FILE_METADATA_FIELDS.filter((field) =>
+        visibleMetadataFields.includes(field),
+    ),
+);
+
+const languageSelectHostField = computed<FileMetadataField | undefined>(
+    () => primaryFields.value[0] ?? additionalFields.value[0],
+);
+
+function getFileKey(fileReference: FileReference): string {
+    return fileReference.file_id ?? fileReference.url;
+}
+
+function getFieldId(fileIndex: number, field: string): string {
+    return `${listId}-${fileIndex}-${field}`;
+}
+
+function getFileLanguage(fileReference: FileReference): Language | undefined {
+    const selectedCode = selectedLanguageCodes.value.get(
+        getFileKey(fileReference),
+    );
+    return (
+        languages.find((language) => language.code === selectedCode) ??
+        defaultMetadataLanguage
+    );
+}
+
+function getSelectableLanguages(field: FileMetadataField): Language[] {
+    const shouldHostLanguageSelect =
+        shouldShowLanguageSelect && field === languageSelectHostField.value;
+    return shouldHostLanguageSelect ? languages : [];
+}
+
+function getLanguageToggleAriaLabel(fileReference: FileReference): string {
+    return $gettext(
+        "Languages for %{fileName}",
+        { fileName: fileReference.name },
+        true,
+    );
+}
+
+function onSelectFileLanguage(
+    fileReference: FileReference,
+    fileIndex: number,
+    languageCode: string,
+) {
+    selectedLanguageCodes.value.set(getFileKey(fileReference), languageCode);
+    emit(UPDATE_METADATA_LANGUAGE, fileIndex, languageCode);
+}
+
+function isExpanded(fileReference: FileReference): boolean {
+    return expandedFileKeys.value.has(getFileKey(fileReference));
+}
+
+function toggleExpanded(fileReference: FileReference) {
+    const fileKey = getFileKey(fileReference);
+    if (!expandedFileKeys.value.delete(fileKey)) {
+        expandedFileKeys.value.add(fileKey);
+    }
+}
+
+function markAltTextTouched(fileReference: FileReference) {
+    touchedAltTextKeys.value.add(getFileKey(fileReference));
+}
+
+function getHelpText(field: FileMetadataField): string | undefined {
+    if (field !== "altText") {
+        return undefined;
+    }
+    return $gettext("Describe the image for people who cannot see it.");
+}
+
+function getErrorText(
+    fileReference: FileReference,
+    field: FileMetadataField,
+): string | undefined {
+    const shouldShowAltTextError =
+        field === "altText" &&
+        isAltTextRequired &&
+        touchedAltTextKeys.value.has(getFileKey(fileReference)) &&
+        !hasAnyAltText(fileReference);
+
+    if (!shouldShowAltTextError) {
+        return undefined;
+    }
+    return $gettext(
+        "Enter alternative text for %{fileName}.",
+        { fileName: fileReference.name },
+        true,
+    );
+}
+
+function onBlurField(fileReference: FileReference, field: FileMetadataField) {
+    if (field === "altText") {
+        markAltTextTouched(fileReference);
+    }
+}
+
+function onUpdateField(
+    fileReference: FileReference,
+    fileIndex: number,
+    field: FileMetadataField,
+    value: string,
+) {
+    const language = getFileLanguage(fileReference);
+    if (!language) {
+        return;
+    }
+    emit(
+        UPDATE_METADATA,
+        fileIndex,
+        field,
+        setLocalizedValue(fileReference[field], language, value),
+    );
+}
 </script>
 
 <template>
-    <div
+    <ul
         v-if="files.length"
-        @click.stop.prevent
+        class="file-list"
+        @click.stop
     >
-        <div
+        <li
             v-for="(fileReference, fileIndex) in files"
-            :key="fileReference.file_id"
-            class="file-list"
+            :key="getFileKey(fileReference)"
+            class="file-list-item"
         >
-            <Image
-                image-class="image-list-image"
-                :src="fileReference.url"
-                :alt="fileReference.name"
-            />
-            <Button
-                icon="pi pi-times"
-                severity="danger"
-                outlined
-                rounded
-                class="delete-button"
-                @click="
-                    (event) => emit(REMOVE, fileReference, fileIndex, event)
-                "
-            />
-        </div>
-    </div>
+            <div
+                class="file-summary"
+                @click.prevent
+            >
+                <Image
+                    image-class="image-list-image"
+                    :src="fileReference.url"
+                    :alt="
+                        getFileAltText(
+                            fileReference,
+                            getFileLanguage(fileReference)?.code ?? null,
+                        )
+                    "
+                />
+                <span class="file-name">{{ fileReference.name }}</span>
+                <Button
+                    icon="pi pi-times"
+                    severity="danger"
+                    outlined
+                    rounded
+                    class="delete-button"
+                    :aria-label="
+                        $gettext(
+                            'Remove %{fileName}',
+                            { fileName: fileReference.name },
+                            true,
+                        )
+                    "
+                    @click="
+                        (event) => emit(REMOVE, fileReference, fileIndex, event)
+                    "
+                />
+            </div>
+
+            <div
+                v-if="getFileLanguage(fileReference)"
+                class="file-metadata"
+            >
+                <FileMetadataInput
+                    v-for="field in primaryFields"
+                    :key="field"
+                    :input-id="getFieldId(fileIndex, field)"
+                    :label="metadataFieldLabels[field]"
+                    :language="getFileLanguage(fileReference)!"
+                    :model-value="
+                        getLocalizedValue(
+                            fileReference[field],
+                            getFileLanguage(fileReference)!.code,
+                        )
+                    "
+                    :is-required="field === 'altText' && isAltTextRequired"
+                    :help-text="getHelpText(field)"
+                    :error-text="getErrorText(fileReference, field)"
+                    :selectable-languages="getSelectableLanguages(field)"
+                    :language-toggle-aria-label="
+                        getLanguageToggleAriaLabel(fileReference)
+                    "
+                    @update:model-value="
+                        onUpdateField(fileReference, fileIndex, field, $event)
+                    "
+                    @update:language="
+                        onSelectFileLanguage(fileReference, fileIndex, $event)
+                    "
+                    @blur="onBlurField(fileReference, field)"
+                />
+
+                <template v-if="additionalFields.length">
+                    <Button
+                        class="additional-metadata-toggle"
+                        :icon="
+                            isExpanded(fileReference)
+                                ? 'pi pi-chevron-down'
+                                : 'pi pi-chevron-right'
+                        "
+                        :label="$gettext('Additional metadata')"
+                        :aria-expanded="isExpanded(fileReference)"
+                        :aria-controls="getFieldId(fileIndex, 'additional')"
+                        text
+                        @click="toggleExpanded(fileReference)"
+                    />
+                    <div
+                        v-show="isExpanded(fileReference)"
+                        :id="getFieldId(fileIndex, 'additional')"
+                        class="file-metadata"
+                    >
+                        <FileMetadataInput
+                            v-for="field in additionalFields"
+                            :key="field"
+                            :input-id="getFieldId(fileIndex, field)"
+                            :label="metadataFieldLabels[field]"
+                            :language="getFileLanguage(fileReference)!"
+                            :model-value="
+                                getLocalizedValue(
+                                    fileReference[field],
+                                    getFileLanguage(fileReference)!.code,
+                                )
+                            "
+                            :is-multiline="field === 'description'"
+                            :selectable-languages="
+                                getSelectableLanguages(field)
+                            "
+                            :language-toggle-aria-label="
+                                getLanguageToggleAriaLabel(fileReference)
+                            "
+                            @update:model-value="
+                                onUpdateField(
+                                    fileReference,
+                                    fileIndex,
+                                    field,
+                                    $event,
+                                )
+                            "
+                            @update:language="
+                                onSelectFileLanguage(
+                                    fileReference,
+                                    fileIndex,
+                                    $event,
+                                )
+                            "
+                        />
+                    </div>
+                </template>
+            </div>
+        </li>
+    </ul>
 </template>
 
 <style scoped>
 .file-list {
     display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    list-style: none;
+    margin: 0.75rem 0 0;
+    padding: 0;
+}
+
+.file-list-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border: 1px solid var(--p-content-border-color);
+    border-radius: var(--p-content-border-radius);
+    background: var(--p-content-hover-background);
+}
+
+.file-summary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     width: 100%;
 }
 
@@ -61,7 +374,22 @@ const emit = defineEmits<{
     height: auto;
 }
 
+.file-name {
+    flex: 1 1 auto;
+    overflow-wrap: anywhere;
+}
+
 .delete-button {
     flex: 0 0 auto;
+}
+
+.file-metadata {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.additional-metadata-toggle {
+    align-self: flex-start;
 }
 </style>
