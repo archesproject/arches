@@ -619,6 +619,7 @@ class ResourceAPITests(ArchesTestCase):
             response = self.client.get(url)
 
         self.assertEqual(response.status_code, 403)
+        self.assertIn("does not exist", response.json()["message"])
 
     def test_related_resources_in_resource_report_api(self):
         self.client.login(username="admin", password="admin")
@@ -868,6 +869,7 @@ class ResourceIdentifiersAPITests(ArchesTestCase):
             reverse("api-resource-identifiers", args=[str(self.resource_instance_id)])
         )
         self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
+        self.assertIn("does not exist", response.json()["message"])
 
     @patch("arches.app.views.api.resource.user_can_read_resource")
     def test_get_resource_identifiers_returns_identifiers(self, mock_user_can_read):
