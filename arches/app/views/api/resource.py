@@ -619,7 +619,14 @@ class ResourceInstanceLifecycleStates(APIBase):
 
 class ResourceInstanceLifecycleState(APIBase):
     def get(self, request, resourceid):
-        resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+        if not user_can_read_resource(user=request.user, resourceid=resourceid):
+            return JSONErrorResponse(
+                _("Request Failed"), _("Permission Denied"), status=403
+            )
+        try:
+            resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+        except models.ResourceInstance.DoesNotExist:
+            return JSONErrorResponse(_("Resource instance not found"), status=404)
         return JSONResponse(resource_instance.resource_instance_lifecycle_state)
 
     def post(self, request, resourceid):
