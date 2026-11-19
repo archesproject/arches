@@ -586,6 +586,12 @@ const viewModel = function (params) {
                 self.zoom(
                     parseFloat(map.getZoom())
                 );
+
+                // Zooming with the scroll wheel or a pinch zooms around the
+                // pointer, which moves the center as well, so record it too.
+                var center = map.getCenter();
+                self.centerX(parseFloat(center.lng));
+                self.centerY(parseFloat(center.lat));
             });
 
             map.on('dragend', function () {
