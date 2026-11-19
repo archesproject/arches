@@ -30,7 +30,10 @@ class ExcelWriter(TileCsvWriter):
         del wb["Sheet"]
 
         virtual_workbook = BytesIO()
-        wb.save(virtual_workbook)
+        if wb._sheets:
+            wb.save(virtual_workbook)
+        else:
+            return []
 
         excel_file_for_export = []
         excel_file_for_export.append(
