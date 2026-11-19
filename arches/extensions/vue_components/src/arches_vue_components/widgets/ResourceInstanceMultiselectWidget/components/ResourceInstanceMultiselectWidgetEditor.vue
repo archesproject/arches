@@ -26,6 +26,10 @@ import type { AliasedTileData } from "@/arches_vue_components/types.ts";
 import type { ResourceInstanceListAliasedNodeData } from "@/arches_vue_components/datatypes/resource-instance-list/types.ts";
 
 const ITEM_SIZE = 36;
+const FILTER_DEBOUNCE_MILLISECONDS = 600;
+const UPDATE_IS_LOADING_EVENT = "update:isLoading" as const;
+const UPDATE_ALIASED_NODE_DATA_EVENT = "update:aliasedNodeData" as const;
+const READY_EVENT = "ready" as const;
 
 const {
     cardXNodeXWidgetData = undefined,
@@ -40,12 +44,12 @@ const {
 }>();
 
 const emit = defineEmits<{
-    (event: "update:isLoading", isLoading: boolean): void;
+    (event: typeof UPDATE_IS_LOADING_EVENT, isLoading: boolean): void;
     (
-        event: "update:aliasedNodeData",
+        event: typeof UPDATE_ALIASED_NODE_DATA_EVENT,
         updatedValue: ResourceInstanceListAliasedNodeData,
     ): void;
-    (event: "ready"): void;
+    (event: typeof READY_EVENT): void;
 }>();
 
 const { $gettext } = useGettext();
@@ -81,7 +85,7 @@ const selectedValues = ref<string[]>(
 const resourceResultsCurrentCount = computed(() => options.value.length);
 
 watch(isLoading, (newValue) => {
-    emit("update:isLoading", newValue);
+    emit(UPDATE_IS_LOADING_EVENT, newValue);
 });
 
 watchEffect(async () => {
@@ -89,11 +93,13 @@ watchEffect(async () => {
         return;
     }
     await getOptions(1);
-    emit("ready");
+    emit(READY_EVENT);
 });
 
-async function getOptions(page: number, filterTerm?: string) {
-    if (!graphSlug || !nodeAlias) return;
+async function getOptions(page: number, filterTerm?: string): Promise<void> {
+    if (!graphSlug || !nodeAlias) {
+        return;
+    }
     try {
         isLoading.value = true;
         emptyFilterMessage.value = $gettext("Searching...");
@@ -140,7 +146,9 @@ async function getOptions(page: number, filterTerm?: string) {
     }
 }
 
-async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
+async function onLazyLoadResources(
+    event?: VirtualScrollerLazyEvent,
+): Promise<void> {
     if (isLoading.value) {
         return;
     }
@@ -189,17 +197,17 @@ function getChipLabel(value: string): string {
 
 const onFilter = debounce(function onFilterDebounced(
     event: MultiSelectFilterEvent,
-) {
+): void {
     getOptions(1, event.value);
-}, 600);
+}, FILTER_DEBOUNCE_MILLISECONDS);
 
-function onCreateNewResource(graphId: string) {
+function onCreateNewResource(graphId: string): void {
     selectedGraphId.value = graphId;
     resourceCreationDialogKey.value++;
     showResourceCreation.value = true;
 }
 
-function onUpdateModelValue(updatedValue: string[]) {
+function onUpdateModelValue(updatedValue: string[]): void {
     const mergedValue = [...updatedValue];
     selectedValues.value.forEach((selectedId, index) => {
         if (isUnavailable(selectedId) && !updatedValue.includes(selectedId)) {
@@ -209,7 +217,7 @@ function onUpdateModelValue(updatedValue: string[]) {
     setSelectedValues(mergedValue);
 }
 
-function removeSelectedValue(removedId: string) {
+function removeSelectedValue(removedId: string): void {
     setSelectedValues(
         selectedValues.value.filter((selectedId) => selectedId !== removedId),
     );
@@ -230,7 +238,7 @@ function buildResourceReference(selectedId: string): ResourceInstanceReference {
     };
 }
 
-function setSelectedValues(updatedValue: string[]) {
+function setSelectedValues(updatedValue: string[]): void {
     selectedValues.value = updatedValue;
     const nodeValues = updatedValue.map(buildResourceReference);
     const resolvedOptions = updatedValue
@@ -242,12 +250,12 @@ function setSelectedValues(updatedValue: string[]) {
                 option !== undefined,
         );
     emit(
-        "update:aliasedNodeData",
+        UPDATE_ALIASED_NODE_DATA_EVENT,
         buildResourceInstanceListAliasedNodeData(nodeValues, resolvedOptions),
     );
 }
 
-async function onResourceCreated(createdTile: AliasedTileData) {
+function onResourceCreated(createdTile: AliasedTileData): void {
     selectedValues.value = [
         ...selectedValues.value,
         createdTile.resourceinstance,
@@ -308,7 +316,7 @@ async function onResourceCreated(createdTile: AliasedTileData) {
             <div>{{ slotProps.option.display_value }}</div>
         </template>
         <template #chip="slotProps">
-            <div style="width: 100%">
+            <div class="chip-label">
                 <div class="chip-text">
                     {{ getChipLabel(slotProps.value) }}
                 </div>
@@ -316,12 +324,12 @@ async function onResourceCreated(createdTile: AliasedTileData) {
             <div class="button-container">
                 <template v-if="!isUnavailable(slotProps.value)">
                     <Button
+                        class="no-text-decoration"
                         as="a"
                         icon="pi pi-info-circle"
                         target="_blank"
                         variant="text"
                         size="small"
-                        class="no-text-decoration"
                         :href="
                             generateArchesURL('arches:resource_report', {
                                 resourceid: slotProps.value,
@@ -330,12 +338,12 @@ async function onResourceCreated(createdTile: AliasedTileData) {
                         @click.stop
                     />
                     <Button
+                        class="no-text-decoration"
                         as="a"
                         icon="pi pi-pencil"
                         target="_blank"
                         variant="text"
                         size="small"
-                        class="no-text-decoration"
                         :href="
                             generateArchesURL('arches:resource_editor', {
                                 resourceid: slotProps.value,
@@ -357,24 +365,18 @@ async function onResourceCreated(createdTile: AliasedTileData) {
     <ResourceInstanceCreation
         v-if="showResourceCreation"
         :key="resourceCreationDialogKey"
-        :graph-id="selectedGraphId!"
+        :graph-id="selectedGraphId"
         @resource-created="onResourceCreated"
     />
 </template>
 
 <style scoped>
-/*
- * Chip colours can be overridden by setting these custom properties on any
- * ancestor of the widget:
- *   --resource-instance-multiselect-chip-background
- *   --resource-instance-multiselect-chip-color
- *   --resource-instance-multiselect-chip-button-color
- *   --resource-instance-multiselect-chip-button-hover-background
- * The defaults (blue-700 with white) keep text and icons above 4.5:1 contrast
- * with both the Arches and the default OpenVue blue palettes.
- */
 .no-text-decoration {
     text-decoration: none;
+}
+
+.chip-label {
+    inline-size: 100%;
 }
 
 .button-container {
@@ -383,21 +385,22 @@ async function onResourceCreated(createdTile: AliasedTileData) {
 }
 
 .chip-text {
-    width: min-content;
-    min-width: fit-content;
+    inline-size: min-content;
+    min-inline-size: fit-content;
     overflow-wrap: anywhere;
-    padding: 0.5rem 1rem;
+    padding-block: 0.5rem;
+    padding-inline: 1rem;
 }
 
 :deep(.p-multiselect-label) {
-    width: inherit;
+    inline-size: inherit;
     flex-direction: column;
     white-space: break-spaces;
     align-items: flex-start;
 }
 
 :deep(.p-multiselect-chip-item) {
-    width: inherit;
+    inline-size: inherit;
     border: 0.125rem solid
         var(--resource-instance-multiselect-chip-background, var(--p-blue-700));
     padding: 0.25rem;
@@ -411,7 +414,6 @@ async function onResourceCreated(createdTile: AliasedTileData) {
     color: var(--resource-instance-multiselect-chip-color, var(--p-surface-0));
 }
 
-/* Text buttons otherwise use the primary colour and gain a border on hover. */
 :deep(.p-multiselect-chip-item .p-button),
 :deep(.p-multiselect-chip-item .p-button:not(:disabled):hover) {
     border: none;
@@ -438,7 +440,7 @@ async function onResourceCreated(createdTile: AliasedTileData) {
 
 :deep(.p-multiselect-label-container) {
     white-space: break-spaces;
-    width: inherit;
+    inline-size: inherit;
 }
 </style>
 
@@ -463,7 +465,8 @@ async function onResourceCreated(createdTile: AliasedTileData) {
 
 .create-new-option {
     font-weight: bold;
-    padding: 0.5rem 1rem;
+    padding-block: 0.5rem;
+    padding-inline: 1rem;
     cursor: pointer;
 }
 

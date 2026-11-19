@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, ref, watchEffect } from "vue";
 
-import { Image, Galleria } from "openvue";
+import Galleria from "openvue/galleria";
+import Image from "openvue/image";
 
 import { useLanguageStore } from "@/arches_vue_components/stores/useLanguageStore.ts";
 import { useSettingsStore } from "@/arches_vue_components/stores/useSettingsStore.ts";
@@ -9,7 +10,7 @@ import { useSettingsStore } from "@/arches_vue_components/stores/useSettingsStor
 import type {
     FileListAliasedNodeData,
     FileReference,
-} from "@/arches_vue_components/datatypes/file-list/types";
+} from "@/arches_vue_components/datatypes/file-list/types.ts";
 
 const { aliasedNodeData } = defineProps<{
     aliasedNodeData: FileListAliasedNodeData;
@@ -18,11 +19,6 @@ const { aliasedNodeData } = defineProps<{
 const languageStore = useLanguageStore();
 const settingsStore = useSettingsStore();
 const forceScriptName = ref("");
-
-onMounted(async () => {
-    forceScriptName.value = await settingsStore.fetchForceScriptName();
-    await languageStore.fetchAllLanguages();
-});
 
 const fileReferences = computed(() => aliasedNodeData?.node_value ?? []);
 
@@ -38,8 +34,6 @@ const imageData = computed(() => {
         });
 });
 
-// Files a browser can't show as an image (PDFs, spreadsheets, ...) are listed
-// as links instead of being handed to the gallery as broken images.
 const otherFiles = computed(() => {
     return fileReferences.value
         .filter((fileReference) => !isImage(fileReference))
@@ -56,7 +50,11 @@ const showThumbnails = computed(() => {
     return imageData.value.length > 1;
 });
 
-// Uploads can arrive with a blank MIME type, so fall back to the extension.
+watchEffect(async () => {
+    forceScriptName.value = await settingsStore.fetchForceScriptName();
+    await languageStore.fetchAllLanguages();
+});
+
 function fileExtension(fileReference: FileReference): string {
     const fileName = fileReference.name || fileReference.url || "";
     return fileName.split(".").pop()?.toLowerCase() ?? "";
@@ -94,7 +92,7 @@ function fileIcon(fileReference: FileReference): string {
     return "pi pi-file";
 }
 
-function getFileUrl(originalUrl: string) {
+function getFileUrl(originalUrl: string): string {
     const httpRegex = /^(blob:|https?:\/\/)/;
     if (
         !originalUrl ||
@@ -123,7 +121,7 @@ function altText(fileReference: FileReference): string {
     >
         <template #item="slotProps">
             <Image
-                class="mainImage"
+                class="main-image"
                 :src="slotProps.item.itemImageSrc"
                 :alt="slotProps.item.alt"
             />
@@ -133,7 +131,7 @@ function altText(fileReference: FileReference): string {
             #thumbnail="slotProps"
         >
             <Image
-                class="thumbnailImage"
+                class="thumbnail-image"
                 :src="slotProps.item.itemImageSrc"
                 :alt="slotProps.item.alt"
             />
@@ -144,19 +142,19 @@ function altText(fileReference: FileReference): string {
         class="file-list-viewer-files"
     >
         <li
-            v-for="(file, fileIndex) in otherFiles"
-            :key="fileIndex"
+            v-for="file in otherFiles"
+            :key="file.url"
         >
             <a
                 class="file-list-viewer-file"
-                :href="file.url"
-                :title="file.name"
                 target="_blank"
                 rel="noopener"
+                :href="file.url"
+                :title="file.name"
             >
                 <i
-                    :class="file.icon"
                     aria-hidden="true"
+                    :class="file.icon"
                 />
                 <span class="file-list-viewer-file-name">{{ file.name }}</span>
             </a>
@@ -193,18 +191,18 @@ function altText(fileReference: FileReference): string {
     white-space: nowrap;
 }
 
-:deep(.mainImage) {
+:deep(.main-image) {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-:deep(.mainImage img) {
-    max-width: 100%;
+:deep(.main-image img) {
+    max-inline-size: 100%;
 }
 
-:deep(.thumbnailImage img) {
-    max-height: 5rem;
+:deep(.thumbnail-image img) {
+    max-block-size: 5rem;
 }
 
 :deep(.p-galleria-thumbnail-item) {

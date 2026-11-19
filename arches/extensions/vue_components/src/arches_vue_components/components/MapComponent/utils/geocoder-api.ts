@@ -50,7 +50,6 @@ async function forwardGeocode(
         params.set("bounded", "1");
     }
 
-    // Failures propagate so the geocoder reports an error, not "no results".
     const response = await fetch(
         `${GEOCODER_PROVIDER_URL}?${params.toString()}`,
     );

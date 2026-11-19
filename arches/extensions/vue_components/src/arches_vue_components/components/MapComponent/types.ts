@@ -48,8 +48,6 @@ export interface MapLayer {
 }
 
 export interface MapInteractionTool {
-    // A stable, untranslated key for choosing tools; the name is translated.
-    id?: string;
     name: string;
     header: string;
     component: Component;
@@ -59,14 +57,29 @@ export interface MapInteractionTool {
     wide?: boolean;
 }
 
-// A header button that runs a command rather than opening a panel.
 export interface MapHeaderAction {
     id: string;
     label: string;
     icon: string;
     ariaLabel?: string;
+    isPressed?: boolean;
     disabled?: boolean;
     onClick: () => void;
+}
+
+export interface GeocoderHosts {
+    input: HTMLInputElement;
+    clearHost: HTMLElement;
+    searchHost: HTMLElement;
+}
+
+export interface GeocoderControls {
+    hosts: ShallowRef<GeocoderHosts | null>;
+    hintId: string;
+    inputText: Ref<string>;
+    isSearching: Ref<boolean>;
+    statusMessage: Ref<string>;
+    clear: () => void;
 }
 
 export type DrawMode = "point" | "line" | "polygon";
@@ -194,7 +207,6 @@ export interface MapComponentProps {
     allowedGeometryTypes?: string[];
     resolveOverlayLayers?: (candidateOverlayLayers: MapLayer[]) => MapLayer[];
     interactionTools?: MapInteractionTool[];
-    visibleToolIds?: string[];
     headerActions?: MapHeaderAction[];
     maxFeatures?: number;
     featurePopupComponent?: Component;

@@ -1,17 +1,20 @@
 <script setup lang="ts">
-import Drawer from "openvue/drawer";
-
 import { useGettext } from "vue3-gettext";
 
-const { $gettext } = useGettext();
+import Drawer from "openvue/drawer";
+
+const UPDATE_SHOULD_SHOW_HELP_DRAWER_EVENT =
+    "update:shouldShowHelpDrawer" as const;
 
 const { shouldShowHelpDrawer } = defineProps<{
     shouldShowHelpDrawer: boolean;
 }>();
 
 const emit = defineEmits<{
-    (event: "update:shouldShowHelpDrawer", value: boolean): void;
+    (event: typeof UPDATE_SHOULD_SHOW_HELP_DRAWER_EVENT, value: boolean): void;
 }>();
+
+const { $gettext } = useGettext();
 
 type EdtfExample = {
     primaryValue: string;
@@ -85,23 +88,24 @@ const edtfExamples: EdtfExample[] = [
     },
 ];
 
-function handleUpdateVisible(nextVisible: boolean) {
-    emit("update:shouldShowHelpDrawer", nextVisible);
+function handleUpdateVisible(nextVisible: boolean): void {
+    emit(UPDATE_SHOULD_SHOW_HELP_DRAWER_EVENT, nextVisible);
 }
 </script>
 
 <template>
     <Drawer
-        :visible="shouldShowHelpDrawer"
         position="right"
-        style="height: 100%; width: 30%"
+        style="block-size: 100%; inline-size: 30%"
+        :visible="shouldShowHelpDrawer"
         :modal="true"
         :dismissable="true"
         :pt="{
             header: {
                 style: {
                     backgroundColor: 'var(--p-content-hover-background)',
-                    borderBottom: '1px solid var(--p-content-border-color)',
+                    borderBlockEnd:
+                        '0.1rem solid var(--p-content-border-color)',
                 },
             },
         }"
@@ -121,7 +125,9 @@ function handleUpdateVisible(nextVisible: boolean) {
             }}
         </p>
 
-        <h5>{{ $gettext("Some common encodings:") }}</h5>
+        <h5 class="edtf-encodings-heading">
+            {{ $gettext("Some common encodings:") }}
+        </h5>
 
         <section
             v-for="currentEdtfExample in edtfExamples"
@@ -157,31 +163,27 @@ function handleUpdateVisible(nextVisible: boolean) {
 
 <style scoped>
 .drawer-title {
+    margin-block: 0 0.2rem;
     font-size: 1.75rem;
     font-weight: 600;
-    margin-bottom: 0.2rem;
-    margin-top: 0rem;
-    padding: 1rem 1.1rem;
 }
-h4.drawer-title {
-   padding: 0rem;
-}
+
 .drawer-description {
-    margin-top: 0.75rem;
-    margin-bottom: 0.5rem;
+    margin-block: 0.75rem 0.5rem;
 }
+
 p {
-    margin-top: 0.25rem;
-    margin-bottom: 0.5rem;
+    margin-block: 0.25rem 0.5rem;
 }
-h5 {
+
+.edtf-encodings-heading {
+    margin-block: 1.5rem 0.25rem;
     font-size: 1.5rem;
     font-weight: 600;
-    margin-top: 1.5rem;
-    margin-bottom: 0.25rem;
 }
+
 .edtf-example {
-    margin-bottom: 1.75rem;
+    margin-block-end: 1.75rem;
     line-height: 1.2;
 }
 
@@ -195,7 +197,7 @@ h5 {
 }
 
 .edtf-example-description {
-    margin-top: 0.15rem;
+    margin-block-start: 0.15rem;
     color: var(--p-text-muted-color);
 }
 </style>

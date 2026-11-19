@@ -7,6 +7,7 @@ import { buildMapSettings } from "@/arches_vue_components/widgets/MapWidget/util
 
 import type {
     MapHeaderAction,
+    MapInteractionTool,
     MapSettings,
 } from "@/arches_vue_components/components/MapComponent/types.ts";
 import type { GeoJSONFeatureCollectionAliasedNodeData } from "@/arches_vue_components/datatypes/geojson-feature-collection/types.ts";
@@ -15,13 +16,13 @@ import type { MapCardXNodeXWidgetData } from "@/arches_vue_components/widgets/Ma
 const {
     aliasedNodeData,
     cardXNodeXWidgetData = undefined,
-    visibleToolIds = undefined,
+    interactionTools = undefined,
     headerActions = undefined,
     defaultSettings = undefined,
 } = defineProps<{
     aliasedNodeData: GeoJSONFeatureCollectionAliasedNodeData;
     cardXNodeXWidgetData?: MapCardXNodeXWidgetData;
-    visibleToolIds?: string[];
+    interactionTools?: MapInteractionTool[];
     headerActions?: MapHeaderAction[];
     defaultSettings?: Partial<MapSettings>;
 }>();
@@ -30,7 +31,6 @@ const emit = defineEmits<{
     "update:isLoading": [isLoading: boolean];
 }>();
 
-// The widget config wins; the caller's defaults fill only what it leaves unset.
 const mapSettings = computed<Partial<MapSettings>>(() => ({
     ...defaultSettings,
     ...Object.fromEntries(
@@ -54,7 +54,7 @@ const mapSettings = computed<Partial<MapSettings>>(() => ({
         :max-zoom="cardXNodeXWidgetData?.config?.maxZoom"
         :basemap="cardXNodeXWidgetData?.config?.basemap"
         :is-read-only="true"
-        :visible-tool-ids="visibleToolIds"
+        :interaction-tools="interactionTools"
         :header-actions="headerActions"
         :settings="mapSettings"
         @update:is-loading="emit('update:isLoading', $event)"
@@ -62,15 +62,7 @@ const mapSettings = computed<Partial<MapSettings>>(() => ({
 </template>
 
 <style>
-/*
- * Ancestors can set --map-component-viewer-block-size to change the height
- * and --map-component-viewer-header-font-size to resize the header buttons.
- */
 .map-widget-viewer {
     --map-component-min-height: var(--map-component-viewer-block-size, 37.2rem);
-    --map-header-button-font-size: var(
-        --map-component-viewer-header-font-size,
-        1.35rem
-    );
 }
 </style>

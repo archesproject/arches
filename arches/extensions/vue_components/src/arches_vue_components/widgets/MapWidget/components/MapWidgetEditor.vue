@@ -98,8 +98,7 @@ function onValueUpdate(updatedValue: FeatureCollection): void {
 </template>
 
 <style>
-/* Ancestors can set --map-component-editor-block-size to change the height. */
 .map-widget-editor {
-    --map-component-min-height: var(--map-component-editor-block-size, 56rem);
+    --map-component-min-height: 56rem;
 }
 </style>

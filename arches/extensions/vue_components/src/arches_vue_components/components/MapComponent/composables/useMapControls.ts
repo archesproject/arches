@@ -1,4 +1,4 @@
-import { useId, watch } from "vue";
+import { ref, shallowRef, useId, watch } from "vue";
 
 import "@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css";
 import * as maplibregl from "maplibre-gl";
@@ -11,7 +11,11 @@ import { geocoderApi } from "@/arches_vue_components/components/MapComponent/uti
 import type { Ref, ShallowRef } from "vue";
 import type { IControl, Map as MaplibreMap } from "maplibre-gl";
 
-import type { MapSettings } from "@/arches_vue_components/components/MapComponent/types.ts";
+import type {
+    GeocoderControls,
+    GeocoderHosts,
+    MapSettings,
+} from "@/arches_vue_components/components/MapComponent/types.ts";
 
 const CONTROL_POSITION = "top-right";
 const DEFAULT_MAX_PITCH = 60;
@@ -21,11 +25,17 @@ export function useMapControls(
     map: ShallowRef<MaplibreMap | null>,
     settings: Ref<MapSettings>,
     fullscreenContainer: Readonly<Ref<HTMLElement | null>>,
-): void {
+): GeocoderControls {
     const { $gettext, $ngettext } = useGettext();
     const geocoderHintId = useId();
 
+    const geocoderHosts = shallowRef<GeocoderHosts | null>(null);
+    const geocoderInputText = ref("");
+    const isGeocoderSearching = ref(false);
+    const geocoderStatusMessage = ref("");
+
     let orderedControls: { control: IControl; isVisible: () => boolean }[] = [];
+    let geocoder: AccessibleGeocoder | null = null;
 
     watch(
         map,
@@ -34,41 +44,10 @@ export function useMapControls(
                 return;
             }
 
+            geocoder = createGeocoder();
             orderedControls = [
                 {
-                    control: new AccessibleGeocoder(
-                        geocoderApi,
-                        {
-                            maplibregl,
-                            placeholder:
-                                settings.value.geocoderPlaceholder ??
-                                $gettext("Search for a place"),
-                        },
-                        {
-                            searchButtonLabel: $gettext("Search"),
-                            clearButtonLabel: $gettext("Clear search"),
-                            hint: $gettext(
-                                "Type a place name, then press Enter or select Search.",
-                            ),
-                            searching: $gettext("Searching for places…"),
-                            placesFound: (count) =>
-                                $ngettext(
-                                    "%{count} place found. Use the arrow keys to choose it.",
-                                    "%{count} places found. Use the arrow keys to choose one.",
-                                    count,
-                                    { count: String(count) },
-                                ),
-                            noPlacesFound: $gettext("No places found."),
-                            searchFailed: $gettext(
-                                "The place search failed. Try again later.",
-                            ),
-                            placeChosen: (placeName) =>
-                                $gettext("Showing %{placeName}.", {
-                                    placeName,
-                                }),
-                        },
-                        geocoderHintId,
-                    ),
+                    control: geocoder,
                     isVisible: () => settings.value.geocoderVisible,
                 },
                 {
@@ -102,6 +81,74 @@ export function useMapControls(
         ],
         syncControls,
     );
+
+    function createGeocoder(): AccessibleGeocoder {
+        const createdGeocoder = new AccessibleGeocoder(
+            geocoderApi,
+            {
+                maplibregl,
+                placeholder:
+                    settings.value.geocoderPlaceholder ??
+                    $gettext("Search for a place"),
+            },
+            setGeocoderHosts,
+        );
+
+        createdGeocoder.on("loading", () => {
+            isGeocoderSearching.value = true;
+            geocoderStatusMessage.value = $gettext("Searching for places…");
+        });
+        createdGeocoder.on("results", (results) => {
+            isGeocoderSearching.value = false;
+            const placeCount = results.features?.length ?? 0;
+            if (placeCount > 0) {
+                geocoderStatusMessage.value = $ngettext(
+                    "%{count} place found. Use the arrow keys to choose it.",
+                    "%{count} places found. Use the arrow keys to choose one.",
+                    placeCount,
+                    { count: String(placeCount) },
+                );
+            } else {
+                geocoderStatusMessage.value = $gettext("No places found.");
+            }
+        });
+        createdGeocoder.on("error", () => {
+            geocoderStatusMessage.value = $gettext(
+                "The place search failed. Try again later.",
+            );
+        });
+        createdGeocoder.on("result", ({ result }) => {
+            syncGeocoderInputText();
+            geocoderStatusMessage.value = $gettext(
+                "Showing %{placeName}.",
+                { placeName: result.place_name },
+                true,
+            );
+        });
+        createdGeocoder.on("clear", () => {
+            syncGeocoderInputText();
+            geocoderStatusMessage.value = "";
+        });
+
+        return createdGeocoder;
+    }
+
+    function setGeocoderHosts(hosts: GeocoderHosts | null): void {
+        geocoderHosts.value = hosts;
+        if (hosts) {
+            hosts.input.setAttribute("aria-describedby", geocoderHintId);
+            hosts.input.addEventListener("input", syncGeocoderInputText);
+        }
+        syncGeocoderInputText();
+    }
+
+    function syncGeocoderInputText(): void {
+        geocoderInputText.value = geocoderHosts.value?.input.value ?? "";
+    }
+
+    function clearGeocoder(): void {
+        geocoder?.clear();
+    }
 
     function syncControls(): void {
         for (const { control } of orderedControls) {
@@ -148,4 +195,13 @@ export function useMapControls(
             });
         }
     }
+
+    return {
+        hosts: geocoderHosts,
+        hintId: geocoderHintId,
+        inputText: geocoderInputText,
+        isSearching: isGeocoderSearching,
+        statusMessage: geocoderStatusMessage,
+        clear: clearGeocoder,
+    };
 }

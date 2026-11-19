@@ -8,8 +8,8 @@ import type {
     CoordinateReadoutFormat,
     MapHeaderAction,
     MapInteractionTool,
-    MapSettings,
     MapScaleUnit,
+    MapSettings,
 } from "@/arches_vue_components/components/MapComponent/types.ts";
 
 export interface GeometryTypeConfig {
@@ -57,9 +57,6 @@ export interface MapWidgetProps extends BaseWidgetProps {
     value?: FeatureCollection | null;
     interactionTools?: MapInteractionTool[];
     featurePopupComponent?: Component;
-    // Read by the viewer only: which header tools to show, extra buttons, and
-    // settings to use where the widget config leaves them unset.
-    visibleToolIds?: string[];
     headerActions?: MapHeaderAction[];
     defaultSettings?: Partial<MapSettings>;
 }

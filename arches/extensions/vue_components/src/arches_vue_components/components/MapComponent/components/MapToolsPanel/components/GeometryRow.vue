@@ -92,6 +92,10 @@ const bufferToggleLabel = computed(() => {
     return $gettext("Apply buffer to %{label}", { label });
 });
 
+const isBufferControlsShown = computed(
+    () => isBufferOn.value && areBufferControlsVisible.value,
+);
+
 watch([bufferDistance, bufferUnits], () => {
     if (isBufferOn.value) {
         applyBufferDebounced();
@@ -208,15 +212,15 @@ function editFeature(): void {
             <Button
                 class="geometry-delete-button"
                 icon="pi pi-trash"
-                :title="$gettext('Delete')"
                 severity="secondary"
                 size="small"
+                :title="$gettext('Delete')"
                 :aria-label="$gettext('Delete %{label}', { label })"
                 @click="deleteDrawnFeature(feature)"
             />
         </div>
         <div
-            v-if="isBufferOn && areBufferControlsVisible"
+            v-if="isBufferControlsShown"
             :id="bufferControlsId"
             class="geometry-buffer-controls"
         >
@@ -277,7 +281,7 @@ function editFeature(): void {
     flex: 1;
     justify-content: flex-start;
     gap: 0.4rem;
-    min-width: 0;
+    min-inline-size: 0;
     padding: 0;
     color: inherit;
 }
@@ -291,7 +295,7 @@ function editFeature(): void {
 .geometry-row-label {
     flex: 1;
     text-align: start;
-    min-width: 0;
+    min-inline-size: 0;
     overflow: hidden;
     font-size: 1.3rem;
     font-weight: 600;
@@ -302,8 +306,8 @@ function editFeature(): void {
 .geometry-buffer-disclosure,
 .geometry-delete-button {
     flex: 0 0 auto;
-    width: 2.4rem;
-    height: 2.4rem;
+    inline-size: 2.4rem;
+    block-size: 2.4rem;
     padding: 0;
 }
 
@@ -336,17 +340,16 @@ function editFeature(): void {
 
 .geometry-buffer-distance {
     flex: 0 0 8rem;
-    width: 8rem;
+    inline-size: 8rem;
 }
 
-/* The input keeps its intrinsic width unless told to fill its wrapper. */
 .geometry-buffer-distance :deep(.p-inputnumber-input) {
-    width: 100%;
-    min-width: 0;
+    inline-size: 100%;
+    min-inline-size: 0;
 }
 
 .geometry-buffer-units {
     flex: 1;
-    min-width: 0;
+    min-inline-size: 0;
 }
 </style>

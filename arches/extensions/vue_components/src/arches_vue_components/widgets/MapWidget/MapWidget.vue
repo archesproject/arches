@@ -62,7 +62,7 @@ onMounted(() => {
         v-if="mode === VIEW"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :aliased-node-data="resolvedAliasedNodeData"
-        :visible-tool-ids="visibleToolIds"
+        :interaction-tools="interactionTools"
         :header-actions="headerActions"
         :default-settings="defaultSettings"
         @update:is-loading="emit('update:isLoading', $event)"

@@ -16,12 +16,14 @@ import type {
     NodeGroup,
 } from "@/arches_vue_components/types.ts";
 
+const RESOURCE_CREATED_EVENT = "resource-created" as const;
+
 const { graphId } = defineProps<{
     graphId: string;
 }>();
 
 const emit = defineEmits<{
-    (event: "resourceCreated", resource: AliasedTileData): void;
+    (event: typeof RESOURCE_CREATED_EVENT, resource: AliasedTileData): void;
 }>();
 
 const visible = ref(true);
@@ -49,9 +51,9 @@ watchEffect(async () => {
     visible.value = true;
 });
 
-function onSave(event: AliasedTileData) {
+function onSave(event: AliasedTileData): void {
     visible.value = false;
-    emit("resourceCreated", event);
+    emit(RESOURCE_CREATED_EVENT, event);
 }
 </script>
 
@@ -60,17 +62,18 @@ function onSave(event: AliasedTileData) {
         v-model:visible="visible"
         position="center"
         :draggable="false"
-        :header="
-            $gettext('Create a new %{graphName}', { graphName: graphName })
-        "
+        :header="$gettext('Create a new %{graphName}', { graphName }, true)"
         :close-on-escape="true"
         :modal="true"
         :pt="{
+            mask: {
+                class: 'resource-instance-creation-mask',
+            },
             root: {
                 class: 'resource-instance-creation-dialog',
                 style: {
-                    width: '64rem',
-                    maxWidth: 'calc(100vw - 3.2rem)',
+                    inlineSize: '64rem',
+                    maxInlineSize: '100%',
                     borderRadius: '0',
                 },
             },
@@ -78,7 +81,8 @@ function onSave(event: AliasedTileData) {
                 style: {
                     background: 'var(--p-content-hover-background)',
                     color: 'var(--p-text-color)',
-                    borderBottom: '0.1rem solid var(--p-content-border-color)',
+                    borderBlockEnd:
+                        '0.1rem solid var(--p-content-border-color)',
                     borderRadius: '0',
                 },
             },
@@ -92,14 +96,16 @@ function onSave(event: AliasedTileData) {
         >
             <strong>
                 {{
-                    $gettext("You're creating a new %{graphName}.", {
-                        graphName: graphName,
-                    })
+                    $gettext(
+                        "You're creating a new %{graphName}.",
+                        { graphName },
+                        true,
+                    )
                 }}
             </strong>
             {{
                 $gettext(
-                    "Add the basic details here. When you save, the new record is created right away and added to the field you're editing. To add more information later, open the new record from its link in the report.",
+                    "Add the basic details here. When you save, the new record is created right away and added to the field you're editing. To add more information later, open the new record from its link.",
                 )
             }}
         </Message>
@@ -113,10 +119,12 @@ function onSave(event: AliasedTileData) {
     </Dialog>
 </template>
 
-<!-- Not scoped: the dialog is teleported to <body>, outside this component. -->
 <style>
+.resource-instance-creation-mask {
+    padding-inline: 1.6rem;
+}
+
 .resource-instance-creation-dialog {
-    /* Text inputs otherwise round more than the selects beside them. */
     --p-inputtext-border-radius: var(--p-select-border-radius);
 }
 
@@ -135,7 +143,6 @@ function onSave(event: AliasedTileData) {
     gap: 1.5rem;
 }
 
-/* The small Message sizes its own text and icon; match the field labels. */
 .resource-instance-creation-dialog
     .resource-instance-creation-note
     .p-message-text {
@@ -157,7 +164,6 @@ function onSave(event: AliasedTileData) {
     border-radius: 0.15rem;
 }
 
-/* Matches the report editor panel's field labels. */
 .resource-instance-creation-dialog .p-dialog-content .widget-label {
     margin-block-end: 0.5rem;
     color: var(--p-text-muted-color);

@@ -62,6 +62,7 @@ function focusTool(toolName: string): void {
             v-for="tool in tools"
             :key="tool.name"
             class="map-header-button"
+            size="small"
             :class="{
                 'map-header-button-active': tool.name === activeToolName,
             }"
@@ -69,7 +70,6 @@ function focusTool(toolName: string): void {
             :aria-expanded="tool.name === activeToolName"
             :aria-controls="panelId"
             :text="true"
-            size="small"
             @click="emit(TOGGLE_TOOL_EVENT, tool.name)"
         >
             <i
@@ -91,11 +91,12 @@ function focusTool(toolName: string): void {
                 v-for="action in actions"
                 :key="action.id"
                 class="map-header-button"
+                size="small"
                 :data-action-id="action.id"
                 :aria-label="action.ariaLabel"
+                :aria-pressed="action.isPressed"
                 :disabled="action.disabled"
                 :text="true"
-                size="small"
                 @click="action.onClick"
             >
                 <i
@@ -119,12 +120,11 @@ function focusTool(toolName: string): void {
 
 .map-header-button {
     gap: 0.8rem;
-    min-height: 4.4rem;
+    min-block-size: 4.4rem;
     padding-block: 1.1rem;
     padding-inline: 1.75rem;
     border-radius: 0;
     color: var(--p-text-muted-color);
-    /* Small buttons, so themes that force a button font size leave these be. */
     font-size: var(--map-header-button-font-size, 1.35rem);
     font-weight: 600;
 }

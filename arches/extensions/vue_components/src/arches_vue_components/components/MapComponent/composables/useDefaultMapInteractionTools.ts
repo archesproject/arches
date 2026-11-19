@@ -6,14 +6,6 @@ import MapToolsPanel from "@/arches_vue_components/components/MapComponent/compo
 import OverlayPanel from "@/arches_vue_components/components/MapComponent/components/OverlayPanel/OverlayPanel.vue";
 import SettingsPanel from "@/arches_vue_components/components/MapComponent/components/SettingsPanel/SettingsPanel.vue";
 
-import {
-    BASEMAP_TOOL_ID,
-    LEGEND_TOOL_ID,
-    MAP_TOOLS_TOOL_ID,
-    OVERLAYS_TOOL_ID,
-    SETTINGS_TOOL_ID,
-} from "@/arches_vue_components/components/MapComponent/constants.ts";
-
 import type {
     MapContext,
     MapInteractionTool,
@@ -28,7 +20,6 @@ export function useDefaultMapInteractionTools(): MapInteractionTool[] {
 
     return [
         {
-            id: MAP_TOOLS_TOOL_ID,
             name: $gettext("Map Tools"),
             header: $gettext("Map Tools"),
             component: MapToolsPanel,
@@ -36,14 +27,12 @@ export function useDefaultMapInteractionTools(): MapInteractionTool[] {
             wide: true,
         },
         {
-            id: BASEMAP_TOOL_ID,
             name: $gettext("Basemap"),
             header: $gettext("Basemap"),
             component: BasemapPanel,
             icon: "pi pi-globe",
         },
         {
-            id: OVERLAYS_TOOL_ID,
             name: $gettext("Overlays"),
             header: $gettext("Overlays"),
             component: OverlayPanel,
@@ -51,14 +40,12 @@ export function useDefaultMapInteractionTools(): MapInteractionTool[] {
             badgeCount: countVisibleOverlays,
         },
         {
-            id: LEGEND_TOOL_ID,
             name: $gettext("Legend"),
             header: $gettext("Legend"),
             component: LegendPanel,
             icon: "pi pi-book",
         },
         {
-            id: SETTINGS_TOOL_ID,
             name: $gettext("Settings"),
             header: $gettext("Settings"),
             component: SettingsPanel,
