@@ -271,6 +271,7 @@ function onResourceCreated(createdTile: AliasedTileData): void {
         display="chip"
         option-label="display_value"
         option-value="resource_id"
+        overlay-class="resource-instance-multiselect-widget-overlay"
         :filter="true"
         :filter-fields="['display_value', 'resource_id']"
         :empty-filter-message="emptyFilterMessage"
@@ -472,5 +473,17 @@ function onResourceCreated(createdTile: AliasedTileData): void {
 
 .create-new-option:hover {
     background: var(--p-multiselect-option-focus-background);
+}
+
+.resource-instance-multiselect-widget-overlay .p-checkbox,
+.resource-instance-multiselect-widget-overlay .p-checkbox-box {
+    inline-size: 1.8rem;
+    block-size: 1.8rem;
+}
+
+.resource-instance-multiselect-widget-overlay .p-checkbox-icon {
+    inline-size: 1.2rem;
+    block-size: 1.2rem;
+    font-size: 1.2rem;
 }
 </style>

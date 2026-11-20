@@ -6,6 +6,8 @@ import { useGettext } from "vue3-gettext";
 import Badge from "openvue/badge";
 import Button from "openvue/button";
 
+import { EXPAND_MAP_ACTION_ID } from "@/arches_vue_components/components/MapComponent/constants.ts";
+
 import type {
     MapContext,
     MapHeaderAction,
@@ -92,7 +94,10 @@ function focusTool(toolName: string): void {
                 :key="action.id"
                 class="map-header-button"
                 size="small"
-                :data-action-id="action.id"
+                :class="{
+                    'map-header-expand-button':
+                        action.id === EXPAND_MAP_ACTION_ID,
+                }"
                 :aria-label="action.ariaLabel"
                 :aria-pressed="action.isPressed"
                 :disabled="action.disabled"
@@ -136,6 +141,52 @@ function focusTool(toolName: string): void {
 
 .map-header-icon {
     font-size: 1.6rem;
+}
+
+.map-header-button.map-header-expand-button {
+    --p-button-label-font-weight: 600;
+    flex-shrink: 0;
+    align-self: center;
+    gap: 0.6rem;
+    block-size: 2.7rem;
+    min-block-size: 0;
+    margin-inline-end: 1.2rem;
+    padding-block: 0;
+    padding-inline: 1.2rem;
+    border: 0.1rem solid var(--p-content-border-color);
+    border-radius: var(--p-button-rounded-border-radius);
+    background: var(--p-content-background);
+    color: var(--p-text-muted-color);
+    font-size: 1.2rem;
+    line-height: 1.2;
+}
+
+.map-header-expand-button .map-header-icon {
+    font-size: 1.2rem;
+}
+
+.map-header-button.map-header-expand-button:not(:disabled):hover {
+    border-color: var(--p-primary-color);
+    background: var(--p-content-background);
+    color: var(--p-primary-color);
+}
+
+.map-header-button.map-header-expand-button[aria-pressed="true"],
+.map-header-button.map-header-expand-button[aria-pressed="true"]:not(
+        :disabled
+    ):hover {
+    border-color: var(
+        --map-header-expand-button-pressed-background,
+        var(--p-primary-color)
+    );
+    background: var(
+        --map-header-expand-button-pressed-background,
+        var(--p-primary-color)
+    );
+    color: var(
+        --map-header-expand-button-pressed-color,
+        var(--p-primary-contrast-color)
+    );
 }
 
 .map-header-button.map-header-button-active {
