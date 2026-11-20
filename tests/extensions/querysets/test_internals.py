@@ -123,6 +123,17 @@ class InternalsTests(GraphTestCase):
             self.cardinality_1_child_tile.pk, [c.pk for c in tile._tile_trees]
         )
 
+    def test_refresh_from_db_without_child_prefetch(self):
+        """Graphs with no nested nodegroups cap depth at 0, so the
+        _tile_trees prefetch is skipped. Refreshing must still work."""
+        tile = TileTree.get_tiles(
+            "datatype_lookups", "datatypes_1", resource_ids=[self.resource_42.pk]
+        ).get()
+        tile.refresh_from_db(
+            from_queryset=TileTree.get_tiles("datatype_lookups", "datatypes_1", depth=0)
+        )
+        self.assertEqual(tile._tile_trees, [])
+
     def test_node_aliases_false_omits_alias_expressions(self):
         alias = self.string_node_1.alias
         resources = ResourceTileTree.get_tiles("datatype_lookups", node_aliases=False)

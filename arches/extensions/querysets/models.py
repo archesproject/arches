@@ -94,7 +94,7 @@ class AliasedDataMixin:
             models.Model.refresh_from_db(self, using, fields, from_queryset)
             # Retrieve aliased data from the queryset cache.
             self.aliased_data = from_queryset[0].aliased_data
-            self._tile_trees = from_queryset[0]._tile_trees
+            self._tile_trees = getattr(from_queryset[0], "_tile_trees", [])
         else:
             # Django 4: good-enough riff on refresh_from_db(), but not bulletproof.
             db_instance = from_queryset.get()
@@ -103,7 +103,7 @@ class AliasedDataMixin:
             self.aliased_data = db_instance.aliased_data
             if isinstance(self, TileModel) and self.parenttile_id:
                 self.parenttile = TileModel.objects.get(pk=self.parenttile_id)
-            self._tile_trees = from_queryset[0]._tile_trees
+            self._tile_trees = getattr(from_queryset[0], "_tile_trees", [])
 
 
 class ResourceTileTree(ResourceInstance, AliasedDataMixin):
