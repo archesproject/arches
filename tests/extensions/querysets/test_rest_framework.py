@@ -533,6 +533,29 @@ class RestFrameworkTests(GraphTestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK, response.json())
         self.assertTrue(TileModel.objects.filter(pk=misparented_tile.pk).exists())
 
+    def test_update_tile_rejects_moving_the_tile_to_another_resource(self):
+        tile = self.resource_42.aliased_data.datatypes_1
+        update_url = reverse(
+            "arches_querysets:api-tile",
+            kwargs={
+                "graph": "datatype_lookups",
+                "nodegroup_alias": "datatypes_1",
+                "pk": tile.pk,
+            },
+        )
+        request_body = {"resourceinstance": str(self.resource_none.pk)}
+
+        self.client.login(username="dev", password="dev")
+        response = self.client.patch(
+            update_url, request_body, content_type="application/json"
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertIn("resourceinstance", response.json())
+        self.assertEqual(
+            TileModel.objects.get(pk=tile.pk).resourceinstance_id, self.resource_42.pk
+        )
+
     def test_update_tile_rejects_a_related_resource_without_a_resource_id(self):
         update_url = reverse(
             "arches_querysets:api-tile",

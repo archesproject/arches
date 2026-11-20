@@ -310,6 +310,17 @@ class ArchesModelAPIMixin:
         self.validate_tile_data_and_save(serializer)
 
     def perform_update(self, serializer):
+        # update() only checked edit permission on the tile's current
+        # resource, and saving cannot move a tile to another resource.
+        resource = serializer.validated_data.get("resourceinstance")
+        if (
+            isinstance(serializer.instance, TileModel)
+            and resource is not None
+            and resource.pk != serializer.instance.resourceinstance_id
+        ):
+            raise ValidationError(
+                {"resourceinstance": [_("A tile cannot be moved to another resource.")]}
+            )
         self.validate_tile_data_and_save(serializer)
 
     def perform_destroy(self, instance):
