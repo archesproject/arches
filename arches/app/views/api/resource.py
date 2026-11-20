@@ -46,6 +46,22 @@ from arches.app.views.resource import (
 logger = logging.getLogger(__name__)
 
 
+def resource_not_available_response():
+    """Return the response for a resource the user is not allowed to read.
+
+    The message deliberately doesn't say whether the resource exists, so the
+    same wording can be used whether it is missing or hidden (#11563).
+    """
+    return JSONErrorResponse(
+        _("Resource not available"),
+        _(
+            "Either the resource you are looking for does not exist, "
+            "or you do not have permission to access it."
+        ),
+        status=HTTPStatus.FORBIDDEN,
+    )
+
+
 @method_decorator(csrf_exempt, name="dispatch")
 class Resources(APIBase):
     se = SearchEngineFactory().create()
@@ -99,7 +115,7 @@ class Resources(APIBase):
                 )
 
             if not user_can_read_resource(user=request.user, resource=resource):
-                return JSONResponse(status=403)
+                return resource_not_available_response()
 
         allowed_formats = ["json", "json-ld", "arches-json"]
         format = request.GET.get("format", "json-ld")
@@ -507,9 +523,7 @@ class ResourceIdentifiers(APIBase):
             return JSONErrorResponse(_("Resource instance not found"), status=404)
 
         if not user_can_read_resource(user=request.user, resource=resource_instance):
-            return JSONErrorResponse(
-                _("Request Failed"), _("Permission Denied"), status=403
-            )
+            return resource_not_available_response()
 
         resource_identifiers = models.ResourceIdentifier.objects.filter(
             resourceid=resource_instance
@@ -666,7 +680,7 @@ class ResourceInstanceLifecycleState(APIBase):
 class ResourceReport(APIBase):
     def get(self, request, resourceid):
         if not user_can_read_resource(user=request.user, resourceid=resourceid):
-            return JSONResponse(status=403)
+            return resource_not_available_response()
 
         exclude = request.GET.get("exclude", [])
         uncompacted_value = request.GET.get("uncompacted")
