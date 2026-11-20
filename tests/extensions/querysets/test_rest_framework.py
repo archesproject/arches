@@ -556,6 +556,58 @@ class RestFrameworkTests(GraphTestCase):
             TileModel.objects.get(pk=tile.pk).resourceinstance_id, self.resource_42.pk
         )
 
+    def test_update_tile_rejects_a_null_resourceinstance(self):
+        tile = self.resource_42.aliased_data.datatypes_1
+        update_url = reverse(
+            "arches_querysets:api-tile",
+            kwargs={
+                "graph": "datatype_lookups",
+                "nodegroup_alias": "datatypes_1",
+                "pk": tile.pk,
+            },
+        )
+
+        self.client.login(username="dev", password="dev")
+        response = self.client.patch(
+            update_url, {"resourceinstance": None}, content_type="application/json"
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertIn("resourceinstance", response.json())
+        self.assertEqual(
+            TileModel.objects.get(pk=tile.pk).resourceinstance_id, self.resource_42.pk
+        )
+
+    def test_update_tile_move_to_uneditable_resource_is_forbidden(self):
+        tile = self.resource_42.aliased_data.datatypes_1
+        update_url = reverse(
+            "arches_querysets:api-tile",
+            kwargs={
+                "graph": "datatype_lookups",
+                "nodegroup_alias": "datatypes_1",
+                "pk": tile.pk,
+            },
+        )
+        request_body = {"resourceinstance": str(self.resource_none.pk)}
+
+        def can_edit_only_resource_42(*, user, resource=None, resourceid=None):
+            resource_id = resource.pk if resource is not None else resourceid
+            return str(resource_id) == str(self.resource_42.pk)
+
+        self.client.login(username="dev", password="dev")
+        with patch(
+            "arches.extensions.querysets.rest_framework.view_mixins.user_can_edit_resource",
+            side_effect=can_edit_only_resource_42,
+        ):
+            response = self.client.patch(
+                update_url, request_body, content_type="application/json"
+            )
+
+        self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
+        self.assertEqual(
+            TileModel.objects.get(pk=tile.pk).resourceinstance_id, self.resource_42.pk
+        )
+
     def test_update_tile_rejects_a_related_resource_without_a_resource_id(self):
         update_url = reverse(
             "arches_querysets:api-tile",
