@@ -20,6 +20,7 @@ const { aliasedNodeData, value, mode } = defineProps<RichTextWidgetProps>();
 const emit = defineEmits<{
     "update:value": [updatedValue: Record<string, LanguageValue> | null];
     "update:aliasedNodeData": [updatedValue: StringAliasedNodeData];
+    "update:selectedLanguage": [languageCode: string];
     initialized: [updatedValue: StringAliasedNodeData];
     ready: [];
 }>();
@@ -50,6 +51,7 @@ function onUpdateAliasedNodeData(
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
         :aliased-node-data="resolvedAliasedNodeData"
         @update:aliased-node-data="onUpdateAliasedNodeData"
+        @update:selected-language="emit('update:selectedLanguage', $event)"
         @ready="emit('ready')"
     />
     <RichTextWidgetViewer

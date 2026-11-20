@@ -13,3 +13,19 @@ export function buildStringAliasedNodeData(
         details: [],
     };
 }
+
+export function resolveInitialLanguageCode(
+    nodeValue: Record<string, LanguageValue> | null | undefined,
+    requestedLanguageCode: string,
+): string {
+    const filledLanguageCodes = Object.entries(nodeValue ?? {})
+        .filter(([, languageValue]) => languageValue.value !== "")
+        .map(([languageCode]) => languageCode);
+    if (filledLanguageCodes.includes(requestedLanguageCode)) {
+        return requestedLanguageCode;
+    }
+    if (filledLanguageCodes.length > 0) {
+        return filledLanguageCodes[0];
+    }
+    return requestedLanguageCode;
+}

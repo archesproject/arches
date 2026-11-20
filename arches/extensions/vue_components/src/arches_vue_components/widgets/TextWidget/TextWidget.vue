@@ -20,6 +20,7 @@ const { aliasedNodeData, value, mode } = defineProps<TextWidgetProps>();
 const emit = defineEmits<{
     "update:value": [updatedValue: Record<string, LanguageValue> | null];
     "update:aliasedNodeData": [updatedValue: StringAliasedNodeData];
+    "update:selectedLanguage": [languageCode: string];
     initialized: [updatedValue: StringAliasedNodeData];
     ready: [];
 }>();
@@ -51,6 +52,7 @@ function onUpdateAliasedNodeData(
         :aliased-node-data="resolvedAliasedNodeData"
         :render-context="renderContext"
         @update:aliased-node-data="onUpdateAliasedNodeData"
+        @update:selected-language="emit('update:selectedLanguage', $event)"
         @ready="emit('ready')"
     />
     <TextWidgetViewer
