@@ -196,14 +196,6 @@ function navigateToNextFeature(): void {
                     v-html="descriptor.map_popup"
                 />
                 <!-- eslint-enable vue/no-v-html -->
-                <div
-                    v-if="descriptor.displaydescription"
-                    class="popup-snippet-section"
-                >
-                    <p class="popup-snippet">
-                        {{ descriptor.displaydescription }}
-                    </p>
-                </div>
             </template>
         </div>
 
@@ -235,7 +227,7 @@ function navigateToNextFeature(): void {
     --popup-skeleton-height: 1.6rem;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    block-size: 100%;
     font-size: 1.35rem;
 }
 
@@ -244,7 +236,7 @@ function navigateToNextFeature(): void {
     align-items: center;
     justify-content: space-between;
     gap: 0.95rem;
-    min-height: 3rem;
+    min-block-size: 3rem;
     padding-block: 0.55rem;
     padding-inline: 0.95rem;
     background: var(--p-primary-color);
@@ -267,8 +259,8 @@ function navigateToNextFeature(): void {
     --p-button-primary-border-color: var(--p-primary-hover-color);
     --p-button-primary-hover-background: var(--p-primary-active-color);
     --p-button-primary-hover-border-color: var(--p-primary-active-color);
-    width: 2.4rem;
-    height: 2.4rem;
+    inline-size: 2.4rem;
+    block-size: 2.4rem;
     padding: 0;
 }
 
@@ -276,7 +268,7 @@ function navigateToNextFeature(): void {
     display: flex;
     flex: 1;
     flex-direction: column;
-    min-height: 0;
+    min-block-size: 0;
     overflow-y: auto;
     transition: opacity var(--p-transition-duration);
 }
@@ -324,20 +316,6 @@ function navigateToNextFeature(): void {
 
 .popup-html-content {
     overflow-wrap: break-word;
-}
-
-.popup-snippet-section {
-    padding-block-end: 1.1rem;
-    padding-inline: 1.45rem;
-}
-
-.popup-snippet {
-    margin: 0;
-    padding-block-start: 0.95rem;
-    border-block-start: 0.1rem dashed var(--p-content-border-color);
-    color: var(--p-text-muted-color);
-    font-size: 1.3rem;
-    line-height: 1.4;
 }
 
 .popup-footer {

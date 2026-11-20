@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref } from "vue";
+
 import { useGettext } from "vue3-gettext";
-import InputText from "openvue/inputtext";
+
 import Button from "openvue/button";
+import InputText from "openvue/inputtext";
 
 import EDTFHelpDrawer from "@/arches_vue_components/widgets/EDTFWidget/components/EDTFWidgetEditor/components/EDTFHelpDrawer.vue";
 
@@ -11,22 +13,30 @@ import { buildEDTFAliasedNodeData } from "@/arches_vue_components/datatypes/edtf
 import type { CardXNodeXWidgetData } from "@/arches_vue_components/types.ts";
 import type { EDTFAliasedNodeData } from "@/arches_vue_components/datatypes/edtf/types.ts";
 
+const UPDATE_ALIASED_NODE_DATA_EVENT = "update:aliasedNodeData" as const;
+
 const { cardXNodeXWidgetData = undefined, aliasedNodeData } = defineProps<{
     cardXNodeXWidgetData?: CardXNodeXWidgetData;
     aliasedNodeData: EDTFAliasedNodeData | null;
 }>();
 
 const emit = defineEmits<{
-    (event: "update:aliasedNodeData", updatedValue: EDTFAliasedNodeData): void;
+    (
+        event: typeof UPDATE_ALIASED_NODE_DATA_EVENT,
+        updatedValue: EDTFAliasedNodeData,
+    ): void;
 }>();
 
 const { $gettext } = useGettext();
 
 const shouldShowHelpDrawer = ref(false);
 
-function handleUpdateModelValue(updatedValue: string | undefined) {
+function handleUpdateModelValue(updatedValue: string | undefined): void {
     const newValue = updatedValue ?? "";
-    emit("update:aliasedNodeData", buildEDTFAliasedNodeData(newValue || null));
+    emit(
+        UPDATE_ALIASED_NODE_DATA_EVENT,
+        buildEDTFAliasedNodeData(newValue || null),
+    );
 }
 </script>
 
@@ -42,10 +52,12 @@ function handleUpdateModelValue(updatedValue: string | undefined) {
             @update:model-value="handleUpdateModelValue"
         />
         <Button
-            class="p-button-text custom-text-button"
+            class="custom-text-button"
+            variant="text"
+            size="small"
             @click="shouldShowHelpDrawer = true"
         >
-            {{ $gettext("EDTF Formatting") }}
+            <span>{{ $gettext("EDTF Formatting") }}</span>
         </Button>
 
         <EDTFHelpDrawer
@@ -59,15 +71,17 @@ function handleUpdateModelValue(updatedValue: string | undefined) {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    width: 100%;
+    inline-size: 100%;
 }
 
 .flex-input {
     flex: 1 1 auto;
-    min-width: 0;
+    min-inline-size: 0;
 }
 
 .custom-text-button {
-    padding: 0rem 1rem;
+    padding-block: 0.75rem;
+    padding-inline: 1rem;
+    font-size: 1.1rem;
 }
 </style>

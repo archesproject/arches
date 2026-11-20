@@ -1,6 +1,8 @@
+import io
 import json
 from urllib.parse import urlsplit, parse_qs
 from django.contrib.auth.models import User
+from django.core import management
 from django.core.validators import URLValidator
 from django.db import connection
 from django.http import HttpRequest
@@ -159,11 +161,9 @@ def _post_save_edit_log(
         multiprocessing,
         index,
     )
-    if index and not settings.ELASTICSEARCH_ENABLED:
-        logger.debug("Elasticsearch is disabled; skipping Elasticsearch indexing")
-        index = False
+    es_index = index and settings.ELASTICSEARCH_ENABLED
     try:
-        if index:
+        if es_index:
             with connection.cursor() as cursor:
                 log_event_details(cursor, loadid, "done|Indexing...")
 
@@ -177,6 +177,18 @@ def _post_save_edit_log(
             )
             logger.debug(
                 "Indexing complete for loadid=%s; fetching user id=%s", loadid, userid
+            )
+        elif index:
+            logger.debug("Elasticsearch is disabled; recalculating descriptors only")
+            # Descriptors are otherwise only recalculated as part of indexing
+            with connection.cursor() as cursor:
+                log_event_details(cursor, loadid, "done|Recalculating descriptors...")
+            management.call_command(
+                "resources",
+                "calculate_descriptors",
+                transaction=str(loadid),
+                yes=True,
+                stdout=io.StringIO(),
             )
         else:
             logger.debug("Skipping indexing for loadid=%s (index=False)", loadid)
@@ -216,7 +228,7 @@ def _post_save_edit_log(
                 ),
             )
             log_event_details(cursor, loadid, "done")
-            final_status = "indexed" if index else "completed"
+            final_status = "indexed" if es_index else "completed"
             cursor.execute(
                 """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
                 (final_status, timezone.now(), True, True, loadid),

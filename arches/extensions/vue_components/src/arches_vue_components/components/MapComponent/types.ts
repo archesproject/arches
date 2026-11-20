@@ -57,6 +57,31 @@ export interface MapInteractionTool {
     wide?: boolean;
 }
 
+export interface MapHeaderAction {
+    id: string;
+    label: string;
+    icon: string;
+    ariaLabel?: string;
+    isPressed?: boolean;
+    disabled?: boolean;
+    onClick: () => void;
+}
+
+export interface GeocoderHosts {
+    input: HTMLInputElement;
+    clearHost: HTMLElement;
+    searchHost: HTMLElement;
+}
+
+export interface GeocoderControls {
+    hosts: ShallowRef<GeocoderHosts | null>;
+    hintId: string;
+    inputText: Ref<string>;
+    isSearching: Ref<boolean>;
+    statusMessage: Ref<string>;
+    clear: () => void;
+}
+
 export type DrawMode = "point" | "line" | "polygon";
 
 export interface CoordinateRow {
@@ -187,6 +212,7 @@ export interface MapComponentProps {
     resolveOverlayLayers?: (candidateOverlayLayers: MapLayer[]) => MapLayer[];
     resolveMapSources?: (candidateMapSources: MapSource[]) => MapSource[];
     interactionTools?: MapInteractionTool[];
+    headerActions?: MapHeaderAction[];
     maxFeatures?: number;
     featurePopupComponent?: Component;
     openPopupsInsideDrawnShapes?: boolean;

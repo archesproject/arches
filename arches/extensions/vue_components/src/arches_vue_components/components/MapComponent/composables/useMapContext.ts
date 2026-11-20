@@ -36,6 +36,7 @@ import type { UseFeaturePopupReturn } from "@/arches_vue_components/components/M
 import type {
     Basemap,
     CoordinateSystem,
+    GeocoderControls,
     MapContext,
     MapLayer,
     MapSettings,
@@ -128,6 +129,7 @@ export interface UseMapContextReturn
         "popupContainer" | "popupFeatures" | "popupFeatureIndex"
     > {
     context: MapContext;
+    geocoderControls: GeocoderControls;
 }
 
 export function useMapContext(
@@ -197,11 +199,13 @@ export function useMapContext(
         map,
         overlayLayerIds,
         drawnFeatureControls.isActivelyDrawingOrEditing,
-        drawnFeatureControls.isFeatureClickBlockedByDrawing,
+        (point) =>
+            !props.isReadOnly &&
+            drawnFeatureControls.isFeatureClickBlockedByDrawing(point),
         drawnFeatureControls.deselectDrawnFeatureIfSelected,
     );
     useBasemapStyle(map, basemaps);
-    useMapControls(map, settings, fullscreenContainer);
+    const geocoderControls = useMapControls(map, settings, fullscreenContainer);
 
     watch(isLoading, (newValue) => {
         emit("update:isLoading", newValue);
@@ -387,5 +391,11 @@ export function useMapContext(
         popupFeature,
     };
 
-    return { context, popupContainer, popupFeatures, popupFeatureIndex };
+    return {
+        context,
+        popupContainer,
+        popupFeatures,
+        popupFeatureIndex,
+        geocoderControls,
+    };
 }

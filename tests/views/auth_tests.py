@@ -21,6 +21,8 @@ import hashlib
 import time
 from unittest import mock
 
+import pyotp
+
 from django.http import HttpRequest
 from django.urls import reverse
 from django.contrib.auth import get_user
@@ -220,7 +222,7 @@ class AuthTests(ArchesTestCase):
         ):
             with mock.patch(
                 "arches.app.utils.arches_crypto.AESCipher.decrypt",
-                return_value="123456",
+                return_value=pyotp.random_base32(),
             ):
                 with mock.patch("pyotp.TOTP.verify", return_value=True):
                     response = self.client.post(

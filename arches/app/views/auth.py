@@ -733,7 +733,7 @@ class TwoFactorAuthenticationSettingsView(View):
 
                 if generate_qr_code:
                     uri = pyotp.totp.TOTP(mfa_hash).provisioning_uri(
-                        user.email, issuer_name=settings.APP_TITLE
+                        name=user.email, issuer_name=settings.APP_TITLE
                     )
                     uri_qrcode = qrcode.make(uri)
 

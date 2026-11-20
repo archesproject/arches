@@ -60,6 +60,10 @@ const isOpacityControlVisible = computed(
         isOverlayOpacityAdjustable(overlay.layerdefinitions),
 );
 
+const isOpacitySliderVisible = computed(
+    () => isOpacityControlVisible.value && isOpacityExpanded.value,
+);
+
 const overlayIndex = computed(() => overlays.value.indexOf(overlay));
 
 const canMoveUp = computed(() => !isReorderDisabled && overlayIndex.value > 0);
@@ -124,6 +128,7 @@ function updateOpacity(value: number | number[]): void {
                 />
             </div>
             <Checkbox
+                size="large"
                 :input-id="visibilityInputId"
                 :model-value="overlay.addtomap"
                 :binary="true"
@@ -175,7 +180,7 @@ function updateOpacity(value: number | number[]): void {
             </Button>
         </div>
         <div
-            v-if="isOpacityControlVisible && isOpacityExpanded"
+            v-if="isOpacitySliderVisible"
             class="overlay-opacity"
         >
             <Slider
@@ -206,7 +211,6 @@ function updateOpacity(value: number | number[]): void {
 .overlay-row:hover {
     background: var(--p-content-hover-background);
 }
-
 
 .overlay-row-drag-target {
     box-shadow: inset 0 0.3rem 0 var(--p-primary-color);
@@ -243,8 +247,8 @@ function updateOpacity(value: number | number[]): void {
 }
 
 .overlay-reorder-button {
-    width: 2rem;
-    height: 1.6rem;
+    inline-size: 2rem;
+    block-size: 1.6rem;
     padding: 0;
 }
 
@@ -254,7 +258,7 @@ function updateOpacity(value: number | number[]): void {
     flex: 1;
     justify-content: flex-start;
     gap: 0.65rem;
-    min-width: 0;
+    min-inline-size: 0;
     padding: 0.6rem;
     color: inherit;
     cursor: pointer;
@@ -263,7 +267,7 @@ function updateOpacity(value: number | number[]): void {
 .overlay-label {
     flex: 1;
     text-align: start;
-    min-width: 0;
+    min-inline-size: 0;
     overflow: hidden;
     font-size: 1.35rem;
     text-overflow: ellipsis;
