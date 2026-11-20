@@ -1,4 +1,4 @@
-import { ref, shallowRef, watch } from "vue";
+import { computed, ref, shallowRef, watch } from "vue";
 
 import * as maplibregl from "maplibre-gl";
 
@@ -35,20 +35,30 @@ const POINT_GEOMETRY_TYPES = ["Point", "MultiPoint"];
 export interface UseFeaturePopupReturn
     extends Pick<
         MapContext,
-        "showFeatureHighlight" | "clearFeatureHighlight" | "closeFeaturePopup"
+        | "showFeatureHighlight"
+        | "clearFeatureHighlight"
+        | "closeFeaturePopup"
+        | "popupFeature"
     > {
     popupFeatures: ShallowRef<Feature[]>;
+    popupFeatureIndex: Ref<number>;
     popupContainer: Ref<HTMLElement | null>;
+    isClickableOverlayFeatureAt: (point: MapMouseEvent["point"]) => boolean;
 }
 
 export function useFeaturePopup(
     map: ShallowRef<MaplibreMap | null>,
     overlayLayerIds: ComputedRef<string[]>,
     isActivelyDrawingOrEditing: () => boolean,
-    isDrawnFeatureOnTop: (point: MapMouseEvent["point"]) => boolean,
+    isFeatureClickBlockedByDrawing: (point: MapMouseEvent["point"]) => boolean,
+    deselectDrawnFeatureIfSelected: () => void,
 ): UseFeaturePopupReturn {
     const popupFeatures = shallowRef<Feature[]>([]);
+    const popupFeatureIndex = ref(0);
     const popupContainer = ref<HTMLElement | null>(null);
+    const popupFeature = computed(
+        () => popupFeatures.value[popupFeatureIndex.value] ?? null,
+    );
 
     let activePopup: Popup | null = null;
     let latestClickToken = 0;
@@ -72,9 +82,6 @@ export function useFeaturePopup(
         if (!overlayLayerIds.value.length) {
             return;
         }
-        if (isActivelyDrawingOrEditing()) {
-            return;
-        }
 
         const features = map.value!.queryRenderedFeatures(event.point, {
             layers: overlayLayerIds.value,
@@ -83,7 +90,7 @@ export function useFeaturePopup(
         if (!features.length) {
             return;
         }
-        if (isDrawnFeatureOnTop(event.point)) {
+        if (isFeatureClickBlockedByDrawing(event.point)) {
             return;
         }
 
@@ -145,6 +152,7 @@ export function useFeaturePopup(
 
     function openFeaturePopup(features: Feature[], lngLat: LngLat): void {
         activePopup?.remove();
+        deselectDrawnFeatureIfSelected();
 
         const container = document.createElement("div");
         container.className = "feature-info-popup-container";
@@ -159,6 +167,7 @@ export function useFeaturePopup(
             .addTo(map.value!);
 
         popupContainer.value = container;
+        popupFeatureIndex.value = 0;
         popupFeatures.value = features;
 
         activePopup.on("close", () => {
@@ -174,23 +183,31 @@ export function useFeaturePopup(
     }
 
     function handleMapMousemove(event: MapMouseEvent): void {
-        const canvas = map.value!.getCanvas();
-
-        if (!overlayLayerIds.value.length) {
-            canvas.style.cursor = "";
+        if (isActivelyDrawingOrEditing()) {
             return;
         }
 
-        const features = map.value!.queryRenderedFeatures(event.point, {
+        const canvas = map.value!.getCanvas();
+        const isOverClickableFeature = isClickableOverlayFeatureAt(event.point);
+
+        canvas.style.cursor = isOverClickableFeature ? "pointer" : "";
+    }
+
+    function isClickableOverlayFeatureAt(
+        point: MapMouseEvent["point"],
+    ): boolean {
+        if (!overlayLayerIds.value.length) {
+            return false;
+        }
+
+        const features = map.value!.queryRenderedFeatures(point, {
             layers: overlayLayerIds.value,
         });
-        const isOverClickableFeature = features.some(
+        return features.some(
             (feature) =>
                 isClusterFeature(feature) ||
                 feature.properties.resourceinstanceid,
         );
-
-        canvas.style.cursor = isOverClickableFeature ? "pointer" : "";
     }
 
     function ensureHighlightLayers(): void {
@@ -276,9 +293,12 @@ export function useFeaturePopup(
 
     return {
         popupFeatures,
+        popupFeatureIndex,
+        popupFeature,
         popupContainer,
         showFeatureHighlight,
         clearFeatureHighlight,
         closeFeaturePopup,
+        isClickableOverlayFeatureAt,
     };
 }

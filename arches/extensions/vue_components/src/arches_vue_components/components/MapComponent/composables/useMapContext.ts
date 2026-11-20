@@ -124,7 +124,10 @@ export function resolveDefaultOverlayLayers(
 }
 
 export interface UseMapContextReturn
-    extends Pick<UseFeaturePopupReturn, "popupContainer" | "popupFeatures"> {
+    extends Pick<
+        UseFeaturePopupReturn,
+        "popupContainer" | "popupFeatures" | "popupFeatureIndex"
+    > {
     context: MapContext;
     geocoderControls: GeocoderControls;
 }
@@ -144,8 +147,10 @@ export function useMapContext(
         resolveOverlayLayers?: (
             candidateOverlayLayers: MapLayer[],
         ) => MapLayer[];
+        resolveMapSources?: (candidateMapSources: MapSource[]) => MapSource[];
         maxFeatures?: number;
         isReadOnly?: boolean;
+        openPopupsInsideDrawnShapes?: boolean;
         settings?: Partial<MapSettings>;
     },
     emit: MapComponentEmit,
@@ -183,17 +188,21 @@ export function useMapContext(
     } = useOverlayLayers(map, overlays, mapSources);
     const {
         popupFeatures,
+        popupFeatureIndex,
+        popupFeature,
         popupContainer,
         showFeatureHighlight,
         clearFeatureHighlight,
         closeFeaturePopup,
+        isClickableOverlayFeatureAt,
     } = useFeaturePopup(
         map,
         overlayLayerIds,
         drawnFeatureControls.isActivelyDrawingOrEditing,
         (point) =>
             !props.isReadOnly &&
-            drawnFeatureControls.isDrawnFeatureOnTop(point),
+            drawnFeatureControls.isFeatureClickBlockedByDrawing(point),
+        drawnFeatureControls.deselectDrawnFeatureIfSelected,
     );
     useBasemapStyle(map, basemaps);
     const geocoderControls = useMapControls(map, settings, fullscreenContainer);
@@ -230,7 +239,7 @@ export function useMapContext(
         });
 
         map.value.once(STYLE_LOAD_EVENT, () => {
-            drawnFeatureControls.setupDraw();
+            drawnFeatureControls.setupDraw(isClickableOverlayFeatureAt);
             fitToValue();
 
             emit("ready");
@@ -295,10 +304,13 @@ export function useMapContext(
                     source: raw.source,
                 }),
             );
-            mapSources.value = [
+            const candidateMapSources = [
                 ...((mapData?.map_sources ?? []) as MapSource[]),
                 ...resourceSources,
             ];
+            mapSources.value =
+                props.resolveMapSources?.(candidateMapSources) ??
+                candidateMapSources;
 
             coordinateSystems.value = (mapData?.preferred_coordinate_systems ??
                 []) as CoordinateSystem[];
@@ -369,12 +381,21 @@ export function useMapContext(
         addFeatures: drawnFeatureControls.addFeatures,
         updateDrawnFeature: drawnFeatureControls.updateDrawnFeature,
         fitToFeatures: drawnFeatureControls.fitToFeatures,
+        isFeatureClickBlockedByDrawing:
+            drawnFeatureControls.isFeatureClickBlockedByDrawing,
         moveOverlay,
         setOverlayOpacity,
         showFeatureHighlight,
         clearFeatureHighlight,
         closeFeaturePopup,
+        popupFeature,
     };
 
-    return { context, popupContainer, popupFeatures, geocoderControls };
+    return {
+        context,
+        popupContainer,
+        popupFeatures,
+        popupFeatureIndex,
+        geocoderControls,
+    };
 }
