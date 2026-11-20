@@ -118,6 +118,13 @@ INSTALLED_APPS = _BUNDLED_APPLICATIONS_WITH_DEPENDENCIES + INSTALLED_APPS
 
 LOGGING["loggers"]["django.request"]["level"] = "ERROR"
 LOGGING["loggers"]["arches"]["level"] = "ERROR"
+# Resolve sys.stderr at emit time so `--buffer` captures log output.
+LOGGING["handlers"]["console"][
+    "class"
+] = "arches.test.log_handlers.CurrentStderrHandler"
+# Drop Django's default stream handler (bound at config time, escapes --buffer
+# and duplicates django.request output).
+LOGGING["loggers"]["django"] = {"handlers": []}
 
 ELASTICSEARCH_PREFIX = "test"
 
@@ -135,6 +142,7 @@ TEST_RUNNER = "arches.test.runner.ArchesTestRunner"
 SILENCED_SYSTEM_CHECKS.append(
     "arches.W001"
 )  # Cache backend does not support rate-limiting
+SILENCED_SYSTEM_CHECKS.append("gis.W001")  # GDAL version warning; environment noise
 
 FILE_TYPE_CHECKING = "lenient"
 
