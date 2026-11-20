@@ -103,7 +103,7 @@ class AliasedDataMixin:
             self.aliased_data = db_instance.aliased_data
             if isinstance(self, TileModel) and self.parenttile_id:
                 self.parenttile = TileModel.objects.get(pk=self.parenttile_id)
-            self._tile_trees = getattr(from_queryset[0], "_tile_trees", [])
+            self._tile_trees = getattr(db_instance, "_tile_trees", [])
 
 
 class ResourceTileTree(ResourceInstance, AliasedDataMixin):
