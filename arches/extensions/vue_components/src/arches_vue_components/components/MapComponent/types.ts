@@ -1,6 +1,6 @@
 import type { Component, ComputedRef, Ref, ShallowRef } from "vue";
 import type { Feature, FeatureCollection, GeoJSON, Geometry } from "geojson";
-import type { Map as MaplibreMap } from "maplibre-gl";
+import type { Map as MaplibreMap, MapMouseEvent } from "maplibre-gl";
 
 export interface Basemap {
     id: string;
@@ -151,15 +151,18 @@ export interface MapContext {
         features: Feature[],
         options?: { animate?: boolean },
     ) => void;
+    isFeatureClickBlockedByDrawing: (point: MapMouseEvent["point"]) => boolean;
     moveOverlay: (overlay: MapLayer, toIndex: number) => void;
     setOverlayOpacity: (overlay: MapLayer, opacityPercent: number) => void;
     showFeatureHighlight: (geometries: Geometry[]) => void;
     clearFeatureHighlight: () => void;
     closeFeaturePopup: () => void;
+    popupFeature: ComputedRef<Feature | null>;
 }
 
 export interface FeaturePopupProps {
     features: Feature[];
+    index: number;
     context?: MapContext;
 }
 
@@ -190,6 +193,7 @@ export interface MapSource {
         data?: GeoJSON;
         tileSize?: number;
         coordinates?: [number, number];
+        promoteId?: string;
     };
     source_json?: string;
 }
@@ -206,9 +210,11 @@ export interface MapComponentProps {
     basemap?: string;
     allowedGeometryTypes?: string[];
     resolveOverlayLayers?: (candidateOverlayLayers: MapLayer[]) => MapLayer[];
+    resolveMapSources?: (candidateMapSources: MapSource[]) => MapSource[];
     interactionTools?: MapInteractionTool[];
     headerActions?: MapHeaderAction[];
     maxFeatures?: number;
     featurePopupComponent?: Component;
+    openPopupsInsideDrawnShapes?: boolean;
     settings?: Partial<MapSettings>;
 }

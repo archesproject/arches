@@ -40,6 +40,7 @@ import type {
     MapInteractionTool,
     MapLayer,
     MapSettings,
+    MapSource,
 } from "@/arches_vue_components/components/MapComponent/types.ts";
 
 const {
@@ -54,11 +55,13 @@ const {
     basemap = undefined,
     allowedGeometryTypes = undefined,
     resolveOverlayLayers = undefined,
+    resolveMapSources = undefined,
     interactionTools = undefined,
     headerActions = undefined,
     maxFeatures = undefined,
     featurePopupComponent = undefined,
     isReadOnly = false,
+    openPopupsInsideDrawnShapes = false,
     settings = undefined,
 } = defineProps<{
     value?: FeatureCollection | null;
@@ -72,11 +75,13 @@ const {
     basemap?: string;
     allowedGeometryTypes?: string[];
     resolveOverlayLayers?: (candidateOverlayLayers: MapLayer[]) => MapLayer[];
+    resolveMapSources?: (candidateMapSources: MapSource[]) => MapSource[];
     interactionTools?: MapInteractionTool[];
     headerActions?: MapHeaderAction[];
     maxFeatures?: number;
     featurePopupComponent?: Component;
     isReadOnly?: boolean;
+    openPopupsInsideDrawnShapes?: boolean;
     settings?: Partial<MapSettings>;
 }>();
 
@@ -93,28 +98,35 @@ const mapShell = useTemplateRef<HTMLDivElement>("mapShell");
 const mapContainer = useTemplateRef<HTMLDivElement>("mapContainer");
 const mapHeader = useTemplateRef<InstanceType<typeof MapHeader>>("mapHeader");
 
-const { context, popupContainer, popupFeatures, geocoderControls } =
-    useMapContext(
-        {
-            value: () => value ?? null,
-            zoom,
-            pitch,
-            bearing,
-            centerX,
-            centerY,
-            minZoom,
-            maxZoom,
-            basemap,
-            allowedGeometryTypes,
-            resolveOverlayLayers,
-            maxFeatures,
-            isReadOnly,
-            settings,
-        },
-        emit,
-        mapContainer,
-        mapShell,
-    );
+const {
+    context,
+    popupContainer,
+    popupFeatures,
+    popupFeatureIndex,
+    geocoderControls,
+} = useMapContext(
+    {
+        value: () => value ?? null,
+        zoom,
+        pitch,
+        bearing,
+        centerX,
+        centerY,
+        minZoom,
+        maxZoom,
+        basemap,
+        allowedGeometryTypes,
+        resolveOverlayLayers,
+        resolveMapSources,
+        maxFeatures,
+        isReadOnly,
+        openPopupsInsideDrawnShapes,
+        settings,
+    },
+    emit,
+    mapContainer,
+    mapShell,
+);
 const {
     hosts: geocoderHosts,
     inputText: geocoderInputText,
@@ -297,6 +309,7 @@ async function closePanel(): Promise<void> {
     >
         <component
             :is="resolvedFeaturePopupComponent"
+            v-model:index="popupFeatureIndex"
             :features="popupFeatures"
         />
     </Teleport>

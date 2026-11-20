@@ -37,6 +37,7 @@ import type { Feature, FeatureCollection } from "geojson";
 import type {
     GeoJSONSource,
     Map as MaplibreMap,
+    MapGeoJSONFeature,
     MapMouseEvent,
 } from "maplibre-gl";
 
@@ -79,11 +80,14 @@ export interface UseDrawnFeaturesReturn
         | "addFeatures"
         | "updateDrawnFeature"
         | "fitToFeatures"
+        | "isFeatureClickBlockedByDrawing"
     > {
-    setupDraw: () => void;
+    setupDraw: (
+        isClickableOverlayFeatureAt: (point: MapMouseEvent["point"]) => boolean,
+    ) => void;
     addBufferLayer: () => void;
     isActivelyDrawingOrEditing: () => boolean;
-    isDrawnFeatureOnTop: (point: MapMouseEvent["point"]) => boolean;
+    deselectDrawnFeatureIfSelected: () => void;
     replaceDrawnFeatures: (featureCollection: FeatureCollection | null) => void;
 }
 
@@ -93,6 +97,7 @@ export function useDrawnFeatures(
         value: MaybeRefOrGetter<FeatureCollection | null>;
         maxFeatures?: number;
         isReadOnly?: boolean;
+        openPopupsInsideDrawnShapes?: boolean;
     },
     emit: MapComponentEmit,
 ): UseDrawnFeaturesReturn {
@@ -123,14 +128,65 @@ export function useDrawnFeatures(
         );
     }
 
-    function isDrawnFeatureOnTop(point: MapMouseEvent["point"]): boolean {
+    function isFeatureClickBlockedByDrawing(
+        point: MapMouseEvent["point"],
+    ): boolean {
+        if (isActivelyDrawingOrEditing()) {
+            return true;
+        }
+
         const topFeature = map.value!.queryRenderedFeatures(point)[0];
+        if (
+            props.openPopupsInsideDrawnShapes &&
+            topFeature?.layer.type === "fill"
+        ) {
+            return false;
+        }
         return topFeature?.layer.id.startsWith(DRAW_LAYER_ID_PREFIX);
     }
 
-    function setupDraw(): void {
+    function setupDraw(
+        isClickableOverlayFeatureAt: (point: MapMouseEvent["point"]) => boolean,
+    ): void {
+        const defaultSimpleSelectMode = MapboxDraw.modes[SIMPLE_SELECT];
+        let simpleSelectMode = defaultSimpleSelectMode;
+        if (props.openPopupsInsideDrawnShapes) {
+            simpleSelectMode = {
+                ...defaultSimpleSelectMode,
+                clickOnFeature(
+                    this: {
+                        clickAnywhere: (
+                            state: unknown,
+                            event: MapMouseEvent,
+                        ) => void;
+                    },
+                    state: unknown,
+                    event: MapMouseEvent & {
+                        featureTarget: MapGeoJSONFeature;
+                    },
+                ): void {
+                    if (
+                        event.featureTarget.layer.type === "fill" &&
+                        isClickableOverlayFeatureAt(event.point)
+                    ) {
+                        this.clickAnywhere(state, event);
+                        return;
+                    }
+                    defaultSimpleSelectMode.clickOnFeature.call(
+                        this,
+                        state,
+                        event,
+                    );
+                },
+            };
+        }
+
         draw = new MapboxDraw({
-            modes: { ...MapboxDraw.modes, [STATIC]: STATIC_MODE },
+            modes: {
+                ...MapboxDraw.modes,
+                [SIMPLE_SELECT]: simpleSelectMode,
+                [STATIC]: STATIC_MODE,
+            },
             defaultMode: props.isReadOnly ? STATIC : SIMPLE_SELECT,
             displayControlsDefault: false,
             controls: {
@@ -317,9 +373,19 @@ export function useDrawnFeatures(
         draw?.changeMode(SIMPLE_SELECT);
     }
 
+    function deselectDrawnFeatureIfSelected(): void {
+        if (
+            draw?.getMode() === SIMPLE_SELECT &&
+            draw.getSelectedIds().length > 0
+        ) {
+            deselectDrawnFeature();
+        }
+    }
+
     function editDrawnFeature(feature: Feature): void {
         const featureId = String(feature.id);
         selectedDrawnFeature.value = feature;
+        map.value!.getCanvas().style.cursor = "";
 
         if (feature.geometry.type === GEOMETRY_TYPE_POINT) {
             draw.changeMode(SIMPLE_SELECT, { featureIds: [featureId] });
@@ -431,7 +497,8 @@ export function useDrawnFeatures(
         setupDraw,
         addBufferLayer,
         isActivelyDrawingOrEditing,
-        isDrawnFeatureOnTop,
+        isFeatureClickBlockedByDrawing,
+        deselectDrawnFeatureIfSelected,
         replaceDrawnFeatures,
         setDrawMode,
         selectDrawnFeature,
