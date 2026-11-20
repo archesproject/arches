@@ -6,8 +6,10 @@ import type { BaseWidgetProps } from "@/arches_vue_components/widgets/types.ts";
 import type { GeoJSONFeatureCollectionAliasedNodeData } from "@/arches_vue_components/datatypes/geojson-feature-collection/types.ts";
 import type {
     CoordinateReadoutFormat,
+    MapHeaderAction,
     MapInteractionTool,
     MapScaleUnit,
+    MapSettings,
 } from "@/arches_vue_components/components/MapComponent/types.ts";
 
 export interface GeometryTypeConfig {
@@ -55,4 +57,6 @@ export interface MapWidgetProps extends BaseWidgetProps {
     value?: FeatureCollection | null;
     interactionTools?: MapInteractionTool[];
     featurePopupComponent?: Component;
+    headerActions?: MapHeaderAction[];
+    defaultSettings?: Partial<MapSettings>;
 }

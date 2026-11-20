@@ -58,6 +58,7 @@ export const FEATURE_HIGHLIGHT_OUTLINE_LAYER_ID =
 export const COORDINATE_PREVIEW_SOURCE_ID = "map-component-coordinate-preview";
 export const COMPONENT_LAYER_ID_PREFIX = "map-component-";
 export const WGS84_SRID = "4326";
+export const EXPAND_MAP_ACTION_ID = "expand-map";
 
 export const DRAW_MODE_BY_GEOMETRY_TYPE: Record<string, DrawMode> = {
     [GEOMETRY_TYPE_POINT]: POINT,
@@ -91,3 +92,7 @@ export const DEFAULT_MAP_SETTINGS: MapSettings = {
 export const panelHeaderActionsKey: InjectionKey<
     Readonly<ShallowRef<HTMLDivElement | null>>
 > = Symbol("panelHeaderActions");
+
+export const mapExpandTargetKey: InjectionKey<
+    Readonly<ShallowRef<HTMLElement | null>>
+> = Symbol("mapExpandTarget");
