@@ -6,7 +6,9 @@ import tempfile
 import uuid
 from io import StringIO
 from pathlib import Path
+from unittest import TestCase, mock
 
+from elasticsearch import ApiError, ConnectionTimeout
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import override_settings
@@ -15,6 +17,7 @@ from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.management.commands.es_index_diff import Command
 from tests.base_test import ArchesTestCase
 
 
@@ -86,3 +89,38 @@ class EsIndexDiffCommandTest(ArchesTestCase):
         for batch_size in (0, 20000):
             with self.assertRaises(CommandError):
                 call_command("es_index_diff", batch_size=batch_size, stdout=StringIO())
+
+
+class EsIndexDiffTuningTest(TestCase):
+    """Auto-tuning and retry logic; mocks Elasticsearch."""
+
+    def make_command(self, shards=4, stats=None):
+        cmd = Command(stdout=StringIO(), stderr=StringIO())
+        cmd.index = "test_resources"
+        cmd.batch_size = 10000
+        cmd.es = mock.MagicMock()
+        cmd.es.search.return_value = {"_shards": {"total": shards}}
+        if stats is None:
+            cmd.es.cluster.stats.side_effect = ApiError(
+                "forbidden", mock.Mock(status=403), {}
+            )
+        else:
+            cmd.es.cluster.stats.return_value = stats
+        return cmd
+
+    def test_auto_slices_without_cpu_stats(self):
+        self.assertEqual(self.make_command(shards=4).auto_slices(), 2)
+        self.assertEqual(self.make_command(shards=1).auto_slices(), 1)
+
+    def test_auto_slices_uses_cpus(self):
+        stats = {"nodes": {"os": {"allocated_processors": 3}}}
+        self.assertEqual(self.make_command(4, stats).auto_slices(), 3)
+        self.assertEqual(self.make_command(2, stats).auto_slices(), 2)
+
+    @mock.patch("arches.management.commands.es_index_diff.time.sleep")
+    def test_timeout_retries_with_half_batch_size(self, _sleep):
+        cmd = self.make_command()
+        cmd.fetch_es = mock.Mock(side_effect=[ConnectionTimeout("slow"), ({}, 0)])
+        self.assertEqual(cmd.fetch_es_with_retry("a"), ({}, 0))
+        self.assertEqual(cmd.batch_size, 5000)
+        self.assertEqual(cmd.fetch_es.call_count, 2)
