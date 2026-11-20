@@ -50,20 +50,17 @@ async function forwardGeocode(
         params.set("bounded", "1");
     }
 
-    try {
-        const response = await fetch(
-            `${GEOCODER_PROVIDER_URL}?${params.toString()}`,
-        );
-        const geojson: { features: PlaceSearchResult[] } =
-            await response.json();
-        return {
-            type: "FeatureCollection",
-            features: geojson.features.map(toGeocoderFeature),
-        };
-    } catch (error) {
-        console.error(error);
-        return { type: "FeatureCollection", features: [] };
+    const response = await fetch(
+        `${GEOCODER_PROVIDER_URL}?${params.toString()}`,
+    );
+    if (!response.ok) {
+        throw new Error(response.statusText);
     }
+    const geojson: { features: PlaceSearchResult[] } = await response.json();
+    return {
+        type: "FeatureCollection",
+        features: geojson.features.map(toGeocoderFeature),
+    };
 }
 
 export const geocoderApi: MaplibreGeocoderApi = { forwardGeocode };
