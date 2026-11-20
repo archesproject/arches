@@ -1644,6 +1644,54 @@ class Graph(models.GraphModel):
                 valid_errors, fields=["node"], batch_size=500
             )
 
+    @contextmanager
+    def preserve_resource_x_resource_records(self):
+        """Keep the relationships of nodes recreated during a restore."""
+        relationships = models.ResourceXResource.objects.filter(
+            node__graph_id=self.graphid
+        )
+        relationship_ids_by_node_id = {}
+        for relationship_id, node_id in relationships.values_list("pk", "node_id"):
+            relationship_ids_by_node_id.setdefault(node_id, []).append(relationship_id)
+        relationships.update(node=None)
+
+        yield
+
+        restored_node_ids = set(
+            models.Node.objects.filter(
+                pk__in=relationship_ids_by_node_id.keys()
+            ).values_list("pk", flat=True)
+        )
+        for node_id, relationship_ids in relationship_ids_by_node_id.items():
+            detached_relationships = models.ResourceXResource.objects.filter(
+                pk__in=relationship_ids
+            )
+            if node_id in restored_node_ids:
+                detached_relationships.update(node_id=node_id)
+            else:
+                detached_relationships.delete()
+
+    @contextmanager
+    def preserve_geojson_geometries(self):
+        """Rebuild the geometry index of nodes recreated during a restore."""
+        tile_ids = [
+            str(tile_id)
+            for tile_id in models.GeoJSONGeometry.objects.filter(
+                node__graph_id=self.graphid
+            )
+            .values_list("tile_id", flat=True)
+            .distinct()
+        ]
+
+        yield
+
+        if tile_ids:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT refresh_tile_geojson_geometries(tileid) FROM unnest(%s::uuid[]) AS tileid;",
+                    [tile_ids],
+                )
+
     def update_permissions_from_serialized_graph(self, serialized_graph):
         if (
             "user_permissions" in serialized_graph
@@ -2679,7 +2727,12 @@ class Graph(models.GraphModel):
         """
         Restores a Graph's state from a serialized graph
         """
-        with transaction.atomic(), self.preserve_staging_records():
+        with (
+            transaction.atomic(),
+            self.preserve_staging_records(),
+            self.preserve_resource_x_resource_records(),
+            self.preserve_geojson_geometries(),
+        ):
             self.delete_associated_entities()
 
             for serialized_nodegroup in serialized_graph["nodegroups"]:
