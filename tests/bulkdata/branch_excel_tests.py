@@ -20,6 +20,7 @@ from io import StringIO
 import json
 import shutil
 import os
+import uuid
 from arches.app.models.models import EditLog
 from arches.app.models.graph import Graph
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
@@ -28,7 +29,10 @@ from arches.app.utils.data_management.resource_graphs.importer import (
 )
 from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.etl_modules.branch_excel_importer import BranchExcelImporter
-from arches.app.etl_modules.branch_excel_exporter import BranchExcelExporter
+from arches.app.etl_modules.branch_excel_exporter import (
+    BranchExcelExporter,
+    tile_tree_query,
+)
 from arches.app.models.system_settings import settings
 from tests.base_test import ArchesTransactionTestCase
 from django.contrib.auth.models import User
@@ -239,6 +243,72 @@ class BranchExcelTests(ArchesTransactionTestCase):
         )
 
         self.assertTrue(os.path.exists(exported_file_path))
+
+    def test_get_tiles_by_resource_across_batches(self):
+        """Tiles should be grouped under the right resource, in input order, with
+        parents before children and an empty list for a resource with no tiles,
+        regardless of batch size."""
+        graph_id = "a5c3946a-a9c0-4472-9191-ffc0f35a5901"
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT t.resourceinstanceid::text, array_agg(t.tileid::text)
+                FROM tiles t
+                JOIN resource_instances r ON r.resourceinstanceid = t.resourceinstanceid
+                WHERE r.graphid = %s
+                GROUP BY t.resourceinstanceid
+                """,
+                [graph_id],
+            )
+            tileids_by_resource = {
+                resource_id: sorted(tileids)
+                for resource_id, tileids in cursor.fetchall()
+            }
+            self.assertGreaterEqual(
+                len(tileids_by_resource),
+                2,
+                "Expected at least two resources with tiles from setUp import",
+            )
+
+            # Nest one tile under another so the tile tree has depth.
+            parent_tileid, child_tileid = next(
+                tileids for tileids in tileids_by_resource.values() if len(tileids) >= 2
+            )[:2]
+            cursor.execute(
+                """UPDATE tiles SET parenttileid = %s WHERE tileid = %s""",
+                [parent_tileid, child_tileid],
+            )
+
+            resource_ids = sorted(tileids_by_resource)
+            resource_ids.insert(1, str(uuid.uuid4()))  # a resource with no tiles
+
+            exporter = BranchExcelExporter()
+            for batch_size in (1, 2, 500):
+                with self.subTest(batch_size=batch_size):
+                    exporter.resource_batch_size = batch_size
+                    results = list(
+                        exporter.get_tiles_by_resource(
+                            cursor, tile_tree_query, resource_ids
+                        )
+                    )
+                    self.assertEqual(
+                        [resource_id for resource_id, _ in results], resource_ids
+                    )
+                    for resource_id, tiles in results:
+                        self.assertEqual(
+                            sorted(str(tile["tileid"]) for tile in tiles),
+                            tileids_by_resource.get(resource_id, []),
+                        )
+                        seen_tileids = set()
+                        for tile in tiles:
+                            self.assertEqual(
+                                str(tile["resourceinstanceid"]), resource_id
+                            )
+                            if tile["parenttileid"] is not None:
+                                self.assertIn(str(tile["parenttileid"]), seen_tileids)
+                            seen_tileids.add(str(tile["tileid"]))
+                            if str(tile["tileid"]) == child_tileid:
+                                self.assertEqual(tile["depth"], 1)
 
     def test_cli(self):
         out = StringIO()

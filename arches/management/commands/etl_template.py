@@ -19,8 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from django.core.management.base import BaseCommand
 from openpyxl import Workbook, styles
 from django.db import connection
-from arches.app.models.card import Card
-from arches.app.models.models import Node
+from arches.app.models.models import CardModel, Node
 from arches.app.models.system_settings import settings
 from arches.app.utils.db_utils import dictfetchall
 
@@ -117,15 +116,17 @@ def create_workbook(graphid, tiledata=None) -> Workbook:
         rows = cursor.fetchall()
         first_sheet = True
         metadata = {"nodes": [], "graphid": graphid}
+        nodes_by_nodegroup = {}
         column_length = 0
         for row in rows:
             details = dict(zip(columns, row))
             tab = "    " * details["depth"]
-            nodes = (
+            nodes = list(
                 Node.objects.filter(nodegroup_id=details["nodegroupid"])
                 .exclude(datatype="semantic")
                 .values("datatype", "alias")
             )
+            nodes_by_nodegroup[str(details["nodegroupid"])] = nodes
             metadata["nodes"] += nodes
             if details["depth"] == 0:
                 column_length = 0
@@ -159,17 +160,14 @@ def create_workbook(graphid, tiledata=None) -> Workbook:
         if tiledata is not None:
             for root_nodegroup, tiles in tiledata.items():
                 sheet = wb[root_nodegroup]
+                row_number = sheet.max_row
                 for tile in tiles:
-                    row_number = sheet.max_row + 1
+                    row_number += 1
                     tab = "    " * tile["depth"]
                     sheet[f"A{row_number}"] = str(tile["resourceinstanceid"])
                     sheet[f"B{row_number}"] = str(tile["tileid"])
                     sheet[f"C{row_number}"] = f'{tab}{tile["alias"]}'
-                    nodes = (
-                        Node.objects.filter(nodegroup_id=tile["nodegroupid"])
-                        .exclude(datatype="semantic")
-                        .values("alias")
-                    )
+                    nodes = nodes_by_nodegroup.get(str(tile["nodegroupid"]), [])
                     for i, node in enumerate(nodes):
                         if tile.get(node["alias"]) is not None:
                             sheet.cell(
@@ -182,6 +180,13 @@ def create_workbook(graphid, tiledata=None) -> Workbook:
         return wb
 
 
+def get_card_names_by_nodegroup(graphid):
+    return {
+        str(card.nodegroup_id): str(card.name)
+        for card in CardModel.objects.filter(graph_id=graphid)
+    }
+
+
 def create_tile_excel_workbook(graphid, tiledata=None):
     wb = Workbook()
     with connection.cursor() as cursor:
@@ -189,9 +194,11 @@ def create_tile_excel_workbook(graphid, tiledata=None):
             """SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graphid,)
         )
         rows = dictfetchall(cursor)
+        card_names = get_card_names_by_nodegroup(graphid)
+        nodes_by_nodegroup = {}
         first_sheet = True
         for row in rows:
-            card_name = str(Card.objects.get(nodegroup=row["nodegroupid"]).name)
+            card_name = card_names[str(row["nodegroupid"])]
             sheet_name = card_name.replace("/", "_")
             if first_sheet is True:
                 sheet = wb.active
@@ -202,11 +209,12 @@ def create_tile_excel_workbook(graphid, tiledata=None):
             sheet[f"A1"] = "tileid"
             sheet[f"B1"] = "parenttile_id"
             sheet[f"C1"] = "resourceinstance_id"
-            nodes = (
+            nodes = list(
                 Node.objects.filter(nodegroup_id=row["nodegroupid"])
                 .exclude(datatype="semantic")
                 .values("datatype", "alias")
             )
+            nodes_by_nodegroup[str(row["nodegroupid"])] = nodes
             for i, node in enumerate(nodes):
                 sheet.cell(column=i + 4, row=1, value=node["alias"])
             trailing_column = len(nodes) + 4
@@ -218,16 +226,13 @@ def create_tile_excel_workbook(graphid, tiledata=None):
             for card_name, tiles in tiledata.items():
                 sheet_name = card_name.replace("/", "_")
                 sheet = wb[sheet_name]
+                row_number = sheet.max_row
                 for tile in tiles:
-                    row_number = sheet.max_row + 1
+                    row_number += 1
                     sheet[f"A{row_number}"] = str(tile["tileid"])
                     sheet[f"B{row_number}"] = str(tile["parenttileid"])
                     sheet[f"C{row_number}"] = str(tile["resourceinstanceid"])
-                    nodes = (
-                        Node.objects.filter(nodegroup_id=tile["nodegroupid"])
-                        .exclude(datatype="semantic")
-                        .values("alias")
-                    )
+                    nodes = nodes_by_nodegroup.get(str(tile["nodegroupid"]), [])
                     for i, node in enumerate(nodes):
                         if tile.get(node["alias"]) is not None:
                             sheet.cell(
