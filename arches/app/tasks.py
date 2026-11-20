@@ -337,7 +337,7 @@ def export_excel_data(
     finally:
         msg = _("Excel Export: {}").format(status)
         user = User.objects.get(id=user_id)
-        notify_completion(msg, user)
+        notify_completion(msg, user, context={"loadid": str(load_id)})
 
 
 @shared_task

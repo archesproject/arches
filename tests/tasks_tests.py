@@ -1,9 +1,13 @@
 import logging
+import uuid
 
 from django.contrib.auth.models import User
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
-from arches.app.tasks import update_resource_instance_data_based_on_graph_diff
+from arches.app.tasks import (
+    export_excel_data,
+    update_resource_instance_data_based_on_graph_diff,
+)
 from arches.app.models import models
 from arches.app.models.graph import Graph
 
@@ -527,3 +531,52 @@ class UpdateResourceInstanceDataTaskTests(ArchesTestCase):
                 resourceinstance=resource_instance,
                 nodegroup_id=nodegroup_id,
             )
+
+
+class ExportExcelDataTaskTests(ArchesTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        logging.getLogger("arches.app.tasks").setLevel(logging.CRITICAL)
+
+        super().setUpTestData()
+
+        cls.user = User.objects.create(username="arches_export_user")
+        cls.etl_module = models.ETLModule.objects.get(slug="branch-excel-exporter")
+
+    def setUp(self):
+        self.load_id = uuid.uuid4()
+        models.LoadEvent.objects.create(
+            loadid=self.load_id,
+            user=self.user,
+            etl_module=self.etl_module,
+            status="indexed",
+        )
+
+    def run_export(self, exporter):
+        export_excel_data(
+            exporter, self.user.pk, str(self.load_id), "graphid", "Graph", ["a"]
+        )
+
+    @patch("arches.app.tasks.notify_completion")
+    def test_notification_carries_the_load_id(self, mock_notify):
+        self.run_export(Mock())
+
+        msg, notified_user = mock_notify.call_args[0]
+        self.assertEqual(msg, "Excel Export: Completed")
+        self.assertEqual(notified_user, self.user)
+        self.assertEqual(
+            mock_notify.call_args[1], {"context": {"loadid": str(self.load_id)}}
+        )
+
+    @patch("arches.app.tasks.notify_completion")
+    def test_failure_notification_carries_the_load_id(self, mock_notify):
+        exporter = Mock()
+        exporter.run_export_task.side_effect = RuntimeError("boom")
+
+        self.run_export(exporter)
+
+        msg, _ = mock_notify.call_args[0]
+        self.assertEqual(msg, "Excel Export: Failed")
+        self.assertEqual(
+            mock_notify.call_args[1], {"context": {"loadid": str(self.load_id)}}
+        )
