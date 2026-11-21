@@ -310,6 +310,19 @@ class ArchesModelAPIMixin:
         self.validate_tile_data_and_save(serializer)
 
     def perform_update(self, serializer):
+        resource = serializer.validated_data.get("resourceinstance")
+        if (
+            isinstance(serializer.instance, TileModel)
+            and "resourceinstance" in serializer.validated_data
+            and getattr(resource, "pk", None) != serializer.instance.resourceinstance_id
+        ):
+            if resource is not None and not user_can_edit_resource(
+                user=self.request.user, resource=resource
+            ):
+                raise PermissionDenied
+            raise ValidationError(
+                {"resourceinstance": [_("A tile cannot be moved to another resource.")]}
+            )
         self.validate_tile_data_and_save(serializer)
 
     def perform_destroy(self, instance):
