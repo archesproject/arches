@@ -12,9 +12,11 @@ from tests.base_test import ArchesTestCase
 
 class RecordingFunction(BaseFunction):
     calls = []
+    result = None
 
     def post_import(self, transaction_id, *args, **kwargs):
         RecordingFunction.calls.append((self.config, transaction_id))
+        return RecordingFunction.result
 
 
 class CallPostImportFunctionsTests(ArchesTestCase):
@@ -64,6 +66,7 @@ class CallPostImportFunctionsTests(ArchesTestCase):
 
     def setUp(self):
         RecordingFunction.calls = []
+        RecordingFunction.result = None
         test_functionids = {
             self.graph_function.pk,
             self.global_function.pk,
@@ -103,3 +106,13 @@ class CallPostImportFunctionsTests(ArchesTestCase):
         _call_post_import_functions(other_transaction_id)
 
         self.assertEqual(RecordingFunction.calls, [(None, other_transaction_id)])
+
+    def test_returns_no_results_when_functions_return_none(self):
+        self.assertEqual(_call_post_import_functions(self.transaction_id), {})
+
+    def test_returns_results_reported_by_functions(self):
+        RecordingFunction.result = {"indexed": True}
+
+        self.assertEqual(
+            _call_post_import_functions(self.transaction_id), {"indexed": True}
+        )

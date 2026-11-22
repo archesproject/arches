@@ -194,7 +194,7 @@ def _post_save_edit_log(
             logger.debug("Skipping indexing for loadid=%s (index=False)", loadid)
 
         logger.debug("Calling function post_import hooks for loadid=%s", loadid)
-        _call_post_import_functions(loadid)
+        post_import_function_results = _call_post_import_functions(loadid)
 
         user = User.objects.get(id=userid)
         user_email = getattr(user, "email", "")
@@ -228,7 +228,13 @@ def _post_save_edit_log(
                 ),
             )
             log_event_details(cursor, loadid, "done")
-            final_status = "indexed" if es_index else "completed"
+            indexed_by_function = post_import_function_results.get("indexed")
+            if indexed_by_function is False:
+                final_status = "unindexed"
+            elif es_index or indexed_by_function:
+                final_status = "indexed"
+            else:
+                final_status = "completed"
             cursor.execute(
                 """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
                 (final_status, timezone.now(), True, True, loadid),
@@ -256,6 +262,10 @@ def _call_post_import_functions(loadid):
     Bulk loads write tiles without calling Tile.save, so functions never see
     post_save. Instead, give functions a chance to act on the whole load by its
     transaction id.
+
+    Returns the key/value pairs the functions' post_import methods return,
+    merged into one dictionary, e.g. {"indexed": True} from a function that
+    indexed the load, so the load can be marked indexed without Elasticsearch.
     """
     graphids = (
         EditLog.objects.filter(transactionid=loadid)
@@ -274,11 +284,15 @@ def _call_post_import_functions(loadid):
         function.get_class_module()()
         for function in Function.objects.filter(functiontype="global")
     ]
+    results = {}
     for function in functions:
         try:
-            function.post_import(loadid)
+            result = function.post_import(loadid)
         except NotImplementedError:
-            pass
+            continue
+        if isinstance(result, dict):
+            results.update(result)
+    return results
 
 
 def get_resourceids_from_search_url(search_url, user=None):
