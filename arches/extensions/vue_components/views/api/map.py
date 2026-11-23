@@ -8,6 +8,7 @@ from django.http import (
     HttpResponseForbidden,
     HttpResponseNotFound,
 )
+from django.urls import reverse
 from django.views.generic import View
 
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -33,6 +34,32 @@ class MapDataAPI(View):
                 source_dict["tiles"] = [
                     urljoin(settings.PUBLIC_SERVER_ADDRESS, tiles[0])
                 ]
+
+    @staticmethod
+    def _basemaps(readable_map_layers):
+        """Local basemaps the user can read, then settings.BASEMAPS, which give
+        way when a local basemap is the instance's default basemap."""
+        readable_map_layer_ids = {map_layer.pk for map_layer in readable_map_layers}
+        local_basemaps = [
+            {
+                "name": local_basemap.name,
+                "title": local_basemap.map_layer.name,
+                "url": reverse(
+                    "local_basemap_style", kwargs={"name": local_basemap.name}
+                ),
+                "addtomap": local_basemap.map_layer.addtomap,
+            }
+            for local_basemap in models.LocalBasemap.objects.select_related("map_layer")
+            if local_basemap.map_layer_id in readable_map_layer_ids
+        ]
+        has_default_local_basemap = any(
+            local_basemap["addtomap"] for local_basemap in local_basemaps
+        )
+        configured_basemaps = [
+            {**basemap, "addtomap": False} if has_default_local_basemap else basemap
+            for basemap in getattr(settings, "BASEMAPS", [])
+        ]
+        return local_basemaps + configured_basemaps
 
     def get(self, request):
         map_layers = user_can_read_map_layers(request.user)
@@ -87,7 +114,7 @@ class MapDataAPI(View):
             {
                 "map_layers": map_layers,
                 "map_sources": map_sources,
-                "basemaps": getattr(settings, "BASEMAPS", []),
+                "basemaps": self._basemaps(map_layers),
                 "resource_map_layers": resource_map_layers,
                 "resource_map_sources": resource_map_sources,
                 "default_bounds": getattr(settings, "DEFAULT_BOUNDS", None),

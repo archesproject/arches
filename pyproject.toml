@@ -53,6 +53,7 @@ dependencies = [
     "openpyxl==3.1.5",
     "packaging==26.2",
     "pillow>=11.3.0",
+    "pmtiles==3.8.1",
     "polib==1.1.1",
     "psycopg==3.3.6",
     "pycryptodome<4.0.0,>=3.23.0",
