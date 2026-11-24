@@ -81,6 +81,12 @@ describe("FileList metadata", () => {
 
     it("labels every input and defaults each field to the system language", () => {
         const wrapper = mountFileList({});
+        const metadataGroup = wrapper.get('[role="group"]');
+        expect(
+            wrapper
+                .get(`#${metadataGroup.attributes("aria-labelledby")}`)
+                .text(),
+        ).toBe("vase.jpg");
 
         for (const input of wrapper.findAll("input, textarea")) {
             expect(
@@ -117,6 +123,21 @@ describe("FileList metadata", () => {
         expect(wrapper.get(`#${errorId}`).text()).toBe(
             "Enter alternative text for vase.jpg.",
         );
+    });
+
+    it("opens a field in its only filled language", () => {
+        const wrapper = mountFileList({
+            altText: {
+                en: { value: "", direction: "ltr" },
+                ar: { value: "مزهرية", direction: "rtl" },
+            },
+        });
+        const [altTextSelect, titleSelect] = wrapper.findAllComponents({
+            name: "Select",
+        });
+
+        expect(altTextSelect.props("modelValue")).toBe("ar");
+        expect(titleSelect.props("modelValue")).toBe("en");
     });
 
     it("switches one field's language without affecting the others", async () => {
