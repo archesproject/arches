@@ -9,17 +9,13 @@ import FileMetadataInput from "@/arches_vue_components/widgets/FileListWidget/co
 
 import {
     ADDITIONAL_FILE_METADATA_FIELDS,
-    FILE_METADATA_FIELDS,
     PRIMARY_FILE_METADATA_FIELDS,
     REMOVE,
     UPDATE_METADATA,
-    UPDATE_METADATA_LANGUAGE,
 } from "@/arches_vue_components/datatypes/file-list/constants.ts";
 import {
     getFileAltText,
-    getLocalizedValue,
     hasAnyAltText,
-    setLocalizedValue,
 } from "@/arches_vue_components/datatypes/file-list/utils.ts";
 
 import type { Language } from "@/arches_vue_components/types.ts";
@@ -33,15 +29,13 @@ const {
     files,
     languages = [],
     defaultMetadataLanguage = undefined,
-    shouldShowLanguageSelect = false,
-    visibleMetadataFields = FILE_METADATA_FIELDS,
+    hiddenMetadataFields = [],
     isAltTextRequired = false,
 } = defineProps<{
     files: FileReference[];
     languages?: Language[];
     defaultMetadataLanguage?: Language;
-    shouldShowLanguageSelect?: boolean;
-    visibleMetadataFields?: readonly FileMetadataField[];
+    hiddenMetadataFields?: FileMetadataField[];
     isAltTextRequired?: boolean;
 }>();
 
@@ -58,11 +52,6 @@ const emit = defineEmits<{
         field: FileMetadataField,
         localizedValue: Record<string, LanguageValue>,
     ): void;
-    (
-        e: typeof UPDATE_METADATA_LANGUAGE,
-        fileIndex: number,
-        languageCode: string,
-    ): void;
 }>();
 
 const { $gettext } = useGettext();
@@ -70,7 +59,6 @@ const { $gettext } = useGettext();
 const listId = useId();
 const touchedAltTextKeys = ref(new Set<string>());
 const expandedFileKeys = ref(new Set<string>());
-const selectedLanguageCodes = ref(new Map<string, string>());
 
 const metadataFieldLabels = computed<Record<FileMetadataField, string>>(() => ({
     altText: $gettext("Alternative text"),
@@ -80,19 +68,15 @@ const metadataFieldLabels = computed<Record<FileMetadataField, string>>(() => ({
 }));
 
 const primaryFields = computed(() =>
-    PRIMARY_FILE_METADATA_FIELDS.filter((field) =>
-        visibleMetadataFields.includes(field),
+    PRIMARY_FILE_METADATA_FIELDS.filter(
+        (field) => !hiddenMetadataFields.includes(field),
     ),
 );
 
 const additionalFields = computed(() =>
-    ADDITIONAL_FILE_METADATA_FIELDS.filter((field) =>
-        visibleMetadataFields.includes(field),
+    ADDITIONAL_FILE_METADATA_FIELDS.filter(
+        (field) => !hiddenMetadataFields.includes(field),
     ),
-);
-
-const languageSelectHostField = computed<FileMetadataField | undefined>(
-    () => primaryFields.value[0] ?? additionalFields.value[0],
 );
 
 function getFileKey(fileReference: FileReference): string {
@@ -101,39 +85,6 @@ function getFileKey(fileReference: FileReference): string {
 
 function getFieldId(fileIndex: number, field: string): string {
     return `${listId}-${fileIndex}-${field}`;
-}
-
-function getFileLanguage(fileReference: FileReference): Language | undefined {
-    const selectedCode = selectedLanguageCodes.value.get(
-        getFileKey(fileReference),
-    );
-    return (
-        languages.find((language) => language.code === selectedCode) ??
-        defaultMetadataLanguage
-    );
-}
-
-function getSelectableLanguages(field: FileMetadataField): Language[] {
-    const shouldHostLanguageSelect =
-        shouldShowLanguageSelect && field === languageSelectHostField.value;
-    return shouldHostLanguageSelect ? languages : [];
-}
-
-function getLanguageToggleAriaLabel(fileReference: FileReference): string {
-    return $gettext(
-        "Languages for %{fileName}",
-        { fileName: fileReference.name },
-        true,
-    );
-}
-
-function onSelectFileLanguage(
-    fileReference: FileReference,
-    fileIndex: number,
-    languageCode: string,
-) {
-    selectedLanguageCodes.value.set(getFileKey(fileReference), languageCode);
-    emit(UPDATE_METADATA_LANGUAGE, fileIndex, languageCode);
 }
 
 function isExpanded(fileReference: FileReference): boolean {
@@ -183,24 +134,6 @@ function onBlurField(fileReference: FileReference, field: FileMetadataField) {
         markAltTextTouched(fileReference);
     }
 }
-
-function onUpdateField(
-    fileReference: FileReference,
-    fileIndex: number,
-    field: FileMetadataField,
-    value: string,
-) {
-    const language = getFileLanguage(fileReference);
-    if (!language) {
-        return;
-    }
-    emit(
-        UPDATE_METADATA,
-        fileIndex,
-        field,
-        setLocalizedValue(fileReference[field], language, value),
-    );
-}
 </script>
 
 <template>
@@ -224,7 +157,7 @@ function onUpdateField(
                     :alt="
                         getFileAltText(
                             fileReference,
-                            getFileLanguage(fileReference)?.code ?? null,
+                            defaultMetadataLanguage?.code ?? null,
                         )
                     "
                 />
@@ -249,7 +182,7 @@ function onUpdateField(
             </div>
 
             <div
-                v-if="getFileLanguage(fileReference)"
+                v-if="defaultMetadataLanguage"
                 class="file-metadata"
             >
                 <FileMetadataInput
@@ -257,25 +190,14 @@ function onUpdateField(
                     :key="field"
                     :input-id="getFieldId(fileIndex, field)"
                     :label="metadataFieldLabels[field]"
-                    :language="getFileLanguage(fileReference)!"
-                    :model-value="
-                        getLocalizedValue(
-                            fileReference[field],
-                            getFileLanguage(fileReference)!.code,
-                        )
-                    "
+                    :languages="languages"
+                    :default-language="defaultMetadataLanguage"
+                    :model-value="fileReference[field]"
                     :is-required="field === 'altText' && isAltTextRequired"
                     :help-text="getHelpText(field)"
                     :error-text="getErrorText(fileReference, field)"
-                    :selectable-languages="getSelectableLanguages(field)"
-                    :language-toggle-aria-label="
-                        getLanguageToggleAriaLabel(fileReference)
-                    "
                     @update:model-value="
-                        onUpdateField(fileReference, fileIndex, field, $event)
-                    "
-                    @update:language="
-                        onSelectFileLanguage(fileReference, fileIndex, $event)
+                        emit(UPDATE_METADATA, fileIndex, field, $event)
                     "
                     @blur="onBlurField(fileReference, field)"
                 />
@@ -304,34 +226,12 @@ function onUpdateField(
                             :key="field"
                             :input-id="getFieldId(fileIndex, field)"
                             :label="metadataFieldLabels[field]"
-                            :language="getFileLanguage(fileReference)!"
-                            :model-value="
-                                getLocalizedValue(
-                                    fileReference[field],
-                                    getFileLanguage(fileReference)!.code,
-                                )
-                            "
+                            :languages="languages"
+                            :default-language="defaultMetadataLanguage"
+                            :model-value="fileReference[field]"
                             :is-multiline="field === 'description'"
-                            :selectable-languages="
-                                getSelectableLanguages(field)
-                            "
-                            :language-toggle-aria-label="
-                                getLanguageToggleAriaLabel(fileReference)
-                            "
                             @update:model-value="
-                                onUpdateField(
-                                    fileReference,
-                                    fileIndex,
-                                    field,
-                                    $event,
-                                )
-                            "
-                            @update:language="
-                                onSelectFileLanguage(
-                                    fileReference,
-                                    fileIndex,
-                                    $event,
-                                )
+                                emit(UPDATE_METADATA, fileIndex, field, $event)
                             "
                         />
                     </div>

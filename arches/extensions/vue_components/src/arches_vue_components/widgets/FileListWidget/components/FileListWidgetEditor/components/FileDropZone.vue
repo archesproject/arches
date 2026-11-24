@@ -2,6 +2,8 @@
 import { computed, useId } from "vue";
 import { useGettext } from "vue3-gettext";
 
+import Button from "openvue/button";
+
 import type { CardXNodeXWidgetData } from "@/arches_vue_components/types";
 
 const { $gettext } = useGettext();
@@ -60,9 +62,9 @@ const displayFileTypes = computed(() => {
             },
         }"
     >
-        <button
+        <Button
             :id="cardXNodeXWidgetData?.node.alias"
-            type="button"
+            unstyled
             class="upload-container"
             :class="{ 'p-disabled': isDisabled }"
             :aria-disabled="isDisabled ? 'true' : undefined"
@@ -89,7 +91,7 @@ const displayFileTypes = computed(() => {
                     })
                 }}
             </span>
-        </button>
+        </Button>
         <span
             v-if="isDisabled"
             :id="disabledReasonId"

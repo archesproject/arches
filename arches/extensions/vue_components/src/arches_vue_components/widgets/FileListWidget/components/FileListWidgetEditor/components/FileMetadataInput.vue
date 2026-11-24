@@ -1,51 +1,66 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import { useGettext } from "vue3-gettext";
 
-import Button from "openvue/button";
 import InputText from "openvue/inputtext";
 import Select from "openvue/select";
 import Textarea from "openvue/textarea";
 
+import {
+    getLocalizedValue,
+    setLocalizedValue,
+} from "@/arches_vue_components/datatypes/file-list/utils.ts";
+
 import type { Language } from "@/arches_vue_components/types.ts";
+import type { LanguageValue } from "@/arches_vue_components/datatypes/string/types.ts";
 
 const {
     inputId,
     label,
-    language,
-    modelValue,
+    languages,
+    defaultLanguage,
+    modelValue = undefined,
     isMultiline = false,
     isRequired = false,
     helpText = undefined,
     errorText = undefined,
-    selectableLanguages = [],
-    languageToggleAriaLabel = undefined,
 } = defineProps<{
     inputId: string;
     label: string;
-    language: Language;
-    modelValue: string;
+    languages: Language[];
+    defaultLanguage: Language;
+    modelValue?: Record<string, LanguageValue>;
     isMultiline?: boolean;
     isRequired?: boolean;
     helpText?: string;
     errorText?: string;
-    selectableLanguages?: Language[];
-    languageToggleAriaLabel?: string;
 }>();
 
 const emit = defineEmits<{
-    (e: "update:modelValue", value: string): void;
-    (e: "update:language", languageCode: string): void;
+    (
+        e: "update:modelValue",
+        localizedValue: Record<string, LanguageValue>,
+    ): void;
     (e: "blur"): void;
 }>();
 
-const isLanguagePanelOpen = ref(false);
+const { $gettext } = useGettext();
+
+const selectedLanguageCode = ref<string>();
+
+const selectedLanguage = computed(
+    () =>
+        languages.find(
+            (language) => language.code === selectedLanguageCode.value,
+        ) ?? defaultLanguage,
+);
+
+const inputValue = computed(() =>
+    getLocalizedValue(modelValue, selectedLanguage.value.code),
+);
 
 const helpId = computed(() => `${inputId}-help`);
 const errorId = computed(() => `${inputId}-error`);
-const languagePanelId = computed(() => `${inputId}-language-panel`);
-const languageLabelId = computed(() => `${inputId}-language-label`);
-
-const shouldShowLanguageToggle = computed(() => selectableLanguages.length > 1);
 
 const describedBy = computed(() => {
     const describingIds = [
@@ -55,55 +70,31 @@ const describedBy = computed(() => {
     return describingIds.length ? describingIds.join(" ") : undefined;
 });
 
+const languageSelectAriaLabel = computed(() =>
+    $gettext("Language for %{fieldLabel}", { fieldLabel: label }, true),
+);
+
 function formatLanguageOption(option: Language): string {
     return `${option.name} (${option.code})`;
+}
+
+function onUpdateInputValue(value: string | undefined) {
+    emit(
+        "update:modelValue",
+        setLocalizedValue(modelValue, selectedLanguage.value, value ?? ""),
+    );
 }
 </script>
 
 <template>
     <div class="file-metadata-field">
-        <div class="file-metadata-label-row">
-            <label
-                :for="inputId"
-                class="file-metadata-label"
-            >
-                {{ label }}
-                <span v-if="isRequired">{{ $gettext("(required)") }}</span>
-            </label>
-            <Button
-                v-if="shouldShowLanguageToggle"
-                class="metadata-language-toggle"
-                :icon="
-                    isLanguagePanelOpen
-                        ? 'pi pi-chevron-down'
-                        : 'pi pi-chevron-right'
-                "
-                :label="$gettext('Languages')"
-                :aria-label="languageToggleAriaLabel"
-                :aria-expanded="isLanguagePanelOpen"
-                :aria-controls="languagePanelId"
-                size="small"
-                text
-                @click="isLanguagePanelOpen = !isLanguagePanelOpen"
-            />
-        </div>
-        <div
-            v-if="shouldShowLanguageToggle"
-            v-show="isLanguagePanelOpen"
-            :id="languagePanelId"
-            class="metadata-language-panel"
+        <label
+            :for="inputId"
+            class="file-metadata-label"
         >
-            <label :id="languageLabelId">{{ $gettext("Language") }}</label>
-            <Select
-                :model-value="language.code"
-                :options="selectableLanguages"
-                :option-label="formatLanguageOption"
-                option-value="code"
-                :aria-labelledby="languageLabelId"
-                fluid
-                @update:model-value="emit('update:language', $event)"
-            />
-        </div>
+            {{ label }}
+            <span v-if="isRequired">{{ $gettext("(required)") }}</span>
+        </label>
         <p
             v-if="helpText"
             :id="helpId"
@@ -111,31 +102,42 @@ function formatLanguageOption(option: Language): string {
         >
             {{ helpText }}
         </p>
-        <Textarea
-            v-if="isMultiline"
-            :id="inputId"
-            :lang="language.code"
-            :dir="language.default_direction"
-            :model-value="modelValue"
-            :aria-describedby="describedBy"
-            rows="2"
-            fluid
-            @update:model-value="emit('update:modelValue', $event ?? '')"
-            @blur="emit('blur')"
-        />
-        <InputText
-            v-else
-            :id="inputId"
-            :lang="language.code"
-            :dir="language.default_direction"
-            :model-value="modelValue"
-            :aria-required="isRequired ? 'true' : undefined"
-            :aria-invalid="errorText ? 'true' : undefined"
-            :aria-describedby="describedBy"
-            fluid
-            @update:model-value="emit('update:modelValue', $event ?? '')"
-            @blur="emit('blur')"
-        />
+        <div class="file-metadata-inputs">
+            <Select
+                class="file-metadata-language"
+                :model-value="selectedLanguage.code"
+                :options="languages"
+                :option-label="formatLanguageOption"
+                option-value="code"
+                :aria-label="languageSelectAriaLabel"
+                @update:model-value="selectedLanguageCode = $event"
+            />
+            <Textarea
+                v-if="isMultiline"
+                :id="inputId"
+                :lang="selectedLanguage.code"
+                :dir="selectedLanguage.default_direction"
+                :model-value="inputValue"
+                :aria-describedby="describedBy"
+                rows="3"
+                fluid
+                @update:model-value="onUpdateInputValue"
+                @blur="emit('blur')"
+            />
+            <InputText
+                v-else
+                :id="inputId"
+                :lang="selectedLanguage.code"
+                :dir="selectedLanguage.default_direction"
+                :model-value="inputValue"
+                :aria-required="isRequired ? 'true' : undefined"
+                :aria-invalid="errorText ? 'true' : undefined"
+                :aria-describedby="describedBy"
+                fluid
+                @update:model-value="onUpdateInputValue"
+                @blur="emit('blur')"
+            />
+        </div>
         <p
             v-if="errorText"
             :id="errorId"
@@ -154,33 +156,18 @@ function formatLanguageOption(option: Language): string {
     width: 100%;
 }
 
-.file-metadata-label-row {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
 .file-metadata-label {
-    flex: 1 1 auto;
     font-weight: 600;
 }
 
-.metadata-language-toggle {
-    flex: 0 0 auto;
-}
-
-.metadata-language-panel {
+.file-metadata-inputs {
     display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    padding: 0.75rem;
-    border: 1px solid var(--p-content-border-color);
-    border-radius: var(--p-content-border-radius);
-    background: var(--p-content-background);
+    align-items: flex-start;
+    column-gap: 0.5rem;
 }
 
-.metadata-language-panel label {
-    font-weight: 600;
+.file-metadata-language {
+    flex: 0 0 auto;
 }
 
 .file-metadata-help,

@@ -30,10 +30,6 @@ export interface FileReference {
     description?: Record<string, LanguageValue>;
     title?: Record<string, LanguageValue>;
 }
-export interface FileMetadataVisibilityConfig {
-    visible: boolean;
-}
-
 export interface FileListCardXNodeXWidgetData extends CardXNodeXWidgetData {
     config: CardXNodeXWidgetData["config"] & {
         acceptedFiles: string;
@@ -41,10 +37,6 @@ export interface FileListCardXNodeXWidgetData extends CardXNodeXWidgetData {
         maxFilesize: number;
         rerender: boolean;
         label: string;
-        metadataFields?: Partial<
-            Record<FileMetadataField, FileMetadataVisibilityConfig>
-        >;
-        metadataLanguageSelect?: FileMetadataVisibilityConfig;
     };
 }
 

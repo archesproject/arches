@@ -3,6 +3,7 @@ import type {
     FileListAliasedNodeData,
     FileListCardXNodeXWidgetData,
     FileMetadata,
+    FileMetadataField,
     FileReference,
 } from "@/arches_vue_components/datatypes/file-list/types.ts";
 
@@ -21,5 +22,5 @@ export interface FileListWidgetProps extends BaseWidgetProps {
     cardXNodeXWidgetData?: FileListCardXNodeXWidgetData;
     aliasedNodeData?: FileListAliasedNodeData | null;
     value?: FileReference[] | null;
-    metadataLanguageCode?: string;
+    hiddenMetadataFields?: FileMetadataField[];
 }
