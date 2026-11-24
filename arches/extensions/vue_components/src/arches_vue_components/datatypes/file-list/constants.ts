@@ -1,6 +1,5 @@
 export const REMOVE = "remove";
 export const UPDATE_METADATA = "update:metadata";
-export const UPDATE_METADATA_LANGUAGE = "update:metadataLanguage";
 
 export const FILE_METADATA_FIELDS = [
     "altText",

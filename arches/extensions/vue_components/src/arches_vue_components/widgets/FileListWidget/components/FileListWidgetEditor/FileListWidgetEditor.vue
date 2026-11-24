@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watchEffect } from "vue";
+import { computed, ref, watchEffect } from "vue";
 
 import FileUpload from "openvue/fileupload";
+import Message from "openvue/message";
 
 import FileList from "@/arches_vue_components/widgets/FileListWidget/components/FileListWidgetEditor/components/FileList.vue";
 import FileDropZone from "@/arches_vue_components/widgets/FileListWidget/components/FileListWidgetEditor/components/FileDropZone.vue";
@@ -10,8 +11,6 @@ import { useLanguageStore } from "@/arches_vue_components/stores/useLanguageStor
 import {
     buildEmptyFileMetadata,
     buildFileListAliasedNodeData,
-    getVisibleMetadataFields,
-    shouldShowMetadataLanguageSelect,
 } from "@/arches_vue_components/datatypes/file-list/utils.ts";
 
 import type { LanguageValue } from "@/arches_vue_components/datatypes/string/types.ts";
@@ -29,11 +28,11 @@ import type {
 const {
     aliasedNodeData,
     cardXNodeXWidgetData = undefined,
-    metadataLanguageCode = undefined,
+    hiddenMetadataFields = undefined,
 } = defineProps<{
     aliasedNodeData: FileListAliasedNodeData | null;
     cardXNodeXWidgetData?: FileListCardXNodeXWidgetData;
-    metadataLanguageCode?: string;
+    hiddenMetadataFields?: FileMetadataField[];
 }>();
 
 const emit = defineEmits<{
@@ -41,44 +40,26 @@ const emit = defineEmits<{
         event: "update:aliasedNodeData",
         updatedValue: FileListAliasedNodeData,
     ): void;
-    (
-        event: "update:metadataLanguageCode",
-        languageCode: string,
-        fileIndex: number,
-    ): void;
 }>();
 
 const fileUploadRef = ref<InstanceType<typeof FileUpload> | null>(null);
 
 const languageStore = useLanguageStore();
 
-onMounted(async () => {
-    await languageStore.fetchAllLanguages();
-});
+const languageFetchError = ref<string | null>(null);
 
-const requestLanguage = computed(() =>
-    languageStore.languages.find(
-        (language) => language.code === languageStore.requestLanguageCode,
-    ),
-);
 
 const defaultMetadataLanguage = computed(
     () =>
         languageStore.languages.find(
-            (language) => language.code === metadataLanguageCode,
-        ) ?? requestLanguage.value,
-);
-
-const isMetadataLanguageSelectShown = computed(() =>
-    shouldShowMetadataLanguageSelect(cardXNodeXWidgetData),
+            (language) => language.code === languageStore.requestLanguageCode,
+        ) ??
+        languageStore.languages.find((language) => language.isdefault) ??
+        languageStore.languages[0],
 );
 
 const isAltTextRequired = computed(() =>
     Boolean(cardXNodeXWidgetData?.node.config?.imagesOnly),
-);
-
-const visibleMetadataFields = computed(() =>
-    getVisibleMetadataFields(cardXNodeXWidgetData),
 );
 
 const savedFiles = ref<FileReference[]>([]);
@@ -105,6 +86,15 @@ const acceptedFileTypes = computed(() => {
     }
 
     return fileTypes;
+});
+
+watchEffect(async () => {
+    try {
+        await languageStore.fetchAllLanguages();
+    } catch (error) {
+        languageFetchError.value =
+            error instanceof Error ? error.message : String(error);
+    }
 });
 
 watchEffect(() => {
@@ -190,15 +180,6 @@ function onUpdateSavedFileMetadata(
     emitUpdatedValue();
 }
 
-// Saved files come first in the emitted value (see emitUpdatedValue), so a
-// pending file's index is offset by the number of saved files.
-function onSelectMetadataLanguage(
-    languageCode: string,
-    fileIndexInValue: number,
-): void {
-    emit("update:metadataLanguageCode", languageCode, fileIndexInValue);
-}
-
 function onRemovePendingFile(
     fileIndex: number,
     removeFileCallback: (index: number) => void,
@@ -243,42 +224,44 @@ function openFileChooser(): void {
                 :accepted-file-types="acceptedFileTypes"
             />
 
+            <Message
+                v-if="languageFetchError"
+                severity="error"
+                size="small"
+                variant="simple"
+            >
+                {{
+                    $gettext(
+                        "Unable to load languages: %{message}",
+                        { message: languageFetchError },
+                        true,
+                    )
+                }}
+            </Message>
+
             <FileList
                 :files="pendingFiles as unknown as FileReference[]"
                 :languages="languageStore.languages"
                 :default-metadata-language="defaultMetadataLanguage"
-                :should-show-language-select="isMetadataLanguageSelectShown"
-                :visible-metadata-fields="visibleMetadataFields"
+                :hidden-metadata-fields="hiddenMetadataFields"
                 :is-alt-text-required="isAltTextRequired"
                 @remove="
                     (_fileReference, fileIndex) =>
                         onRemovePendingFile(fileIndex, removeFileCallback)
                 "
                 @update:metadata="onUpdatePendingFileMetadata"
-                @update:metadata-language="
-                    (fileIndex, languageCode) =>
-                        onSelectMetadataLanguage(
-                            languageCode,
-                            savedFiles.length + fileIndex,
-                        )
-                "
             />
 
             <FileList
                 :files="savedFiles"
                 :languages="languageStore.languages"
                 :default-metadata-language="defaultMetadataLanguage"
-                :should-show-language-select="isMetadataLanguageSelectShown"
-                :visible-metadata-fields="visibleMetadataFields"
+                :hidden-metadata-fields="hiddenMetadataFields"
                 :is-alt-text-required="isAltTextRequired"
                 @remove="
                     (_fileReference, fileIndex) => onRemoveSavedFile(fileIndex)
                 "
                 @update:metadata="onUpdateSavedFileMetadata"
-                @update:metadata-language="
-                    (fileIndex, languageCode) =>
-                        onSelectMetadataLanguage(languageCode, fileIndex)
-                "
             />
         </template>
     </FileUpload>
