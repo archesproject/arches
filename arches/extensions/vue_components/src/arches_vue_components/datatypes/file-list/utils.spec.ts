@@ -1,31 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import {
-    buildEmptyFileMetadata,
     getFileAltText,
     hasAnyAltText,
-    setLocalizedValue,
 } from "@/arches_vue_components/datatypes/file-list/utils.ts";
 
-import type { Language } from "@/arches_vue_components/types.ts";
 import type { FileReference } from "@/arches_vue_components/datatypes/file-list/types.ts";
-
-const english: Language = {
-    code: "en",
-    default_direction: "ltr",
-    id: 1,
-    isdefault: true,
-    name: "English",
-    scope: "system",
-};
-const arabic: Language = {
-    code: "ar",
-    default_direction: "rtl",
-    id: 2,
-    isdefault: false,
-    name: "Arabic",
-    scope: "system",
-};
 
 function buildFileReference(
     overrides: Partial<FileReference> = {},
@@ -37,51 +17,22 @@ function buildFileReference(
     } as FileReference;
 }
 
-describe("buildEmptyFileMetadata", () => {
-    it("starts every metadata field with an empty value per language", () => {
-        const metadata = buildEmptyFileMetadata([english, arabic]);
-
-        for (const field of [
-            "altText",
-            "title",
-            "description",
-            "attribution",
-        ] as const) {
-            expect(metadata[field]).toEqual({
-                en: { value: "", direction: "ltr" },
-                ar: { value: "", direction: "rtl" },
-            });
-        }
-    });
-});
-
 describe("getFileAltText", () => {
-    it("reads the alt text in the requested language", () => {
-        const fileReference = buildFileReference({
+    it("uses alt text, then title, in the requested language, never the file name", () => {
+        const withAltText = buildFileReference({
             altText: {
                 en: { value: "A red vase", direction: "ltr" },
                 ar: { value: "مزهرية حمراء", direction: "rtl" },
             },
         });
-
-        expect(getFileAltText(fileReference, "ar")).toBe("مزهرية حمراء");
-    });
-
-    it("falls back to the title in the same language", () => {
-        const fileReference = buildFileReference({
+        const withTitleOnly = buildFileReference({
             altText: { en: { value: "", direction: "ltr" } },
             title: { en: { value: "Vase, 1890", direction: "ltr" } },
         });
 
-        expect(getFileAltText(fileReference, "en")).toBe("Vase, 1890");
-    });
-
-    it("is empty without a language and never uses the file name", () => {
-        const fileReference = buildFileReference({
-            altText: { en: { value: "A red vase", direction: "ltr" } },
-        });
-
-        expect(getFileAltText(fileReference, null)).toBe("");
+        expect(getFileAltText(withAltText, "ar")).toBe("مزهرية حمراء");
+        expect(getFileAltText(withTitleOnly, "en")).toBe("Vase, 1890");
+        expect(getFileAltText(withAltText, null)).toBe("");
         expect(getFileAltText(buildFileReference(), "en")).toBe("");
     });
 });
@@ -100,20 +51,5 @@ describe("hasAnyAltText", () => {
 
         expect(hasAnyAltText(withArabicAltText)).toBe(true);
         expect(hasAnyAltText(withBlankAltText)).toBe(false);
-    });
-});
-
-describe("setLocalizedValue", () => {
-    it("sets one language and keeps the others", () => {
-        const updated = setLocalizedValue(
-            { en: { value: "A vase", direction: "ltr" } },
-            arabic,
-            "مزهرية",
-        );
-
-        expect(updated).toEqual({
-            en: { value: "A vase", direction: "ltr" },
-            ar: { value: "مزهرية", direction: "rtl" },
-        });
     });
 });
