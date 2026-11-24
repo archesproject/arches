@@ -46,7 +46,9 @@ const emit = defineEmits<{
 
 const { $gettext } = useGettext();
 
-const selectedLanguageCode = ref<string>();
+const selectedLanguageCode = ref<string | undefined>(
+    getOnlyFilledLanguageCode(),
+);
 
 const selectedLanguage = computed(
     () =>
@@ -73,6 +75,16 @@ const describedBy = computed(() => {
 const languageSelectAriaLabel = computed(() =>
     $gettext("Language for %{fieldLabel}", { fieldLabel: label }, true),
 );
+
+function getOnlyFilledLanguageCode(): string | undefined {
+    const filledLanguageCodes = Object.entries(modelValue ?? {})
+        .filter(([, languageValue]) => languageValue.value.trim())
+        .map(([languageCode]) => languageCode);
+    if (filledLanguageCodes.length === 1) {
+        return filledLanguageCodes[0];
+    }
+    return undefined;
+}
 
 function formatLanguageOption(option: Language): string {
     return `${option.name}`;
