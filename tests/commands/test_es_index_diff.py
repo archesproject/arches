@@ -11,12 +11,12 @@ from unittest import TestCase, mock
 from elasticsearch import ApiError, ConnectionTimeout
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.test import override_settings
 
 from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.management.commands import es_index_diff as command_module
 from arches.management.commands.es_index_diff import Command
 from tests.base_test import ArchesTestCase
 
@@ -80,7 +80,9 @@ class EsIndexDiffCommandTest(ArchesTestCase):
         self.assertEqual(self.run_command(partitions=1)[:2], baseline)
         self.assertEqual(self.run_command(partitions=256, slices=1)[:2], baseline)
 
-    @override_settings(ELASTICSEARCH_ENABLED=False)
+    @mock.patch.object(
+        command_module, "settings", mock.Mock(ELASTICSEARCH_ENABLED=False)
+    )
     def test_requires_elasticsearch(self):
         with self.assertRaises(CommandError):
             call_command("es_index_diff", stdout=StringIO())
