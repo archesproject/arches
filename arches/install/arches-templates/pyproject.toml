@@ -35,6 +35,7 @@ dev = [
     "livereload",
     "pre-commit==4.6.1",
     "sst",
+    "tblib",
 ]
 
 [tool.setuptools]
