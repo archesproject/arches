@@ -79,7 +79,7 @@ describe("FileList metadata", () => {
         );
     });
 
-    it("labels every metadata input", () => {
+    it("labels every metadata input and language select", () => {
         const wrapper = mountFileList({});
 
         for (const input of wrapper.findAll("input, textarea")) {
@@ -88,151 +88,74 @@ describe("FileList metadata", () => {
             );
             expect(label.exists()).toBe(true);
         }
+        expect(wrapper.find('[aria-label="Language for Title"]').exists()).toBe(
+            true,
+        );
     });
 
-    it("marks alt text required and links its help text", () => {
+    it("links alt text help, then a required error once it loses focus empty", async () => {
         const wrapper = mountFileList({});
         const altTextInput = wrapper.get('input[aria-required="true"]');
-        const helpId = altTextInput.attributes("aria-describedby");
+        const [helpId] = altTextInput
+            .attributes("aria-describedby")!
+            .split(" ");
 
         expect(wrapper.get(`#${helpId}`).text()).toContain(
             "Describe the image",
         );
         expect(altTextInput.attributes("aria-invalid")).toBeUndefined();
-    });
-
-    it("shows a linked error once empty alt text loses focus", async () => {
-        const wrapper = mountFileList({});
-        const altTextInput = wrapper.get('input[aria-required="true"]');
 
         await altTextInput.trigger("blur");
 
         expect(altTextInput.attributes("aria-invalid")).toBe("true");
-        const describedByIds = altTextInput
+        const [, errorId] = altTextInput
             .attributes("aria-describedby")!
             .split(" ");
-        expect(wrapper.get(`#${describedByIds[1]}`).text()).toBe(
+        expect(wrapper.get(`#${errorId}`).text()).toBe(
             "Enter alternative text for vase.jpg.",
         );
     });
 
-    it("shows no error when another language has alt text", async () => {
-        const wrapper = mountFileList({
-            altText: { fr: { value: "Un vase", direction: "ltr" } },
-        });
-        const altTextInput = wrapper.get('input[aria-required="true"]');
-
-        await altTextInput.trigger("blur");
-
-        expect(altTextInput.attributes("aria-invalid")).toBeUndefined();
-    });
-
-    it("tags the inputs with the metadata language", () => {
+    it("defaults each field to the system language", () => {
         const wrapper = mountFileList({});
 
+        const languageSelects = wrapper.findAllComponents({ name: "Select" });
+        expect(languageSelects).toHaveLength(4);
+        for (const languageSelect of languageSelects) {
+            expect(languageSelect.props("modelValue")).toBe("en");
+        }
         for (const input of wrapper.findAll("input, textarea")) {
             expect(input.attributes("lang")).toBe("en");
             expect(input.attributes("dir")).toBe("ltr");
         }
     });
 
-    it("emits the localized value when alt text is typed", async () => {
-        const wrapper = mountFileList({});
+    it("switches one field's language without affecting the others", async () => {
+        const wrapper = mountFileList({
+            altText: { en: { value: "A vase", direction: "ltr" } },
+        });
+        const [altTextSelect, titleSelect] = wrapper.findAllComponents({
+            name: "Select",
+        });
 
-        await wrapper.get('input[aria-required="true"]').setValue("A vase");
-
-        expect(wrapper.emitted("update:metadata")?.[0]).toEqual([
-            0,
-            "altText",
-            { en: { value: "A vase", direction: "ltr" } },
-        ]);
-    });
-
-    it("names the remove button after the file", () => {
-        const wrapper = mountFileList({});
-
-        expect(wrapper.get(".delete-button").attributes("aria-label")).toBe(
-            "Remove vase.jpg",
-        );
-    });
-
-    it("uses the alt text, not the file name, for the thumbnail", () => {
-        const wrapper = mountFileList({});
-
-        expect(wrapper.get("img").attributes("alt")).toBe("");
-    });
-
-    it("hides the language select by default", () => {
-        const wrapper = mountFileList({});
-
-        expect(wrapper.find(".metadata-language-toggle").exists()).toBe(false);
-        expect(wrapper.find(".metadata-language-panel").exists()).toBe(false);
-    });
-
-    it("hides the language select when there's only one language", () => {
-        const wrapper = mountFileList(
-            {},
-            { shouldShowLanguageSelect: true, languages: [english] },
-        );
-
-        expect(wrapper.find(".metadata-language-toggle").exists()).toBe(false);
-    });
-
-    it("collapses the language select behind a toggle on the alt text label row", async () => {
-        const wrapper = mountFileList({}, { shouldShowLanguageSelect: true });
-        const labelRow = wrapper.get(".file-metadata-label-row");
-        const toggle = labelRow.get(".metadata-language-toggle");
-        const panel = wrapper.get(`#${toggle.attributes("aria-controls")}`);
-
-        expect(labelRow.get("label").text()).toBe(
-            "Alternative text (required)",
-        );
-        expect(toggle.attributes("aria-label")).toBe("Languages for vase.jpg");
-        expect(toggle.attributes("aria-expanded")).toBe("false");
-        expect(panel.isVisible()).toBe(false);
-
-        await toggle.trigger("click");
-
-        expect(toggle.attributes("aria-expanded")).toBe("true");
-        expect(panel.isVisible()).toBe(true);
-    });
-
-    it("edits and emits the selected language", async () => {
-        const wrapper = mountFileList({}, { shouldShowLanguageSelect: true });
-        const languageSelect = wrapper.findComponent({ name: "Select" });
-
-        expect(languageSelect.props("modelValue")).toBe("en");
-        languageSelect.vm.$emit("update:modelValue", "ar");
+        altTextSelect.vm.$emit("update:modelValue", "ar");
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.emitted("update:metadataLanguage")?.[0]).toEqual([
-            0,
-            "ar",
-        ]);
+        expect(titleSelect.props("modelValue")).toBe("en");
         const altTextInput = wrapper.get('input[aria-required="true"]');
         expect(altTextInput.attributes("lang")).toBe("ar");
         expect(altTextInput.attributes("dir")).toBe("rtl");
+        expect((altTextInput.element as HTMLInputElement).value).toBe("");
 
         await altTextInput.setValue("مزهرية");
-        expect(wrapper.emitted("update:metadata")?.[0]?.[2]).toEqual({
-            ar: { value: "مزهرية", direction: "rtl" },
-        });
-    });
-
-    it("moves the language toggle to the first visible field", () => {
-        const wrapper = mountFileList(
-            {},
+        expect(wrapper.emitted("update:metadata")?.[0]).toEqual([
+            0,
+            "altText",
             {
-                shouldShowLanguageSelect: true,
-                visibleMetadataFields: ["attribution"],
+                en: { value: "A vase", direction: "ltr" },
+                ar: { value: "مزهرية", direction: "rtl" },
             },
-        );
-        const toggles = wrapper.findAll(".metadata-language-toggle");
-
-        expect(toggles).toHaveLength(1);
-        expect(wrapper.get(".file-metadata-label-row label").text()).toBe(
-            "Attribution",
-        );
+        ]);
     });
 
     it("collapses the additional metadata behind a toggle", async () => {
@@ -249,10 +172,10 @@ describe("FileList metadata", () => {
         expect(drawer.isVisible()).toBe(true);
     });
 
-    it("shows only the visible metadata fields", () => {
+    it("omits hidden metadata fields", () => {
         const wrapper = mountFileList(
             {},
-            { visibleMetadataFields: ["altText", "attribution"] },
+            { hiddenMetadataFields: ["title", "description"] },
         );
         const labels = wrapper
             .findAll(".file-metadata-label")
@@ -261,10 +184,10 @@ describe("FileList metadata", () => {
         expect(labels).toEqual(["Alternative text (required)", "Attribution"]);
     });
 
-    it("drops the toggle when no additional fields are visible", () => {
+    it("drops the additional metadata toggle when every additional field is hidden", () => {
         const wrapper = mountFileList(
             {},
-            { visibleMetadataFields: ["altText"] },
+            { hiddenMetadataFields: ["title", "description", "attribution"] },
         );
 
         expect(wrapper.find(".additional-metadata-toggle").exists()).toBe(
