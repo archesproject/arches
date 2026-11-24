@@ -22,6 +22,7 @@ import os
 
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.cache import cache
+from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db import connection
 from django.db.models import Q
@@ -524,6 +525,8 @@ def get_export_file(request):
     url = None
     if exportid is not None:
         export = SearchExportHistory.objects.get(pk=exportid)
+        if export.user != user and not user.is_superuser:
+            raise PermissionDenied()
         try:
             url = export.downloadfile.url
             return JSONResponse({"message": _("Downloading"), "url": url}, indent=4)
