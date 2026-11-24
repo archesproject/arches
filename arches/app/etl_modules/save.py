@@ -266,6 +266,8 @@ def _call_post_import_functions(loadid):
     Returns the key/value pairs the functions' post_import methods return,
     merged into one dictionary, e.g. {"indexed": True} from a function that
     indexed the load, so the load can be marked indexed without Elasticsearch.
+    Once any function reports {"indexed": False}, the result stays False, so a
+    function that indexed the load cannot hide one that failed to.
     """
     graphids = (
         EditLog.objects.filter(transactionid=loadid)
@@ -291,7 +293,10 @@ def _call_post_import_functions(loadid):
         except NotImplementedError:
             continue
         if isinstance(result, dict):
+            indexed = results.get("indexed")
             results.update(result)
+            if indexed is False:
+                results["indexed"] = False
     return results
 
 
