@@ -26,7 +26,7 @@ class FileView(View):
             path = file.path.url
         except File.DoesNotExist:
             file = SearchExportHistory.objects.get(pk=fileid)
-            if file.user != request.user and not request.user.is_superuser:
+            if file.user_id != request.user.id and not request.user.is_superuser:
                 raise PermissionDenied()
             path = file.downloadfile.url
             is_search_export_history = True
