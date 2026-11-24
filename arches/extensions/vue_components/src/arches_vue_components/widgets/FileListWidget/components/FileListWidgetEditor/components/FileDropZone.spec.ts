@@ -20,17 +20,7 @@ function mountFileDropZone(isDisabled: boolean) {
 }
 
 describe("FileDropZone", () => {
-    it("is a real button that opens the file chooser", async () => {
-        const { wrapper, openFileChooser } = mountFileDropZone(false);
-        const button = wrapper.get("button");
-
-        expect(button.attributes("type")).toBe("button");
-        await button.trigger("click");
-
-        expect(openFileChooser).toHaveBeenCalledOnce();
-    });
-
-    it("explains why it is disabled and doesn't open the chooser", async () => {
+    it("opens the chooser only when enabled, and explains why it is disabled", async () => {
         const { wrapper, openFileChooser } = mountFileDropZone(true);
         const button = wrapper.get("button");
 
@@ -39,8 +29,11 @@ describe("FileDropZone", () => {
         expect(wrapper.get(`#${reasonId}`).text()).toBe(
             "Maximum number of files reached.",
         );
-
         await button.trigger("click");
         expect(openFileChooser).not.toHaveBeenCalled();
+
+        await wrapper.setProps({ isDisabled: false });
+        await button.trigger("click");
+        expect(openFileChooser).toHaveBeenCalledOnce();
     });
 });

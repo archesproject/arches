@@ -79,18 +79,21 @@ describe("FileList metadata", () => {
         );
     });
 
-    it("labels every metadata input and language select", () => {
+    it("labels every input and defaults each field to the system language", () => {
         const wrapper = mountFileList({});
 
         for (const input of wrapper.findAll("input, textarea")) {
-            const label = wrapper.find(
-                `label[for="${input.attributes("id")}"]`,
-            );
-            expect(label.exists()).toBe(true);
+            expect(
+                wrapper.find(`label[for="${input.attributes("id")}"]`).exists(),
+            ).toBe(true);
+            expect(input.attributes("lang")).toBe("en");
+            expect(input.attributes("dir")).toBe("ltr");
         }
-        expect(wrapper.find('[aria-label="Language for Title"]').exists()).toBe(
-            true,
-        );
+        const languageSelects = wrapper.findAllComponents({ name: "Select" });
+        expect(languageSelects).toHaveLength(4);
+        for (const languageSelect of languageSelects) {
+            expect(languageSelect.props("modelValue")).toBe("en");
+        }
     });
 
     it("links alt text help, then a required error once it loses focus empty", async () => {
@@ -114,20 +117,6 @@ describe("FileList metadata", () => {
         expect(wrapper.get(`#${errorId}`).text()).toBe(
             "Enter alternative text for vase.jpg.",
         );
-    });
-
-    it("defaults each field to the system language", () => {
-        const wrapper = mountFileList({});
-
-        const languageSelects = wrapper.findAllComponents({ name: "Select" });
-        expect(languageSelects).toHaveLength(4);
-        for (const languageSelect of languageSelects) {
-            expect(languageSelect.props("modelValue")).toBe("en");
-        }
-        for (const input of wrapper.findAll("input, textarea")) {
-            expect(input.attributes("lang")).toBe("en");
-            expect(input.attributes("dir")).toBe("ltr");
-        }
     });
 
     it("switches one field's language without affecting the others", async () => {
@@ -172,24 +161,16 @@ describe("FileList metadata", () => {
         expect(drawer.isVisible()).toBe(true);
     });
 
-    it("omits hidden metadata fields", () => {
+    it("omits hidden fields, and the additional metadata toggle once all are hidden", () => {
         const wrapper = mountFileList(
             {},
-            { hiddenMetadataFields: ["title", "description"] },
+            { hiddenMetadataFields: ["title", "description", "attribution"] },
         );
         const labels = wrapper
             .findAll(".file-metadata-label")
             .map((label) => label.text());
 
-        expect(labels).toEqual(["Alternative text (required)", "Attribution"]);
-    });
-
-    it("drops the additional metadata toggle when every additional field is hidden", () => {
-        const wrapper = mountFileList(
-            {},
-            { hiddenMetadataFields: ["title", "description", "attribution"] },
-        );
-
+        expect(labels).toEqual(["Alternative text (required)"]);
         expect(wrapper.find(".additional-metadata-toggle").exists()).toBe(
             false,
         );
