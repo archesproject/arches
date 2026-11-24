@@ -75,7 +75,7 @@ const languageSelectAriaLabel = computed(() =>
 );
 
 function formatLanguageOption(option: Language): string {
-    return `${option.name} (${option.code})`;
+    return `${option.name}`;
 }
 
 function onUpdateInputValue(value: string | undefined) {
