@@ -48,7 +48,6 @@ const languageStore = useLanguageStore();
 
 const languageFetchError = ref<string | null>(null);
 
-
 const defaultMetadataLanguage = computed(
     () =>
         languageStore.languages.find(
