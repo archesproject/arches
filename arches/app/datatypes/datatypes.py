@@ -28,6 +28,7 @@ from rdflib import ConjunctiveGraph as Graph
 from rdflib.namespace import DC, DCTERMS, RDF, RDFS, XSD
 
 from arches.app.const import ExtensionType
+from arches.app.datatypes.abstract.external_domain import BaseExternalDomainDataType
 from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.core.util import get_value_from_jsonld
 from arches.app.models import models
@@ -2754,9 +2755,6 @@ class LanguageDataType(BaseExternalDomainDataType):
 
     def get_option_display(self, language):
         return language.name
-
-    def get_lookup_filter(self, value):
-        return Q(code=value) | Q(name=value)
 
     def get_invalid_message(self, value):
         message = _(

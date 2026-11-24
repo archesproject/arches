@@ -1,4 +1,4 @@
-from arches.app.datatypes.core.external_domain import BaseExternalDomainDataType
+from arches.app.datatypes.abstract.external_domain import BaseExternalDomainDataType
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
 from arches.app.views.api import APIBase
