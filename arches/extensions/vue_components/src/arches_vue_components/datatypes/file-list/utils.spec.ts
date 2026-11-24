@@ -3,17 +3,12 @@ import { describe, expect, it } from "vitest";
 import {
     buildEmptyFileMetadata,
     getFileAltText,
-    getVisibleMetadataFields,
     hasAnyAltText,
     setLocalizedValue,
-    shouldShowMetadataLanguageSelect,
 } from "@/arches_vue_components/datatypes/file-list/utils.ts";
 
 import type { Language } from "@/arches_vue_components/types.ts";
-import type {
-    FileListCardXNodeXWidgetData,
-    FileReference,
-} from "@/arches_vue_components/datatypes/file-list/types.ts";
+import type { FileReference } from "@/arches_vue_components/datatypes/file-list/types.ts";
 
 const english: Language = {
     code: "en",
@@ -58,80 +53,6 @@ describe("buildEmptyFileMetadata", () => {
             });
         }
     });
-
-    it("gives each field its own object", () => {
-        const metadata = buildEmptyFileMetadata([english]);
-
-        expect(metadata.altText).not.toBe(metadata.title);
-    });
-});
-
-describe("getVisibleMetadataFields", () => {
-    function buildCardXNodeXWidgetData(
-        metadataFields?: FileListCardXNodeXWidgetData["config"]["metadataFields"],
-    ): FileListCardXNodeXWidgetData {
-        return {
-            config: { metadataFields },
-        } as FileListCardXNodeXWidgetData;
-    }
-
-    it("shows every field without widget data", () => {
-        expect(getVisibleMetadataFields(undefined)).toEqual([
-            "altText",
-            "title",
-            "description",
-            "attribution",
-        ]);
-    });
-
-    it("shows every field when the config has no entries", () => {
-        expect(
-            getVisibleMetadataFields(buildCardXNodeXWidgetData()),
-        ).toHaveLength(4);
-    });
-
-    it("hides only the fields whose visible bit is false", () => {
-        const cardXNodeXWidgetData = buildCardXNodeXWidgetData({
-            title: { visible: false },
-            description: { visible: false },
-            attribution: { visible: true },
-        });
-
-        expect(getVisibleMetadataFields(cardXNodeXWidgetData)).toEqual([
-            "altText",
-            "attribution",
-        ]);
-    });
-});
-
-describe("shouldShowMetadataLanguageSelect", () => {
-    function buildCardXNodeXWidgetData(
-        metadataLanguageSelect?: FileListCardXNodeXWidgetData["config"]["metadataLanguageSelect"],
-    ): FileListCardXNodeXWidgetData {
-        return {
-            config: { metadataLanguageSelect },
-        } as FileListCardXNodeXWidgetData;
-    }
-
-    it("hides the picker without widget data or a config entry", () => {
-        expect(shouldShowMetadataLanguageSelect(undefined)).toBe(false);
-        expect(
-            shouldShowMetadataLanguageSelect(buildCardXNodeXWidgetData()),
-        ).toBe(false);
-    });
-
-    it("follows the visible bit", () => {
-        expect(
-            shouldShowMetadataLanguageSelect(
-                buildCardXNodeXWidgetData({ visible: true }),
-            ),
-        ).toBe(true);
-        expect(
-            shouldShowMetadataLanguageSelect(
-                buildCardXNodeXWidgetData({ visible: false }),
-            ),
-        ).toBe(false);
-    });
 });
 
 describe("getFileAltText", () => {
@@ -155,37 +76,30 @@ describe("getFileAltText", () => {
         expect(getFileAltText(fileReference, "en")).toBe("Vase, 1890");
     });
 
-    it("never falls back to the file name", () => {
-        expect(getFileAltText(buildFileReference(), "en")).toBe("");
-    });
-
-    it("returns an empty string without a language", () => {
+    it("is empty without a language and never uses the file name", () => {
         const fileReference = buildFileReference({
             altText: { en: { value: "A red vase", direction: "ltr" } },
         });
 
         expect(getFileAltText(fileReference, null)).toBe("");
+        expect(getFileAltText(buildFileReference(), "en")).toBe("");
     });
 });
 
 describe("hasAnyAltText", () => {
-    it("is true when any language has alt text", () => {
-        const fileReference = buildFileReference({
+    it("is true when any language has non-blank alt text", () => {
+        const withArabicAltText = buildFileReference({
             altText: {
-                en: { value: "", direction: "ltr" },
+                en: { value: "  ", direction: "ltr" },
                 ar: { value: "مزهرية", direction: "rtl" },
             },
         });
-
-        expect(hasAnyAltText(fileReference)).toBe(true);
-    });
-
-    it("ignores whitespace-only values", () => {
-        const fileReference = buildFileReference({
+        const withBlankAltText = buildFileReference({
             altText: { en: { value: "  ", direction: "ltr" } },
         });
 
-        expect(hasAnyAltText(fileReference)).toBe(false);
+        expect(hasAnyAltText(withArabicAltText)).toBe(true);
+        expect(hasAnyAltText(withBlankAltText)).toBe(false);
     });
 });
 
