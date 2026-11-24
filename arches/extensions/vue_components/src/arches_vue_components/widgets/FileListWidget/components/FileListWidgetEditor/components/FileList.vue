@@ -161,7 +161,12 @@ function onBlurField(fileReference: FileReference, field: FileMetadataField) {
                         )
                     "
                 />
-                <span class="file-name">{{ fileReference.name }}</span>
+                <span
+                    :id="getFieldId(fileIndex, 'name')"
+                    class="file-name"
+                >
+                    {{ fileReference.name }}
+                </span>
                 <Button
                     icon="pi pi-times"
                     severity="danger"
@@ -184,6 +189,8 @@ function onBlurField(fileReference: FileReference, field: FileMetadataField) {
             <div
                 v-if="defaultMetadataLanguage"
                 class="file-metadata"
+                role="group"
+                :aria-labelledby="getFieldId(fileIndex, 'name')"
             >
                 <FileMetadataInput
                     v-for="field in primaryFields"
