@@ -15,9 +15,11 @@ from packaging.version import Version
 arches_version = Version(_arches_version_str)
 from arches.app.models.models import Node, ResourceInstance, TileModel
 from arches.app.utils.permission_backend import (
+    get_nodegroups_by_perm,
     user_can_delete_resource,
     user_can_edit_resource,
     user_can_read_resource,
+    user_is_resource_reviewer,
 )
 from arches.app.utils.string_utils import str_to_bool
 
@@ -269,9 +271,16 @@ class ArchesModelAPIMixin:
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
+        options = self.serializer_class.Meta
+        if issubclass(options.model, TileModel):
+            # Deleting a tile edits its resource; the resource itself remains.
+            permission_callable = user_can_edit_resource
+        else:
+            permission_callable = user_can_delete_resource
+
         self.get_object = partial(
             self.get_object,
-            permission_callable=user_can_delete_resource,
+            permission_callable=permission_callable,
         )
         return super().destroy(request, *args, **kwargs)
 
@@ -326,6 +335,27 @@ class ArchesModelAPIMixin:
         self.validate_tile_data_and_save(serializer)
 
     def perform_destroy(self, instance):
+        # Tiles follow the rules TileData.delete_tile() enforces.
+        if isinstance(instance, TileModel):
+            user = self.request.user
+            if not (
+                user_is_resource_reviewer(user, resource=instance.resourceinstance)
+                or instance.is_fully_provisional()
+            ):
+                raise PermissionDenied(
+                    _(
+                        "You do not have permissions to delete a tile with authoritative data."
+                    )
+                )
+
+            # Not user.has_perm(): without explicit nodegroup permissions it
+            # falls back to group permissions, which these views don't require.
+            deletable_nodegroups = get_nodegroups_by_perm(
+                user, "models.delete_nodegroup"
+            )
+            if instance.nodegroup_id not in deletable_nodegroups:
+                raise PermissionDenied
+
         instance.delete(request=self.request)
 
     @staticmethod

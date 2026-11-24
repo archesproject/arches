@@ -7,6 +7,7 @@ from django.db import connection
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
+from arches.app.const import DefaultLifecycleStates
 from arches.app.models.models import (
     ResourceInstance,
     ResourceInstanceLifecycleState,
@@ -392,3 +393,125 @@ class ResourcePermissionTests(GraphTestCase):
         self.assertEqual(len(response.json()["results"]), 11)
         self.assertNotContains(response, "Unreadable Resource")
         self.assertEqual(query_count, baseline_query_count)
+
+
+class TileDeletePermissionTests(GraphTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.reviewer = User.objects.create_user("tile_reviewer", password="x")
+        cls.reviewer.groups.add(
+            *Group.objects.filter(name__in=["Resource Editor", "Resource Reviewer"])
+        )
+        cls.editor = User.objects.create_user("tile_editor", password="x")
+        cls.editor.groups.add(Group.objects.get(name="Resource Editor"))
+
+    def setUp(self):
+        self.enterContext(
+            permission_framework(
+                DEFAULT_ALLOW_PERMISSION_FRAMEWORK,
+                ArchesDefaultAllowPermissionFramework(),
+            )
+        )
+
+    def set_lifecycle_state(self, lifecycle_state):
+        ResourceInstance.objects.filter(pk=self.resource_42.pk).update(
+            resource_instance_lifecycle_state_id=lifecycle_state.value
+        )
+
+    def create_tile(self, provisionaledits=None):
+        return TileModel.objects.create(
+            nodegroup=self.nodegroup_n,
+            resourceinstance=self.resource_42,
+            data={},
+            provisionaledits=provisionaledits,
+        )
+
+    def delete_tile(self, user, tile):
+        self.client.force_login(user)
+        return self.client.delete(
+            reverse(
+                "arches_querysets:api-tile",
+                kwargs={
+                    "graph": "datatype_lookups",
+                    "nodegroup_alias": "datatypes_n",
+                    "pk": str(tile.pk),
+                },
+            )
+        )
+
+    def assert_tile_deleted(self, response, tile):
+        self.assertEqual(response.status_code, 204, response.content)
+        self.assertFalse(TileModel.objects.filter(pk=tile.pk).exists())
+
+    def assert_tile_kept(self, response, tile):
+        self.assertEqual(response.status_code, 403, response.content)
+        self.assertTrue(TileModel.objects.filter(pk=tile.pk).exists())
+
+    def test_deleting_a_tile_requires_edit_permission_on_its_resource(self):
+        for lifecycle_state, tile_is_deleted in (
+            (DefaultLifecycleStates.DRAFT, True),
+            (DefaultLifecycleStates.ACTIVE, True),
+            (DefaultLifecycleStates.RETIRED, False),
+        ):
+            with self.subTest(lifecycle_state=lifecycle_state.name):
+                self.set_lifecycle_state(lifecycle_state)
+                tile = self.create_tile()
+
+                response = self.delete_tile(self.reviewer, tile)
+
+                if tile_is_deleted:
+                    self.assert_tile_deleted(response, tile)
+                else:
+                    self.assert_tile_kept(response, tile)
+
+    def test_deleting_a_resource_still_requires_delete_permission(self):
+        self.set_lifecycle_state(DefaultLifecycleStates.ACTIVE)
+        self.client.force_login(self.reviewer)
+
+        response = self.client.delete(
+            reverse(
+                "arches_querysets:api-resource",
+                kwargs={"graph": "datatype_lookups", "pk": str(self.resource_42.pk)},
+            )
+        )
+
+        self.assertEqual(response.status_code, 403, response.content)
+        self.assertTrue(
+            ResourceInstance.objects.filter(pk=self.resource_42.pk).exists()
+        )
+
+    def test_only_reviewers_can_delete_authoritative_tiles(self):
+        self.set_lifecycle_state(DefaultLifecycleStates.DRAFT)
+        authoritative_tile = self.create_tile()
+        provisional_tile = self.create_tile(
+            provisionaledits={
+                str(self.editor.pk): {
+                    "value": {},
+                    "action": "create",
+                    "status": "review",
+                }
+            }
+        )
+
+        authoritative_response = self.delete_tile(self.editor, authoritative_tile)
+        provisional_response = self.delete_tile(self.editor, provisional_tile)
+
+        self.assert_tile_kept(authoritative_response, authoritative_tile)
+        self.assertContains(
+            authoritative_response,
+            "You do not have permissions to delete a tile with authoritative data.",
+            status_code=403,
+        )
+        self.assert_tile_deleted(provisional_response, provisional_tile)
+
+    def test_deleting_a_tile_requires_delete_permission_on_its_nodegroup(self):
+        self.set_lifecycle_state(DefaultLifecycleStates.DRAFT)
+        framework = ArchesDefaultAllowPermissionFramework()
+        for permission in ("read_nodegroup", "write_nodegroup"):
+            framework.assign_perm(permission, self.reviewer, self.nodegroup_n)
+        tile = self.create_tile()
+
+        response = self.delete_tile(self.reviewer, tile)
+
+        self.assert_tile_kept(response, tile)
