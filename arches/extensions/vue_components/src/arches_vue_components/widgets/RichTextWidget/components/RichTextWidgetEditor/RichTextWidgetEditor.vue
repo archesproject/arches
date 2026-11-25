@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watchEffect } from "vue";
+import { ref, watch, watchEffect } from "vue";
 
 import { useGettext } from "vue3-gettext";
 import Editor from "openvue/editor";
@@ -8,7 +8,10 @@ import Select from "openvue/select";
 import FocusController from "@/arches_vue_components/widgets/RichTextWidget/components/RichTextWidgetEditor/components/FocusController.vue";
 
 import { fetchLanguages } from "@/arches_vue_components/widgets/api.ts";
-import { buildStringAliasedNodeData } from "@/arches_vue_components/datatypes/string/utils.ts";
+import {
+    buildStringAliasedNodeData,
+    resolveInitialLanguageCode,
+} from "@/arches_vue_components/datatypes/string/utils.ts";
 
 import type {
     StringCardXNodeXWidgetData,
@@ -24,11 +27,14 @@ const { cardXNodeXWidgetData = undefined, aliasedNodeData } = defineProps<{
     aliasedNodeData: StringAliasedNodeData | null;
 }>();
 
+const initialNodeValue = aliasedNodeData?.node_value;
+
 const emit = defineEmits<{
     (
         event: "update:aliasedNodeData",
         updatedValue: StringAliasedNodeData,
     ): void;
+    (event: "update:selectedLanguage", languageCode: string): void;
     (event: "ready"): void;
 }>();
 
@@ -47,9 +53,14 @@ watchEffect(async () => {
 
     languages.value = response.languages;
 
+    const targetLanguageCode = resolveInitialLanguageCode(
+        initialNodeValue,
+        response.request_language,
+    );
+
     selectedLanguage.value =
         languages.value.find((lang: Language) => {
-            return lang.code === response.request_language;
+            return lang.code === targetLanguageCode;
         }) ??
         response.languages.find((lang: Language) => lang.isdefault) ??
         response.languages[0];
@@ -78,6 +89,16 @@ watchEffect(() => {
         singleInputValue.value = "";
     }
 });
+
+watch(
+    selectedLanguage,
+    (language) => {
+        if (language) {
+            emit("update:selectedLanguage", language.code);
+        }
+    },
+    { immediate: true },
+);
 
 function onUpdateModelValue(updatedValue: string | undefined) {
     if (updatedValue === undefined) {
