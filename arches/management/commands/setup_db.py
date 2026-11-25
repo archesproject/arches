@@ -24,8 +24,8 @@ import psycopg
 from django.apps import apps
 from django.conf import settings
 from django.core import management
-from django.core.management.base import BaseCommand, CommandError
-from django.db import connection
+from django.core.management.base import BaseCommand
+from django.db import connections
 from arches.management.commands.utils import get_yn_input
 
 
@@ -207,6 +207,13 @@ To create it, use:
 
         cursor = conn.cursor()
         if can_create_db is True:
+            # pg_terminate_backend also kills any connection Django already
+            # holds to the old database, including idle ones in a connection
+            # pool; discard them (and the pool) so they reconnect.
+            connections.close_all()
+            for db_connection in connections.all(initialized_only=True):
+                if getattr(db_connection, "pool", None):
+                    db_connection.close_pool()
             self.drop_and_recreate_db(cursor)
         else:
             self.reset_db(cursor)
