@@ -3,6 +3,7 @@
 
 import os
 import tempfile
+from unittest.mock import patch
 
 from django.test.utils import captured_stdout
 
@@ -13,7 +14,41 @@ from arches.app.utils.data_management.resource_graphs.exporter import (
     get_graphs_for_export,
 )
 from arches.management.commands.packages import Command
-from tests.base_test import ArchesTransactionTestCase
+from tests.base_test import ArchesTestCase, ArchesTransactionTestCase
+
+
+class LoadPackageGraphsTests(ArchesTestCase):
+    def load_package_graph_dirs(self, **kwargs):
+        with tempfile.TemporaryDirectory() as package_dir:
+            branches = os.path.join(package_dir, "graphs", "branches")
+            resource_models = os.path.join(package_dir, "graphs", "resource_models")
+            os.makedirs(branches)
+            os.makedirs(resource_models)
+
+            with (
+                patch(
+                    "arches.management.commands.packages.task_management.check_if_celery_available",
+                    return_value=False,
+                ),
+                patch.object(Command, "load_concepts"),
+                patch.object(Command, "update_resource_geojson_geometries"),
+                patch.object(Command, "import_graphs") as import_graphs,
+                captured_stdout(),
+            ):
+                Command().load_package(
+                    package_dir, yes=True, defer_indexing=False, **kwargs
+                )
+
+            imported = [call.args[0] for call in import_graphs.call_args_list]
+            return imported, branches, resource_models
+
+    def test_load_package_loads_branches_then_resource_models(self):
+        imported, branches, resource_models = self.load_package_graph_dirs()
+        self.assertEqual(imported, [branches, resource_models])
+
+    def test_load_package_skip_branches(self):
+        imported, _, resource_models = self.load_package_graph_dirs(skip_branches=True)
+        self.assertEqual(imported, [resource_models])
 
 
 class ImportGraphsTests(ArchesTransactionTestCase):
