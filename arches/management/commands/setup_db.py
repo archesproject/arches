@@ -211,9 +211,8 @@ To create it, use:
             # holds to the old database, including idle ones in a connection
             # pool; discard them (and the pool) so they reconnect.
             connections.close_all()
-            for db_connection in connections.all(initialized_only=True):
-                if getattr(db_connection, "pool", None):
-                    db_connection.close_pool()
+            for db_connection in connections.all():
+                db_connection.close_pool()
             self.drop_and_recreate_db(cursor)
         else:
             self.reset_db(cursor)
