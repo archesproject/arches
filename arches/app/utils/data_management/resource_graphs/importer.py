@@ -160,6 +160,30 @@ def import_graph(graphs, overwrite_graphs=True, user=None):
                 graph = Graph(resource)
                 graph.slugify_node_aliases()
 
+                branch_publication_ids = {
+                    str(node.sourcebranchpublication_id)
+                    for node in graph.nodes.values()
+                    if node.sourcebranchpublication_id
+                }
+                existing_publication_ids = {
+                    str(publicationid)
+                    for publicationid in GraphXPublishedGraph.objects.filter(
+                        publicationid__in=branch_publication_ids
+                    ).values_list("publicationid", flat=True)
+                }
+                missing_publication_ids = (
+                    branch_publication_ids - existing_publication_ids
+                )
+                for publicationid in missing_publication_ids:
+                    logger.warning(
+                        "Source branch publication {0} not found; clearing branch link on nodes in {1}".format(
+                            publicationid, graph.name
+                        )
+                    )
+                for node in graph.nodes.values():
+                    if str(node.sourcebranchpublication_id) in missing_publication_ids:
+                        node.sourcebranchpublication_id = None
+
                 ontology_classes = [
                     str(f["source"])
                     for f in OntologyClass.objects.all().values("source")
