@@ -832,7 +832,7 @@ class Command(BaseCommand):
         def load_graphs(package_dir):
             overwrite_graphs = True if yes is True else False
             if skip_branches:
-                print("skipping branches")
+                print("skipping branch graphs (--skip_branches)")
             else:
                 try:
                     branches = glob.glob(
