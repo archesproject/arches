@@ -28,6 +28,7 @@ from arches.app.models.models import (
     OntologyClass,
     GraphXPublishedGraph,
     Language,
+    Node,
     PublishedGraph,
     Resource2ResourceConstraint,
 )
@@ -64,7 +65,45 @@ class GraphImportException(Exception):
     pass
 
 
-def import_graph(graphs, overwrite_graphs=True, user=None):
+def clear_missing_branch_publications(graphids):
+    """
+    Clears node links to source branch publications that don't exist.
+    Run after every graph in a batch is imported, as a node may reference the
+    publication of a graph imported later in the same batch.
+    """
+    missing_links = Node.objects.filter(
+        graph_id__in=graphids, sourcebranchpublication_id__isnull=False
+    ).exclude(
+        sourcebranchpublication_id__in=GraphXPublishedGraph.objects.values(
+            "publicationid"
+        )
+    )
+    missing = set(missing_links.values_list("graph_id", "sourcebranchpublication_id"))
+    if not missing:
+        return
+
+    for graphid, publicationid in missing:
+        logger.warning(
+            "Source branch publication {0} not found; clearing branch link on nodes in graph {1}".format(
+                publicationid, graphid
+            )
+        )
+    missing_links.update(sourcebranchpublication=None)
+
+    missing_publication_ids = {str(publicationid) for _, publicationid in missing}
+    for published_graph in PublishedGraph.objects.filter(
+        publication__graph_id__in={graphid for graphid, _ in missing}
+    ):
+        serialized_nodes = (published_graph.serialized_graph or {}).get("nodes", [])
+        for node in serialized_nodes:
+            if str(node.get("sourcebranchpublication_id")) in missing_publication_ids:
+                node["sourcebranchpublication_id"] = None
+        published_graph.save()
+
+
+def import_graph(
+    graphs, overwrite_graphs=True, user=None, clear_missing_branch_links=True
+):
     reporter = GraphImportReporter(graphs)
 
     def update_resource_instance_config(node):
@@ -320,6 +359,11 @@ def import_graph(graphs, overwrite_graphs=True, user=None):
                         )
             except:
                 pass
+
+        if clear_missing_branch_links:
+            clear_missing_branch_publications(
+                [resource["graphid"] for resource in graphs]
+            )
 
         return errors, reporter
 

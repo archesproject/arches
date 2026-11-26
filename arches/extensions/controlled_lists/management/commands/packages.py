@@ -87,6 +87,7 @@ class Command(PackagesCommand):
         dev=False,
         defer_indexing=True,
         is_application=False,
+        skip_branches=False,
     ):
 
         super().load_package(
@@ -99,6 +100,7 @@ class Command(PackagesCommand):
             dev=dev,
             defer_indexing=defer_indexing,
             is_application=is_application,
+            skip_branches=skip_branches,
         )
 
     def load_concepts(self, package_dir, overwrite, stage, defer_indexing):

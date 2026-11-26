@@ -20,6 +20,7 @@ from arches.app.utils.data_management.resource_graphs import (
     exporter as ResourceGraphExporter,
 )
 from arches.app.utils.data_management.resource_graphs.importer import (
+    clear_missing_branch_publications,
     import_graph as ResourceGraphImporter,
 )
 from arches.app.utils.data_management.resources.formats.csvfile import (
@@ -318,6 +319,13 @@ class Command(BaseCommand):
             help="languages desired as a comma separated list",
         )
 
+        parser.add_argument(
+            "--skip_branches",
+            action="store_true",
+            dest="skip_branches",
+            help="Skip loading branch graphs from the package. Resource models are still loaded.",
+        )
+
     def handle(self, *args, **options):
         if options["operation"] is None:
             self.print_help("manage.py", "packages")
@@ -460,6 +468,7 @@ class Command(BaseCommand):
                 options["dev"],
                 False if str(options["defer_indexing"])[0].lower() == "f" else True,
                 False if arches_application_path is None else True,
+                options["skip_branches"],
             )
 
         if options["operation"] in ["create", "create_package"]:
@@ -671,6 +680,7 @@ class Command(BaseCommand):
         dev=False,
         defer_indexing=True,
         is_application=False,
+        skip_branches=False,
     ):
         celery_worker_running = task_management.check_if_celery_available()
 
@@ -821,11 +831,16 @@ class Command(BaseCommand):
 
         def load_graphs(package_dir):
             overwrite_graphs = True if yes is True else False
-            try:
-                branches = glob.glob(os.path.join(package_dir, "graphs", "branches"))[0]
-                self.import_graphs(branches, overwrite_graphs=overwrite_graphs)
-            except IndexError as e:
-                logger.warning("No branches in package")
+            if skip_branches:
+                print("skipping branch graphs (--skip_branches)")
+            else:
+                try:
+                    branches = glob.glob(
+                        os.path.join(package_dir, "graphs", "branches")
+                    )[0]
+                    self.import_graphs(branches, overwrite_graphs=overwrite_graphs)
+                except IndexError as e:
+                    logger.warning("No branches in package")
             try:
                 resource_models = glob.glob(
                     os.path.join(package_dir, "graphs", "resource_models")
@@ -1221,7 +1236,11 @@ class Command(BaseCommand):
         self.load_concepts(
             package_location, overwrite_concepts, stage_concepts, defer_indexing
         )
-        print("loading resource models and branches")
+        print(
+            "loading resource models"
+            if skip_branches
+            else "loading resource models and branches"
+        )
         load_graphs(package_location)
         print("loading resource to resource constraints")
         load_resource_to_resource_constraints(package_location)
@@ -1624,9 +1643,12 @@ class Command(BaseCommand):
             data_source = [data_source]
 
         errors = []
+        graphids = []
         # One transaction for the whole batch: nodes may reference another
         # graph's publication (sourcebranchpublication) via a deferred FK, so
         # every graph in the batch must be present before anything commits.
+        # Links to publications still missing once the batch is in (e.g. the
+        # branch wasn't loaded) are cleared before commit.
         with transaction.atomic():
             for path in data_source:
                 if os.path.isfile(os.path.join(path)):
@@ -1634,9 +1656,12 @@ class Command(BaseCommand):
                     with open(path, "r") as f:
                         archesfile = JSONDeserializer().deserialize(f)
                         errs, importer = ResourceGraphImporter(
-                            archesfile["graph"], overwrite_graphs
+                            archesfile["graph"],
+                            overwrite_graphs,
+                            clear_missing_branch_links=False,
                         )
                         errors.extend(errs)
+                        graphids.extend(g["graphid"] for g in archesfile["graph"])
                 else:
                     file_paths = sorted(
                         file_path
@@ -1648,9 +1673,13 @@ class Command(BaseCommand):
                         with open(os.path.join(path, file_path), "r") as f:
                             archesfile = JSONDeserializer().deserialize(f)
                             errs, importer = ResourceGraphImporter(
-                                archesfile["graph"], overwrite_graphs
+                                archesfile["graph"],
+                                overwrite_graphs,
+                                clear_missing_branch_links=False,
                             )
                             errors.extend(errs)
+                            graphids.extend(g["graphid"] for g in archesfile["graph"])
+            clear_missing_branch_publications(graphids)
         for e in errors:
             utils.print_message(e)
 
