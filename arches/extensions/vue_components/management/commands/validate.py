@@ -108,7 +108,7 @@ class Command(BaseValidateCommand):
                 #####
 
                 else:
-                    raise NotImplementedError
+                    return super().check_integrity(check, queryset, fix_action)
 
         # Print the report (after any requested fixes are made)
         if self.options["verbosity"] > 0:
