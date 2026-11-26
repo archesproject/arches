@@ -19,7 +19,9 @@ class BaseFunction(object):
     def on_import(self, *args, **kwargs):
         raise NotImplementedError
 
-    # occurs after a bulk load (ETL), which writes tiles without calling Tile.save
+    # occurs after a bulk load (ETL), which writes tiles without calling Tile.save;
+    # may return a dict of results, e.g. {"indexed": True} if the function indexed
+    # the load, or {"indexed": False} if indexing failed
     def post_import(self, *args, **kwargs):
         raise NotImplementedError
 
