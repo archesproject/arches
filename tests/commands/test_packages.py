@@ -7,7 +7,7 @@ import tempfile
 from django.test.utils import captured_stdout
 
 from arches.app.models.graph import Graph
-from arches.app.models.models import Node
+from arches.app.models.models import Node, PublishedGraph
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.data_management.resource_graphs.exporter import (
     get_graphs_for_export,
@@ -56,3 +56,37 @@ class ImportGraphsTests(ArchesTransactionTestCase):
             ).count(),
             len(dependent_json["nodes"]),
         )
+
+    def test_import_graph_referencing_missing_publication(self):
+        source = Graph.objects.create_graph(name="Source Branch")
+        dependent = Graph.objects.create_graph(name="Dependent Branch")
+
+        dependent_id = dependent.pk
+        source_publication_id = source.publication_id
+
+        dependent_json = get_graphs_for_export(graphids=[str(dependent_id)])["graph"][0]
+        for node in dependent_json["nodes"]:
+            node["sourcebranchpublication_id"] = str(source_publication_id)
+
+        dependent.delete()
+        source.delete()
+
+        with tempfile.TemporaryDirectory() as directory:
+            # The source branch is never imported, as with --skip_branches.
+            with open(os.path.join(directory, "dependent.json"), "w") as f:
+                f.write(JSONSerializer().serialize({"graph": [dependent_json]}))
+
+            with captured_stdout():
+                Command().import_graphs(directory)
+
+        self.assertTrue(Graph.objects.filter(pk=dependent_id).exists())
+        self.assertFalse(
+            Node.objects.filter(
+                graph_id=dependent_id, sourcebranchpublication__isnull=False
+            ).exists()
+        )
+        for published_graph in PublishedGraph.objects.filter(
+            publication__graph_id=dependent_id
+        ):
+            for node in published_graph.serialized_graph["nodes"]:
+                self.assertIsNone(node["sourcebranchpublication_id"])

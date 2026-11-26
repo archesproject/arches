@@ -20,6 +20,7 @@ from arches.app.utils.data_management.resource_graphs import (
     exporter as ResourceGraphExporter,
 )
 from arches.app.utils.data_management.resource_graphs.importer import (
+    clear_missing_branch_publications,
     import_graph as ResourceGraphImporter,
 )
 from arches.app.utils.data_management.resources.formats.csvfile import (
@@ -1642,9 +1643,12 @@ class Command(BaseCommand):
             data_source = [data_source]
 
         errors = []
+        graphids = []
         # One transaction for the whole batch: nodes may reference another
         # graph's publication (sourcebranchpublication) via a deferred FK, so
         # every graph in the batch must be present before anything commits.
+        # Links to publications still missing once the batch is in (e.g. the
+        # branch wasn't loaded) are cleared before commit.
         with transaction.atomic():
             for path in data_source:
                 if os.path.isfile(os.path.join(path)):
@@ -1652,9 +1656,12 @@ class Command(BaseCommand):
                     with open(path, "r") as f:
                         archesfile = JSONDeserializer().deserialize(f)
                         errs, importer = ResourceGraphImporter(
-                            archesfile["graph"], overwrite_graphs
+                            archesfile["graph"],
+                            overwrite_graphs,
+                            clear_missing_branch_links=False,
                         )
                         errors.extend(errs)
+                        graphids.extend(g["graphid"] for g in archesfile["graph"])
                 else:
                     file_paths = sorted(
                         file_path
@@ -1666,9 +1673,13 @@ class Command(BaseCommand):
                         with open(os.path.join(path, file_path), "r") as f:
                             archesfile = JSONDeserializer().deserialize(f)
                             errs, importer = ResourceGraphImporter(
-                                archesfile["graph"], overwrite_graphs
+                                archesfile["graph"],
+                                overwrite_graphs,
+                                clear_missing_branch_links=False,
                             )
                             errors.extend(errs)
+                            graphids.extend(g["graphid"] for g in archesfile["graph"])
+            clear_missing_branch_publications(graphids)
         for e in errors:
             utils.print_message(e)
 
