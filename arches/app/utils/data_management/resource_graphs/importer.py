@@ -67,9 +67,8 @@ class GraphImportException(Exception):
 
 def clear_missing_branch_publications(graphids):
     """
-    Clears node links to source branch publications that don't exist, e.g.
-    when a graph is loaded without the branches it was built from. Run this
-    once every graph in a batch is imported, since a node may reference the
+    Clears node links to source branch publications that don't exist.
+    Run after every graph in a batch is imported, as a node may reference the
     publication of a graph imported later in the same batch.
     """
     missing_links = Node.objects.filter(
