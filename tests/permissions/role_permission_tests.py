@@ -156,3 +156,38 @@ class ApplicationAdministratorRoleTests(ArchesTestCase):
         response = self.client.get(reverse("map_layer_manager"))
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.assertIn(reverse("auth"), response.url)
+
+
+class GraphEditorRoleTests(ArchesTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.graph_editor = User.objects.create(username="role_graph_editor")
+        cls.graph_editor.groups.add(Group.objects.get(name="Graph Editor"))
+
+        cls.guest = User.objects.create(username="role_guest")
+        cls.guest.groups.add(Group.objects.get(name="Guest"))
+
+        cls.superuser = User.objects.create(username="role_super", is_superuser=True)
+
+        custom_group = Group.objects.create(name="Custom Graph Editors")
+        custom_group.permissions.add(
+            Permission.objects.get(
+                codename="manage_graphs", content_type__app_label="models"
+            )
+        )
+        cls.custom_editor = User.objects.create(username="role_custom")
+        cls.custom_editor.groups.add(custom_group)
+
+    def test_graph_manager_follows_permission(self):
+        url = reverse("graph", kwargs={"graphid": ""})
+        for user, expected in [
+            (self.graph_editor, HTTPStatus.OK),
+            (self.custom_editor, HTTPStatus.OK),
+            (self.superuser, HTTPStatus.OK),
+            (self.guest, HTTPStatus.FOUND),
+        ]:
+            with self.subTest(user=user.username):
+                self.client.force_login(user)
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, expected)

@@ -89,7 +89,7 @@
         {% endif %}
 
         <!-- Graph Designer -->
-        {% if request.user|has_group:"Graph Editor" %}
+        {% if perms.models.manage_graphs %}
         <li {% if "views/graph" in main_script %} class="active-sub" {% endif %}
             data-bind="click: navigate.bind(this, '{% url 'graph' '' %}')">
             <a href="#" aria-labelledby="designer-link-label">

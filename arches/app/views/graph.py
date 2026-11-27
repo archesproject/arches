@@ -24,6 +24,7 @@ from dateutil import tz
 from http import HTTPStatus
 from io import BytesIO
 
+from django.contrib.auth.decorators import permission_required
 from django.db import transaction
 from django.shortcuts import redirect, render
 from django.db.models import F, Func, Q
@@ -80,7 +81,7 @@ class GraphBaseView(BaseManagerView):
         return context
 
 
-@method_decorator(group_required("Graph Editor"), name="dispatch")
+@method_decorator(permission_required("models.manage_graphs"), name="dispatch")
 class GraphSettingsView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = models.GraphModel.objects.get(graphid=graphid)
@@ -199,7 +200,7 @@ class GraphSettingsView(GraphBaseView):
         )
 
 
-@method_decorator(group_required("Graph Editor"), name="dispatch")
+@method_decorator(permission_required("models.manage_graphs"), name="dispatch")
 class GraphManagerView(GraphBaseView):
     def get(self, request, graphid):
         if graphid is None or graphid == "":
@@ -224,7 +225,7 @@ class GraphManagerView(GraphBaseView):
             return render(request, "views/graph.htm", context)
 
 
-@method_decorator(group_required("Graph Editor"), name="dispatch")
+@method_decorator(permission_required("models.manage_graphs"), name="dispatch")
 class GraphDesignerView(GraphBaseView):
     def get_ontology_namespaces(self):
         ontology_namespaces = settings.ONTOLOGY_NAMESPACES
@@ -434,7 +435,7 @@ class GraphDataView(View):
 
         return HttpResponseNotFound()
 
-    @method_decorator(group_required("Graph Editor"), name="dispatch")
+    @method_decorator(permission_required("models.manage_graphs"), name="dispatch")
     def post(self, request, graphid=None):
         ret = {}
         try:
@@ -588,7 +589,7 @@ class GraphDataView(View):
         except GraphValidationError as e:
             return JSONErrorResponse(e.title, e.message, {"status": "Failed"})
 
-    @method_decorator(group_required("Graph Editor"), name="dispatch")
+    @method_decorator(permission_required("models.manage_graphs"), name="dispatch")
     def delete(self, request, graphid):
         if self.action == "delete_node":
             data = JSONDeserializer().deserialize(request.body)
@@ -657,7 +658,7 @@ class GraphDataView(View):
         return True
 
 
-@method_decorator(group_required("Graph Editor"), name="dispatch")
+@method_decorator(permission_required("models.manage_graphs"), name="dispatch")
 class GraphPublicationView(View):
     action = None
 
@@ -796,7 +797,7 @@ class GraphPublicationView(View):
                 )
 
 
-@method_decorator(group_required("Graph Editor"), name="dispatch")
+@method_decorator(permission_required("models.manage_graphs"), name="dispatch")
 class CardView(GraphBaseView):
     action = "update_card"
 
@@ -827,7 +828,7 @@ class DatatypeTemplateView(TemplateView):
         return render(request, "views/components/datatypes/%s.htm" % template)
 
 
-@method_decorator(group_required("Graph Editor"), name="dispatch")
+@method_decorator(permission_required("models.manage_graphs"), name="dispatch")
 class ModelHistoryView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
@@ -924,7 +925,7 @@ class ModelHistoryView(GraphBaseView):
         return JSONResponse(JSONSerializer().serialize(graphs_x_published_graphs))
 
 
-@method_decorator(group_required("Graph Editor"), name="dispatch")
+@method_decorator(permission_required("models.manage_graphs"), name="dispatch")
 class FunctionManagerView(GraphBaseView):
     action = ""
 
@@ -1002,7 +1003,7 @@ class PermissionDataError(Exception):
     pass
 
 
-@method_decorator(group_required("Graph Editor"), name="dispatch")
+@method_decorator(permission_required("models.manage_graphs"), name="dispatch")
 class PermissionDataView(View):
     action = None
 

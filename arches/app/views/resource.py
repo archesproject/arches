@@ -1092,12 +1092,12 @@ class ResourceReportView(MapBaseManagerView):
                 and not (
                     request.user.groups.filter(
                         name__in=[
-                            "Graph Editor",
                             "RDM Administrator",
                             "System Administrator",
                         ]
                     ).exists()
                     or request.user.has_perm("models.manage_application")
+                    or request.user.has_perm("models.manage_graphs")
                 )
             ),
             graph_has_unpublished_changes=bool(graph.has_unpublished_changes),

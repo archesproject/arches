@@ -15,6 +15,10 @@ ROLE_PERMISSIONS = {
         "Can administer map layers, spatial views and user preferences",
         "Application Administrator",
     ),
+    ("graphmodel", "manage_graphs"): (
+        "Can use the Arches Designer",
+        "Graph Editor",
+    ),
 }
 
 
@@ -74,6 +78,13 @@ class Migration(migrations.Migration):
                         "Can administer map layers, spatial views and user preferences",
                     ),
                 ),
+            },
+        ),
+        migrations.AlterModelOptions(
+            name="graphmodel",
+            options={
+                "managed": True,
+                "permissions": (("manage_graphs", "Can use the Arches Designer"),),
             },
         ),
         migrations.RunPython(grant_role_permissions, remove_role_permissions),

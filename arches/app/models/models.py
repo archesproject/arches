@@ -773,6 +773,7 @@ class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
     class Meta:
         managed = True
         db_table = "graphs"
+        permissions = (("manage_graphs", "Can use the Arches Designer"),)
 
         constraints = [
             # Can't use nulls_distinct=False yet (Postgres 15+ feature)
