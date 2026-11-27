@@ -27,6 +27,10 @@ ROLE_PERMISSIONS = {
         "Can edit system settings",
         "System Administrator",
     ),
+    ("resourceinstance", "review_resources"): (
+        "Can review provisional edits",
+        "Resource Reviewer",
+    ),
 }
 
 
@@ -74,6 +78,7 @@ class Migration(migrations.Migration):
                     ("edit_resources", "Can use the resource editor"),
                     ("export_resources", "Can export search results"),
                     ("edit_system_settings", "Can edit system settings"),
+                    ("review_resources", "Can review provisional edits"),
                 ),
             },
         ),

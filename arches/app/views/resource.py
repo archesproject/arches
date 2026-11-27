@@ -471,11 +471,19 @@ class ResourcePermissionDataView(View):
         ordered_perms = []
         for p in permission_order:
             ordered_perms.append(perms[p])
-        # One query for all editors: user.has_perm() would query per user here.
-        editor_ids = set(
-            User.objects.with_perm(
-                "models.edit_resources",
-                backend="django.contrib.auth.backends.ModelBackend",
+        editor_or_reviewer_perms = ["edit_resources", "review_resources"]
+        editor_or_reviewer_ids = set()
+        for perm in editor_or_reviewer_perms:
+            editor_or_reviewer_ids.update(
+                User.objects.with_perm(
+                    f"models.{perm}",
+                    backend="django.contrib.auth.backends.ModelBackend",
+                ).values_list("pk", flat=True)
+            )
+        editor_or_reviewer_group_ids = set(
+            Group.objects.filter(
+                permissions__content_type__app_label="models",
+                permissions__codename__in=editor_or_reviewer_perms,
             ).values_list("pk", flat=True)
         )
         identities = [
@@ -489,10 +497,7 @@ class ResourcePermissionDataView(View):
                 "system_permissions": apb.get_default_permissions(
                     user, resource_instance
                 ),
-                "is_editor_or_reviewer": bool(
-                    user.pk in editor_ids
-                    or user_is_resource_reviewer(user, resource=resource_instance)
-                ),
+                "is_editor_or_reviewer": user.pk in editor_or_reviewer_ids,
             }
             for user in User.objects.prefetch_related("groups")
         ]
@@ -507,6 +512,7 @@ class ResourcePermissionDataView(View):
                 "default_permissions": self.get_perms(
                     group, "group", resource_instance, ordered_perms
                 ),
+                "is_editor_or_reviewer": group.pk in editor_or_reviewer_group_ids,
             }
             for group in Group.objects.all()
         ]

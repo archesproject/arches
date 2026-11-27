@@ -3,6 +3,7 @@ from http import HTTPStatus
 from django.contrib.auth.models import Group, Permission, User
 from django.urls import reverse
 
+from arches.app.models.graph import Graph
 from arches.app.models.models import ResourceInstance, UserPreference
 from arches.app.models.system_settings import settings
 from arches.app.permissions.arches_default_allow import (
@@ -15,7 +16,9 @@ from arches.app.utils.permission_backend import (
     user_can_read_concepts,
     user_is_resource_editor,
     user_is_resource_exporter,
+    user_is_resource_reviewer,
 )
+from arches.app.views.resource import ResourcePermissionDataView
 from tests.base_test import ArchesTestCase
 
 # these tests can be run from the command line via
@@ -287,3 +290,55 @@ class SystemAdministratorRoleTests(ArchesTestCase):
         )
         self.client.force_login(graph_editor)
         self.assertEqual(self.client.get(url).status_code, HTTPStatus.FORBIDDEN)
+
+
+class ResourceReviewerRoleTests(ArchesTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.reviewer = User.objects.create(username="role_reviewer")
+        cls.reviewer.groups.add(Group.objects.get(name="Resource Reviewer"))
+
+        cls.guest = User.objects.create(username="role_guest")
+        cls.guest.groups.add(Group.objects.get(name="Guest"))
+
+        cls.superuser = User.objects.create(username="role_super", is_superuser=True)
+
+        cls.custom_group = Group.objects.create(name="Custom Reviewers")
+        cls.custom_group.permissions.add(
+            Permission.objects.get(
+                codename="review_resources", content_type__app_label="models"
+            )
+        )
+        cls.custom_reviewer = User.objects.create(username="role_custom")
+        cls.custom_reviewer.groups.add(cls.custom_group)
+
+        graph = Graph.objects.create_graph(
+            name="ROLE_PERMISSIONS_TEST_GRAPH", is_resource=False
+        )
+        graph.isresource = True
+        graph.resource_instance_lifecycle_id = (
+            settings.DEFAULT_RESOURCE_INSTANCE_LIFECYCLE_ID
+        )
+        graph.save(validate=False)
+        cls.resource = ResourceInstance.objects.create(graph=graph)
+
+    def test_user_is_resource_reviewer(self):
+        self.assertTrue(user_is_resource_reviewer(self.reviewer))
+        self.assertTrue(user_is_resource_reviewer(self.superuser))
+        self.assertTrue(user_is_resource_reviewer(self.custom_reviewer))
+        self.assertFalse(user_is_resource_reviewer(self.guest))
+
+    def test_permissions_panel_flags_follow_permission(self):
+        permissions = ResourcePermissionDataView().get_instance_permissions(
+            self.resource
+        )
+        flags = {
+            (identity["type"], identity["name"]): identity["is_editor_or_reviewer"]
+            for identity in permissions["identities"]
+        }
+        self.assertTrue(flags[("user", "role_custom")])
+        self.assertTrue(flags[("group", "Custom Reviewers")])
+        self.assertTrue(flags[("group", "Resource Editor")])
+        self.assertFalse(flags[("user", "role_guest")])
+        self.assertFalse(flags[("group", "Guest")])

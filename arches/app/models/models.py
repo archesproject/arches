@@ -1517,6 +1517,7 @@ class ResourceInstance(
             ("edit_resources", "Can use the resource editor"),
             ("export_resources", "Can export search results"),
             ("edit_system_settings", "Can edit system settings"),
+            ("review_resources", "Can review provisional edits"),
         )
 
     def __str__(self):
