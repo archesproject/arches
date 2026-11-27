@@ -1,4 +1,5 @@
 import json
+from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
@@ -13,7 +14,6 @@ from arches.app.utils.permission_backend import (
     user_can_read_resource,
     user_can_edit_resource,
 )
-from django.contrib.auth.decorators import permission_required
 from arches.app.utils.response import JSONResponse
 from arches.app.views.api import APIBase
 from arches.app.views.tile import TileData as TileView

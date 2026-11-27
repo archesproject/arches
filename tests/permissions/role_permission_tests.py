@@ -25,29 +25,35 @@ from tests.base_test import ArchesTestCase
 # python manage.py test tests.permissions.role_permission_tests --settings="tests.test_settings"
 
 
+def make_user(username, group_name, permission=None):
+    """A user in group_name; given a permission, group_name is created holding only it."""
+    if permission:
+        group = Group.objects.create(name=group_name)
+        group.permissions.add(
+            Permission.objects.get(
+                codename=permission, content_type__app_label="models"
+            )
+        )
+    else:
+        group = Group.objects.get(name=group_name)
+    user = User.objects.create(username=username)
+    user.groups.add(group)
+    return user
+
+
 class ResourceEditorRoleTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.editor = User.objects.create(username="role_editor")
-        cls.editor.groups.add(Group.objects.get(name="Resource Editor"))
+        cls.editor = make_user("role_editor", "Resource Editor")
 
-        cls.crowdsource_editor = User.objects.create(username="role_crowdsource")
-        cls.crowdsource_editor.groups.add(Group.objects.get(name="Crowdsource Editor"))
+        cls.crowdsource_editor = make_user("role_crowdsource", "Crowdsource Editor")
 
-        cls.guest = User.objects.create(username="role_guest")
-        cls.guest.groups.add(Group.objects.get(name="Guest"))
+        cls.guest = make_user("role_guest", "Guest")
 
         cls.superuser = User.objects.create(username="role_super", is_superuser=True)
 
-        custom_group = Group.objects.create(name="Custom Editors")
-        custom_group.permissions.add(
-            Permission.objects.get(
-                codename="edit_resources", content_type__app_label="models"
-            )
-        )
-        cls.custom_editor = User.objects.create(username="role_custom")
-        cls.custom_editor.groups.add(custom_group)
+        cls.custom_editor = make_user("role_custom", "Custom Editors", "edit_resources")
 
     def test_user_is_resource_editor(self):
         self.assertTrue(user_is_resource_editor(self.editor))
@@ -75,22 +81,15 @@ class ResourceExporterRoleTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.exporter = User.objects.create(username="role_exporter")
-        cls.exporter.groups.add(Group.objects.get(name="Resource Exporter"))
+        cls.exporter = make_user("role_exporter", "Resource Exporter")
 
-        cls.guest = User.objects.create(username="role_guest")
-        cls.guest.groups.add(Group.objects.get(name="Guest"))
+        cls.guest = make_user("role_guest", "Guest")
 
         cls.superuser = User.objects.create(username="role_super", is_superuser=True)
 
-        custom_group = Group.objects.create(name="Custom Exporters")
-        custom_group.permissions.add(
-            Permission.objects.get(
-                codename="export_resources", content_type__app_label="models"
-            )
+        cls.custom_exporter = make_user(
+            "role_custom", "Custom Exporters", "export_resources"
         )
-        cls.custom_exporter = User.objects.create(username="role_custom")
-        cls.custom_exporter.groups.add(custom_group)
 
     def test_user_is_resource_exporter(self):
         self.assertTrue(user_is_resource_exporter(self.exporter))
@@ -109,22 +108,15 @@ class ApplicationAdministratorRoleTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.app_admin = User.objects.create(username="role_app_admin")
-        cls.app_admin.groups.add(Group.objects.get(name="Application Administrator"))
+        cls.app_admin = make_user("role_app_admin", "Application Administrator")
 
-        cls.guest = User.objects.create(username="role_guest")
-        cls.guest.groups.add(Group.objects.get(name="Guest"))
+        cls.guest = make_user("role_guest", "Guest")
 
         cls.superuser = User.objects.create(username="role_super", is_superuser=True)
 
-        custom_group = Group.objects.create(name="Custom App Admins")
-        custom_group.permissions.add(
-            Permission.objects.get(
-                codename="manage_application", content_type__app_label="models"
-            )
+        cls.custom_admin = make_user(
+            "role_custom", "Custom App Admins", "manage_application"
         )
-        cls.custom_admin = User.objects.create(username="role_custom")
-        cls.custom_admin.groups.add(custom_group)
 
         cls.other_preference = UserPreference.objects.create(
             username=User.objects.create(username="role_other"),
@@ -178,22 +170,15 @@ class GraphEditorRoleTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.graph_editor = User.objects.create(username="role_graph_editor")
-        cls.graph_editor.groups.add(Group.objects.get(name="Graph Editor"))
+        cls.graph_editor = make_user("role_graph_editor", "Graph Editor")
 
-        cls.guest = User.objects.create(username="role_guest")
-        cls.guest.groups.add(Group.objects.get(name="Guest"))
+        cls.guest = make_user("role_guest", "Guest")
 
         cls.superuser = User.objects.create(username="role_super", is_superuser=True)
 
-        custom_group = Group.objects.create(name="Custom Graph Editors")
-        custom_group.permissions.add(
-            Permission.objects.get(
-                codename="manage_graphs", content_type__app_label="models"
-            )
+        cls.custom_editor = make_user(
+            "role_custom", "Custom Graph Editors", "manage_graphs"
         )
-        cls.custom_editor = User.objects.create(username="role_custom")
-        cls.custom_editor.groups.add(custom_group)
 
     def test_graph_manager_follows_permission(self):
         url = reverse("graph", kwargs={"graphid": ""})
@@ -213,22 +198,13 @@ class RDMAdministratorRoleTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.rdm_admin = User.objects.create(username="role_rdm_admin")
-        cls.rdm_admin.groups.add(Group.objects.get(name="RDM Administrator"))
+        cls.rdm_admin = make_user("role_rdm_admin", "RDM Administrator")
 
-        cls.guest = User.objects.create(username="role_guest")
-        cls.guest.groups.add(Group.objects.get(name="Guest"))
+        cls.guest = make_user("role_guest", "Guest")
 
         cls.superuser = User.objects.create(username="role_super", is_superuser=True)
 
-        custom_group = Group.objects.create(name="Custom RDM Admins")
-        custom_group.permissions.add(
-            Permission.objects.get(
-                codename="manage_rdm", content_type__app_label="models"
-            )
-        )
-        cls.custom_admin = User.objects.create(username="role_custom")
-        cls.custom_admin.groups.add(custom_group)
+        cls.custom_admin = make_user("role_custom", "Custom RDM Admins", "manage_rdm")
 
     def test_user_can_read_concepts(self):
         self.assertTrue(user_can_read_concepts(self.rdm_admin))
@@ -247,20 +223,13 @@ class SystemAdministratorRoleTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.sys_admin = User.objects.create(username="role_sys_admin")
-        cls.sys_admin.groups.add(Group.objects.get(name="System Administrator"))
+        cls.sys_admin = make_user("role_sys_admin", "System Administrator")
 
-        cls.guest = User.objects.create(username="role_guest")
-        cls.guest.groups.add(Group.objects.get(name="Guest"))
+        cls.guest = make_user("role_guest", "Guest")
 
-        custom_group = Group.objects.create(name="Custom System Admins")
-        custom_group.permissions.add(
-            Permission.objects.get(
-                codename="edit_system_settings", content_type__app_label="models"
-            )
+        cls.custom_admin = make_user(
+            "role_custom", "Custom System Admins", "edit_system_settings"
         )
-        cls.custom_admin = User.objects.create(username="role_custom")
-        cls.custom_admin.groups.add(custom_group)
 
     def test_system_settings_resource_refused_without_permission(self):
         # An unsaved instance: the test DB has no system settings resource, and a
@@ -287,8 +256,7 @@ class SystemAdministratorRoleTests(ArchesTestCase):
                         self.assertIsNot(result["permitted"], False)
 
     def test_system_settings_graph_designer_needs_permission(self):
-        graph_editor = User.objects.create(username="role_graph_only")
-        graph_editor.groups.add(Group.objects.get(name="Graph Editor"))
+        graph_editor = make_user("role_graph_only", "Graph Editor")
         url = reverse(
             "graph_designer",
             kwargs={"graphid": settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID},
@@ -301,22 +269,15 @@ class ResourceReviewerRoleTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.reviewer = User.objects.create(username="role_reviewer")
-        cls.reviewer.groups.add(Group.objects.get(name="Resource Reviewer"))
+        cls.reviewer = make_user("role_reviewer", "Resource Reviewer")
 
-        cls.guest = User.objects.create(username="role_guest")
-        cls.guest.groups.add(Group.objects.get(name="Guest"))
+        cls.guest = make_user("role_guest", "Guest")
 
         cls.superuser = User.objects.create(username="role_super", is_superuser=True)
 
-        cls.custom_group = Group.objects.create(name="Custom Reviewers")
-        cls.custom_group.permissions.add(
-            Permission.objects.get(
-                codename="review_resources", content_type__app_label="models"
-            )
+        cls.custom_reviewer = make_user(
+            "role_custom", "Custom Reviewers", "review_resources"
         )
-        cls.custom_reviewer = User.objects.create(username="role_custom")
-        cls.custom_reviewer.groups.add(cls.custom_group)
 
         graph = Graph.objects.create_graph(
             name="ROLE_PERMISSIONS_TEST_GRAPH", is_resource=False

@@ -1,5 +1,6 @@
 import json
 
+from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import F, JSONField, Value
@@ -11,7 +12,6 @@ from django.views.generic import View
 
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
-from django.contrib.auth.decorators import permission_required
 from arches.app.utils.permission_backend import user_is_resource_editor
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
 from arches.app.views.api import APIBase

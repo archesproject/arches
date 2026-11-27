@@ -20,6 +20,7 @@ import json
 import logging
 import uuid
 
+from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.contrib.auth.models import User, Group
 from django.db.models import Prefetch
@@ -42,7 +43,6 @@ from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from django.contrib.auth.decorators import permission_required
 from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
 from arches.app.utils.i18n import LanguageSynchronizer, localize_complex_input

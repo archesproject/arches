@@ -32,6 +32,7 @@ from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.permission_backend import user_is_resource_reviewer
+from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.models import User
 from django.http import HttpResponseNotFound, HttpResponseBadRequest
 from django.utils.decorators import method_decorator
@@ -41,7 +42,6 @@ from django.views.generic import View
 from django.db import transaction
 from django.shortcuts import redirect
 from arches.app.models.resource import EditLog
-from django.contrib.auth.decorators import permission_required
 
 logger = logging.getLogger(__name__)
 

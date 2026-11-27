@@ -568,14 +568,6 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         return False
 
     def group_required(self, user: User, *group_names: list[str]) -> bool:
-        # To fully reimplement this without Django groups, the following group names must (currently) be handled:
-        #  - Application Administrator
-        #  - RDM Administrator
-        #  - Graph Editor
-        #  - Resource Editor
-        #  - Resource Exporter
-        #  - System Administrator
-
         if user.is_authenticated:
             if user.is_superuser or self.user_in_group_by_name(user, group_names):
                 return True

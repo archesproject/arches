@@ -687,7 +687,7 @@ class ResourceReport(APIBase):
         )
 
         # if a user is viewing a report for a resource that does not have the same publication as the current graph publication
-        # ( and therefore is out-of-date ) only allow them to access report details if they have Graph Editor permissions or higher.
+        # ( and therefore is out-of-date ) only allow them to access report details if they hold one of the admin permissions below.
         if graph_has_different_publication and not any(
             request.user.has_perm(perm)
             for perm in (
