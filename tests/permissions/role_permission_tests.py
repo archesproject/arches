@@ -277,3 +277,13 @@ class SystemAdministratorRoleTests(ArchesTestCase):
                         self.assertIs(result["permitted"], False)
                     else:
                         self.assertIsNot(result["permitted"], False)
+
+    def test_system_settings_graph_designer_needs_permission(self):
+        graph_editor = User.objects.create(username="role_graph_only")
+        graph_editor.groups.add(Group.objects.get(name="Graph Editor"))
+        url = reverse(
+            "graph_designer",
+            kwargs={"graphid": settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID},
+        )
+        self.client.force_login(graph_editor)
+        self.assertEqual(self.client.get(url).status_code, HTTPStatus.FORBIDDEN)

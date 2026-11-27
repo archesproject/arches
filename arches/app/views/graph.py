@@ -39,7 +39,6 @@ from django.core.cache import caches
 from guardian.models import GroupObjectPermission, UserObjectPermission
 from django.utils import translation
 from django.core.exceptions import PermissionDenied
-from arches.app.utils.decorators import group_required
 from arches.app.utils import task_management
 
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -247,7 +246,7 @@ class GraphDesignerView(GraphBaseView):
 
     def get(self, request, graphid):
         if graphid == settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
-            if not group_required("System Administrator", raise_exception=True):
+            if not request.user.has_perm("models.edit_system_settings"):
                 raise PermissionDenied
 
         self.source_graph = Graph.objects.get(pk=graphid)
