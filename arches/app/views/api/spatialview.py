@@ -1,12 +1,12 @@
 import logging
 
+from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
-from arches.app.utils.decorators import group_required
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
 from arches.app.views.api import APIBase
@@ -152,7 +152,9 @@ class SpatialView(APIBase):
 
         return self.create_spatialview_from_json_data(json_data)
 
-    @method_decorator(group_required("Application Administrator", raise_exception=True))
+    @method_decorator(
+        permission_required("models.manage_application", raise_exception=True)
+    )
     def post(self, request, identifier=None):
 
         # if identifier is not None then the user is trying to update a spatialview so an error should be returned with a message
@@ -195,7 +197,9 @@ class SpatialView(APIBase):
             return JSONResponse(spatialview.to_json(), status=201)
         return JSONErrorResponse(_("No json request payload"), status=400)
 
-    @method_decorator(group_required("Application Administrator", raise_exception=True))
+    @method_decorator(
+        permission_required("models.manage_application", raise_exception=True)
+    )
     def put(self, request, identifier=None):
 
         if not identifier:
@@ -241,7 +245,9 @@ class SpatialView(APIBase):
             _("Spatialview update failed"), _("No json request payload"), status=400
         )
 
-    @method_decorator(group_required("Application Administrator", raise_exception=True))
+    @method_decorator(
+        permission_required("models.manage_application", raise_exception=True)
+    )
     def delete(self, request, identifier=None):
         if identifier:
             spatialview = None

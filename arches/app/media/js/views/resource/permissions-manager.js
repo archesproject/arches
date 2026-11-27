@@ -248,24 +248,9 @@ export default ko.components.register("permissions-manager", {
                         permission.codename === "change_resourceinstance" ||
                         permission.codename === "delete_resourceinstance"
                     ) {
-                        if (id.type === "user") {
-                            if (
-                                id.creatorOrSuperUser ||
-                                id.is_editor_or_reviewer
-                            ) {
-                                return true;
-                            }
-                        } else {
-                            // id.type === 'group'
-                            if (
-                                id.name === "Resource Editor" ||
-                                id.name === "Resource Reviewer"
-                            ) {
-                                return true;
-                            }
-                        }
-
-                        return false;
+                        return Boolean(
+                            id.creatorOrSuperUser || id.is_editor_or_reviewer
+                        );
                     }
 
                     return true;

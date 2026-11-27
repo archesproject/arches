@@ -1,4 +1,5 @@
 import json
+from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
@@ -13,7 +14,6 @@ from arches.app.utils.permission_backend import (
     user_can_read_resource,
     user_can_edit_resource,
 )
-from arches.app.utils.decorators import group_required
 from arches.app.utils.response import JSONResponse
 from arches.app.views.api import APIBase
 from arches.app.views.tile import TileData as TileView
@@ -60,7 +60,9 @@ class Tile(APIBase):
             request.POST["data"] = request.body
         return tileview.post(request)
 
-    @method_decorator(group_required("Resource Editor", raise_exception=True))
+    @method_decorator(
+        permission_required("models.edit_resources", raise_exception=True)
+    )
     def delete(self, request, tileid):
         try:
             tile = models.TileModel.objects.get(tileid=tileid)
@@ -75,7 +77,7 @@ class Tile(APIBase):
 
 @method_decorator(csrf_exempt, name="dispatch")
 @method_decorator(
-    group_required("Resource Editor", raise_exception=True), name="dispatch"
+    permission_required("models.edit_resources", raise_exception=True), name="dispatch"
 )
 class NodeValue(APIBase):
     def post(self, request):

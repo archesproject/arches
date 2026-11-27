@@ -5,6 +5,7 @@ from uuid import UUID
 import filetype
 import json
 
+from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Max
@@ -15,7 +16,6 @@ from django.utils.translation import gettext as _
 from arches.app.models.system_settings import settings
 from arches.app.models.utils import field_names
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
-from arches.app.utils.decorators import group_required
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
 from arches.app.utils.string_utils import str_to_bool
@@ -91,7 +91,7 @@ class ListView(APIBase):
         return JSONResponse(serialized)
 
     @method_decorator(
-        group_required("RDM Administrator", raise_exception=True), name="dispatch"
+        permission_required("models.manage_rdm", raise_exception=True), name="dispatch"
     )
     def post(self, request):
         skosfile = request.FILES.get("skosfile", None)
@@ -136,7 +136,7 @@ class ListView(APIBase):
             return JSONResponse(lst.serialize(), status=HTTPStatus.CREATED)
 
     @method_decorator(
-        group_required("RDM Administrator", raise_exception=True), name="dispatch"
+        permission_required("models.manage_rdm", raise_exception=True), name="dispatch"
     )
     def patch(self, request, list_id):
         data = JSONDeserializer().deserialize(request.body)
@@ -171,7 +171,7 @@ class ListView(APIBase):
         return JSONResponse(status=HTTPStatus.NO_CONTENT)
 
     @method_decorator(
-        group_required("RDM Administrator", raise_exception=True), name="dispatch"
+        permission_required("models.manage_rdm", raise_exception=True), name="dispatch"
     )
     def delete(self, request, list_id):
         try:
@@ -298,7 +298,7 @@ class FilteredListView(APIBase):
 
 
 @method_decorator(
-    group_required("RDM Administrator", raise_exception=True), name="dispatch"
+    permission_required("models.manage_rdm", raise_exception=True), name="dispatch"
 )
 class ListExportView(APIBase):
     def post(self, request):
@@ -334,7 +334,7 @@ class ListExportView(APIBase):
 
 
 @method_decorator(
-    group_required("RDM Administrator", raise_exception=True), name="dispatch"
+    permission_required("models.manage_rdm", raise_exception=True), name="dispatch"
 )
 class ListItemView(APIBase):
     def post(self, request):
@@ -490,7 +490,7 @@ class ListItemAncestorPathView(APIBase):
 
 
 @method_decorator(
-    group_required("RDM Administrator", raise_exception=True), name="dispatch"
+    permission_required("models.manage_rdm", raise_exception=True), name="dispatch"
 )
 class ListItemValueView(APIBase):
     def post(self, request):
@@ -544,7 +544,7 @@ class ListItemValueView(APIBase):
 
 
 @method_decorator(
-    group_required("RDM Administrator", raise_exception=True), name="dispatch"
+    permission_required("models.manage_rdm", raise_exception=True), name="dispatch"
 )
 class ListItemImageView(APIBase):
     def post(self, request):
@@ -571,7 +571,7 @@ class ListItemImageView(APIBase):
 
 
 @method_decorator(
-    group_required("RDM Administrator", raise_exception=True), name="dispatch"
+    permission_required("models.manage_rdm", raise_exception=True), name="dispatch"
 )
 class ListItemImageMetadataView(APIBase):
     def post(self, request):
@@ -640,7 +640,7 @@ class ListOptionsView(APIBase):
 
 class ListItemCopyView(APIBase):
     @method_decorator(
-        group_required("RDM Administrator", raise_exception=True), name="dispatch"
+        permission_required("models.manage_rdm", raise_exception=True), name="dispatch"
     )
     def post(self, request, item_id):
         data = JSONDeserializer().deserialize(request.body)

@@ -20,6 +20,7 @@ import json
 import logging
 import os
 
+from django.contrib.auth.decorators import permission_required
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.cache import cache
 from django.core.paginator import Paginator
@@ -55,7 +56,7 @@ from arches.app.utils.permission_backend import (
     get_nodegroups_by_perm,
     user_is_resource_reviewer,
 )
-from arches.app.utils.decorators import group_required, requires_elasticsearch
+from arches.app.utils.decorators import requires_elasticsearch
 import arches.app.utils.zip as zip_utils
 import arches.app.utils.task_management as task_management
 from arches.app.utils.data_management.resources.formats.htmlfile import HtmlWriter
@@ -163,7 +164,7 @@ def search_terms(request):
     return JSONResponse(ret)
 
 
-@group_required("Resource Exporter")
+@permission_required("models.export_resources")
 @requires_elasticsearch
 def export_results(request):
     total = int(request.GET.get("total", 0))

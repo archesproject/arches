@@ -17,9 +17,9 @@ class Guest(permissions.BasePermission):
 class RDMAdministrator(permissions.BasePermission):
     @deprecated
     def has_permission(self, request, view):
-        return group_required(request.user, "RDM Administrator")
+        return request.user.has_perm("models.manage_rdm")
 
 
 class ResourceEditor(permissions.BasePermission):
     def has_permission(self, request, view):
-        return group_required(request.user, "Resource Editor")
+        return request.user.has_perm("models.edit_resources")

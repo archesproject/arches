@@ -2,6 +2,7 @@ from celery import app, Celery
 from datetime import datetime
 from http import HTTPStatus
 import logging
+from django.contrib.auth.decorators import permission_required
 from django.db import connection
 from django.core.paginator import Paginator
 from django.forms.models import model_to_dict
@@ -11,7 +12,6 @@ from django.views.generic import View
 from arches.app.etl_modules.base_import_module import FileValidationError
 from arches.app.models.models import ETLModule, LoadEvent, LoadStaging
 from arches.app.utils.pagination import get_paginator
-from arches.app.utils.decorators import group_required
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 import arches.app.utils.task_management as task_management
 
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 @method_decorator(
-    group_required("Resource Editor", raise_exception=True), name="dispatch"
+    permission_required("models.edit_resources", raise_exception=True), name="dispatch"
 )
 class ETLManagerView(View):
     """

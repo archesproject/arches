@@ -378,8 +378,8 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
                         return False
 
                     if result["permitted"] == "unknown":
-                        return self.user_in_group_by_name(
-                            user, settings.RESOURCE_EDITOR_GROUPS
+                        return self.user_is_resource_editor(
+                            user
                         ) or self.user_can_edit_model_nodegroups(
                             user, result["resource"]
                         )
@@ -388,10 +388,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
                 else:
                     return None
 
-            return (
-                self.user_in_group_by_name(user, settings.RESOURCE_EDITOR_GROUPS)
-                or len(self.get_editable_resource_types(user)) > 0
-            )
+            return self.user_is_resource_editor(user)
         return False
 
     def user_can_delete_resource(
@@ -433,8 +430,8 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
                         )
                         if len(protected_tiles) > 0:
                             return False
-                        return self.user_in_group_by_name(
-                            user, settings.RESOURCE_EDITOR_GROUPS
+                        return self.user_is_resource_editor(
+                            user
                         ) or self.user_can_delete_model_nodegroups(
                             user, result["resource"]
                         )
@@ -521,50 +518,48 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
 
     def user_can_read_concepts(self, user: User) -> bool:
         """
-        Requires that a user is a part of the RDM Administrator group
+        Requires that a user holds the ``models.manage_rdm`` permission
 
         """
 
-        if user.is_authenticated:
-            return self.user_in_group_by_name(user, ["RDM Administrator"])
-        return False
+        return user.has_perm("models.manage_rdm")
 
     def user_is_resource_editor(self, user: User, *, resource=None, graph=None) -> bool:
         """
-        Single test for whether a user is in the Resource Editor group.
+        Single test for whether a user holds the ``models.edit_resources`` permission.
 
         Subclasses may use the optional ``resource`` (ResourceInstance) and
         ``graph`` (GraphModel) arguments to implement per-instance or
         per-graph granularity. The base implementation ignores them.
         """
 
-        return self.user_in_group_by_name(user, ["Resource Editor"])
+        return user.has_perm("models.edit_resources")
 
     def user_is_resource_reviewer(
         self, user: User, *, resource=None, graph=None
     ) -> bool:
         """
-        Single test for whether a user is in the Resource Reviewer group.
+        Single test for whether a user holds the ``models.review_resources`` permission.
 
         Subclasses may use the optional ``resource`` (ResourceInstance) and
         ``graph`` (GraphModel) arguments to implement per-instance or
         per-graph granularity. The base implementation ignores them.
         """
 
-        return self.user_in_group_by_name(user, ["Resource Reviewer"])
+        return user.has_perm("models.review_resources")
 
     def user_is_resource_exporter(
         self, user: User, *, resource=None, graph=None
     ) -> bool:
         """
-        Single test for whether a user is in the Resource Exporter group.
+        Single test for whether a user holds the ``models.export_resources`` permission.
 
         Subclasses may use the optional ``resource`` (ResourceInstance) and
         ``graph`` (GraphModel) arguments to implement per-instance or
         per-graph granularity. The base implementation ignores them.
         """
 
-        return self.user_in_group_by_name(user, ["Resource Exporter"])
+        return user.has_perm("models.export_resources")
 
     def user_in_group_by_name(self, user: User, names: Iterable[str]) -> bool:
         for group in user.groups.all():
@@ -573,14 +568,6 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         return False
 
     def group_required(self, user: User, *group_names: list[str]) -> bool:
-        # To fully reimplement this without Django groups, the following group names must (currently) be handled:
-        #  - Application Administrator
-        #  - RDM Administrator
-        #  - Graph Editor
-        #  - Resource Editor
-        #  - Resource Exporter
-        #  - System Administrator
-
         if user.is_authenticated:
             if user.is_superuser or self.user_in_group_by_name(user, group_names):
                 return True

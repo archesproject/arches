@@ -232,6 +232,7 @@ ADMINS = (
 )
 MANAGERS = ADMINS
 
+# Deprecated: no longer read by core; kept for permission frameworks that still do.
 RESOURCE_EDITOR_GROUPS = ("Resource Editor", "Crowdsource Editor")
 
 # Unique session cookie ensures that logins are treated separately for each app

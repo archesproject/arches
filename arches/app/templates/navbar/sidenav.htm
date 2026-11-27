@@ -18,7 +18,7 @@
 
     <ul aria-labelledby="tools-header-label">
         <!-- System Settings list item -->
-        {% if request.user|has_group:"System Administrator" %}
+        {% if perms.models.edit_system_settings %}
         <li {% if "views/resource" in main_script and is_system_settings is True %} class="active-sub" {% endif %} data-bind="click: navigate.bind(this, '{% url 'config' %}')">
             <a href="{% url 'config' %}" aria-labelledby="system-settings-link-label">
                 <i class="ti-alarm-clock"></i>
@@ -89,7 +89,7 @@
         {% endif %}
 
         <!-- Graph Designer -->
-        {% if request.user|has_group:"Graph Editor" %}
+        {% if perms.models.manage_graphs %}
         <li {% if "views/graph" in main_script %} class="active-sub" {% endif %}
             data-bind="click: navigate.bind(this, '{% url 'graph' '' %}')">
             <a href="#" aria-labelledby="designer-link-label">
@@ -112,7 +112,7 @@
         {% endif %}
 
         <!-- Map Layer Manager -->
-        {% if request.user|has_group:"Application Administrator" %}
+        {% if perms.models.manage_application %}
         <li {% if "views/map-layer-manager" in main_script %} class="active-sub" {% endif %} data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}')">
             <a href="{% url 'map_layer_manager' %}" aria-labelledby="map-layer-manager-link-label">
                 <i class="fa fa-server"></i>

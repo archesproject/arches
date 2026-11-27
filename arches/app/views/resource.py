@@ -20,6 +20,7 @@ import json
 import logging
 import uuid
 
+from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.contrib.auth.models import User, Group
 from django.db.models import Prefetch
@@ -42,14 +43,12 @@ from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.decorators import group_required
 from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
 from arches.app.utils.i18n import LanguageSynchronizer, localize_complex_input
 from arches.app.utils.pagination import get_paginator
 from arches.app.utils.permission_backend import (
     get_default_settable_permissions,
-    user_is_resource_editor,
     user_is_resource_reviewer,
     user_can_edit_resource,
     user_can_delete_resource,
@@ -103,7 +102,7 @@ def get_resource_relationship_types():
     return relationship_type_values
 
 
-@method_decorator(group_required("Resource Editor"), name="dispatch")
+@method_decorator(permission_required("models.edit_resources"), name="dispatch")
 class ResourceEditorView(MapBaseManagerView):
     action = None
 
@@ -421,7 +420,7 @@ class ResourceEditorView(MapBaseManagerView):
         return JSONResponse({"resourceid": copied_resource.resourceinstanceid})
 
 
-@method_decorator(group_required("Resource Editor"), name="dispatch")
+@method_decorator(permission_required("models.edit_resources"), name="dispatch")
 class ResourcePermissionDataView(View):
     perm_cache = {}
     action = None
@@ -472,6 +471,21 @@ class ResourcePermissionDataView(View):
         ordered_perms = []
         for p in permission_order:
             ordered_perms.append(perms[p])
+        editor_or_reviewer_perms = ["edit_resources", "review_resources"]
+        editor_or_reviewer_ids = set()
+        for perm in editor_or_reviewer_perms:
+            editor_or_reviewer_ids.update(
+                User.objects.with_perm(
+                    f"models.{perm}",
+                    backend="django.contrib.auth.backends.ModelBackend",
+                ).values_list("pk", flat=True)
+            )
+        editor_or_reviewer_group_ids = set(
+            Group.objects.filter(
+                permissions__content_type__app_label="models",
+                permissions__codename__in=editor_or_reviewer_perms,
+            ).values_list("pk", flat=True)
+        )
         identities = [
             {
                 "name": user.username,
@@ -483,10 +497,7 @@ class ResourcePermissionDataView(View):
                 "system_permissions": apb.get_default_permissions(
                     user, resource_instance
                 ),
-                "is_editor_or_reviewer": bool(
-                    user_is_resource_editor(user, resource=resource_instance)
-                    or user_is_resource_reviewer(user, resource=resource_instance)
-                ),
+                "is_editor_or_reviewer": user.pk in editor_or_reviewer_ids,
             }
             for user in User.objects.prefetch_related("groups")
         ]
@@ -501,6 +512,7 @@ class ResourcePermissionDataView(View):
                 "default_permissions": self.get_perms(
                     group, "group", resource_instance, ordered_perms
                 ),
+                "is_editor_or_reviewer": group.pk in editor_or_reviewer_group_ids,
             }
             for group in Group.objects.all()
         ]
@@ -1083,14 +1095,15 @@ class ResourceReportView(MapBaseManagerView):
             graph_has_different_publication=graph_has_different_publication,
             graph_has_different_publication_and_user_has_insufficient_permissions=bool(
                 graph_has_different_publication
-                and not request.user.groups.filter(
-                    name__in=[
-                        "Graph Editor",
-                        "RDM Administrator",
-                        "Application Administrator",
-                        "System Administrator",
-                    ]
-                ).exists()
+                and not any(
+                    request.user.has_perm(perm)
+                    for perm in (
+                        "models.manage_application",
+                        "models.manage_graphs",
+                        "models.manage_rdm",
+                        "models.edit_system_settings",
+                    )
+                )
             ),
             graph_has_unpublished_changes=bool(graph.has_unpublished_changes),
         )

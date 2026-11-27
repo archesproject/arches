@@ -216,6 +216,12 @@ class Concept(SaveSupportsBlindOverwriteMixin, models.Model):
     class Meta:
         managed = True
         db_table = "concepts"
+        permissions = (
+            (
+                "manage_rdm",
+                "Can manage the Reference Data Manager and controlled lists",
+            ),
+        )
 
 
 class DDataType(models.Model):
@@ -773,6 +779,7 @@ class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
     class Meta:
         managed = True
         db_table = "graphs"
+        permissions = (("manage_graphs", "Can use the Arches Designer"),)
 
         constraints = [
             # Can't use nulls_distinct=False yet (Postgres 15+ feature)
@@ -1505,7 +1512,13 @@ class ResourceInstance(
     class Meta:
         managed = True
         db_table = "resource_instances"
-        permissions = (("no_access_to_resourceinstance", "No Access"),)
+        permissions = (
+            ("no_access_to_resourceinstance", "No Access"),
+            ("edit_resources", "Can use the resource editor"),
+            ("export_resources", "Can export search results"),
+            ("edit_system_settings", "Can edit system settings"),
+            ("review_resources", "Can review provisional edits"),
+        )
 
     def __str__(self):
         return f"{self.graph.name}: {self.name} ({self.pk})"
@@ -2726,6 +2739,12 @@ class SpatialView(models.Model):
     class Meta:
         managed = True
         db_table = "spatial_views"
+        permissions = (
+            (
+                "manage_application",
+                "Can administer map layers, spatial views and user preferences",
+            ),
+        )
         triggers = [
             pgtrigger.Trigger(
                 name="arches_update_spatial_views",

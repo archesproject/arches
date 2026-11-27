@@ -16,17 +16,17 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+from django.contrib.auth.decorators import permission_required
 from django.views.generic import View
 from django.utils.decorators import method_decorator
 from arches.app.models.resource import Resource
-from arches.app.utils.decorators import group_required
 from arches.app.utils.index_database import index_resources_by_type
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.core.cache import caches
 
 
-@method_decorator(group_required("Graph Editor"), name="dispatch")
+@method_decorator(permission_required("models.manage_graphs"), name="dispatch")
 class ReIndexResources(View):
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
