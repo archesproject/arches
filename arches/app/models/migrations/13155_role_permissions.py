@@ -1,35 +1,35 @@
 from django.db import migrations
 
-# Each role permission is granted to the default group that used to be checked
+# Each role permission is granted to the default groups that used to be checked
 # by name, so upgraded instances keep the same access.
 ROLE_PERMISSIONS = {
     ("resourceinstance", "edit_resources"): (
         "Can use the resource editor",
-        "Resource Editor",
+        ("Resource Editor", "Crowdsource Editor"),
     ),
     ("resourceinstance", "export_resources"): (
         "Can export search results",
-        "Resource Exporter",
+        ("Resource Exporter",),
     ),
     ("spatialview", "manage_application"): (
         "Can administer map layers, spatial views and user preferences",
-        "Application Administrator",
+        ("Application Administrator",),
     ),
     ("graphmodel", "manage_graphs"): (
         "Can use the Arches Designer",
-        "Graph Editor",
+        ("Graph Editor",),
     ),
     ("concept", "manage_rdm"): (
         "Can manage the Reference Data Manager and controlled lists",
-        "RDM Administrator",
+        ("RDM Administrator",),
     ),
     ("resourceinstance", "edit_system_settings"): (
         "Can edit system settings",
-        "System Administrator",
+        ("System Administrator",),
     ),
     ("resourceinstance", "review_resources"): (
         "Can review provisional edits",
-        "Resource Reviewer",
+        ("Resource Reviewer",),
     ),
 }
 
@@ -39,7 +39,7 @@ def grant_role_permissions(apps, schema_editor):
     Permission = apps.get_model("auth", "Permission")
     Group = apps.get_model("auth", "Group")
 
-    for (model, codename), (name, group_name) in ROLE_PERMISSIONS.items():
+    for (model, codename), (name, group_names) in ROLE_PERMISSIONS.items():
         # post_migrate creates permissions only after every migration has run.
         content_type, _ = ContentType.objects.get_or_create(
             app_label="models", model=model
@@ -49,7 +49,7 @@ def grant_role_permissions(apps, schema_editor):
             content_type=content_type,
             defaults={"name": name},
         )
-        permission.group_set.add(*Group.objects.filter(name=group_name))
+        permission.group_set.add(*Group.objects.filter(name__in=group_names))
 
 
 def remove_role_permissions(apps, schema_editor):

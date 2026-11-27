@@ -32,6 +32,9 @@ class ResourceEditorRoleTests(ArchesTestCase):
         cls.editor = User.objects.create(username="role_editor")
         cls.editor.groups.add(Group.objects.get(name="Resource Editor"))
 
+        cls.crowdsource_editor = User.objects.create(username="role_crowdsource")
+        cls.crowdsource_editor.groups.add(Group.objects.get(name="Crowdsource Editor"))
+
         cls.guest = User.objects.create(username="role_guest")
         cls.guest.groups.add(Group.objects.get(name="Guest"))
 
@@ -48,6 +51,7 @@ class ResourceEditorRoleTests(ArchesTestCase):
 
     def test_user_is_resource_editor(self):
         self.assertTrue(user_is_resource_editor(self.editor))
+        self.assertTrue(user_is_resource_editor(self.crowdsource_editor))
         self.assertTrue(user_is_resource_editor(self.superuser))
         self.assertTrue(user_is_resource_editor(self.custom_editor))
         self.assertFalse(user_is_resource_editor(self.guest))
@@ -56,6 +60,7 @@ class ResourceEditorRoleTests(ArchesTestCase):
         url = reverse("etl_manager")
         for user, expected in [
             (self.editor, HTTPStatus.OK),
+            (self.crowdsource_editor, HTTPStatus.OK),
             (self.custom_editor, HTTPStatus.OK),
             (self.superuser, HTTPStatus.OK),
             (self.guest, HTTPStatus.FORBIDDEN),

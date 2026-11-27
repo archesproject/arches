@@ -378,8 +378,8 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
                         return False
 
                     if result["permitted"] == "unknown":
-                        return self.user_in_group_by_name(
-                            user, settings.RESOURCE_EDITOR_GROUPS
+                        return self.user_is_resource_editor(
+                            user
                         ) or self.user_can_edit_model_nodegroups(
                             user, result["resource"]
                         )
@@ -388,10 +388,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
                 else:
                     return None
 
-            return (
-                self.user_in_group_by_name(user, settings.RESOURCE_EDITOR_GROUPS)
-                or len(self.get_editable_resource_types(user)) > 0
-            )
+            return self.user_is_resource_editor(user)
         return False
 
     def user_can_delete_resource(
@@ -433,8 +430,8 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
                         )
                         if len(protected_tiles) > 0:
                             return False
-                        return self.user_in_group_by_name(
-                            user, settings.RESOURCE_EDITOR_GROUPS
+                        return self.user_is_resource_editor(
+                            user
                         ) or self.user_can_delete_model_nodegroups(
                             user, result["resource"]
                         )
