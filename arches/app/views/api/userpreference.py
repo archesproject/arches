@@ -1,12 +1,12 @@
 import logging
 
+from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
-from arches.app.utils.decorators import group_required
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
 from arches.app.views.api import APIBase
 
@@ -26,7 +26,7 @@ class UserPreferenceListCreateView(APIBase):
 
         # check user permission
         administrator_user = False
-        if request.user.groups.filter(name="Application Administrator").exists():
+        if request.user.has_perm("models.manage_application"):
             administrator_user = True
 
         if administrator_user:  # give view to everything
@@ -36,7 +36,9 @@ class UserPreferenceListCreateView(APIBase):
                 models.UserPreference.objects.filter(username=request.user)
             )
 
-    @method_decorator(group_required("Application Administrator", raise_exception=True))
+    @method_decorator(
+        permission_required("models.manage_application", raise_exception=True)
+    )
     def post(self, request):
         try:
             user_pref_json = JSONDeserializer().deserialize(request.body)
@@ -113,7 +115,7 @@ class UserPreferenceDetailView(APIBase):
 
         # check user permission
         administrator_user = False
-        if request.user.groups.filter(name="Application Administrator").exists():
+        if request.user.has_perm("models.manage_application"):
             administrator_user = True
 
         try:
@@ -133,7 +135,9 @@ class UserPreferenceDetailView(APIBase):
                 status=403,
             )
 
-    @method_decorator(group_required("Application Administrator", raise_exception=True))
+    @method_decorator(
+        permission_required("models.manage_application", raise_exception=True)
+    )
     def delete(self, request, identifier):
         """
         Delete User Preference with given userpreferenceid.

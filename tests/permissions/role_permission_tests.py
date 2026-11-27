@@ -3,6 +3,7 @@ from http import HTTPStatus
 from django.contrib.auth.models import Group, Permission, User
 from django.urls import reverse
 
+from arches.app.models.models import UserPreference
 from arches.app.utils.permission_backend import (
     user_is_resource_editor,
     user_is_resource_exporter,
@@ -84,5 +85,74 @@ class ResourceExporterRoleTests(ArchesTestCase):
     def test_export_endpoint_refuses_without_permission(self):
         self.client.force_login(self.guest)
         response = self.client.get(reverse("export_results"))
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+        self.assertIn(reverse("auth"), response.url)
+
+
+class ApplicationAdministratorRoleTests(ArchesTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.app_admin = User.objects.create(username="role_app_admin")
+        cls.app_admin.groups.add(Group.objects.get(name="Application Administrator"))
+
+        cls.guest = User.objects.create(username="role_guest")
+        cls.guest.groups.add(Group.objects.get(name="Guest"))
+
+        cls.superuser = User.objects.create(username="role_super", is_superuser=True)
+
+        custom_group = Group.objects.create(name="Custom App Admins")
+        custom_group.permissions.add(
+            Permission.objects.get(
+                codename="manage_application", content_type__app_label="models"
+            )
+        )
+        cls.custom_admin = User.objects.create(username="role_custom")
+        cls.custom_admin.groups.add(custom_group)
+
+        cls.other_preference = UserPreference.objects.create(
+            username=User.objects.create(username="role_other"),
+            preferencename="someone else's preference",
+            config=[],
+        )
+
+    def test_all_users_preferences_follow_permission(self):
+        url = reverse("api_user_preference_list_view")
+        other_id = str(self.other_preference.userpreferenceid)
+        for user, sees_others in [
+            (self.app_admin, True),
+            (self.custom_admin, True),
+            (self.superuser, True),
+            (self.guest, False),
+        ]:
+            with self.subTest(user=user.username):
+                self.client.force_login(user)
+                response = self.client.get(url)
+                if sees_others:
+                    self.assertContains(response, other_id)
+                else:
+                    self.assertNotContains(response, other_id)
+
+    def test_admin_only_endpoint_follows_permission(self):
+        url = reverse("api_user_preference_list_view")
+        for user, allowed in [
+            (self.app_admin, True),
+            (self.custom_admin, True),
+            (self.superuser, True),
+            (self.guest, False),
+        ]:
+            with self.subTest(user=user.username):
+                self.client.force_login(user)
+                response = self.client.post(
+                    url, data={}, content_type="application/json"
+                )
+                if allowed:
+                    self.assertNotEqual(response.status_code, HTTPStatus.FORBIDDEN)
+                else:
+                    self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
+
+    def test_map_layer_manager_redirects_without_permission(self):
+        self.client.force_login(self.guest)
+        response = self.client.get(reverse("map_layer_manager"))
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.assertIn(reverse("auth"), response.url)

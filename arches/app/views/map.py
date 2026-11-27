@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+from django.contrib.auth.decorators import permission_required
 from django.contrib.gis.db.models import Extent
 from django.contrib.gis.db.models.functions import Transform
 from django.db import transaction
@@ -30,7 +31,6 @@ from arches.app.models.card import Card
 from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.decorators import group_required
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.permission_backend import (
     get_users_with_permission_for_object,
@@ -38,7 +38,7 @@ from arches.app.utils.permission_backend import (
 )
 
 
-@method_decorator(group_required("Application Administrator"), name="dispatch")
+@method_decorator(permission_required("models.manage_application"), name="dispatch")
 class MapLayerManagerView(MapBaseManagerView):
     def get(self, request):
         datatype_factory = DataTypeFactory()

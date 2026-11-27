@@ -2730,6 +2730,12 @@ class SpatialView(models.Model):
     class Meta:
         managed = True
         db_table = "spatial_views"
+        permissions = (
+            (
+                "manage_application",
+                "Can administer map layers, spatial views and user preferences",
+            ),
+        )
         triggers = [
             pgtrigger.Trigger(
                 name="arches_update_spatial_views",

@@ -11,6 +11,10 @@ ROLE_PERMISSIONS = {
         "Can export search results",
         "Resource Exporter",
     ),
+    ("spatialview", "manage_application"): (
+        "Can administer map layers, spatial views and user preferences",
+        "Application Administrator",
+    ),
 }
 
 
@@ -57,6 +61,18 @@ class Migration(migrations.Migration):
                     ("no_access_to_resourceinstance", "No Access"),
                     ("edit_resources", "Can use the resource editor"),
                     ("export_resources", "Can export search results"),
+                ),
+            },
+        ),
+        migrations.AlterModelOptions(
+            name="spatialview",
+            options={
+                "managed": True,
+                "permissions": (
+                    (
+                        "manage_application",
+                        "Can administer map layers, spatial views and user preferences",
+                    ),
                 ),
             },
         ),
