@@ -42,14 +42,13 @@ from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.decorators import group_required
+from django.contrib.auth.decorators import permission_required
 from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
 from arches.app.utils.i18n import LanguageSynchronizer, localize_complex_input
 from arches.app.utils.pagination import get_paginator
 from arches.app.utils.permission_backend import (
     get_default_settable_permissions,
-    user_is_resource_editor,
     user_is_resource_reviewer,
     user_can_edit_resource,
     user_can_delete_resource,
@@ -103,7 +102,7 @@ def get_resource_relationship_types():
     return relationship_type_values
 
 
-@method_decorator(group_required("Resource Editor"), name="dispatch")
+@method_decorator(permission_required("models.edit_resources"), name="dispatch")
 class ResourceEditorView(MapBaseManagerView):
     action = None
 
@@ -421,7 +420,7 @@ class ResourceEditorView(MapBaseManagerView):
         return JSONResponse({"resourceid": copied_resource.resourceinstanceid})
 
 
-@method_decorator(group_required("Resource Editor"), name="dispatch")
+@method_decorator(permission_required("models.edit_resources"), name="dispatch")
 class ResourcePermissionDataView(View):
     perm_cache = {}
     action = None
@@ -472,6 +471,13 @@ class ResourcePermissionDataView(View):
         ordered_perms = []
         for p in permission_order:
             ordered_perms.append(perms[p])
+        # One query for all editors: user.has_perm() would query per user here.
+        editor_ids = set(
+            User.objects.with_perm(
+                "models.edit_resources",
+                backend="django.contrib.auth.backends.ModelBackend",
+            ).values_list("pk", flat=True)
+        )
         identities = [
             {
                 "name": user.username,
@@ -484,7 +490,7 @@ class ResourcePermissionDataView(View):
                     user, resource_instance
                 ),
                 "is_editor_or_reviewer": bool(
-                    user_is_resource_editor(user, resource=resource_instance)
+                    user.pk in editor_ids
                     or user_is_resource_reviewer(user, resource=resource_instance)
                 ),
             }

@@ -1656,15 +1656,15 @@ class RestFrameworkPerformanceTests(GraphTestCase):
 
     def test_resource_list_view_performance(self):
         # 1: auth
-        # 2: auth groups
-        # 3: node alias lookup in get_tiles()
-        # 4-16: PerformanceTests.test_get_graph_objects()
-        # 17: resource count (paginator)
-        # 18: select resources limit 500
-        # 19: tile depth 1
-        # 20: tile depth 2
-        # 21-24: arches perms (BUG: core arches)
-        num_queries = 24
+        # 2-3: user and group permissions (edit_resources)
+        # 4: node alias lookup in get_tiles()
+        # 5-17: PerformanceTests.test_get_graph_objects()
+        # 18: resource count (paginator)
+        # 19: select resources limit 500
+        # 20: tile depth 1
+        # 21: tile depth 2
+        # 22-25: arches perms (BUG: core arches)
+        num_queries = 25
         if arches_version < Version("8.1.0a0"):
             num_queries += 1  # extra user profile query on Arches 8.0 and below.
         if arches_version < Version("8.2.0a8"):
@@ -1686,14 +1686,14 @@ class RestFrameworkPerformanceTests(GraphTestCase):
 
     def test_tile_list_view_performance(self):
         # 1: auth
-        # 2: auth groups
-        # 3: node alias lookup in get_tiles()
-        # 4-16: PerformanceTests.test_get_graph_objects()
-        # 17: tile count (paginator)
-        # 18: select tiles limit 500
-        # 19: tile depth 2
-        # 20-23: arches perms (BUG: core arches)
-        num_queries = 23
+        # 2-3: user and group permissions (edit_resources)
+        # 4: node alias lookup in get_tiles()
+        # 5-17: PerformanceTests.test_get_graph_objects()
+        # 18: tile count (paginator)
+        # 19: select tiles limit 500
+        # 20: tile depth 2
+        # 21-24: arches perms (BUG: core arches)
+        num_queries = 24
         if arches_version < Version("8.1.0a0"):
             num_queries += 1  # extra user profile query on Arches 8.0 and below.
         if arches_version < Version("8.2.0a8"):

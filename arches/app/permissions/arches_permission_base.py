@@ -531,14 +531,14 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
 
     def user_is_resource_editor(self, user: User, *, resource=None, graph=None) -> bool:
         """
-        Single test for whether a user is in the Resource Editor group.
+        Single test for whether a user holds the ``models.edit_resources`` permission.
 
         Subclasses may use the optional ``resource`` (ResourceInstance) and
         ``graph`` (GraphModel) arguments to implement per-instance or
         per-graph granularity. The base implementation ignores them.
         """
 
-        return self.user_in_group_by_name(user, ["Resource Editor"])
+        return user.has_perm("models.edit_resources")
 
     def user_is_resource_reviewer(
         self, user: User, *, resource=None, graph=None

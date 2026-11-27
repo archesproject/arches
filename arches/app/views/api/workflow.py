@@ -11,7 +11,7 @@ from django.views.generic import View
 
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
-from arches.app.utils.decorators import group_required
+from django.contrib.auth.decorators import permission_required
 from arches.app.utils.permission_backend import user_is_resource_editor
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
 from arches.app.views.api import APIBase
@@ -79,7 +79,7 @@ class UserIncompleteWorkflows(APIBase):
 
 
 @method_decorator(
-    group_required("Resource Editor", raise_exception=True), name="dispatch"
+    permission_required("models.edit_resources", raise_exception=True), name="dispatch"
 )
 class WorkflowHistoryView(View):
 

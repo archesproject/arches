@@ -1505,7 +1505,10 @@ class ResourceInstance(
     class Meta:
         managed = True
         db_table = "resource_instances"
-        permissions = (("no_access_to_resourceinstance", "No Access"),)
+        permissions = (
+            ("no_access_to_resourceinstance", "No Access"),
+            ("edit_resources", "Can use the resource editor"),
+        )
 
     def __str__(self):
         return f"{self.graph.name}: {self.name} ({self.pk})"

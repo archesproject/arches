@@ -22,4 +22,4 @@ class RDMAdministrator(permissions.BasePermission):
 
 class ResourceEditor(permissions.BasePermission):
     def has_permission(self, request, view):
-        return group_required(request.user, "Resource Editor")
+        return request.user.has_perm("models.edit_resources")

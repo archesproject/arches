@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 from unittest import mock
 
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group, Permission, User
 from django.db import connection
 from guardian.models import GroupObjectPermission, UserObjectPermission
 from guardian.shortcuts import assign_perm, get_perms
@@ -2260,10 +2260,14 @@ class DraftGraphTests(ArchesTestCase):
         nodegroup = updated_source_graph.get_nodegroups()[:1][0]
 
         GroupObjectPermission.objects.create(
-            group_id=1, content_object=nodegroup, permission_id=93
+            group_id=1,
+            content_object=nodegroup,
+            permission=Permission.objects.get(codename="write_nodegroup"),
         )
         UserObjectPermission.objects.create(
-            user_id=2, content_object=nodegroup, permission_id=94
+            user_id=2,
+            content_object=nodegroup,
+            permission=Permission.objects.get(codename="delete_nodegroup"),
         )
 
         # calling `*.objects.create()` does not set dirty flag
