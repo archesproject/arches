@@ -3,7 +3,10 @@ from http import HTTPStatus
 from django.contrib.auth.models import Group, Permission, User
 from django.urls import reverse
 
-from arches.app.utils.permission_backend import user_is_resource_editor
+from arches.app.utils.permission_backend import (
+    user_is_resource_editor,
+    user_is_resource_exporter,
+)
 from tests.base_test import ArchesTestCase
 
 # these tests can be run from the command line via
@@ -49,3 +52,37 @@ class ResourceEditorRoleTests(ArchesTestCase):
                 self.client.force_login(user)
                 response = self.client.get(url, QUERY_STRING="action=loadEvent")
                 self.assertEqual(response.status_code, expected)
+
+
+class ResourceExporterRoleTests(ArchesTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.exporter = User.objects.create(username="role_exporter")
+        cls.exporter.groups.add(Group.objects.get(name="Resource Exporter"))
+
+        cls.guest = User.objects.create(username="role_guest")
+        cls.guest.groups.add(Group.objects.get(name="Guest"))
+
+        cls.superuser = User.objects.create(username="role_super", is_superuser=True)
+
+        custom_group = Group.objects.create(name="Custom Exporters")
+        custom_group.permissions.add(
+            Permission.objects.get(
+                codename="export_resources", content_type__app_label="models"
+            )
+        )
+        cls.custom_exporter = User.objects.create(username="role_custom")
+        cls.custom_exporter.groups.add(custom_group)
+
+    def test_user_is_resource_exporter(self):
+        self.assertTrue(user_is_resource_exporter(self.exporter))
+        self.assertTrue(user_is_resource_exporter(self.superuser))
+        self.assertTrue(user_is_resource_exporter(self.custom_exporter))
+        self.assertFalse(user_is_resource_exporter(self.guest))
+
+    def test_export_endpoint_refuses_without_permission(self):
+        self.client.force_login(self.guest)
+        response = self.client.get(reverse("export_results"))
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+        self.assertIn(reverse("auth"), response.url)

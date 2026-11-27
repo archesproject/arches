@@ -7,6 +7,10 @@ ROLE_PERMISSIONS = {
         "Can use the resource editor",
         "Resource Editor",
     ),
+    ("resourceinstance", "export_resources"): (
+        "Can export search results",
+        "Resource Exporter",
+    ),
 }
 
 
@@ -52,6 +56,7 @@ class Migration(migrations.Migration):
                 "permissions": (
                     ("no_access_to_resourceinstance", "No Access"),
                     ("edit_resources", "Can use the resource editor"),
+                    ("export_resources", "Can export search results"),
                 ),
             },
         ),
