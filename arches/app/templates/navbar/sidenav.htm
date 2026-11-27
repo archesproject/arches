@@ -18,7 +18,7 @@
 
     <ul aria-labelledby="tools-header-label">
         <!-- System Settings list item -->
-        {% if request.user|has_group:"System Administrator" %}
+        {% if perms.models.edit_system_settings %}
         <li {% if "views/resource" in main_script and is_system_settings is True %} class="active-sub" {% endif %} data-bind="click: navigate.bind(this, '{% url 'config' %}')">
             <a href="{% url 'config' %}" aria-labelledby="system-settings-link-label">
                 <i class="ti-alarm-clock"></i>

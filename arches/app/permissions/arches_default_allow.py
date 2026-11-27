@@ -308,7 +308,7 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
             result["resource"] = resource
 
             if str(resource.pk) == settings.SYSTEM_SETTINGS_RESOURCE_ID:
-                if not self.user_in_group_by_name(user, ["System Administrator"]):
+                if not user.has_perm("models.edit_system_settings"):
                     result["permitted"] = False
                     return result
 

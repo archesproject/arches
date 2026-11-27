@@ -23,6 +23,10 @@ ROLE_PERMISSIONS = {
         "Can manage the Reference Data Manager and controlled lists",
         "RDM Administrator",
     ),
+    ("resourceinstance", "edit_system_settings"): (
+        "Can edit system settings",
+        "System Administrator",
+    ),
 }
 
 
@@ -69,6 +73,7 @@ class Migration(migrations.Migration):
                     ("no_access_to_resourceinstance", "No Access"),
                     ("edit_resources", "Can use the resource editor"),
                     ("export_resources", "Can export search results"),
+                    ("edit_system_settings", "Can edit system settings"),
                 ),
             },
         ),

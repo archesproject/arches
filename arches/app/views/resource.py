@@ -1089,15 +1089,14 @@ class ResourceReportView(MapBaseManagerView):
             graph_has_different_publication=graph_has_different_publication,
             graph_has_different_publication_and_user_has_insufficient_permissions=bool(
                 graph_has_different_publication
-                and not (
-                    request.user.groups.filter(
-                        name__in=[
-                            "System Administrator",
-                        ]
-                    ).exists()
-                    or request.user.has_perm("models.manage_application")
-                    or request.user.has_perm("models.manage_graphs")
-                    or request.user.has_perm("models.manage_rdm")
+                and not any(
+                    request.user.has_perm(perm)
+                    for perm in (
+                        "models.manage_application",
+                        "models.manage_graphs",
+                        "models.manage_rdm",
+                        "models.edit_system_settings",
+                    )
                 )
             ),
             graph_has_unpublished_changes=bool(graph.has_unpublished_changes),

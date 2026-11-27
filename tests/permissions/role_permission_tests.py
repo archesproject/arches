@@ -3,7 +3,14 @@ from http import HTTPStatus
 from django.contrib.auth.models import Group, Permission, User
 from django.urls import reverse
 
-from arches.app.models.models import UserPreference
+from arches.app.models.models import ResourceInstance, UserPreference
+from arches.app.models.system_settings import settings
+from arches.app.permissions.arches_default_allow import (
+    ArchesDefaultAllowPermissionFramework,
+)
+from arches.app.permissions.arches_default_deny import (
+    ArchesDefaultDenyPermissionFramework,
+)
 from arches.app.utils.permission_backend import (
     user_can_read_concepts,
     user_is_resource_editor,
@@ -226,3 +233,47 @@ class RDMAdministratorRoleTests(ArchesTestCase):
         response = self.client.get(reverse("rdm", kwargs={"conceptid": ""}))
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.assertIn(reverse("auth"), response.url)
+
+
+class SystemAdministratorRoleTests(ArchesTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.sys_admin = User.objects.create(username="role_sys_admin")
+        cls.sys_admin.groups.add(Group.objects.get(name="System Administrator"))
+
+        cls.guest = User.objects.create(username="role_guest")
+        cls.guest.groups.add(Group.objects.get(name="Guest"))
+
+        custom_group = Group.objects.create(name="Custom System Admins")
+        custom_group.permissions.add(
+            Permission.objects.get(
+                codename="edit_system_settings", content_type__app_label="models"
+            )
+        )
+        cls.custom_admin = User.objects.create(username="role_custom")
+        cls.custom_admin.groups.add(custom_group)
+
+    def test_system_settings_resource_refused_without_permission(self):
+        # An unsaved instance: the test DB has no system settings resource, and a
+        # missing one makes the allow framework permit before this check runs.
+        resource = ResourceInstance(pk=settings.SYSTEM_SETTINGS_RESOURCE_ID)
+        for framework in (
+            ArchesDefaultAllowPermissionFramework(),
+            ArchesDefaultDenyPermissionFramework(),
+        ):
+            for user, refused in [
+                (self.sys_admin, False),
+                (self.custom_admin, False),
+                (self.guest, True),
+            ]:
+                with self.subTest(
+                    framework=type(framework).__name__, user=user.username
+                ):
+                    result = framework.check_resource_instance_permissions(
+                        user, None, "change_resourceinstance", resource=resource
+                    )
+                    if refused:
+                        self.assertIs(result["permitted"], False)
+                    else:
+                        self.assertIsNot(result["permitted"], False)

@@ -688,15 +688,14 @@ class ResourceReport(APIBase):
 
         # if a user is viewing a report for a resource that does not have the same publication as the current graph publication
         # ( and therefore is out-of-date ) only allow them to access report details if they have Graph Editor permissions or higher.
-        if graph_has_different_publication and not (
-            request.user.groups.filter(
-                name__in=[
-                    "System Administrator",
-                ]
-            ).exists()
-            or request.user.has_perm("models.manage_application")
-            or request.user.has_perm("models.manage_graphs")
-            or request.user.has_perm("models.manage_rdm")
+        if graph_has_different_publication and not any(
+            request.user.has_perm(perm)
+            for perm in (
+                "models.manage_application",
+                "models.manage_graphs",
+                "models.manage_rdm",
+                "models.edit_system_settings",
+            )
         ):
             return JSONResponse(
                 {
