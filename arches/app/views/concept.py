@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import uuid
+from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import ValidationError
 from django.db import transaction, connection
 from django.db.models import Q
@@ -51,14 +52,13 @@ from arches.app.search.elasticsearch_dsl_builder import (
     SimpleQueryString,
 )
 from arches.app.search.mappings import CONCEPTS_INDEX
-from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.utils.skos import SKOSWriter, SKOSReader
 from arches.app.views.base import BaseManagerView
 
 
-@method_decorator(group_required("RDM Administrator"), name="dispatch")
+@method_decorator(permission_required("models.manage_rdm"), name="dispatch")
 class RDMView(BaseManagerView):
     def get(self, request, conceptid):
         lang = request.GET.get("lang", request.LANGUAGE_CODE)
@@ -128,7 +128,7 @@ def sort_languages(languages, lang):
     return sorted(languages, key=lambda x: x.name)
 
 
-@group_required("RDM Administrator")
+@permission_required("models.manage_rdm")
 def concept(request, conceptid):
     f = request.GET.get("f", "json")
     mode = request.GET.get("mode", "")
@@ -403,7 +403,7 @@ def get_concept_collections(request):
     return JSONResponse(concept_collections)
 
 
-@group_required("RDM Administrator")
+@permission_required("models.manage_rdm")
 def make_collection(request, conceptid):
     concept = Concept().get(id=conceptid, values=[])
     try:
@@ -424,7 +424,7 @@ def make_collection(request, conceptid):
         )
 
 
-@group_required("RDM Administrator")
+@permission_required("models.manage_rdm")
 def manage_parents(request, conceptid):
     if request.method == "POST":
         json = request.body
@@ -643,7 +643,7 @@ def concept_tree(request, mode):
     return JSONResponse(concepts, indent=4)
 
 
-@group_required("RDM Administrator", raise_exception=True)
+@permission_required("models.manage_rdm", raise_exception=True)
 def _delete_concept_value(request):
     data = JSONDeserializer().deserialize(request.body)
 

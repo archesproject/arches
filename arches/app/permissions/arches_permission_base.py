@@ -521,13 +521,11 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
 
     def user_can_read_concepts(self, user: User) -> bool:
         """
-        Requires that a user is a part of the RDM Administrator group
+        Requires that a user holds the ``models.manage_rdm`` permission
 
         """
 
-        if user.is_authenticated:
-            return self.user_in_group_by_name(user, ["RDM Administrator"])
-        return False
+        return user.has_perm("models.manage_rdm")
 
     def user_is_resource_editor(self, user: User, *, resource=None, graph=None) -> bool:
         """

@@ -691,12 +691,12 @@ class ResourceReport(APIBase):
         if graph_has_different_publication and not (
             request.user.groups.filter(
                 name__in=[
-                    "RDM Administrator",
                     "System Administrator",
                 ]
             ).exists()
             or request.user.has_perm("models.manage_application")
             or request.user.has_perm("models.manage_graphs")
+            or request.user.has_perm("models.manage_rdm")
         ):
             return JSONResponse(
                 {

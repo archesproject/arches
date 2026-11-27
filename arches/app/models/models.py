@@ -216,6 +216,12 @@ class Concept(SaveSupportsBlindOverwriteMixin, models.Model):
     class Meta:
         managed = True
         db_table = "concepts"
+        permissions = (
+            (
+                "manage_rdm",
+                "Can manage the Reference Data Manager and controlled lists",
+            ),
+        )
 
 
 class DDataType(models.Model):

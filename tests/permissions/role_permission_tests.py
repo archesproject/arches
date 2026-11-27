@@ -5,6 +5,7 @@ from django.urls import reverse
 
 from arches.app.models.models import UserPreference
 from arches.app.utils.permission_backend import (
+    user_can_read_concepts,
     user_is_resource_editor,
     user_is_resource_exporter,
 )
@@ -191,3 +192,37 @@ class GraphEditorRoleTests(ArchesTestCase):
                 self.client.force_login(user)
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, expected)
+
+
+class RDMAdministratorRoleTests(ArchesTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.rdm_admin = User.objects.create(username="role_rdm_admin")
+        cls.rdm_admin.groups.add(Group.objects.get(name="RDM Administrator"))
+
+        cls.guest = User.objects.create(username="role_guest")
+        cls.guest.groups.add(Group.objects.get(name="Guest"))
+
+        cls.superuser = User.objects.create(username="role_super", is_superuser=True)
+
+        custom_group = Group.objects.create(name="Custom RDM Admins")
+        custom_group.permissions.add(
+            Permission.objects.get(
+                codename="manage_rdm", content_type__app_label="models"
+            )
+        )
+        cls.custom_admin = User.objects.create(username="role_custom")
+        cls.custom_admin.groups.add(custom_group)
+
+    def test_user_can_read_concepts(self):
+        self.assertTrue(user_can_read_concepts(self.rdm_admin))
+        self.assertTrue(user_can_read_concepts(self.superuser))
+        self.assertTrue(user_can_read_concepts(self.custom_admin))
+        self.assertFalse(user_can_read_concepts(self.guest))
+
+    def test_rdm_redirects_without_permission(self):
+        self.client.force_login(self.guest)
+        response = self.client.get(reverse("rdm", kwargs={"conceptid": ""}))
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+        self.assertIn(reverse("auth"), response.url)

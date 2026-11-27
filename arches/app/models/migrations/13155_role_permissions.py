@@ -19,6 +19,10 @@ ROLE_PERMISSIONS = {
         "Can use the Arches Designer",
         "Graph Editor",
     ),
+    ("concept", "manage_rdm"): (
+        "Can manage the Reference Data Manager and controlled lists",
+        "RDM Administrator",
+    ),
 }
 
 
@@ -85,6 +89,18 @@ class Migration(migrations.Migration):
             options={
                 "managed": True,
                 "permissions": (("manage_graphs", "Can use the Arches Designer"),),
+            },
+        ),
+        migrations.AlterModelOptions(
+            name="concept",
+            options={
+                "managed": True,
+                "permissions": (
+                    (
+                        "manage_rdm",
+                        "Can manage the Reference Data Manager and controlled lists",
+                    ),
+                ),
             },
         ),
         migrations.RunPython(grant_role_permissions, remove_role_permissions),
